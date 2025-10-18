@@ -64,7 +64,11 @@ import {
   Psychology as AnthropicIcon,
   AutoAwesome as OpenAIIcon,
   AccountTree as SupersetIcon,
+  DataUsage as DataUsageIcon,
 } from '@mui/icons-material';
+
+// Import DataCatalog component
+import DataCatalog from '../DataCatalog';
 
 // Mock data for connections
 const connections = {
@@ -709,6 +713,7 @@ const DataSourcesConnections = () => {
         >
           <Tab label="Databases" icon={<DatabaseIcon />} iconPosition="start" />
           <Tab label="Integrations" icon={<LinkIcon />} iconPosition="start" />
+          <Tab label="Data Catalog" icon={<DataUsageIcon />} iconPosition="start" />
         </Tabs>
       </Paper>
 
@@ -723,6 +728,12 @@ const DataSourcesConnections = () => {
         <Grid container spacing={3}>
           {connections.integrations.map(renderIntegrationCard)}
         </Grid>
+      )}
+
+      {activeTab === 2 && (
+        <Box>
+          <DataCatalog />
+        </Box>
       )}
 
       {/* Connection Dialog */}

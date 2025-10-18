@@ -8,41 +8,32 @@ import {
   Stack,
   Chip,
   Avatar,
+  IconButton,
   useTheme,
   alpha,
 } from '@mui/material';
 import {
   Monitor as MonitorIcon,
   Storage as StorageIcon,
-  Cached as CachedIcon,
-  QueryStats as QueryStatsIcon,
   Settings as SettingsIcon,
-  Schedule as ScheduleIcon,
-  Hub as HubIcon,
+  AccountCircle as PersonaIcon,
   CheckCircle as CheckCircleIcon,
   Warning as WarningIcon,
+  Error as ErrorIcon,
+  Refresh as RefreshIcon,
 } from '@mui/icons-material';
 
-// Import the new components
+// Import the components
 import SystemHealthMonitoring from './controlcenter/SystemHealthMonitoring';
 import DataSourcesConnections from './controlcenter/DataSourcesConnections';
-import CacheManagement from './controlcenter/CacheManagement';
-import QueryIntelligence from './controlcenter/QueryIntelligence';
-import ConfigurationSettings from './controlcenter/ConfigurationSettings';
-import AutomationScheduling from './controlcenter/AutomationScheduling';
+import PlatformSettings from './controlcenter/PlatformSettings';
+import UserProfileManager from './UserProfileManager';
 
-const ControlCenter = () => {
+const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
   const theme = useTheme();
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = [
-    {
-      label: 'System Health',
-      icon: <MonitorIcon />,
-      component: <SystemHealthMonitoring />,
-      status: 'healthy',
-      badge: '99.9%',
-    },
     {
       label: 'Data Sources',
       icon: <StorageIcon />,
@@ -51,32 +42,25 @@ const ControlCenter = () => {
       badge: '9 Active',
     },
     {
-      label: 'Cache Management',
-      icon: <CachedIcon />,
-      component: <CacheManagement />,
+      label: 'System Health',
+      icon: <MonitorIcon />,
+      component: <SystemHealthMonitoring />,
       status: 'healthy',
-      badge: '84.5%',
+      badge: '99.9%',
     },
     {
-      label: 'Query Intelligence',
-      icon: <QueryStatsIcon />,
-      component: <QueryIntelligence />,
-      status: 'healthy',
-      badge: '1.2K Queries',
-    },
-    {
-      label: 'Configuration',
+      label: 'Settings',
       icon: <SettingsIcon />,
-      component: <ConfigurationSettings />,
+      component: <PlatformSettings />,
       status: 'healthy',
-      badge: '24 Settings',
+      badge: 'Config',
     },
     {
-      label: 'Automation',
-      icon: <ScheduleIcon />,
-      component: <AutomationScheduling />,
+      label: 'AI Persona',
+      icon: <PersonaIcon />,
+      component: <UserProfileManager />,
       status: 'healthy',
-      badge: '5 Active Jobs',
+      badge: 'Profile',
     },
   ];
 
@@ -103,12 +87,35 @@ const ControlCenter = () => {
     <Box>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" fontWeight={700} gutterBottom>
-          Control Center
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Centralized platform management and monitoring dashboard
-        </Typography>
+        <Stack direction="row" alignItems="center" justifyContent="space-between">
+          <Box>
+            <Typography variant="h4" fontWeight={700} gutterBottom>
+              Control Center
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Centralized platform management and monitoring dashboard
+            </Typography>
+          </Box>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Chip
+              size="small"
+              icon={apiHealth?.status === 'healthy' ? <CheckCircleIcon /> : <ErrorIcon />}
+              label={`API: ${apiHealth?.status || 'Unknown'}`}
+              color={apiHealth?.status === 'healthy' ? 'success' : 'error'}
+              variant="outlined"
+            />
+            <Chip
+              size="small"
+              icon={<CheckCircleIcon />}
+              label="DB: Connected"
+              color="success"
+              variant="outlined"
+            />
+            <IconButton color="primary" onClick={onRefreshStatus} size="small">
+              <RefreshIcon />
+            </IconButton>
+          </Stack>
+        </Stack>
       </Box>
 
       {/* Tab Navigation */}

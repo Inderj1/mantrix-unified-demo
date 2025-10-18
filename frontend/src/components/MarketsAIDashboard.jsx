@@ -249,18 +249,9 @@ const MarketsAIDashboard = () => {
 
       {/* Category Tiles Grid */}
       <Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-          <Typography variant="h6" fontWeight={600}>
-            Market Signal Categories
-          </Typography>
-          <Button
-            size="small"
-            startIcon={<SettingsIcon />}
-            onClick={() => setConfigPanelOpen(true)}
-          >
-            Configure
-          </Button>
-        </Box>
+        <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
+          Market Signal Categories
+        </Typography>
 
         <Grid container spacing={2}>
           {categories.map((category) => {

@@ -68,14 +68,6 @@ const EnhancedSidebar = ({
           secondary: 'Business Process Analytics',
           color: '#FF6B35',
         },
-        {
-          id: 12,
-          icon: <PersonaIcon />,
-          primary: 'AI PERSONA',
-          secondary: 'Role-Based Insights',
-          color: '#9C27B0',
-          path: '/profile',
-        },
       ],
     },
     {
@@ -106,34 +98,28 @@ const EnhancedSidebar = ({
       ],
     },
     {
-      section: 'ML Studio',
+      section: 'Processing Hub',
       items: [
         {
           id: 9,
           icon: <VisionIcon />,
-          primary: 'VISION AI',
+          primary: 'VISION.AI',
           secondary: 'Inventory & Stock Management',
           color: '#00BCD4',
-          status: 'new',
-        },
-      ],
-    },
-    {
-      section: 'Data & Analytics',
-      items: [
-        {
-          id: 5,
-          icon: <DataUsageIcon />,
-          primary: 'DATA CATALOG',
-          secondary: 'Schema & Relationships',
-          color: '#607D8B',
         },
         {
           id: 6,
           icon: <DescriptionIcon />,
-          primary: 'DOCUMENT INTELLIGENCE',
+          primary: 'DOCS.AI',
           secondary: 'Upload & Analyze Documents',
           color: '#9C27B0',
+        },
+        {
+          id: 13,
+          icon: <ForumIcon />,
+          primary: 'COMMS.AI',
+          secondary: 'Email & Communication Analysis',
+          color: '#E91E63',
         },
       ],
     },

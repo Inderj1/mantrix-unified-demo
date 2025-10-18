@@ -70,7 +70,6 @@ import ScenarioAIDashboard from './components/ScenarioAIDashboard';
 import ForecastAIDashboard from './components/ForecastAIDashboard';
 import ResultsTable from './components/ResultsTable';
 import EnterprisePulse from './components/EnterprisePulse';
-import DataCatalog from './components/DataCatalog';
 // import StoxShiftAI from './components/StoxShiftAI'; // File doesn't exist
 import StoxAILanding from './components/StoxAILanding';
 import ShortageDetector from './components/stox/ShortageDetector';
@@ -80,7 +79,7 @@ import InboundRiskMonitor from './components/stox/InboundRiskMonitor';
 import AgingStockIntelligence from './components/stox/AgingStockIntelligence';
 import GlobalSearch from './components/GlobalSearch';
 import VisionAIDashboard from './components/VisionAIDashboard';
-import UserProfileManager from './components/UserProfileManager';
+import EmailIntelligence from './components/EmailIntelligence';
 import { sapFioriTheme, sapChartColors } from './themes/sapFioriTheme';
 import { defaultTheme } from './themes/defaultTheme';
 import {
@@ -476,37 +475,13 @@ function App() {
         <AppBar position="static" elevation={0} sx={{ bgcolor: 'white', color: 'text.primary' }}>
           <Toolbar>
             <Typography variant="h6" sx={{ flexGrow: 0, fontWeight: 500, mr: 3 }}>
-              {['Chat Interface', 'CORE.AI', 'AXIS.AI', 'MARKETS.AI', 'Control Center', 'Data Catalog', 'Document Intelligence', 'Process Intelligence', 'Enterprise Pulse', 'Vision AI'][selectedTab]}
+              {['AXIS.AI', 'CORE.AI', 'AXIS.AI', 'MARKETS.AI', 'Control Center', '', 'DOCS.AI', 'Process Mining', 'Enterprise Pulse', 'VISION.AI', '', '', '', 'COMMS.AI'][selectedTab] || ''}
             </Typography>
             
             {/* Global Search */}
             <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
               <GlobalSearch onNavigate={handleSearchNavigation} />
             </Box>
-            
-            <Stack direction="row" spacing={1} alignItems="center">
-              {/* API Status */}
-              <Chip
-                size="small"
-                icon={apiHealth?.status === 'healthy' ? <CheckCircleIcon /> : <ErrorIcon />}
-                label={`API: ${apiHealth?.status || 'Unknown'}`}
-                color={apiHealth?.status === 'healthy' ? 'success' : 'error'}
-                variant="outlined"
-              />
-              {/* DB Status */}
-              <Chip
-                size="small"
-                icon={<CheckCircleIcon />}
-                label="DB: Connected"
-                color="success"
-                variant="outlined"
-              />
-              <MuiTooltip title="Refresh Status">
-                <IconButton color="inherit" onClick={checkApiHealth} size="small">
-                  <RefreshIcon />
-                </IconButton>
-              </MuiTooltip>
-            </Stack>
             
             {/* Authentication Button */}
             <Box sx={{ ml: 2 }}>
@@ -639,12 +614,7 @@ function App() {
           )}
 
           {/* Control Center */}
-          {selectedTab === 4 && <ControlCenter />}
-
-
-
-          {/* Data Catalog Tab */}
-          {selectedTab === 5 && <DataCatalog />}
+          {selectedTab === 4 && <ControlCenter apiHealth={apiHealth} onRefreshStatus={checkApiHealth} />}
 
           {/* Old Data Explorer code - can be removed */}
           {false && selectedTab === 5 && (
@@ -972,10 +942,10 @@ function App() {
             </Box>
           )}
 
-          {/* AI Persona Tab */}
-          {selectedTab === 12 && (
+          {/* COMMS.AI Tab */}
+          {selectedTab === 13 && (
             <Box sx={{ height: 'calc(100vh - 180px)', overflow: 'auto' }}>
-              <UserProfileManager />
+              <EmailIntelligence />
             </Box>
           )}
 
