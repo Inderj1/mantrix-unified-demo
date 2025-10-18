@@ -1,0 +1,182 @@
+/* PivotTable UI Style Overrides */
+
+/* Main container */
+.pvtUi {
+  font-family: '"Roboto", "Helvetica", "Arial", sans-serif';
+  font-size: 14px;
+  background-color: transparent;
+}
+
+/* Dropzones */
+.pvtAxisContainer, .pvtVals {
+  border: 1px solid #e0e0e0;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.pvtAxisContainer li, .pvtVals li {
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin: 2px;
+  font-size: 12px;
+}
+
+/* Unused fields */
+.pvtUnused {
+  border: 1px solid #e0e0e0;
+  background-color: #fafafa;
+  border-radius: 4px;
+  padding: 8px;
+}
+
+.pvtUnused li {
+  background-color: #fff;
+  border: 1px solid #1976d2;
+  color: #1976d2;
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin: 2px;
+  font-size: 12px;
+  cursor: move;
+}
+
+.pvtUnused li:hover {
+  background-color: #e3f2fd;
+}
+
+/* Dropdowns */
+.pvtUi select {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 14px;
+  background-color: white;
+}
+
+/* Table styling */
+.pvtTable {
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.pvtTable thead tr {
+  background-color: #f5f5f5;
+}
+
+.pvtTable th {
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  padding: 6px 8px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.pvtTable td {
+  border: 1px solid #e0e0e0;
+  padding: 6px 8px;
+}
+
+.pvtTable tr:hover td {
+  background-color: #f5f5f5;
+}
+
+/* Value cells */
+.pvtVal {
+  text-align: right;
+  color: #333;
+}
+
+/* Total cells */
+.pvtTotal, .pvtGrandTotal {
+  font-weight: 600;
+  background-color: #e8f5e9;
+}
+
+/* Filter dialog */
+.pvtFilterBox {
+  background-color: white;
+  border: 2px solid #1976d2;
+  border-radius: 4px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+  padding: 12px;
+}
+
+.pvtFilterBox h4 {
+  margin-top: 0;
+  color: #1976d2;
+}
+
+.pvtFilterBox button {
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  margin: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.pvtFilterBox button:hover {
+  background-color: #1565c0;
+}
+
+/* Checkbox styling */
+.pvtCheckContainer {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 8px;
+  margin: 8px 0;
+}
+
+.pvtCheckContainer label {
+  display: block;
+  padding: 2px 0;
+  cursor: pointer;
+}
+
+.pvtCheckContainer label:hover {
+  background-color: #f5f5f5;
+}
+
+/* Plotly chart container */
+.pvtPlotContainer {
+  margin-top: 16px;
+}
+
+/* Plotly chart styling */
+.pvtRendererArea .plotly .plot-container {
+  background-color: transparent !important;
+}
+
+.pvtRendererArea .plotly .main-svg {
+  background-color: transparent !important;
+}
+
+/* Enhanced chart colors */
+.pvtRendererArea .plotly .traces .scatter .points path {
+  fill-opacity: 0.9 !important;
+}
+
+.pvtRendererArea .plotly .traces .bars .points path {
+  fill-opacity: 0.85 !important;
+  stroke-width: 1px;
+  stroke-opacity: 0.5;
+}
+
+/* Better hover effects */
+.pvtRendererArea .plotly .hoverlayer .hovertext {
+  fill: #333 !important;
+  font-size: 13px !important;
+}
+
+.pvtRendererArea .plotly .hoverlayer .hovertext path {
+  fill: white !important;
+  stroke: #333 !important;
+  stroke-width: 1px !important;
+}

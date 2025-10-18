@@ -1,0 +1,47 @@
+{
+  "authentication": {
+    "enabled": true,
+    "provider": "clerk",
+    "sso": {
+      "enabled": true,
+      "providers": ["google", "microsoft", "saml"]
+    },
+    "access_control": {
+      "mode": "whitelist",
+      "authorized_emails": [
+        "admin@example.com",
+        "user1@company.com",
+        "user2@company.com"
+      ],
+      "authorized_domains": [
+        "thecloudmantra.com",
+        "partner.com"
+      ],
+      "roles": {
+        "admin": [
+          "admin@example.com",
+          "corelab.ai@thecloudmantra.com"
+        ],
+        "user": []
+      }
+    },
+    "protected_routes": {
+      "/": false,
+      "/chat": true,
+      "/query": true,
+      "/process-mining": true,
+      "/whatif-analysis": true,
+      "/history": true,
+      "/schema": false,
+      "/health": false,
+      "/customer-360": true,
+      "/product-performance": true,
+      "/financial-analytics": true,
+      "/admin/settings": true
+    },
+    "session": {
+      "timeout_minutes": 480,
+      "refresh_enabled": true
+    }
+  }
+}
