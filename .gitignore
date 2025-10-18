@@ -26,11 +26,21 @@ ENV/
 env/
 backend/venv/
 
-# Environment variables
+# Environment variables - SOX2 Compliance
 .env
+.env.*
 .env.local
 .env.*.local
+.env.development
+.env.production
+.env.test
+.env.staging
 backend/.env
+backend/.env.*
+frontend/.env
+frontend/.env.*
+**/.env
+**/.env.*
 
 # IDEs
 .vscode/
@@ -76,16 +86,102 @@ dump.rdb
 .DS_Store
 Thumbs.db
 
-# Credentials
+# Credentials & Secrets - SOX2 Compliance
 credentials/
+secrets/
 *.pem
 *.key
+*.p12
+*.pfx
+*.crt
+*.cer
 gcp-key.json
+*-key.json
+service-account*.json
+*credentials*.json
+*secrets*.json
+*password*.txt
+*api-key*.txt
+*token*.txt
+.secrets
+.credentials
+auth.json
+oauth*.json
 
-# Data files (optional - comment out if you want to commit data)
-files/
-configs/*.json
-!configs/.gitkeep
+# API Keys & Tokens
+*_API_KEY*
+*_SECRET*
+*_TOKEN*
+*_PASSWORD*
 
-# Docker
+# Database configs with credentials
+database.ini
+db.ini
+*connection*.json
+
+# Sensitive Data & Configs - SOX2 Compliance
+# Configuration files that may contain sensitive data
+configs/*_credentials.json
+configs/*_secrets.json
+configs/*_private.json
+configs/production*.json
+configs/prod*.json
+
+# Data files with PII or sensitive information
+files/*.csv
+files/*.xlsx
+files/*.xls
+files/customer*.csv
+files/sales*.csv
+files/*_confidential.*
+files/*_private.*
+
+# User data
+user_data/
+customer_data/
+pii_data/
+
+# Docker with sensitive data
 .dockerignore
+docker-compose.override.yml
+docker-compose.prod.yml
+docker-compose.production.yml
+
+# Backup files
+*.backup
+*.bak
+*.old
+*.orig
+backup/
+backups/
+
+# SSL Certificates
+*.csr
+ssl/
+certs/
+
+# SSH Keys
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+*.ppk
+authorized_keys
+known_hosts
+
+# AWS
+.aws/
+*.pem
+
+# Azure
+.azure/
+
+# Private notes or documentation with sensitive info
+NOTES.md
+TODO_PRIVATE.md
+*_PRIVATE.*
+*_CONFIDENTIAL.*
+
+# Jupyter notebooks with outputs (may contain sensitive data)
+**/.ipynb_checkpoints/
+*.ipynb
