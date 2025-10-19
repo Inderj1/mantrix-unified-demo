@@ -161,7 +161,7 @@ const StoxAILanding = ({ onTileClick, onBack }) => {
       </Box>
 
       {/* Module Tiles */}
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
         {stoxModules.map((module, index) => (
           <Grid item xs={12} sm={6} md={4} key={module.id}>
             <Zoom in timeout={300 + index * 100}>
@@ -173,7 +173,7 @@ const StoxAILanding = ({ onTileClick, onBack }) => {
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   border: '1px solid',
                   borderColor: 'divider',
-                  borderRadius: 3,
+                  borderRadius: 2,
                   overflow: 'hidden',
                   '&:hover': module.status === 'active' ? {
                     transform: 'translateY(-8px)',
@@ -195,7 +195,7 @@ const StoxAILanding = ({ onTileClick, onBack }) => {
                 <Box
                   className="module-header"
                   sx={{
-                    height: 140,
+                    height: 80,
                     background: `linear-gradient(135deg, ${module.bgColor} 0%, ${alpha(module.color, 0.1)} 100%)`,
                     display: 'flex',
                     alignItems: 'center',
@@ -207,15 +207,15 @@ const StoxAILanding = ({ onTileClick, onBack }) => {
                   <Avatar
                     className="module-icon"
                     sx={{
-                      width: 80,
-                      height: 80,
+                      width: 48,
+                      height: 48,
                       bgcolor: 'white',
                       color: module.color,
                       transition: 'transform 0.3s ease',
                       boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
                     }}
                   >
-                    <module.icon sx={{ fontSize: 40 }} />
+                    <module.icon sx={{ fontSize: 28 }} />
                   </Avatar>
                   {module.status === 'coming-soon' && (
                     <Chip
@@ -233,14 +233,15 @@ const StoxAILanding = ({ onTileClick, onBack }) => {
                   )}
                 </Box>
 
-                <CardContent sx={{ p: 3 }}>
+                <CardContent sx={{ p: 1.5 }}>
                   <Typography
                     variant="h6"
                     gutterBottom
                     sx={{
                       fontWeight: 700,
                       color: module.color,
-                      mb: 0.5,
+                      mb: 0.25,
+                      fontSize: '0.95rem',
                     }}
                   >
                     {module.title}
@@ -250,7 +251,8 @@ const StoxAILanding = ({ onTileClick, onBack }) => {
                     sx={{
                       color: 'text.secondary',
                       fontWeight: 600,
-                      mb: 2,
+                      mb: 1,
+                      fontSize: '0.7rem',
                     }}
                   >
                     {module.subtitle}
@@ -259,25 +261,26 @@ const StoxAILanding = ({ onTileClick, onBack }) => {
                     variant="body2"
                     sx={{
                       color: 'text.secondary',
-                      mb: 3,
-                      minHeight: 60,
-                      lineHeight: 1.6,
+                      mb: 1.5,
+                      minHeight: 36,
+                      lineHeight: 1.4,
+                      fontSize: '0.75rem',
                     }}
                   >
                     {module.description}
                   </Typography>
 
-                  <Box sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
+                  <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
                     alignItems: 'center',
                     mt: 'auto',
                   }}>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Typography variant="caption" color="text.secondary">
+                    <Stack direction="row" spacing={0.5} alignItems="center">
+                      <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
                         {module.stats.label}:
                       </Typography>
-                      <Typography variant="body2" fontWeight={700} color={module.color}>
+                      <Typography variant="body2" fontWeight={700} color={module.color} sx={{ fontSize: '0.8rem' }}>
                         {module.stats.value}
                       </Typography>
                     </Stack>

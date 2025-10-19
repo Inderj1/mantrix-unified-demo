@@ -78,8 +78,11 @@ import ReallocationOptimizer from './components/stox/ReallocationOptimizer';
 import InboundRiskMonitor from './components/stox/InboundRiskMonitor';
 import AgingStockIntelligence from './components/stox/AgingStockIntelligence';
 import GlobalSearch from './components/GlobalSearch';
-import VisionAIDashboard from './components/VisionAIDashboard';
+import DocumentVisionIntelligence from './components/DocumentVisionIntelligence';
 import EmailIntelligence from './components/EmailIntelligence';
+import CommsConfig from './components/CommsConfig';
+import RouteAI from './components/RouteAI';
+import RevEQ from './components/RevEQ';
 import { sapFioriTheme, sapChartColors } from './themes/sapFioriTheme';
 import { defaultTheme } from './themes/defaultTheme';
 import {
@@ -475,7 +478,7 @@ function App() {
         <AppBar position="static" elevation={0} sx={{ bgcolor: 'white', color: 'text.primary' }}>
           <Toolbar>
             <Typography variant="h6" sx={{ flexGrow: 0, fontWeight: 500, mr: 3 }}>
-              {['AXIS.AI', 'CORE.AI', 'AXIS.AI', 'MARKETS.AI', 'Control Center', '', 'DOCS.AI', 'Process Mining', 'Enterprise Pulse', 'VISION.AI', '', '', '', 'COMMS.AI'][selectedTab] || ''}
+              {['AXIS.AI', 'CORE.AI', 'AXIS.AI', 'MARKETS.AI', 'Control Center', '', 'DOCS.AI', 'Process Mining', 'Enterprise Pulse', 'VISION.AI - Document Intelligence', '', '', '', 'COMMS.AI', '', 'ROUTE.AI'][selectedTab] || ''}
             </Typography>
             
             {/* Global Search */}
@@ -516,6 +519,10 @@ function App() {
                     } else if (moduleId === 'stox') {
                       setCoreAIView('stox');
                       setStoxView('landing');
+                    } else if (moduleId === 'route') {
+                      setCoreAIView('route');
+                    } else if (moduleId === 'reveq') {
+                      setCoreAIView('reveq');
                     }
                   }} />
                 </Box>
@@ -578,6 +585,16 @@ function App() {
                   {stoxView === 'aging-stock-intelligence' && (
                     <AgingStockIntelligence onBack={() => setStoxView('landing')} />
                   )}
+                </Box>
+              </Fade>
+              <Fade in={coreAIView === 'route'} timeout={300}>
+                <Box sx={{ display: coreAIView === 'route' ? 'block' : 'none', height: '100%' }}>
+                  <RouteAI onBack={() => setCoreAIView('landing')} />
+                </Box>
+              </Fade>
+              <Fade in={coreAIView === 'reveq'} timeout={300}>
+                <Box sx={{ display: coreAIView === 'reveq' ? 'block' : 'none', height: '100%' }}>
+                  <RevEQ onBack={() => setCoreAIView('landing')} />
                 </Box>
               </Fade>
             </Box>
@@ -937,15 +954,22 @@ function App() {
           
           {/* Vision AI Tab */}
           {selectedTab === 9 && (
-            <Box sx={{ height: 'calc(100vh - 180px)' }}>
-              <VisionAIDashboard onBack={() => setSelectedTab(0)} />
+            <Box sx={{ height: 'calc(100vh - 180px)', overflow: 'auto' }}>
+              <DocumentVisionIntelligence onNavigateToConfig={() => setSelectedTab(4)} />
             </Box>
           )}
 
           {/* COMMS.AI Tab */}
           {selectedTab === 13 && (
             <Box sx={{ height: 'calc(100vh - 180px)', overflow: 'auto' }}>
-              <EmailIntelligence />
+              <EmailIntelligence onNavigateToConfig={() => setSelectedTab(4)} />
+            </Box>
+          )}
+
+          {/* ROUTE.AI Tab */}
+          {selectedTab === 15 && (
+            <Box sx={{ height: 'calc(100vh - 180px)', overflow: 'auto' }}>
+              <RouteAI />
             </Box>
           )}
 

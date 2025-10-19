@@ -10,7 +10,7 @@
     "@googlemaps/react-wrapper": "^1.2.0",
     "@mui/icons-material": "^5.17.1",
     "@mui/material": "^5.15.14",
-    "@mui/x-data-grid": "^6.19.8",
+    "@mui/x-data-grid": "^6.20.4",
     "@react-spring/web": "^9.7.5",
     "@tanstack/react-table": "^8.21.3",
     "@types/uuid": "^10.0.0",

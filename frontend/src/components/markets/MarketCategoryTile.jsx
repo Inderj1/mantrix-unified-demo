@@ -72,9 +72,9 @@ const MarketCategoryTile = ({
       }}
       onClick={enabled ? onClick : undefined}
     >
-      <CardContent sx={{ pb: 2 }}>
+      <CardContent sx={{ pb: 1.5, p: 1.5 }}>
         {/* Config Icon */}
-        <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
+        <Box sx={{ position: 'absolute', top: 6, right: 6 }}>
           <Tooltip title="Configure category">
             <IconButton
               size="small"
@@ -98,14 +98,14 @@ const MarketCategoryTile = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: 56,
-            height: 56,
+            width: 48,
+            height: 48,
             borderRadius: 2,
             bgcolor: `${category.color}20`,
-            mb: 2,
+            mb: 1.5,
           }}
         >
-          <IconComponent sx={{ fontSize: 32, color: category.color }} />
+          <IconComponent sx={{ fontSize: 28, color: category.color }} />
         </Box>
 
         {/* Category Name */}
@@ -113,8 +113,8 @@ const MarketCategoryTile = ({
           variant="h6"
           sx={{
             fontWeight: 600,
-            fontSize: '1rem',
-            mb: 0.5,
+            fontSize: '0.95rem',
+            mb: 0.25,
             color: enabled ? 'text.primary' : 'text.disabled',
           }}
         >
@@ -126,8 +126,10 @@ const MarketCategoryTile = ({
           variant="caption"
           sx={{
             color: 'text.secondary',
-            mb: 2,
-            minHeight: 40,
+            mb: 1.5,
+            minHeight: 32,
+            fontSize: '0.7rem',
+            lineHeight: 1.4,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             display: '-webkit-box',
@@ -139,9 +141,9 @@ const MarketCategoryTile = ({
         </Typography>
 
         {/* Metrics Row */}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1.5 }}>
           {/* Alert Count Badge */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <Badge
               badgeContent={signalCount}
               color={getBadgeColor()}
@@ -149,6 +151,7 @@ const MarketCategoryTile = ({
               sx={{
                 '& .MuiBadge-badge': {
                   fontWeight: 600,
+                  fontSize: '0.65rem',
                 }
               }}
             >
@@ -159,6 +162,8 @@ const MarketCategoryTile = ({
                   bgcolor: signalCount > 0 ? `${severityLevel.color}20` : '#f5f5f5',
                   color: signalCount > 0 ? severityLevel.color : 'text.secondary',
                   fontWeight: 500,
+                  height: 20,
+                  fontSize: '0.7rem',
                 }}
               />
             </Badge>
@@ -180,17 +185,17 @@ const MarketCategoryTile = ({
 
         {/* Severity Level Indicator */}
         {enabled && signalCount > 0 && (
-          <Box sx={{ mt: 1.5, pt: 1.5, borderTop: '1px solid #e0e0e0' }}>
+          <Box sx={{ mt: 1, pt: 1, borderTop: '1px solid #e0e0e0' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
                 Highest:
               </Typography>
               <Chip
                 label={severityLevel.label}
                 size="small"
                 sx={{
-                  height: 20,
-                  fontSize: '0.65rem',
+                  height: 18,
+                  fontSize: '0.6rem',
                   fontWeight: 600,
                   bgcolor: severityLevel.bgColor,
                   color: severityLevel.color,
@@ -203,13 +208,13 @@ const MarketCategoryTile = ({
 
         {/* Disabled State */}
         {!enabled && (
-          <Box sx={{ mt: 1.5, pt: 1.5, borderTop: '1px solid #e0e0e0' }}>
+          <Box sx={{ mt: 1, pt: 1, borderTop: '1px solid #e0e0e0' }}>
             <Chip
               label="Disabled"
               size="small"
               sx={{
-                height: 20,
-                fontSize: '0.65rem',
+                height: 18,
+                fontSize: '0.6rem',
                 bgcolor: '#f5f5f5',
                 color: 'text.disabled',
               }}

@@ -40,6 +40,7 @@ import {
   ModelTraining as ModelIcon,
   SmartToy as AIModelIcon,
   AccountCircle as PersonaIcon,
+  Settings as SettingsIcon,
 } from '@mui/icons-material';
 
 const EnhancedSidebar = ({
@@ -104,7 +105,7 @@ const EnhancedSidebar = ({
           id: 9,
           icon: <VisionIcon />,
           primary: 'VISION.AI',
-          secondary: 'Inventory & Stock Management',
+          secondary: 'Document OCR & Image Intelligence',
           color: '#00BCD4',
         },
         {

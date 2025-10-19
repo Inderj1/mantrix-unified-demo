@@ -10,6 +10,7 @@ import WhatIfAnalysisPage from './pages/WhatIfAnalysis';
 import AdminSettings from './pages/AdminSettings';
 import HomePage from './pages/HomePage';
 import UserProfileManager from './components/UserProfileManager';
+import CommsConfig from './components/CommsConfig';
 import ProtectedRoute from './components/ProtectedRoute';
 import { initializeSettings } from './utils/initializeSettings';
 
@@ -64,6 +65,7 @@ function App() {
             <Route path="/health" element={<HealthPage />} />
             <Route path="/profile" element={<UserProfileManager />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
+            <Route path="/comms/config" element={<CommsConfig />} />
           </Routes>
         </Layout>
       </Box>
@@ -145,6 +147,14 @@ function App() {
               element={
                 <ProtectedRoute routePath="/admin/settings">
                   <AdminSettings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/comms/config"
+              element={
+                <ProtectedRoute routePath="/comms/config">
+                  <CommsConfig />
                 </ProtectedRoute>
               }
             />

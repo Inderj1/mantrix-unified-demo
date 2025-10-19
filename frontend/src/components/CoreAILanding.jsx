@@ -18,6 +18,8 @@ import {
   Speed as OptimaIcon,
   Security as SecurityIcon,
   ArrowForward as ArrowForwardIcon,
+  LocalShipping as FleetIcon,
+  Engineering as EquipmentIcon,
 } from '@mui/icons-material';
 
 const aiModules = [
@@ -34,18 +36,6 @@ const aiModules = [
     status: 'active',
   },
   {
-    id: 'prism',
-    title: 'PRISM.AI',
-    subtitle: 'Predictive Risk & Insights Management',
-    description: 'Risk analysis, predictive modeling, and business intelligence',
-    icon: AnalyticsIcon,
-    color: '#9c27b0',
-    bgColor: '#f3e5f5',
-    path: '/coreai/prism',
-    stats: { label: 'Risk Factors', value: '45' },
-    status: 'coming-soon',
-  },
-  {
     id: 'stox',
     title: 'STOX.AI',
     subtitle: 'Smart Inventory Optimization',
@@ -58,40 +48,28 @@ const aiModules = [
     status: 'active',
   },
   {
-    id: 'flow',
-    title: 'FLOW.AI',
-    subtitle: 'Process Flow Automation',
-    description: 'Workflow automation, process mining, and operational efficiency',
-    icon: FlowIcon,
-    color: '#ed6c02',
+    id: 'route',
+    title: 'ROUTE.AI',
+    subtitle: 'Fleet & Route Optimization',
+    description: 'AI-powered fleet management, route optimization, and logistics intelligence',
+    icon: FleetIcon,
+    color: '#FF9800',
     bgColor: '#fff3e0',
-    path: '/coreai/flow',
-    stats: { label: 'Workflows', value: '38' },
-    status: 'coming-soon',
+    path: '/coreai/route',
+    stats: { label: 'Active Vehicles', value: '45' },
+    status: 'active',
   },
   {
-    id: 'optima',
-    title: 'OPTIMA.AI',
-    subtitle: 'Performance Optimization Engine',
-    description: 'Resource optimization, performance tuning, and efficiency analytics',
-    icon: OptimaIcon,
-    color: '#0288d1',
-    bgColor: '#e1f5fe',
-    path: '/coreai/optima',
-    stats: { label: 'Optimizations', value: '156' },
-    status: 'coming-soon',
-  },
-  {
-    id: 'sentry',
-    title: 'SENTRY.AI',
-    subtitle: 'Security & Compliance Monitor',
-    description: 'Security monitoring, compliance tracking, and anomaly detection',
-    icon: SecurityIcon,
-    color: '#d32f2f',
-    bgColor: '#ffebee',
-    path: '/coreai/sentry',
-    stats: { label: 'Threats Blocked', value: '892' },
-    status: 'coming-soon',
+    id: 'reveq',
+    title: 'RevEQ',
+    subtitle: 'Equipment Optimization',
+    description: 'Smart equipment lifecycle management, predictive maintenance, and asset optimization',
+    icon: EquipmentIcon,
+    color: '#9C27B0',
+    bgColor: '#f3e5f5',
+    path: '/coreai/reveq',
+    stats: { label: 'Active Assets', value: '156' },
+    status: 'active',
   },
 ];
 
@@ -136,7 +114,7 @@ const CoreAILanding = ({ onTileClick }) => {
           const isActive = module.status === 'active';
           
           return (
-            <Grid item xs={12} sm={6} md={4} key={module.id}>
+            <Grid item xs={12} sm={6} md={6} key={module.id}>
               <Card
                 sx={{
                   height: '100%',

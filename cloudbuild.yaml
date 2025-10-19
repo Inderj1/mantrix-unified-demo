@@ -1,0 +1,109 @@
+# Cloud Build configuration for CI/CD with SOC compliance
+# Builds, tests, and deploys the application to GCP
+
+steps:
+  # Step 1: Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-image'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/mantrix-unified-di:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/mantrix-unified-di:latest'
+      - '--build-arg'
+      - 'BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")'
+      - '--build-arg'
+      - 'VCS_REF=$COMMIT_SHA'
+      - '.'
+
+  # Step 2: Vulnerability scanning
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'scan-image'
+    args:
+      - 'beta'
+      - 'container'
+      - 'images'
+      - 'scan'
+      - 'gcr.io/$PROJECT_ID/mantrix-unified-di:$COMMIT_SHA'
+    waitFor: ['build-image']
+
+  # Step 3: Push to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-image'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/mantrix-unified-di:$COMMIT_SHA'
+    waitFor: ['scan-image']
+
+  # Step 4: Push latest tag
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-latest'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/mantrix-unified-di:latest'
+    waitFor: ['push-image']
+
+  # Step 5: Deploy to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'deploy-cloud-run'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'mantrix-unified-di'
+      - '--image=gcr.io/$PROJECT_ID/mantrix-unified-di:$COMMIT_SHA'
+      - '--region=us-central1'
+      - '--platform=managed'
+      - '--allow-unauthenticated=false'  # SOC: Require authentication
+      - '--max-instances=10'
+      - '--min-instances=1'
+      - '--memory=2Gi'
+      - '--cpu=2'
+      - '--timeout=300'
+      - '--concurrency=80'
+      - '--port=8000'
+      - '--use-http2'
+      - '--ingress=internal-and-cloud-load-balancing'  # SOC: Restrict ingress
+      - '--vpc-connector=mantrix-vpc-connector'
+      - '--service-account=mantrix-api-sa@$PROJECT_ID.iam.gserviceaccount.com'
+      - '--set-env-vars=API_ENV=production,ENABLE_AUDIT_LOGGING=true,REQUIRE_MFA=true'
+      - '--set-secrets=ANTHROPIC_API_KEY=anthropic-api-key:latest,OPENAI_API_KEY=openai-api-key:latest'
+    waitFor: ['push-latest']
+
+  # Step 6: Update audit logs
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'log-deployment'
+    args:
+      - 'logging'
+      - 'write'
+      - 'deployment-audit'
+      - '--severity=NOTICE'
+      - '--payload-type=json'
+      - '--log-name=deployment-logs'
+      - '{"deployment":"mantrix-unified-di","commit":"$COMMIT_SHA","timestamp":"$(date -u +%Y-%m-%dT%H:%M:%SZ)","user":"$_TRIGGER_USER"}'
+    waitFor: ['deploy-cloud-run']
+
+# Images to push to Container Registry
+images:
+  - 'gcr.io/$PROJECT_ID/mantrix-unified-di:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/mantrix-unified-di:latest'
+
+# Build options for SOC compliance
+options:
+  machineType: 'N1_HIGHCPU_8'
+  logging: CLOUD_LOGGING_ONLY  # SOC: Centralized logging
+  logStreamingOption: STREAM_ON
+  substitutionOption: ALLOW_LOOSE
+
+# Timeout for entire build
+timeout: '1800s'
+
+# Substitutions
+substitutions:
+  _TRIGGER_USER: 'cloud-build-service'
+
+# Tags for organization
+tags:
+  - 'mantrix-unified-di'
+  - 'production'
+  - 'soc-compliant'

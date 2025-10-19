@@ -14,6 +14,8 @@ from src.api.user_profile_routes import router as user_profile_router
 from src.api.document_routes import router as document_router
 from src.api.markets_routes import router as markets_router
 from src.api.stox_routes import router as stox_router
+from src.api.comms_routes import router as comms_router
+from src.api.comms_config_routes import router as comms_config_router
 
 # Configure structured logging
 structlog.configure(
@@ -125,6 +127,8 @@ app.include_router(user_profile_router)
 app.include_router(document_router, prefix="/api/v1/documents")
 app.include_router(markets_router, prefix="/api/v1")
 app.include_router(stox_router)
+app.include_router(comms_router)
+app.include_router(comms_config_router)
 
 
 @app.get("/")

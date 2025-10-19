@@ -28,6 +28,7 @@ import SystemHealthMonitoring from './controlcenter/SystemHealthMonitoring';
 import DataSourcesConnections from './controlcenter/DataSourcesConnections';
 import PlatformSettings from './controlcenter/PlatformSettings';
 import UserProfileManager from './UserProfileManager';
+import CommsConfig from './CommsConfig';
 
 const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
   const theme = useTheme();
@@ -61,6 +62,13 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
       component: <UserProfileManager />,
       status: 'healthy',
       badge: 'Profile',
+    },
+    {
+      label: 'COMMS Config',
+      icon: <SettingsIcon />,
+      component: <CommsConfig />,
+      status: 'healthy',
+      badge: 'Comms',
     },
   ];
 
