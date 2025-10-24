@@ -77,6 +77,16 @@ import InventoryHeatmap from './components/stox/InventoryHeatmap';
 import ReallocationOptimizer from './components/stox/ReallocationOptimizer';
 import InboundRiskMonitor from './components/stox/InboundRiskMonitor';
 import AgingStockIntelligence from './components/stox/AgingStockIntelligence';
+import DemandWorkbench from './components/stox/DemandWorkbench.jsx';
+import SellThroughAnalytics from './components/stox/SellThroughAnalytics.jsx';
+import SellInForecast from './components/stox/SellInForecast.jsx';
+import SKUAggregation from './components/stox/SKUAggregation.jsx';
+import BOMExplorer from './components/stox/BOMExplorer.jsx';
+import ComponentConsolidation from './components/stox/ComponentConsolidation.jsx';
+import StoreDeployment from './components/stox/StoreDeployment.jsx';
+import ExecutiveCommandCenter from './components/stox/ExecutiveCommandCenter.jsx';
+import ModuleTilesView from './components/stox/ModuleTilesView.jsx';
+import FioriTileDetail from './components/stox/FioriTileDetail.jsx';
 import GlobalSearch from './components/GlobalSearch';
 import DocumentVisionIntelligence from './components/DocumentVisionIntelligence';
 import EmailIntelligence from './components/EmailIntelligence';
@@ -159,6 +169,7 @@ function App() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [coreAIView, setCoreAIView] = useState('landing'); // 'landing', 'margen', 'stox'
   const [stoxView, setStoxView] = useState('landing'); // 'landing', 'stoxshift'
+  const [currentFioriTile, setCurrentFioriTile] = useState(null); // { tileId, title, moduleId, moduleColor }
   const [axisAIView, setAxisAIView] = useState('landing'); // 'landing', 'forecast', 'budget', 'driver', 'scenario', 'insights'
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
   const [apiHealth, setApiHealth] = useState(null);
@@ -191,29 +202,35 @@ function App() {
   // Handle search navigation
   const handleSearchNavigation = (action) => {
     console.log('Search navigation:', action);
-    
+
     // Navigate to the appropriate tab
     if (action.tabId !== undefined) {
       setSelectedTab(action.tabId);
     }
-    
+
     // Handle CORE.AI specific navigation
     if (action.view) {
-      setCoreAIView(action.view);
-      
-      // Handle STOX.AI specific navigation
-      if (action.stoxView) {
-        setStoxView(action.stoxView);
-        
-        // Handle STOXSHIFT.AI specific navigation
-        if (action.stoxshiftTile) {
-          // This would require passing props to StoxShiftAI to auto-select tile/tab
-          // For now, we'll just navigate to the page
-          console.log('Navigate to STOXSHIFT tile:', action.stoxshiftTile, 'tab:', action.stoxshiftTab);
+      // Check if this is a STOX.AI navigation
+      if (action.view === 'stox' || action.view === 'margen' || ['demand-workbench', 'demand-flow', 'demand-forecasting', 'outbound-replenishment', 'dc-inventory', 'supply-planning', 'bom-explosion', 'component-consolidation', 'analytics-whatif'].includes(action.view)) {
+        // First set CORE.AI view to STOX
+        setCoreAIView('stox');
+
+        // Then navigate to the specific STOX module
+        if (action.view !== 'stox') {
+          setStoxView(action.view);
         }
+      } else {
+        setCoreAIView(action.view);
+      }
+
+      // Handle STOXSHIFT.AI specific navigation
+      if (action.stoxshiftTile) {
+        // This would require passing props to StoxShiftAI to auto-select tile/tab
+        // For now, we'll just navigate to the page
+        console.log('Navigate to STOXSHIFT tile:', action.stoxshiftTile, 'tab:', action.stoxshiftTab);
       }
     }
-    
+
     // Handle AXIS.AI specific navigation
     if (action.axisView) {
       setAxisAIView(action.axisView);
@@ -563,6 +580,30 @@ function App() {
                         } else if (moduleId === 'aging-stock-intelligence') {
                           console.log('Setting stoxView to: aging-stock-intelligence');
                           setStoxView('aging-stock-intelligence');
+                        } else if (moduleId === 'sop-planning' || moduleId === 'demand-workbench') {
+                          console.log('Setting stoxView to: demand-workbench');
+                          setStoxView('demand-workbench');
+                        } else if (moduleId === 'sell-through-analytics') {
+                          console.log('Setting stoxView to: sell-through-analytics');
+                          setStoxView('sell-through-analytics');
+                        } else if (moduleId === 'sell-in-forecast') {
+                          console.log('Setting stoxView to: sell-in-forecast');
+                          setStoxView('sell-in-forecast');
+                        } else if (moduleId === 'sku-aggregation') {
+                          console.log('Setting stoxView to: sku-aggregation');
+                          setStoxView('sku-aggregation');
+                        } else if (moduleId === 'bom-explorer') {
+                          console.log('Setting stoxView to: bom-explorer');
+                          setStoxView('bom-explorer');
+                        } else if (moduleId === 'store-deployment') {
+                          console.log('Setting stoxView to: store-deployment');
+                          setStoxView('store-deployment');
+                        } else if (moduleId === 'executive-command') {
+                          console.log('Setting stoxView to: executive-command');
+                          setStoxView('executive-command');
+                        } else if (['demand-flow', 'demand-forecasting', 'outbound-replenishment', 'dc-inventory', 'supply-planning', 'bom-explosion', 'component-consolidation', 'analytics-whatif'].includes(moduleId)) {
+                          console.log('Setting stoxView to module tiles:', moduleId);
+                          setStoxView(moduleId);
                         }
                       }}
                     />
@@ -584,6 +625,80 @@ function App() {
                   )}
                   {stoxView === 'aging-stock-intelligence' && (
                     <AgingStockIntelligence onBack={() => setStoxView('landing')} />
+                  )}
+                  {stoxView === 'demand-workbench' && (
+                    <DemandWorkbench onBack={() => setStoxView('landing')} />
+                  )}
+                  {stoxView === 'sell-through-analytics' && (
+                    <SellThroughAnalytics onBack={() => setStoxView('landing')} />
+                  )}
+                  {stoxView === 'sell-in-forecast' && (
+                    <SellInForecast onBack={() => setStoxView('landing')} />
+                  )}
+                  {stoxView === 'sku-aggregation' && (
+                    <SKUAggregation onBack={() => setStoxView('landing')} />
+                  )}
+                  {stoxView === 'bom-explorer' && (
+                    <BOMExplorer onBack={() => setStoxView('landing')} />
+                  )}
+                  {/* component-consolidation now uses ModuleTilesView */}
+                  {stoxView === 'store-deployment' && (
+                    <StoreDeployment onBack={() => setStoxView('landing')} />
+                  )}
+                  {stoxView === 'executive-command' && (
+                    <ExecutiveCommandCenter onBack={() => setStoxView('landing')} />
+                  )}
+                  {/* PRD Module Tiles Views */}
+                  {['demand-flow', 'demand-forecasting', 'outbound-replenishment', 'dc-inventory', 'supply-planning', 'bom-explosion', 'component-consolidation', 'analytics-whatif'].includes(stoxView) && !currentFioriTile && (
+                    <ModuleTilesView
+                      moduleId={stoxView}
+                      onBack={(target) => {
+                        if (target === 'stox') {
+                          setStoxView('landing');
+                        } else if (target === 'core') {
+                          setCoreAIView('landing');
+                        }
+                      }}
+                      onTileClick={(tileId) => {
+                        console.log('Fiori tile clicked:', tileId);
+                        // Get module data to pass to detail view
+                        const moduleColors = {
+                          'demand-flow': '#06b6d4',
+                          'demand-forecasting': '#10b981',
+                          'outbound-replenishment': '#3b82f6',
+                          'dc-inventory': '#f59e0b',
+                          'supply-planning': '#8b5cf6',
+                          'bom-explosion': '#ec4899',
+                          'component-consolidation': '#ef4444',
+                          'analytics-whatif': '#607D8B',
+                        };
+                        setCurrentFioriTile({
+                          tileId,
+                          moduleId: stoxView,
+                          moduleColor: moduleColors[stoxView] || '#3b82f6',
+                        });
+                      }}
+                    />
+                  )}
+                  {/* Fiori Tile Detail View */}
+                  {currentFioriTile && (
+                    <FioriTileDetail
+                      tileId={currentFioriTile.tileId}
+                      tileTitle={currentFioriTile.tileId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                      moduleColor={currentFioriTile.moduleColor}
+                      onBack={(target) => {
+                        if (target === 'module') {
+                          setCurrentFioriTile(null);
+                        } else if (target === 'stox') {
+                          setCurrentFioriTile(null);
+                          setStoxView('landing');
+                        } else if (target === 'core') {
+                          setCurrentFioriTile(null);
+                          setStoxView('landing');
+                          setCoreAIView('landing');
+                        }
+                      }}
+                    />
                   )}
                 </Box>
               </Fade>
