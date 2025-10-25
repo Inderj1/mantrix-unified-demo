@@ -85,6 +85,7 @@ import BOMExplorer from './components/stox/BOMExplorer.jsx';
 import ComponentConsolidation from './components/stox/ComponentConsolidation.jsx';
 import StoreDeployment from './components/stox/StoreDeployment.jsx';
 import ExecutiveCommandCenter from './components/stox/ExecutiveCommandCenter.jsx';
+import ScenarioPlanner from './components/stox/ScenarioPlanner.jsx';
 import ModuleTilesView from './components/stox/ModuleTilesView.jsx';
 import FioriTileDetail from './components/stox/FioriTileDetail.jsx';
 import GlobalSearch from './components/GlobalSearch';
@@ -553,7 +554,7 @@ function App() {
                 <Box sx={{
                   display: coreAIView === 'stox' ? 'block' : 'none',
                   height: '100%',
-                  overflow: 'hidden',
+                  overflow: 'auto',
                   width: '100%'
                 }}>
                   {stoxView === 'landing' && (
@@ -647,6 +648,9 @@ function App() {
                   )}
                   {stoxView === 'executive-command' && (
                     <ExecutiveCommandCenter onBack={() => setStoxView('landing')} />
+                  )}
+                  {stoxView === 'scenario-planner' && (
+                    <ScenarioPlanner onBack={() => setStoxView('landing')} />
                   )}
                   {/* PRD Module Tiles Views */}
                   {['demand-flow', 'demand-forecasting', 'outbound-replenishment', 'dc-inventory', 'supply-planning', 'bom-explosion', 'component-consolidation', 'analytics-whatif'].includes(stoxView) && !currentFioriTile && (

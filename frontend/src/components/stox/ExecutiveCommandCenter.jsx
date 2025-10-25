@@ -19,8 +19,7 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  ToggleButton,
-  ToggleButtonGroup,
+  ButtonGroup,
 } from '@mui/material';
 import {
   DataGrid,
@@ -49,12 +48,13 @@ import {
   Settings,
   Add,
 } from '@mui/icons-material';
+import TimeGranularitySelector from '../common/TimeGranularitySelector';
 
 const ExecutiveCommandCenter = ({ onBack }) => {
   const [sopData, setSOPData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
-  const [selectedView, setSelectedView] = useState('monthly');
+  const [granularity, setGranularity] = useState('daily');
   const [selectedRows, setSelectedRows] = useState([]);
   const [consensusDialogOpen, setConsensusDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -62,143 +62,118 @@ const ExecutiveCommandCenter = ({ onBack }) => {
   useEffect(() => {
     fetchSOPData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [granularity]);
+
+  const generateDataByGranularity = (granularity) => {
+    const kpiMetrics = [
+      { name: 'Forecast Accuracy (MAPE)', category: 'Demand Planning', target: 95.0, owner: 'Demand Planning Team' },
+      { name: 'Service Level %', category: 'Operations', target: 95.0, owner: 'Operations Team' },
+      { name: 'Inventory Days on Hand', category: 'Inventory', target: 45.0, owner: 'Inventory Team' },
+      { name: 'Stock-Out Rate %', category: 'Operations', target: 2.0, owner: 'Operations Team' },
+      { name: 'On-Time Delivery %', category: 'Supply', target: 97.0, owner: 'Supply Chain Team' },
+      { name: 'Component Shortage Rate %', category: 'Supply', target: 2.0, owner: 'Procurement Team' },
+      { name: 'Inventory Turnover Ratio', category: 'Inventory', target: 8.0, owner: 'Inventory Team' },
+      { name: 'Order Fill Rate %', category: 'Operations', target: 98.0, owner: 'Operations Team' },
+    ];
+
+    const trends = ['Improving', 'Stable', 'Declining'];
+    const statuses = ['On Track', 'Warning', 'At Risk', 'Critical'];
+    const data = [];
+    let idCounter = 1;
+
+    if (granularity === 'daily') {
+      // Daily: Last 7 days
+      for (let day = 7; day >= 1; day--) {
+        const date = new Date();
+        date.setDate(date.getDate() - day);
+        const dateStr = date.toISOString().split('T')[0];
+
+        kpiMetrics.forEach((kpi) => {
+          const baseValue = kpi.target + (Math.random() - 0.5) * 5;
+          const variance = ((baseValue - kpi.target) / kpi.target) * 100;
+          const priorValue = baseValue - (Math.random() - 0.5) * 2;
+
+          data.push({
+            id: `KPI${String(idCounter++).padStart(3, '0')}`,
+            metric_name: kpi.name,
+            category: kpi.category,
+            current_value: parseFloat(baseValue.toFixed(1)),
+            target_value: kpi.target,
+            variance_pct: parseFloat(variance.toFixed(1)),
+            trend: trends[Math.floor(Math.random() * trends.length)],
+            period: dateStr,
+            status: Math.abs(variance) > 10 ? 'Critical' : Math.abs(variance) > 5 ? 'At Risk' : Math.abs(variance) > 2 ? 'Warning' : 'On Track',
+            prior_period_value: parseFloat(priorValue.toFixed(1)),
+            ytd_value: parseFloat((kpi.target + (Math.random() - 0.5) * 3).toFixed(1)),
+            forecast_horizon_value: parseFloat((kpi.target + (Math.random() - 0.5) * 4).toFixed(1)),
+            owner: kpi.owner,
+            action_items: variance < -5 ? 'Urgent action required' : variance < 0 ? 'Monitor closely' : 'Maintain current performance',
+          });
+        });
+      }
+    } else if (granularity === 'weekly') {
+      // Weekly: Last 4 weeks
+      for (let week = 6; week >= 3; week--) {
+        kpiMetrics.forEach((kpi) => {
+          const baseValue = kpi.target + (Math.random() - 0.5) * 6;
+          const variance = ((baseValue - kpi.target) / kpi.target) * 100;
+          const priorValue = baseValue - (Math.random() - 0.5) * 3;
+
+          data.push({
+            id: `KPI${String(idCounter++).padStart(3, '0')}`,
+            metric_name: kpi.name,
+            category: kpi.category,
+            current_value: parseFloat(baseValue.toFixed(1)),
+            target_value: kpi.target,
+            variance_pct: parseFloat(variance.toFixed(1)),
+            trend: trends[Math.floor(Math.random() * trends.length)],
+            period: `2024-W${String(week).padStart(2, '0')}`,
+            status: Math.abs(variance) > 10 ? 'Critical' : Math.abs(variance) > 5 ? 'At Risk' : Math.abs(variance) > 2 ? 'Warning' : 'On Track',
+            prior_period_value: parseFloat(priorValue.toFixed(1)),
+            ytd_value: parseFloat((kpi.target + (Math.random() - 0.5) * 3).toFixed(1)),
+            forecast_horizon_value: parseFloat((kpi.target + (Math.random() - 0.5) * 4).toFixed(1)),
+            owner: kpi.owner,
+            action_items: variance < -5 ? 'Urgent action required' : variance < 0 ? 'Monitor closely' : 'Maintain current performance',
+          });
+        });
+      }
+    } else if (granularity === 'monthly') {
+      // Monthly: Last 3 months
+      const months = ['Dec 2023', 'Jan 2024', 'Feb 2024'];
+      months.forEach((month) => {
+        kpiMetrics.forEach((kpi) => {
+          const baseValue = kpi.target + (Math.random() - 0.5) * 8;
+          const variance = ((baseValue - kpi.target) / kpi.target) * 100;
+          const priorValue = baseValue - (Math.random() - 0.5) * 4;
+
+          data.push({
+            id: `KPI${String(idCounter++).padStart(3, '0')}`,
+            metric_name: kpi.name,
+            category: kpi.category,
+            current_value: parseFloat(baseValue.toFixed(1)),
+            target_value: kpi.target,
+            variance_pct: parseFloat(variance.toFixed(1)),
+            trend: trends[Math.floor(Math.random() * trends.length)],
+            period: month,
+            status: Math.abs(variance) > 10 ? 'Critical' : Math.abs(variance) > 5 ? 'At Risk' : Math.abs(variance) > 2 ? 'Warning' : 'On Track',
+            prior_period_value: parseFloat(priorValue.toFixed(1)),
+            ytd_value: parseFloat((kpi.target + (Math.random() - 0.5) * 3).toFixed(1)),
+            forecast_horizon_value: parseFloat((kpi.target + (Math.random() - 0.5) * 4).toFixed(1)),
+            owner: kpi.owner,
+            action_items: variance < -5 ? 'Urgent action required' : variance < 0 ? 'Monitor closely' : 'Maintain current performance',
+          });
+        });
+      });
+    }
+
+    return data;
+  };
 
   const fetchSOPData = async () => {
     setLoading(true);
     try {
-      // Executive Command Center KPI data
-      const mockData = [
-        {
-          id: 'KPI001',
-          metric_name: 'Forecast Accuracy (MAPE)',
-          category: 'Demand Planning',
-          current_value: 94.2,
-          target_value: 95.0,
-          variance_pct: -0.8,
-          trend: 'Improving',
-          period: '2024-W06',
-          status: 'Warning',
-          prior_period_value: 93.5,
-          ytd_value: 93.8,
-          forecast_horizon_value: 95.5,
-          owner: 'Demand Planning Team',
-          action_items: 'Continue model refinements for seasonal products',
-        },
-        {
-          id: 'KPI002',
-          metric_name: 'Service Level %',
-          category: 'Operations',
-          current_value: 96.8,
-          target_value: 95.0,
-          variance_pct: 1.8,
-          trend: 'Stable',
-          period: '2024-W06',
-          status: 'On Track',
-          prior_period_value: 96.5,
-          ytd_value: 96.2,
-          forecast_horizon_value: 96.0,
-          owner: 'Operations Team',
-          action_items: 'Maintain current execution standards',
-        },
-        {
-          id: 'KPI003',
-          metric_name: 'Inventory Days on Hand',
-          category: 'Inventory',
-          current_value: 42.5,
-          target_value: 45.0,
-          variance_pct: -5.6,
-          trend: 'Declining',
-          period: '2024-W06',
-          status: 'Warning',
-          prior_period_value: 44.8,
-          ytd_value: 46.3,
-          forecast_horizon_value: 40.2,
-          owner: 'Inventory Team',
-          action_items: 'Review replenishment policies for key SKUs',
-        },
-        {
-          id: 'KPI004',
-          metric_name: 'Stock-Out Rate %',
-          category: 'Operations',
-          current_value: 2.1,
-          target_value: 2.0,
-          variance_pct: 5.0,
-          trend: 'Stable',
-          period: '2024-W06',
-          status: 'At Risk',
-          prior_period_value: 2.0,
-          ytd_value: 2.3,
-          forecast_horizon_value: 1.8,
-          owner: 'Operations Team',
-          action_items: 'Monitor critical SKUs; expedite replenishment for low stock items',
-        },
-        {
-          id: 'KPI005',
-          metric_name: 'On-Time Delivery %',
-          category: 'Supply',
-          current_value: 98.2,
-          target_value: 97.0,
-          variance_pct: 1.2,
-          trend: 'Improving',
-          period: '2024-W06',
-          status: 'On Track',
-          prior_period_value: 97.8,
-          ytd_value: 97.5,
-          forecast_horizon_value: 98.5,
-          owner: 'Supply Chain Team',
-          action_items: 'Continue vendor relationship initiatives',
-        },
-        {
-          id: 'KPI006',
-          metric_name: 'Component Shortage Rate %',
-          category: 'Supply',
-          current_value: 3.2,
-          target_value: 2.0,
-          variance_pct: 60.0,
-          trend: 'Declining',
-          period: '2024-W06',
-          status: 'Critical',
-          prior_period_value: 2.8,
-          ytd_value: 2.5,
-          forecast_horizon_value: 2.3,
-          owner: 'Procurement Team',
-          action_items: 'Urgent: Expedite PO-45123 for COMP-P205; engage alternate suppliers',
-        },
-        {
-          id: 'KPI007',
-          metric_name: 'Inventory Turnover Ratio',
-          category: 'Inventory',
-          current_value: 8.6,
-          target_value: 8.0,
-          variance_pct: 7.5,
-          trend: 'Improving',
-          period: '2024-W06',
-          status: 'On Track',
-          prior_period_value: 8.3,
-          ytd_value: 8.1,
-          forecast_horizon_value: 9.0,
-          owner: 'Inventory Team',
-          action_items: 'Maintain velocity on fast-moving SKUs',
-        },
-        {
-          id: 'KPI008',
-          metric_name: 'Order Fill Rate %',
-          category: 'Operations',
-          current_value: 97.5,
-          target_value: 98.0,
-          variance_pct: -0.5,
-          trend: 'Stable',
-          period: '2024-W06',
-          status: 'Warning',
-          prior_period_value: 97.4,
-          ytd_value: 97.6,
-          forecast_horizon_value: 98.2,
-          owner: 'Operations Team',
-          action_items: 'Focus on complete order fulfillment for B2B customers',
-        },
-      ];
-
+      // Generate data based on current granularity
+      const mockData = generateDataByGranularity(granularity);
       setSOPData(mockData);
 
       // Calculate metrics
@@ -479,16 +454,10 @@ const ExecutiveCommandCenter = ({ onBack }) => {
 
       {/* Action Bar */}
       <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1.5 }}>
-        <ToggleButtonGroup
-          value={selectedView}
-          exclusive
-          onChange={(e, newView) => newView && setSelectedView(newView)}
-          size="small"
-        >
-          <ToggleButton value="monthly">Monthly</ToggleButton>
-          <ToggleButton value="quarterly">Quarterly</ToggleButton>
-          <ToggleButton value="weekly">Weekly</ToggleButton>
-        </ToggleButtonGroup>
+        <TimeGranularitySelector
+          value={granularity}
+          onChange={setGranularity}
+        />
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button startIcon={<Upload />} variant="outlined" size="small">
             Import

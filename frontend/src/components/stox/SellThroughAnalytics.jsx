@@ -19,8 +19,6 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  ToggleButton,
-  ToggleButtonGroup,
 } from '@mui/material';
 import {
   DataGrid,
@@ -49,12 +47,13 @@ import {
   Settings,
   Add,
 } from '@mui/icons-material';
+import TimeGranularitySelector from '../common/TimeGranularitySelector';
 
 const SellThroughAnalytics = ({ onBack }) => {
   const [sopData, setSOPData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
-  const [selectedView, setSelectedView] = useState('monthly');
+  const [granularity, setGranularity] = useState('daily');
   const [selectedRows, setSelectedRows] = useState([]);
   const [consensusDialogOpen, setConsensusDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -62,120 +61,145 @@ const SellThroughAnalytics = ({ onBack }) => {
   useEffect(() => {
     fetchSOPData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [granularity]);
+
+  // Helper function to generate data based on granularity
+  const generateDataByGranularity = (granularity) => {
+    const products = [
+      { sku: 'SKU-7891', name: 'Madison Reed Premium Color Kit' },
+      { sku: 'SKU-4523', name: 'Color Reviving Gloss' },
+      { sku: 'SKU-9021', name: 'Root Retouch Kit' },
+    ];
+
+    const partners = [
+      { name: 'Target', location: 'Target DC - Minneapolis', leadTime: 5, targetSL: 95 },
+      { name: 'Amazon', location: 'Amazon FC - Phoenix', leadTime: 3, targetSL: 98 },
+      { name: 'Walmart', location: 'Walmart DC - Bentonville', leadTime: 4, targetSL: 95 },
+    ];
+
+    const data = [];
+    let idCounter = 1;
+
+    if (granularity === 'daily') {
+      // Generate 7 days of data
+      for (let day = 1; day <= 7; day++) {
+        products.forEach((product, pIdx) => {
+          partners.forEach((partner, partIdx) => {
+            const baseSales = 400 + (pIdx * 300) + (partIdx * 200);
+            const sales = Math.floor(baseSales * (0.9 + Math.random() * 0.2));
+            const inventory = Math.floor(sales * (3 + Math.random() * 5));
+            const sellThrough = ((sales / (sales + inventory)) * 100).toFixed(1);
+            const daysSupply = (inventory / sales).toFixed(1);
+            const actualSL = 90 + Math.random() * 10;
+
+            data.push({
+              id: `STA${String(idCounter++).padStart(3, '0')}`,
+              product_sku: product.sku,
+              sales_date: `2024-02-${String(day).padStart(2, '0')}`,
+              week: `2024-W06`,
+              month: '2024-02',
+              sales_qty: sales,
+              inventory_ending: inventory,
+              stockout_flag: inventory < sales ? 'Y' : 'N',
+              partner: partner.name,
+              sell_through_rate_pct: parseFloat(sellThrough),
+              days_of_supply: parseFloat(daysSupply),
+              alert_status: daysSupply < 5 ? 'Critical' : daysSupply < 10 ? 'Warning' : 'OK',
+              partner_location: partner.location,
+              replenishment_lead_time: partner.leadTime,
+              target_service_level: partner.targetSL,
+              actual_service_level: parseFloat(actualSL.toFixed(1)),
+              product_id: product.sku,
+              product_name: product.name,
+              status: daysSupply < 5 ? 'critical' : daysSupply < 10 ? 'warning' : 'ok',
+            });
+          });
+        });
+      }
+    } else if (granularity === 'weekly') {
+      // Generate 4 weeks of data
+      for (let week = 3; week <= 6; week++) {
+        products.forEach((product, pIdx) => {
+          partners.forEach((partner, partIdx) => {
+            const baseSales = 2800 + (pIdx * 2100) + (partIdx * 1400);
+            const sales = Math.floor(baseSales * (0.9 + Math.random() * 0.2));
+            const inventory = Math.floor(sales * (3 + Math.random() * 5));
+            const sellThrough = ((sales / (sales + inventory)) * 100).toFixed(1);
+            const daysSupply = ((inventory / sales) * 7).toFixed(1);
+            const actualSL = 90 + Math.random() * 10;
+
+            data.push({
+              id: `STA${String(idCounter++).padStart(3, '0')}`,
+              product_sku: product.sku,
+              sales_date: `2024-W${String(week).padStart(2, '0')}`,
+              week: `2024-W${String(week).padStart(2, '0')}`,
+              month: '2024-02',
+              sales_qty: sales,
+              inventory_ending: inventory,
+              stockout_flag: inventory < (sales * 0.5) ? 'Y' : 'N',
+              partner: partner.name,
+              sell_through_rate_pct: parseFloat(sellThrough),
+              days_of_supply: parseFloat(daysSupply),
+              alert_status: daysSupply < 10 ? 'Critical' : daysSupply < 20 ? 'Warning' : 'OK',
+              partner_location: partner.location,
+              replenishment_lead_time: partner.leadTime,
+              target_service_level: partner.targetSL,
+              actual_service_level: parseFloat(actualSL.toFixed(1)),
+              product_id: product.sku,
+              product_name: product.name,
+              status: daysSupply < 10 ? 'critical' : daysSupply < 20 ? 'warning' : 'ok',
+            });
+          });
+        });
+      }
+    } else if (granularity === 'monthly') {
+      // Generate 3 months of data
+      for (let month = 12; month <= 2; month++) {
+        const monthLabel = month > 10 ? `2023-${month}` : `2024-0${month}`;
+
+        products.forEach((product, pIdx) => {
+          partners.forEach((partner, partIdx) => {
+            const baseSales = 12000 + (pIdx * 9000) + (partIdx * 6000);
+            const sales = Math.floor(baseSales * (0.9 + Math.random() * 0.2));
+            const inventory = Math.floor(sales * (3 + Math.random() * 5));
+            const sellThrough = ((sales / (sales + inventory)) * 100).toFixed(1);
+            const daysSupply = ((inventory / sales) * 30).toFixed(1);
+            const actualSL = 90 + Math.random() * 10;
+
+            data.push({
+              id: `STA${String(idCounter++).padStart(3, '0')}`,
+              product_sku: product.sku,
+              sales_date: monthLabel,
+              week: monthLabel,
+              month: monthLabel,
+              sales_qty: sales,
+              inventory_ending: inventory,
+              stockout_flag: inventory < (sales * 0.5) ? 'Y' : 'N',
+              partner: partner.name,
+              sell_through_rate_pct: parseFloat(sellThrough),
+              days_of_supply: parseFloat(daysSupply),
+              alert_status: daysSupply < 30 ? 'Critical' : daysSupply < 60 ? 'Warning' : 'OK',
+              partner_location: partner.location,
+              replenishment_lead_time: partner.leadTime,
+              target_service_level: partner.targetSL,
+              actual_service_level: parseFloat(actualSL.toFixed(1)),
+              product_id: product.sku,
+              product_name: product.name,
+              status: daysSupply < 30 ? 'critical' : daysSupply < 60 ? 'warning' : 'ok',
+            });
+          });
+        });
+      }
+    }
+
+    return data;
+  };
 
   const fetchSOPData = async () => {
     setLoading(true);
     try {
-      // Simulated Sell-Through Analytics data with Input Data + Additional Columns
-      const mockData = [
-        {
-          id: 'STA001',
-          // Base columns from Input Data
-          product_sku: 'SKU-7891',
-          sales_date: '2024-W06',
-          sales_qty: 3200,
-          inventory_ending: 8500,
-          stockout_flag: 'N',
-
-          // Additional columns to ADD
-          partner: 'Target',
-          week: '2024-W06',
-          sell_through_rate_pct: 27.3,
-          days_of_supply: 18.5,
-          alert_status: 'OK',
-          partner_location: 'Target DC - Minneapolis',
-          replenishment_lead_time: 5,
-          target_service_level: 95,
-          actual_service_level: 96.8,
-
-          // Supporting fields
-          product_id: 'SKU-7891',
-          product_name: 'Madison Reed Premium Color Kit',
-          status: 'ok',
-        },
-        {
-          id: 'STA002',
-          product_sku: 'SKU-7891',
-          sales_date: '2024-W06',
-          sales_qty: 2850,
-          inventory_ending: 3200,
-          stockout_flag: 'N',
-          partner: 'Amazon',
-          week: '2024-W06',
-          sell_through_rate_pct: 47.1,
-          days_of_supply: 7.8,
-          alert_status: 'Warning',
-          partner_location: 'Amazon FC - Phoenix',
-          replenishment_lead_time: 3,
-          target_service_level: 98,
-          actual_service_level: 97.2,
-          product_id: 'SKU-7891',
-          product_name: 'Madison Reed Premium Color Kit',
-          status: 'warning',
-        },
-        {
-          id: 'STA003',
-          product_sku: 'SKU-4523',
-          sales_date: '2024-W06',
-          sales_qty: 1820,
-          inventory_ending: 950,
-          stockout_flag: 'Y',
-          partner: 'Walmart',
-          week: '2024-W06',
-          sell_through_rate_pct: 65.7,
-          days_of_supply: 3.6,
-          alert_status: 'Critical',
-          partner_location: 'Walmart DC - Bentonville',
-          replenishment_lead_time: 4,
-          target_service_level: 95,
-          actual_service_level: 88.3,
-          product_id: 'SKU-4523',
-          product_name: 'Color Reviving Gloss',
-          status: 'critical',
-        },
-        {
-          id: 'STA004',
-          product_sku: 'SKU-4523',
-          sales_date: '2024-W06',
-          sales_qty: 2100,
-          inventory_ending: 12500,
-          stockout_flag: 'N',
-          partner: 'Target',
-          week: '2024-W06',
-          sell_through_rate_pct: 14.4,
-          days_of_supply: 41.4,
-          alert_status: 'OK',
-          partner_location: 'Target DC - Minneapolis',
-          replenishment_lead_time: 5,
-          target_service_level: 95,
-          actual_service_level: 98.1,
-          product_id: 'SKU-4523',
-          product_name: 'Color Reviving Gloss',
-          status: 'ok',
-        },
-        {
-          id: 'STA005',
-          product_sku: 'SKU-9021',
-          sales_date: '2024-W06',
-          sales_qty: 890,
-          inventory_ending: 4200,
-          stockout_flag: 'N',
-          partner: 'Amazon',
-          week: '2024-W06',
-          sell_through_rate_pct: 17.5,
-          days_of_supply: 32.8,
-          alert_status: 'OK',
-          partner_location: 'Amazon FC - Dallas',
-          replenishment_lead_time: 3,
-          target_service_level: 98,
-          actual_service_level: 99.1,
-          product_id: 'SKU-9021',
-          product_name: 'Root Retouch Kit',
-          status: 'ok',
-        },
-      ];
-
+      // Generate data based on current granularity
+      const mockData = generateDataByGranularity(granularity);
       setSOPData(mockData);
 
       // Calculate metrics for Sell-Through Analytics
@@ -218,7 +242,8 @@ const SellThroughAnalytics = ({ onBack }) => {
     {
       field: 'partner',
       headerName: 'Partner',
-      width: 120,
+      flex: 0.8,
+      minWidth: 150,
       renderCell: (params) => (
         <Chip
           label={params.value}
@@ -230,7 +255,8 @@ const SellThroughAnalytics = ({ onBack }) => {
     {
       field: 'product_id',
       headerName: 'Product ID',
-      width: 110,
+      flex: 1,
+      minWidth: 200,
       renderCell: (params) => (
         <Box>
           <Typography variant="body2" sx={{ fontWeight: 500 }}>
@@ -337,7 +363,8 @@ const SellThroughAnalytics = ({ onBack }) => {
     {
       field: 'partner_location',
       headerName: 'Partner Location',
-      width: 200,
+      flex: 1,
+      minWidth: 180,
       renderCell: (params) => (
         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {params.value}
@@ -430,14 +457,21 @@ const SellThroughAnalytics = ({ onBack }) => {
             </Typography>
           </Breadcrumbs>
 
-          <Button
-            startIcon={<ArrowBackIcon />}
-            onClick={onBack}
-            variant="outlined"
-            size="small"
-          >
-            Back
-          </Button>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Tooltip title="Refresh Data">
+              <IconButton onClick={fetchSOPData} size="small">
+                <Refresh />
+              </IconButton>
+            </Tooltip>
+            <Button
+              startIcon={<ArrowBackIcon />}
+              onClick={onBack}
+              variant="outlined"
+              size="small"
+            >
+              Back
+            </Button>
+          </Stack>
         </Stack>
 
         <Box>
@@ -452,16 +486,10 @@ const SellThroughAnalytics = ({ onBack }) => {
 
       {/* Action Bar */}
       <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1.5 }}>
-        <ToggleButtonGroup
-          value={selectedView}
-          exclusive
-          onChange={(e, newView) => newView && setSelectedView(newView)}
-          size="small"
-        >
-          <ToggleButton value="monthly">Monthly</ToggleButton>
-          <ToggleButton value="quarterly">Quarterly</ToggleButton>
-          <ToggleButton value="weekly">Weekly</ToggleButton>
-        </ToggleButtonGroup>
+        <TimeGranularitySelector
+          value={granularity}
+          onChange={setGranularity}
+        />
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button startIcon={<Upload />} variant="outlined" size="small">
             Import

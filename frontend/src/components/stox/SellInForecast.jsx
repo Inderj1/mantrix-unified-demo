@@ -19,8 +19,6 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  ToggleButton,
-  ToggleButtonGroup,
 } from '@mui/material';
 import {
   DataGrid,
@@ -49,12 +47,13 @@ import {
   Settings,
   Add,
 } from '@mui/icons-material';
+import TimeGranularitySelector from '../common/TimeGranularitySelector';
 
 const SellInForecast = ({ onBack }) => {
   const [sopData, setSOPData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
-  const [selectedView, setSelectedView] = useState('monthly');
+  const [granularity, setGranularity] = useState('daily');
   const [selectedRows, setSelectedRows] = useState([]);
   const [consensusDialogOpen, setConsensusDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -62,125 +61,148 @@ const SellInForecast = ({ onBack }) => {
   useEffect(() => {
     fetchSOPData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [granularity]);
+
+  // Helper function to generate data based on granularity
+  const generateDataByGranularity = (granularity) => {
+    const products = [
+      { sku: 'SKU-7891', name: 'Madison Reed Premium Color Kit' },
+      { sku: 'SKU-4523', name: 'Color Reviving Gloss' },
+      { sku: 'SKU-9021', name: 'Root Retouch Kit' },
+    ];
+
+    const customers = [
+      { id: 'CUST-TARGET-001', name: 'Target Corporation' },
+      { id: 'CUST-AMAZON-001', name: 'Amazon' },
+      { id: 'CUST-WALMART-001', name: 'Walmart' },
+    ];
+
+    const data = [];
+    let idCounter = 1;
+    let orderCounter = 45890;
+
+    const orderStatuses = ['In Transit', 'Planned', 'Processing', 'Shipped', 'Delivered'];
+    const pipelineStatuses = ['On Track', 'Delayed', 'Critical', 'At Risk'];
+
+    if (granularity === 'daily') {
+      // Generate 7 days of shipment data
+      for (let day = 1; day <= 7; day++) {
+        products.forEach((product, pIdx) => {
+          customers.forEach((customer, cIdx) => {
+            if (Math.random() > 0.3) { // Not every day has shipments
+              const forecast = 400 + (pIdx * 500) + (cIdx * 300);
+              const inventory = Math.floor(forecast * (1.5 + Math.random() * 2));
+              const targetInv = Math.floor(forecast * (2 + Math.random()));
+              const replenish = Math.max(0, targetInv - inventory);
+
+              data.push({
+                id: `SIF${String(idCounter++).padStart(3, '0')}`,
+                product_sku: product.sku,
+                sales_date: `2024-02-${String(day).padStart(2, '0')}`,
+                week: `2024-W06`,
+                month: '2024-02',
+                sales_qty: replenish > 0 ? replenish : 0,
+                customer_id: customer.id,
+                sell_through_forecast: forecast,
+                partner_inventory: inventory,
+                target_inventory: targetInv,
+                replenishment_qty: replenish,
+                order_status: orderStatuses[Math.floor(Math.random() * orderStatuses.length)],
+                pipeline_status: replenish > targetInv * 0.5 ? 'Critical' : pipelineStatuses[Math.floor(Math.random() * pipelineStatuses.length)],
+                order_number: replenish > 0 ? `SO-${orderCounter++}` : '',
+                shipment_date: `2024-02-${String(day).padStart(2, '0')}`,
+                expected_delivery_date: `2024-02-${String(Math.min(day + 3, 28)).padStart(2, '0')}`,
+                product_id: product.sku,
+                product_name: product.name,
+                customer_name: customer.name,
+                status: replenish === 0 ? 'ok' : replenish > targetInv * 0.5 ? 'critical' : 'active',
+              });
+            }
+          });
+        });
+      }
+    } else if (granularity === 'weekly') {
+      // Generate 4 weeks of shipment data
+      for (let week = 3; week <= 6; week++) {
+        products.forEach((product, pIdx) => {
+          customers.forEach((customer, cIdx) => {
+            const forecast = 2800 + (pIdx * 3500) + (cIdx * 2100);
+            const inventory = Math.floor(forecast * (1.5 + Math.random() * 2));
+            const targetInv = Math.floor(forecast * (2 + Math.random()));
+            const replenish = Math.max(0, targetInv - inventory);
+
+            data.push({
+              id: `SIF${String(idCounter++).padStart(3, '0')}`,
+              product_sku: product.sku,
+              sales_date: `2024-W${String(week).padStart(2, '0')}`,
+              week: `2024-W${String(week).padStart(2, '0')}`,
+              month: '2024-02',
+              sales_qty: replenish > 0 ? replenish : 0,
+              customer_id: customer.id,
+              sell_through_forecast: forecast,
+              partner_inventory: inventory,
+              target_inventory: targetInv,
+              replenishment_qty: replenish,
+              order_status: orderStatuses[Math.floor(Math.random() * orderStatuses.length)],
+              pipeline_status: replenish > targetInv * 0.5 ? 'Critical' : pipelineStatuses[Math.floor(Math.random() * pipelineStatuses.length)],
+              order_number: replenish > 0 ? `SO-${orderCounter++}` : '',
+              shipment_date: week === 6 ? `2024-02-${10 + cIdx}` : '',
+              expected_delivery_date: week === 6 ? `2024-02-${15 + cIdx}` : '',
+              product_id: product.sku,
+              product_name: product.name,
+              customer_name: customer.name,
+              status: replenish === 0 ? 'ok' : replenish > targetInv * 0.5 ? 'critical' : 'planned',
+            });
+          });
+        });
+      }
+    } else if (granularity === 'monthly') {
+      // Generate 3 months of shipment data
+      for (let month = 12; month <= 2; month++) {
+        const monthLabel = month > 10 ? `2023-${month}` : `2024-0${month}`;
+
+        products.forEach((product, pIdx) => {
+          customers.forEach((customer, cIdx) => {
+            const forecast = 12000 + (pIdx * 15000) + (cIdx * 9000);
+            const inventory = Math.floor(forecast * (1.5 + Math.random() * 2));
+            const targetInv = Math.floor(forecast * (2 + Math.random()));
+            const replenish = Math.max(0, targetInv - inventory);
+
+            data.push({
+              id: `SIF${String(idCounter++).padStart(3, '0')}`,
+              product_sku: product.sku,
+              sales_date: monthLabel,
+              week: monthLabel,
+              month: monthLabel,
+              sales_qty: replenish > 0 ? replenish : 0,
+              customer_id: customer.id,
+              sell_through_forecast: forecast,
+              partner_inventory: inventory,
+              target_inventory: targetInv,
+              replenishment_qty: replenish,
+              order_status: orderStatuses[Math.floor(Math.random() * orderStatuses.length)],
+              pipeline_status: replenish > targetInv * 0.5 ? 'Critical' : pipelineStatuses[Math.floor(Math.random() * pipelineStatuses.length)],
+              order_number: replenish > 0 ? `SO-${orderCounter++}` : '',
+              shipment_date: monthLabel,
+              expected_delivery_date: monthLabel,
+              product_id: product.sku,
+              product_name: product.name,
+              customer_name: customer.name,
+              status: replenish === 0 ? 'ok' : replenish > targetInv * 0.5 ? 'critical' : 'planned',
+            });
+          });
+        });
+      }
+    }
+
+    return data;
+  };
 
   const fetchSOPData = async () => {
     setLoading(true);
     try {
-      // Sell-In Forecast data
-      const mockData = [
-        {
-          id: 'SIF001',
-          // Base columns from Input Data
-          product_sku: 'SKU-7891',
-          sales_date: '2024-W06',
-          sales_qty: 3200,
-
-          // Additional columns to ADD (11 total)
-          customer_id: 'CUST-TARGET-001',
-          week: '2024-W06',
-          sell_through_forecast: 3100,
-          partner_inventory: 8500,
-          target_inventory: 10000,
-          replenishment_qty: 1500,
-          order_status: 'In Transit',
-          pipeline_status: 'On Track',
-          order_number: 'SO-45892',
-          shipment_date: '2024-02-12',
-          expected_delivery_date: '2024-02-17',
-
-          // Supporting fields
-          product_id: 'SKU-7891',
-          product_name: 'Madison Reed Premium Color Kit',
-          customer_name: 'Target Corporation',
-          status: 'active',
-        },
-        {
-          id: 'SIF002',
-          product_sku: 'SKU-7891',
-          sales_date: '2024-W07',
-          sales_qty: 0,
-          customer_id: 'CUST-AMAZON-001',
-          week: '2024-W07',
-          sell_through_forecast: 2900,
-          partner_inventory: 3200,
-          target_inventory: 8000,
-          replenishment_qty: 4800,
-          order_status: 'Planned',
-          pipeline_status: 'Delayed',
-          order_number: 'SO-45901',
-          shipment_date: '2024-02-19',
-          expected_delivery_date: '2024-02-22',
-          product_id: 'SKU-7891',
-          product_name: 'Madison Reed Premium Color Kit',
-          customer_name: 'Amazon',
-          status: 'planned',
-        },
-        {
-          id: 'SIF003',
-          product_sku: 'SKU-4523',
-          sales_date: '2024-W06',
-          sales_qty: 1820,
-          customer_id: 'CUST-WALMART-001',
-          week: '2024-W06',
-          sell_through_forecast: 1850,
-          partner_inventory: 950,
-          target_inventory: 6000,
-          replenishment_qty: 5050,
-          order_status: 'Processing',
-          pipeline_status: 'Critical',
-          order_number: 'SO-45887',
-          shipment_date: '2024-02-10',
-          expected_delivery_date: '2024-02-14',
-          product_id: 'SKU-4523',
-          product_name: 'Color Reviving Gloss',
-          customer_name: 'Walmart',
-          status: 'critical',
-        },
-        {
-          id: 'SIF004',
-          product_sku: 'SKU-4523',
-          sales_date: '2024-W07',
-          sales_qty: 0,
-          customer_id: 'CUST-TARGET-001',
-          week: '2024-W07',
-          sell_through_forecast: 2100,
-          partner_inventory: 12500,
-          target_inventory: 9000,
-          replenishment_qty: 0,
-          order_status: 'Not Required',
-          pipeline_status: 'On Track',
-          order_number: '',
-          shipment_date: '',
-          expected_delivery_date: '',
-          product_id: 'SKU-4523',
-          product_name: 'Color Reviving Gloss',
-          customer_name: 'Target Corporation',
-          status: 'ok',
-        },
-        {
-          id: 'SIF005',
-          product_sku: 'SKU-9021',
-          sales_date: '2024-W07',
-          sales_qty: 0,
-          customer_id: 'CUST-AMAZON-001',
-          week: '2024-W07',
-          sell_through_forecast: 920,
-          partner_inventory: 4200,
-          target_inventory: 5000,
-          replenishment_qty: 800,
-          order_status: 'Planned',
-          pipeline_status: 'On Track',
-          order_number: 'SO-45903',
-          shipment_date: '2024-02-20',
-          expected_delivery_date: '2024-02-23',
-          product_id: 'SKU-9021',
-          product_name: 'Root Retouch Kit',
-          customer_name: 'Amazon',
-          status: 'planned',
-        },
-      ];
-
+      // Generate data based on current granularity
+      const mockData = generateDataByGranularity(granularity);
       setSOPData(mockData);
 
       // Calculate metrics
@@ -219,7 +241,8 @@ const SellInForecast = ({ onBack }) => {
     {
       field: 'product_name',
       headerName: 'Product',
-      width: 200,
+      flex: 1,
+      minWidth: 200,
       renderCell: (params) => (
         <Box>
           <Typography variant="body2" sx={{ fontWeight: 500 }}>
@@ -234,7 +257,8 @@ const SellInForecast = ({ onBack }) => {
     {
       field: 'customer_name',
       headerName: 'Customer',
-      width: 160,
+      flex: 0.8,
+      minWidth: 150,
       renderCell: (params) => (
         <Box>
           <Typography variant="body2" sx={{ fontWeight: 500 }}>
@@ -448,16 +472,10 @@ const SellInForecast = ({ onBack }) => {
 
       {/* Action Bar */}
       <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1.5 }}>
-        <ToggleButtonGroup
-          value={selectedView}
-          exclusive
-          onChange={(e, newView) => newView && setSelectedView(newView)}
-          size="small"
-        >
-          <ToggleButton value="monthly">Monthly</ToggleButton>
-          <ToggleButton value="quarterly">Quarterly</ToggleButton>
-          <ToggleButton value="weekly">Weekly</ToggleButton>
-        </ToggleButtonGroup>
+        <TimeGranularitySelector
+          value={granularity}
+          onChange={setGranularity}
+        />
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button startIcon={<Upload />} variant="outlined" size="small">
             Import

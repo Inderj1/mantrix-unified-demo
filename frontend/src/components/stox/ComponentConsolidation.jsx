@@ -42,7 +42,7 @@ const ComponentConsolidation = ({ onBack }) => {
   const [sopData, setSOPData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
-  const [selectedView, setSelectedView] = useState('monthly');
+  const [selectedView, setSelectedView] = useState('daily');
   const [selectedRows, setSelectedRows] = useState([]);
 
   useEffect(() => {
@@ -62,8 +62,8 @@ const ComponentConsolidation = ({ onBack }) => {
           total_requirement: 8370,
           available_stock: 12500,
           on_order: 5000,
-          shortage: 0,
-          pr_number: '',
+          shortage: 0, // 8370 - 12500 - 5000 = negative, so 0
+          pr_number: 'PR-78943',
           po_number: 'PO-45123',
           vendor: 'ChemSupply Inc.',
           lead_time_days: 14,
@@ -80,17 +80,17 @@ const ComponentConsolidation = ({ onBack }) => {
           component_name: 'Color Pigment Base',
           total_requirement: 16740,
           available_stock: 8200,
-          on_order: 0,
-          shortage: 8540,
+          on_order: 15000,
+          shortage: 0, // 16740 - 8200 - 15000 = negative, so 0 (order in progress)
           pr_number: 'PR-78945',
-          po_number: '',
+          po_number: 'PO-45189',
           vendor: 'PigmentCo Ltd',
           lead_time_days: 21,
           status: 'Critical',
           unit_of_measure: 'EA',
           unit_cost: 5.80,
           extended_value: 97092.00,
-          expected_arrival_date: '',
+          expected_arrival_date: '2024-03-05',
           buyer: 'Sarah Johnson',
         },
         {
@@ -100,12 +100,12 @@ const ComponentConsolidation = ({ onBack }) => {
           total_requirement: 8370,
           available_stock: 6500,
           on_order: 3000,
-          shortage: 0,
-          pr_number: '',
+          shortage: 0, // 8370 - 6500 - 3000 = negative, covered
+          pr_number: 'PR-78944',
           po_number: 'PO-45156',
           vendor: 'PackPro Solutions',
           lead_time_days: 10,
-          status: 'Warning',
+          status: 'OK',
           unit_of_measure: 'EA',
           unit_cost: 1.25,
           extended_value: 10462.50,
@@ -138,17 +138,55 @@ const ComponentConsolidation = ({ onBack }) => {
           total_requirement: 6430,
           available_stock: 4200,
           on_order: 5000,
-          shortage: 0,
-          pr_number: '',
+          shortage: 0, // 6430 - 4200 - 5000 = negative, covered
+          pr_number: 'PR-78942',
           po_number: 'PO-45178',
           vendor: 'PackPro Solutions',
           lead_time_days: 8,
-          status: 'Warning',
+          status: 'OK',
           unit_of_measure: 'EA',
           unit_cost: 0.85,
           extended_value: 5465.50,
           expected_arrival_date: '2024-02-12',
           buyer: 'Mike Chen',
+        },
+        {
+          id: 'CC006',
+          component_id: 'PKG-P018',
+          component_name: 'Pump Dispenser',
+          total_requirement: 12550,
+          available_stock: 7200,
+          on_order: 8000,
+          shortage: 0, // 12550 - 7200 - 8000 = negative, covered
+          pr_number: 'PR-78946',
+          po_number: 'PO-45189',
+          vendor: 'PackPro Solutions',
+          lead_time_days: 9,
+          status: 'OK',
+          unit_of_measure: 'EA',
+          unit_cost: 0.95,
+          extended_value: 11922.50,
+          expected_arrival_date: '2024-02-18',
+          buyer: 'Mike Chen',
+        },
+        {
+          id: 'CC007',
+          component_id: 'COMP-A401',
+          component_name: 'Ammonia-Free Activator',
+          total_requirement: 6750,
+          available_stock: 4200,
+          on_order: 0,
+          shortage: 2550, // 6750 - 4200 - 0 = 2550 shortage!
+          pr_number: 'PR-78947',
+          po_number: '',
+          vendor: 'ChemSupply Inc.',
+          lead_time_days: 18,
+          status: 'Critical',
+          unit_of_measure: 'EA',
+          unit_cost: 4.20,
+          extended_value: 28350.00,
+          expected_arrival_date: '2024-02-28',
+          buyer: 'Sarah Johnson',
         },
       ];
 
@@ -192,7 +230,8 @@ const ComponentConsolidation = ({ onBack }) => {
     {
       field: 'component_name',
       headerName: 'Component Name',
-      width: 200,
+      flex: 1,
+      minWidth: 200,
       renderCell: (params) => (
         <Typography variant="body2" sx={{ fontWeight: 500 }}>
           {params.value}
@@ -261,7 +300,8 @@ const ComponentConsolidation = ({ onBack }) => {
     {
       field: 'vendor',
       headerName: 'Vendor',
-      width: 180,
+      flex: 0.8,
+      minWidth: 150,
     },
     {
       field: 'lead_time_days',

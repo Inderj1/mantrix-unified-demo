@@ -46,7 +46,7 @@ const stoxModules = [
     color: '#3F51B5',
     bgColor: '#E8EAF6',
     stats: { label: 'Forecasts', value: '1.2K' },
-    status: 'active',
+    status: 'hidden',
     gradient: 'linear-gradient(135deg, #3F51B5 0%, #5C6BC0 100%)',
     metadata: {
       users: 'Demand Planners, Category Managers',
@@ -269,7 +269,7 @@ const StoxAILanding = ({ onTileClick, onBack }) => {
 
       {/* Module Tiles */}
       <Grid container spacing={2}>
-        {stoxModules.map((module, index) => (
+        {stoxModules.filter(m => m.status !== 'hidden').map((module, index) => (
           <Grid item xs={12} sm={6} md={4} key={module.id}>
             <Zoom in timeout={300 + index * 100}>
               <Card

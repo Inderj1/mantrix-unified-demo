@@ -54,7 +54,7 @@ const StoreDeployment = ({ onBack }) => {
   const [sopData, setSOPData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
-  const [selectedView, setSelectedView] = useState('monthly');
+  const [selectedView, setSelectedView] = useState('daily');
   const [selectedRows, setSelectedRows] = useState([]);
   const [consensusDialogOpen, setConsensusDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -214,7 +214,8 @@ const StoreDeployment = ({ onBack }) => {
     {
       field: 'store_location',
       headerName: 'Store Location',
-      width: 130,
+      flex: 1,
+      minWidth: 180,
       renderCell: (params) => (
         <Typography variant="body2" sx={{ fontWeight: 500 }}>
           {params.value}
@@ -224,7 +225,8 @@ const StoreDeployment = ({ onBack }) => {
     {
       field: 'product_name',
       headerName: 'Product',
-      width: 220,
+      flex: 1,
+      minWidth: 200,
       renderCell: (params) => (
         <Box>
           <Typography variant="body2" sx={{ fontWeight: 500 }}>

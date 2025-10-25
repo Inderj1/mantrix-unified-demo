@@ -19,8 +19,6 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  ToggleButton,
-  ToggleButtonGroup,
 } from '@mui/material';
 import {
   DataGrid,
@@ -49,12 +47,13 @@ import {
   Settings,
   Add,
 } from '@mui/icons-material';
+import TimeGranularitySelector from '../common/TimeGranularitySelector';
 
 const DemandWorkbench = ({ onBack }) => {
   const [sopData, setSOPData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
-  const [selectedView, setSelectedView] = useState('monthly');
+  const [granularity, setGranularity] = useState('daily');
   const [selectedRows, setSelectedRows] = useState([]);
   const [consensusDialogOpen, setConsensusDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -62,124 +61,144 @@ const DemandWorkbench = ({ onBack }) => {
   useEffect(() => {
     fetchSOPData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [granularity]);
+
+  // Helper function to generate data based on granularity
+  const generateDataByGranularity = (granularity) => {
+    const products = [
+      { sku: 'SKU-7891', name: 'Madison Reed Premium Color Kit', family: 'Hair Color' },
+      { sku: 'SKU-4523', name: 'Color Reviving Gloss', family: 'Hair Care' },
+      { sku: 'SKU-9021', name: 'Root Retouch Kit', family: 'Hair Color' },
+    ];
+
+    const locations = [
+      { id: 'NYC-001', store_id: 'STORE_001', channel: 'STORE' },
+      { id: 'ONLINE', store_id: 'WEB_MAIN', channel: 'ONLINE' },
+      { id: 'TARGET-DC', store_id: 'B2B_TARGET', channel: 'B2B' },
+      { id: 'LA-045', store_id: 'STORE_045', channel: 'STORE' },
+    ];
+
+    const data = [];
+    let idCounter = 1;
+
+    if (granularity === 'daily') {
+      // Generate 7 days of data
+      for (let day = 1; day <= 7; day++) {
+        products.forEach((product, pIdx) => {
+          locations.forEach((location, lIdx) => {
+            const baseActual = 100 + (pIdx * 300) + (lIdx * 50);
+            const actual = Math.floor(baseActual * (0.9 + Math.random() * 0.2));
+            const forecast = Math.floor(actual * (0.95 + Math.random() * 0.1));
+            const accuracy = ((1 - Math.abs(actual - forecast) / actual) * 100).toFixed(1);
+
+            data.push({
+              id: `DW${String(idCounter++).padStart(3, '0')}`,
+              store_id: location.store_id,
+              product_sku: product.sku,
+              location_id: location.id,
+              product_id: product.sku,
+              sales_date: `2024-02-${String(day).padStart(2, '0')}`,
+              week: `2024-W06`,
+              month: '2024-02',
+              actual_sales: actual,
+              promo_flag: day === 5 || day === 6 ? 'Y' : 'N',
+              channel: location.channel,
+              forecast_qty: forecast,
+              accuracy_pct: parseFloat(accuracy),
+              override_flag: accuracy < 90 ? 'Y' : 'N',
+              comments: accuracy < 90 ? 'Manual adjustment needed' : '',
+              forecast_model_used: location.channel === 'ONLINE' ? 'STOX.AI-v2.3-LSTM' : 'STOX.AI-v2.3-ARIMA',
+              confidence_interval: `${forecast * 0.9}-${forecast * 1.1}`,
+              product_family: product.family,
+              product_name: product.name,
+              status: 'approved',
+            });
+          });
+        });
+      }
+    } else if (granularity === 'weekly') {
+      // Generate 4 weeks of data
+      for (let week = 3; week <= 6; week++) {
+        products.forEach((product, pIdx) => {
+          locations.forEach((location, lIdx) => {
+            const baseActual = 700 + (pIdx * 2100) + (lIdx * 350);
+            const actual = Math.floor(baseActual * (0.9 + Math.random() * 0.2));
+            const forecast = Math.floor(actual * (0.95 + Math.random() * 0.1));
+            const accuracy = ((1 - Math.abs(actual - forecast) / actual) * 100).toFixed(1);
+
+            data.push({
+              id: `DW${String(idCounter++).padStart(3, '0')}`,
+              store_id: location.store_id,
+              product_sku: product.sku,
+              location_id: location.id,
+              product_id: product.sku,
+              sales_date: `2024-W${String(week).padStart(2, '0')}`,
+              week: `2024-W${String(week).padStart(2, '0')}`,
+              month: '2024-02',
+              actual_sales: actual,
+              promo_flag: week === 6 ? 'Y' : 'N',
+              channel: location.channel,
+              forecast_qty: forecast,
+              accuracy_pct: parseFloat(accuracy),
+              override_flag: accuracy < 90 ? 'Y' : 'N',
+              comments: week === 6 ? 'Valentine promotion' : '',
+              forecast_model_used: location.channel === 'ONLINE' ? 'STOX.AI-v2.3-LSTM' : 'STOX.AI-v2.3-ARIMA',
+              confidence_interval: `${Math.floor(forecast * 0.9)}-${Math.floor(forecast * 1.1)}`,
+              product_family: product.family,
+              product_name: product.name,
+              status: 'approved',
+            });
+          });
+        });
+      }
+    } else if (granularity === 'monthly') {
+      // Generate 3 months of data
+      for (let month = 12; month <= 2; month++) {
+        const monthStr = month > 10 ? `2023-${month}` : `2024-0${month}`;
+        const monthLabel = month > 10 ? `2023-${month}` : `2024-0${month}`;
+
+        products.forEach((product, pIdx) => {
+          locations.forEach((location, lIdx) => {
+            const baseActual = 3000 + (pIdx * 9000) + (lIdx * 1500);
+            const actual = Math.floor(baseActual * (0.9 + Math.random() * 0.2));
+            const forecast = Math.floor(actual * (0.95 + Math.random() * 0.1));
+            const accuracy = ((1 - Math.abs(actual - forecast) / actual) * 100).toFixed(1);
+
+            data.push({
+              id: `DW${String(idCounter++).padStart(3, '0')}`,
+              store_id: location.store_id,
+              product_sku: product.sku,
+              location_id: location.id,
+              product_id: product.sku,
+              sales_date: monthLabel,
+              week: monthLabel,
+              month: monthLabel,
+              actual_sales: actual,
+              promo_flag: month === 12 ? 'Y' : 'N',
+              channel: location.channel,
+              forecast_qty: forecast,
+              accuracy_pct: parseFloat(accuracy),
+              override_flag: accuracy < 90 ? 'Y' : 'N',
+              comments: month === 12 ? 'Holiday season spike' : '',
+              forecast_model_used: location.channel === 'ONLINE' ? 'STOX.AI-v2.3-LSTM' : 'STOX.AI-v2.3-ARIMA',
+              confidence_interval: `${Math.floor(forecast * 0.9)}-${Math.floor(forecast * 1.1)}`,
+              product_family: product.family,
+              product_name: product.name,
+              status: 'approved',
+            });
+          });
+        });
+      }
+    }
+
+    return data;
+  };
 
   const fetchSOPData = async () => {
     setLoading(true);
     try {
-      // Simulated Demand Workbench data with Input Data + Additional Columns
-      const mockData = [
-        {
-          id: 'DW001',
-          // Base columns from Input Data
-          store_id: 'STORE_001',
-          product_sku: 'SKU-7891',
-          location_id: 'NYC-001',
-          product_id: 'SKU-7891',
-          sales_date: '2024-W06',
-          actual_sales: 1250,
-          promo_flag: 'Y',
-
-          // Additional columns to ADD
-          channel: 'STORE',
-          week: '2024-W06',
-          forecast_qty: 1180,
-          accuracy_pct: 94.4,
-          override_flag: 'N',
-          comments: 'Valentine promotion driving higher sales',
-          forecast_model_used: 'STOX.AI-v2.3-ARIMA',
-          confidence_interval: '1050-1310',
-
-          // Legacy fields for compatibility
-          product_family: 'Hair Color',
-          product_name: 'Madison Reed Premium Color Kit',
-          status: 'approved',
-        },
-        {
-          id: 'DW002',
-          store_id: 'WEB_MAIN',
-          product_sku: 'SKU-7891',
-          location_id: 'ONLINE',
-          product_id: 'SKU-7891',
-          sales_date: '2024-W06',
-          actual_sales: 890,
-          promo_flag: 'N',
-          channel: 'ONLINE',
-          week: '2024-W06',
-          forecast_qty: 920,
-          accuracy_pct: 96.7,
-          override_flag: 'N',
-          comments: '',
-          forecast_model_used: 'STOX.AI-v2.3-LSTM',
-          confidence_interval: '820-1020',
-          product_family: 'Hair Color',
-          product_name: 'Madison Reed Premium Color Kit',
-          status: 'approved',
-        },
-        {
-          id: 'DW003',
-          store_id: 'B2B_TARGET',
-          product_sku: 'SKU-7891',
-          location_id: 'TARGET-DC',
-          product_id: 'SKU-7891',
-          sales_date: '2024-W06',
-          actual_sales: 3200,
-          promo_flag: 'Y',
-          channel: 'B2B',
-          week: '2024-W06',
-          forecast_qty: 3100,
-          accuracy_pct: 96.9,
-          override_flag: 'N',
-          comments: 'Partner promotion aligned with our forecast',
-          forecast_model_used: 'STOX.AI-v2.3-XGBoost',
-          confidence_interval: '2900-3300',
-          product_family: 'Hair Color',
-          product_name: 'Madison Reed Premium Color Kit',
-          status: 'approved',
-        },
-        {
-          id: 'DW004',
-          store_id: 'STORE_045',
-          product_sku: 'SKU-4523',
-          location_id: 'LA-045',
-          product_id: 'SKU-4523',
-          sales_date: '2024-W06',
-          actual_sales: 780,
-          promo_flag: 'N',
-          channel: 'STORE',
-          week: '2024-W06',
-          forecast_qty: 850,
-          accuracy_pct: 91.8,
-          override_flag: 'Y',
-          comments: 'Manual override - new store ramp slower than expected',
-          forecast_model_used: 'STOX.AI-v2.3-ARIMA',
-          confidence_interval: '750-950',
-          product_family: 'Hair Care',
-          product_name: 'Color Reviving Gloss',
-          status: 'review',
-        },
-        {
-          id: 'DW005',
-          store_id: 'WEB_MAIN',
-          product_sku: 'SKU-4523',
-          location_id: 'ONLINE',
-          product_id: 'SKU-4523',
-          sales_date: '2024-W06',
-          actual_sales: 1450,
-          promo_flag: 'Y',
-          channel: 'ONLINE',
-          week: '2024-W06',
-          forecast_qty: 1380,
-          accuracy_pct: 95.2,
-          override_flag: 'N',
-          comments: 'Email campaign boosted sales',
-          forecast_model_used: 'STOX.AI-v2.3-LSTM',
-          confidence_interval: '1250-1510',
-          product_family: 'Hair Care',
-          product_name: 'Color Reviving Gloss',
-          status: 'approved',
-        },
-      ];
+      // Generate data based on current granularity
+      const mockData = generateDataByGranularity(granularity);
 
       setSOPData(mockData);
 
@@ -223,7 +242,8 @@ const DemandWorkbench = ({ onBack }) => {
     {
       field: 'location_id',
       headerName: 'Location ID',
-      width: 120,
+      flex: 1,
+      minWidth: 180,
       renderCell: (params) => (
         <Typography variant="body2" sx={{ fontWeight: 500 }}>
           {params.value}
@@ -233,7 +253,8 @@ const DemandWorkbench = ({ onBack }) => {
     {
       field: 'product_id',
       headerName: 'Product ID',
-      width: 120,
+      flex: 1,
+      minWidth: 200,
       renderCell: (params) => (
         <Box>
           <Typography variant="body2" sx={{ fontWeight: 500 }}>
@@ -246,10 +267,15 @@ const DemandWorkbench = ({ onBack }) => {
       ),
     },
     {
-      field: 'week',
-      headerName: 'Week',
-      width: 100,
+      field: granularity === 'daily' ? 'sales_date' : granularity === 'weekly' ? 'week' : 'month',
+      headerName: granularity === 'daily' ? 'Date' : granularity === 'weekly' ? 'Week' : 'Month',
+      width: 120,
       align: 'center',
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+          {params.value}
+        </Typography>
+      ),
     },
     {
       field: 'channel',
@@ -328,7 +354,8 @@ const DemandWorkbench = ({ onBack }) => {
     {
       field: 'forecast_model_used',
       headerName: 'Model',
-      width: 180,
+      flex: 0.8,
+      minWidth: 150,
       renderCell: (params) => (
         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {params.value}
@@ -349,7 +376,8 @@ const DemandWorkbench = ({ onBack }) => {
     {
       field: 'comments',
       headerName: 'Comments',
-      width: 240,
+      flex: 1,
+      minWidth: 200,
       renderCell: (params) => (
         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {params.value || '-'}
@@ -441,16 +469,10 @@ const DemandWorkbench = ({ onBack }) => {
 
       {/* Action Bar */}
       <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1.5 }}>
-        <ToggleButtonGroup
-          value={selectedView}
-          exclusive
-          onChange={(e, newView) => newView && setSelectedView(newView)}
-          size="small"
-        >
-          <ToggleButton value="monthly">Monthly</ToggleButton>
-          <ToggleButton value="quarterly">Quarterly</ToggleButton>
-          <ToggleButton value="weekly">Weekly</ToggleButton>
-        </ToggleButtonGroup>
+        <TimeGranularitySelector
+          value={granularity}
+          onChange={setGranularity}
+        />
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button startIcon={<Upload />} variant="outlined" size="small">
             Import

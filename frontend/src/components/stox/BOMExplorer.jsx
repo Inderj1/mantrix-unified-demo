@@ -54,7 +54,7 @@ const BOMExplorer = ({ onBack }) => {
   const [sopData, setSOPData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
-  const [selectedView, setSelectedView] = useState('monthly');
+  const [selectedView, setSelectedView] = useState('daily');
   const [selectedRows, setSelectedRows] = useState([]);
   const [consensusDialogOpen, setConsensusDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -101,7 +101,7 @@ const BOMExplorer = ({ onBack }) => {
           lead_time_days: 21,
           supplier: 'PigmentCo Ltd',
           bom_level: 1,
-          alternative_bom: '',
+          alternative_bom: 'COMP-P206',
           scrap_pct: 3.5,
           component_type: 'ROH',
           safety_stock: 8000,
@@ -139,7 +139,7 @@ const BOMExplorer = ({ onBack }) => {
           lead_time_days: 12,
           supplier: 'BeautyIngredients Corp',
           bom_level: 1,
-          alternative_bom: '',
+          alternative_bom: 'COMP-G302',
           scrap_pct: 1.5,
           component_type: 'ROH',
           safety_stock: 7000,
@@ -204,7 +204,8 @@ const BOMExplorer = ({ onBack }) => {
     {
       field: 'finished_good_name',
       headerName: 'Finished Good',
-      width: 200,
+      flex: 1,
+      minWidth: 200,
       renderCell: (params) => (
         <Box>
           <Typography variant="body2" sx={{ fontWeight: 500 }}>
@@ -219,7 +220,8 @@ const BOMExplorer = ({ onBack }) => {
     {
       field: 'component_name',
       headerName: 'Component',
-      width: 180,
+      flex: 1,
+      minWidth: 180,
       renderCell: (params) => (
         <Box>
           <Typography variant="body2" sx={{ fontWeight: 500 }}>
@@ -304,7 +306,8 @@ const BOMExplorer = ({ onBack }) => {
     {
       field: 'supplier',
       headerName: 'Supplier',
-      width: 160,
+      flex: 0.8,
+      minWidth: 150,
     },
     {
       field: 'bom_level',

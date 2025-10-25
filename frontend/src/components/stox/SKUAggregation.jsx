@@ -19,8 +19,7 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  ToggleButton,
-  ToggleButtonGroup,
+  ButtonGroup,
 } from '@mui/material';
 import {
   DataGrid,
@@ -48,13 +47,15 @@ import {
   Delete,
   Settings,
   Add,
+  DateRange as WeeklyIcon,
+  EventNote as MonthlyIcon,
 } from '@mui/icons-material';
 
 const SKUAggregation = ({ onBack }) => {
   const [sopData, setSOPData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
-  const [selectedView, setSelectedView] = useState('monthly');
+  const [granularity, setGranularity] = useState('daily');
   const [selectedRows, setSelectedRows] = useState([]);
   const [consensusDialogOpen, setConsensusDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -62,125 +63,114 @@ const SKUAggregation = ({ onBack }) => {
   useEffect(() => {
     fetchSOPData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [granularity]);
+
+  // Helper function to generate data based on granularity (Weekly/Monthly only - Daily doesn't make sense for aggregation)
+  const generateDataByGranularity = (granularity) => {
+    const products = [
+      { sku: 'SKU-7891', name: 'Madison Reed Premium Color Kit' },
+      { sku: 'SKU-4523', name: 'Color Reviving Gloss' },
+      { sku: 'SKU-9021', name: 'Root Retouch Kit' },
+      { sku: 'SKU-3312', name: 'Shine Therapy Conditioner' },
+      { sku: 'SKU-5641', name: 'Volume Boost Shampoo' },
+    ];
+
+    const data = [];
+    let idCounter = 1;
+    let pirCounter = 1;
+
+    if (granularity === 'weekly') {
+      // Generate 4 weeks of aggregated data
+      for (let week = 3; week <= 6; week++) {
+        products.forEach((product, pIdx) => {
+          const storeBase = 700 + (pIdx * 200);
+          const onlineBase = 800 + (pIdx * 250);
+          const b2bBase = 5000 + (pIdx * 1500);
+
+          const storeForecast = Math.floor(storeBase * (0.9 + Math.random() * 0.2));
+          const onlineForecast = Math.floor(onlineBase * (0.9 + Math.random() * 0.2));
+          const b2bForecast = Math.floor(b2bBase * (0.9 + Math.random() * 0.2));
+          const totalDemand = storeForecast + onlineForecast + b2bForecast;
+
+          const prevWeekTotal = Math.floor(totalDemand * (0.85 + Math.random() * 0.15));
+          const yoyGrowth = ((totalDemand - prevWeekTotal) / prevWeekTotal * 100).toFixed(1);
+
+          data.push({
+            id: `SKA${String(idCounter++).padStart(3, '0')}`,
+            product_sku: product.sku,
+            sales_date: `2024-W${String(week).padStart(2, '0')}`,
+            week: `2024-W${String(week).padStart(2, '0')}`,
+            month: '2024-02',
+            store_forecast: storeForecast,
+            online_forecast: onlineForecast,
+            b2b_forecast: b2bForecast,
+            total_demand: totalDemand,
+            store_mix_pct: parseFloat(((storeForecast / totalDemand) * 100).toFixed(1)),
+            online_mix_pct: parseFloat(((onlineForecast / totalDemand) * 100).toFixed(1)),
+            b2b_mix_pct: parseFloat(((b2bForecast / totalDemand) * 100).toFixed(1)),
+            pir_status: week === 6 ? 'Created' : week === 5 ? 'Pending' : 'Completed',
+            pir_number: week >= 5 ? `PIR-240207-${String(pirCounter++).padStart(3, '0')}` : '',
+            mrp_run_date: `2024-02-07 03:00:00`,
+            previous_week_total: prevWeekTotal,
+            yoy_growth_pct: parseFloat(yoyGrowth),
+            product_id: product.sku,
+            product_name: product.name,
+            status: week === 6 ? 'active' : week === 5 ? 'pending' : 'completed',
+          });
+        });
+      }
+    } else if (granularity === 'monthly') {
+      // Generate 3 months of aggregated data
+      for (let month = 12; month <= 2; month++) {
+        const monthLabel = month > 10 ? `2023-${month}` : `2024-0${month}`;
+
+        products.forEach((product, pIdx) => {
+          const storeBase = 3000 + (pIdx * 800);
+          const onlineBase = 3500 + (pIdx * 1000);
+          const b2bBase = 20000 + (pIdx * 6000);
+
+          const storeForecast = Math.floor(storeBase * (0.9 + Math.random() * 0.2));
+          const onlineForecast = Math.floor(onlineBase * (0.9 + Math.random() * 0.2));
+          const b2bForecast = Math.floor(b2bBase * (0.9 + Math.random() * 0.2));
+          const totalDemand = storeForecast + onlineForecast + b2bForecast;
+
+          const prevMonthTotal = Math.floor(totalDemand * (0.85 + Math.random() * 0.15));
+          const yoyGrowth = ((totalDemand - prevMonthTotal) / prevMonthTotal * 100).toFixed(1);
+
+          data.push({
+            id: `SKA${String(idCounter++).padStart(3, '0')}`,
+            product_sku: product.sku,
+            sales_date: monthLabel,
+            week: monthLabel,
+            month: monthLabel,
+            store_forecast: storeForecast,
+            online_forecast: onlineForecast,
+            b2b_forecast: b2bForecast,
+            total_demand: totalDemand,
+            store_mix_pct: parseFloat(((storeForecast / totalDemand) * 100).toFixed(1)),
+            online_mix_pct: parseFloat(((onlineForecast / totalDemand) * 100).toFixed(1)),
+            b2b_mix_pct: parseFloat(((b2bForecast / totalDemand) * 100).toFixed(1)),
+            pir_status: month === 2 ? 'Created' : month === 1 ? 'Pending' : 'Completed',
+            pir_number: month >= 1 ? `PIR-2024${String(month).padStart(2, '0')}-${String(pirCounter++).padStart(3, '0')}` : '',
+            mrp_run_date: `${monthLabel}-01 03:00:00`,
+            previous_week_total: prevMonthTotal,
+            yoy_growth_pct: parseFloat(yoyGrowth),
+            product_id: product.sku,
+            product_name: product.name,
+            status: month === 2 ? 'active' : month === 1 ? 'pending' : 'completed',
+          });
+        });
+      }
+    }
+
+    return data;
+  };
 
   const fetchSOPData = async () => {
     setLoading(true);
     try {
-      // SKU Aggregation data
-      const mockData = [
-        {
-          id: 'SKA001',
-          // Base columns from Input Data
-          product_sku: 'SKU-7891',
-          sales_date: '2024-W07',
-
-          // Additional columns to ADD (13 total)
-          week: '2024-W07',
-          store_forecast: 1250,
-          online_forecast: 920,
-          b2b_forecast: 6200,
-          total_demand: 8370,
-          store_mix_pct: 14.9,
-          online_mix_pct: 11.0,
-          b2b_mix_pct: 74.1,
-          pir_status: 'Created',
-          pir_number: 'PIR-240207-001',
-          mrp_run_date: '2024-02-07 03:00:00',
-          previous_week_total: 7570,
-          yoy_growth_pct: 10.6,
-
-          // Supporting fields
-          product_id: 'SKU-7891',
-          product_name: 'Madison Reed Premium Color Kit',
-          status: 'active',
-        },
-        {
-          id: 'SKA002',
-          product_sku: 'SKU-4523',
-          sales_date: '2024-W07',
-          week: '2024-W07',
-          store_forecast: 850,
-          online_forecast: 1380,
-          b2b_forecast: 4200,
-          total_demand: 6430,
-          store_mix_pct: 13.2,
-          online_mix_pct: 21.5,
-          b2b_mix_pct: 65.3,
-          pir_status: 'Created',
-          pir_number: 'PIR-240207-002',
-          mrp_run_date: '2024-02-07 03:00:00',
-          previous_week_total: 5650,
-          yoy_growth_pct: 13.8,
-          product_id: 'SKU-4523',
-          product_name: 'Color Reviving Gloss',
-          status: 'active',
-        },
-        {
-          id: 'SKA003',
-          product_sku: 'SKU-9021',
-          sales_date: '2024-W07',
-          week: '2024-W07',
-          store_forecast: 620,
-          online_forecast: 780,
-          b2b_forecast: 1850,
-          total_demand: 3250,
-          store_mix_pct: 19.1,
-          online_mix_pct: 24.0,
-          b2b_mix_pct: 56.9,
-          pir_status: 'Created',
-          pir_number: 'PIR-240207-003',
-          mrp_run_date: '2024-02-07 03:00:00',
-          previous_week_total: 2940,
-          yoy_growth_pct: 10.5,
-          product_id: 'SKU-9021',
-          product_name: 'Root Retouch Kit',
-          status: 'active',
-        },
-        {
-          id: 'SKA004',
-          product_sku: 'SKU-3312',
-          sales_date: '2024-W07',
-          week: '2024-W07',
-          store_forecast: 420,
-          online_forecast: 560,
-          b2b_forecast: 980,
-          total_demand: 1960,
-          store_mix_pct: 21.4,
-          online_mix_pct: 28.6,
-          b2b_mix_pct: 50.0,
-          pir_status: 'Pending',
-          pir_number: '',
-          mrp_run_date: '2024-02-07 03:00:00',
-          previous_week_total: 2120,
-          yoy_growth_pct: -7.5,
-          product_id: 'SKU-3312',
-          product_name: 'Shine Therapy Conditioner',
-          status: 'pending',
-        },
-        {
-          id: 'SKA005',
-          product_sku: 'SKU-5641',
-          sales_date: '2024-W07',
-          week: '2024-W07',
-          store_forecast: 1150,
-          online_forecast: 890,
-          b2b_forecast: 3200,
-          total_demand: 5240,
-          store_mix_pct: 21.9,
-          online_mix_pct: 17.0,
-          b2b_mix_pct: 61.1,
-          pir_status: 'Created',
-          pir_number: 'PIR-240207-005',
-          mrp_run_date: '2024-02-07 03:00:00',
-          previous_week_total: 4980,
-          yoy_growth_pct: 5.2,
-          product_id: 'SKU-5641',
-          product_name: 'Volume Boost Shampoo',
-          status: 'active',
-        },
-      ];
-
+      // Generate data based on current granularity
+      const mockData = generateDataByGranularity(granularity);
       setSOPData(mockData);
 
       // Calculate metrics
@@ -215,7 +205,8 @@ const SKUAggregation = ({ onBack }) => {
     {
       field: 'product_name',
       headerName: 'Product',
-      width: 200,
+      flex: 1,
+      minWidth: 200,
       renderCell: (params) => (
         <Box>
           <Typography variant="body2" sx={{ fontWeight: 500 }}>
@@ -247,7 +238,7 @@ const SKUAggregation = ({ onBack }) => {
     {
       field: 'store_forecast',
       headerName: 'Store Forecast',
-      width: 120,
+      width: 150,
       align: 'right',
       renderCell: (params) => (
         <Box>
@@ -263,7 +254,7 @@ const SKUAggregation = ({ onBack }) => {
     {
       field: 'online_forecast',
       headerName: 'Online Forecast',
-      width: 120,
+      width: 150,
       align: 'right',
       renderCell: (params) => (
         <Box>
@@ -279,7 +270,7 @@ const SKUAggregation = ({ onBack }) => {
     {
       field: 'b2b_forecast',
       headerName: 'B2B Forecast',
-      width: 120,
+      width: 140,
       align: 'right',
       renderCell: (params) => (
         <Box>
@@ -295,7 +286,7 @@ const SKUAggregation = ({ onBack }) => {
     {
       field: 'store_mix_pct',
       headerName: 'Store Mix %',
-      width: 110,
+      width: 130,
       align: 'center',
       renderCell: (params) => (
         <Box sx={{ width: '100%' }}>
@@ -314,7 +305,7 @@ const SKUAggregation = ({ onBack }) => {
     {
       field: 'online_mix_pct',
       headerName: 'Online Mix %',
-      width: 110,
+      width: 130,
       align: 'center',
       renderCell: (params) => (
         <Box sx={{ width: '100%' }}>
@@ -333,7 +324,7 @@ const SKUAggregation = ({ onBack }) => {
     {
       field: 'b2b_mix_pct',
       headerName: 'B2B Mix %',
-      width: 110,
+      width: 120,
       align: 'center',
       renderCell: (params) => (
         <Box sx={{ width: '100%' }}>
@@ -400,7 +391,8 @@ const SKUAggregation = ({ onBack }) => {
     {
       field: 'pir_number',
       headerName: 'PIR Number',
-      width: 140,
+      flex: 0.8,
+      minWidth: 150,
       renderCell: (params) => (
         <Typography variant="body2" sx={{ color: params.value ? 'text.primary' : 'text.disabled' }}>
           {params.value || 'N/A'}
@@ -523,16 +515,29 @@ const SKUAggregation = ({ onBack }) => {
 
       {/* Action Bar */}
       <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1.5 }}>
-        <ToggleButtonGroup
-          value={selectedView}
-          exclusive
-          onChange={(e, newView) => newView && setSelectedView(newView)}
-          size="small"
-        >
-          <ToggleButton value="monthly">Monthly</ToggleButton>
-          <ToggleButton value="quarterly">Quarterly</ToggleButton>
-          <ToggleButton value="weekly">Weekly</ToggleButton>
-        </ToggleButtonGroup>
+        <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}>
+          <Typography variant="body2" color="text.secondary" fontWeight={600}>
+            View By:
+          </Typography>
+          <ButtonGroup size="small" variant="outlined">
+            <Button
+              variant={granularity === 'weekly' ? 'contained' : 'outlined'}
+              onClick={() => setGranularity('weekly')}
+              startIcon={<WeeklyIcon sx={{ fontSize: 16 }} />}
+              sx={{ minWidth: 100 }}
+            >
+              Weekly
+            </Button>
+            <Button
+              variant={granularity === 'monthly' ? 'contained' : 'outlined'}
+              onClick={() => setGranularity('monthly')}
+              startIcon={<MonthlyIcon sx={{ fontSize: 16 }} />}
+              sx={{ minWidth: 100 }}
+            >
+              Monthly
+            </Button>
+          </ButtonGroup>
+        </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button startIcon={<Upload />} variant="outlined" size="small">
             Import
