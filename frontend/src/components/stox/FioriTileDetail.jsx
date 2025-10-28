@@ -743,7 +743,7 @@ const FioriTileDetail = ({ tileId, tileTitle, moduleColor, onBack }) => {
           {metrics.map((metric, index) => (
             <Grid item xs={12} sm={6} md={3} key={index}>
               <Card sx={{
-                height: '100%',
+                height: '100vh',
                 borderLeft: `4px solid ${metric.color}`,
                 transition: 'all 0.3s',
                 '&:hover': {
@@ -795,7 +795,7 @@ const FioriTileDetail = ({ tileId, tileTitle, moduleColor, onBack }) => {
         <Grid container spacing={2} sx={{ mb: 2, flexShrink: 0 }}>
           {[1, 2, 3, 4].map((i) => (
             <Grid item xs={12} sm={6} md={3} key={i}>
-              <Card sx={{ height: '100%' }}>
+              <Card sx={{ height: '100vh' }}>
                 <CardContent sx={{ p: 1.5 }}>
                   <Stack direction="row" spacing={1.5} alignItems="flex-start">
                     <Avatar sx={{ bgcolor: alpha('#ccc', 0.3), width: 40, height: 40 }}>

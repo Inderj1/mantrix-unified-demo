@@ -338,7 +338,7 @@ const ModuleTilesView = ({ moduleId, onBack, onTileClick }) => {
   }
 
   return (
-    <Box sx={{ p: 2, height: '100%', overflowY: 'auto' }}>
+    <Box sx={{ p: 2, height: '100vh', overflowY: 'auto' }}>
       {/* Header with Breadcrumbs */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -400,7 +400,7 @@ const ModuleTilesView = ({ moduleId, onBack, onTileClick }) => {
             <Zoom in timeout={300 + index * 100}>
               <Card
                 sx={{
-                  height: '100%',
+                  height: '100vh',
                   cursor: tile.status === 'active' ? 'pointer' : 'default',
                   opacity: tile.status === 'coming-soon' ? 0.7 : 1,
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',

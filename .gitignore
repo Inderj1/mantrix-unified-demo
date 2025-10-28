@@ -185,3 +185,4 @@ TODO_PRIVATE.md
 # Jupyter notebooks with outputs (may contain sensitive data)
 **/.ipynb_checkpoints/
 *.ipynb
+mantrix.tar.gz

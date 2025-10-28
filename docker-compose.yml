@@ -38,11 +38,11 @@ services:
       CACHE_ENABLED: "true"
       
       # PostgreSQL Configuration
-      POSTGRES_HOST: host.docker.internal
+      POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
-      POSTGRES_USER: inder
-      POSTGRES_PASSWORD: ""
-      POSTGRES_DATABASE: customer_analytics
+      POSTGRES_USER: mantrix
+      POSTGRES_PASSWORD: mantrix123
+      POSTGRES_DATABASE: mantrix_madison
       
       # Logging
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
@@ -55,6 +55,7 @@ services:
       - redis
       - mongodb
       - neo4j
+      - postgres
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
@@ -145,6 +146,25 @@ services:
       timeout: 10s
       retries: 5
 
+  # PostgreSQL Database for Mantrix Madison App
+  postgres:
+    image: postgres:16
+    ports:
+      - "5433:5432"  # Exposed on 5433 to avoid conflict with system postgres
+    environment:
+      POSTGRES_USER: mantrix
+      POSTGRES_PASSWORD: mantrix123
+      POSTGRES_DB: mantrix_madison
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./raw:/raw:ro  # Mount raw CSV files as read-only
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mantrix -d mantrix_madison"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # Nginx Reverse Proxy (optional, for production)
   nginx:
     image: nginx:alpine
@@ -174,6 +194,8 @@ volumes:
   neo4j_import:
     driver: local
   neo4j_plugins:
+    driver: local
+  postgres_data:
     driver: local
 
 networks:

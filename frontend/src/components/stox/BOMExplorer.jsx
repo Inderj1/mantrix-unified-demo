@@ -391,7 +391,7 @@ const BOMExplorer = ({ onBack }) => {
   return (
     <Box sx={{
       p: 3,
-      height: '100%',
+      height: '100vh',
       display: 'flex',
       flexDirection: 'column',
       overflowY: 'auto',

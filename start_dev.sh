@@ -36,12 +36,12 @@ fi
 
 # Start Redis
 echo -e "\n${YELLOW}Starting Redis...${NC}"
-if pgrep -x "redis-server" > /dev/null; then
+if pgrep -f "redis-server" > /dev/null; then
     echo -e "${GREEN}✓ Redis already running${NC}"
 else
     redis-server --daemonize yes
     sleep 1
-    if pgrep -x "redis-server" > /dev/null; then
+    if pgrep -f "redis-server" > /dev/null; then
         echo -e "${GREEN}✓ Redis started successfully${NC}"
     else
         echo -e "${RED}✗ Failed to start Redis${NC}"

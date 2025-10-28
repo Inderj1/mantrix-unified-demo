@@ -330,7 +330,7 @@ const ScenarioPlanner = ({ onBack }) => {
   ];
 
   return (
-    <Box sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ mb: 2 }}>
