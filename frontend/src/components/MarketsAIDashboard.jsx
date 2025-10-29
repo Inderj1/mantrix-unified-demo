@@ -30,6 +30,7 @@ import MarketCategoryTile from './markets/MarketCategoryTile';
 import MarketCategoryDetail from './markets/MarketCategoryDetail';
 import MarketConfigPanel from './markets/MarketConfigPanel';
 import mockMarketSignals, { getSignalsByCategory, getTotalImpact, getCriticalSignals } from '../data/mockMarketData';
+import { usePersistedState } from '../hooks/usePersistedState';
 
 /**
  * MarketsAIDashboard - Main dashboard for market intelligence
@@ -38,8 +39,11 @@ import mockMarketSignals, { getSignalsByCategory, getTotalImpact, getCriticalSig
 const MarketsAIDashboard = () => {
   const categories = getCategoriesArray();
 
-  // State
-  const [enabledCategories, setEnabledCategories] = useState(categories.map(c => c.id));
+  // State - persisted configuration
+  const [enabledCategories, setEnabledCategories] = usePersistedState(
+    'mantrix-markets-enabled-categories',
+    categories.map(c => c.id)
+  );
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
   const [configPanelOpen, setConfigPanelOpen] = useState(false);

@@ -16,6 +16,8 @@ import {
   Person as PersonIcon,
   Settings as SettingsIcon,
 } from '@mui/icons-material';
+import { clearCache } from '../config/queryClient';
+import { clearNavigationState } from '../hooks/usePersistedState';
 
 function AuthButton() {
   let clerkHooks = { openSignIn: null, signOut: null };
@@ -51,6 +53,9 @@ function AuthButton() {
 
   const handleSignOut = async () => {
     handleClose();
+    // Clear React Query cache and navigation state before signing out
+    await clearCache();
+    clearNavigationState();
     await signOut();
   };
 

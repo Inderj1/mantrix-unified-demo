@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Box, Paper, Typography, Grid, Card, CardContent, Chip, Button, Breadcrumbs, Link, Stack, IconButton, Tooltip, alpha,
   Dialog, DialogTitle, DialogContent, DialogActions, Divider, Table, TableBody, TableRow, TableCell, Select, MenuItem, FormControl, InputLabel,
@@ -8,11 +8,12 @@ import {
   TrendingUp, Refresh, NavigateNext as NavigateNextIcon, ArrowBack as ArrowBackIcon, Download, Warehouse, Store, Layers,
   ExpandMore, ChevronRight, Info, TrendingDown, TrendingFlat, Functions, CalendarMonth, ViewModule,
 } from '@mui/icons-material';
+import { useDCDemandData } from '../../hooks/useStoxData';
 
 const DCDemandAggregation = ({ onBack }) => {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [metrics, setMetrics] = useState(null);
+  // Use persistent data hook
+  const { data, loading, refetch } = useDCDemandData();
+
   const [expandedRows, setExpandedRows] = useState([]);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedChannel, setSelectedChannel] = useState(null);
@@ -23,125 +24,20 @@ const DCDemandAggregation = ({ onBack }) => {
   const [groupBy, setGroupBy] = useState('none');
   const [timeBucket, setTimeBucket] = useState('daily');
 
-  useEffect(() => { fetchData(); }, []);
+  // Calculate metrics from data
+  const metrics = useMemo(() => {
+    if (!data || data.length === 0) return null;
 
-  const fetchData = () => {
-    setLoading(true);
-    setTimeout(() => {
-      const dcs = ['DC-East', 'DC-Midwest', 'DC-West'];
-      const products = ['MR_HAIR_101', 'MR_HAIR_102', 'MR_HAIR_103'];
-      const currentDate = '2025-01-11';
-      const isoWeek = '2025-W02';
+    const dcsSet = new Set(data.map(row => row.dc_location));
+    const totalChannels = data.length * 4; // 4 channels per row
 
-      const aggregationData = [];
-      let idCounter = 1;
-      let totalChannels = 0;
-
-      dcs.forEach((dc) => {
-        products.forEach((product) => {
-          // Step 1: Individual channel forecasts
-          const retailFcst = Math.round(400 + Math.random() * 200);
-          const amazonFcst = Math.round(250 + Math.random() * 200);
-          const wholesaleFcst = Math.round(100 + Math.random() * 100);
-          const d2cFcst = Math.round(80 + Math.random() * 50);
-
-          // Step 2: Daily DC Aggregation
-          const dailyForecastDC = retailFcst + amazonFcst + wholesaleFcst + d2cFcst;
-
-          // Channel variances (for statistical calculations)
-          const retailStdDev = Math.round(retailFcst * 0.15);
-          const amazonStdDev = Math.round(amazonFcst * 0.18);
-          const wholesaleStdDev = Math.round(wholesaleFcst * 0.12);
-          const d2cStdDev = Math.round(d2cFcst * 0.25);
-
-          // Step 3: Statistical measures
-          const rho = 0.3; // correlation coefficient
-
-          // Independent variance
-          const independentVar = Math.pow(retailStdDev, 2) + Math.pow(amazonStdDev, 2) +
-                                Math.pow(wholesaleStdDev, 2) + Math.pow(d2cStdDev, 2);
-
-          // Correlated variance
-          const correlationTerm = 2 * rho * (
-            retailStdDev * amazonStdDev + retailStdDev * wholesaleStdDev + retailStdDev * d2cStdDev +
-            amazonStdDev * wholesaleStdDev + amazonStdDev * d2cStdDev + wholesaleStdDev * d2cStdDev
-          );
-
-          const dailyStdDevDC = Math.round(Math.sqrt(independentVar + correlationTerm));
-          const weeklyMeanDC = dailyForecastDC * 7;
-          const weeklyStdDevDC = Math.round(dailyStdDevDC * Math.sqrt(7));
-
-          const numLocations = Math.round(15 + Math.random() * 35);
-          const variance = Math.round((Math.random() - 0.5) * 100);
-          const variancePct = ((Math.abs(variance) / dailyForecastDC) * 100).toFixed(1);
-
-          // Single row with all channel data mapped
-          const rowId = `DA${String(idCounter++).padStart(4, '0')}`;
-          totalChannels += 4;
-
-          aggregationData.push({
-            id: rowId,
-            date: currentDate,
-            iso_week: isoWeek,
-            dc_location: dc,
-            product_sku: product,
-
-            // Aggregated DC data
-            daily_forecast_dc: dailyForecastDC,
-            weekly_mean_dc: weeklyMeanDC,
-            weekly_stddev_dc: weeklyStdDevDC,
-            num_locations: numLocations,
-            variance,
-            variance_pct: parseFloat(variancePct),
-            status: Math.abs(variance) < 50 ? 'Aligned' : parseFloat(variancePct) < 5 ? 'Good' : 'Review',
-
-            // Retail channel
-            retail_fcst: retailFcst,
-            retail_stddev: retailStdDev,
-            retail_weekly: retailFcst * 7,
-            retail_pct: ((retailFcst / dailyForecastDC) * 100).toFixed(1),
-            retail_trend: '+5%',
-            retail_trend_dir: 'up',
-
-            // Amazon channel
-            amazon_fcst: amazonFcst,
-            amazon_stddev: amazonStdDev,
-            amazon_weekly: amazonFcst * 7,
-            amazon_pct: ((amazonFcst / dailyForecastDC) * 100).toFixed(1),
-            amazon_trend: '0%',
-            amazon_trend_dir: 'flat',
-
-            // Wholesale channel
-            wholesale_fcst: wholesaleFcst,
-            wholesale_stddev: wholesaleStdDev,
-            wholesale_weekly: wholesaleFcst * 7,
-            wholesale_pct: ((wholesaleFcst / dailyForecastDC) * 100).toFixed(1),
-            wholesale_trend: '-2%',
-            wholesale_trend_dir: 'down',
-
-            // D2C channel
-            d2c_fcst: d2cFcst,
-            d2c_stddev: d2cStdDev,
-            d2c_weekly: d2cFcst * 7,
-            d2c_pct: ((d2cFcst / dailyForecastDC) * 100).toFixed(1),
-            d2c_trend: '+8%',
-            d2c_trend_dir: 'up',
-
-            correlation_rho: rho,
-          });
-        });
-      });
-
-      setData(aggregationData);
-      setMetrics({
-        totalDCs: dcs.length,
-        totalDemand: aggregationData.reduce((sum, row) => sum + row.daily_forecast_dc, 0),
-        avgWeeklyMean: Math.round(aggregationData.reduce((sum, row) => sum + row.weekly_mean_dc, 0) / aggregationData.length),
-        channelsTracked: totalChannels,
-      });
-      setLoading(false);
-    }, 800);
-  };
+    return {
+      totalDCs: dcsSet.size,
+      totalDemand: data.reduce((sum, row) => sum + row.daily_forecast_dc, 0),
+      avgWeeklyMean: Math.round(data.reduce((sum, row) => sum + row.weekly_mean_dc, 0) / data.length),
+      channelsTracked: totalChannels,
+    };
+  }, [data]);
 
   const handleDetailsClick = (channelData) => {
     setSelectedChannel(channelData);
@@ -496,7 +392,7 @@ const DCDemandAggregation = ({ onBack }) => {
 
             <Divider orientation="vertical" flexItem />
 
-            <Tooltip title="Refresh"><IconButton onClick={fetchData} color="primary"><Refresh /></IconButton></Tooltip>
+            <Tooltip title="Refresh"><IconButton onClick={refetch} color="primary"><Refresh /></IconButton></Tooltip>
             <Tooltip title="Export"><IconButton color="primary"><Download /></IconButton></Tooltip>
           </Stack>
         </Stack>

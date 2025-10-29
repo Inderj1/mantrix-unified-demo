@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ClerkProvider, useUser } from '@clerk/clerk-react';
 import AuthButton from './components/AuthButton';
+import { usePersistedState } from './hooks/usePersistedState';
 // Removed react-router-dom imports - using tab-based navigation
 import {
   Box,
@@ -177,10 +178,10 @@ function App() {
   
   // State management
   const [loading, setLoading] = useState(false);
-  const [selectedTab, setSelectedTab] = useState(0);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedTab, setSelectedTab] = usePersistedState('mantrix-selectedTab', 0);
+  const [drawerOpen, setDrawerOpen] = usePersistedState('mantrix-drawerOpen', false);
   const [coreAIView, setCoreAIView] = useState('landing'); // 'landing', 'margen', 'stox'
-  const [stoxView, setStoxView] = useState('landing'); // 'landing', 'stoxshift'
+  const [stoxView, setStoxView] = usePersistedState('mantrix-stoxView', 'landing'); // 'landing', 'stoxshift'
   const [currentFioriTile, setCurrentFioriTile] = useState(null); // { tileId, title, moduleId, moduleColor }
   const [axisAIView, setAxisAIView] = useState('landing'); // 'landing', 'forecast', 'budget', 'driver', 'scenario', 'insights'
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });

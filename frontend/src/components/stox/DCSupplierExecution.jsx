@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Box, Paper, Typography, Grid, Card, CardContent, Chip, Button, Breadcrumbs, Link, Stack, IconButton, Tooltip, alpha,
 } from '@mui/material';
@@ -7,134 +7,25 @@ import {
   LocalShipping, Refresh, NavigateNext as NavigateNextIcon, ArrowBack as ArrowBackIcon, Download, ShoppingCart, Build, SwapHoriz, AttachMoney,
 } from '@mui/icons-material';
 import stoxTheme from './stoxTheme';
+import { useDCSupplierData } from '../../hooks/useStoxData';
 
 const DCSupplierExecution = ({ onBack }) => {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [metrics, setMetrics] = useState(null);
+  // Use persistent data hook
+  const { data, loading, refetch } = useDCSupplierData();
 
-  useEffect(() => { fetchData(); }, []);
+  // Calculate metrics from data
+  const metrics = useMemo(() => {
+    if (!data || data.length === 0) return null;
 
-  const fetchData = () => {
-    setLoading(true);
-    setTimeout(() => {
-      // Real data from Actionable _ Supplier PL Engine tab
-      const executionData = [
-        {
-          id: 'SE0001',
-          component: 'Conditioner 250 ml',
-          sku: 'MR_HAIR_101',
-          dc: 'DC-East',
-          net_req: 2922,
-          lot_size: 3400,
-          lead_time_days: 14,
-          source_type: 'Buy',
-          supplier: 'Vendor A',
-          on_time_pct: 0.9,
-          mode: 'Sea',
-          release_date: '2025-03-25',
-          need_date: '2025-04-08',
-          unit_cost: 3,
-          order_value: 10200, // 3400 × 3
-          freight_util: 0.87,
-          status: '🟢 Normal',
-          action: 'Generate Purchase Requirement'
-        },
-        {
-          id: 'SE0002',
-          component: 'Box',
-          sku: 'MR_HAIR_101',
-          dc: 'DC-East',
-          net_req: 2834,
-          lot_size: 4000,
-          lead_time_days: 7,
-          source_type: 'Buy',
-          supplier: 'Vendor B',
-          on_time_pct: 0.85,
-          mode: 'Truck',
-          release_date: '2025-03-29',
-          need_date: '2025-04-05',
-          unit_cost: 0.4,
-          order_value: 1600, // 4000 × 0.4
-          freight_util: 0.92,
-          status: '⚠️ Tight',
-          action: 'Expedite Order'
-        },
-        {
-          id: 'SE0003',
-          component: 'Leaflet',
-          sku: 'MR_HAIR_101',
-          dc: 'DC-East',
-          net_req: 334,
-          lot_size: 3000,
-          lead_time_days: 2,
-          source_type: 'Make',
-          supplier: 'In-house Print Plant',
-          on_time_pct: 1.0,
-          mode: 'Internal',
-          release_date: '2025-04-03',
-          need_date: '2025-04-05',
-          unit_cost: 0.1,
-          order_value: 300, // 3000 × 0.1
-          freight_util: 0.8,
-          status: '🟢 Normal',
-          action: 'Trigger Production Order'
-        },
-        {
-          id: 'SE0004',
-          component: 'Conditioner 250 ml',
-          sku: 'MR_HAIR_101',
-          dc: 'DC-Midwest',
-          net_req: 2922,
-          lot_size: 3400,
-          lead_time_days: 14,
-          source_type: 'Buy',
-          supplier: 'Vendor A',
-          on_time_pct: 0.9,
-          mode: 'Sea',
-          release_date: '2025-03-25',
-          need_date: '2025-04-08',
-          unit_cost: 3,
-          order_value: 10200,
-          freight_util: 1.0,
-          status: '🟢 Full Load',
-          action: 'Generate Purchase Requirement'
-        },
-        {
-          id: 'SE0005',
-          component: 'Box',
-          sku: 'MR_HAIR_101',
-          dc: 'DC-Midwest',
-          net_req: 2834,
-          lot_size: 4000,
-          lead_time_days: 7,
-          source_type: 'Transfer',
-          supplier: 'DC-East',
-          on_time_pct: 0.95,
-          mode: 'Truck',
-          release_date: '2025-03-29',
-          need_date: '2025-04-05',
-          unit_cost: 0.4,
-          order_value: 1600,
-          freight_util: 0.88,
-          status: '🟡 Partial Load',
-          action: 'Initiate Transfer'
-        }
-      ];
-
-      setData(executionData);
-
-      setMetrics({
-        totalOrders: executionData.length,
-        buyOrders: executionData.filter(d => d.source_type === 'Buy').length,
-        makeOrders: executionData.filter(d => d.source_type === 'Make').length,
-        transferOrders: executionData.filter(d => d.source_type === 'Transfer').length,
-        totalOrderValue: executionData.reduce((sum, row) => sum + row.order_value, 0),
-        avgFreightUtil: ((executionData.reduce((sum, row) => sum + row.freight_util, 0) / executionData.length) * 100).toFixed(1),
-      });
-      setLoading(false);
-    }, 800);
-  };
+    return {
+      totalOrders: data.length,
+      buyOrders: data.filter(d => d.source_type === 'Buy').length,
+      makeOrders: data.filter(d => d.source_type === 'Make').length,
+      transferOrders: data.filter(d => d.source_type === 'Transfer').length,
+      totalOrderValue: data.reduce((sum, row) => sum + row.order_value, 0),
+      avgFreightUtil: ((data.reduce((sum, row) => sum + row.freight_util, 0) / data.length) * 100).toFixed(1),
+    };
+  }, [data]);
 
   const columns = [
     { field: 'id', headerName: 'ID', minWidth: 100, flex: 0.8 },
@@ -176,7 +67,7 @@ const DCSupplierExecution = ({ onBack }) => {
             <Typography variant="body2" color="text.secondary">Supplier collaboration portal with order tracking, delivery management, and performance metrics</Typography>
           </Box>
           <Stack direction="row" spacing={1}>
-            <Tooltip title="Refresh"><IconButton onClick={fetchData} color="primary"><Refresh /></IconButton></Tooltip>
+            <Tooltip title="Refresh"><IconButton onClick={refetch} color="primary"><Refresh /></IconButton></Tooltip>
             <Tooltip title="Export"><IconButton color="primary"><Download /></IconButton></Tooltip>
           </Stack>
         </Stack>

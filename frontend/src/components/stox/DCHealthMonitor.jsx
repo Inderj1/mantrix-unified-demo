@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Box, Paper, Typography, Grid, Card, CardContent, Chip, Button, Breadcrumbs, Link, Stack, IconButton, Tooltip, alpha, Alert, AlertTitle, Collapse,
 } from '@mui/material';
@@ -7,93 +7,33 @@ import {
   ShowChart, Refresh, NavigateNext as NavigateNextIcon, ArrowBack as ArrowBackIcon, Download, CheckCircle, Warning, Error, FilterList, Close,
 } from '@mui/icons-material';
 import stoxTheme from './stoxTheme';
+import { useDCHealthData } from '../../hooks/useStoxData';
 
 const DCHealthMonitor = ({ onBack }) => {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [metrics, setMetrics] = useState(null);
+  // Use persistent data hook
+  const { data, loading, refetch } = useDCHealthData();
+
   const [alertFilter, setAlertFilter] = useState('all'); // 'all', 'critical', 'warning', 'healthy'
   const [showAlerts, setShowAlerts] = useState(true);
 
-  useEffect(() => { fetchData(); }, []);
+  // Calculate metrics from data
+  const metrics = useMemo(() => {
+    if (!data || data.length === 0) return null;
 
-  const fetchData = () => {
-    setLoading(true);
-    setTimeout(() => {
-      // Aligned data: Aggregated from 12 stores (6 per DC) - matches Store-level totals
-      const healthData = [
-        {
-          id: 'DH0001',
-          dc_location: 'DC-East',
-          product_sku: 'MR_HAIR_101',
-          channels: 'Retail Stores (6 stores)',
-          weekly_mu: 959, // Sum of 6 stores: (20+27+25+22+23+20)×7 = 137×7 = 959
-          sigma: 192,
-          lead_time_weeks: 2,
-          sigma_l: 0.5,
-          service_level: 0.98,
-          z_score: 2.05,
-          beta: 0.3,
-          on_time: 0.9,
-          safety_stock: 147, // Sum of 6 stores: 22+28+26+24+25+22 = 147
-          rop: 2065, // (959×2)+147
-          target: 1022, // Sum of 6 stores: 162+190+180+165+170+155 = 1022
-          on_hand: 920, // Sum of 6 stores: 130+180+200+150+140+120 = 920
-          on_order: 120, // Sum of 6 stores: 20+30+20+10+15+25 = 120
-          allocated: 50, // Sum of 6 stores: 5+10+15+8+7+5 = 50
-          available: 990, // Sum of 6 stores: 145+200+205+152+148+140 = 990
-          health_pct: 0.97, // available/target = 990/1022 = 96.9%
-          status: '🟢 Healthy',
-          requirement_qty: 32, // target - available = 1022-990
-          freight_util: 0.85,
-          action: 'Healthy inventory position - maintain current levels'
-        },
-        {
-          id: 'DH0002',
-          dc_location: 'DC-Midwest',
-          product_sku: 'MR_HAIR_101',
-          channels: 'Retail Stores (6 stores)',
-          weekly_mu: 749, // Sum of 6 stores: (18+22+19+17+16+15)×7 = 107×7 = 749
-          sigma: 150,
-          lead_time_weeks: 2,
-          sigma_l: 0.3,
-          service_level: 0.95,
-          z_score: 1.64,
-          beta: 0.3,
-          on_time: 0.85,
-          safety_stock: 120, // Sum of 6 stores: 20+25+21+19+18+17 = 120
-          rop: 1618, // (749×2)+120
-          target: 835, // Sum of 6 stores: 140+170+145+135+125+120 = 835
-          on_hand: 820, // Sum of 6 stores: 95+340+110+100+90+85 = 820
-          on_order: 115, // Sum of 6 stores: 40+0+30+20+15+10 = 115
-          allocated: 48, // Sum of 6 stores: 5+15+10+8+6+4 = 48
-          available: 887, // Sum of 6 stores: 130+325+130+112+99+91 = 887
-          health_pct: 1.06, // available/target = 887/835 = 106.2%
-          status: '🟠 Overstock',
-          requirement_qty: 0, // available > target
-          freight_util: 0.92,
-          action: 'Overstock detected (Miami 325 vs target 170) - rebalance inventory'
-        }
-      ];
+    const criticalItems = data.filter(d => d.status.includes('Critical'));
+    const warningItems = data.filter(d => d.status.includes('Warning') || d.status.includes('Monitor'));
+    const healthyItems = data.filter(d => d.status.includes('Normal') || d.status.includes('Healthy'));
 
-      setData(healthData);
-
-      const criticalItems = healthData.filter(d => d.status.includes('Critical'));
-      const warningItems = healthData.filter(d => d.status.includes('Warning'));
-      const healthyItems = healthData.filter(d => d.status.includes('Normal') || d.status.includes('Healthy'));
-
-      setMetrics({
-        healthyCount: healthyItems.length,
-        warningCount: warningItems.length,
-        criticalCount: criticalItems.length,
-        avgHealthScore: (healthData.reduce((sum, row) => sum + (row.health_pct * 100), 0) / healthData.length).toFixed(1),
-        criticalItems: criticalItems.slice(0, 3),
-        lowStockItems: healthData.filter(d => d.available < 2000).slice(0, 3),
-        overstockItems: [],
-      });
-      setLoading(false);
-    }, 800);
-  };
+    return {
+      healthyCount: healthyItems.length,
+      warningCount: warningItems.length,
+      criticalCount: criticalItems.length,
+      avgHealthScore: (data.reduce((sum, row) => sum + (row.health_pct * 100), 0) / data.length).toFixed(1),
+      criticalItems: criticalItems.slice(0, 3),
+      lowStockItems: data.filter(d => d.available < 2000).slice(0, 3),
+      overstockItems: [],
+    };
+  }, [data]);
 
   const filteredData = data.filter(row => {
     if (alertFilter === 'all') return true;
@@ -175,7 +115,7 @@ const DCHealthMonitor = ({ onBack }) => {
             <Typography variant="body2" color="text.secondary">Real-time visibility into DC inventory health, stock levels, and availability across network</Typography>
           </Box>
           <Stack direction="row" spacing={1}>
-            <Tooltip title="Refresh"><IconButton onClick={fetchData} color="primary"><Refresh /></IconButton></Tooltip>
+            <Tooltip title="Refresh"><IconButton onClick={refetch} color="primary"><Refresh /></IconButton></Tooltip>
             <Tooltip title="Export"><IconButton color="primary"><Download /></IconButton></Tooltip>
           </Stack>
         </Stack>
