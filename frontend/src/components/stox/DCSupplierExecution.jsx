@@ -4,7 +4,7 @@ import {
 } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import {
-  LocalShipping, Refresh, NavigateNext as NavigateNextIcon, ArrowBack as ArrowBackIcon, Download, CheckCircle, Schedule, Error, Warning,
+  LocalShipping, Refresh, NavigateNext as NavigateNextIcon, ArrowBack as ArrowBackIcon, Download, ShoppingCart, Build, SwapHoriz, AttachMoney,
 } from '@mui/icons-material';
 import stoxTheme from './stoxTheme';
 
@@ -18,176 +18,142 @@ const DCSupplierExecution = ({ onBack }) => {
   const fetchData = () => {
     setLoading(true);
     setTimeout(() => {
-      const suppliers = ['SUP-A', 'SUP-B', 'SUP-C', 'SUP-D'];
-      const products = ['SKU-7891', 'SKU-4523', 'SKU-9021', 'SKU-3456'];
-      const executionData = [];
-      let idCounter = 1;
-
-      suppliers.forEach((supplier) => {
-        products.forEach((product) => {
-          const orderQty = Math.round(1000 + Math.random() * 5000);
-          const deliveredQty = Math.round(orderQty * (0.85 + Math.random() * 0.15));
-          const onTimeDelivery = Math.random() > 0.3;
-          const qualityScore = Math.round(85 + Math.random() * 15);
-          const leadTime = Math.round(10 + Math.random() * 20);
-          const variance = orderQty - deliveredQty;
-
-          executionData.push({
-            id: `SE${String(idCounter++).padStart(4, '0')}`,
-            supplier_id: supplier,
-            product_sku: product,
-            po_number: `PO-${10000 + idCounter}`,
-            order_qty: orderQty,
-            delivered_qty: deliveredQty,
-            variance,
-            lead_time_days: leadTime,
-            on_time: onTimeDelivery ? 'Yes' : 'No',
-            quality_score: qualityScore,
-            order_date: new Date(Date.now() - leadTime * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            delivery_date: new Date().toISOString().split('T')[0],
-            status: onTimeDelivery && variance === 0 && qualityScore > 90 ? 'Excellent' : onTimeDelivery ? 'Good' : 'Delayed',
-          });
-        });
-      });
+      // Real data from Actionable _ Supplier PL Engine tab
+      const executionData = [
+        {
+          id: 'SE0001',
+          component: 'Conditioner 250 ml',
+          sku: 'MR_HAIR_101',
+          dc: 'DC-East',
+          net_req: 2922,
+          lot_size: 3400,
+          lead_time_days: 14,
+          source_type: 'Buy',
+          supplier: 'Vendor A',
+          on_time_pct: 0.9,
+          mode: 'Sea',
+          release_date: '2025-03-25',
+          need_date: '2025-04-08',
+          unit_cost: 3,
+          order_value: 10200, // 3400 × 3
+          freight_util: 0.87,
+          status: '🟢 Normal',
+          action: 'Generate Purchase Requirement'
+        },
+        {
+          id: 'SE0002',
+          component: 'Box',
+          sku: 'MR_HAIR_101',
+          dc: 'DC-East',
+          net_req: 2834,
+          lot_size: 4000,
+          lead_time_days: 7,
+          source_type: 'Buy',
+          supplier: 'Vendor B',
+          on_time_pct: 0.85,
+          mode: 'Truck',
+          release_date: '2025-03-29',
+          need_date: '2025-04-05',
+          unit_cost: 0.4,
+          order_value: 1600, // 4000 × 0.4
+          freight_util: 0.92,
+          status: '⚠️ Tight',
+          action: 'Expedite Order'
+        },
+        {
+          id: 'SE0003',
+          component: 'Leaflet',
+          sku: 'MR_HAIR_101',
+          dc: 'DC-East',
+          net_req: 334,
+          lot_size: 3000,
+          lead_time_days: 2,
+          source_type: 'Make',
+          supplier: 'In-house Print Plant',
+          on_time_pct: 1.0,
+          mode: 'Internal',
+          release_date: '2025-04-03',
+          need_date: '2025-04-05',
+          unit_cost: 0.1,
+          order_value: 300, // 3000 × 0.1
+          freight_util: 0.8,
+          status: '🟢 Normal',
+          action: 'Trigger Production Order'
+        },
+        {
+          id: 'SE0004',
+          component: 'Conditioner 250 ml',
+          sku: 'MR_HAIR_101',
+          dc: 'DC-Midwest',
+          net_req: 2922,
+          lot_size: 3400,
+          lead_time_days: 14,
+          source_type: 'Buy',
+          supplier: 'Vendor A',
+          on_time_pct: 0.9,
+          mode: 'Sea',
+          release_date: '2025-03-25',
+          need_date: '2025-04-08',
+          unit_cost: 3,
+          order_value: 10200,
+          freight_util: 1.0,
+          status: '🟢 Full Load',
+          action: 'Generate Purchase Requirement'
+        },
+        {
+          id: 'SE0005',
+          component: 'Box',
+          sku: 'MR_HAIR_101',
+          dc: 'DC-Midwest',
+          net_req: 2834,
+          lot_size: 4000,
+          lead_time_days: 7,
+          source_type: 'Transfer',
+          supplier: 'DC-East',
+          on_time_pct: 0.95,
+          mode: 'Truck',
+          release_date: '2025-03-29',
+          need_date: '2025-04-05',
+          unit_cost: 0.4,
+          order_value: 1600,
+          freight_util: 0.88,
+          status: '🟡 Partial Load',
+          action: 'Initiate Transfer'
+        }
+      ];
 
       setData(executionData);
 
-      // Calculate supplier performance
-      const supplierStats = {};
-      suppliers.forEach(sup => {
-        const supplierOrders = executionData.filter(d => d.supplier_id === sup);
-        const onTimeOrders = supplierOrders.filter(d => d.on_time === 'Yes').length;
-        const avgQuality = (supplierOrders.reduce((sum, row) => sum + row.quality_score, 0) / supplierOrders.length).toFixed(1);
-        const avgLeadTime = (supplierOrders.reduce((sum, row) => sum + row.lead_time_days, 0) / supplierOrders.length).toFixed(1);
-
-        supplierStats[sup] = {
-          supplier: sup,
-          orders: supplierOrders.length,
-          onTimeRate: ((onTimeOrders / supplierOrders.length) * 100).toFixed(1),
-          avgQuality: parseFloat(avgQuality),
-          avgLeadTime: parseFloat(avgLeadTime),
-        };
-      });
-
-      const sortedSuppliers = Object.values(supplierStats).sort((a, b) => b.onTimeRate - a.onTimeRate);
-
       setMetrics({
         totalOrders: executionData.length,
-        excellentCount: executionData.filter(d => d.status === 'Excellent').length,
-        onTimeRate: ((executionData.filter(d => d.on_time === 'Yes').length / executionData.length) * 100).toFixed(1),
-        avgQuality: (executionData.reduce((sum, row) => sum + row.quality_score, 0) / executionData.length).toFixed(1),
-        topPerformers: sortedSuppliers.slice(0, 3),
-        bottomPerformers: sortedSuppliers.slice(-3).reverse(),
+        buyOrders: executionData.filter(d => d.source_type === 'Buy').length,
+        makeOrders: executionData.filter(d => d.source_type === 'Make').length,
+        transferOrders: executionData.filter(d => d.source_type === 'Transfer').length,
+        totalOrderValue: executionData.reduce((sum, row) => sum + row.order_value, 0),
+        avgFreightUtil: ((executionData.reduce((sum, row) => sum + row.freight_util, 0) / executionData.length) * 100).toFixed(1),
       });
       setLoading(false);
     }, 800);
   };
 
   const columns = [
-    { field: 'id', headerName: 'Exec ID', minWidth: 100, flex: 1 },
-    { field: 'supplier_id', headerName: 'Supplier', minWidth: 110, flex: 0.9, align: 'center', headerAlign: 'center' },
-    { field: 'po_number', headerName: 'PO Number', minWidth: 120, flex: 0.9, align: 'center', headerAlign: 'center' },
-    { field: 'product_sku', headerName: 'SKU', minWidth: 120, flex: 0.9, align: 'center', headerAlign: 'center' },
-    {
-      field: 'order_qty',
-      headerName: 'Ordered',
-      minWidth: 110,
-      flex: 0.9,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      valueFormatter: (params) => params.value?.toLocaleString(),
-    },
-    {
-      field: 'delivered_qty',
-      headerName: 'Delivered',
-      minWidth: 110,
-      flex: 0.9,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      valueFormatter: (params) => params.value?.toLocaleString(),
-    },
-    {
-      field: 'variance',
-      headerName: 'Variance',
-      minWidth: 110,
-      flex: 0.9,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => (
-        <Chip
-          label={params.value === 0 ? '0' : params.value}
-          size="small"
-          color={params.value === 0 ? 'success' : 'warning'}
-        />
-      ),
-    },
-    {
-      field: 'lead_time_days',
-      headerName: 'Lead Time',
-      minWidth: 110,
-      flex: 0.9,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => `${params.value} days`,
-    },
-    {
-      field: 'on_time',
-      headerName: 'On Time',
-      minWidth: 100,
-      flex: 0.8,
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => (
-        <Chip
-          label={params.value}
-          size="small"
-          color={params.value === 'Yes' ? 'success' : 'error'}
-          variant="outlined"
-        />
-      ),
-    },
-    {
-      field: 'quality_score',
-      headerName: 'Quality',
-      minWidth: 100,
-      flex: 0.9,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => (
-        <Chip
-          label={`${params.value}%`}
-          size="small"
-          color={params.value > 90 ? 'success' : params.value > 80 ? 'warning' : 'error'}
-        />
-      ),
-    },
-    { field: 'order_date', headerName: 'Order Date', minWidth: 120, flex: 0.9, align: 'center', headerAlign: 'center' },
-    { field: 'delivery_date', headerName: 'Delivery', minWidth: 120, flex: 0.9, align: 'center', headerAlign: 'center' },
-    {
-      field: 'status',
-      headerName: 'Status',
-      minWidth: 110,
-      flex: 0.9,
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => (
-        <Stack direction="row" spacing={0.5} alignItems="center">
-          {params.value === 'Excellent' ? (
-            <CheckCircle sx={{ fontSize: 16, color: 'success.main' }} />
-          ) : params.value === 'Good' ? (
-            <Warning sx={{ fontSize: 16, color: 'warning.main' }} />
-          ) : (
-            <Error sx={{ fontSize: 16, color: 'error.main' }} />
-          )}
-          <Typography variant="caption">{params.value}</Typography>
-        </Stack>
-      ),
-    },
+    { field: 'id', headerName: 'ID', minWidth: 100, flex: 0.8 },
+    { field: 'component', headerName: 'Component / SKU', minWidth: 160, flex: 1.3 },
+    { field: 'dc', headerName: 'DC', minWidth: 110, flex: 0.9, align: 'center', headerAlign: 'center' },
+    { field: 'source_type', headerName: 'Source Type', minWidth: 120, flex: 1, align: 'center', headerAlign: 'center' },
+    { field: 'supplier', headerName: 'Supplier / Plant / DC', minWidth: 180, flex: 1.4 },
+    { field: 'net_req', headerName: 'Net Req', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'lot_size', headerName: 'Lot Size', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'lead_time_days', headerName: 'Lead Time (days)', minWidth: 130, flex: 1, type: 'number', align: 'center', headerAlign: 'center' },
+    { field: 'on_time_pct', headerName: 'On-Time %', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `${(params.value * 100).toFixed(0)}%` },
+    { field: 'mode', headerName: 'Mode', minWidth: 100, flex: 0.8, align: 'center', headerAlign: 'center' },
+    { field: 'release_date', headerName: 'Release Date', minWidth: 120, flex: 1, align: 'center', headerAlign: 'center' },
+    { field: 'need_date', headerName: 'Need Date', minWidth: 120, flex: 1, align: 'center', headerAlign: 'center' },
+    { field: 'unit_cost', headerName: 'Unit Cost ($)', minWidth: 120, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `$${params.value}` },
+    { field: 'order_value', headerName: 'Order Value ($)', minWidth: 130, flex: 1, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `$${params.value?.toLocaleString()}` },
+    { field: 'freight_util', headerName: 'Freight Util %', minWidth: 120, flex: 1, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `${(params.value * 100).toFixed(0)}%` },
+    { field: 'status', headerName: 'Status', minWidth: 130, flex: 1.1, align: 'center', headerAlign: 'center' },
+    { field: 'action', headerName: 'Action / Recommendation', minWidth: 220, flex: 1.7 },
   ];
 
   return (
@@ -233,10 +199,10 @@ const DCSupplierExecution = ({ onBack }) => {
             <Card sx={{ background: `linear-gradient(135deg, ${alpha('#10b981', 0.1)} 0%, ${alpha('#10b981', 0.05)} 100%)` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <CheckCircle sx={{ color: '#10b981' }} />
-                  <Typography variant="body2" color="text.secondary">Excellent</Typography>
+                  <ShoppingCart sx={{ color: '#10b981' }} />
+                  <Typography variant="body2" color="text.secondary">Buy Orders</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#10b981">{metrics.excellentCount}</Typography>
+                <Typography variant="h4" fontWeight={700} color="#10b981">{metrics.buyOrders}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -244,10 +210,10 @@ const DCSupplierExecution = ({ onBack }) => {
             <Card sx={{ background: `linear-gradient(135deg, ${alpha('#3b82f6', 0.1)} 0%, ${alpha('#3b82f6', 0.05)} 100%)` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <Schedule sx={{ color: '#3b82f6' }} />
-                  <Typography variant="body2" color="text.secondary">On-Time Rate</Typography>
+                  <Build sx={{ color: '#3b82f6' }} />
+                  <Typography variant="body2" color="text.secondary">Make Orders</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#3b82f6">{metrics.onTimeRate}%</Typography>
+                <Typography variant="h4" fontWeight={700} color="#3b82f6">{metrics.makeOrders}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -255,91 +221,18 @@ const DCSupplierExecution = ({ onBack }) => {
             <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2563eb', 0.1)} 0%, ${alpha('#2563eb', 0.05)} 100%)` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <CheckCircle sx={{ color: '#2563eb' }} />
-                  <Typography variant="body2" color="text.secondary">Avg Quality</Typography>
+                  <SwapHoriz sx={{ color: '#2563eb' }} />
+                  <Typography variant="body2" color="text.secondary">Transfer Orders</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#2563eb">{metrics.avgQuality}%</Typography>
+                <Typography variant="h4" fontWeight={700} color="#2563eb">{metrics.transferOrders}</Typography>
               </CardContent>
             </Card>
           </Grid>
         </Grid>
       )}
 
-      {/* Supplier Performance Summary */}
-      {metrics && (
-        <Grid container spacing={2} sx={{ mb: 2 }}>
-          <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 2, bgcolor: alpha('#10b981', 0.05), border: '1px solid', borderColor: alpha('#10b981', 0.2) }}>
-              <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2, color: '#10b981' }}>
-                Top Performers (On-Time Delivery)
-              </Typography>
-              <Stack spacing={1.5}>
-                {metrics.topPerformers.map((supplier, idx) => (
-                  <Stack key={idx} direction="row" justifyContent="space-between" alignItems="center">
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Chip
-                        label={`#${idx + 1}`}
-                        size="small"
-                        sx={{ bgcolor: '#10b981', color: 'white', fontWeight: 700, width: 32 }}
-                      />
-                      <Typography variant="body2" fontWeight={600}>{supplier.supplier}</Typography>
-                    </Stack>
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <Chip
-                        label={`${supplier.onTimeRate}% On-Time`}
-                        size="small"
-                        color="success"
-                        variant="outlined"
-                      />
-                      <Chip
-                        label={`Quality: ${supplier.avgQuality}%`}
-                        size="small"
-                        sx={{ bgcolor: alpha('#10b981', 0.1) }}
-                      />
-                    </Stack>
-                  </Stack>
-                ))}
-              </Stack>
-            </Paper>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 2, bgcolor: alpha('#ef4444', 0.05), border: '1px solid', borderColor: alpha('#ef4444', 0.2) }}>
-              <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2, color: '#ef4444' }}>
-                Needs Improvement
-              </Typography>
-              <Stack spacing={1.5}>
-                {metrics.bottomPerformers.map((supplier, idx) => (
-                  <Stack key={idx} direction="row" justifyContent="space-between" alignItems="center">
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Chip
-                        label={`#${metrics.topPerformers.length - idx}`}
-                        size="small"
-                        sx={{ bgcolor: '#ef4444', color: 'white', fontWeight: 700, width: 32 }}
-                      />
-                      <Typography variant="body2" fontWeight={600}>{supplier.supplier}</Typography>
-                    </Stack>
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <Chip
-                        label={`${supplier.onTimeRate}% On-Time`}
-                        size="small"
-                        color="error"
-                        variant="outlined"
-                      />
-                      <Chip
-                        label={`${supplier.avgLeadTime}d Lead Time`}
-                        size="small"
-                        sx={{ bgcolor: alpha('#ef4444', 0.1) }}
-                      />
-                    </Stack>
-                  </Stack>
-                ))}
-              </Stack>
-            </Paper>
-          </Grid>
-        </Grid>
-      )}
 
-      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0, width: '100%' }}>
         <DataGrid
           rows={data}
           columns={columns}

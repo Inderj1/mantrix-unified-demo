@@ -14,54 +14,96 @@ const DCBOM = ({ onBack }) => {
   const fetchData = () => {
     setLoading(true);
     setTimeout(() => {
-      const fgProducts = ['FG-7891', 'FG-4523', 'FG-9021'];
-      const components = ['COMP-A', 'COMP-B', 'COMP-C', 'COMP-D'];
-      const bomData = [];
-      let idCounter = 1;
-
-      fgProducts.forEach((fg) => {
-        components.forEach((comp) => {
-          const qty_per_unit = Math.round(1 + Math.random() * 5);
-          const fg_demand = Math.round(500 + Math.random() * 1500);
-          const comp_required = qty_per_unit * fg_demand;
-          const on_hand = Math.round(comp_required * (0.8 + Math.random() * 0.4));
-          const shortage = Math.max(0, comp_required - on_hand);
-
-          bomData.push({
-            id: `BOM${String(idCounter++).padStart(4, '0')}`,
-            finished_good: fg,
-            component_sku: comp,
-            qty_per_unit,
-            fg_demand,
-            component_required: comp_required,
-            on_hand,
-            shortage,
-            status: shortage > 0 ? 'Shortage' : 'Available',
-          });
-        });
-      });
+      // Real data from DC_BOM Demand Layer tab
+      const bomData = [
+        {
+          id: 'BOM0001',
+          parent_sku: 'MR_HAIR_101',
+          dc: 'DC-East',
+          requirement_qty: 4334,
+          component: 'Shampoo 250 ml',
+          usage_per_kit: 1,
+          yield_pct: 0.98,
+          gross_req: 4334,
+          adj_req: 4422, // 4334 / 0.98
+          on_hand: 5000,
+          on_order: 0,
+          net_req: 0, // 4422 - 5000 - 0 = 0 (no shortage)
+          action: 'No Action'
+        },
+        {
+          id: 'BOM0002',
+          parent_sku: 'MR_HAIR_101',
+          dc: 'DC-East',
+          requirement_qty: 4334,
+          component: 'Conditioner 250 ml',
+          usage_per_kit: 1,
+          yield_pct: 0.98,
+          gross_req: 4334,
+          adj_req: 4422, // 4334 / 0.98
+          on_hand: 1000,
+          on_order: 500,
+          net_req: 2922, // 4422 - 1000 - 500
+          action: 'Generate Requirement (Buy)'
+        },
+        {
+          id: 'BOM0003',
+          parent_sku: 'MR_HAIR_101',
+          dc: 'DC-East',
+          requirement_qty: 4334,
+          component: 'Box',
+          usage_per_kit: 1,
+          yield_pct: 1.0,
+          gross_req: 4334,
+          adj_req: 4334, // 4334 / 1.0
+          on_hand: 1500,
+          on_order: 0,
+          net_req: 2834, // 4334 - 1500 - 0
+          action: 'Generate Requirement (Buy)'
+        },
+        {
+          id: 'BOM0004',
+          parent_sku: 'MR_HAIR_101',
+          dc: 'DC-East',
+          requirement_qty: 4334,
+          component: 'Leaflet',
+          usage_per_kit: 1,
+          yield_pct: 1.0,
+          gross_req: 4334,
+          adj_req: 4334, // 4334 / 1.0
+          on_hand: 4000,
+          on_order: 0,
+          net_req: 334, // 4334 - 4000 - 0
+          action: 'Generate Requirement (Make / Print)'
+        }
+      ];
 
       setData(bomData);
       setMetrics({
-        totalBOMs: fgProducts.length,
+        totalParentSKUs: 1,
         totalComponents: bomData.length,
-        shortages: bomData.filter(d => d.status === 'Shortage').length,
+        shortages: bomData.filter(d => d.net_req > 0).length,
+        totalNetReq: bomData.reduce((sum, row) => sum + row.net_req, 0),
       });
       setLoading(false);
     }, 800);
   };
 
   const columns = [
-    { field: 'id', headerName: 'BOM ID', minWidth: 110, flex: 1 },
-    { field: 'finished_good', headerName: 'Finished Good', minWidth: 140, flex: 1.1, align: 'center', headerAlign: 'center' },
-    { field: 'component_sku', headerName: 'Component', minWidth: 130, flex: 1, align: 'center', headerAlign: 'center' },
-    { field: 'qty_per_unit', headerName: 'Qty/Unit', minWidth: 100, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center' },
-    { field: 'fg_demand', headerName: 'FG Demand', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'component_required', headerName: 'Required', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'on_hand', headerName: 'On Hand', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'id', headerName: 'ID', minWidth: 100, flex: 0.8 },
+    { field: 'parent_sku', headerName: 'Parent SKU', minWidth: 130, flex: 1, align: 'center', headerAlign: 'center' },
+    { field: 'dc', headerName: 'DC', minWidth: 100, flex: 0.8, align: 'center', headerAlign: 'center' },
+    { field: 'requirement_qty', headerName: 'Requirement Qty', minWidth: 130, flex: 1, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'component', headerName: 'Component', minWidth: 160, flex: 1.3 },
+    { field: 'usage_per_kit', headerName: 'Usage/Kit', minWidth: 100, flex: 0.8, type: 'number', align: 'center', headerAlign: 'center' },
+    { field: 'yield_pct', headerName: 'Yield %', minWidth: 100, flex: 0.8, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `${(params.value * 100).toFixed(0)}%` },
+    { field: 'gross_req', headerName: 'Gross Req', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'adj_req', headerName: 'Adj. Req', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'on_hand', headerName: 'On-Hand', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'on_order', headerName: 'On-Order', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
     {
-      field: 'shortage',
-      headerName: 'Shortage',
+      field: 'net_req',
+      headerName: 'Net Req',
       minWidth: 110,
       flex: 0.9,
       type: 'number',
@@ -69,15 +111,7 @@ const DCBOM = ({ onBack }) => {
       headerAlign: 'center',
       renderCell: (params) => params.value > 0 ? <Chip label={params.value.toLocaleString()} size="small" color="error" /> : <Chip label="0" size="small" color="success" />,
     },
-    {
-      field: 'status',
-      headerName: 'Status',
-      minWidth: 110,
-      flex: 0.9,
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => <Chip label={params.value} size="small" color={params.value === 'Available' ? 'success' : 'error'} />,
-    },
+    { field: 'action', headerName: 'Action / Source', minWidth: 200, flex: 1.5 },
   ];
 
   return (

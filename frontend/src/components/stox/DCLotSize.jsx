@@ -18,107 +18,124 @@ const DCLotSize = ({ onBack }) => {
   const fetchData = () => {
     setLoading(true);
     setTimeout(() => {
-      const products = ['SKU-7891', 'SKU-4523', 'SKU-9021', 'SKU-3456', 'SKU-5678'];
-      const suppliers = ['SUP-A', 'SUP-B', 'SUP-C'];
-      const lotData = [];
-      let idCounter = 1;
-
-      products.forEach((product) => {
-        suppliers.forEach((supplier) => {
-          const annualDemand = Math.round(10000 + Math.random() * 40000);
-          const orderingCost = Math.round(50 + Math.random() * 150);
-          const holdingCost = Math.round(5 + Math.random() * 20);
-          const eoq = Math.round(Math.sqrt((2 * annualDemand * orderingCost) / holdingCost));
-          const currentLotSize = Math.round(eoq * (0.7 + Math.random() * 0.6));
-          const optimalLotSize = eoq;
-          const savings = Math.round(Math.abs(currentLotSize - optimalLotSize) * (holdingCost * 0.1));
-
-          lotData.push({
-            id: `LS${String(idCounter++).padStart(4, '0')}`,
-            product_sku: product,
-            supplier_id: supplier,
-            annual_demand: annualDemand,
-            ordering_cost: orderingCost,
-            holding_cost: holdingCost,
-            current_lot_size: currentLotSize,
-            optimal_lot_size: optimalLotSize,
-            eoq,
-            potential_savings: savings,
-            status: Math.abs(currentLotSize - optimalLotSize) < eoq * 0.15 ? 'Optimal' : 'Review',
-          });
-        });
-      });
+      // Real data from Lot Size Optimization tab
+      const lotData = [
+        {
+          id: 'LS0001',
+          sku: 'MR_HAIR_101',
+          channel: 'Retail',
+          dc: 'DC-East',
+          weekly_mu: 1100,
+          setup_cost: 250,
+          carrying_rate: 0.2,
+          unit_cost: 3,
+          holding_cost_weekly: 0.0115, // (unit_cost * carrying_rate) / 52
+          moq: 2000,
+          pallet_multiple: 100,
+          truck_capacity: 7000,
+          eoq: 6914, // √((2×weekly_mu×52×setup_cost)/(unit_cost×carrying_rate))
+          adj_moq: 6914,
+          rounded_lot: 6900,
+          final_lot: 6900,
+          orders_per_year: 8, // 52/(final_lot/weekly_mu)
+          total_cost: 6200, // (setup_cost×orders_per_year) + (final_lot/2×holding_cost_weekly×52)
+          notes: 'Full truck every 8 weeks'
+        },
+        {
+          id: 'LS0002',
+          sku: 'MR_HAIR_101',
+          channel: 'Amazon',
+          dc: 'DC-East',
+          weekly_mu: 900,
+          setup_cost: 250,
+          carrying_rate: 0.2,
+          unit_cost: 3,
+          holding_cost_weekly: 0.0115,
+          moq: 2000,
+          pallet_multiple: 100,
+          truck_capacity: 7000,
+          eoq: 6302,
+          adj_moq: 6302,
+          rounded_lot: 6300,
+          final_lot: 6300,
+          orders_per_year: 7,
+          total_cost: 5800,
+          notes: 'Slightly smaller cadence'
+        },
+        {
+          id: 'LS0003',
+          sku: 'MR_HAIR_101',
+          channel: 'D2C',
+          dc: 'DC-Midwest',
+          weekly_mu: 600,
+          setup_cost: 250,
+          carrying_rate: 0.2,
+          unit_cost: 3,
+          holding_cost_weekly: 0.0115,
+          moq: 2000,
+          pallet_multiple: 100,
+          truck_capacity: 7000,
+          eoq: 5157,
+          adj_moq: 5157,
+          rounded_lot: 5200,
+          final_lot: 5200,
+          orders_per_year: 6,
+          total_cost: 5100,
+          notes: 'Partial-load pattern'
+        },
+        {
+          id: 'LS0004',
+          sku: 'MR_HAIR_101',
+          channel: 'Wholesale',
+          dc: 'DC-Midwest',
+          weekly_mu: 400,
+          setup_cost: 250,
+          carrying_rate: 0.2,
+          unit_cost: 3,
+          holding_cost_weekly: 0.0115,
+          moq: 2000,
+          pallet_multiple: 100,
+          truck_capacity: 7000,
+          eoq: 4207,
+          adj_moq: 4207,
+          rounded_lot: 4200,
+          final_lot: 4200,
+          orders_per_year: 5,
+          total_cost: 4800,
+          notes: 'Combine with D2C to full truck'
+        }
+      ];
 
       setData(lotData);
       setMetrics({
         totalRecords: lotData.length,
-        optimalCount: lotData.filter(d => d.status === 'Optimal').length,
-        totalSavings: lotData.reduce((sum, row) => sum + row.potential_savings, 0),
         avgEOQ: Math.round(lotData.reduce((sum, row) => sum + row.eoq, 0) / lotData.length),
+        totalAnnualCost: lotData.reduce((sum, row) => sum + row.total_cost, 0),
+        avgOrdersPerYear: Math.round(lotData.reduce((sum, row) => sum + row.orders_per_year, 0) / lotData.length),
       });
       setLoading(false);
     }, 800);
   };
 
   const columns = [
-    { field: 'id', headerName: 'Lot ID', minWidth: 100, flex: 1 },
-    { field: 'product_sku', headerName: 'SKU', minWidth: 120, flex: 0.9, align: 'center', headerAlign: 'center' },
-    { field: 'supplier_id', headerName: 'Supplier', minWidth: 110, flex: 0.9, align: 'center', headerAlign: 'center' },
+    { field: 'id', headerName: 'ID', minWidth: 100, flex: 0.8 },
+    { field: 'sku', headerName: 'SKU', minWidth: 120, flex: 1, align: 'center', headerAlign: 'center' },
+    { field: 'channel', headerName: 'Channel', minWidth: 110, flex: 0.9, align: 'center', headerAlign: 'center' },
+    { field: 'dc', headerName: 'DC', minWidth: 110, flex: 0.9, align: 'center', headerAlign: 'center' },
+    { field: 'weekly_mu', headerName: 'μ (wk)', minWidth: 100, flex: 0.8, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'setup_cost', headerName: 'S ($/order)', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `$${params.value}` },
+    { field: 'unit_cost', headerName: 'Unit Cost ($)', minWidth: 120, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `$${params.value}` },
+    { field: 'moq', headerName: 'MOQ', minWidth: 100, flex: 0.8, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'truck_capacity', headerName: 'Truck Cap', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'eoq', headerName: 'EOQ', minWidth: 100, flex: 0.8, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'rounded_lot', headerName: 'Rounded Lot', minWidth: 120, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'final_lot', headerName: 'Final Lot', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'orders_per_year', headerName: 'Orders/yr', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center' },
     {
-      field: 'annual_demand',
-      headerName: 'Annual Demand',
-      minWidth: 140,
-      flex: 1.1,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      valueFormatter: (params) => params.value?.toLocaleString(),
-    },
-    {
-      field: 'ordering_cost',
-      headerName: 'Order Cost',
+      field: 'total_cost',
+      headerName: 'Total Cost ($)',
       minWidth: 120,
-      flex: 0.9,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      valueFormatter: (params) => `$${params.value}`,
-    },
-    {
-      field: 'holding_cost',
-      headerName: 'Holding Cost',
-      minWidth: 120,
-      flex: 0.9,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      valueFormatter: (params) => `$${params.value}`,
-    },
-    {
-      field: 'current_lot_size',
-      headerName: 'Current Lot',
-      minWidth: 120,
-      flex: 0.9,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      valueFormatter: (params) => params.value?.toLocaleString(),
-    },
-    {
-      field: 'optimal_lot_size',
-      headerName: 'Optimal (EOQ)',
-      minWidth: 140,
-      flex: 1.1,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      valueFormatter: (params) => params.value?.toLocaleString(),
-    },
-    {
-      field: 'potential_savings',
-      headerName: 'Savings',
-      minWidth: 110,
-      flex: 0.9,
+      flex: 1,
       type: 'number',
       align: 'center',
       headerAlign: 'center',
@@ -126,22 +143,12 @@ const DCLotSize = ({ onBack }) => {
         <Chip
           label={`$${params.value.toLocaleString()}`}
           size="small"
-          color="success"
+          color="info"
           sx={{ fontWeight: 600 }}
         />
       ),
     },
-    {
-      field: 'status',
-      headerName: 'Status',
-      minWidth: 100,
-      flex: 0.9,
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => (
-        <Chip label={params.value} size="small" color={params.value === 'Optimal' ? 'success' : 'warning'} />
-      ),
-    },
+    { field: 'notes', headerName: 'Notes', minWidth: 200, flex: 1.5 },
   ];
 
   return (

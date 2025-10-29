@@ -20,49 +20,76 @@ const DCHealthMonitor = ({ onBack }) => {
   const fetchData = () => {
     setLoading(true);
     setTimeout(() => {
-      const dcs = ['DC-CENTRAL-01', 'DC-WEST-02', 'DC-EAST-03', 'DC-SOUTH-04'];
-      const products = ['SKU-7891', 'SKU-4523', 'SKU-9021', 'SKU-3456', 'SKU-5678'];
-      const healthData = [];
-      let idCounter = 1;
-
-      dcs.forEach((dc) => {
-        products.forEach((product) => {
-          const onHand = Math.round(500 + Math.random() * 2000);
-          const available = Math.round(onHand * (0.8 + Math.random() * 0.2));
-          const allocated = onHand - available;
-          const inTransit = Math.round(100 + Math.random() * 500);
-          const turnover = (5 + Math.random() * 10).toFixed(1);
-          const healthScore = Math.round(70 + Math.random() * 30);
-
-          healthData.push({
-            id: `DH${String(idCounter++).padStart(4, '0')}`,
-            dc_location: dc,
-            product_sku: product,
-            on_hand: onHand,
-            available,
-            allocated,
-            in_transit: inTransit,
-            turnover_rate: parseFloat(turnover),
-            health_score: healthScore,
-            status: healthScore > 85 ? 'Healthy' : healthScore > 70 ? 'Warning' : 'Critical',
-          });
-        });
-      });
+      // Aligned data: Aggregated from 12 stores (6 per DC) - matches Store-level totals
+      const healthData = [
+        {
+          id: 'DH0001',
+          dc_location: 'DC-East',
+          product_sku: 'MR_HAIR_101',
+          channels: 'Retail Stores (6 stores)',
+          weekly_mu: 959, // Sum of 6 stores: (20+27+25+22+23+20)×7 = 137×7 = 959
+          sigma: 192,
+          lead_time_weeks: 2,
+          sigma_l: 0.5,
+          service_level: 0.98,
+          z_score: 2.05,
+          beta: 0.3,
+          on_time: 0.9,
+          safety_stock: 147, // Sum of 6 stores: 22+28+26+24+25+22 = 147
+          rop: 2065, // (959×2)+147
+          target: 1022, // Sum of 6 stores: 162+190+180+165+170+155 = 1022
+          on_hand: 920, // Sum of 6 stores: 130+180+200+150+140+120 = 920
+          on_order: 120, // Sum of 6 stores: 20+30+20+10+15+25 = 120
+          allocated: 50, // Sum of 6 stores: 5+10+15+8+7+5 = 50
+          available: 990, // Sum of 6 stores: 145+200+205+152+148+140 = 990
+          health_pct: 0.97, // available/target = 990/1022 = 96.9%
+          status: '🟢 Healthy',
+          requirement_qty: 32, // target - available = 1022-990
+          freight_util: 0.85,
+          action: 'Healthy inventory position - maintain current levels'
+        },
+        {
+          id: 'DH0002',
+          dc_location: 'DC-Midwest',
+          product_sku: 'MR_HAIR_101',
+          channels: 'Retail Stores (6 stores)',
+          weekly_mu: 749, // Sum of 6 stores: (18+22+19+17+16+15)×7 = 107×7 = 749
+          sigma: 150,
+          lead_time_weeks: 2,
+          sigma_l: 0.3,
+          service_level: 0.95,
+          z_score: 1.64,
+          beta: 0.3,
+          on_time: 0.85,
+          safety_stock: 120, // Sum of 6 stores: 20+25+21+19+18+17 = 120
+          rop: 1618, // (749×2)+120
+          target: 835, // Sum of 6 stores: 140+170+145+135+125+120 = 835
+          on_hand: 820, // Sum of 6 stores: 95+340+110+100+90+85 = 820
+          on_order: 115, // Sum of 6 stores: 40+0+30+20+15+10 = 115
+          allocated: 48, // Sum of 6 stores: 5+15+10+8+6+4 = 48
+          available: 887, // Sum of 6 stores: 130+325+130+112+99+91 = 887
+          health_pct: 1.06, // available/target = 887/835 = 106.2%
+          status: '🟠 Overstock',
+          requirement_qty: 0, // available > target
+          freight_util: 0.92,
+          action: 'Overstock detected (Miami 325 vs target 170) - rebalance inventory'
+        }
+      ];
 
       setData(healthData);
 
-      const criticalItems = healthData.filter(d => d.status === 'Critical');
-      const warningItems = healthData.filter(d => d.status === 'Warning');
-      const healthyItems = healthData.filter(d => d.status === 'Healthy');
+      const criticalItems = healthData.filter(d => d.status.includes('Critical'));
+      const warningItems = healthData.filter(d => d.status.includes('Warning'));
+      const healthyItems = healthData.filter(d => d.status.includes('Normal') || d.status.includes('Healthy'));
 
       setMetrics({
         healthyCount: healthyItems.length,
         warningCount: warningItems.length,
         criticalCount: criticalItems.length,
-        avgHealthScore: (healthData.reduce((sum, row) => sum + row.health_score, 0) / healthData.length).toFixed(1),
-        criticalItems: criticalItems.slice(0, 3), // Top 3 critical
-        lowStockItems: healthData.filter(d => d.available < 300).slice(0, 3),
-        overstockItems: healthData.filter(d => d.on_hand > 2000).slice(0, 3),
+        avgHealthScore: (healthData.reduce((sum, row) => sum + (row.health_pct * 100), 0) / healthData.length).toFixed(1),
+        criticalItems: criticalItems.slice(0, 3),
+        lowStockItems: healthData.filter(d => d.available < 2000).slice(0, 3),
+        overstockItems: [],
       });
       setLoading(false);
     }, 800);
@@ -77,27 +104,32 @@ const DCHealthMonitor = ({ onBack }) => {
   });
 
   const columns = [
-    { field: 'id', headerName: 'ID', minWidth: 100, flex: 1 },
-    { field: 'dc_location', headerName: 'DC Location', minWidth: 140, flex: 1.1, align: 'center', headerAlign: 'center' },
-    { field: 'product_sku', headerName: 'SKU', minWidth: 120, flex: 0.9, align: 'center', headerAlign: 'center' },
-    { field: 'on_hand', headerName: 'On Hand', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'available', headerName: 'Available', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'id', headerName: 'ID', minWidth: 100, flex: 0.8 },
+    { field: 'dc_location', headerName: 'DC', minWidth: 120, flex: 0.9, align: 'center', headerAlign: 'center' },
+    { field: 'product_sku', headerName: 'SKU', minWidth: 120, flex: 1, align: 'center', headerAlign: 'center' },
+    { field: 'channels', headerName: 'Channels Aggregated', minWidth: 200, flex: 1.5 },
+    { field: 'weekly_mu', headerName: 'μ (Weekly)', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'sigma', headerName: 'σ', minWidth: 80, flex: 0.7, type: 'number', align: 'center', headerAlign: 'center' },
+    { field: 'safety_stock', headerName: 'Safety Stock', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'rop', headerName: 'ROP', minWidth: 100, flex: 0.8, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'target', headerName: 'Target Inventory', minWidth: 130, flex: 1, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'on_hand', headerName: 'On-Hand', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'on_order', headerName: 'On-Order', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
     { field: 'allocated', headerName: 'Allocated', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'in_transit', headerName: 'In Transit', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'turnover_rate', headerName: 'Turnover', minWidth: 100, flex: 0.8, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `${params.value}x` },
+    { field: 'available', headerName: 'Available', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
     {
-      field: 'health_score',
-      headerName: 'Health Score',
-      minWidth: 130,
-      flex: 1.2,
+      field: 'health_pct',
+      headerName: 'Health %',
+      minWidth: 120,
+      flex: 1,
       type: 'number',
       align: 'center',
       headerAlign: 'center',
       renderCell: (params) => (
         <Stack direction="row" spacing={1} alignItems="center">
-          <Typography variant="body2" fontWeight={600}>{params.value}</Typography>
+          <Typography variant="body2" fontWeight={600}>{(params.value * 100).toFixed(0)}%</Typography>
           <Box sx={{ width: 60, height: 6, bgcolor: alpha('#e0e0e0', 0.3), borderRadius: 1, overflow: 'hidden' }}>
-            <Box sx={{ width: `${params.value}%`, height: '100vh', bgcolor: params.value > 85 ? '#10b981' : params.value > 70 ? '#f59e0b' : '#ef4444' }} />
+            <Box sx={{ width: `${params.value * 100}%`, height: '100%', bgcolor: params.value > 0.85 ? '#10b981' : params.value > 0.70 ? '#f59e0b' : '#ef4444' }} />
           </Box>
         </Stack>
       ),
@@ -111,13 +143,16 @@ const DCHealthMonitor = ({ onBack }) => {
       headerAlign: 'center',
       renderCell: (params) => (
         <Stack direction="row" spacing={0.5} alignItems="center">
-          {params.value === 'Healthy' ? <CheckCircle sx={{ fontSize: 16, color: 'success.main' }} /> :
-           params.value === 'Warning' ? <Warning sx={{ fontSize: 16, color: 'warning.main' }} /> :
+          {params.value?.includes('Normal') || params.value?.includes('🟢') ? <CheckCircle sx={{ fontSize: 16, color: 'success.main' }} /> :
+           params.value?.includes('Warning') || params.value?.includes('⚠') ? <Warning sx={{ fontSize: 16, color: 'warning.main' }} /> :
            <Error sx={{ fontSize: 16, color: 'error.main' }} />}
           <Typography variant="caption">{params.value}</Typography>
         </Stack>
       ),
     },
+    { field: 'requirement_qty', headerName: 'Requirement Qty', minWidth: 130, flex: 1, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'freight_util', headerName: 'Freight Util %', minWidth: 120, flex: 1, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `${(params.value * 100).toFixed(0)}%` },
+    { field: 'action', headerName: 'Action / Recommendation', minWidth: 250, flex: 2 },
   ];
 
   return (

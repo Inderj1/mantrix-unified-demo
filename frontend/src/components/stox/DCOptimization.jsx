@@ -18,68 +18,73 @@ const DCOptimization = ({ onBack }) => {
   const fetchData = () => {
     setLoading(true);
     setTimeout(() => {
-      const dcs = ['DC-CENTRAL-01', 'DC-WEST-02', 'DC-EAST-03'];
-      const products = ['SKU-7891', 'SKU-4523', 'SKU-9021', 'SKU-3456'];
-      const optData = [];
-      let idCounter = 1;
+      // Aligned data: Aggregated from 12 stores (6 per DC) - matches Store-level totals
+      const safetyStockData = [
+        {
+          id: 'SS0001',
+          dc_location: 'DC-East',
+          product_sku: 'MR_HAIR_101',
+          channels: 'Retail Stores (6 stores)',
+          weekly_mu: 959, // Sum of 6 stores: (20+27+25+22+23+20)×7 = 959
+          sigma: 192, // Aggregated standard deviation
+          lead_time_weeks: 2,
+          sigma_l: 0.5,
+          service_level: 0.98,
+          z_score: 2.05,
+          base_ss: 139, // Simplified calculation for aligned data
+          supplier_ontime: 0.9,
+          beta: 0.3,
+          adjusted_ss: 147, // Sum of 6 stores: 22+28+26+24+25+22 = 147
+          rop: 2065, // (959×2)+147
+          target_inventory: 1022 // Sum of 6 stores: 162+190+180+165+170+155 = 1022
+        },
+        {
+          id: 'SS0002',
+          dc_location: 'DC-Midwest',
+          product_sku: 'MR_HAIR_101',
+          channels: 'Retail Stores (6 stores)',
+          weekly_mu: 749, // Sum of 6 stores: (18+22+19+17+16+15)×7 = 749
+          sigma: 150, // Aggregated standard deviation
+          lead_time_weeks: 2,
+          sigma_l: 0.3,
+          service_level: 0.95,
+          z_score: 1.64,
+          base_ss: 114, // Simplified calculation for aligned data
+          supplier_ontime: 0.85,
+          beta: 0.3,
+          adjusted_ss: 120, // Sum of 6 stores: 20+25+21+19+18+17 = 120
+          rop: 1618, // (749×2)+120
+          target_inventory: 835 // Sum of 6 stores: 140+170+145+135+125+120 = 835
+        }
+      ];
 
-      dcs.forEach((dc) => {
-        products.forEach((product) => {
-          const currentStock = Math.round(800 + Math.random() * 1200);
-          const optimalStock = Math.round(currentStock * (0.85 + Math.random() * 0.3));
-          const recommended_action = currentStock > optimalStock * 1.2 ? 'Reduce' : currentStock < optimalStock * 0.8 ? 'Increase' : 'Maintain';
-
-          optData.push({
-            id: `DO${String(idCounter++).padStart(4, '0')}`,
-            dc_location: dc,
-            product_sku: product,
-            current_stock: currentStock,
-            optimal_stock: optimalStock,
-            variance: currentStock - optimalStock,
-            utilization_pct: ((currentStock / optimalStock) * 100).toFixed(1),
-            recommended_action,
-            potential_savings: Math.round(Math.abs(currentStock - optimalStock) * 15),
-          });
-        });
-      });
-
-      setData(optData);
+      setData(safetyStockData);
       setMetrics({
-        totalRecords: optData.length,
-        optimalCount: optData.filter(d => d.recommended_action === 'Maintain').length,
-        totalSavings: optData.reduce((sum, row) => sum + row.potential_savings, 0),
+        totalRecords: safetyStockData.length,
+        avgServiceLevel: (safetyStockData.reduce((sum, row) => sum + row.service_level, 0) / safetyStockData.length * 100).toFixed(1),
+        totalTargetInventory: safetyStockData.reduce((sum, row) => sum + row.target_inventory, 0),
       });
       setLoading(false);
     }, 800);
   };
 
   const columns = [
-    { field: 'id', headerName: 'ID', minWidth: 100, flex: 1 },
-    { field: 'dc_location', headerName: 'DC', minWidth: 140, flex: 1.1, align: 'center', headerAlign: 'center' },
-    { field: 'product_sku', headerName: 'SKU', minWidth: 120, flex: 0.9, align: 'center', headerAlign: 'center' },
-    { field: 'current_stock', headerName: 'Current', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'optimal_stock', headerName: 'Optimal', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    {
-      field: 'variance',
-      headerName: 'Variance',
-      minWidth: 110,
-      flex: 0.9,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => <Chip label={params.value > 0 ? `+${params.value}` : params.value} size="small" color={Math.abs(params.value) < 100 ? 'success' : 'warning'} />,
-    },
-    { field: 'utilization_pct', headerName: 'Utilization %', minWidth: 130, flex: 1.1, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `${params.value}%` },
-    {
-      field: 'recommended_action',
-      headerName: 'Action',
-      minWidth: 110,
-      flex: 0.9,
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => <Chip label={params.value} size="small" color={params.value === 'Maintain' ? 'success' : params.value === 'Increase' ? 'info' : 'warning'} />,
-    },
-    { field: 'potential_savings', headerName: 'Savings', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `$${params.value?.toLocaleString()}` },
+    { field: 'id', headerName: 'ID', minWidth: 100, flex: 0.8 },
+    { field: 'dc_location', headerName: 'DC', minWidth: 120, flex: 0.9, align: 'center', headerAlign: 'center' },
+    { field: 'product_sku', headerName: 'SKU', minWidth: 120, flex: 1, align: 'center', headerAlign: 'center' },
+    { field: 'channels', headerName: 'Channels (Aggregated)', minWidth: 220, flex: 1.5 },
+    { field: 'weekly_mu', headerName: 'μDC (Weekly)', minWidth: 120, flex: 1, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'sigma', headerName: 'σDC', minWidth: 90, flex: 0.8, type: 'number', align: 'center', headerAlign: 'center' },
+    { field: 'lead_time_weeks', headerName: 'L (Weeks)', minWidth: 100, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center' },
+    { field: 'sigma_l', headerName: 'σL', minWidth: 80, flex: 0.7, type: 'number', align: 'center', headerAlign: 'center' },
+    { field: 'service_level', headerName: 'Service Level', minWidth: 120, flex: 1, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `${(params.value * 100).toFixed(0)}%` },
+    { field: 'z_score', headerName: 'z', minWidth: 80, flex: 0.7, type: 'number', align: 'center', headerAlign: 'center' },
+    { field: 'supplier_ontime', headerName: 'Supplier On-Time Rate', minWidth: 150, flex: 1.2, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `${(params.value * 100).toFixed(0)}%` },
+    { field: 'beta', headerName: 'β', minWidth: 80, flex: 0.7, type: 'number', align: 'center', headerAlign: 'center' },
+    { field: 'base_ss', headerName: 'Base SSDC', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'adjusted_ss', headerName: 'Adjusted SSDCadj', minWidth: 140, flex: 1.1, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'rop', headerName: 'Reorder Point (ROP)', minWidth: 150, flex: 1.2, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'target_inventory', headerName: 'Target Inventory', minWidth: 140, flex: 1.1, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
   ];
 
   return (

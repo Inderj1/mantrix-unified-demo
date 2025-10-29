@@ -417,13 +417,13 @@ const searchableItems = [
     action: { type: 'navigate', tabId: 9 },
   },
   {
-    id: 'docs-ai',
-    title: 'DOCS.AI',
+    id: 'doc-analysis',
+    title: 'DOCUMENT HUB',
     subtitle: 'Upload & Analyze Documents',
-    path: ['DOCS.AI'],
+    path: ['Mantra AI', 'DOCUMENT HUB'],
     icon: <ScienceIcon />,
     color: '#9C27B0',
-    tags: ['docs', 'documents', 'upload', 'analyze', 'pdf', 'text'],
+    tags: ['docs', 'documents', 'upload', 'analyze', 'pdf', 'text', 'mantra'],
     action: { type: 'navigate', tabId: 6 },
   },
   {

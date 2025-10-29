@@ -115,32 +115,6 @@ const dcSystemModules = [
     gradient: 'linear-gradient(135deg, #172554 0%, #0c1844 100%)',
     view: 'dc'
   },
-  {
-    id: 'dc-financial-impact',
-    title: 'Financial Impact',
-    subtitle: 'DC Module 7',
-    description: 'Working capital analysis, inventory valuation, and financial impact reporting',
-    icon: AnalyticsIcon,
-    color: '#0c1844',
-    bgColor: '#dbeafe',
-    stats: { label: 'WC', value: '$45M' },
-    status: 'active',
-    gradient: 'linear-gradient(135deg, #0c1844 0%, #020617 100%)',
-    view: 'dc'
-  },
-  {
-    id: 'dc-planning-table',
-    title: 'Planning Table (UI5)',
-    subtitle: 'DC Module 8',
-    description: 'Excel-like planning table with grouping, aggregation, and inline editing using UI5 Web Components',
-    icon: DashboardIcon,
-    color: '#059669',
-    bgColor: '#d1fae5',
-    stats: { label: 'Records', value: '1.2K' },
-    status: 'active',
-    gradient: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-    view: 'dc'
-  },
 ];
 
 const storeSystemModules = [

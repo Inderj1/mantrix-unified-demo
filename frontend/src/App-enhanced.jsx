@@ -97,7 +97,6 @@ import DCOptimization from './components/stox/DCOptimization.jsx';
 import DCBOM from './components/stox/DCBOM.jsx';
 import DCLotSize from './components/stox/DCLotSize.jsx';
 import DCSupplierExecution from './components/stox/DCSupplierExecution.jsx';
-import DCPlanningTable from './components/stox/DCPlanningTable.jsx';
 import ModuleTilesView from './components/stox/ModuleTilesView.jsx';
 import FioriTileDetail from './components/stox/FioriTileDetail.jsx';
 import GlobalSearch from './components/GlobalSearch';
@@ -224,7 +223,7 @@ function App() {
     // Handle CORE.AI specific navigation
     if (action.view) {
       // Check if this is a STOX.AI navigation
-      if (action.view === 'stox' || action.view === 'margen' || ['demand-workbench', 'demand-flow', 'demand-forecasting', 'outbound-replenishment', 'dc-inventory', 'supply-planning', 'bom-explosion', 'component-consolidation', 'analytics-whatif', 'store-forecasting', 'store-health-monitor', 'store-optimization', 'store-replenishment', 'store-financial-impact', 'dc-demand-aggregation', 'dc-health-monitor', 'dc-optimization', 'dc-bom', 'dc-lot-size', 'dc-supplier-exec', 'dc-financial-impact', 'dc-planning-table'].includes(action.view)) {
+      if (action.view === 'stox' || action.view === 'margen' || ['demand-workbench', 'demand-flow', 'demand-forecasting', 'outbound-replenishment', 'dc-inventory', 'supply-planning', 'bom-explosion', 'component-consolidation', 'analytics-whatif', 'store-forecasting', 'store-health-monitor', 'store-optimization', 'store-replenishment', 'store-financial-impact', 'dc-demand-aggregation', 'dc-health-monitor', 'dc-optimization', 'dc-bom', 'dc-lot-size', 'dc-supplier-exec', 'dc-financial-impact'].includes(action.view)) {
         // First set CORE.AI view to STOX
         setCoreAIView('stox');
 
@@ -508,7 +507,7 @@ function App() {
         <AppBar position="static" elevation={0} sx={{ bgcolor: 'white', color: 'text.primary' }}>
           <Toolbar>
             <Typography variant="h6" sx={{ flexGrow: 0, fontWeight: 500, mr: 3 }}>
-              {['AXIS.AI', 'CORE.AI', 'AXIS.AI', 'MARKETS.AI', 'Control Center', '', 'DOCS.AI', 'Process Mining', 'Enterprise Pulse', 'VISION.AI - Document Intelligence', '', '', '', 'COMMS.AI', '', 'ROUTE.AI'][selectedTab] || ''}
+              {['AXIS.AI', 'CORE.AI', 'AXIS.AI', 'MARKETS.AI', 'Control Center', '', 'DOCUMENT HUB', 'Process Mining', 'Enterprise Pulse', 'VISION.AI - Document Intelligence', '', '', '', 'COMMS.AI', '', 'ROUTE.AI'][selectedTab] || ''}
             </Typography>
             
             {/* Global Search */}
@@ -614,7 +613,7 @@ function App() {
                         } else if (moduleId === 'executive-command') {
                           console.log('Setting stoxView to: executive-command');
                           setStoxView('executive-command');
-                        } else if (['demand-flow', 'demand-forecasting', 'outbound-replenishment', 'dc-inventory', 'supply-planning', 'bom-explosion', 'component-consolidation', 'analytics-whatif', 'store-forecasting', 'store-health-monitor', 'store-optimization', 'store-replenishment', 'store-financial-impact', 'dc-demand-aggregation', 'dc-health-monitor', 'dc-optimization', 'dc-bom', 'dc-lot-size', 'dc-supplier-exec', 'dc-financial-impact', 'dc-planning-table'].includes(moduleId)) {
+                        } else if (['demand-flow', 'demand-forecasting', 'outbound-replenishment', 'dc-inventory', 'supply-planning', 'bom-explosion', 'component-consolidation', 'analytics-whatif', 'store-forecasting', 'store-health-monitor', 'store-optimization', 'store-replenishment', 'store-financial-impact', 'dc-demand-aggregation', 'dc-health-monitor', 'dc-optimization', 'dc-bom', 'dc-lot-size', 'dc-supplier-exec', 'dc-financial-impact'].includes(moduleId)) {
                           console.log('Setting stoxView to module tiles:', moduleId);
                           setStoxView(moduleId);
                         }
@@ -698,9 +697,6 @@ function App() {
                   )}
                   {stoxView === 'dc-supplier-exec' && (
                     <DCSupplierExecution onBack={() => setStoxView('landing')} />
-                  )}
-                  {stoxView === 'dc-planning-table' && (
-                    <DCPlanningTable onBack={() => setStoxView('landing')} />
                   )}
                   {/* PRD Module Tiles Views */}
                   {['demand-flow', 'demand-forecasting', 'outbound-replenishment', 'dc-inventory', 'supply-planning', 'bom-explosion', 'component-consolidation', 'analytics-whatif'].includes(stoxView) && !currentFioriTile && (

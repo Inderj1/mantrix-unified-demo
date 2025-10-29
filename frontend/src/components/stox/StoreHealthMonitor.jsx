@@ -46,68 +46,43 @@ const StoreHealthMonitor = ({ onBack }) => {
     setLoading(true);
 
     setTimeout(() => {
-      const stores = [
-        { id: 'STORE-001', name: 'NYC Fifth Avenue', region: 'Northeast' },
-        { id: 'STORE-045', name: 'LA Beverly Hills', region: 'West' },
-        { id: 'STORE-089', name: 'Chicago Magnificent Mile', region: 'Midwest' },
-        { id: 'STORE-123', name: 'Miami Design District', region: 'Southeast' },
-        { id: 'STORE-167', name: 'Dallas Galleria', region: 'Southwest' },
+      // Aligned data: 12 stores (6 DC-East, 6 DC-Midwest) - aggregates to DC-level totals
+      const healthData = [
+        // DC-East Region Stores
+        { id: 'HM0001', store_id: 'Store-Chicago-001', store_name: 'Chicago Magnificent Mile', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 20, current_inventory: 130, inbound_shipments: 20, committed_orders: 5, available_inventory: 145, target_inventory: 162, safety_stock: 22, days_of_supply: 7.25, inventory_health_pct: 88, health_status: '🟡 Reorder Soon (Yellow)', fill_rate: 0.965, stockout_risk: 'Low Risk', action: 'Plan replenishment - inventory below 70% of target' },
+        { id: 'HM0002', store_id: 'Store-NYC-015', store_name: 'NYC Fifth Avenue', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 27, current_inventory: 180, inbound_shipments: 30, committed_orders: 10, available_inventory: 200, target_inventory: 190, safety_stock: 28, days_of_supply: 7.4, inventory_health_pct: 106, health_status: '🟢 Healthy (Green)', fill_rate: 0.985, stockout_risk: 'Low Risk', action: 'No action needed' },
+        { id: 'HM0003', store_id: 'Store-Boston-022', store_name: 'Boston Newbury St', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 25, current_inventory: 200, inbound_shipments: 20, committed_orders: 15, available_inventory: 205, target_inventory: 180, safety_stock: 26, days_of_supply: 8.2, inventory_health_pct: 116, health_status: '🟢 Healthy (Green)', fill_rate: 0.98, stockout_risk: 'Low Risk', action: 'No action needed' },
+        { id: 'HM0004', store_id: 'Store-Philly-018', store_name: 'Philadelphia Rittenhouse', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 22, current_inventory: 150, inbound_shipments: 10, committed_orders: 8, available_inventory: 152, target_inventory: 165, safety_stock: 24, days_of_supply: 6.9, inventory_health_pct: 91, health_status: '🟢 Healthy (Green)', fill_rate: 0.97, stockout_risk: 'Low Risk', action: 'No action needed' },
+        { id: 'HM0005', store_id: 'Store-DC-Metro-012', store_name: 'DC Georgetown', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 23, current_inventory: 140, inbound_shipments: 15, committed_orders: 7, available_inventory: 148, target_inventory: 170, safety_stock: 25, days_of_supply: 6.4, inventory_health_pct: 85, health_status: '🟢 Healthy (Green)', fill_rate: 0.96, stockout_risk: 'Low Risk', action: 'No action needed' },
+        { id: 'HM0006', store_id: 'Store-Baltimore-009', store_name: 'Baltimore Harbor', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 20, current_inventory: 120, inbound_shipments: 25, committed_orders: 5, available_inventory: 140, target_inventory: 155, safety_stock: 22, days_of_supply: 7.0, inventory_health_pct: 89, health_status: '🟢 Healthy (Green)', fill_rate: 0.97, stockout_risk: 'Low Risk', action: 'No action needed' },
+
+        // DC-Midwest Region Stores
+        { id: 'HM0007', store_id: 'Store-Dallas-019', store_name: 'Dallas Galleria', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 18, current_inventory: 95, inbound_shipments: 40, committed_orders: 5, available_inventory: 130, target_inventory: 140, safety_stock: 20, days_of_supply: 7.2, inventory_health_pct: 92, health_status: '🟢 Healthy (Green)', fill_rate: 0.975, stockout_risk: 'Low Risk', action: 'No action needed' },
+        { id: 'HM0008', store_id: 'Store-Miami-008', store_name: 'Miami Design District', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 22, current_inventory: 340, inbound_shipments: 0, committed_orders: 15, available_inventory: 325, target_inventory: 170, safety_stock: 25, days_of_supply: 14.8, inventory_health_pct: 207, health_status: '🟠 Overstock (Orange)', fill_rate: 0.99, stockout_risk: 'No Risk', action: 'Slow down orders - too much inventory' },
+        { id: 'HM0009', store_id: 'Store-Minneapolis-031', store_name: 'Minneapolis Mall', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 19, current_inventory: 110, inbound_shipments: 30, committed_orders: 10, available_inventory: 130, target_inventory: 145, safety_stock: 21, days_of_supply: 6.8, inventory_health_pct: 88, health_status: '🟡 Reorder Soon (Yellow)', fill_rate: 0.97, stockout_risk: 'Low Risk', action: 'Plan replenishment - inventory below 70% of target' },
+        { id: 'HM0010', store_id: 'Store-Detroit-025', store_name: 'Detroit Somerset', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 17, current_inventory: 100, inbound_shipments: 20, committed_orders: 8, available_inventory: 112, target_inventory: 135, safety_stock: 19, days_of_supply: 6.6, inventory_health_pct: 80, health_status: '🟢 Healthy (Green)', fill_rate: 0.96, stockout_risk: 'Low Risk', action: 'No action needed' },
+        { id: 'HM0011', store_id: 'Store-STL-014', store_name: 'St Louis Plaza', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 16, current_inventory: 90, inbound_shipments: 15, committed_orders: 6, available_inventory: 99, target_inventory: 125, safety_stock: 18, days_of_supply: 6.2, inventory_health_pct: 76, health_status: '🟢 Healthy (Green)', fill_rate: 0.95, stockout_risk: 'Low Risk', action: 'No action needed' },
+        { id: 'HM0012', store_id: 'Store-KC-027', store_name: 'Kansas City Plaza', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 15, current_inventory: 85, inbound_shipments: 10, committed_orders: 4, available_inventory: 91, target_inventory: 120, safety_stock: 17, days_of_supply: 6.1, inventory_health_pct: 72, health_status: '🟢 Healthy (Green)', fill_rate: 0.94, stockout_risk: 'Low Risk', action: 'No action needed' },
       ];
 
-      const products = [
-        { sku: 'SKU-7891', name: 'Premium Color Kit' },
-        { sku: 'SKU-4523', name: 'Color Reviving Gloss' },
-        { sku: 'SKU-9021', name: 'Root Retouch Kit' },
-        { sku: 'SKU-3456', name: 'Hair Treatment Serum' },
-      ];
+      setHealthData(healthData);
 
-      const data = [];
-      let idCounter = 1;
-
-      stores.forEach((store) => {
-        products.forEach((product) => {
-          const onHand = Math.round(50 + Math.random() * 200);
-          const minStock = Math.round(onHand * 0.3);
-          const maxStock = Math.round(onHand * 1.8);
-          const avgDailySales = Math.round(5 + Math.random() * 15);
-          const daysOfStock = Math.round(onHand / avgDailySales);
-          const stockoutRisk = daysOfStock < 7 ? 'High' : daysOfStock < 14 ? 'Medium' : 'Low';
-          const overstock = onHand > maxStock ? 'Yes' : 'No';
-          const healthScore = overstock === 'Yes' ? 60 : stockoutRisk === 'High' ? 55 : stockoutRisk === 'Medium' ? 75 : 95;
-
-          data.push({
-            id: `SH${String(idCounter++).padStart(4, '0')}`,
-            store_id: store.id,
-            store_name: store.name,
-            region: store.region,
-            product_sku: product.sku,
-            product_name: product.name,
-            on_hand: onHand,
-            min_stock: minStock,
-            max_stock: maxStock,
-            avg_daily_sales: avgDailySales,
-            days_of_stock: daysOfStock,
-            stockout_risk: stockoutRisk,
-            overstock: overstock,
-            health_score: healthScore,
-            status: healthScore > 85 ? 'Healthy' : healthScore > 70 ? 'Warning' : 'Critical',
-          });
-        });
-      });
-
-      setHealthData(data);
-
-      const healthyCount = data.filter(d => d.status === 'Healthy').length;
-      const warningCount = data.filter(d => d.status === 'Warning').length;
-      const criticalCount = data.filter(d => d.status === 'Critical').length;
-      const avgHealthScore = data.reduce((sum, row) => sum + row.health_score, 0) / data.length;
+      // Calculate metrics based on health status
+      const healthyCount = healthData.filter(d => d.health_status.includes('Green')).length;
+      const warningCount = healthData.filter(d => d.health_status.includes('Yellow')).length;
+      const criticalCount = healthData.filter(d => d.health_status.includes('Red')).length;
+      const overstockCount = healthData.filter(d => d.health_status.includes('Orange')).length;
+      const avgHealthScore = (healthData.reduce((sum, row) => sum + row.inventory_health_pct, 0) / healthData.length).toFixed(1);
+      const avgFillRate = ((healthData.reduce((sum, row) => sum + row.fill_rate, 0) / healthData.length) * 100).toFixed(1);
 
       setMetrics({
-        totalRecords: data.length,
+        totalRecords: healthData.length,
         healthyCount,
         warningCount,
         criticalCount,
-        avgHealthScore: avgHealthScore.toFixed(1),
+        overstockCount,
+        avgHealthScore,
+        avgFillRate,
       });
 
       setLoading(false);
@@ -115,15 +90,24 @@ const StoreHealthMonitor = ({ onBack }) => {
   };
 
   const columns = [
-    { field: 'id', headerName: 'Health ID', minWidth: 110, flex: 1 },
-    { field: 'store_id', headerName: 'Store ID', minWidth: 120, flex: 0.9, align: 'center', headerAlign: 'center' },
-    { field: 'store_name', headerName: 'Store Name', minWidth: 180, flex: 1.2, align: 'center', headerAlign: 'center' },
-    { field: 'region', headerName: 'Region', minWidth: 120, flex: 0.9, align: 'center', headerAlign: 'center' },
+    { field: 'id', headerName: 'ID', minWidth: 100, flex: 0.8 },
+    { field: 'store_id', headerName: 'Store ID', minWidth: 140, flex: 1.1, align: 'center', headerAlign: 'center' },
+    { field: 'store_name', headerName: 'Store Name', minWidth: 180, flex: 1.4 },
     { field: 'product_sku', headerName: 'SKU', minWidth: 120, flex: 0.9, align: 'center', headerAlign: 'center' },
-    { field: 'product_name', headerName: 'Product', minWidth: 180, flex: 1.2, align: 'center', headerAlign: 'center' },
+    { field: 'product_name', headerName: 'Product', minWidth: 180, flex: 1.4 },
     {
-      field: 'on_hand',
-      headerName: 'On Hand',
+      field: 'forecasted_demand',
+      headerName: 'Daily Forecast',
+      minWidth: 120,
+      flex: 1,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      valueFormatter: (params) => params.value?.toLocaleString(),
+    },
+    {
+      field: 'current_inventory',
+      headerName: 'Current',
       minWidth: 110,
       flex: 0.9,
       type: 'number',
@@ -132,164 +116,144 @@ const StoreHealthMonitor = ({ onBack }) => {
       valueFormatter: (params) => params.value?.toLocaleString(),
     },
     {
-      field: 'avg_daily_sales',
-      headerName: 'Avg Daily Sales',
-      minWidth: 140,
-      flex: 1.1,
+      field: 'inbound_shipments',
+      headerName: 'Inbound',
+      minWidth: 110,
+      flex: 0.9,
       type: 'number',
       align: 'center',
       headerAlign: 'center',
+      valueFormatter: (params) => params.value?.toLocaleString(),
     },
     {
-      field: 'days_of_stock',
+      field: 'committed_orders',
+      headerName: 'Committed',
+      minWidth: 120,
+      flex: 1,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      valueFormatter: (params) => params.value?.toLocaleString(),
+    },
+    {
+      field: 'available_inventory',
+      headerName: 'Available',
+      minWidth: 110,
+      flex: 0.9,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      valueFormatter: (params) => params.value?.toLocaleString(),
+    },
+    {
+      field: 'target_inventory',
+      headerName: 'Target',
+      minWidth: 110,
+      flex: 0.9,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      valueFormatter: (params) => params.value?.toLocaleString(),
+    },
+    {
+      field: 'safety_stock',
+      headerName: 'Safety Stock',
+      minWidth: 120,
+      flex: 1,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      valueFormatter: (params) => params.value?.toLocaleString(),
+    },
+    {
+      field: 'days_of_supply',
       headerName: 'Days of Stock',
       minWidth: 130,
       flex: 1.1,
       type: 'number',
       align: 'center',
       headerAlign: 'center',
-      renderCell: (params) => (
-        <Chip
-          label={`${params.value} days`}
-          size="small"
-          color={params.value < 7 ? 'error' : params.value < 14 ? 'warning' : 'success'}
-        />
-      ),
+      valueFormatter: (params) => `${params.value?.toFixed(1)} days`,
     },
     {
-      field: 'stockout_risk',
-      headerName: 'Stockout Risk',
-      minWidth: 130,
-      flex: 1.1,
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => (
-        <Chip
-          label={params.value}
-          size="small"
-          color={params.value === 'High' ? 'error' : params.value === 'Medium' ? 'warning' : 'success'}
-          variant="outlined"
-        />
-      ),
-    },
-    {
-      field: 'overstock',
-      headerName: 'Overstock',
+      field: 'inventory_health_pct',
+      headerName: 'Health %',
       minWidth: 110,
       flex: 0.9,
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => (
-        <Chip
-          label={params.value}
-          size="small"
-          color={params.value === 'Yes' ? 'warning' : 'default'}
-          variant="outlined"
-        />
-      ),
-    },
-    {
-      field: 'health_score',
-      headerName: 'Health Score',
-      minWidth: 130,
-      flex: 1.2,
       type: 'number',
       align: 'center',
       headerAlign: 'center',
       renderCell: (params) => (
-        <Stack direction="row" spacing={1} alignItems="center">
-          <Typography variant="body2" fontWeight={600}>{params.value}</Typography>
-          <Box
-            sx={{
-              width: 60,
-              height: 6,
-              bgcolor: alpha('#e0e0e0', 0.3),
-              borderRadius: 1,
-              overflow: 'hidden',
-            }}
-          >
-            <Box
-              sx={{
-                width: `${params.value}%`,
-                height: '100vh',
-                bgcolor: params.value > 85 ? '#10b981' : params.value > 70 ? '#f59e0b' : '#ef4444',
-              }}
-            />
-          </Box>
-        </Stack>
+        <Chip
+          label={`${params.value}%`}
+          size="small"
+          color={params.value >= 70 ? 'success' : params.value >= 30 ? 'warning' : 'error'}
+          sx={{ fontWeight: 600 }}
+        />
       ),
     },
     {
-      field: 'status',
+      field: 'health_status',
       headerName: 'Status',
-      minWidth: 120,
-      flex: 1,
+      minWidth: 160,
+      flex: 1.3,
       align: 'center',
       headerAlign: 'center',
-      renderCell: (params) => (
-        <Stack direction="row" spacing={0.5} alignItems="center">
-          {params.value === 'Healthy' ? (
-            <CheckCircle sx={{ fontSize: 16, color: 'success.main' }} />
-          ) : params.value === 'Warning' ? (
-            <Warning sx={{ fontSize: 16, color: 'warning.main' }} />
-          ) : (
-            <Error sx={{ fontSize: 16, color: 'error.main' }} />
-          )}
-          <Typography variant="caption">{params.value}</Typography>
-        </Stack>
-      ),
+    },
+    {
+      field: 'fill_rate',
+      headerName: 'Fill Rate',
+      minWidth: 110,
+      flex: 0.9,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      valueFormatter: (params) => `${(params.value * 100).toFixed(1)}%`,
+    },
+    {
+      field: 'stockout_risk',
+      headerName: 'Stockout Risk',
+      minWidth: 180,
+      flex: 1.4,
+      align: 'center',
+      headerAlign: 'center',
+    },
+    {
+      field: 'action',
+      headerName: 'Action / Recommendation',
+      minWidth: 250,
+      flex: 2,
     },
   ];
 
   return (
     <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>
-              STOX.AI
-            </Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>
-              Store Level View
-            </Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
-              Health Monitor
-            </Typography>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Store System</Link>
+            <Typography color="primary" variant="body1" fontWeight={600}>Inventory Health Monitor</Typography>
           </Breadcrumbs>
-          <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">
-            Back
-          </Button>
+          <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>
         </Stack>
-
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-              <ShowChart sx={{ fontSize: 32, color: '#2563eb' }} />
-              <Typography variant="h4" fontWeight={700}>
-                Store Health Monitor
-              </Typography>
+              <ShowChart sx={{ fontSize: 32, color: '#10b981' }} />
+              <Typography variant="h4" fontWeight={700}>Inventory Health Monitor</Typography>
             </Stack>
             <Typography variant="body2" color="text.secondary">
-              Real-time store inventory health monitoring with stock alerts and availability tracking
+              Real-time inventory status with health alerts and days of supply monitoring
             </Typography>
           </Box>
           <Stack direction="row" spacing={1}>
-            <Tooltip title="Refresh Data">
-              <IconButton onClick={fetchHealthData} color="primary">
-                <Refresh />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Export Data">
-              <IconButton color="primary">
-                <Download />
-              </IconButton>
-            </Tooltip>
+            <Tooltip title="Refresh"><IconButton onClick={fetchHealthData} color="primary"><Refresh /></IconButton></Tooltip>
+            <Tooltip title="Export"><IconButton color="primary"><Download /></IconButton></Tooltip>
           </Stack>
         </Stack>
       </Box>
 
-      {/* Metrics */}
       {metrics && (
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={6} md={3}>
@@ -326,36 +290,28 @@ const StoreHealthMonitor = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2563eb', 0.1)} 0%, ${alpha('#2563eb', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#3b82f6', 0.1)} 0%, ${alpha('#3b82f6', 0.05)} 100%)` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <ShowChart sx={{ color: '#2563eb' }} />
-                  <Typography variant="body2" color="text.secondary">Avg Health Score</Typography>
+                  <Inventory sx={{ color: '#3b82f6' }} />
+                  <Typography variant="body2" color="text.secondary">Avg Health</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#2563eb">{metrics.avgHealthScore}</Typography>
+                <Typography variant="h4" fontWeight={700} color="#3b82f6">{metrics.avgHealthScore}%</Typography>
               </CardContent>
             </Card>
           </Grid>
         </Grid>
       )}
 
-      {/* DataGrid */}
-      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0, width: '100%' }}>
         <DataGrid
           rows={healthData}
           columns={columns}
           loading={loading}
           density="compact"
           slots={{ toolbar: GridToolbar }}
-          slotProps={{
-            toolbar: {
-              showQuickFilter: true,
-              quickFilterProps: { debounceMs: 500 },
-            },
-          }}
-          initialState={{
-            pagination: { paginationModel: { pageSize: 25 } },
-          }}
+          slotProps={{ toolbar: { showQuickFilter: true, quickFilterProps: { debounceMs: 500 } } }}
+          initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
           pageSizeOptions={[10, 25, 50, 100]}
           checkboxSelection
           disableRowSelectionOnClick

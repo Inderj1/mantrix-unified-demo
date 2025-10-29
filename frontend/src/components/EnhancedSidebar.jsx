@@ -69,6 +69,13 @@ const EnhancedSidebar = ({
           secondary: 'Business Process Analytics',
           color: '#FF6B35',
         },
+        {
+          id: 6,
+          icon: <DescriptionIcon />,
+          primary: 'DOCUMENT HUB',
+          secondary: 'Upload & Analyze Documents',
+          color: '#9C27B0',
+        },
       ],
     },
     {
@@ -107,13 +114,6 @@ const EnhancedSidebar = ({
           primary: 'VISION.AI',
           secondary: 'Document OCR & Image Intelligence',
           color: '#00BCD4',
-        },
-        {
-          id: 6,
-          icon: <DescriptionIcon />,
-          primary: 'DOCS.AI',
-          secondary: 'Upload & Analyze Documents',
-          color: '#9C27B0',
         },
         {
           id: 13,
