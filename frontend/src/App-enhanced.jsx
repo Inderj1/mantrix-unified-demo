@@ -64,6 +64,16 @@ import EnhancedSidebar from './components/EnhancedSidebar';
 import MarketsAIDashboard from './components/MarketsAIDashboard';
 import CoreAILanding from './components/CoreAILanding';
 import MargenAIDashboard from './components/margenai/MargenAIDashboard';
+import MargenAILanding from './components/MargenAILanding';
+import MargenAITable from './components/margenai/MargenAITable';
+import SegmentAnalytics from './components/margenai/SegmentAnalytics';
+import RevenueSalesAnalytics from './components/margenai/RevenueSalesAnalytics';
+import CostOperationsManagement from './components/margenai/CostOperationsManagement';
+import RevenueGrowthAnalytics from './components/margenai/RevenueGrowthAnalytics';
+import CostCOGSAnalytics from './components/margenai/CostCOGSAnalytics';
+import MarginProfitabilityAnalytics from './components/margenai/MarginProfitabilityAnalytics';
+import PLGLExplorerAnalytics from './components/margenai/PLGLExplorerAnalytics';
+import FinancialDriversAnalytics from './components/margenai/FinancialDriversAnalytics';
 import AxisAIDashboard from './components/AxisAIDashboard';
 import DocumentIntelligence from './components/DocumentIntelligence';
 import ProcessMiningPage from './pages/ProcessMiningPage';
@@ -102,12 +112,19 @@ import DCSupplierExecution from './components/stox/DCSupplierExecution.jsx';
 import DCFinancialImpact from './components/stox/DCFinancialImpact.jsx';
 import ModuleTilesView from './components/stox/ModuleTilesView.jsx';
 import FioriTileDetail from './components/stox/FioriTileDetail.jsx';
+import TicketingSystem from './components/stox/TicketingSystem.jsx';
 import GlobalSearch from './components/GlobalSearch';
 import DocumentVisionIntelligence from './components/DocumentVisionIntelligence';
 import EmailIntelligence from './components/EmailIntelligence';
 import CommsConfig from './components/CommsConfig';
 import RouteAI from './components/RouteAI';
-import RevEQ from './components/RevEQ';
+import RouteAILanding from './components/RouteAILanding';
+import FleetManagement from './components/routeai/FleetManagement';
+import RouteOptimization from './components/routeai/RouteOptimization';
+import DeliveryTracking from './components/routeai/DeliveryTracking';
+import PerformanceAnalytics from './components/routeai/PerformanceAnalytics';
+import FuelManagement from './components/routeai/FuelManagement';
+import MaintenanceScheduler from './components/routeai/MaintenanceScheduler';
 import { sapFioriTheme, sapChartColors } from './themes/sapFioriTheme';
 import { defaultTheme } from './themes/defaultTheme';
 import {
@@ -182,8 +199,10 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [selectedTab, setSelectedTab] = usePersistedState('mantrix-selectedTab', 0);
   const [drawerOpen, setDrawerOpen] = usePersistedState('mantrix-drawerOpen', false);
-  const [coreAIView, setCoreAIView] = useState('landing'); // 'landing', 'margen', 'stox'
+  const [coreAIView, setCoreAIView] = useState('landing'); // 'landing', 'margen', 'stox', 'route'
   const [stoxView, setStoxView] = usePersistedState('mantrix-stoxView', 'landing'); // 'landing', 'stoxshift'
+  const [margenView, setMargenView] = usePersistedState('mantrix-margenView', 'landing'); // 'landing', 'revenue-sales', 'cost-operations', etc.
+  const [routeView, setRouteView] = usePersistedState('mantrix-routeView', 'landing'); // 'landing', module IDs
   const [currentFioriTile, setCurrentFioriTile] = useState(null); // { tileId, title, moduleId, moduleColor }
   const [axisAIView, setAxisAIView] = useState('landing'); // 'landing', 'forecast', 'budget', 'driver', 'scenario', 'insights'
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
@@ -510,7 +529,7 @@ function App() {
         <AppBar position="static" elevation={0} sx={{ bgcolor: 'white', color: 'text.primary' }}>
           <Toolbar>
             <Typography variant="h6" sx={{ flexGrow: 0, fontWeight: 500, mr: 3 }}>
-              {['AXIS.AI', 'CORE.AI', 'AXIS.AI', 'MARKETS.AI', 'Control Center', '', 'DOCUMENT HUB', 'Process Mining', 'Enterprise Pulse', 'VISION.AI - Document Intelligence', '', '', '', 'COMMS.AI', '', 'ROUTE.AI'][selectedTab] || ''}
+              {['AXIS.AI', 'CORE.AI', 'AXIS.AI', 'MARKETS.AI', 'Control Center', '', 'DOCUMENT HUB', 'Process Mining', 'Enterprise Pulse', 'VISION.AI - Document Intelligence', '', '', '', 'EMAIL INTEL', '', 'ROUTE.AI'][selectedTab] || ''}
             </Typography>
             
             {/* Global Search */}
@@ -553,15 +572,37 @@ function App() {
                       setStoxView('landing');
                     } else if (moduleId === 'route') {
                       setCoreAIView('route');
-                    } else if (moduleId === 'reveq') {
-                      setCoreAIView('reveq');
+                      setRouteView('landing');
                     }
                   }} />
                 </Box>
               </Fade>
               <Fade in={coreAIView === 'margen'} timeout={300}>
-                <Box sx={{ display: coreAIView === 'margen' ? 'block' : 'none', height: '100%' }}>
-                  <MargenAIDashboard onBack={() => setCoreAIView('landing')} />
+                <Box sx={{ display: coreAIView === 'margen' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
+                  {margenView === 'landing' && (
+                    <MargenAILanding
+                      onBack={() => setCoreAIView('landing')}
+                      onTileClick={(moduleId) => {
+                        console.log('MargenAI tile clicked:', moduleId);
+                        setMargenView(moduleId);
+                      }}
+                    />
+                  )}
+                  {margenView === 'revenue-growth' && (
+                    <RevenueGrowthAnalytics onBack={() => setMargenView('landing')} />
+                  )}
+                  {margenView === 'cost-cogs' && (
+                    <CostCOGSAnalytics onBack={() => setMargenView('landing')} />
+                  )}
+                  {margenView === 'margin-profitability' && (
+                    <MarginProfitabilityAnalytics onBack={() => setMargenView('landing')} />
+                  )}
+                  {margenView === 'pl-gl-explorer' && (
+                    <PLGLExplorerAnalytics onBack={() => setMargenView('landing')} />
+                  )}
+                  {margenView === 'drivers-whatif' && (
+                    <FinancialDriversAnalytics onBack={() => setMargenView('landing')} />
+                  )}
                 </Box>
               </Fade>
               <Fade in={coreAIView === 'stox'} timeout={300}>
@@ -630,7 +671,7 @@ function App() {
                         } else if (moduleId === 'executive-command') {
                           console.log('Setting stoxView to: executive-command');
                           setStoxView('executive-command');
-                        } else if (['demand-flow', 'demand-forecasting', 'outbound-replenishment', 'dc-inventory', 'supply-planning', 'bom-explosion', 'component-consolidation', 'analytics-whatif', 'store-forecasting', 'store-health-monitor', 'store-optimization', 'store-replenishment', 'store-financial-impact', 'dc-demand-aggregation', 'dc-health-monitor', 'dc-optimization', 'dc-bom', 'dc-lot-size', 'dc-supplier-exec', 'dc-financial-impact'].includes(moduleId)) {
+                        } else if (['demand-flow', 'demand-forecasting', 'outbound-replenishment', 'dc-inventory', 'supply-planning', 'bom-explosion', 'component-consolidation', 'analytics-whatif', 'tile0-forecast-simulation', 'store-forecasting', 'store-health-monitor', 'store-optimization', 'store-replenishment', 'store-financial-impact', 'dc-demand-aggregation', 'dc-health-monitor', 'dc-optimization', 'dc-bom', 'dc-lot-size', 'dc-supplier-exec', 'dc-financial-impact'].includes(moduleId)) {
                           console.log('Setting stoxView to module tiles:', moduleId);
                           setStoxView(moduleId);
                         }
@@ -776,13 +817,37 @@ function App() {
                 </Box>
               </Fade>
               <Fade in={coreAIView === 'route'} timeout={300}>
-                <Box sx={{ display: coreAIView === 'route' ? 'block' : 'none', height: '100%' }}>
-                  <RouteAI onBack={() => setCoreAIView('landing')} />
-                </Box>
-              </Fade>
-              <Fade in={coreAIView === 'reveq'} timeout={300}>
-                <Box sx={{ display: coreAIView === 'reveq' ? 'block' : 'none', height: '100%' }}>
-                  <RevEQ onBack={() => setCoreAIView('landing')} />
+                <Box sx={{ display: coreAIView === 'route' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
+                  {routeView === 'landing' && (
+                    <RouteAILanding
+                      onBack={() => setCoreAIView('landing')}
+                      onTileClick={(moduleId) => {
+                        console.log('RouteAI tile clicked:', moduleId);
+                        setRouteView(moduleId);
+                      }}
+                    />
+                  )}
+                  {routeView === 'fleet-management' && (
+                    <FleetManagement onBack={() => setRouteView('landing')} />
+                  )}
+                  {routeView === 'route-optimization' && (
+                    <RouteOptimization onBack={() => setRouteView('landing')} />
+                  )}
+                  {routeView === 'delivery-tracking' && (
+                    <DeliveryTracking onBack={() => setRouteView('landing')} />
+                  )}
+                  {routeView === 'performance-analytics' && (
+                    <PerformanceAnalytics onBack={() => setRouteView('landing')} />
+                  )}
+                  {routeView === 'fuel-management' && (
+                    <FuelManagement onBack={() => setRouteView('landing')} />
+                  )}
+                  {routeView === 'maintenance-scheduler' && (
+                    <MaintenanceScheduler onBack={() => setRouteView('landing')} />
+                  )}
+                  {!['landing', 'fleet-management', 'route-optimization', 'delivery-tracking', 'performance-analytics', 'fuel-management', 'maintenance-scheduler'].includes(routeView) && (
+                    <RouteAI onBack={() => setRouteView('landing')} />
+                  )}
                 </Box>
               </Fade>
             </Box>
@@ -1147,7 +1212,14 @@ function App() {
             </Box>
           )}
 
-          {/* COMMS.AI Tab */}
+          {/* COMMAND TOWER Tab */}
+          {selectedTab === 10 && (
+            <Box sx={{ height: 'calc(100vh - 180px)', overflow: 'auto' }}>
+              <TicketingSystem onBack={() => setSelectedTab(1)} />
+            </Box>
+          )}
+
+          {/* EMAIL INTEL Tab */}
           {selectedTab === 13 && (
             <Box sx={{ height: 'calc(100vh - 180px)', overflow: 'auto' }}>
               <EmailIntelligence onNavigateToConfig={() => setSelectedTab(4)} />

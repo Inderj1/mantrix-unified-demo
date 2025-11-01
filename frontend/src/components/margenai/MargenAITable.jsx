@@ -49,6 +49,7 @@ import {
   getSortedRowModel,
   flexRender,
 } from '@tanstack/react-table';
+import { useProductOverview } from '../../hooks/useMargenData';
 
 // API service for MargenAI data
 const margenAPI = {
@@ -91,24 +92,14 @@ const margenAPI = {
   }
 };
 
-const MargenAITable = ({ onRowClick }) => {
+const MargenAITable = ({ onRowClick, onBack }) => {
   // State management
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [sorting, setSorting] = useState([]);
   const [globalFilter, setGlobalFilter] = useState('');
   const [columnFilters, setColumnFilters] = useState([]);
   const [rowSelection, setRowSelection] = useState({});
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
-  const [pagination, setPagination] = useState({
-    total: 0,
-    limit: 100,
-    offset: 0,
-    hasNext: false,
-    hasPrev: false
-  });
 
   // Drill-down state
   const [drillDownLevel, setDrillDownLevel] = useState(0); // 0: products, 1: segments, 2: transactions
@@ -122,23 +113,15 @@ const MargenAITable = ({ onRowClick }) => {
   const [profitabilityFilter, setProfitabilityFilter] = useState('all');
   const [marginRangeFilter, setMarginRangeFilter] = useState('all');
 
-  // Load data on component mount
-  useEffect(() => {
-    loadProductsData();
-  }, [pagination.offset]);
-
-  const loadProductsData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const result = await margenAPI.getProducts(pagination.limit, pagination.offset);
-      setData(result.products);
-      setPagination(result.pagination);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+  // Use mock data hook
+  const { data: productData, loading, error, refetch } = useProductOverview(100, 0);
+  const data = productData?.products || [];
+  const pagination = productData?.pagination || {
+    total: 0,
+    limit: 100,
+    offset: 0,
+    hasNext: false,
+    hasPrev: false
   };
 
   const handleDrillDown = async (row, level) => {
@@ -624,9 +607,38 @@ const MargenAITable = ({ onRowClick }) => {
   }
 
   return (
-    <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-      {/* Header */}
-      <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+    <Box sx={{ p: 3 }}>
+      {/* Header with Breadcrumbs */}
+      <Box sx={{ mb: 3 }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link
+              component="button"
+              variant="body1"
+              onClick={onBack}
+              sx={{
+                textDecoration: 'none',
+                color: 'text.primary',
+                '&:hover': { textDecoration: 'underline' },
+              }}
+            >
+              MARGEN.AI
+            </Link>
+            <Typography color="primary" variant="body1" fontWeight={600}>
+              Product Overview
+            </Typography>
+          </Breadcrumbs>
+          {onBack && (
+            <Button startIcon={<BackIcon />} onClick={onBack} variant="outlined" size="small">
+              Back to MargenAI
+            </Button>
+          )}
+        </Stack>
+      </Box>
+
+      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+        {/* Header */}
+        <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
           <Box>
             <Typography variant="h6" fontWeight={600}>
@@ -883,7 +895,8 @@ const MargenAITable = ({ onRowClick }) => {
           <ListItemText>Export</ListItemText>
         </MenuItem>
       </Menu>
-    </Paper>
+      </Paper>
+    </Box>
   );
 };
 

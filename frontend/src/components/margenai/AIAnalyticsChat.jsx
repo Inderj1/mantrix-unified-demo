@@ -16,6 +16,9 @@ import {
   Button,
   Card,
   CardContent,
+  Breadcrumbs,
+  Link,
+  Stack,
 } from '@mui/material';
 import {
   Send as SendIcon,
@@ -23,6 +26,8 @@ import {
   Person as PersonIcon,
   History as HistoryIcon,
   Clear as ClearIcon,
+  NavigateNext as NavigateNextIcon,
+  ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import { apiService } from '../../services/api';
 
@@ -43,7 +48,7 @@ const SAMPLE_QUERIES = [
   "Break down COGS by component"
 ];
 
-const AIAnalyticsChat = ({ dashboardData }) => {
+const AIAnalyticsChat = ({ dashboardData, onBack }) => {
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -173,7 +178,35 @@ const AIAnalyticsChat = ({ dashboardData }) => {
   };
 
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 3 }}>
+      {/* Header with Breadcrumbs */}
+      <Box sx={{ mb: 3 }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link
+              component="button"
+              variant="body1"
+              onClick={onBack}
+              sx={{
+                textDecoration: 'none',
+                color: 'text.primary',
+                '&:hover': { textDecoration: 'underline' },
+              }}
+            >
+              MARGEN.AI
+            </Link>
+            <Typography color="primary" variant="body1" fontWeight={600}>
+              AI Analytics Chat
+            </Typography>
+          </Breadcrumbs>
+          {onBack && (
+            <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">
+              Back to MargenAI
+            </Button>
+          )}
+        </Stack>
+      </Box>
+
       {/* Header */}
       <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
         <Box display="flex" justifyContent="space-between" alignItems="center">

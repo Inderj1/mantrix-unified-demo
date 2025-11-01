@@ -44,11 +44,11 @@ const dcSystemModules = [
     subtitle: 'DC Module 1',
     description: 'Aggregate demand forecasts from all store locations and channels for centralized planning',
     icon: TrendingUpIcon,
-    color: '#64748b',
-    bgColor: '#f1f5f9',
+    color: '#3b82f6',
+    bgColor: '#dbeafe',
     stats: { label: 'Locations', value: '450' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
+    gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
     view: 'dc'
   },
   {
@@ -57,11 +57,11 @@ const dcSystemModules = [
     subtitle: 'DC Module 2',
     description: 'Real-time visibility into DC inventory health, stock levels, and availability across network',
     icon: ShowChartIcon,
-    color: '#475569',
-    bgColor: '#e2e8f0',
+    color: '#06b6d4',
+    bgColor: '#cffafe',
     stats: { label: 'DCs', value: '8' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #475569 0%, #334155 100%)',
+    gradient: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
     view: 'dc'
   },
   {
@@ -70,11 +70,11 @@ const dcSystemModules = [
     subtitle: 'DC Module 3',
     description: 'Optimize inventory positioning and allocation across distribution center network',
     icon: AnalyticsIcon,
-    color: '#334155',
-    bgColor: '#cbd5e1',
+    color: '#10b981',
+    bgColor: '#d1fae5',
     stats: { label: 'SKUs', value: '12K' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #334155 0%, #1e293b 100%)',
+    gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
     view: 'dc'
   },
   {
@@ -83,11 +83,11 @@ const dcSystemModules = [
     subtitle: 'DC Module 4',
     description: 'Multi-level BOM management and component tracking for finished goods assembly',
     icon: AccountTreeIcon,
-    color: '#1e293b',
-    bgColor: '#cbd5e1',
+    color: '#8b5cf6',
+    bgColor: '#f3e8ff',
     stats: { label: 'BOMs', value: '2.1K' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+    gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
     view: 'dc'
   },
   {
@@ -96,11 +96,11 @@ const dcSystemModules = [
     subtitle: 'DC Module 5',
     description: 'Economic order quantity and lot size optimization for procurement efficiency',
     icon: InventoryIcon,
-    color: '#0f172a',
-    bgColor: '#cbd5e1',
+    color: '#f97316',
+    bgColor: '#ffedd5',
     stats: { label: 'Orders', value: '850' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #0f172a 0%, #020617 100%)',
+    gradient: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
     view: 'dc'
   },
   {
@@ -109,11 +109,11 @@ const dcSystemModules = [
     subtitle: 'DC Module 6',
     description: 'Supplier collaboration portal with order tracking, delivery management, and performance metrics',
     icon: LocalShippingIcon,
-    color: '#020617',
-    bgColor: '#cbd5e1',
+    color: '#6366f1',
+    bgColor: '#e0e7ff',
     stats: { label: 'Suppliers', value: '120' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #020617 0%, #000000 100%)',
+    gradient: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
     view: 'dc'
   },
   {
@@ -122,11 +122,11 @@ const dcSystemModules = [
     subtitle: 'DC Module 7',
     description: 'Distribution center financial impact analysis with inventory carrying costs and network optimization opportunities',
     icon: AnalyticsIcon,
-    color: '#64748b',
-    bgColor: '#f1f5f9',
+    color: '#f59e0b',
+    bgColor: '#fef3c7',
     stats: { label: 'Savings', value: '$24M' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
+    gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
     view: 'dc'
   },
 ];
@@ -497,6 +497,7 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView = nu
               </Card>
             </Zoom>
           </Grid>
+
         </Grid>
 
         {/* Info Section */}

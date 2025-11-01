@@ -71,7 +71,12 @@ import {
   Download as DownloadIcon,
   ViewColumn as ViewColumnIcon,
   Clear as ClearIcon,
+  Add as AddIcon,
+  Delete as DeleteIcon,
+  Edit as EditIcon,
 } from '@mui/icons-material';
+import { useCustomTypes } from '../hooks/useCustomTypes';
+import CustomTypeConfig from './CustomTypeConfig';
 
 // Custom Toolbar for DataGrid
 function CustomToolbar({ onExport }) {
@@ -270,9 +275,16 @@ const generateSampleData = (typeName, count = 10) => {
 
 const EmailIntelligence = ({ onNavigateToConfig }) => {
   const theme = useTheme();
+  const [selectedType, setSelectedType] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Custom types management
+  const { customTypes, addType, updateType, deleteType } = useCustomTypes('email-intel-custom-types');
+  const [configDialogOpen, setConfigDialogOpen] = useState(false);
+  const [editingType, setEditingType] = useState(null);
 
   // Configuration state
   const [config, setConfig] = useState({ types: [], fields: {} });
@@ -380,6 +392,11 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
     fetchConfiguration();
   }, []);
 
+  // Refetch configuration when custom types change
+  useEffect(() => {
+    fetchConfiguration();
+  }, [customTypes]);
+
   // Fetch data when tab changes
   useEffect(() => {
     if (config.types.length > 0) {
@@ -395,51 +412,69 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
       const response = await fetch('/api/v1/comms/config/complete');
       if (response.ok) {
         const data = await response.json();
-        setConfig(data);
+
+        // Merge with custom types
+        const mergedConfig = {
+          ...data,
+          types: [...data.types, ...customTypes],
+        };
+        setConfig(mergedConfig);
 
         // Calculate stats
         const statsObj = {};
-        data.types.forEach(type => {
+        mergedConfig.types.forEach(type => {
           statsObj[type.name] = 0;
         });
         setStats(statsObj);
 
         // Fetch data for first type
-        if (data.types.length > 0) {
-          fetchDataForType(data.types[0].name);
+        if (mergedConfig.types.length > 0) {
+          fetchDataForType(mergedConfig.types[0].name);
         }
       } else {
         // Use sample config if API fails
         console.log('Using sample configuration data');
-        setConfig(sampleConfig);
+
+        // Merge with custom types
+        const mergedConfig = {
+          ...sampleConfig,
+          types: [...sampleConfig.types, ...customTypes],
+        };
+        setConfig(mergedConfig);
 
         // Calculate stats
         const statsObj = {};
-        sampleConfig.types.forEach(type => {
+        mergedConfig.types.forEach(type => {
           statsObj[type.name] = 0;
         });
         setStats(statsObj);
 
         // Fetch data for first type
-        if (sampleConfig.types.length > 0) {
-          fetchDataForType(sampleConfig.types[0].name);
+        if (mergedConfig.types.length > 0) {
+          fetchDataForType(mergedConfig.types[0].name);
         }
       }
     } catch (err) {
       console.error('Error fetching configuration:', err);
       // Use sample config on error
       console.log('Using sample configuration data due to error');
-      setConfig(sampleConfig);
+
+      // Merge with custom types
+      const mergedConfig = {
+        ...sampleConfig,
+        types: [...sampleConfig.types, ...customTypes],
+      };
+      setConfig(mergedConfig);
 
       // Calculate stats
       const statsObj = {};
-      sampleConfig.types.forEach(type => {
+      mergedConfig.types.forEach(type => {
         statsObj[type.name] = 0;
       });
       setStats(statsObj);
 
       // Fetch data for first type
-      if (sampleConfig.types.length > 0) {
+      if (mergedConfig.types.length > 0) {
         fetchDataForType(sampleConfig.types[0].name);
       }
     }
@@ -703,33 +738,277 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
     return IconComponent;
   };
 
+  // Custom type handlers
+  const handleAddCustomType = () => {
+    setEditingType(null);
+    setConfigDialogOpen(true);
+  };
+
+  const handleEditCustomType = (type) => {
+    setEditingType(type);
+    setConfigDialogOpen(true);
+  };
+
+  const handleSaveCustomType = (formData) => {
+    if (editingType) {
+      updateType(editingType.id, formData);
+    } else {
+      addType(formData);
+    }
+    setConfigDialogOpen(false);
+    setEditingType(null);
+  };
+
+  const handleDeleteCustomType = (typeId) => {
+    if (window.confirm('Are you sure you want to delete this custom type?')) {
+      deleteType(typeId);
+      if (selectedType?.id === typeId) {
+        setSelectedType(null);
+      }
+    }
+  };
+
+  // Tile Landing View
+  if (!selectedType) {
+    // Filter tiles based on search query
+    const filteredTypes = config.types.filter((type) =>
+      type.display_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      type.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    return (
+      <Box sx={{ p: 3, height: '100%', overflowY: 'auto' }}>
+        <Box sx={{ mb: 4 }}>
+          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+            <Box>
+              <Typography variant="h4" fontWeight={700} sx={{ mb: 1 }}>
+                EMAIL INTEL
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Configurable Communication Intelligence Platform
+              </Typography>
+            </Box>
+            <Stack direction="row" spacing={2}>
+              <Button startIcon={<SettingsIcon />} variant="outlined" onClick={onNavigateToConfig}>
+                Configure
+              </Button>
+              <Button startIcon={<RefreshIcon />} variant="outlined" onClick={refreshAll} disabled={loading}>
+                Refresh
+              </Button>
+            </Stack>
+          </Stack>
+
+          {/* Search Bar */}
+          <TextField
+            fullWidth
+            placeholder="Search communication types..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            InputProps={{
+              startAdornment: <SearchIcon sx={{ color: 'text.secondary', mr: 1 }} />,
+              endAdornment: searchQuery && (
+                <IconButton size="small" onClick={() => setSearchQuery('')}>
+                  <ClearIcon fontSize="small" />
+                </IconButton>
+              ),
+            }}
+            sx={{
+              mt: 2,
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: alpha(theme.palette.primary.main, 0.02),
+              },
+            }}
+          />
+        </Box>
+
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
+            {error}
+          </Alert>
+        )}
+
+        <Grid container spacing={1.5}>
+          {filteredTypes.map((type, index) => {
+            const IconComponent = getIconComponent(type.icon);
+            const colors = ['#2196F3', '#FF9800', '#4CAF50', '#9C27B0'];
+            const color = type.color || colors[index % colors.length];
+
+            return (
+              <Grid item xs={12} sm={6} md={4} key={type.id}>
+                <Card
+                  sx={{
+                    height: 200,
+                    cursor: 'pointer',
+                    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                    border: '1px solid',
+                    borderColor: alpha(color, 0.15),
+                    borderRadius: 2,
+                    overflow: 'hidden',
+                    position: 'relative',
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: 3,
+                      background: `linear-gradient(135deg, ${color} 0%, ${alpha(color, 0.7)} 100%)`,
+                      opacity: 0.8,
+                    },
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: `0 12px 24px ${alpha(color, 0.15)}`,
+                      borderColor: color,
+                      '& .module-icon': {
+                        transform: 'scale(1.15)',
+                        bgcolor: color,
+                        color: 'white',
+                      },
+                      '& .module-arrow': {
+                        opacity: 1,
+                        transform: 'translateX(4px)',
+                      },
+                    },
+                  }}
+                  onClick={() => setSelectedType(type)}
+                >
+                  <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
+                      <Avatar
+                        className="module-icon"
+                        sx={{
+                          width: 40,
+                          height: 40,
+                          bgcolor: alpha(color, 0.1),
+                          color: color,
+                          transition: 'all 0.3s ease',
+                        }}
+                      >
+                        <IconComponent sx={{ fontSize: 22 }} />
+                      </Avatar>
+                      {type.isCustom && (
+                        <Box sx={{ display: 'flex', gap: 0.5 }}>
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditCustomType(type);
+                            }}
+                            sx={{ width: 24, height: 24, color: color }}
+                          >
+                            <EditIcon sx={{ fontSize: 16 }} />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteCustomType(type.id);
+                            }}
+                            sx={{ width: 24, height: 24, color: '#F44336' }}
+                          >
+                            <DeleteIcon sx={{ fontSize: 16 }} />
+                          </IconButton>
+                        </Box>
+                      )}
+                    </Box>
+                    <Typography variant="body1" sx={{ fontWeight: 700, color: color, mb: 0.5, fontSize: '0.9rem', lineHeight: 1.3 }}>
+                      {type.display_name}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      {type.description}
+                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha(color, 0.1) }}>
+                      <Chip label={`${stats[type.name] || 0} Communications`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha(color, 0.08), color: color, fontWeight: 600 }} />
+                      <OpenInNewIcon className="module-arrow" sx={{ color: color, fontSize: 18, opacity: 0.5, transition: 'all 0.3s ease' }} />
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            );
+          })}
+
+          {/* Add Custom Type Tile */}
+          {!searchQuery && (
+            <Grid item xs={12} sm={6} md={4}>
+              <Card
+                sx={{
+                  height: 200,
+                  cursor: 'pointer',
+                  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                  border: '2px dashed',
+                  borderColor: 'divider',
+                  borderRadius: 2,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    borderColor: 'primary.main',
+                    bgcolor: alpha(theme.palette.primary.main, 0.02),
+                  },
+                }}
+                onClick={handleAddCustomType}
+              >
+                <CardContent sx={{ textAlign: 'center' }}>
+                  <Avatar
+                    sx={{
+                      width: 56,
+                      height: 56,
+                      bgcolor: alpha(theme.palette.primary.main, 0.1),
+                      color: 'primary.main',
+                      mx: 'auto',
+                      mb: 2,
+                    }}
+                  >
+                    <AddIcon sx={{ fontSize: 32 }} />
+                  </Avatar>
+                  <Typography variant="body1" fontWeight={600} color="primary">
+                    Add Custom Type
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Create your own communication type
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          )}
+        </Grid>
+
+        {/* No Results Message */}
+        {filteredTypes.length === 0 && (
+          <Box sx={{ textAlign: 'center', py: 8 }}>
+            <SearchIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              No communication types found
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Try adjusting your search query
+            </Typography>
+          </Box>
+        )}
+      </Box>
+    );
+  }
+
+  // Detail View for Selected Type
   return (
     <Box>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
+            <Button startIcon={<OpenInNewIcon sx={{ transform: 'rotate(180deg)' }} />} onClick={() => setSelectedType(null)} variant="text" sx={{ mb: 1 }}>
+              Back to Communication Types
+            </Button>
             <Typography variant="h4" fontWeight={700} gutterBottom>
-              COMMS.AI
+              {selectedType.display_name}
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Configurable Communication Intelligence Platform
+              {selectedType.description}
             </Typography>
           </Box>
           <Stack direction="row" spacing={2}>
-            <Button
-              startIcon={<SettingsIcon />}
-              variant="outlined"
-              onClick={onNavigateToConfig}
-            >
-              Configure
-            </Button>
-            <Button
-              startIcon={<RefreshIcon />}
-              variant="outlined"
-              onClick={refreshAll}
-              disabled={loading}
-            >
+            <Button startIcon={<RefreshIcon />} variant="outlined" onClick={refreshAll} disabled={loading}>
               Refresh
             </Button>
           </Stack>
@@ -743,148 +1022,58 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
         </Alert>
       )}
 
-      {/* Dynamic Stats Cards */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={2.4}>
-          <Card sx={{ bgcolor: alpha('#2196F3', 0.1), border: '1px solid', borderColor: alpha('#2196F3', 0.2) }}>
-            <CardContent>
-              <Stack spacing={1}>
-                <EmailIcon sx={{ color: '#2196F3', fontSize: 32 }} />
-                <Typography variant="h4" fontWeight={700}>
-                  {getTotalEmails()}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Total Communications
-                </Typography>
-              </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {config.types.slice(0, 4).map((type, index) => {
-          const IconComponent = getIconComponent(type.icon);
-          const colors = ['#FF9800', '#4CAF50', '#9C27B0', '#F44336'];
-          const color = type.color || colors[index % colors.length];
-
-          return (
-            <Grid item xs={12} sm={6} md={2.4} key={type.id}>
-              <Card sx={{ bgcolor: alpha(color, 0.1), border: '1px solid', borderColor: alpha(color, 0.2) }}>
-                <CardContent>
-                  <Stack spacing={1}>
-                    <IconComponent sx={{ color, fontSize: 32 }} />
-                    <Typography variant="h4" fontWeight={700}>
-                      {stats[type.name] || 0}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      {type.display_name}
-                    </Typography>
-                  </Stack>
-                </CardContent>
-              </Card>
-            </Grid>
-          );
-        })}
-      </Grid>
-
-      {/* Dynamic Tabs */}
-      {config.types.length > 0 && (
-        <>
-          <Paper sx={{ mb: 3 }}>
-            <Tabs
-              value={activeTab}
-              onChange={(e, v) => setActiveTab(v)}
-              variant="scrollable"
-              scrollButtons="auto"
-              sx={{
-                '& .MuiTab-root': {
-                  minHeight: 64,
-                  textTransform: 'none',
-                  fontSize: '0.9rem',
-                  fontWeight: 600,
-                },
-              }}
-            >
-              {config.types.map((type) => {
-                const IconComponent = getIconComponent(type.icon);
-                return (
-                  <Tab
-                    key={type.id}
-                    icon={<IconComponent />}
-                    iconPosition="start"
-                    label={type.display_name}
-                  />
-                );
-              })}
-            </Tabs>
-          </Paper>
-
-          {/* Dynamic Tab Content */}
-          {config.types.map((type, index) => (
-            activeTab === index && (
-              <Paper key={type.id}>
-                <Box sx={{ p: 2 }}>
-                  <Typography variant="h6" gutterBottom>
-                    {type.display_name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    {type.description || `Track and manage ${type.display_name.toLowerCase()}`}
-                  </Typography>
-                </Box>
-                <Box sx={{ height: 650, width: '100%' }}>
-                  <DataGrid
-                    rows={communicationData[type.name] || []}
-                    columns={buildColumnsForType(type.id)}
-                    initialState={{
-                      pagination: {
-                        paginationModel: { pageSize: 25, page: 0 },
-                      },
-                      density: 'compact',
-                    }}
-                    pageSizeOptions={[10, 25, 50, 100]}
-                    loading={loading}
-                    disableSelectionOnClick
-                    checkboxSelection
-                    disableRowSelectionOnClick
-                    slots={{
-                      toolbar: CustomToolbar,
-                    }}
-                    slotProps={{
-                      toolbar: {
-                        showQuickFilter: true,
-                        quickFilterProps: { debounceMs: 500 },
-                      },
-                    }}
-                    sx={{
-                      border: 'none',
-                      '& .MuiDataGrid-cell:focus': {
-                        outline: 'none',
-                      },
-                      '& .MuiDataGrid-row:hover': {
-                        backgroundColor: alpha(theme.palette.primary.main, 0.05),
-                      },
-                      '& .MuiDataGrid-columnHeaders': {
-                        backgroundColor: theme.palette.mode === 'light' ? 'grey.100' : 'grey.900',
-                        fontSize: '0.875rem',
-                        fontWeight: 600,
-                      },
-                      '& .MuiDataGrid-toolbarContainer': {
-                        padding: 2,
-                        backgroundColor: theme.palette.mode === 'light' ? 'grey.50' : 'grey.900',
-                        borderBottom: '1px solid',
-                        borderColor: 'divider',
-                      },
-                      '& .MuiDataGrid-footerContainer': {
-                        borderTop: '1px solid',
-                        borderColor: 'divider',
-                      },
-                    }}
-                  />
-                </Box>
-              </Paper>
-            )
-          ))}
-        </>
-      )}
+      {/* Data Grid */}
+      <Paper>
+        <Box sx={{ height: 650, width: '100%' }}>
+          <DataGrid
+            rows={communicationData[selectedType.name] || []}
+            columns={buildColumnsForType(selectedType.id)}
+            density="compact"
+            initialState={{
+              pagination: {
+                paginationModel: { pageSize: 25, page: 0 },
+              },
+            }}
+            pageSizeOptions={[10, 25, 50, 100]}
+            loading={loading}
+            checkboxSelection
+            disableRowSelectionOnClick
+            slots={{
+              toolbar: CustomToolbar,
+            }}
+            slotProps={{
+              toolbar: {
+                showQuickFilter: true,
+                quickFilterProps: { debounceMs: 500 },
+              },
+            }}
+            sx={{
+              border: 'none',
+              '& .MuiDataGrid-cell:focus': {
+                outline: 'none',
+              },
+              '& .MuiDataGrid-row:hover': {
+                backgroundColor: alpha(theme.palette.primary.main, 0.05),
+              },
+              '& .MuiDataGrid-columnHeaders': {
+                backgroundColor: theme.palette.mode === 'light' ? 'grey.100' : 'grey.900',
+                fontSize: '0.875rem',
+                fontWeight: 600,
+              },
+              '& .MuiDataGrid-toolbarContainer': {
+                padding: 2,
+                backgroundColor: theme.palette.mode === 'light' ? 'grey.50' : 'grey.900',
+                borderBottom: '1px solid',
+                borderColor: 'divider',
+              },
+              '& .MuiDataGrid-footerContainer': {
+                borderTop: '1px solid',
+                borderColor: 'divider',
+              },
+            }}
+          />
+        </Box>
+      </Paper>
 
       {/* Empty State */}
       {config.types.length === 0 && !loading && (
@@ -901,7 +1090,7 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
             startIcon={<SettingsIcon />}
             onClick={onNavigateToConfig}
           >
-            Configure COMMS.AI
+            Configure EMAIL INTEL
           </Button>
         </Paper>
       )}
@@ -1046,6 +1235,18 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Custom Type Config Dialog */}
+      <CustomTypeConfig
+        open={configDialogOpen}
+        onClose={() => {
+          setConfigDialogOpen(false);
+          setEditingType(null);
+        }}
+        onSave={handleSaveCustomType}
+        editType={editingType}
+        moduleType="email"
+      />
     </Box>
   );
 };

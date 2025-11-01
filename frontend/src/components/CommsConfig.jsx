@@ -312,7 +312,7 @@ const CommsConfig = () => {
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
             <Typography variant="h4" fontWeight={700} gutterBottom>
-              COMMS.AI Configuration
+              EMAIL INTEL Configuration
             </Typography>
             <Typography variant="body1" color="text.secondary">
               Configure communication types and custom fields

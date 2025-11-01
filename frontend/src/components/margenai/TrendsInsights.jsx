@@ -21,6 +21,9 @@ import {
   MenuItem,
   Tab,
   Tabs,
+  Breadcrumbs,
+  Link,
+  Button,
 } from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon,
@@ -31,52 +34,25 @@ import {
   Insights as InsightsIcon,
   Refresh as RefreshIcon,
   CalendarToday as CalendarIcon,
+  NavigateNext as NavigateNextIcon,
+  ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
+import { useTrendsInsights } from '../../hooks/useMargenData';
 
-const TrendsInsights = () => {
+const TrendsInsights = ({ onBack }) => {
   const theme = useTheme();
-  const [trendsData, setTrendsData] = useState(null);
-  const [insightsData, setInsightsData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [monthsBack, setMonthsBack] = useState(12);
   const [activeTab, setActiveTab] = useState(0);
 
-  useEffect(() => {
-    fetchTrendsData();
-  }, [monthsBack]);
+  const { data, loading, error, refetch } = useTrendsInsights(monthsBack);
 
-  const fetchTrendsData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      // Fetch both trends and insights data
-      const [trendsResponse, insightsResponse] = await Promise.all([
-        fetch(`/api/v1/margen/trends/analysis?months_back=${monthsBack}`),
-        fetch('/api/v1/margen/insights/performance')
-      ]);
-
-      if (!trendsResponse.ok) throw new Error('Failed to fetch trends data');
-      if (!insightsResponse.ok) throw new Error('Failed to fetch insights data');
-
-      const trendsResult = await trendsResponse.json();
-      const insightsResult = await insightsResponse.json();
-
-      setTrendsData(trendsResult.trends_data);
-      setInsightsData(insightsResult.insights);
-    } catch (err) {
-      console.error('Error fetching trends data:', err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const trendsData = data?.trends_data || null;
+  const insightsData = data?.insights || null;
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await fetchTrendsData();
+    await refetch();
     setRefreshing(false);
   };
 
@@ -488,6 +464,34 @@ const TrendsInsights = () => {
 
   return (
     <Box sx={{ p: 3 }}>
+      {/* Header with Breadcrumbs */}
+      <Box sx={{ mb: 3 }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link
+              component="button"
+              variant="body1"
+              onClick={onBack}
+              sx={{
+                textDecoration: 'none',
+                color: 'text.primary',
+                '&:hover': { textDecoration: 'underline' },
+              }}
+            >
+              MARGEN.AI
+            </Link>
+            <Typography color="primary" variant="body1" fontWeight={600}>
+              Trends Analysis
+            </Typography>
+          </Breadcrumbs>
+          {onBack && (
+            <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">
+              Back to MargenAI
+            </Button>
+          )}
+        </Stack>
+      </Box>
+
       {/* Header */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
         <Box>

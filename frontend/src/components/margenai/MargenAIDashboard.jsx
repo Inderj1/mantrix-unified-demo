@@ -1,495 +1,359 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
-  Paper,
-  Typography,
-  Tabs,
-  Tab,
-  CircularProgress,
-  Breadcrumbs,
-  Link,
-  IconButton,
-  Tooltip,
-  Alert,
+  Grid,
   Card,
   CardContent,
-  Grid,
-  Stack,
+  Typography,
+  IconButton,
   Chip,
-  useTheme,
-  useMediaQuery,
+  Avatar,
+  Stack,
+  Button,
+  Breadcrumbs,
+  Link,
   alpha,
+  useTheme,
+  Fade,
+  Zoom,
 } from '@mui/material';
 import {
-  Home as HomeIcon,
+  ArrowForward as ArrowForwardIcon,
   NavigateNext as NavigateNextIcon,
-  TableView as TableIcon,
-  Analytics as AnalyticsIcon,
-  ShowChart as TrendsIcon,
-  Assessment as SummaryIcon,
-  Refresh as RefreshIcon,
+  ArrowBack as ArrowBackIcon,
   TrendingUp as TrendingUpIcon,
   AttachMoney as MoneyIcon,
+  Assessment as AssessmentIcon,
+  TableView as TableIcon,
   People as PeopleIcon,
-  ShoppingCart as OrdersIcon,
-  Forum as ChatIcon,
-  Science as WorkbenchIcon,
+  Timeline as TimelineIcon,
+  Lightbulb as LightbulbIcon,
+  BarChart as BarChartIcon,
+  PieChart as PieChartIcon,
+  ShowChart as ShowChartIcon,
 } from '@mui/icons-material';
 
-// Import the MargenAI components
-import MargenAITable from './MargenAITable';
-import SegmentAnalytics from './SegmentAnalytics';
-import TrendsInsights from './TrendsInsights';
-import MargenAIChat from './MargenAIChat';
-import AnalyticsWorkbench from './AnalyticsWorkbench';
+const marginModules = [
+  {
+    id: 'margin-trends',
+    title: 'Margin Trends',
+    subtitle: 'Performance Analytics',
+    description: 'Track margin performance over time with detailed trend analysis and forecasting',
+    icon: TimelineIcon,
+    color: '#10b981',
+    bgColor: '#d1fae5',
+    stats: { label: 'Avg Margin', value: '32.4%' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+  },
+  {
+    id: 'margin-waterfall',
+    title: 'Margin Waterfall',
+    subtitle: 'Performance Analytics',
+    description: 'Visualize margin breakdown from gross to net with detailed component analysis',
+    icon: BarChartIcon,
+    color: '#3b82f6',
+    bgColor: '#dbeafe',
+    stats: { label: 'Components', value: '12' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+  },
+  {
+    id: 'product-margins',
+    title: 'Product Margins',
+    subtitle: 'Product Analysis',
+    description: 'Deep dive into product-level profitability and contribution margins',
+    icon: TableIcon,
+    color: '#f97316',
+    bgColor: '#ffedd5',
+    stats: { label: 'Products', value: '247' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+  },
+  {
+    id: 'customer-margins',
+    title: 'Customer Margins',
+    subtitle: 'Customer Analysis',
+    description: 'Analyze profitability by customer segment and identify high-value relationships',
+    icon: PeopleIcon,
+    color: '#06b6d4',
+    bgColor: '#cffafe',
+    stats: { label: 'Segments', value: '11' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+  },
+  {
+    id: 'margin-drivers',
+    title: 'Margin Drivers',
+    subtitle: 'Insights & Analytics',
+    description: 'Identify key drivers impacting margins with AI-powered analysis',
+    icon: LightbulbIcon,
+    color: '#8b5cf6',
+    bgColor: '#f3e8ff',
+    stats: { label: 'Drivers', value: '18' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+  },
+  {
+    id: 'margin-mix',
+    title: 'Product Mix Analysis',
+    subtitle: 'Insights & Analytics',
+    description: 'Optimize product mix for maximum profitability and margin improvement',
+    icon: PieChartIcon,
+    color: '#ec4899',
+    bgColor: '#fce7f3',
+    stats: { label: 'Scenarios', value: '6' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
+  },
+  {
+    id: 'margin-forecast',
+    title: 'Margin Forecast',
+    subtitle: 'Forecasting',
+    description: 'AI-powered margin forecasting with scenario planning and what-if analysis',
+    icon: ShowChartIcon,
+    color: '#6366f1',
+    bgColor: '#e0e7ff',
+    stats: { label: 'Accuracy', value: '94%' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+  },
+  {
+    id: 'margin-alerts',
+    title: 'Margin Alerts',
+    subtitle: 'Monitoring',
+    description: 'Real-time alerts for margin anomalies and threshold violations',
+    icon: AssessmentIcon,
+    color: '#f59e0b',
+    bgColor: '#fef3c7',
+    stats: { label: 'Active', value: '3' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+  },
+  {
+    id: 'margin-benchmark',
+    title: 'Margin Benchmarking',
+    subtitle: 'Competitive Analysis',
+    description: 'Compare margins against industry benchmarks and best practices',
+    icon: TrendingUpIcon,
+    color: '#64748b',
+    bgColor: '#f1f5f9',
+    stats: { label: 'Peers', value: '24' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
+  },
+];
 
-const MargenAIDashboard = ({ onBack }) => {
+const MargenAIDashboard = ({ onBack, onTileClick }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  
-  const [activeTab, setActiveTab] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState(null);
-  const [summaryData, setSummaryData] = useState(null);
 
-  const tabs = [
-    { 
-      label: 'Overview', 
-      icon: <SummaryIcon />,
-      description: 'Key margin metrics and performance indicators'
-    },
-    { 
-      label: 'Product Analysis', 
-      icon: <TableIcon />,
-      description: 'Interactive product margin analysis with drill-down'
-    },
-    { 
-      label: 'Segment Analytics', 
-      icon: <AnalyticsIcon />,
-      description: 'Customer segment profitability analysis'
-    },
-    { 
-      label: 'Trends & Insights', 
-      icon: <TrendsIcon />,
-      description: 'Historical trends and performance insights'
-    },
-    { 
-      label: 'Ask MargenAI', 
-      icon: <ChatIcon />,
-      description: 'Natural language queries about margin data'
-    },
-    { 
-      label: 'Analytics Workbench', 
-      icon: <WorkbenchIcon />,
-      description: 'Advanced analytics with Superset visualizations'
-    },
+  const handleTileClick = (moduleId) => {
+    console.log('Margin Performance tile clicked:', moduleId);
+    if (onTileClick) {
+      onTileClick(moduleId);
+    }
+  };
+
+  // Group modules by category
+  const categories = [
+    { name: 'Performance Analytics', modules: marginModules.filter(m => m.subtitle === 'Performance Analytics') },
+    { name: 'Product & Customer Analysis', modules: marginModules.filter(m => m.subtitle === 'Product Analysis' || m.subtitle === 'Customer Analysis') },
+    { name: 'Insights & Analytics', modules: marginModules.filter(m => m.subtitle === 'Insights & Analytics') },
+    { name: 'Forecasting & Monitoring', modules: marginModules.filter(m => m.subtitle === 'Forecasting' || m.subtitle === 'Monitoring' || m.subtitle === 'Competitive Analysis') },
   ];
 
-  useEffect(() => {
-    fetchSummaryData();
-  }, []);
-
-  const fetchSummaryData = async () => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const response = await fetch('/api/v1/margen/summary');
-      if (!response.ok) throw new Error('Failed to fetch summary');
-      const result = await response.json();
-      setSummaryData(result.summary);
-    } catch (err) {
-      console.error('Error fetching summary data:', err);
-      setError(err.message || 'Failed to fetch data');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    await fetchSummaryData();
-    setRefreshing(false);
-  };
-
-  const renderOverviewTab = () => {
-    if (!summaryData) {
-      return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-          <CircularProgress />
-        </Box>
-      );
-    }
-
-    return (
-      <Grid container spacing={3}>
-        {/* Key Metrics Cards */}
-        <Grid item xs={12} md={3}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Box>
-                  <Typography variant="h4" fontWeight={600} color="primary">
-                    {summaryData.total_products?.toLocaleString() || '0'}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Total Products
-                  </Typography>
-                </Box>
-                <MoneyIcon sx={{ fontSize: 40, color: 'primary.light' }} />
-              </Stack>
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                Active in system
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={3}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Box>
-                  <Typography variant="h4" fontWeight={600} color="success.main">
-                    ${summaryData.total_revenue?.toLocaleString() || '0'}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Total Revenue
-                  </Typography>
-                </Box>
-                <TrendingUpIcon sx={{ fontSize: 40, color: 'success.light' }} />
-              </Stack>
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                Across all products
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={3}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Box>
-                  <Typography variant="h4" fontWeight={600} color="success.main">
-                    ${summaryData.total_margin?.toLocaleString() || '0'}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Total Margin
-                  </Typography>
-                </Box>
-                <MoneyIcon sx={{ fontSize: 40, color: 'success.light' }} />
-              </Stack>
-              <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 1 }}>
-                <Typography variant="body2" fontWeight={600} color="success.main">
-                  {summaryData.overall_margin_pct?.toFixed(1) || '0.0'}%
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  margin rate
-                </Typography>
-              </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={3}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Box>
-                  <Typography variant="h4" fontWeight={600}>
-                    {summaryData.total_customers?.toLocaleString() || '0'}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Customers
-                  </Typography>
-                </Box>
-                <PeopleIcon sx={{ fontSize: 40, color: 'info.light' }} />
-              </Stack>
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                Unique customers
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Performance Breakdown */}
-        <Grid item xs={12} md={8}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent>
-              <Typography variant="h6" fontWeight={600} gutterBottom>
-                Profitability Breakdown
-              </Typography>
-              <Grid container spacing={2} sx={{ mt: 1 }}>
-                <Grid item xs={6} sm={3}>
-                  <Box sx={{ textAlign: 'center', p: 2 }}>
-                    <Typography variant="h5" fontWeight={600} color="success.main">
-                      {((summaryData.high_profit_pct || 0)).toFixed(1)}%
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      High Profit
-                    </Typography>
-                    <Chip 
-                      label=">25% margin" 
-                      size="small" 
-                      color="success" 
-                      variant="outlined"
-                      sx={{ mt: 0.5 }}
-                    />
-                  </Box>
-                </Grid>
-                <Grid item xs={6} sm={3}>
-                  <Box sx={{ textAlign: 'center', p: 2 }}>
-                    <Typography variant="h5" fontWeight={600} color="warning.main">
-                      {(100 - (summaryData.high_profit_pct || 0) - (summaryData.loss_making_pct || 0)).toFixed(1)}%
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Moderate
-                    </Typography>
-                    <Chip 
-                      label="5-25% margin" 
-                      size="small" 
-                      color="warning" 
-                      variant="outlined"
-                      sx={{ mt: 0.5 }}
-                    />
-                  </Box>
-                </Grid>
-                <Grid item xs={6} sm={3}>
-                  <Box sx={{ textAlign: 'center', p: 2 }}>
-                    <Typography variant="h5" fontWeight={600} color="error.main">
-                      {(summaryData.loss_making_pct || 0).toFixed(1)}%
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Loss Making
-                    </Typography>
-                    <Chip 
-                      label="<0% margin" 
-                      size="small" 
-                      color="error" 
-                      variant="outlined"
-                      sx={{ mt: 0.5 }}
-                    />
-                  </Box>
-                </Grid>
-                <Grid item xs={6} sm={3}>
-                  <Box sx={{ textAlign: 'center', p: 2 }}>
-                    <Typography variant="h5" fontWeight={600}>
-                      {summaryData.total_orders?.toLocaleString() || '0'}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Total Orders
-                    </Typography>
-                    <Chip 
-                      label="transactions" 
-                      size="small" 
-                      variant="outlined"
-                      sx={{ mt: 0.5 }}
-                    />
-                  </Box>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent>
-              <Typography variant="h6" fontWeight={600} gutterBottom>
-                Data Period
-              </Typography>
-              <Stack spacing={2} sx={{ mt: 2 }}>
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    Start Date
-                  </Typography>
-                  <Typography variant="body1" fontWeight={500}>
-                    {summaryData.data_start_date ? 
-                      new Date(summaryData.data_start_date).toLocaleDateString() : 
-                      'N/A'
-                    }
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    End Date
-                  </Typography>
-                  <Typography variant="body1" fontWeight={500}>
-                    {summaryData.data_end_date ? 
-                      new Date(summaryData.data_end_date).toLocaleDateString() : 
-                      'N/A'
-                    }
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    Data Source
-                  </Typography>
-                  <Typography variant="body1" fontWeight={500} color="primary">
-                    PostgreSQL Database
-                  </Typography>
-                </Box>
-              </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-    );
-  };
-
-  const renderProductAnalysisTab = () => {
-    return <MargenAITable onRowClick={() => {}} />;
-  };
-
-  const renderSegmentAnalyticsTab = () => {
-    return <SegmentAnalytics />;
-  };
-
-  const renderTrendsInsightsTab = () => {
-    return <TrendsInsights />;
-  };
-
-  const renderChatTab = () => {
-    return (
-      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-        <MargenAIChat />
-      </Box>
-    );
-  };
-
-  const renderWorkbenchTab = () => {
-    return <AnalyticsWorkbench />;
-  };
-
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 400 }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
   return (
-    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ p: 3, height: '100%', overflowY: 'auto' }}>
       {/* Header */}
-      <Box sx={{ p: 3, borderBottom: 1, borderColor: 'divider' }}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Box>
-            <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-              <Link
-                component="button"
-                variant="body2"
-                onClick={onBack}
-                sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-              >
-                <HomeIcon fontSize="small" />
-                Home
-              </Link>
-              <Typography variant="body2" color="text.primary" fontWeight={600}>
-                MargenAI Analytics
-              </Typography>
-            </Breadcrumbs>
-            <Typography variant="h4" fontWeight={700} sx={{ mt: 1 }}>
-              Margin Intelligence Platform
+      <Box sx={{ mb: 4 }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link
+              component="button"
+              variant="body1"
+              onClick={onBack}
+              sx={{
+                textDecoration: 'none',
+                color: 'text.primary',
+                '&:hover': { textDecoration: 'underline' },
+              }}
+            >
+              MARGEN.AI
+            </Link>
+            <Typography color="primary" variant="body1" fontWeight={600}>
+              Margin Performance
             </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Real-time profitability analysis powered by PostgreSQL data
+          </Breadcrumbs>
+          {onBack && (
+            <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">
+              Back to MargenAI
+            </Button>
+          )}
+        </Stack>
+
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Avatar
+            sx={{
+              width: 64,
+              height: 64,
+              bgcolor: alpha('#8b5cf6', 0.1),
+            }}
+          >
+            <TrendingUpIcon sx={{ fontSize: 36, color: '#8b5cf6' }} />
+          </Avatar>
+          <Box>
+            <Typography variant="h4" fontWeight={700}>
+              Margin Performance
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Comprehensive margin analysis and profitability insights
             </Typography>
           </Box>
-          <Stack direction="row" spacing={2}>
-            <Tooltip title="Refresh Data">
-              <IconButton 
-                onClick={handleRefresh} 
-                disabled={refreshing}
-                sx={{ 
-                  bgcolor: alpha(theme.palette.primary.main, 0.1),
-                  '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.2) }
-                }}
-              >
-                <RefreshIcon sx={{ color: 'primary.main' }} />
-              </IconButton>
-            </Tooltip>
-          </Stack>
-        </Stack>
-      </Box>
-
-      {/* Error State */}
-      {error && (
-        <Alert severity="error" sx={{ m: 2 }}>
-          {error}
-        </Alert>
-      )}
-
-      {/* Tabs Navigation */}
-      <Paper sx={{ borderRadius: 0, borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs
-          value={activeTab}
-          onChange={(e, v) => setActiveTab(v)}
-          variant={isMobile ? "scrollable" : "fullWidth"}
-          scrollButtons="auto"
-          sx={{
-            '& .MuiTab-root': {
-              minHeight: 72,
-              textTransform: 'none',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              px: 3,
-            },
-            '& .MuiTabs-indicator': {
-              height: 3,
-              borderRadius: '3px 3px 0 0',
-            },
-          }}
-        >
-          {tabs.map((tab, index) => (
-            <Tab
-              key={index}
-              icon={
-                <Stack direction="row" spacing={1.5} alignItems="center">
-                  <Box
-                    sx={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 2,
-                      bgcolor: activeTab === index ? 'primary.main' : alpha(theme.palette.primary.main, 0.1),
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: activeTab === index ? 'white' : 'primary.main',
-                      transition: 'all 0.2s ease',
-                    }}
-                  >
-                    {tab.icon}
-                  </Box>
-                  <Box sx={{ textAlign: 'left', display: { xs: 'none', md: 'block' } }}>
-                    <Typography variant="body2" fontWeight={600}>
-                      {tab.label}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {tab.description}
-                    </Typography>
-                  </Box>
-                </Stack>
-              }
-              iconPosition="start"
-            />
-          ))}
-        </Tabs>
-      </Paper>
-
-      {/* Tab Content */}
-      <Box sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        <Box sx={{ flex: 1, p: activeTab === 1 ? 0 : activeTab === 2 ? 0 : activeTab === 3 ? 0 : activeTab === 4 ? 0 : activeTab === 5 ? 0 : 3, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
-          {activeTab === 0 && renderOverviewTab()}
-          {activeTab === 1 && renderProductAnalysisTab()}
-          {activeTab === 2 && renderSegmentAnalyticsTab()}
-          {activeTab === 3 && renderTrendsInsightsTab()}
-          {activeTab === 4 && renderChatTab()}
-          {activeTab === 5 && renderWorkbenchTab()}
         </Box>
       </Box>
+
+      {/* Module Categories */}
+      {categories.map((category, index) => (
+        <Fade in timeout={300 + index * 100} key={category.name}>
+          <Box sx={{ mb: 4 }}>
+            <Typography
+              variant="h6"
+              fontWeight={600}
+              sx={{ mb: 2, color: 'text.primary', textTransform: 'uppercase', fontSize: '0.9rem' }}
+            >
+              {category.name}
+            </Typography>
+
+            <Grid container spacing={3} sx={{ maxWidth: 1200, mx: 'auto' }}>
+              {category.modules.map((module, moduleIndex) => (
+                <Grid item xs={12} md={6} lg={4} key={module.id}>
+                  <Zoom in timeout={400 + moduleIndex * 100}>
+                    <Card
+                      sx={{
+                        cursor: 'pointer',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        background: `linear-gradient(135deg, ${alpha(module.color, 0.05)} 0%, ${alpha(
+                          module.color,
+                          0.02
+                        )} 100%)`,
+                        border: `2px solid ${alpha(module.color, 0.1)}`,
+                        position: 'relative',
+                        overflow: 'hidden',
+                        height: '100%',
+                        '&:hover': {
+                          transform: 'translateY(-8px)',
+                          boxShadow: `0 12px 24px ${alpha(module.color, 0.25)}`,
+                          borderColor: alpha(module.color, 0.3),
+                          '& .action-icon': {
+                            transform: 'translateX(4px)',
+                          },
+                        },
+                        '&::before': {
+                          content: '""',
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          height: '4px',
+                          background: module.gradient,
+                        },
+                      }}
+                      onClick={() => handleTileClick(module.id)}
+                    >
+                      <CardContent sx={{ p: 3 }}>
+                        <Stack direction="row" spacing={2} alignItems="flex-start">
+                          <Avatar
+                            sx={{
+                              width: 56,
+                              height: 56,
+                              bgcolor: module.bgColor,
+                              border: `2px solid ${alpha(module.color, 0.2)}`,
+                            }}
+                          >
+                            <module.icon sx={{ fontSize: 28, color: module.color }} />
+                          </Avatar>
+
+                          <Box sx={{ flex: 1, minWidth: 0 }}>
+                            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
+                              <Box>
+                                <Typography variant="h6" fontWeight={600} sx={{ mb: 0.5 }}>
+                                  {module.title}
+                                </Typography>
+                                <Chip
+                                  label={module.subtitle}
+                                  size="small"
+                                  sx={{
+                                    height: 20,
+                                    fontSize: '0.7rem',
+                                    bgcolor: alpha(module.color, 0.1),
+                                    color: module.color,
+                                    fontWeight: 600,
+                                    mb: 1,
+                                  }}
+                                />
+                              </Box>
+                              <IconButton
+                                className="action-icon"
+                                sx={{
+                                  bgcolor: alpha(module.color, 0.1),
+                                  color: module.color,
+                                  transition: 'transform 0.2s',
+                                  '&:hover': {
+                                    bgcolor: alpha(module.color, 0.2),
+                                  },
+                                }}
+                              >
+                                <ArrowForwardIcon />
+                              </IconButton>
+                            </Stack>
+
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.5 }}>
+                              {module.description}
+                            </Typography>
+
+                            <Stack direction="row" spacing={2} alignItems="center">
+                              <Box
+                                sx={{
+                                  px: 2,
+                                  py: 0.5,
+                                  borderRadius: 1,
+                                  bgcolor: alpha(module.color, 0.1),
+                                  border: `1px solid ${alpha(module.color, 0.2)}`,
+                                }}
+                              >
+                                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                                  {module.stats.label}
+                                </Typography>
+                                <Typography variant="body2" fontWeight={700} color={module.color}>
+                                  {module.stats.value}
+                                </Typography>
+                              </Box>
+
+                              {module.status === 'active' && (
+                                <Chip
+                                  label="Active"
+                                  size="small"
+                                  sx={{
+                                    height: 24,
+                                    fontSize: '0.7rem',
+                                    bgcolor: alpha('#10b981', 0.1),
+                                    color: '#10b981',
+                                    fontWeight: 600,
+                                  }}
+                                />
+                              )}
+                            </Stack>
+                          </Box>
+                        </Stack>
+                      </CardContent>
+                    </Card>
+                  </Zoom>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        </Fade>
+      ))}
     </Box>
   );
 };

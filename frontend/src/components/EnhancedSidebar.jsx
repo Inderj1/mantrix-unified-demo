@@ -41,6 +41,7 @@ import {
   SmartToy as AIModelIcon,
   AccountCircle as PersonaIcon,
   Settings as SettingsIcon,
+  RocketLaunch as ExecutionIcon,
 } from '@mui/icons-material';
 
 const EnhancedSidebar = ({
@@ -111,16 +112,24 @@ const EnhancedSidebar = ({
         {
           id: 9,
           icon: <VisionIcon />,
-          primary: 'VISION.AI',
+          primary: 'VISION STUDIO',
           secondary: 'Document OCR & Image Intelligence',
           color: '#00BCD4',
         },
         {
           id: 13,
           icon: <ForumIcon />,
-          primary: 'COMMS.AI',
+          primary: 'EMAIL INTEL',
           secondary: 'Email & Communication Analysis',
           color: '#E91E63',
+        },
+        {
+          id: 10,
+          icon: <ExecutionIcon />,
+          primary: 'COMMAND TOWER',
+          secondary: 'Action Tracking & Audit Trail',
+          color: '#10b981',
+          status: 'active',
         },
       ],
     },

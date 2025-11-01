@@ -15,6 +15,9 @@ import {
   Divider,
   Tooltip,
   IconButton,
+  Breadcrumbs,
+  Link,
+  Button,
 } from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon,
@@ -24,6 +27,8 @@ import {
   Insights as InsightsIcon,
   Assessment as AssessmentIcon,
   Refresh as RefreshIcon,
+  NavigateNext as NavigateNextIcon,
+  ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import {
   useReactTable,
@@ -31,38 +36,19 @@ import {
   getSortedRowModel,
   flexRender,
 } from '@tanstack/react-table';
+import { useSegmentAnalytics } from '../../hooks/useMargenData';
 
-const SegmentAnalytics = () => {
+const SegmentAnalytics = ({ onBack }) => {
   const theme = useTheme();
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: segmentData, loading, error, refetch } = useSegmentAnalytics();
   const [refreshing, setRefreshing] = useState(false);
   const [sorting, setSorting] = useState([]);
 
-  useEffect(() => {
-    fetchSegmentData();
-  }, []);
-
-  const fetchSegmentData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await fetch('/api/v1/margen/segments/analytics');
-      if (!response.ok) throw new Error('Failed to fetch segment analytics');
-      const result = await response.json();
-      setData(result.segments);
-    } catch (err) {
-      console.error('Error fetching segment analytics:', err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const data = segmentData?.segments || [];
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await fetchSegmentData();
+    await refetch();
     setRefreshing(false);
   };
 
@@ -240,6 +226,34 @@ const SegmentAnalytics = () => {
 
   return (
     <Box sx={{ p: 3 }}>
+      {/* Header with Breadcrumbs */}
+      <Box sx={{ mb: 3 }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link
+              component="button"
+              variant="body1"
+              onClick={onBack}
+              sx={{
+                textDecoration: 'none',
+                color: 'text.primary',
+                '&:hover': { textDecoration: 'underline' },
+              }}
+            >
+              MARGEN.AI
+            </Link>
+            <Typography color="primary" variant="body1" fontWeight={600}>
+              Segment Analytics
+            </Typography>
+          </Breadcrumbs>
+          {onBack && (
+            <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">
+              Back to MargenAI
+            </Button>
+          )}
+        </Stack>
+      </Box>
+
       {/* Header */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
         <Box>

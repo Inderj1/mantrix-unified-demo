@@ -26,6 +26,7 @@ import {
   Button,
   Breadcrumbs,
   Link,
+  Stack,
 } from '@mui/material';
 import {
   ExpandMore as ExpandIcon,
@@ -33,6 +34,7 @@ import {
   TrendingDown as TrendingDownIcon,
   ZoomIn as ZoomInIcon,
   NavigateNext as NavigateNextIcon,
+  ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import './shared/chartSetup'; // Import Chart.js setup to register components
 import DrillDownTable from './shared/DrillDownTable';
@@ -40,7 +42,7 @@ import InteractiveChart from './shared/InteractiveChart';
 import SafeChart from './shared/SafeChart';
 import { apiService } from '../../services/api';
 
-const RevenueSalesAnalytics = ({ revenueData, growthData, summaryData, onDrillDown }) => {
+const RevenueSalesAnalytics = ({ revenueData, growthData, summaryData, onDrillDown, onBack }) => {
   const chartInstanceId = useId();
   const [groupBy, setGroupBy] = useState('customer');
   const [timePeriod, setTimePeriod] = useState('ytd');
@@ -381,7 +383,35 @@ const RevenueSalesAnalytics = ({ revenueData, growthData, summaryData, onDrillDo
   };
 
   return (
-    <Box>
+    <Box sx={{ p: 3 }}>
+      {/* Header with Breadcrumbs */}
+      <Box sx={{ mb: 3 }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link
+              component="button"
+              variant="body1"
+              onClick={onBack}
+              sx={{
+                textDecoration: 'none',
+                color: 'text.primary',
+                '&:hover': { textDecoration: 'underline' },
+              }}
+            >
+              MARGEN.AI
+            </Link>
+            <Typography color="primary" variant="body1" fontWeight={600}>
+              Revenue & Sales
+            </Typography>
+          </Breadcrumbs>
+          {onBack && (
+            <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">
+              Back to MargenAI
+            </Button>
+          )}
+        </Stack>
+      </Box>
+
       {/* Filters */}
       <Paper elevation={2} sx={{ p: 2, mb: 3 }}>
         <Grid container spacing={2} alignItems="center">

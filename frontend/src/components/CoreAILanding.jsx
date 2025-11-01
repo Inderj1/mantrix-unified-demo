@@ -59,18 +59,6 @@ const aiModules = [
     stats: { label: 'Active Vehicles', value: '45' },
     status: 'active',
   },
-  {
-    id: 'reveq',
-    title: 'RevEQ',
-    subtitle: 'Equipment Optimization',
-    description: 'Smart equipment lifecycle management, predictive maintenance, and asset optimization',
-    icon: EquipmentIcon,
-    color: '#9C27B0',
-    bgColor: '#f3e5f5',
-    path: '/coreai/reveq',
-    stats: { label: 'Active Assets', value: '156' },
-    status: 'active',
-  },
 ];
 
 const CoreAILanding = ({ onTileClick }) => {
@@ -114,7 +102,7 @@ const CoreAILanding = ({ onTileClick }) => {
           const isActive = module.status === 'active';
           
           return (
-            <Grid item xs={12} sm={6} md={6} key={module.id}>
+            <Grid item xs={12} sm={6} md={4} key={module.id}>
               <Card
                 sx={{
                   height: '100%',
@@ -161,7 +149,7 @@ const CoreAILanding = ({ onTileClick }) => {
                   )}
 
                   {/* Icon and Title */}
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2, minHeight: 80 }}>
                     <Box
                       className="module-icon"
                       sx={{
@@ -179,20 +167,21 @@ const CoreAILanding = ({ onTileClick }) => {
                       <Icon sx={{ fontSize: 32, color: module.color }} />
                     </Box>
                     <Box sx={{ flex: 1 }}>
-                      <Typography 
-                        variant="h5" 
-                        fontWeight="bold" 
-                        sx={{ 
+                      <Typography
+                        variant="h5"
+                        fontWeight="bold"
+                        sx={{
                           color: isActive ? 'text.primary' : 'text.secondary',
                           mb: 0.5,
+                          lineHeight: 1.2,
                         }}
                       >
                         {module.title}
                       </Typography>
-                      <Typography 
-                        variant="body2" 
+                      <Typography
+                        variant="body2"
                         color="text.secondary"
-                        sx={{ fontWeight: 500 }}
+                        sx={{ fontWeight: 500, lineHeight: 1.4 }}
                       >
                         {module.subtitle}
                       </Typography>

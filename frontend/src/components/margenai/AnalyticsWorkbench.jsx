@@ -28,6 +28,8 @@ import {
   Drawer,
   AppBar,
   Toolbar,
+  Breadcrumbs,
+  Link,
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
@@ -45,6 +47,8 @@ import {
   Refresh as RefreshIcon,
   Download as DownloadIcon,
   FilterList as FilterIcon,
+  NavigateNext as NavigateNextIcon,
+  ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 
 // Import sub-components
@@ -97,7 +101,7 @@ const analyticsModules = [
   },
 ];
 
-const AnalyticsWorkbench = () => {
+const AnalyticsWorkbench = ({ onBack }) => {
   const theme = useTheme();
   const [selectedModule, setSelectedModule] = useState('rfm-segmentation');
   const [drawerOpen, setDrawerOpen] = useState(true);
@@ -179,7 +183,36 @@ const AnalyticsWorkbench = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', height: '100%', position: 'relative' }}>
+    <Box sx={{ display: 'flex', height: '100%', position: 'relative', flexDirection: 'column', p: 3 }}>
+      {/* Header with Breadcrumbs */}
+      <Box sx={{ mb: 3 }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link
+              component="button"
+              variant="body1"
+              onClick={onBack}
+              sx={{
+                textDecoration: 'none',
+                color: 'text.primary',
+                '&:hover': { textDecoration: 'underline' },
+              }}
+            >
+              MARGEN.AI
+            </Link>
+            <Typography color="primary" variant="body1" fontWeight={600}>
+              Analytics Workbench
+            </Typography>
+          </Breadcrumbs>
+          {onBack && (
+            <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">
+              Back to MargenAI
+            </Button>
+          )}
+        </Stack>
+      </Box>
+
+      <Box sx={{ display: 'flex', height: '100%', position: 'relative' }}>
       {/* Side Navigation Drawer */}
       <Drawer
         sx={{
@@ -340,6 +373,7 @@ const AnalyticsWorkbench = () => {
             renderComponent()
           )}
         </Box>
+      </Box>
       </Box>
     </Box>
   );

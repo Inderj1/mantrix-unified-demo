@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Paper, Typography, Grid, Card, CardContent, Chip, Button, Breadcrumbs, Link, Stack, IconButton, Tooltip, alpha,
+  Box, Paper, Typography, Grid, Card, CardContent, Chip, Button, Breadcrumbs, Link, Stack, IconButton, Tooltip, alpha, Snackbar, Alert,
 } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import {
   LocalShipping, Refresh, NavigateNext as NavigateNextIcon, ArrowBack as ArrowBackIcon, Download, CheckCircle, Schedule, Send,
 } from '@mui/icons-material';
 import stoxTheme from './stoxTheme';
+import { createTicket, updateTicketStatus } from '../../hooks/useTickets';
 
 const StoreReplenishment = ({ onBack }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   useEffect(() => { fetchData(); }, []);
 
@@ -310,7 +312,54 @@ const StoreReplenishment = ({ onBack }) => {
               color="primary"
               onClick={(e) => {
                 e.stopPropagation();
-                alert(`Generating order for ${params.row.store_name}: ${params.row.final_order_qty} units of ${params.row.product_sku}`);
+                // Create ticket for STO/PR creation
+                const ticket = createTicket({
+                  ticket_type: 'STO_CREATION',
+                  source_tile: 'Tile 4: Stock Transfer Execution',
+                  source_module_id: 'store-replenishment',
+                  priority: params.row.current_inventory < params.row.reorder_point * 0.5 ? 'High' : 'Normal',
+                  metadata: {
+                    store_id: params.row.store_id,
+                    store_name: params.row.store_name,
+                    product_sku: params.row.product_sku,
+                    product_name: params.row.product_name,
+                    order_qty: params.row.final_order_qty,
+                    order_value: params.row.order_value,
+                    source_dc: params.row.source_dc_region,
+                    freight_cost: params.row.freight_cost,
+                    expected_arrival: params.row.expected_arrival
+                  },
+                  action_taken: 'Create STO/PR',
+                  notes: `Automated replenishment order. Current inventory (${params.row.current_inventory}) below ROP (${params.row.reorder_point}).`
+                });
+
+                // Simulate SAP order creation with random success/failure
+                setTimeout(() => {
+                  const success = Math.random() > 0.1; // 90% success rate
+                  if (success) {
+                    const stoNumber = `STO-2025-${String(Math.floor(Math.random() * 999999)).padStart(6, '0')}`;
+                    updateTicketStatus(ticket.ticket_id, 'Completed', `${stoNumber} created successfully in SAP`);
+                    setSnackbar({
+                      open: true,
+                      message: `✓ Ticket ${ticket.ticket_id} created | ${stoNumber} generated for ${params.row.store_name}`,
+                      severity: 'success'
+                    });
+                  } else {
+                    updateTicketStatus(ticket.ticket_id, 'Failed', 'SAP Error: Connection timeout');
+                    setSnackbar({
+                      open: true,
+                      message: `✗ Ticket ${ticket.ticket_id} failed | SAP connection error`,
+                      severity: 'error'
+                    });
+                  }
+                }, 1500);
+
+                // Immediate feedback
+                setSnackbar({
+                  open: true,
+                  message: `Creating ticket ${ticket.ticket_id} for ${params.row.store_name}...`,
+                  severity: 'info'
+                });
               }}
               sx={{ fontSize: '0.70rem', py: 0.5 }}
             >
@@ -415,6 +464,18 @@ const StoreReplenishment = ({ onBack }) => {
           sx={stoxTheme.getDataGridSx()}
         />
       </Paper>
+
+      {/* Snackbar for ticket notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

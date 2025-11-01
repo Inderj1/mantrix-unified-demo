@@ -39,6 +39,9 @@ import {
   Alert,
   LinearProgress,
   Tooltip,
+  Breadcrumbs,
+  Link,
+  Stack,
 } from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon,
@@ -51,12 +54,14 @@ import {
   AttachMoney as MoneyIcon,
   ZoomIn as ZoomInIcon,
   Edit as EditIcon,
+  NavigateNext as NavigateNextIcon,
+  ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import './shared/chartSetup'; // Import Chart.js setup to register components first
 import { Line, Bar } from 'react-chartjs-2';
 import InteractiveChart from './shared/InteractiveChart';
 
-const PredictiveInsights = ({ actionData, growthData, summaryData, onDrillDown }) => {
+const PredictiveInsights = ({ actionData, growthData, summaryData, onDrillDown, onBack }) => {
   const [activeTab, setActiveTab] = useState(0);
   const [selectedScenario, setSelectedScenario] = useState('Base Case');
   const [forecastHorizon, setForecastHorizon] = useState(12); // months
@@ -714,7 +719,35 @@ const PredictiveInsights = ({ actionData, growthData, summaryData, onDrillDown }
   };
 
   return (
-    <Box>
+    <Box sx={{ p: 3 }}>
+      {/* Header with Breadcrumbs */}
+      <Box sx={{ mb: 3 }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link
+              component="button"
+              variant="body1"
+              onClick={onBack}
+              sx={{
+                textDecoration: 'none',
+                color: 'text.primary',
+                '&:hover': { textDecoration: 'underline' },
+              }}
+            >
+              MARGEN.AI
+            </Link>
+            <Typography color="primary" variant="body1" fontWeight={600}>
+              Predictive Insights
+            </Typography>
+          </Breadcrumbs>
+          {onBack && (
+            <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">
+              Back to MargenAI
+            </Button>
+          )}
+        </Stack>
+      </Box>
+
       <Paper elevation={1} sx={{ mb: 3 }}>
         <Tabs
           value={activeTab}

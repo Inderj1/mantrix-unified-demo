@@ -22,6 +22,10 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  Breadcrumbs,
+  Link,
+  Stack,
+  Button,
 } from '@mui/material';
 import {
   AccountBalance as AccountBalanceIcon,
@@ -31,13 +35,15 @@ import {
   ZoomIn as ZoomInIcon,
   GetApp as ExportIcon,
   Timeline as TimelineIcon,
+  NavigateNext as NavigateNextIcon,
+  ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import './shared/chartSetup'; // Import Chart.js setup to register components
 import DrillDownTable from './shared/DrillDownTable';
 import InteractiveChart from './shared/InteractiveChart';
 import SafeChart from './shared/SafeChart';
 
-const CostOperationsManagement = ({ cashData, revenueData, onDrillDown }) => {
+const CostOperationsManagement = ({ cashData, revenueData, onDrillDown, onBack }) => {
   const chartId = useId();
   const [activeTab, setActiveTab] = useState(0);
   const [selectedDivision, setSelectedDivision] = useState(null);
@@ -477,7 +483,35 @@ const CostOperationsManagement = ({ cashData, revenueData, onDrillDown }) => {
   };
 
   return (
-    <Box>
+    <Box sx={{ p: 3 }}>
+      {/* Header with Breadcrumbs */}
+      <Box sx={{ mb: 3 }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link
+              component="button"
+              variant="body1"
+              onClick={onBack}
+              sx={{
+                textDecoration: 'none',
+                color: 'text.primary',
+                '&:hover': { textDecoration: 'underline' },
+              }}
+            >
+              MARGEN.AI
+            </Link>
+            <Typography color="primary" variant="body1" fontWeight={600}>
+              Cost & Operations
+            </Typography>
+          </Breadcrumbs>
+          {onBack && (
+            <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">
+              Back to MargenAI
+            </Button>
+          )}
+        </Stack>
+      </Box>
+
       <Paper elevation={1} sx={{ mb: 3 }}>
         <Tabs
           value={activeTab}
