@@ -272,13 +272,24 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView = nu
             </Button>
           </Stack>
 
-          <Box>
-            <Typography variant="h4" fontWeight={700} sx={{ letterSpacing: '-0.5px' }}>
-              STOX.AI
-            </Typography>
-            <Typography variant="subtitle1" color="text.secondary">
-              Smart Inventory & Supply Chain Optimization Platform
-            </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Avatar
+              sx={{
+                width: 64,
+                height: 64,
+                bgcolor: alpha('#2e7d32', 0.1),
+              }}
+            >
+              <InventoryIcon sx={{ fontSize: 36, color: '#2e7d32' }} />
+            </Avatar>
+            <Box>
+              <Typography variant="h4" fontWeight={700} sx={{ letterSpacing: '-0.5px' }}>
+                STOX.AI
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Smart Inventory & Supply Chain Optimization Platform
+              </Typography>
+            </Box>
           </Box>
         </Box>
 

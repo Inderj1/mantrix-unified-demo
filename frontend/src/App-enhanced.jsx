@@ -528,10 +528,6 @@ function App() {
       }}>
         <AppBar position="static" elevation={0} sx={{ bgcolor: 'white', color: 'text.primary' }}>
           <Toolbar>
-            <Typography variant="h6" sx={{ flexGrow: 0, fontWeight: 500, mr: 3 }}>
-              {['AXIS.AI', 'CORE.AI', 'AXIS.AI', 'MARKETS.AI', 'Control Center', '', 'DOCUMENT HUB', 'Process Mining', 'Enterprise Pulse', 'VISION.AI - Document Intelligence', '', '', '', 'EMAIL INTEL', '', 'ROUTE.AI'][selectedTab] || ''}
-            </Typography>
-            
             {/* Global Search */}
             <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
               <GlobalSearch onNavigate={handleSearchNavigation} />

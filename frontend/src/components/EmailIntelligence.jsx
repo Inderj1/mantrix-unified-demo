@@ -780,13 +780,24 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
       <Box sx={{ p: 3, height: '100%', overflowY: 'auto' }}>
         <Box sx={{ mb: 4 }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-            <Box>
-              <Typography variant="h4" fontWeight={700} sx={{ mb: 1 }}>
-                EMAIL INTEL
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                Configurable Communication Intelligence Platform
-              </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Avatar
+                sx={{
+                  width: 64,
+                  height: 64,
+                  bgcolor: alpha('#2196F3', 0.1),
+                }}
+              >
+                <EmailIcon sx={{ fontSize: 36, color: '#2196F3' }} />
+              </Avatar>
+              <Box>
+                <Typography variant="h4" fontWeight={700}>
+                  EMAIL INTEL
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  Configurable Communication Intelligence Platform
+                </Typography>
+              </Box>
             </Box>
             <Stack direction="row" spacing={2}>
               <Button startIcon={<SettingsIcon />} variant="outlined" onClick={onNavigateToConfig}>

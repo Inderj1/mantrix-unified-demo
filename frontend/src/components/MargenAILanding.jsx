@@ -142,7 +142,7 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
             <Typography variant="h4" fontWeight={700}>
               MARGEN.AI
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body1" color="text.secondary">
               Margin Intelligence & Financial Analytics Platform
             </Typography>
           </Box>

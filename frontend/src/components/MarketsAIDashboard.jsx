@@ -16,6 +16,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Avatar,
+  alpha,
 } from '@mui/material';
 import {
   Settings as SettingsIcon,
@@ -126,32 +128,33 @@ const MarketsAIDashboard = () => {
       >
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <RadarIcon sx={{ fontSize: 40, color: '#FF5722' }} />
+            <Avatar
+              sx={{
+                width: 64,
+                height: 64,
+                bgcolor: alpha('#FF5722', 0.1),
+              }}
+            >
+              <RadarIcon sx={{ fontSize: 36, color: '#FF5722' }} />
+            </Avatar>
             <Box>
-              <Typography
-                variant="h4"
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  color: '#111827',
-                  fontWeight: 700,
-                  letterSpacing: '-0.025em',
-                }}
-              >
-                MARKETS.AI
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="h4" fontWeight={700}>
+                  MARKETS.AI
+                </Typography>
                 <Chip
                   label="Market Intelligence"
                   size="small"
                   sx={{
+                    height: 22,
                     bgcolor: '#fef3c7',
                     color: '#d97706',
                     fontWeight: 600,
                     border: '1px solid #fde68a',
                   }}
                 />
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#6b7280', mt: 0.5 }}>
+              </Box>
+              <Typography variant="body1" color="text.secondary">
                 Comprehensive market signal monitoring across 15 categories
               </Typography>
             </Box>

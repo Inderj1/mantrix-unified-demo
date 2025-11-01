@@ -25,6 +25,8 @@ import {
   Drawer,
   useTheme,
   useMediaQuery,
+  Avatar,
+  alpha,
 } from '@mui/material';
 import {
   CloudUpload as UploadIcon,
@@ -442,13 +444,24 @@ const DocumentIntelligence = () => {
           >
             <MenuIcon />
           </IconButton>
-          <Box>
-            <Typography variant="h5" fontWeight="bold">
-              Document Intelligence
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Upload, analyze, and extract insights from your documents using AI
-            </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Avatar
+              sx={{
+                width: 64,
+                height: 64,
+                bgcolor: alpha('#7c3aed', 0.1),
+              }}
+            >
+              <ArticleIcon sx={{ fontSize: 36, color: '#7c3aed' }} />
+            </Avatar>
+            <Box>
+              <Typography variant="h4" fontWeight={700}>
+                Document Intelligence
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Upload, analyze, and extract insights from your documents using AI
+              </Typography>
+            </Box>
           </Box>
         </Box>
       </Paper>

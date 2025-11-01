@@ -154,7 +154,7 @@ const RouteAILanding = ({ onTileClick, onBack }) => {
             <Typography variant="h4" fontWeight={700}>
               ROUTE.AI
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body1" color="text.secondary">
               Fleet & Route Optimization Platform
             </Typography>
           </Box>

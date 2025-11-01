@@ -28,6 +28,8 @@ import {
   Select,
   ToggleButtonGroup,
   ToggleButton,
+  Avatar,
+  alpha,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -50,6 +52,7 @@ import {
   ViewList as ViewListIcon,
   ViewModule as ViewModuleIcon,
   Sort as SortIcon,
+  Notifications as NotificationsIcon,
 } from '@mui/icons-material';
 import { DataGrid } from '@mui/x-data-grid';
 
@@ -314,13 +317,24 @@ const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
     <Box>
       {/* Header with Stats */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Box>
-          <Typography variant="h5" fontWeight={600}>
-            Enterprise Pulse
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Proactive monitoring with AI-powered insights
-          </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Avatar
+            sx={{
+              width: 64,
+              height: 64,
+              bgcolor: alpha('#FF5722', 0.1),
+            }}
+          >
+            <NotificationsIcon sx={{ fontSize: 36, color: '#FF5722' }} />
+          </Avatar>
+          <Box>
+            <Typography variant="h4" fontWeight={700}>
+              Enterprise Pulse
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Proactive monitoring with AI-powered insights
+            </Typography>
+          </Box>
         </Box>
         <Button
           variant="contained"

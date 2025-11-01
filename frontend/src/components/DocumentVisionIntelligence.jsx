@@ -495,13 +495,24 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
       <Box sx={{ p: 3, height: '100%', overflowY: 'auto' }}>
         <Box sx={{ mb: 4 }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-            <Box>
-              <Typography variant="h4" fontWeight={700} sx={{ mb: 1 }}>
-                VISION.AI - Document Intelligence
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                AI-powered OCR and document processing platform
-              </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Avatar
+                sx={{
+                  width: 64,
+                  height: 64,
+                  bgcolor: alpha('#9C27B0', 0.1),
+                }}
+              >
+                <DocumentIcon sx={{ fontSize: 36, color: '#9C27B0' }} />
+              </Avatar>
+              <Box>
+                <Typography variant="h4" fontWeight={700}>
+                  VISION.AI - Document Intelligence
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  AI-powered OCR and document processing platform
+                </Typography>
+              </Box>
             </Box>
             <Stack direction="row" spacing={2}>
               <Button startIcon={<SettingsIcon />} variant="outlined" onClick={onNavigateToConfig}>

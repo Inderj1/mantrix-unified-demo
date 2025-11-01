@@ -9,6 +9,7 @@ import {
   Chip,
   alpha,
   useTheme,
+  Avatar,
 } from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon,
@@ -16,6 +17,7 @@ import {
   Inventory as InventoryIcon,
   AccountTree as FlowIcon,
   Speed as OptimaIcon,
+  Speed as SpeedIcon,
   Security as SecurityIcon,
   ArrowForward as ArrowForwardIcon,
   LocalShipping as FleetIcon,
@@ -74,25 +76,25 @@ const CoreAILanding = ({ onTileClick }) => {
     <Box sx={{ p: 3, maxWidth: 1400, mx: 'auto' }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
-        <Typography 
-          variant="h4" 
-          sx={{ 
-            fontWeight: 700,
-            color: theme.palette.primary.main,
-            mb: 1
-          }}
-        >
-          Core.AI Suite
-        </Typography>
-        <Typography 
-          variant="h6" 
-          sx={{ 
-            color: theme.palette.text.secondary,
-            mb: 3
-          }}
-        >
-          Intelligent Business Solutions powered by Advanced AI
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+          <Avatar
+            sx={{
+              width: 64,
+              height: 64,
+              bgcolor: alpha(theme.palette.primary.main, 0.1),
+            }}
+          >
+            <SpeedIcon sx={{ fontSize: 36, color: theme.palette.primary.main }} />
+          </Avatar>
+          <Box>
+            <Typography variant="h4" fontWeight={700}>
+              CORE.AI
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Operational Intelligence Suite
+            </Typography>
+          </Box>
+        </Box>
       </Box>
 
       {/* Tiles Grid */}

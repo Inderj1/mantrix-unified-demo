@@ -96,13 +96,24 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Box>
-            <Typography variant="h4" fontWeight={700} gutterBottom>
-              Control Center
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Centralized platform management and monitoring dashboard
-            </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Avatar
+              sx={{
+                width: 64,
+                height: 64,
+                bgcolor: alpha('#1976d2', 0.1),
+              }}
+            >
+              <SettingsIcon sx={{ fontSize: 36, color: '#1976d2' }} />
+            </Avatar>
+            <Box>
+              <Typography variant="h4" fontWeight={700}>
+                Control Center
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Centralized platform management and monitoring dashboard
+              </Typography>
+            </Box>
           </Box>
           <Stack direction="row" spacing={1} alignItems="center">
             <Chip

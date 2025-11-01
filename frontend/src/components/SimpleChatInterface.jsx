@@ -28,6 +28,7 @@ import {
   Tabs,
   Card,
   CardContent,
+  alpha,
 } from '@mui/material';
 import {
   Send as SendIcon,
@@ -2146,16 +2147,29 @@ const SimpleChatInterface = () => {
         <Paper elevation={1} sx={{ p: 1.5, borderRadius: 0, position: 'relative', zIndex: 10, flexShrink: 0 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             {/* Left section */}
-            <Box>
-              <Typography variant="h5" fontWeight="bold">
-                Analytics Companion
-                <Chip label="v2.0 Research" size="small" color="success" sx={{ ml: 1 }} />
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                {mode === 'chat' 
-                  ? 'Ask questions about your data in natural language'
-                  : 'Conduct comprehensive data analysis with AI-powered research'}
-              </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Avatar
+                sx={{
+                  width: 48,
+                  height: 48,
+                  bgcolor: alpha('#1976d2', 0.1),
+                }}
+              >
+                <AnalyticsIcon sx={{ fontSize: 28, color: '#1976d2' }} />
+              </Avatar>
+              <Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="h4" fontWeight={700}>
+                    AXIS.AI
+                  </Typography>
+                  <Chip label="v2.0 Research" size="small" color="success" sx={{ height: 22 }} />
+                </Box>
+                <Typography variant="body1" color="text.secondary">
+                  {mode === 'chat'
+                    ? 'Ask questions about your data in natural language'
+                    : 'Conduct comprehensive data analysis with AI-powered research'}
+                </Typography>
+              </Box>
             </Box>
             
             {/* Right section */}
