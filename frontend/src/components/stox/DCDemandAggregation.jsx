@@ -3,39 +3,34 @@ import {
   Box, Paper, Typography, Grid, Card, CardContent, Chip, Button, Breadcrumbs, Link, Stack, IconButton, Tooltip, alpha,
   Dialog, DialogTitle, DialogContent, DialogActions, Divider, Table, TableBody, TableRow, TableCell, Select, MenuItem, FormControl, InputLabel,
 } from '@mui/material';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { GridToolbar } from '@mui/x-data-grid';
 import {
   TrendingUp, Refresh, NavigateNext as NavigateNextIcon, ArrowBack as ArrowBackIcon, Download, Warehouse, Store, Layers,
   ExpandMore, ChevronRight, Info, TrendingDown, TrendingFlat, Functions, CalendarMonth, ViewModule,
 } from '@mui/icons-material';
 import { useDCDemandData } from '../../hooks/useStoxData';
+import TreeDataGrid from './TreeDataGrid';
 
 const DCDemandAggregation = ({ onBack }) => {
   // Use persistent data hook
   const { data, loading, refetch } = useDCDemandData();
 
-  const [expandedRows, setExpandedRows] = useState([]);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedChannel, setSelectedChannel] = useState(null);
   const [quickFilterText, setQuickFilterText] = useState('');
 
-  // Aggregation features
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [groupBy, setGroupBy] = useState('none');
-  const [timeBucket, setTimeBucket] = useState('daily');
-
-  // Calculate metrics from data
+  // Calculate metrics from parent (DC-level) data only
   const metrics = useMemo(() => {
     if (!data || data.length === 0) return null;
 
-    const dcsSet = new Set(data.map(row => row.dc_location));
-    const totalChannels = data.length * 4; // 4 channels per row
+    const dcRows = data.filter(row => row.level === 0);
+    const channelRows = data.filter(row => row.level === 1);
 
     return {
-      totalDCs: dcsSet.size,
-      totalDemand: data.reduce((sum, row) => sum + row.daily_forecast_dc, 0),
-      avgWeeklyMean: Math.round(data.reduce((sum, row) => sum + row.weekly_mean_dc, 0) / data.length),
-      channelsTracked: totalChannels,
+      totalDCs: dcRows.length,
+      totalDemand: dcRows.reduce((sum, row) => sum + row.daily_forecast_dc, 0),
+      avgWeeklyMean: Math.round(dcRows.reduce((sum, row) => sum + row.weekly_mean_dc, 0) / dcRows.length),
+      channelsTracked: channelRows.length, // Total channels across all DCs
     };
   }, [data]);
 
@@ -44,95 +39,12 @@ const DCDemandAggregation = ({ onBack }) => {
     setDetailsOpen(true);
   };
 
-  // Aggregation calculations
-  const calculateAggregations = useMemo(() => {
-    if (selectedRows.length === 0) return null;
-
-    const selectedData = data.filter(row => selectedRows.includes(row.id));
-
-    const totalForecast = selectedData.reduce((sum, row) => sum + row.daily_forecast_dc, 0);
-    const avgForecast = totalForecast / selectedData.length;
-    const minForecast = Math.min(...selectedData.map(row => row.daily_forecast_dc));
-    const maxForecast = Math.max(...selectedData.map(row => row.daily_forecast_dc));
-
-    const totalRetail = selectedData.reduce((sum, row) => sum + row.retail_fcst, 0);
-    const totalAmazon = selectedData.reduce((sum, row) => sum + row.amazon_fcst, 0);
-    const totalWholesale = selectedData.reduce((sum, row) => sum + row.wholesale_fcst, 0);
-    const totalD2C = selectedData.reduce((sum, row) => sum + row.d2c_fcst, 0);
-
-    return {
-      count: selectedData.length,
-      totalForecast,
-      avgForecast,
-      minForecast,
-      maxForecast,
-      totalRetail,
-      totalAmazon,
-      totalWholesale,
-      totalD2C,
-    };
-  }, [selectedRows, data]);
-
-  // Group By functionality
-  const groupedData = useMemo(() => {
-    if (groupBy === 'none') return data;
-
-    const grouped = {};
-
-    data.forEach(row => {
-      let key;
-      if (groupBy === 'dc') key = row.dc_location;
-      else if (groupBy === 'sku') key = row.product_sku;
-      else if (groupBy === 'week') key = row.iso_week;
-      else return;
-
-      if (!grouped[key]) {
-        grouped[key] = {
-          id: key,
-          groupKey: key,
-          dc_location: groupBy === 'dc' ? key : 'All DCs',
-          product_sku: groupBy === 'sku' ? key : 'All SKUs',
-          iso_week: groupBy === 'week' ? key : row.iso_week,
-          date: row.date,
-          daily_forecast_dc: 0,
-          retail_fcst: 0,
-          amazon_fcst: 0,
-          wholesale_fcst: 0,
-          d2c_fcst: 0,
-          weekly_mean_dc: 0,
-          weekly_stddev_dc: 0,
-          count: 0,
-        };
-      }
-
-      grouped[key].daily_forecast_dc += row.daily_forecast_dc;
-      grouped[key].retail_fcst += row.retail_fcst;
-      grouped[key].amazon_fcst += row.amazon_fcst;
-      grouped[key].wholesale_fcst += row.wholesale_fcst;
-      grouped[key].d2c_fcst += row.d2c_fcst;
-      grouped[key].weekly_mean_dc += row.weekly_mean_dc;
-      grouped[key].count += 1;
-    });
-
-    return Object.values(grouped).map(group => ({
-      ...group,
-      retail_pct: ((group.retail_fcst / group.daily_forecast_dc) * 100).toFixed(1),
-      amazon_pct: ((group.amazon_fcst / group.daily_forecast_dc) * 100).toFixed(1),
-      wholesale_pct: ((group.wholesale_fcst / group.daily_forecast_dc) * 100).toFixed(1),
-      d2c_pct: ((group.d2c_fcst / group.daily_forecast_dc) * 100).toFixed(1),
-      weekly_mean_dc: Math.round(group.weekly_mean_dc / group.count),
-      weekly_stddev_dc: Math.round(group.weekly_stddev_dc / group.count),
-      status: 'Aggregated',
-    }));
-  }, [data, groupBy]);
-
-  // Simple filtering
+  // Simple filtering on hierarchical data
   const filteredRows = useMemo(() => {
-    const baseData = groupBy === 'none' ? data : groupedData;
     const searchText = quickFilterText.toLowerCase().trim();
-    if (!searchText) return baseData;
+    if (!searchText) return data;
 
-    return baseData.filter(row => {
+    return data.filter(row => {
       const searchableText = [
         row.id,
         row.dc_location,
@@ -142,7 +54,7 @@ const DCDemandAggregation = ({ onBack }) => {
       ].join(' ').toLowerCase();
       return searchableText.includes(searchText);
     });
-  }, [data, groupedData, groupBy, quickFilterText]);
+  }, [data, quickFilterText]);
 
   const columns = [
     {
@@ -183,9 +95,9 @@ const DCDemandAggregation = ({ onBack }) => {
     },
     {
       field: 'dc_location',
-      headerName: 'DC',
-      minWidth: 120,
-      flex: 0.9,
+      headerName: 'DC / Channel',
+      minWidth: 150,
+      flex: 1.2,
       align: 'center',
       headerAlign: 'center',
     },
@@ -196,10 +108,22 @@ const DCDemandAggregation = ({ onBack }) => {
       flex: 1,
       align: 'center',
       headerAlign: 'center',
+      renderCell: (params) => {
+        if (!params.value) {
+          return <Typography variant="caption" sx={{ color: '#94a3b8', fontStyle: 'italic' }}>Aggregated</Typography>;
+        }
+        return <Typography variant="body2">{params.value}</Typography>;
+      },
+    },
+    {
+      field: 'product_name',
+      headerName: 'Product',
+      minWidth: 180,
+      flex: 1.4,
     },
     {
       field: 'daily_forecast_dc',
-      headerName: 'Total Forecast',
+      headerName: 'Daily Forecast',
       minWidth: 130,
       flex: 1,
       type: 'number',
@@ -214,112 +138,8 @@ const DCDemandAggregation = ({ onBack }) => {
       ),
     },
     {
-      field: 'retail_fcst',
-      headerName: 'Retail',
-      minWidth: 100,
-      flex: 0.9,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      valueFormatter: (params) => params.value?.toLocaleString(),
-    },
-    {
-      field: 'retail_pct',
-      headerName: 'Retail %',
-      minWidth: 90,
-      flex: 0.8,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => (
-        <Chip
-          label={`${params.value}%`}
-          size="small"
-          sx={{ bgcolor: alpha('#3b82f6', 0.12), color: '#2563eb', fontWeight: 600, border: '1px solid', borderColor: alpha('#2563eb', 0.2) }}
-        />
-      ),
-    },
-    {
-      field: 'amazon_fcst',
-      headerName: 'Amazon',
-      minWidth: 100,
-      flex: 0.9,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      valueFormatter: (params) => params.value?.toLocaleString(),
-    },
-    {
-      field: 'amazon_pct',
-      headerName: 'Amazon %',
-      minWidth: 90,
-      flex: 0.8,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => (
-        <Chip
-          label={`${params.value}%`}
-          size="small"
-          sx={{ bgcolor: alpha('#f59e0b', 0.12), color: '#d97706', fontWeight: 600, border: '1px solid', borderColor: alpha('#d97706', 0.2) }}
-        />
-      ),
-    },
-    {
-      field: 'wholesale_fcst',
-      headerName: 'Wholesale',
-      minWidth: 110,
-      flex: 0.9,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      valueFormatter: (params) => params.value?.toLocaleString(),
-    },
-    {
-      field: 'wholesale_pct',
-      headerName: 'Wholesale %',
-      minWidth: 100,
-      flex: 0.8,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => (
-        <Chip
-          label={`${params.value}%`}
-          size="small"
-          sx={{ bgcolor: alpha('#8b5cf6', 0.12), color: '#7c3aed', fontWeight: 600, border: '1px solid', borderColor: alpha('#7c3aed', 0.2) }}
-        />
-      ),
-    },
-    {
-      field: 'd2c_fcst',
-      headerName: 'D2C',
-      minWidth: 90,
-      flex: 0.9,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      valueFormatter: (params) => params.value?.toLocaleString(),
-    },
-    {
-      field: 'd2c_pct',
-      headerName: 'D2C %',
-      minWidth: 80,
-      flex: 0.8,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => (
-        <Chip
-          label={`${params.value}%`}
-          size="small"
-          sx={{ bgcolor: alpha('#ec4899', 0.12), color: '#db2777', fontWeight: 600, border: '1px solid', borderColor: alpha('#db2777', 0.2) }}
-        />
-      ),
-    },
-    {
       field: 'weekly_mean_dc',
-      headerName: 'Weekly Avg (μ)',
+      headerName: 'Weekly Mean (μ)',
       minWidth: 130,
       flex: 1,
       type: 'number',
@@ -329,13 +149,29 @@ const DCDemandAggregation = ({ onBack }) => {
     },
     {
       field: 'weekly_stddev_dc',
-      headerName: 'Variability (σ)',
-      minWidth: 120,
+      headerName: 'Std Dev (σ)',
+      minWidth: 110,
       flex: 0.9,
       type: 'number',
       align: 'center',
       headerAlign: 'center',
-      valueFormatter: (params) => params.value?.toFixed(2),
+      valueFormatter: (params) => params.value?.toFixed(1),
+    },
+    {
+      field: 'contribution_pct',
+      headerName: 'Contribution %',
+      minWidth: 120,
+      flex: 1,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => params.value ? (
+        <Chip
+          label={`${params.value}%`}
+          size="small"
+          sx={{ bgcolor: alpha('#10b981', 0.12), color: '#059669', fontWeight: 600 }}
+        />
+      ) : null,
     },
     {
       field: 'status',
@@ -348,7 +184,7 @@ const DCDemandAggregation = ({ onBack }) => {
         <Chip
           label={params.value}
           size="small"
-          color={params.value === 'Aligned' ? 'success' : params.value === 'Good' ? 'info' : 'warning'}
+          color={params.value === 'Aggregated' ? 'primary' : params.value === 'Channel' ? 'success' : 'default'}
         />
       ),
     },
@@ -375,23 +211,7 @@ const DCDemandAggregation = ({ onBack }) => {
               Aggregate demand forecasts from all store locations and channels for centralized planning
             </Typography>
           </Box>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <FormControl size="small" sx={{ minWidth: 150 }}>
-              <InputLabel>Group By</InputLabel>
-              <Select
-                value={groupBy}
-                label="Group By"
-                onChange={(e) => setGroupBy(e.target.value)}
-              >
-                <MenuItem value="none">No Grouping</MenuItem>
-                <MenuItem value="dc">By DC Location</MenuItem>
-                <MenuItem value="sku">By Product SKU</MenuItem>
-                <MenuItem value="week">By ISO Week</MenuItem>
-              </Select>
-            </FormControl>
-
-            <Divider orientation="vertical" flexItem />
-
+          <Stack direction="row" spacing={1}>
             <Tooltip title="Refresh"><IconButton onClick={refetch} color="primary"><Refresh /></IconButton></Tooltip>
             <Tooltip title="Export"><IconButton color="primary"><Download /></IconButton></Tooltip>
           </Stack>
@@ -447,71 +267,8 @@ const DCDemandAggregation = ({ onBack }) => {
         </Grid>
       )}
 
-      {calculateAggregations && (
-        <Paper sx={{ p: 2, mb: 2, bgcolor: alpha('#3b82f6', 0.05), border: '1px solid', borderColor: alpha('#3b82f6', 0.2) }}>
-          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-            <Functions sx={{ color: '#3b82f6', fontSize: 20 }} />
-            <Typography variant="subtitle2" fontWeight={600} color="#3b82f6">
-              Selection Aggregation ({calculateAggregations.count} rows)
-            </Typography>
-          </Stack>
-          <Grid container spacing={2}>
-            <Grid item xs={6} md={2.4}>
-              <Typography variant="caption" color="text.secondary">Total Forecast</Typography>
-              <Typography variant="body1" fontWeight={700}>
-                {calculateAggregations.totalForecast.toLocaleString()}
-              </Typography>
-            </Grid>
-            <Grid item xs={6} md={2.4}>
-              <Typography variant="caption" color="text.secondary">Average</Typography>
-              <Typography variant="body1" fontWeight={700}>
-                {Math.round(calculateAggregations.avgForecast).toLocaleString()}
-              </Typography>
-            </Grid>
-            <Grid item xs={6} md={2.4}>
-              <Typography variant="caption" color="text.secondary">Min / Max</Typography>
-              <Typography variant="body1" fontWeight={700}>
-                {calculateAggregations.minForecast.toLocaleString()} / {calculateAggregations.maxForecast.toLocaleString()}
-              </Typography>
-            </Grid>
-            <Grid item xs={6} md={2.4}>
-              <Stack direction="row" spacing={1}>
-                <Box>
-                  <Typography variant="caption" sx={{ color: '#2563eb' }}>Retail</Typography>
-                  <Typography variant="body2" fontWeight={600}>
-                    {calculateAggregations.totalRetail.toLocaleString()}
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography variant="caption" sx={{ color: '#d97706' }}>Amazon</Typography>
-                  <Typography variant="body2" fontWeight={600}>
-                    {calculateAggregations.totalAmazon.toLocaleString()}
-                  </Typography>
-                </Box>
-              </Stack>
-            </Grid>
-            <Grid item xs={6} md={2.4}>
-              <Stack direction="row" spacing={1}>
-                <Box>
-                  <Typography variant="caption" sx={{ color: '#7c3aed' }}>Wholesale</Typography>
-                  <Typography variant="body2" fontWeight={600}>
-                    {calculateAggregations.totalWholesale.toLocaleString()}
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography variant="caption" sx={{ color: '#db2777' }}>D2C</Typography>
-                  <Typography variant="body2" fontWeight={600}>
-                    {calculateAggregations.totalD2C.toLocaleString()}
-                  </Typography>
-                </Box>
-              </Stack>
-            </Grid>
-          </Grid>
-        </Paper>
-      )}
-
       <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <DataGrid
+        <TreeDataGrid
           rows={filteredRows}
           columns={columns}
           loading={loading}
@@ -527,12 +284,8 @@ const DCDemandAggregation = ({ onBack }) => {
               }
             }
           }}
-          initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
-          pageSizeOptions={[10, 25, 50, 100]}
-          checkboxSelection
-          onRowSelectionModelChange={(newSelection) => setSelectedRows(newSelection)}
-          disableRowSelectionOnClick
-          getRowClassName={(params) => params.row.isChild ? 'child-row' : 'parent-row'}
+          initialState={{ pagination: { paginationModel: { pageSize: 50 } } }}
+          pageSizeOptions={[25, 50, 100, 200]}
           sx={{
             '& .MuiDataGrid-cell': {
               fontSize: '0.8rem',
@@ -543,14 +296,6 @@ const DCDemandAggregation = ({ onBack }) => {
               fontSize: '0.85rem',
               fontWeight: 700,
               borderBottom: '2px solid #64748b',
-            },
-            '& .parent-row': {
-              bgcolor: alpha('#3b82f6', 0.02),
-              '&:hover': { bgcolor: alpha('#3b82f6', 0.08) },
-            },
-            '& .child-row': {
-              bgcolor: alpha('#f8fafc', 1),
-              '&:hover': { bgcolor: alpha('#3b82f6', 0.05) },
             },
             '& .MuiDataGrid-cell:focus': { outline: 'none' },
           }}

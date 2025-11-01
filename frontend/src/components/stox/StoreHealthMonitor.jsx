@@ -46,24 +46,108 @@ const StoreHealthMonitor = ({ onBack }) => {
     setLoading(true);
 
     setTimeout(() => {
-      // Aligned data: 12 stores (6 DC-East, 6 DC-Midwest) - aggregates to DC-level totals
-      const healthData = [
-        // DC-East Region Stores
-        { id: 'HM0001', store_id: 'Store-Chicago-001', store_name: 'Chicago Magnificent Mile', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 20, current_inventory: 130, inbound_shipments: 20, committed_orders: 5, available_inventory: 145, target_inventory: 162, safety_stock: 22, days_of_supply: 7.25, inventory_health_pct: 88, health_status: '🟡 Reorder Soon (Yellow)', fill_rate: 0.965, stockout_risk: 'Low Risk', action: 'Plan replenishment - inventory below 70% of target' },
-        { id: 'HM0002', store_id: 'Store-NYC-015', store_name: 'NYC Fifth Avenue', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 27, current_inventory: 180, inbound_shipments: 30, committed_orders: 10, available_inventory: 200, target_inventory: 190, safety_stock: 28, days_of_supply: 7.4, inventory_health_pct: 106, health_status: '🟢 Healthy (Green)', fill_rate: 0.985, stockout_risk: 'Low Risk', action: 'No action needed' },
-        { id: 'HM0003', store_id: 'Store-Boston-022', store_name: 'Boston Newbury St', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 25, current_inventory: 200, inbound_shipments: 20, committed_orders: 15, available_inventory: 205, target_inventory: 180, safety_stock: 26, days_of_supply: 8.2, inventory_health_pct: 116, health_status: '🟢 Healthy (Green)', fill_rate: 0.98, stockout_risk: 'Low Risk', action: 'No action needed' },
-        { id: 'HM0004', store_id: 'Store-Philly-018', store_name: 'Philadelphia Rittenhouse', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 22, current_inventory: 150, inbound_shipments: 10, committed_orders: 8, available_inventory: 152, target_inventory: 165, safety_stock: 24, days_of_supply: 6.9, inventory_health_pct: 91, health_status: '🟢 Healthy (Green)', fill_rate: 0.97, stockout_risk: 'Low Risk', action: 'No action needed' },
-        { id: 'HM0005', store_id: 'Store-DC-Metro-012', store_name: 'DC Georgetown', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 23, current_inventory: 140, inbound_shipments: 15, committed_orders: 7, available_inventory: 148, target_inventory: 170, safety_stock: 25, days_of_supply: 6.4, inventory_health_pct: 85, health_status: '🟢 Healthy (Green)', fill_rate: 0.96, stockout_risk: 'Low Risk', action: 'No action needed' },
-        { id: 'HM0006', store_id: 'Store-Baltimore-009', store_name: 'Baltimore Harbor', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 20, current_inventory: 120, inbound_shipments: 25, committed_orders: 5, available_inventory: 140, target_inventory: 155, safety_stock: 22, days_of_supply: 7.0, inventory_health_pct: 89, health_status: '🟢 Healthy (Green)', fill_rate: 0.97, stockout_risk: 'Low Risk', action: 'No action needed' },
-
-        // DC-Midwest Region Stores
-        { id: 'HM0007', store_id: 'Store-Dallas-019', store_name: 'Dallas Galleria', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 18, current_inventory: 95, inbound_shipments: 40, committed_orders: 5, available_inventory: 130, target_inventory: 140, safety_stock: 20, days_of_supply: 7.2, inventory_health_pct: 92, health_status: '🟢 Healthy (Green)', fill_rate: 0.975, stockout_risk: 'Low Risk', action: 'No action needed' },
-        { id: 'HM0008', store_id: 'Store-Miami-008', store_name: 'Miami Design District', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 22, current_inventory: 340, inbound_shipments: 0, committed_orders: 15, available_inventory: 325, target_inventory: 170, safety_stock: 25, days_of_supply: 14.8, inventory_health_pct: 207, health_status: '🟠 Overstock (Orange)', fill_rate: 0.99, stockout_risk: 'No Risk', action: 'Slow down orders - too much inventory' },
-        { id: 'HM0009', store_id: 'Store-Minneapolis-031', store_name: 'Minneapolis Mall', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 19, current_inventory: 110, inbound_shipments: 30, committed_orders: 10, available_inventory: 130, target_inventory: 145, safety_stock: 21, days_of_supply: 6.8, inventory_health_pct: 88, health_status: '🟡 Reorder Soon (Yellow)', fill_rate: 0.97, stockout_risk: 'Low Risk', action: 'Plan replenishment - inventory below 70% of target' },
-        { id: 'HM0010', store_id: 'Store-Detroit-025', store_name: 'Detroit Somerset', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 17, current_inventory: 100, inbound_shipments: 20, committed_orders: 8, available_inventory: 112, target_inventory: 135, safety_stock: 19, days_of_supply: 6.6, inventory_health_pct: 80, health_status: '🟢 Healthy (Green)', fill_rate: 0.96, stockout_risk: 'Low Risk', action: 'No action needed' },
-        { id: 'HM0011', store_id: 'Store-STL-014', store_name: 'St Louis Plaza', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 16, current_inventory: 90, inbound_shipments: 15, committed_orders: 6, available_inventory: 99, target_inventory: 125, safety_stock: 18, days_of_supply: 6.2, inventory_health_pct: 76, health_status: '🟢 Healthy (Green)', fill_rate: 0.95, stockout_risk: 'Low Risk', action: 'No action needed' },
-        { id: 'HM0012', store_id: 'Store-KC-027', store_name: 'Kansas City Plaza', product_sku: 'MR_HAIR_101', product_name: 'Premium Hair Color Kit', forecasted_demand: 15, current_inventory: 85, inbound_shipments: 10, committed_orders: 4, available_inventory: 91, target_inventory: 120, safety_stock: 17, days_of_supply: 6.1, inventory_health_pct: 72, health_status: '🟢 Healthy (Green)', fill_rate: 0.94, stockout_risk: 'Low Risk', action: 'No action needed' },
+      // Multiple SKUs with store-level health data
+      const stores = [
+        { id: 'Store-Chicago-001', name: 'Chicago Magnificent Mile', baseData: { 'MR_HAIR_101': { demand: 20, current: 130, target: 162, safety: 22 }, 'MR_HAIR_201': { demand: 13, current: 85, target: 105, safety: 14 }, 'MR_CARE_301': { demand: 9, current: 60, target: 75, safety: 10 } } },
+        { id: 'Store-NYC-015', name: 'NYC Fifth Avenue', baseData: { 'MR_HAIR_101': { demand: 27, current: 180, target: 190, safety: 28 }, 'MR_HAIR_201': { demand: 17, current: 115, target: 125, safety: 18 }, 'MR_CARE_301': { demand: 12, current: 80, target: 90, safety: 13 } } },
+        { id: 'Store-Boston-022', name: 'Boston Newbury St', baseData: { 'MR_HAIR_101': { demand: 25, current: 200, target: 180, safety: 26 }, 'MR_HAIR_201': { demand: 16, current: 130, target: 115, safety: 17 }, 'MR_CARE_301': { demand: 11, current: 90, target: 82, safety: 12 } } },
+        { id: 'Store-Philly-018', name: 'Philadelphia Rittenhouse', baseData: { 'MR_HAIR_101': { demand: 22, current: 150, target: 165, safety: 24 }, 'MR_HAIR_201': { demand: 14, current: 95, target: 108, safety: 15 }, 'MR_CARE_301': { demand: 10, current: 68, target: 78, safety: 11 } } },
+        { id: 'Store-DC-Metro-012', name: 'DC Georgetown', baseData: { 'MR_HAIR_101': { demand: 23, current: 140, target: 170, safety: 25 }, 'MR_HAIR_201': { demand: 15, current: 92, target: 112, safety: 16 }, 'MR_CARE_301': { demand: 10, current: 65, target: 80, safety: 11 } } },
+        { id: 'Store-Baltimore-009', name: 'Baltimore Harbor', baseData: { 'MR_HAIR_101': { demand: 20, current: 120, target: 155, safety: 22 }, 'MR_HAIR_201': { demand: 13, current: 78, target: 102, safety: 14 }, 'MR_CARE_301': { demand: 9, current: 55, target: 73, safety: 10 } } },
+        { id: 'Store-Dallas-019', name: 'Dallas Galleria', baseData: { 'MR_HAIR_101': { demand: 18, current: 95, target: 140, safety: 20 }, 'MR_HAIR_201': { demand: 12, current: 65, target: 92, safety: 13 }, 'MR_CARE_301': { demand: 8, current: 45, target: 66, safety: 9 } } },
+        { id: 'Store-Miami-008', name: 'Miami Design District', baseData: { 'MR_HAIR_101': { demand: 22, current: 340, target: 170, safety: 25 }, 'MR_HAIR_201': { demand: 14, current: 210, target: 112, safety: 16 }, 'MR_CARE_301': { demand: 10, current: 145, target: 80, safety: 11 } } },
+        { id: 'Store-Minneapolis-031', name: 'Minneapolis Mall', baseData: { 'MR_HAIR_101': { demand: 19, current: 110, target: 145, safety: 21 }, 'MR_HAIR_201': { demand: 12, current: 72, target: 95, safety: 13 }, 'MR_CARE_301': { demand: 9, current: 52, target: 68, safety: 10 } } },
+        { id: 'Store-Detroit-025', name: 'Detroit Somerset', baseData: { 'MR_HAIR_101': { demand: 17, current: 100, target: 135, safety: 19 }, 'MR_HAIR_201': { demand: 11, current: 68, target: 88, safety: 12 }, 'MR_CARE_301': { demand: 8, current: 48, target: 63, safety: 9 } } },
+        { id: 'Store-STL-014', name: 'St Louis Plaza', baseData: { 'MR_HAIR_101': { demand: 16, current: 90, target: 125, safety: 18 }, 'MR_HAIR_201': { demand: 10, current: 60, target: 82, safety: 11 }, 'MR_CARE_301': { demand: 7, current: 42, target: 58, safety: 8 } } },
+        { id: 'Store-KC-027', name: 'Kansas City Plaza', baseData: { 'MR_HAIR_101': { demand: 15, current: 85, target: 120, safety: 17 }, 'MR_HAIR_201': { demand: 10, current: 56, target: 78, safety: 11 }, 'MR_CARE_301': { demand: 7, current: 40, target: 56, safety: 8 } } },
       ];
+
+      const products = [
+        { sku: 'MR_HAIR_101', name: 'Premium Hair Color Kit' },
+        { sku: 'MR_HAIR_201', name: 'Root Touch-Up Spray' },
+        { sku: 'MR_CARE_301', name: 'Intensive Hair Mask' },
+      ];
+
+      const healthData = [];
+      let idCounter = 1;
+
+      stores.forEach((store) => {
+        products.forEach((product) => {
+          const base = store.baseData[product.sku];
+          const onHand = base.current;
+          const available = onHand;
+          const healthPct = Math.round((available / base.target) * 100);
+          const daysOfSupply = (available / base.demand).toFixed(1);
+
+          // NEW TILE 2 COLUMNS
+          // 1. In-Transit Supply (Units) - shipments on the way
+          const inTransitSupply = healthPct < 70 ? Math.round(base.target * 0.3) : Math.round(base.target * 0.1);
+
+          // 2. Inventory Position = On-Hand + In-Transit − Committed (assume committed = 0)
+          const inventoryPosition = onHand + inTransitSupply;
+
+          // 3. Reorder Trigger Point (ROP) = Safety Stock + (AvgDailyDemand × LeadTime)
+          const leadTimeDays = 7; // 1 week lead time from DC to Store
+          const avgDailyDemand = base.demand; // Already daily demand
+          const reorderTriggerPoint = base.safety + (avgDailyDemand * leadTimeDays);
+
+          // 4. Stockout Risk (%) - Using normal distribution approximation
+          // Higher risk if inventory position < ROP
+          let stockoutRiskPct;
+          if (inventoryPosition >= reorderTriggerPoint * 1.2) {
+            stockoutRiskPct = Math.round(2 + Math.random() * 3); // 2-5%
+          } else if (inventoryPosition >= reorderTriggerPoint) {
+            stockoutRiskPct = Math.round(8 + Math.random() * 7); // 8-15%
+          } else if (inventoryPosition >= reorderTriggerPoint * 0.8) {
+            stockoutRiskPct = Math.round(20 + Math.random() * 15); // 20-35%
+          } else {
+            stockoutRiskPct = Math.round(50 + Math.random() * 30); // 50-80%
+          }
+
+          // 5. Excess Flag = "Y" if OnHand > MaxLevel (1.5× target)
+          const maxLevel = base.target * 1.5;
+          const excessFlag = onHand > maxLevel ? 'Y' : 'N';
+
+          let healthStatus, action;
+          if (healthPct > 150) {
+            healthStatus = '🟠 Overstock (Orange)';
+            action = 'Slow down orders - too much inventory';
+          } else if (healthPct >= 90) {
+            healthStatus = '🟢 Healthy (Green)';
+            action = 'No action needed';
+          } else if (healthPct >= 70) {
+            healthStatus = '🟡 Reorder Soon (Yellow)';
+            action = 'Plan replenishment - inventory below 70% of target';
+          } else {
+            healthStatus = '🔴 Critical (Red)';
+            action = 'Urgent replenishment required';
+          }
+
+          healthData.push({
+            id: `HM${String(idCounter++).padStart(4, '0')}`,
+            store_id: store.id,
+            store_name: store.name,
+            product_sku: product.sku,
+            product_name: product.name,
+            current_inventory: onHand,
+            available_inventory: available,
+            target_inventory: base.target,
+            safety_stock: base.safety,
+            days_of_supply: parseFloat(daysOfSupply),
+            inventory_health_pct: healthPct,
+            health_status: healthStatus,
+            fill_rate: 0.92 + Math.random() * 0.08,
+            stockout_risk: healthPct >= 80 ? 'Low Risk' : healthPct >= 60 ? 'Medium Risk' : 'High Risk',
+            action: action,
+            // New Tile 2 columns
+            in_transit_supply: inTransitSupply,
+            inventory_position: inventoryPosition,
+            reorder_trigger_point: reorderTriggerPoint,
+            stockout_risk_pct: stockoutRiskPct,
+            excess_flag: excessFlag,
+          });
+        });
+      });
 
       setHealthData(healthData);
 
@@ -96,40 +180,10 @@ const StoreHealthMonitor = ({ onBack }) => {
     { field: 'product_sku', headerName: 'SKU', minWidth: 120, flex: 0.9, align: 'center', headerAlign: 'center' },
     { field: 'product_name', headerName: 'Product', minWidth: 180, flex: 1.4 },
     {
-      field: 'forecasted_demand',
-      headerName: 'Daily Forecast',
-      minWidth: 120,
-      flex: 1,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      valueFormatter: (params) => params.value?.toLocaleString(),
-    },
-    {
       field: 'current_inventory',
       headerName: 'Current',
       minWidth: 110,
       flex: 0.9,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      valueFormatter: (params) => params.value?.toLocaleString(),
-    },
-    {
-      field: 'inbound_shipments',
-      headerName: 'Inbound',
-      minWidth: 110,
-      flex: 0.9,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'center',
-      valueFormatter: (params) => params.value?.toLocaleString(),
-    },
-    {
-      field: 'committed_orders',
-      headerName: 'Committed',
-      minWidth: 120,
-      flex: 1,
       type: 'number',
       align: 'center',
       headerAlign: 'center',
@@ -219,6 +273,88 @@ const StoreHealthMonitor = ({ onBack }) => {
       headerAlign: 'center',
     },
     {
+      field: 'in_transit_supply',
+      headerName: 'In-Transit',
+      minWidth: 110,
+      flex: 0.9,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <Chip
+          label={params.value?.toLocaleString()}
+          size="small"
+          sx={{
+            fontWeight: 700,
+            bgcolor: alpha('#f59e0b', 0.12),
+            color: '#d97706',
+          }}
+        />
+      ),
+    },
+    {
+      field: 'inventory_position',
+      headerName: 'Inventory Position',
+      minWidth: 150,
+      flex: 1.2,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      valueFormatter: (params) => params.value?.toLocaleString(),
+    },
+    {
+      field: 'reorder_trigger_point',
+      headerName: 'ROP (Trigger)',
+      minWidth: 140,
+      flex: 1.1,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <Chip
+          label={params.value?.toLocaleString()}
+          size="small"
+          sx={{
+            fontWeight: 700,
+            bgcolor: alpha('#8b5cf6', 0.12),
+            color: '#7c3aed',
+          }}
+        />
+      ),
+    },
+    {
+      field: 'stockout_risk_pct',
+      headerName: 'Stockout Risk %',
+      minWidth: 150,
+      flex: 1.2,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <Chip
+          label={`${params.value}%`}
+          size="small"
+          color={params.value < 10 ? 'success' : params.value < 30 ? 'warning' : 'error'}
+          sx={{ fontWeight: 600 }}
+        />
+      ),
+    },
+    {
+      field: 'excess_flag',
+      headerName: 'Excess',
+      minWidth: 100,
+      flex: 0.8,
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => (
+        params.value === 'Y' ? (
+          <Chip label="Yes" size="small" color="error" sx={{ fontWeight: 600 }} />
+        ) : (
+          <Typography variant="caption" sx={{ color: '#94a3b8' }}>No</Typography>
+        )
+      ),
+    },
+    {
       field: 'action',
       headerName: 'Action / Recommendation',
       minWidth: 250,
@@ -233,7 +369,7 @@ const StoreHealthMonitor = ({ onBack }) => {
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Store System</Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>Inventory Health Monitor</Typography>
+            <Typography color="primary" variant="body1" fontWeight={600}>Tile 2: Inventory Health</Typography>
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>
         </Stack>
@@ -241,10 +377,10 @@ const StoreHealthMonitor = ({ onBack }) => {
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
               <ShowChart sx={{ fontSize: 32, color: '#10b981' }} />
-              <Typography variant="h4" fontWeight={700}>Inventory Health Monitor</Typography>
+              <Typography variant="h4" fontWeight={700}>Tile 2: Inventory Health Monitoring</Typography>
             </Stack>
             <Typography variant="body2" color="text.secondary">
-              Real-time inventory status with health alerts and days of supply monitoring
+              Measure inventory adequacy vs. forecast, compute safety stock, ROP, and stockout risk
             </Typography>
           </Box>
           <Stack direction="row" spacing={1}>

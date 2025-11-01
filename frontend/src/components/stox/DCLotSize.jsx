@@ -122,18 +122,29 @@ const DCLotSize = ({ onBack }) => {
     { field: 'sku', headerName: 'SKU', minWidth: 120, flex: 1, align: 'center', headerAlign: 'center' },
     { field: 'channel', headerName: 'Channel', minWidth: 110, flex: 0.9, align: 'center', headerAlign: 'center' },
     { field: 'dc', headerName: 'DC', minWidth: 110, flex: 0.9, align: 'center', headerAlign: 'center' },
-    { field: 'weekly_mu', headerName: 'μ (wk)', minWidth: 100, flex: 0.8, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'setup_cost', headerName: 'S ($/order)', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `$${params.value}` },
-    { field: 'unit_cost', headerName: 'Unit Cost ($)', minWidth: 120, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `$${params.value}` },
-    { field: 'moq', headerName: 'MOQ', minWidth: 100, flex: 0.8, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'truck_capacity', headerName: 'Truck Cap', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'eoq', headerName: 'EOQ', minWidth: 100, flex: 0.8, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'rounded_lot', headerName: 'Rounded Lot', minWidth: 120, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'final_lot', headerName: 'Final Lot', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'orders_per_year', headerName: 'Orders/yr', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center' },
     {
-      field: 'total_cost',
-      headerName: 'Total Cost ($)',
+      field: 'moq',
+      headerName: 'MOQ',
+      minWidth: 100,
+      flex: 0.8,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      valueFormatter: (params) => params.value?.toLocaleString(),
+    },
+    {
+      field: 'truck_capacity',
+      headerName: 'Truck Cap',
+      minWidth: 110,
+      flex: 0.9,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      valueFormatter: (params) => params.value?.toLocaleString(),
+    },
+    {
+      field: 'final_lot',
+      headerName: 'Order Qty',
       minWidth: 120,
       flex: 1,
       type: 'number',
@@ -141,14 +152,46 @@ const DCLotSize = ({ onBack }) => {
       headerAlign: 'center',
       renderCell: (params) => (
         <Chip
-          label={`$${params.value.toLocaleString()}`}
+          label={params.value?.toLocaleString()}
           size="small"
-          color="info"
-          sx={{ fontWeight: 600 }}
+          sx={{
+            fontWeight: 700,
+            bgcolor: alpha('#3b82f6', 0.12),
+            color: '#2563eb',
+          }}
         />
       ),
     },
-    { field: 'notes', headerName: 'Notes', minWidth: 200, flex: 1.5 },
+    {
+      field: 'orders_per_year',
+      headerName: 'Orders/Year',
+      minWidth: 120,
+      flex: 1,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+    },
+    {
+      field: 'total_cost',
+      headerName: 'Total Cost ($)',
+      minWidth: 130,
+      flex: 1.1,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <Chip
+          label={`$${params.value.toLocaleString()}`}
+          size="small"
+          sx={{
+            fontWeight: 700,
+            bgcolor: alpha('#10b981', 0.12),
+            color: '#059669',
+          }}
+        />
+      ),
+    },
+    { field: 'notes', headerName: 'Notes / Recommendation', minWidth: 250, flex: 2 },
   ];
 
   return (

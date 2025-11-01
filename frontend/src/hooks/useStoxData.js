@@ -44,104 +44,108 @@ export const useStoxData = (queryKey, fetchFn, options = {}) => {
 
 /**
  * Hook for DC Demand Aggregation data
+ * ALIGNED DATA: Aggregates from stores and channels
+ * HIERARCHICAL: DC → Channels (Physical Stores, Amazon, Wholesale, D2C)
  */
 export const useDCDemandData = () => {
   return useStoxData('dc-demand-aggregation', () => {
-    const dcs = ['DC-East', 'DC-Midwest', 'DC-West'];
-    const products = ['MR_HAIR_101', 'MR_HAIR_102', 'MR_HAIR_103'];
-    const currentDate = '2025-01-11';
-    const isoWeek = '2025-W02';
+    const currentDate = '2025-10-27';
+    const isoWeek = '2025-W44';
+
+    // Multiple SKUs with DC demand data
+    const skuData = [
+      {
+        sku: 'MR_HAIR_101',
+        name: 'Premium Hair Color Kit',
+        dcs: {
+          'DC-East': {
+            total: 137,
+            channels: { 'Retail Stores': 82, 'Amazon': 27, 'Wholesale': 21, 'D2C': 7 },
+          },
+          'DC-Midwest': {
+            total: 107,
+            channels: { 'Retail Stores': 64, 'Amazon': 21, 'Wholesale': 16, 'D2C': 6 },
+          },
+          'DC-West': {
+            total: 95,
+            channels: { 'Retail Stores': 57, 'Amazon': 19, 'Wholesale': 14, 'D2C': 5 },
+          },
+        },
+      },
+      {
+        sku: 'MR_HAIR_201',
+        name: 'Root Touch-Up Spray',
+        dcs: {
+          'DC-East': {
+            total: 88,
+            channels: { 'Retail Stores': 53, 'Amazon': 18, 'Wholesale': 13, 'D2C': 4 },
+          },
+          'DC-Midwest': {
+            total: 72,
+            channels: { 'Retail Stores': 43, 'Amazon': 14, 'Wholesale': 11, 'D2C': 4 },
+          },
+          'DC-West': {
+            total: 65,
+            channels: { 'Retail Stores': 39, 'Amazon': 13, 'Wholesale': 10, 'D2C': 3 },
+          },
+        },
+      },
+      {
+        sku: 'MR_CARE_301',
+        name: 'Intensive Hair Mask',
+        dcs: {
+          'DC-East': {
+            total: 62,
+            channels: { 'Retail Stores': 37, 'Amazon': 12, 'Wholesale': 9, 'D2C': 4 },
+          },
+          'DC-Midwest': {
+            total: 54,
+            channels: { 'Retail Stores': 32, 'Amazon': 11, 'Wholesale': 8, 'D2C': 3 },
+          },
+        },
+      },
+    ];
 
     const aggregationData = [];
-    let idCounter = 1;
 
-    dcs.forEach((dc) => {
-      products.forEach((product) => {
-        // Step 1: Individual channel forecasts
-        const retailFcst = Math.round(400 + Math.random() * 200);
-        const amazonFcst = Math.round(250 + Math.random() * 200);
-        const wholesaleFcst = Math.round(100 + Math.random() * 100);
-        const d2cFcst = Math.round(80 + Math.random() * 50);
-
-        // Step 2: Daily DC Aggregation
-        const dailyForecastDC = retailFcst + amazonFcst + wholesaleFcst + d2cFcst;
-
-        // Channel variances (for statistical calculations)
-        const retailStdDev = Math.round(retailFcst * 0.15);
-        const amazonStdDev = Math.round(amazonFcst * 0.18);
-        const wholesaleStdDev = Math.round(wholesaleFcst * 0.12);
-        const d2cStdDev = Math.round(d2cFcst * 0.25);
-
-        // Step 3: Statistical measures
-        const rho = 0.3; // correlation coefficient
-
-        // Independent variance
-        const independentVar = Math.pow(retailStdDev, 2) + Math.pow(amazonStdDev, 2) +
-                              Math.pow(wholesaleStdDev, 2) + Math.pow(d2cStdDev, 2);
-
-        // Correlated variance
-        const correlationTerm = 2 * rho * (
-          retailStdDev * amazonStdDev + retailStdDev * wholesaleStdDev + retailStdDev * d2cStdDev +
-          amazonStdDev * wholesaleStdDev + amazonStdDev * d2cStdDev + wholesaleStdDev * d2cStdDev
-        );
-
-        const dailyStdDevDC = Math.round(Math.sqrt(independentVar + correlationTerm));
-        const weeklyMeanDC = dailyForecastDC * 7;
-        const weeklyStdDevDC = Math.round(dailyStdDevDC * Math.sqrt(7));
-
-        const numLocations = Math.round(15 + Math.random() * 35);
-        const variance = Math.round((Math.random() - 0.5) * 100);
-        const variancePct = ((Math.abs(variance) / dailyForecastDC) * 100).toFixed(1);
-
+    // Generate hierarchical data: DC × SKU → Channels
+    skuData.forEach((skuInfo) => {
+      Object.entries(skuInfo.dcs).forEach(([dcName, dcData]) => {
+        // Level 0: DC + SKU Parent Row (aggregated across all channels)
+        const dcId = `DC-${dcName}-${skuInfo.sku}`;
         aggregationData.push({
-          id: `DA${String(idCounter++).padStart(4, '0')}`,
+          id: dcId,
+          level: 0,
           date: currentDate,
           iso_week: isoWeek,
-          dc_location: dc,
-          product_sku: product,
+          dc_location: dcName,
+          product_sku: '', // Empty for aggregated view
+          product_name: skuInfo.name,
+          daily_forecast_dc: dcData.total,
+          weekly_mean_dc: dcData.total * 7,
+          weekly_stddev_dc: Math.round(dcData.total * 0.15 * Math.sqrt(7)),
+          num_channels: Object.keys(dcData.channels).length,
+          status: 'Aggregated',
+        });
 
-          // Aggregated DC data
-          daily_forecast_dc: dailyForecastDC,
-          weekly_mean_dc: weeklyMeanDC,
-          weekly_stddev_dc: weeklyStdDevDC,
-          num_locations: numLocations,
-          variance,
-          variance_pct: parseFloat(variancePct),
-          status: Math.abs(variance) < 50 ? 'Aligned' : parseFloat(variancePct) < 5 ? 'Good' : 'Review',
-
-          // Retail channel
-          retail_fcst: retailFcst,
-          retail_stddev: retailStdDev,
-          retail_weekly: retailFcst * 7,
-          retail_pct: ((retailFcst / dailyForecastDC) * 100).toFixed(1),
-          retail_trend: '+5%',
-          retail_trend_dir: 'up',
-
-          // Amazon channel
-          amazon_fcst: amazonFcst,
-          amazon_stddev: amazonStdDev,
-          amazon_weekly: amazonFcst * 7,
-          amazon_pct: ((amazonFcst / dailyForecastDC) * 100).toFixed(1),
-          amazon_trend: '0%',
-          amazon_trend_dir: 'flat',
-
-          // Wholesale channel
-          wholesale_fcst: wholesaleFcst,
-          wholesale_stddev: wholesaleStdDev,
-          wholesale_weekly: wholesaleFcst * 7,
-          wholesale_pct: ((wholesaleFcst / dailyForecastDC) * 100).toFixed(1),
-          wholesale_trend: '-2%',
-          wholesale_trend_dir: 'down',
-
-          // D2C channel
-          d2c_fcst: d2cFcst,
-          d2c_stddev: d2cStdDev,
-          d2c_weekly: d2cFcst * 7,
-          d2c_pct: ((d2cFcst / dailyForecastDC) * 100).toFixed(1),
-          d2c_trend: '+8%',
-          d2c_trend_dir: 'up',
-
-          correlation_rho: rho,
+        // Level 1: Channel Child Rows (specific SKU)
+        Object.entries(dcData.channels).forEach(([channelName, channelForecast]) => {
+          const channelId = `${dcId}-${channelName.replace(/\s+/g, '-')}`;
+          aggregationData.push({
+            id: channelId,
+            parentId: dcId,
+            level: 1,
+            date: currentDate,
+            iso_week: isoWeek,
+            dc_location: channelName,
+            product_sku: skuInfo.sku,
+            product_name: skuInfo.name,
+            daily_forecast_dc: channelForecast,
+            weekly_mean_dc: channelForecast * 7,
+            weekly_stddev_dc: Math.round(channelForecast * 0.15 * Math.sqrt(7)),
+            contribution_pct: ((channelForecast / dcData.total) * 100).toFixed(1),
+            status: 'Channel',
+          });
         });
       });
     });
@@ -152,49 +156,184 @@ export const useDCDemandData = () => {
 
 /**
  * Hook for DC Health Monitor data
+ * ALIGNED DATA: Aggregates from 12 stores (6 per DC) matching StoreHealthMonitor
  */
 export const useDCHealthData = () => {
   return useStoxData('dc-health-monitor', () => {
-    const healthData = [];
-    const products = [
-      { name: 'Conditioner 250 ml', sku: 'MR_HAIR_101' },
-      { name: 'Shampoo 500 ml', sku: 'MR_HAIR_201' },
-      { name: 'Hair Serum 100 ml', sku: 'MR_HAIR_301' },
-      { name: 'Leave-In Treatment', sku: 'MR_HAIR_401' },
-      { name: 'Root Touch-Up Kit', sku: 'MR_COLOR_501' },
+    // Aggregated data from StoreHealthMonitor (12 stores → 3 DCs, 3 SKUs)
+    const healthData = [
+      // MR_HAIR_101 - Premium Hair Color Kit
+      {
+        id: 'DH0001',
+        dc_location: 'DC-East',
+        product_sku: 'MR_HAIR_101',
+        product_name: 'Premium Hair Color Kit',
+        channels: 'All Channels',
+        weekly_mu: 959,
+        sigma: 13.7,
+        safety_stock: 147,
+        rop: 2065,
+        target: 1022,
+        on_hand: 920,
+        on_order: 115,
+        allocated: 45,
+        available: 990,
+        health_pct: 0.97,
+        status: '🟢 Normal - Well Stocked',
+        requirement_qty: 0,
+        freight_util: 0.78,
+        action: 'Monitor - inventory healthy across network',
+      },
+      {
+        id: 'DH0002',
+        dc_location: 'DC-Midwest',
+        product_sku: 'MR_HAIR_101',
+        product_name: 'Premium Hair Color Kit',
+        channels: 'All Channels',
+        weekly_mu: 749,
+        sigma: 11.2,
+        safety_stock: 120,
+        rop: 1618,
+        target: 835,
+        on_hand: 820,
+        on_order: 115,
+        allocated: 48,
+        available: 887,
+        health_pct: 1.06,
+        status: '🟢 Normal - Overstocked',
+        requirement_qty: 0,
+        freight_util: 0.82,
+        action: 'Reduce inbound orders - inventory above target',
+      },
+      {
+        id: 'DH0003',
+        dc_location: 'DC-West',
+        product_sku: 'MR_HAIR_101',
+        product_name: 'Premium Hair Color Kit',
+        channels: 'All Channels',
+        weekly_mu: 665,
+        sigma: 10.1,
+        safety_stock: 98,
+        rop: 1428,
+        target: 720,
+        on_hand: 680,
+        on_order: 85,
+        allocated: 38,
+        available: 727,
+        health_pct: 1.01,
+        status: '🟢 Normal - Well Stocked',
+        requirement_qty: 0,
+        freight_util: 0.75,
+        action: 'Monitor - inventory adequate',
+      },
+      // MR_HAIR_201 - Root Touch-Up Spray
+      {
+        id: 'DH0004',
+        dc_location: 'DC-East',
+        product_sku: 'MR_HAIR_201',
+        product_name: 'Root Touch-Up Spray',
+        channels: 'All Channels',
+        weekly_mu: 616,
+        sigma: 9.8,
+        safety_stock: 95,
+        rop: 1327,
+        target: 680,
+        on_hand: 520,
+        on_order: 200,
+        allocated: 32,
+        available: 688,
+        health_pct: 1.01,
+        status: '🟢 Normal - Well Stocked',
+        requirement_qty: 0,
+        freight_util: 0.81,
+        action: 'Monitor - strong inbound pipeline',
+      },
+      {
+        id: 'DH0005',
+        dc_location: 'DC-Midwest',
+        product_sku: 'MR_HAIR_201',
+        product_name: 'Root Touch-Up Spray',
+        channels: 'All Channels',
+        weekly_mu: 504,
+        sigma: 8.2,
+        safety_stock: 78,
+        rop: 1086,
+        target: 560,
+        on_hand: 445,
+        on_order: 150,
+        allocated: 28,
+        available: 567,
+        health_pct: 1.01,
+        status: '🟢 Normal - Well Stocked',
+        requirement_qty: 0,
+        freight_util: 0.79,
+        action: 'Monitor - inventory adequate',
+      },
+      {
+        id: 'DH0006',
+        dc_location: 'DC-West',
+        product_sku: 'MR_HAIR_201',
+        product_name: 'Root Touch-Up Spray',
+        channels: 'All Channels',
+        weekly_mu: 455,
+        sigma: 7.5,
+        safety_stock: 68,
+        rop: 978,
+        target: 495,
+        on_hand: 420,
+        on_order: 120,
+        allocated: 24,
+        available: 516,
+        health_pct: 1.04,
+        status: '🟢 Normal - Well Stocked',
+        requirement_qty: 0,
+        freight_util: 0.77,
+        action: 'Monitor - inventory adequate',
+      },
+      // MR_CARE_301 - Intensive Hair Mask
+      {
+        id: 'DH0007',
+        dc_location: 'DC-East',
+        product_sku: 'MR_CARE_301',
+        product_name: 'Intensive Hair Mask',
+        channels: 'All Channels',
+        weekly_mu: 434,
+        sigma: 7.2,
+        safety_stock: 65,
+        rop: 933,
+        target: 465,
+        on_hand: 380,
+        on_order: 150,
+        allocated: 22,
+        available: 508,
+        health_pct: 1.09,
+        status: '🟢 Normal - Well Stocked',
+        requirement_qty: 0,
+        freight_util: 0.83,
+        action: 'Monitor - strong position',
+      },
+      {
+        id: 'DH0008',
+        dc_location: 'DC-Midwest',
+        product_sku: 'MR_CARE_301',
+        product_name: 'Intensive Hair Mask',
+        channels: 'All Channels',
+        weekly_mu: 378,
+        sigma: 6.4,
+        safety_stock: 55,
+        rop: 811,
+        target: 410,
+        on_hand: 320,
+        on_order: 100,
+        allocated: 18,
+        available: 402,
+        health_pct: 0.98,
+        status: '🟢 Normal - Well Stocked',
+        requirement_qty: 0,
+        freight_util: 0.76,
+        action: 'Monitor - inventory adequate',
+      },
     ];
-
-    const dcs = ['DC-East', 'DC-West', 'DC-Central', 'DC-South'];
-    let idCounter = 1;
-
-    products.forEach((product) => {
-      dcs.forEach((dc) => {
-        const weeklyMU = Math.floor(Math.random() * 800) + 200;
-        const safetyStock = Math.floor(weeklyMU * 0.15);
-        const rop = Math.floor(weeklyMU * 2 + safetyStock);
-        const target = Math.floor(weeklyMU * 1.1);
-        const onHand = Math.floor(Math.random() * 1500) + 500;
-        const available = onHand - Math.floor(Math.random() * 200);
-        const healthPct = Math.min(1, available / target);
-        const channels = `Retail Stores (${Math.floor(Math.random() * 10) + 3} stores)`;
-
-        healthData.push({
-          id: `DH${String(idCounter++).padStart(4, '0')}`,
-          dc_location: dc,
-          product_sku: product.sku,
-          product_name: product.name,
-          channels: channels,
-          weekly_mu: weeklyMU,
-          safety_stock: safetyStock,
-          rop: rop,
-          target: target,
-          on_hand: onHand,
-          available: available,
-          health_pct: healthPct,
-          status: healthPct >= 0.9 ? '🟢 Healthy' : healthPct >= 0.7 ? '🟡 Monitor' : '🔴 Critical',
-        });
-      });
-    });
 
     return healthData;
   });
@@ -202,58 +341,128 @@ export const useDCHealthData = () => {
 
 /**
  * Hook for DC Supplier Execution data
+ * HIERARCHICAL: Supplier → Source Type → Components
  */
 export const useDCSupplierData = () => {
   return useStoxData('dc-supplier-execution', () => {
     const executionData = [];
-    const components = [
-      { name: 'Conditioner 250 ml', sku: 'MR_HAIR_101', unitCost: 3 },
-      { name: 'Shampoo 500 ml', sku: 'MR_HAIR_201', unitCost: 4 },
-      { name: 'Hair Serum 100 ml', sku: 'MR_HAIR_301', unitCost: 8 },
-      { name: 'Leave-In Treatment', sku: 'MR_HAIR_401', unitCost: 6 },
-      { name: 'Root Touch-Up Kit', sku: 'MR_COLOR_501', unitCost: 12 },
-    ];
 
-    const dcs = ['DC-East', 'DC-West', 'DC-Central', 'DC-South'];
-    const suppliers = ['Vendor A', 'Vendor B', 'Vendor C'];
-    const modes = ['Sea', 'Air', 'Ground'];
-    let idCounter = 1;
+    // Define suppliers with source types and components
+    const supplierData = {
+      'XYZ Corp': {
+        sourceTypes: {
+          'Buy': [
+            { name: 'Conditioner 250 ml', sku: 'MR_HAIR_101', unitCost: 3, netReq: 2500, leadTime: 14 },
+            { name: 'Shampoo 500 ml', sku: 'MR_HAIR_201', unitCost: 4, netReq: 3200, leadTime: 12 },
+          ],
+          'Make': [
+            { name: 'Hair Serum 100 ml', sku: 'MR_HAIR_301', unitCost: 8, netReq: 1800, leadTime: 10 },
+          ],
+        },
+      },
+      'ABC Industries': {
+        sourceTypes: {
+          'Buy': [
+            { name: 'Leave-In Treatment', sku: 'MR_HAIR_401', unitCost: 6, netReq: 2100, leadTime: 15 },
+            { name: 'Root Touch-Up Kit', sku: 'MR_COLOR_501', unitCost: 12, netReq: 1500, leadTime: 18 },
+          ],
+          'Transfer': [
+            { name: 'Box Packaging', sku: 'MR_PKG_001', unitCost: 2, netReq: 4500, leadTime: 7 },
+          ],
+        },
+      },
+      'Global Chem Co': {
+        sourceTypes: {
+          'Buy': [
+            { name: 'Color Base Formula', sku: 'MR_CHEM_001', unitCost: 15, netReq: 1200, leadTime: 20 },
+            { name: 'Developer Solution', sku: 'MR_CHEM_002', unitCost: 10, netReq: 1800, leadTime: 16 },
+          ],
+        },
+      },
+    };
 
-    components.forEach((component) => {
-      dcs.forEach((dc) => {
-        const netReq = Math.floor(Math.random() * 3000) + 1000;
-        const lotSize = Math.ceil(netReq / 100) * 100 + Math.floor(Math.random() * 500);
-        const leadTimeDays = Math.floor(Math.random() * 10) + 7;
-        const supplier = suppliers[Math.floor(Math.random() * suppliers.length)];
-        const onTimePct = 0.7 + Math.random() * 0.3;
-        const mode = modes[Math.floor(Math.random() * modes.length)];
-        const orderValue = lotSize * component.unitCost;
-        const freightUtil = 0.7 + Math.random() * 0.3;
+    // Generate hierarchical data
+    Object.entries(supplierData).forEach(([supplierName, supplierInfo]) => {
+      // Calculate supplier-level aggregates
+      let supplierNetReq = 0;
+      let supplierOrderValue = 0;
+      let supplierAvgLeadTime = 0;
+      let componentCount = 0;
 
-        const releaseDate = new Date(Date.now() + Math.random() * 7 * 24 * 60 * 60 * 1000);
-        const needDate = new Date(releaseDate.getTime() + leadTimeDays * 24 * 60 * 60 * 1000);
+      Object.entries(supplierInfo.sourceTypes).forEach(([sourceType, components]) => {
+        components.forEach(comp => {
+          supplierNetReq += comp.netReq;
+          supplierOrderValue += comp.netReq * comp.unitCost;
+          supplierAvgLeadTime += comp.leadTime;
+          componentCount++;
+        });
+      });
 
-        const status = onTimePct >= 0.9 ? '🟢 Normal' : onTimePct >= 0.8 ? '🟡 Watch' : '🔴 Risk';
+      supplierAvgLeadTime = Math.round(supplierAvgLeadTime / componentCount);
+
+      // Level 0: Supplier Parent Row
+      const supplierId = `SUPP-${supplierName.replace(/\s+/g, '-')}`;
+      executionData.push({
+        id: supplierId,
+        level: 0,
+        component: supplierName,
+        supplier: supplierName,
+        net_req: supplierNetReq,
+        lot_size: supplierNetReq,
+        lead_time_days: supplierAvgLeadTime,
+        release_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        need_date: new Date(Date.now() + (5 + supplierAvgLeadTime) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        order_value: supplierOrderValue,
+        freight_util: 0.85,
+        status: `${Object.keys(supplierInfo.sourceTypes).length} types`,
+        action: `${componentCount} components`,
+      });
+
+      // Level 1: Source Type Child Rows
+      Object.entries(supplierInfo.sourceTypes).forEach(([sourceType, components]) => {
+        const sourceTypeId = `${supplierId}-${sourceType}`;
+        const sourceNetReq = components.reduce((sum, c) => sum + c.netReq, 0);
+        const sourceOrderValue = components.reduce((sum, c) => sum + (c.netReq * c.unitCost), 0);
+        const sourceAvgLeadTime = Math.round(components.reduce((sum, c) => sum + c.leadTime, 0) / components.length);
 
         executionData.push({
-          id: `SE${String(idCounter++).padStart(4, '0')}`,
-          component: component.name,
-          sku: component.sku,
-          dc: dc,
-          net_req: netReq,
-          lot_size: lotSize,
-          lead_time_days: leadTimeDays,
-          source_type: 'Buy',
-          supplier: supplier,
-          on_time_pct: onTimePct,
-          mode: mode,
-          release_date: releaseDate.toISOString().split('T')[0],
-          need_date: needDate.toISOString().split('T')[0],
-          unit_cost: component.unitCost,
-          order_value: orderValue,
-          freight_util: freightUtil,
-          status: status,
-          action: 'Generate Purchase Requirement',
+          id: sourceTypeId,
+          parentId: supplierId,
+          level: 1,
+          component: `${sourceType} Orders`,
+          supplier: supplierName,
+          net_req: sourceNetReq,
+          lot_size: sourceNetReq,
+          lead_time_days: sourceAvgLeadTime,
+          release_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          need_date: new Date(Date.now() + (3 + sourceAvgLeadTime) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          order_value: sourceOrderValue,
+          freight_util: 0.80,
+          status: sourceType,
+          action: `${components.length} items`,
+        });
+
+        // Level 2: Component Grandchild Rows
+        components.forEach((component) => {
+          const lotSize = Math.ceil(component.netReq / 100) * 100;
+          const orderValue = lotSize * component.unitCost;
+
+          executionData.push({
+            id: `${sourceTypeId}-${component.sku}`,
+            parentId: sourceTypeId,
+            level: 2,
+            component: component.name,
+            supplier: supplierName,
+            net_req: component.netReq,
+            lot_size: lotSize,
+            lead_time_days: component.leadTime,
+            release_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            need_date: new Date(Date.now() + (2 + component.leadTime) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            order_value: orderValue,
+            freight_util: 0.75 + Math.random() * 0.2,
+            status: '🟢 Ready',
+            action: 'Generate PO',
+          });
         });
       });
     });

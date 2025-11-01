@@ -2,49 +2,167 @@ import React, { useState, useMemo } from 'react';
 import {
   Box, Paper, Typography, Grid, Card, CardContent, Chip, Button, Breadcrumbs, Link, Stack, IconButton, Tooltip, alpha,
 } from '@mui/material';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { GridToolbar } from '@mui/x-data-grid';
 import {
   LocalShipping, Refresh, NavigateNext as NavigateNextIcon, ArrowBack as ArrowBackIcon, Download, ShoppingCart, Build, SwapHoriz, AttachMoney,
 } from '@mui/icons-material';
 import stoxTheme from './stoxTheme';
 import { useDCSupplierData } from '../../hooks/useStoxData';
+import TreeDataGrid from './TreeDataGrid';
 
 const DCSupplierExecution = ({ onBack }) => {
   // Use persistent data hook
   const { data, loading, refetch } = useDCSupplierData();
 
-  // Calculate metrics from data
+  // Calculate metrics from supplier-level (parent) data only
   const metrics = useMemo(() => {
     if (!data || data.length === 0) return null;
 
+    const supplierRows = data.filter(row => row.level === 0);
+    const componentRows = data.filter(row => row.level === 2);
+
     return {
-      totalOrders: data.length,
-      buyOrders: data.filter(d => d.source_type === 'Buy').length,
-      makeOrders: data.filter(d => d.source_type === 'Make').length,
-      transferOrders: data.filter(d => d.source_type === 'Transfer').length,
-      totalOrderValue: data.reduce((sum, row) => sum + row.order_value, 0),
-      avgFreightUtil: ((data.reduce((sum, row) => sum + row.freight_util, 0) / data.length) * 100).toFixed(1),
+      totalOrders: supplierRows.length,
+      buyOrders: componentRows.filter(d => d.status.includes('Ready')).length,
+      makeOrders: data.filter(d => d.status === 'Make').length,
+      transferOrders: data.filter(d => d.status === 'Transfer').length,
+      totalOrderValue: supplierRows.reduce((sum, row) => sum + row.order_value, 0),
+      avgFreightUtil: ((supplierRows.reduce((sum, row) => sum + row.freight_util, 0) / supplierRows.length) * 100).toFixed(1),
     };
   }, [data]);
 
   const columns = [
-    { field: 'id', headerName: 'ID', minWidth: 100, flex: 0.8 },
-    { field: 'component', headerName: 'Component / SKU', minWidth: 160, flex: 1.3 },
-    { field: 'dc', headerName: 'DC', minWidth: 110, flex: 0.9, align: 'center', headerAlign: 'center' },
-    { field: 'source_type', headerName: 'Source Type', minWidth: 120, flex: 1, align: 'center', headerAlign: 'center' },
-    { field: 'supplier', headerName: 'Supplier / Plant / DC', minWidth: 180, flex: 1.4 },
-    { field: 'net_req', headerName: 'Net Req', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'lot_size', headerName: 'Lot Size', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'lead_time_days', headerName: 'Lead Time (days)', minWidth: 130, flex: 1, type: 'number', align: 'center', headerAlign: 'center' },
-    { field: 'on_time_pct', headerName: 'On-Time %', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `${(params.value * 100).toFixed(0)}%` },
-    { field: 'mode', headerName: 'Mode', minWidth: 100, flex: 0.8, align: 'center', headerAlign: 'center' },
-    { field: 'release_date', headerName: 'Release Date', minWidth: 120, flex: 1, align: 'center', headerAlign: 'center' },
-    { field: 'need_date', headerName: 'Need Date', minWidth: 120, flex: 1, align: 'center', headerAlign: 'center' },
-    { field: 'unit_cost', headerName: 'Unit Cost ($)', minWidth: 120, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `$${params.value}` },
-    { field: 'order_value', headerName: 'Order Value ($)', minWidth: 130, flex: 1, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `$${params.value?.toLocaleString()}` },
-    { field: 'freight_util', headerName: 'Freight Util %', minWidth: 120, flex: 1, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `${(params.value * 100).toFixed(0)}%` },
-    { field: 'status', headerName: 'Status', minWidth: 130, flex: 1.1, align: 'center', headerAlign: 'center' },
-    { field: 'action', headerName: 'Action / Recommendation', minWidth: 220, flex: 1.7 },
+    {
+      field: 'id',
+      headerName: 'ID',
+      minWidth: 100,
+      flex: 0.8,
+      renderCell: (params) => (
+        <Chip
+          label={params.value}
+          size="small"
+          sx={{
+            bgcolor: alpha('#475569', 0.12),
+            color: '#475569',
+            fontWeight: 700,
+            fontSize: '0.75rem',
+          }}
+        />
+      ),
+    },
+    { field: 'component', headerName: 'Supplier / Component', minWidth: 200, flex: 1.5 },
+    { field: 'supplier', headerName: 'Supplier Name', minWidth: 150, flex: 1.2 },
+    {
+      field: 'net_req',
+      headerName: 'Net Requirement',
+      minWidth: 130,
+      flex: 1,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      valueFormatter: (params) => params.value?.toLocaleString()
+    },
+    {
+      field: 'lot_size',
+      headerName: 'Lot Size',
+      minWidth: 110,
+      flex: 0.9,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      valueFormatter: (params) => params.value?.toLocaleString()
+    },
+    {
+      field: 'lead_time_days',
+      headerName: 'Lead Time (days)',
+      minWidth: 130,
+      flex: 1,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center'
+    },
+    {
+      field: 'release_date',
+      headerName: 'Release Date',
+      minWidth: 120,
+      flex: 1,
+      align: 'center',
+      headerAlign: 'center'
+    },
+    {
+      field: 'need_date',
+      headerName: 'Need Date',
+      minWidth: 120,
+      flex: 1,
+      align: 'center',
+      headerAlign: 'center'
+    },
+    {
+      field: 'order_value',
+      headerName: 'Order Value ($)',
+      minWidth: 130,
+      flex: 1,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <Chip
+          label={`$${params.value?.toLocaleString()}`}
+          size="small"
+          sx={{ fontWeight: 700, bgcolor: alpha('#10b981', 0.12), color: '#059669' }}
+        />
+      ),
+    },
+    {
+      field: 'freight_util',
+      headerName: 'Freight Util %',
+      minWidth: 120,
+      flex: 1,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      valueFormatter: (params) => `${(params.value * 100).toFixed(0)}%`
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      minWidth: 120,
+      flex: 1,
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <Chip
+          label={params.value}
+          size="small"
+          color={params.value?.includes('Ready') ? 'success' : 'default'}
+        />
+      ),
+    },
+    {
+      field: 'action',
+      headerName: 'Action',
+      minWidth: 150,
+      flex: 1.2,
+      renderCell: (params) => {
+        if (params.row.level === 2 && params.value === 'Generate PO') {
+          return (
+            <Button
+              size="small"
+              variant="contained"
+              color="primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                alert(`Generating PO for: ${params.row.component}`);
+              }}
+              sx={{ fontSize: '0.75rem', py: 0.5 }}
+            >
+              Generate PO
+            </Button>
+          );
+        }
+        return <Typography variant="caption">{params.value}</Typography>;
+      },
+    },
   ];
 
   return (
@@ -124,17 +242,15 @@ const DCSupplierExecution = ({ onBack }) => {
 
 
       <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0, width: '100%' }}>
-        <DataGrid
+        <TreeDataGrid
           rows={data}
           columns={columns}
           loading={loading}
           density="compact"
           slots={{ toolbar: GridToolbar }}
           slotProps={{ toolbar: { showQuickFilter: true, quickFilterProps: { debounceMs: 500 } } }}
-          initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
-          pageSizeOptions={[10, 25, 50, 100]}
-          checkboxSelection
-          disableRowSelectionOnClick
+          initialState={{ pagination: { paginationModel: { pageSize: 50 } } }}
+          pageSizeOptions={[25, 50, 100, 200]}
           sx={stoxTheme.getDataGridSx()}
         />
       </Paper>

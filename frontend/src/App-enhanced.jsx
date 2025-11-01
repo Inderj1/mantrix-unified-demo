@@ -87,6 +87,7 @@ import ComponentConsolidation from './components/stox/ComponentConsolidation.jsx
 import StoreDeployment from './components/stox/StoreDeployment.jsx';
 import ExecutiveCommandCenter from './components/stox/ExecutiveCommandCenter.jsx';
 import ScenarioPlanner from './components/stox/ScenarioPlanner.jsx';
+import Tile0ForecastSimulation from './components/stox/Tile0ForecastSimulation.jsx';
 import StoreForecast from './components/stox/StoreForecast.jsx';
 import StoreHealthMonitor from './components/stox/StoreHealthMonitor.jsx';
 import StoreOptimization from './components/stox/StoreOptimization.jsx';
@@ -98,6 +99,7 @@ import DCOptimization from './components/stox/DCOptimization.jsx';
 import DCBOM from './components/stox/DCBOM.jsx';
 import DCLotSize from './components/stox/DCLotSize.jsx';
 import DCSupplierExecution from './components/stox/DCSupplierExecution.jsx';
+import DCFinancialImpact from './components/stox/DCFinancialImpact.jsx';
 import ModuleTilesView from './components/stox/ModuleTilesView.jsx';
 import FioriTileDetail from './components/stox/FioriTileDetail.jsx';
 import GlobalSearch from './components/GlobalSearch';
@@ -569,9 +571,23 @@ function App() {
                   overflow: 'auto',
                   width: '100%'
                 }}>
-                  {stoxView === 'landing' && (
+                  {(stoxView === 'landing' || stoxView === 'store-modules' || stoxView === 'dc-modules') && (
                     <StoxAILanding
-                      onBack={() => setCoreAIView('landing')}
+                      onBack={() => {
+                        if (stoxView === 'store-modules' || stoxView === 'dc-modules') {
+                          setStoxView('landing');
+                        } else {
+                          setCoreAIView('landing');
+                        }
+                      }}
+                      onCategorySelect={(category) => {
+                        if (category === 'store') {
+                          setStoxView('store-modules');
+                        } else if (category === 'dc') {
+                          setStoxView('dc-modules');
+                        }
+                      }}
+                      initialView={stoxView === 'store-modules' ? 'store' : stoxView === 'dc-modules' ? 'dc' : null}
                       onTileClick={(moduleId) => {
                         console.log('STOX tile clicked in App-enhanced, moduleId:', moduleId);
                         console.log('Current stoxView:', stoxView);
@@ -665,39 +681,45 @@ function App() {
                     <ScenarioPlanner onBack={() => setStoxView('landing')} />
                   )}
                   {/* New Store System Modules */}
+                  {stoxView === 'tile0-forecast-simulation' && (
+                    <Tile0ForecastSimulation onBack={() => setStoxView('store-modules')} />
+                  )}
                   {stoxView === 'store-forecasting' && (
-                    <StoreForecast onBack={() => setStoxView('landing')} />
+                    <StoreForecast onBack={() => setStoxView('store-modules')} />
                   )}
                   {stoxView === 'store-health-monitor' && (
-                    <StoreHealthMonitor onBack={() => setStoxView('landing')} />
+                    <StoreHealthMonitor onBack={() => setStoxView('store-modules')} />
                   )}
                   {stoxView === 'store-optimization' && (
-                    <StoreOptimization onBack={() => setStoxView('landing')} />
+                    <StoreOptimization onBack={() => setStoxView('store-modules')} />
                   )}
                   {stoxView === 'store-replenishment' && (
-                    <StoreReplenishment onBack={() => setStoxView('landing')} />
+                    <StoreReplenishment onBack={() => setStoxView('store-modules')} />
                   )}
                   {stoxView === 'store-financial-impact' && (
-                    <StoreFinancialImpact onBack={() => setStoxView('landing')} />
+                    <StoreFinancialImpact onBack={() => setStoxView('store-modules')} />
                   )}
                   {/* DC System Modules */}
                   {stoxView === 'dc-demand-aggregation' && (
-                    <DCDemandAggregation onBack={() => setStoxView('landing')} />
+                    <DCDemandAggregation onBack={() => setStoxView('dc-modules')} />
                   )}
                   {stoxView === 'dc-health-monitor' && (
-                    <DCHealthMonitor onBack={() => setStoxView('landing')} />
+                    <DCHealthMonitor onBack={() => setStoxView('dc-modules')} />
                   )}
                   {stoxView === 'dc-optimization' && (
-                    <DCOptimization onBack={() => setStoxView('landing')} />
+                    <DCOptimization onBack={() => setStoxView('dc-modules')} />
                   )}
                   {stoxView === 'dc-bom' && (
-                    <DCBOM onBack={() => setStoxView('landing')} />
+                    <DCBOM onBack={() => setStoxView('dc-modules')} />
                   )}
                   {stoxView === 'dc-lot-size' && (
-                    <DCLotSize onBack={() => setStoxView('landing')} />
+                    <DCLotSize onBack={() => setStoxView('dc-modules')} />
                   )}
                   {stoxView === 'dc-supplier-exec' && (
-                    <DCSupplierExecution onBack={() => setStoxView('landing')} />
+                    <DCSupplierExecution onBack={() => setStoxView('dc-modules')} />
+                  )}
+                  {stoxView === 'dc-financial-impact' && (
+                    <DCFinancialImpact onBack={() => setStoxView('dc-modules')} />
                   )}
                   {/* PRD Module Tiles Views */}
                   {['demand-flow', 'demand-forecasting', 'outbound-replenishment', 'dc-inventory', 'supply-planning', 'bom-explosion', 'component-consolidation', 'analytics-whatif'].includes(stoxView) && !currentFioriTile && (

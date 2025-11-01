@@ -72,19 +72,76 @@ const DCOptimization = ({ onBack }) => {
     { field: 'id', headerName: 'ID', minWidth: 100, flex: 0.8 },
     { field: 'dc_location', headerName: 'DC', minWidth: 120, flex: 0.9, align: 'center', headerAlign: 'center' },
     { field: 'product_sku', headerName: 'SKU', minWidth: 120, flex: 1, align: 'center', headerAlign: 'center' },
-    { field: 'channels', headerName: 'Channels (Aggregated)', minWidth: 220, flex: 1.5 },
-    { field: 'weekly_mu', headerName: 'μDC (Weekly)', minWidth: 120, flex: 1, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'sigma', headerName: 'σDC', minWidth: 90, flex: 0.8, type: 'number', align: 'center', headerAlign: 'center' },
-    { field: 'lead_time_weeks', headerName: 'L (Weeks)', minWidth: 100, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center' },
-    { field: 'sigma_l', headerName: 'σL', minWidth: 80, flex: 0.7, type: 'number', align: 'center', headerAlign: 'center' },
-    { field: 'service_level', headerName: 'Service Level', minWidth: 120, flex: 1, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `${(params.value * 100).toFixed(0)}%` },
-    { field: 'z_score', headerName: 'z', minWidth: 80, flex: 0.7, type: 'number', align: 'center', headerAlign: 'center' },
-    { field: 'supplier_ontime', headerName: 'Supplier On-Time Rate', minWidth: 150, flex: 1.2, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `${(params.value * 100).toFixed(0)}%` },
-    { field: 'beta', headerName: 'β', minWidth: 80, flex: 0.7, type: 'number', align: 'center', headerAlign: 'center' },
-    { field: 'base_ss', headerName: 'Base SSDC', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'adjusted_ss', headerName: 'Adjusted SSDCadj', minWidth: 140, flex: 1.1, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'rop', headerName: 'Reorder Point (ROP)', minWidth: 150, flex: 1.2, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'target_inventory', headerName: 'Target Inventory', minWidth: 140, flex: 1.1, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'channels', headerName: 'Channels', minWidth: 180, flex: 1.4 },
+    {
+      field: 'lead_time_weeks',
+      headerName: 'Lead Time (Weeks)',
+      minWidth: 140,
+      flex: 1.1,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+    },
+    {
+      field: 'service_level',
+      headerName: 'Service Level',
+      minWidth: 130,
+      flex: 1,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <Chip
+          label={`${(params.value * 100).toFixed(0)}%`}
+          size="small"
+          sx={{
+            fontWeight: 700,
+            bgcolor: alpha('#10b981', 0.12),
+            color: '#059669',
+          }}
+        />
+      ),
+    },
+    {
+      field: 'adjusted_ss',
+      headerName: 'Safety Stock',
+      minWidth: 130,
+      flex: 1,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <Chip
+          label={params.value?.toLocaleString()}
+          size="small"
+          sx={{
+            fontWeight: 700,
+            bgcolor: alpha('#3b82f6', 0.12),
+            color: '#2563eb',
+          }}
+        />
+      ),
+    },
+    {
+      field: 'rop',
+      headerName: 'ROP',
+      minWidth: 120,
+      flex: 1,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      valueFormatter: (params) => params.value?.toLocaleString(),
+    },
+    {
+      field: 'target_inventory',
+      headerName: 'Target',
+      minWidth: 120,
+      flex: 1,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      valueFormatter: (params) => params.value?.toLocaleString(),
+    },
   ];
 
   return (

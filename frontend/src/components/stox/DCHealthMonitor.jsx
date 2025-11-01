@@ -47,21 +47,63 @@ const DCHealthMonitor = ({ onBack }) => {
     { field: 'id', headerName: 'ID', minWidth: 100, flex: 0.8 },
     { field: 'dc_location', headerName: 'DC', minWidth: 120, flex: 0.9, align: 'center', headerAlign: 'center' },
     { field: 'product_sku', headerName: 'SKU', minWidth: 120, flex: 1, align: 'center', headerAlign: 'center' },
-    { field: 'channels', headerName: 'Channels Aggregated', minWidth: 200, flex: 1.5 },
-    { field: 'weekly_mu', headerName: 'μ (Weekly)', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'sigma', headerName: 'σ', minWidth: 80, flex: 0.7, type: 'number', align: 'center', headerAlign: 'center' },
-    { field: 'safety_stock', headerName: 'Safety Stock', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'rop', headerName: 'ROP', minWidth: 100, flex: 0.8, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'target', headerName: 'Target Inventory', minWidth: 130, flex: 1, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'on_hand', headerName: 'On-Hand', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'on_order', headerName: 'On-Order', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'allocated', headerName: 'Allocated', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'available', headerName: 'Available', minWidth: 110, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
+    { field: 'product_name', headerName: 'Product', minWidth: 180, flex: 1.4 },
+    { field: 'channels', headerName: 'Channels', minWidth: 140, flex: 1.1 },
+    {
+      field: 'target',
+      headerName: 'Target',
+      minWidth: 110,
+      flex: 0.9,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      valueFormatter: (params) => params.value?.toLocaleString(),
+    },
+    {
+      field: 'on_hand',
+      headerName: 'On-Hand',
+      minWidth: 110,
+      flex: 0.9,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      valueFormatter: (params) => params.value?.toLocaleString(),
+    },
+    {
+      field: 'on_order',
+      headerName: 'On-Order',
+      minWidth: 110,
+      flex: 0.9,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      valueFormatter: (params) => params.value?.toLocaleString(),
+    },
+    {
+      field: 'available',
+      headerName: 'Available',
+      minWidth: 110,
+      flex: 0.9,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <Chip
+          label={params.value?.toLocaleString()}
+          size="small"
+          sx={{
+            fontWeight: 700,
+            bgcolor: alpha('#3b82f6', 0.12),
+            color: '#2563eb',
+          }}
+        />
+      ),
+    },
     {
       field: 'health_pct',
       headerName: 'Health %',
-      minWidth: 120,
-      flex: 1,
+      minWidth: 130,
+      flex: 1.1,
       type: 'number',
       align: 'center',
       headerAlign: 'center',
@@ -77,8 +119,8 @@ const DCHealthMonitor = ({ onBack }) => {
     {
       field: 'status',
       headerName: 'Status',
-      minWidth: 120,
-      flex: 1,
+      minWidth: 160,
+      flex: 1.3,
       align: 'center',
       headerAlign: 'center',
       renderCell: (params) => (
@@ -90,8 +132,6 @@ const DCHealthMonitor = ({ onBack }) => {
         </Stack>
       ),
     },
-    { field: 'requirement_qty', headerName: 'Requirement Qty', minWidth: 130, flex: 1, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toLocaleString() },
-    { field: 'freight_util', headerName: 'Freight Util %', minWidth: 120, flex: 1, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `${(params.value * 100).toFixed(0)}%` },
     { field: 'action', headerName: 'Action / Recommendation', minWidth: 250, flex: 2 },
   ];
 

@@ -34,6 +34,7 @@ import {
   Factory as FactoryIcon,
   Warehouse as WarehouseIcon,
   Analytics as AnalyticsIcon,
+  Science as ScienceIcon,
 } from '@mui/icons-material';
 
 const dcSystemModules = [
@@ -115,83 +116,96 @@ const dcSystemModules = [
     gradient: 'linear-gradient(135deg, #020617 0%, #000000 100%)',
     view: 'dc'
   },
+  {
+    id: 'dc-financial-impact',
+    title: 'Financial Impact',
+    subtitle: 'DC Module 7',
+    description: 'Distribution center financial impact analysis with inventory carrying costs and network optimization opportunities',
+    icon: AnalyticsIcon,
+    color: '#64748b',
+    bgColor: '#f1f5f9',
+    stats: { label: 'Savings', value: '$24M' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
+    view: 'dc'
+  },
 ];
 
 const storeSystemModules = [
   {
+    id: 'tile0-forecast-simulation',
+    title: 'Forecast Simulation',
+    subtitle: 'Tile 0',
+    description: 'Compare AI models (ARIMA, ETS, ML), override forecasts, and confirm baseline for Tile 1',
+    icon: ScienceIcon,
+    color: '#8b5cf6',
+    bgColor: '#f3e8ff',
+    stats: { label: 'Models', value: '3' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+    view: 'store'
+  },
+  {
     id: 'store-forecasting',
     title: 'Demand Forecasting',
-    subtitle: 'Store Module 1',
-    description: 'AI-driven store-level demand forecasting with seasonality, trends, and promotion impact',
+    subtitle: 'Tile 1',
+    description: 'Confirmed forecast baseline with volatility, price, cost, and margin data for inventory planning',
     icon: TrendingUpIcon,
     color: '#3b82f6',
     bgColor: '#dbeafe',
-    stats: { label: 'Stores', value: '450' },
+    stats: { label: 'Forecasts', value: '36' },
     status: 'active',
     gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
     view: 'store'
   },
   {
     id: 'store-health-monitor',
-    title: 'Health Monitor',
-    subtitle: 'Store Module 2',
-    description: 'Real-time store inventory health monitoring with stock alerts and availability tracking',
+    title: 'Inventory Health',
+    subtitle: 'Tile 2',
+    description: 'Measure inventory adequacy vs. forecast, compute safety stock, ROP, and stockout risk',
     icon: ShowChartIcon,
-    color: '#2563eb',
-    bgColor: '#dbeafe',
-    stats: { label: 'Alerts', value: '125' },
+    color: '#10b981',
+    bgColor: '#d1fae5',
+    stats: { label: 'Items', value: '36' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-    view: 'store'
-  },
-  {
-    id: 'store-optimization',
-    title: 'Inventory Optimization',
-    subtitle: 'Store Module 3',
-    description: 'Store-level inventory optimization with min/max levels, safety stock, and reorder points',
-    icon: AnalyticsIcon,
-    color: '#1d4ed8',
-    bgColor: '#dbeafe',
-    stats: { label: 'SKUs', value: '8.5K' },
-    status: 'active',
-    gradient: 'linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)',
-    view: 'store'
-  },
-  {
-    id: 'store-replenishment',
-    title: 'Auto Replenishment',
-    subtitle: 'Store Module 4',
-    description: 'Automated replenishment order generation with DC integration and order tracking',
-    icon: LocalShippingIcon,
-    color: '#1e40af',
-    bgColor: '#dbeafe',
-    stats: { label: 'Orders', value: '3.2K' },
-    status: 'active',
-    gradient: 'linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%)',
+    gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
     view: 'store'
   },
   {
     id: 'store-financial-impact',
     title: 'Financial Impact',
-    subtitle: 'Store Module 5',
-    description: 'Store-level financial impact analysis with inventory carrying costs and stockout costs',
+    subtitle: 'Tile 3',
+    description: 'Quantify financial value with GMROI, avoided margin, carrying costs, and net value calculations',
     icon: AnalyticsIcon,
-    color: '#1e3a8a',
-    bgColor: '#dbeafe',
-    stats: { label: 'Savings', value: '$12M' },
+    color: '#f59e0b',
+    bgColor: '#fef3c7',
+    stats: { label: 'Value', value: '$2.5M' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #1e3a8a 0%, #172554 100%)',
+    gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+    view: 'store'
+  },
+  {
+    id: 'store-replenishment',
+    title: 'Stock Transfer Execution',
+    subtitle: 'Tile 4',
+    description: 'Match store demand to best DC based on availability, freight cost, ETA - create STO/PR in SAP',
+    icon: LocalShippingIcon,
+    color: '#2563eb',
+    bgColor: '#dbeafe',
+    stats: { label: 'STOs', value: '36' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
     view: 'store'
   },
 ];
 
 const stoxModules = [];
 
-const StoxAILanding = ({ onTileClick, onBack }) => {
+const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView = null }) => {
   const theme = useTheme();
-  const [selectedView, setSelectedView] = React.useState(null);
+  const [selectedView, setSelectedView] = React.useState(initialView);
 
-  console.log('StoxAILanding rendering, props:', { hasOnTileClick: !!onTileClick, hasOnBack: !!onBack });
+  console.log('StoxAILanding rendering, props:', { hasOnTileClick: !!onTileClick, hasOnBack: !!onBack, initialView });
 
   const handleTileClick = (moduleId) => {
     console.log('handleTileClick called with moduleId:', moduleId);
@@ -205,6 +219,10 @@ const StoxAILanding = ({ onTileClick, onBack }) => {
 
   const handleViewSelect = (view) => {
     setSelectedView(view);
+    // Notify parent component about category selection
+    if (onCategorySelect) {
+      onCategorySelect(view);
+    }
   };
 
   const handleBackToCategories = () => {
@@ -563,7 +581,7 @@ const StoxAILanding = ({ onTileClick, onBack }) => {
       {/* Compact Module Tiles */}
       <Grid container spacing={1.5}>
         {(selectedView === 'dc' ? dcSystemModules : selectedView === 'store' ? storeSystemModules : []).map((module, index) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={module.id}>
+          <Grid item xs={12} sm={6} md={4} lg={4} key={module.id}>
             <Zoom in timeout={200 + index * 50}>
               <Card
                 sx={{
