@@ -3,7 +3,7 @@ MongoDB storage layer for market signals
 Handles persistence, querying, and updates of market intelligence signals
 """
 from typing import List, Optional, Dict
-from datetime import datetime
+from datetime import datetime, timedelta
 from pymongo import MongoClient, DESCENDING
 from pymongo.errors import DuplicateKeyError
 import structlog

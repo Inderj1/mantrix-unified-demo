@@ -39,11 +39,13 @@ const MarketCategoryTile = ({
   const IconComponent = category.icon;
   const severityLevel = getSeverityLevel(highestSeverity);
 
-  // Determine tile border color based on severity
+  // Determine tile border color based on severity - light theme
   const getBorderColor = () => {
     if (!enabled) return '#e0e0e0';
     if (signalCount === 0) return '#e0e0e0';
-    return severityLevel.color;
+    if (highestSeverity >= 80) return '#ffcdd2'; // light red
+    if (highestSeverity >= 60) return '#ffe0b2'; // light orange
+    return '#e3f2fd'; // light blue
   };
 
   // Determine badge color
@@ -67,7 +69,7 @@ const MarketCategoryTile = ({
         '&:hover': enabled ? {
           transform: 'translateY(-4px)',
           boxShadow: 4,
-          borderColor: category.color,
+          borderColor: '#bdbdbd',
         } : {},
       }}
       onClick={enabled ? onClick : undefined}
@@ -101,11 +103,11 @@ const MarketCategoryTile = ({
             width: 48,
             height: 48,
             borderRadius: 2,
-            bgcolor: `${category.color}20`,
+            bgcolor: '#f5f5f5',
             mb: 1.5,
           }}
         >
-          <IconComponent sx={{ fontSize: 28, color: category.color }} />
+          <IconComponent sx={{ fontSize: 28, color: '#666666' }} />
         </Box>
 
         {/* Category Name */}
@@ -159,8 +161,8 @@ const MarketCategoryTile = ({
                 label={signalCount === 0 ? 'No Alerts' : `${signalCount} Alert${signalCount > 1 ? 's' : ''}`}
                 size="small"
                 sx={{
-                  bgcolor: signalCount > 0 ? `${severityLevel.color}20` : '#f5f5f5',
-                  color: signalCount > 0 ? severityLevel.color : 'text.secondary',
+                  bgcolor: '#f5f5f5',
+                  color: 'text.secondary',
                   fontWeight: 500,
                   height: 20,
                   fontSize: '0.7rem',
