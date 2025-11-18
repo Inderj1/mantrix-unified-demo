@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 import asyncio
 import json
 
-from src.db.bigquery import BigQueryClient
+from src.db.database_client import DatabaseClient as BigQueryClient
 from src.core.financial_hierarchy import financial_hierarchy
 from src.core.cache_manager import CacheManager
 from src.config import settings

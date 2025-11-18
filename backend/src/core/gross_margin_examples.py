@@ -6,7 +6,7 @@ GROSS_MARGIN_EXAMPLES = [
         "sql": """SELECT 
     EXTRACT(YEAR FROM Posting_Date) as year,
     ROUND(SUM(COALESCE(Gross_Revenue, 0)), 2) as total_revenue
-FROM `{project}.{dataset}.{table}`
+FROM {table}
 WHERE Posting_Date >= DATE_SUB(CURRENT_DATE(), INTERVAL 2 YEAR)
 GROUP BY year
 ORDER BY year DESC""",
@@ -17,7 +17,7 @@ ORDER BY year DESC""",
         "sql": """SELECT 
     DATE_TRUNC(Posting_Date, MONTH) as month,
     ROUND(SUM(COALESCE(Gross_Revenue, 0)), 2) as monthly_revenue
-FROM `{project}.{dataset}.{table}`
+FROM {table}
 WHERE Posting_Date >= DATE_SUB(CURRENT_DATE(), INTERVAL 12 MONTH)
 GROUP BY month
 ORDER BY month DESC""",
@@ -50,7 +50,7 @@ ORDER BY month DESC""",
         SUM(COALESCE(Gross_Revenue, 0))
     ) * 100, 2) as Calculated_Margin_Pct
     
-FROM `{project}.{dataset}.{table}`
+FROM {table}
 WHERE Customer IS NOT NULL
     AND Fiscal_Year = EXTRACT(YEAR FROM CURRENT_DATE()) - 1  -- Previous year
 GROUP BY Customer
@@ -85,7 +85,7 @@ ORDER BY Gross_Profit DESC""",
     ROUND(MIN(Sales_Margin_of_Gross_Sales), 2) as Min_Margin_Pct,
     ROUND(MAX(Sales_Margin_of_Gross_Sales), 2) as Max_Margin_Pct
     
-FROM `{project}.{dataset}.{table}`
+FROM {table}
 WHERE Material_Number IS NOT NULL
     AND Fiscal_Year = EXTRACT(YEAR FROM CURRENT_DATE()) - 1
     AND Total_COGS IS NOT NULL
@@ -105,7 +105,7 @@ ORDER BY Gross_Profit DESC""",
     ROUND(SUM(COALESCE(Total_COGS, 0)), 2) as Total_COGS,
     ROUND(SUM(COALESCE(Gross_Revenue, 0)) - SUM(COALESCE(Total_COGS, 0)), 2) as Gross_Profit,
     ROUND(AVG(COALESCE(Sales_Margin_of_Gross_Sales, 0)), 2) as Avg_Gross_Margin_Pct
-FROM `{project}.{dataset}.{table}`
+FROM {table}
 WHERE Customer IS NOT NULL
 GROUP BY Customer
 HAVING SUM(COALESCE(Gross_Revenue, 0)) > 0
@@ -128,7 +128,7 @@ ORDER BY Gross_Profit DESC""",
     ROUND(SUM(COALESCE(Total_COGS, 0)), 2) as Total_COGS,
     ROUND(AVG(COALESCE(Sales_Margin_of_Gross_Sales, 0)), 2) as Avg_Gross_Margin_Pct
     
-FROM `{project}.{dataset}.{table}`
+FROM {table}
 WHERE Posting_Date >= DATE_SUB(CURRENT_DATE(), INTERVAL 2 YEAR)
 GROUP BY Year, Month
 ORDER BY Year DESC, Month DESC""",
@@ -155,7 +155,7 @@ ORDER BY Year DESC, Month DESC""",
     -- Gross Margin %
     ROUND(AVG(COALESCE(Sales_Margin_of_Gross_Sales, 0)), 2) as Avg_Gross_Margin_Pct
     
-FROM `{project}.{dataset}.{table}`
+FROM {table}
 WHERE Sales_Region IS NOT NULL
 GROUP BY Sales_Region
 HAVING SUM(COALESCE(Gross_Revenue, 0)) > 0

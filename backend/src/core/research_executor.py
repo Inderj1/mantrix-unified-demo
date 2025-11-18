@@ -11,7 +11,7 @@ import structlog
 
 from src.core.research_planner import ResearchPlan, ResearchStep, StepType
 from src.core.sql_generator import SQLGenerator
-from src.db.bigquery import BigQueryClient
+from src.db.database_client import DatabaseClient as BigQueryClient
 
 logger = structlog.get_logger()
 

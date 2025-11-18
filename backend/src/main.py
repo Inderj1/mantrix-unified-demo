@@ -40,7 +40,7 @@ logger = structlog.get_logger()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    logger.info("Starting NLP to SQL BigQuery service...")
+    logger.info("Starting Mantrix Nexxt Analytics service...")
 
     # Start Enterprise Pulse scheduler in background
     from src.core.pulse_scheduler import get_scheduler
@@ -59,7 +59,7 @@ async def lifespan(app: FastAPI):
     yield
 
     # Shutdown
-    logger.info("Shutting down NLP to SQL BigQuery service...")
+    logger.info("Shutting down Mantrix Nexxt Analytics service...")
 
     # Stop pulse scheduler
     await pulse_scheduler.stop()
@@ -81,9 +81,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="NLP to SQL BigQuery API",
-    description="Convert natural language queries to optimized BigQuery SQL",
-    version="0.1.0",
+    title="Mantrix Nexxt Analytics API",
+    description="Advanced analytics platform with NLP-powered insights and PostgreSQL backend",
+    version="1.0.0",
     lifespan=lifespan
 )
 
@@ -134,8 +134,9 @@ app.include_router(comms_config_router)
 @app.get("/")
 async def root():
     return {
-        "service": "NLP to SQL BigQuery",
-        "version": "0.1.0",
+        "service": "Mantrix Nexxt Analytics API",
+        "version": "1.0.0",
+        "database": "PostgreSQL",
         "docs": "/docs",
         "health": "/api/v1/health"
     }

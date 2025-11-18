@@ -17,7 +17,7 @@ FINANCIAL_QUERY_TEMPLATES = {
                 {dimensions},
                 SUM(CASE WHEN gl_account BETWEEN '4000' AND '4999' THEN amount ELSE 0 END) as revenue,
                 SUM(CASE WHEN gl_account BETWEEN '5000' AND '5999' THEN amount ELSE 0 END) as cogs
-            FROM `{project}.{dataset}.gl_transactions`
+            FROM {project}.{dataset}.gl_transactions`
             WHERE {time_filter}
                 {additional_filters}
             GROUP BY {group_by}
@@ -44,7 +44,7 @@ FINANCIAL_QUERY_TEMPLATES = {
                 SUM(CASE WHEN gl_account BETWEEN '4000' AND '4999' THEN amount ELSE 0 END) as revenue,
                 SUM(CASE WHEN gl_account BETWEEN '5000' AND '5999' THEN amount ELSE 0 END) as cogs,
                 SUM(CASE WHEN gl_account BETWEEN '6000' AND '6999' THEN amount ELSE 0 END) as operating_expenses
-            FROM `{project}.{dataset}.gl_transactions`
+            FROM {project}.{dataset}.gl_transactions`
             WHERE {time_filter}
                 {additional_filters}
             GROUP BY {group_by}
@@ -84,7 +84,7 @@ FINANCIAL_QUERY_TEMPLATES = {
                     WHEN gl_account IN ('6840', '6850') THEN amount 
                     ELSE 0 
                 END) as amortization
-            FROM `{project}.{dataset}.gl_transactions`
+            FROM {project}.{dataset}.gl_transactions`
             WHERE {time_filter}
                 {additional_filters}
             GROUP BY {group_by}
@@ -124,7 +124,7 @@ FINANCIAL_QUERY_TEMPLATES = {
                 END),
                 SUM(CASE WHEN gl_account BETWEEN '4000' AND '4999' THEN amount ELSE 0 END)
             ) * 100 as net_margin_pct
-        FROM `{project}.{dataset}.gl_transactions`
+        FROM {project}.{dataset}.gl_transactions`
         WHERE {time_filter}
             {additional_filters}
         GROUP BY {group_by}
@@ -150,7 +150,7 @@ FINANCIAL_QUERY_TEMPLATES = {
             SUM(amount) as total_amount,
             COUNT(DISTINCT gl_account) as account_count,
             ARRAY_AGG(DISTINCT gl_account ORDER BY gl_account LIMIT 10) as sample_accounts
-        FROM `{project}.{dataset}.gl_transactions`
+        FROM {project}.{dataset}.gl_transactions`
         WHERE gl_account BETWEEN '4000' AND '4999'
             AND {time_filter}
             {additional_filters}
@@ -179,7 +179,7 @@ FINANCIAL_QUERY_TEMPLATES = {
                        SUM(SUM(amount)) OVER ()) * 100 as percentage_of_total,
             COUNT(*) as transaction_count,
             AVG(amount) as avg_transaction_amount
-        FROM `{project}.{dataset}.gl_transactions`
+        FROM {project}.{dataset}.gl_transactions`
         WHERE gl_account BETWEEN '5000' AND '5999'
             AND {time_filter}
             {additional_filters}
@@ -210,7 +210,7 @@ FINANCIAL_QUERY_TEMPLATES = {
                 gl_account,
                 gl_description,
                 amount
-            FROM `{project}.{dataset}.gl_transactions`
+            FROM {project}.{dataset}.gl_transactions`
             WHERE gl_account BETWEEN '6000' AND '6999'
                 AND {time_filter}
                 {additional_filters}
@@ -243,7 +243,7 @@ FINANCIAL_QUERY_TEMPLATES = {
             GL_Account,
             GL_Account_Description,
             ROUND(SUM(GL_Amount_in_CC), 2) AS total_amount
-        FROM `{project}.{dataset}.dataset_25m_table`
+        FROM {project}.{dataset}.dataset_25m_table`
         WHERE GL_Account IS NOT NULL
             AND Posting_Date >= DATE_SUB(CURRENT_DATE(), INTERVAL 2 YEAR)
             {additional_filters}
@@ -271,7 +271,7 @@ FINANCIAL_QUERY_TEMPLATES = {
             reference_number,
             vendor_name,
             {additional_fields}
-        FROM `{project}.{dataset}.gl_transactions`
+        FROM {project}.{dataset}.gl_transactions`
         WHERE gl_account = '{gl_account_number}'
             AND {time_filter}
             {additional_filters}
@@ -295,7 +295,7 @@ FINANCIAL_QUERY_TEMPLATES = {
             {dimensions},
             reference_number,
             vendor_name
-        FROM `{project}.{dataset}.gl_transactions`
+        FROM {project}.{dataset}.gl_transactions`
         WHERE LOWER(gl_description) LIKE LOWER('%{search_term}%')
             AND {time_filter}
             {additional_filters}
@@ -320,7 +320,7 @@ FINANCIAL_QUERY_TEMPLATES = {
             MIN(date) as first_transaction,
             MAX(date) as last_transaction,
             ARRAY_AGG(DISTINCT gl_account ORDER BY gl_account) as gl_accounts_used
-        FROM `{project}.{dataset}.gl_transactions`
+        FROM {project}.{dataset}.gl_transactions`
         WHERE vendor_name IS NOT NULL
             AND amount > 0  -- Expenses are positive in GL
             AND {time_filter}
@@ -344,7 +344,7 @@ FINANCIAL_QUERY_TEMPLATES = {
             SELECT 
                 {dimensions},
                 {metric_calculation} as metric_value
-            FROM `{project}.{dataset}.gl_transactions`
+            FROM {project}.{dataset}.gl_transactions`
             WHERE {current_period_filter}
             GROUP BY {group_by}
         ),
@@ -352,7 +352,7 @@ FINANCIAL_QUERY_TEMPLATES = {
             SELECT 
                 {dimensions},
                 {metric_calculation} as metric_value
-            FROM `{project}.{dataset}.gl_transactions`
+            FROM {project}.{dataset}.gl_transactions`
             WHERE {previous_period_filter}
             GROUP BY {group_by}
         )
@@ -387,7 +387,7 @@ FINANCIAL_QUERY_TEMPLATES = {
                 {metric_calculation} - LAG({metric_calculation}) OVER (ORDER BY {time_dimension}),
                 LAG({metric_calculation}) OVER (ORDER BY {time_dimension})
             ) * 100 as percent_change
-        FROM `{project}.{dataset}.gl_transactions`
+        FROM {project}.{dataset}.gl_transactions`
         WHERE {time_filter}
             {additional_filters}
         GROUP BY {time_dimension}

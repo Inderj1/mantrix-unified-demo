@@ -1,0 +1,20 @@
+{
+  "client_id": "arizona_beverages",
+  "dataset_id": "arizon-poc",
+  "version": "1.0.0",
+  "created_at": "2025-11-17 18:12:09.121852",
+  "updated_at": "2025-11-17 18:12:09.121867",
+  "hierarchies": {},
+  "gl_mappings": null,
+  "material_hierarchy": null,
+  "business_rules": [],
+  "custom_dimensions": {},
+  "relationships": [],
+  "description": "Arizona Beverages business configuration",
+  "tags": [
+    "beverage",
+    "arizona",
+    "copa"
+  ],
+  "is_active": true
+}

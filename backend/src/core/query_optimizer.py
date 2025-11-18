@@ -3,7 +3,7 @@ import re
 import sqlparse
 from sqlparse.sql import Token, TokenList, Identifier, IdentifierList
 import structlog
-from src.db.bigquery import BigQueryClient
+from src.db.database_client import DatabaseClient as BigQueryClient
 from src.core.llm_client import LLMClient
 
 logger = structlog.get_logger()

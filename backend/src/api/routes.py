@@ -24,7 +24,7 @@ from src.api.models import (
     ResearchReportResponse, ResearchInsightResponse, ResearchRecommendationResponse
 )
 from src.core.sql_generator import SQLGenerator
-from src.db.bigquery import BigQueryClient
+from src.db.database_client import DatabaseClient as BigQueryClient
 from src.db.weaviate_client import WeaviateClient
 from src.core.optimization import (
     MaterializedViewManager, MaterializedViewConfig, MaterializedViewOptimizer,
@@ -323,7 +323,16 @@ async def process_query(
             end_time=datetime.utcnow(),
             result_summary=f"{result.get('execution', {}).get('row_count', 0)} rows returned" if execute else "SQL generated"
         )
-        
+
+        # Add top-level results field for frontend compatibility
+        if execute and result.get("execution", {}).get("results"):
+            result["results"] = result["execution"]["results"]
+
+        # Ensure tables_used is always a list (fix for LLM sometimes returning XML strings)
+        if "tables_used" in result and not isinstance(result["tables_used"], list):
+            logger.warning(f"tables_used is not a list: {type(result['tables_used'])}, converting to empty list")
+            result["tables_used"] = []
+
         return QueryResponse(**result)
         
     except Exception as e:

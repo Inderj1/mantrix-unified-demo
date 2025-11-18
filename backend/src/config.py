@@ -12,7 +12,7 @@ class Settings(BaseSettings):
 
     # Anthropic
     anthropic_api_key: str = Field(..., alias="ANTHROPIC_API_KEY")
-    anthropic_model: str = Field(default="claude-3-5-sonnet-20241022", alias="ANTHROPIC_MODEL")
+    anthropic_model: str = Field(default="claude-3-opus-20240229", alias="ANTHROPIC_MODEL")
 
     # OpenAI (for embeddings)
     openai_api_key: Optional[str] = Field(None, alias="OPENAI_API_KEY")
@@ -20,12 +20,12 @@ class Settings(BaseSettings):
         default="text-embedding-3-small", alias="OPENAI_EMBEDDING_MODEL"
     )
 
-    # Google Cloud / BigQuery
-    google_cloud_project: str = Field(..., alias="GOOGLE_CLOUD_PROJECT")
+    # Google Cloud / BigQuery (Optional - deprecated in favor of PostgreSQL)
+    google_cloud_project: Optional[str] = Field(None, alias="GOOGLE_CLOUD_PROJECT")
     google_application_credentials: Optional[str] = Field(
         None, alias="GOOGLE_APPLICATION_CREDENTIALS"
     )
-    bigquery_dataset: str = Field(..., alias="BIGQUERY_DATASET")
+    bigquery_dataset: Optional[str] = Field(None, alias="BIGQUERY_DATASET")
 
     # Weaviate
     weaviate_url: str = Field(default="http://localhost:8082", alias="WEAVIATE_URL")
@@ -55,8 +55,8 @@ class Settings(BaseSettings):
     neo4j_uri: str = Field(default="bolt://localhost:7687", alias="NEO4J_URI")
     neo4j_user: str = Field(default="neo4j", alias="NEO4J_USER")
     neo4j_password: str = Field(default="password123", alias="NEO4J_PASSWORD")
-    mongodb_db_name: str = Field(default="nlp_sql_conversations", alias="MONGODB_DB_NAME")
-    mongodb_database: str = Field(default="nlp_sql_conversations", alias="MONGODB_DATABASE")
+    mongodb_db_name: str = Field(default="mantrix_nexxt_conversations", alias="MONGODB_DB_NAME")
+    mongodb_database: str = Field(default="mantrix_nexxt_conversations", alias="MONGODB_DATABASE")
     mongodb_conversations_collection: str = Field(
         default="conversations", alias="MONGODB_CONVERSATIONS_COLLECTION"
     )
@@ -94,16 +94,22 @@ class Settings(BaseSettings):
         default=False, alias="CACHE_RESULT_ENABLED"
     )  # Off by default for fresh data
 
-    # PostgreSQL Configuration
+    # PostgreSQL Configuration (Primary Database)
     postgres_host: str = Field(default="localhost", alias="POSTGRES_HOST")
-    postgres_port: int = Field(default=5432, alias="POSTGRES_PORT")
-    postgres_user: str = Field(default="inder", alias="POSTGRES_USER")
-    postgres_password: str = Field(default="", alias="POSTGRES_PASSWORD")
-    postgres_database: str = Field(default="customer_analytics", alias="POSTGRES_DATABASE")
+    postgres_port: int = Field(default=5433, alias="POSTGRES_PORT")  # Docker maps to 5433
+    postgres_user: str = Field(default="mantrix", alias="POSTGRES_USER")
+    postgres_password: str = Field(default="mantrix123", alias="POSTGRES_PASSWORD")
+    postgres_database: str = Field(default="mantrix_nexxt", alias="POSTGRES_DATABASE")
     
     # Clerk Authentication
     clerk_secret_key: Optional[str] = Field(None, alias="CLERK_SECRET_KEY")
     production_domain: Optional[str] = Field(None, alias="PRODUCTION_DOMAIN")
+
+    # Apache Jena Fuseki Configuration
+    fuseki_url: str = Field(default="http://localhost:3030", alias="FUSEKI_URL")
+    fuseki_dataset: str = Field(default="mantrix_csg", alias="FUSEKI_DATASET")
+    fuseki_user: str = Field(default="admin", alias="FUSEKI_USER")
+    fuseki_password: str = Field(default="mantrix123", alias="FUSEKI_PASSWORD")
 
 
 settings = Settings()

@@ -28,7 +28,7 @@ FINANCIAL_ANALYSIS_QUERIES = [
         SUM(COALESCE(Gross_Revenue, 0))
     ) * 100, 2) as Calculated_Margin_Pct
     
-FROM `{project}.{dataset}.{table}`
+FROM {table}
 WHERE Material_Group IS NOT NULL
     AND Fiscal_Year = EXTRACT(YEAR FROM CURRENT_DATE()) - 1
 GROUP BY Material_Group
@@ -64,7 +64,7 @@ ORDER BY Gross_Profit DESC""",
         ROUND(AVG(Sales_Margin_of_Gross_Sales), 2) as Avg_Gross_Margin_Pct,
         ROUND(AVG(Sales_Margin_of_Net_Sales), 2) as Avg_Net_Margin_Pct
         
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Customer IS NOT NULL
         AND Fiscal_Year = EXTRACT(YEAR FROM CURRENT_DATE()) - 1
     GROUP BY Customer
@@ -104,7 +104,7 @@ LIMIT 20""",
         -- Transaction count for context
         COUNT(*) as Transaction_Count
         
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Posting_Date IS NOT NULL
         AND PARSE_DATE('%Y%m%d', CAST(Posting_Date AS STRING)) >= DATE_SUB(CURRENT_DATE(), INTERVAL 12 MONTH)
     GROUP BY Year, Month, Year_Month
@@ -148,7 +148,7 @@ ORDER BY Year_Month""",
     ROUND(MAX(Sales_Margin_of_Gross_Sales), 2) as Max_Margin_Pct,
     ROUND(STDDEV(Sales_Margin_of_Gross_Sales), 2) as Margin_StdDev
     
-FROM `{project}.{dataset}.{table}`
+FROM {table}
 WHERE Sales_Region IS NOT NULL 
     AND Distribution_Channel IS NOT NULL
 GROUP BY Sales_Region, Distribution_Channel
@@ -179,7 +179,7 @@ ORDER BY Sales_Region, Avg_Gross_Margin_Pct DESC""",
         -- Contribution Margin %
         ROUND(AVG(Sales_Margin_of_Gross_Sales), 2) as Avg_Contribution_Margin_Pct
         
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Material_Number IS NOT NULL
         AND Fiscal_Year = EXTRACT(YEAR FROM CURRENT_DATE()) - 1
     GROUP BY Material_Number, Material_Group
@@ -206,7 +206,7 @@ ORDER BY Avg_Contribution_Margin_Pct ASC""",
         'Material Costs' as Cost_Driver,
         ROUND(SUM(Total_COGM), 2) as Total_Cost,
         ROUND(AVG(Total_COGM / NULLIF(Total_COGS, 0) * 100), 2) as Pct_of_COGS
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Total_COGM > 0 AND Total_COGS > 0
     
     UNION ALL
@@ -215,7 +215,7 @@ ORDER BY Avg_Contribution_Margin_Pct ASC""",
         'Freight & Delivery' as Cost_Driver,
         ROUND(SUM(TL_Delivery_Costs + Incoming_Freight_Var), 2) as Total_Cost,
         ROUND(AVG((TL_Delivery_Costs + Incoming_Freight_Var) / NULLIF(Total_COGS, 0) * 100), 2) as Pct_of_COGS
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Total_COGS > 0
     
     UNION ALL
@@ -224,7 +224,7 @@ ORDER BY Avg_Contribution_Margin_Pct ASC""",
         'Packaging' as Cost_Driver,
         ROUND(SUM(Packaging), 2) as Total_Cost,
         ROUND(AVG(Packaging / NULLIF(Total_COGS, 0) * 100), 2) as Pct_of_COGS
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Packaging > 0 AND Total_COGS > 0
     
     UNION ALL
@@ -233,7 +233,7 @@ ORDER BY Avg_Contribution_Margin_Pct ASC""",
         'Warehouse & Storage' as Cost_Driver,
         ROUND(SUM(ABS(Warehouse_AND_Storage_Abs_Var)), 2) as Total_Cost,
         ROUND(AVG(ABS(Warehouse_AND_Storage_Abs_Var) / NULLIF(Total_COGS, 0) * 100), 2) as Pct_of_COGS
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Warehouse_AND_Storage_Abs_Var != 0 AND Total_COGS > 0
     
     UNION ALL
@@ -242,7 +242,7 @@ ORDER BY Avg_Contribution_Margin_Pct ASC""",
         'Purchase Price Variance' as Cost_Driver,
         ROUND(SUM(ABS(Purchase_Price_Variance)), 2) as Total_Cost,
         ROUND(AVG(ABS(Purchase_Price_Variance) / NULLIF(Total_COGS, 0) * 100), 2) as Pct_of_COGS
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Purchase_Price_Variance != 0 AND Total_COGS > 0
 )
 SELECT 
@@ -275,7 +275,7 @@ LIMIT 5""",
         
         COUNT(*) as Transaction_Count
         
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Posting_Date IS NOT NULL
         AND Total_COGM > 0
         AND PARSE_DATE('%Y%m%d', CAST(Posting_Date AS STRING)) >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
@@ -316,7 +316,7 @@ ORDER BY Year_Quarter DESC""",
         
         COUNT(*) as Transaction_Count
         
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Posting_Date IS NOT NULL
         AND PARSE_DATE('%Y%m%d', CAST(Posting_Date AS STRING)) >= DATE_SUB(DATE_TRUNC(CURRENT_DATE(), MONTH), INTERVAL 1 MONTH)
         AND PARSE_DATE('%Y%m%d', CAST(Posting_Date AS STRING)) < DATE_TRUNC(CURRENT_DATE(), MONTH)
@@ -363,7 +363,7 @@ WITH product_costs AS (
         ROUND(MAX(Total_COGS), 2) as Max_Cost,
         ROUND(STDDEV(Total_COGS), 2) as Cost_StdDev
         
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Material_Number = 'PRODUCT_X_ID'  -- Replace with actual product
         OR LOWER(Material_Description) LIKE '%product x%'  -- Or search by name
     GROUP BY Material_Number, Material_Description, Material_Base_Unit
@@ -392,12 +392,12 @@ LIMIT 10""",
         ROUND(AVG(Purchase_Price_Variance), 2) as Avg_Price_Variance,
         
         -- Percentage of total company COGS
-        ROUND(SUM(Total_COGS) / (SELECT SUM(Total_COGS) FROM `{project}.{dataset}.{table}`) * 100, 2) as Pct_of_Total_COGS,
+        ROUND(SUM(Total_COGS) / (SELECT SUM(Total_COGS) FROM {table}) * 100, 2) as Pct_of_Total_COGS,
         
         -- Quality metrics (using variances as proxy)
         ROUND(SUM(ABS(Subcontracting_Var_Check)), 2) as Quality_Variances
         
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Vendor_lifnr IS NOT NULL
         AND Fiscal_Year = EXTRACT(YEAR FROM CURRENT_DATE()) - 1
     GROUP BY Vendor_ID
@@ -433,7 +433,7 @@ WITH actual_margins AS (
         -- Assuming budget margin target of 40% (adjust based on actual budget)
         40.0 as Budget_Gross_Margin_Pct
         
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Fiscal_Year = EXTRACT(YEAR FROM CURRENT_DATE()) - 1
     GROUP BY Fiscal_Year, Month
 )
@@ -476,7 +476,7 @@ ORDER BY Fiscal_Year, Month""",
         
         COUNT(*) as Transaction_Count
         
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE EXTRACT(YEAR FROM PARSE_DATE('%Y%m%d', CAST(Posting_Date AS STRING))) = EXTRACT(YEAR FROM CURRENT_DATE()) - 1
         AND EXTRACT(MONTH FROM PARSE_DATE('%Y%m%d', CAST(Posting_Date AS STRING))) IN (3, 4, 5)  -- March, April, May
     GROUP BY Month, Material_Group, Sales_Region
@@ -537,7 +537,7 @@ LIMIT 20""",
         ROUND(SUM(COALESCE(Gross_Revenue, 0)) - SUM(Total_COS), 2) as Net_Profit,
         ROUND(AVG(Sales_Margin_of_Net_Sales), 2) as Avg_Net_Margin_Pct
         
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Sales_Region IS NOT NULL
         AND PARSE_DATE('%Y%m%d', CAST(Posting_Date AS STRING)) >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
     GROUP BY Sales_Region, Year, Quarter, Year_Quarter
@@ -597,7 +597,7 @@ LIMIT 1""",
         -- Volume metrics
         COUNT(*) as Transaction_Count
         
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Sales_Region IS NOT NULL
         AND Material_Group IS NOT NULL
         AND Distribution_Channel IS NOT NULL
@@ -658,7 +658,7 @@ LIMIT 20""",
         
         COUNT(*) as Transaction_Count
         
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Material_Number IS NOT NULL
         AND Customer IS NOT NULL
         AND Fiscal_Year = EXTRACT(YEAR FROM CURRENT_DATE()) - 1
@@ -716,7 +716,7 @@ WITH product_analysis AS (
         ROUND(MAX(Sales_Margin_of_Gross_Sales), 2) as Max_Margin,
         ROUND(STDDEV(Sales_Margin_of_Gross_Sales), 2) as Margin_Volatility
         
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Material_Number = 'PRODUCT_X'  -- Replace with actual product
         OR LOWER(Material_Description) LIKE '%product x%'
     GROUP BY Material_Number, Material_Description, Sales_Region, Distribution_Channel
@@ -754,7 +754,7 @@ ORDER BY Total_Revenue DESC""",
         -- Calculate current gross profit
         ROUND(SUM(COALESCE(Gross_Revenue, 0)) - SUM(Total_COGS), 2) as Current_Gross_Profit
         
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Fiscal_Year = EXTRACT(YEAR FROM CURRENT_DATE()) - 1
 ),
 scenario_analysis AS (
@@ -817,7 +817,7 @@ FROM scenario_analysis""",
         COUNT(*) as Transaction_Count,
         COUNT(DISTINCT Customer) as Customer_Count
         
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Fiscal_Year = EXTRACT(YEAR FROM CURRENT_DATE()) - 1
     GROUP BY Material_Group, Sales_Region
     HAVING COUNT(*) > 100  -- Significant volume only
@@ -876,7 +876,7 @@ GL_ACCOUNTING_HELPERS = {
         ROUND(SUM(GL_Amount_in_CC), 2) as Net_Amount,
         ROUND(SUM(COALESCE(Gross_Revenue, 0)), 2) as Debits,
         ROUND(SUM(CASE WHEN GL_Amount_in_CC < 0 THEN ABS(GL_Amount_in_CC) ELSE 0 END), 2) as Credits
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Fiscal_Year_Period = {period}
     GROUP BY Fiscal_Year, Fiscal_Year_Period, GL_Account_Type
     """,
@@ -890,7 +890,7 @@ GL_ACCOUNTING_HELPERS = {
         ROUND(SUM(COALESCE(Gross_Revenue, 0)), 2) as Debit_Total,
         ROUND(SUM(CASE WHEN GL_Amount_in_CC < 0 THEN ABS(GL_Amount_in_CC) ELSE 0 END), 2) as Credit_Total,
         ROUND(SUM(GL_Amount_in_CC), 2) as Net_Balance
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Fiscal_Year = {year}
     GROUP BY GL_Account, GL_Account_Description, GL_Account_Type
     ORDER BY GL_Account
@@ -909,7 +909,7 @@ GL_ACCOUNTING_HELPERS = {
         Customer,
         Vendor_lifnr,
         Material_Number
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Posting_Date = {date}
     ORDER BY Reference_Doc, GL_Account
     """

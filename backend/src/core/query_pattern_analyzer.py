@@ -10,7 +10,7 @@ import structlog
 from pydantic import BaseModel, Field
 from enum import Enum
 
-from src.db.bigquery import BigQueryClient
+from src.db.database_client import DatabaseClient as BigQueryClient
 from src.utils.query_logger import QueryLogger
 from src.core.optimization import MaterializedViewManager, MaterializedViewConfig
 from src.core.cache_manager import CacheManager

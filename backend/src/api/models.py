@@ -42,6 +42,7 @@ class QueryResponse(BaseModel):
     optimization_notes: Optional[str] = None
     validation: Optional[Dict[str, Any]] = None
     execution: Optional[Dict[str, Any]] = None
+    results: Optional[List[Dict[str, Any]]] = None  # Top-level results for frontend compatibility
     error: Optional[str] = None
     error_details: Optional[Dict[str, Any]] = None  # Enhanced error information
     confidence_score: Optional[float] = None

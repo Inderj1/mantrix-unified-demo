@@ -7,7 +7,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 echo -e "${GREEN}========================================${NC}"
-echo -e "${GREEN}  Starting Mantrix Unified DI - Dev Environment${NC}"
+echo -e "${GREEN}  Starting Mantrix Development Environment${NC}"
 echo -e "${GREEN}========================================${NC}"
 
 # Function to cleanup on exit
@@ -15,7 +15,7 @@ cleanup() {
     echo -e "\n${YELLOW}Shutting down services...${NC}"
     pkill -f "npm start"
     pkill -f "uvicorn src.main:app"
-    redis-cli shutdown 2>/dev/null
+    docker-compose stop redis 2>/dev/null
     echo -e "${GREEN}All services stopped.${NC}"
     exit 0
 }
@@ -34,15 +34,15 @@ else
     echo -e "${GREEN}✓ Virtual environment found${NC}"
 fi
 
-# Start Redis
-echo -e "\n${YELLOW}Starting Redis...${NC}"
-if pgrep -f "redis-server" > /dev/null; then
+# Start Redis via Docker
+echo -e "\n${YELLOW}Starting Redis (Docker)...${NC}"
+if docker ps --format '{{.Names}}' | grep -q "mantrix.*redis"; then
     echo -e "${GREEN}✓ Redis already running${NC}"
 else
-    redis-server --daemonize yes
-    sleep 1
-    if pgrep -f "redis-server" > /dev/null; then
-        echo -e "${GREEN}✓ Redis started successfully${NC}"
+    docker-compose up -d redis
+    sleep 2
+    if docker ps --format '{{.Names}}' | grep -q "mantrix.*redis"; then
+        echo -e "${GREEN}✓ Redis started successfully on localhost:6379${NC}"
     else
         echo -e "${RED}✗ Failed to start Redis${NC}"
         exit 1

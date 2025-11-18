@@ -476,6 +476,18 @@ const SimpleChatInterface = () => {
       }
 
       // Create assistant message with results
+      console.log('🔍 API Response Debug:', {
+        hasTopLevelResults: !!data.results,
+        topLevelResultsLength: data.results?.length,
+        topLevelResultsType: typeof data.results,
+        hasExecutionResults: !!data.execution?.results,
+        executionResultsLength: data.execution?.results?.length,
+        executionResultsType: typeof data.execution?.results,
+        firstResult: data.results?.[0] || data.execution?.results?.[0],
+        fullDataKeys: Object.keys(data),
+        executionKeys: data.execution ? Object.keys(data.execution) : null
+      });
+
       const assistantMessage = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
@@ -490,6 +502,12 @@ const SimpleChatInterface = () => {
         },
         timestamp: new Date(),
       };
+
+      console.log('📊 Assistant Message Created:', {
+        resultsLength: assistantMessage.results.length,
+        resultCount: assistantMessage.resultCount,
+        firstResult: assistantMessage.results[0]
+      });
 
       console.log('Assistant message with results:', assistantMessage.results);
       console.log('Results type:', typeof assistantMessage.results);

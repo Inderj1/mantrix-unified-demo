@@ -8,7 +8,7 @@ import structlog
 from google.cloud import bigquery
 from google.api_core import exceptions
 
-from src.db.bigquery import BigQueryClient
+from src.db.database_client import DatabaseClient as BigQueryClient
 from src.utils.query_logger import QueryLogger
 from src.core.cache_manager import CacheManager
 

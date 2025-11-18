@@ -51,13 +51,18 @@ class RegulatorySignalFetcher(BaseSignalFetcher):
                 url = f"{self.base_url}/documents.json"
 
                 # Get rules from last 7 days
-                params = {
-                    "conditions[type]": "RULE",
-                    "conditions[publication_date][gte]": (datetime.utcnow() - timedelta(days=7)).strftime("%Y-%m-%d"),
-                    "per_page": 10,
-                    "order": "newest",
-                    "fields[]": ["title", "abstract", "publication_date", "agencies", "html_url", "topics"]
-                }
+                params = [
+                    ("conditions[type]", "RULE"),
+                    ("conditions[publication_date][gte]", (datetime.utcnow() - timedelta(days=7)).strftime("%Y-%m-%d")),
+                    ("per_page", "10"),
+                    ("order", "newest"),
+                    ("fields[]", "title"),
+                    ("fields[]", "abstract"),
+                    ("fields[]", "publication_date"),
+                    ("fields[]", "agencies"),
+                    ("fields[]", "html_url"),
+                    ("fields[]", "topics")
+                ]
 
                 response = await client.get(url, params=params, timeout=15.0)
                 response.raise_for_status()
@@ -116,13 +121,18 @@ class RegulatorySignalFetcher(BaseSignalFetcher):
             async with httpx.AsyncClient() as client:
                 url = f"{self.base_url}/documents.json"
 
-                params = {
-                    "conditions[type]": "PRORULE",  # Proposed Rule
-                    "conditions[publication_date][gte]": (datetime.utcnow() - timedelta(days=7)).strftime("%Y-%m-%d"),
-                    "per_page": 5,
-                    "order": "newest",
-                    "fields[]": ["title", "abstract", "publication_date", "agencies", "html_url", "comment_date"]
-                }
+                params = [
+                    ("conditions[type]", "PRORULE"),  # Proposed Rule
+                    ("conditions[publication_date][gte]", (datetime.utcnow() - timedelta(days=7)).strftime("%Y-%m-%d")),
+                    ("per_page", "5"),
+                    ("order", "newest"),
+                    ("fields[]", "title"),
+                    ("fields[]", "abstract"),
+                    ("fields[]", "publication_date"),
+                    ("fields[]", "agencies"),
+                    ("fields[]", "html_url"),
+                    ("fields[]", "comment_date")
+                ]
 
                 response = await client.get(url, params=params, timeout=15.0)
                 response.raise_for_status()

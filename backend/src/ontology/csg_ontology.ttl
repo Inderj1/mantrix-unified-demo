@@ -1,0 +1,272 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix csg: <http://mantrix.ai/ontology/csg#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+# Ontology Definition
+csg:CSGOntology a owl:Ontology ;
+    rdfs:label "CSG Surgical Device Sales Ontology" ;
+    rdfs:comment "Ontology for modeling surgical device sales, surgeons, distributors, facilities, and medical procedures" ;
+    owl:versionInfo "1.0" .
+
+# ========================================
+# Classes
+# ========================================
+
+# People
+csg:Surgeon a owl:Class ;
+    rdfs:label "Surgeon" ;
+    rdfs:comment "Medical professional who performs surgical procedures" .
+
+csg:Distributor a owl:Class ;
+    rdfs:label "Distributor" ;
+    rdfs:comment "Sales representative who distributes surgical devices" .
+
+# Places
+csg:Facility a owl:Class ;
+    rdfs:label "Medical Facility" ;
+    rdfs:comment "Hospital, clinic, or surgical center where procedures are performed" .
+
+csg:Region a owl:Class ;
+    rdfs:label "Geographic Region" ;
+    rdfs:comment "Geographic area for sales and distribution" .
+
+# Products and Transactions
+csg:SurgicalDevice a owl:Class ;
+    rdfs:label "Surgical Device" ;
+    rdfs:comment "Medical device used in surgical procedures" .
+
+csg:Transaction a owl:Class ;
+    rdfs:label "Sales Transaction" ;
+    rdfs:comment "A single sales transaction record" .
+
+csg:ItemCode a owl:Class ;
+    rdfs:label "Item Code" ;
+    rdfs:comment "Product identifier for a surgical device" .
+
+# ========================================
+# Object Properties (Relationships)
+# ========================================
+
+# Surgeon relationships
+csg:performsSurgeryAt a owl:ObjectProperty ;
+    rdfs:label "performs surgery at" ;
+    rdfs:domain csg:Surgeon ;
+    rdfs:range csg:Facility ;
+    rdfs:comment "Surgeon performs surgeries at a medical facility" .
+
+csg:usesDevice a owl:ObjectProperty ;
+    rdfs:label "uses device" ;
+    rdfs:domain csg:Surgeon ;
+    rdfs:range csg:SurgicalDevice ;
+    rdfs:comment "Surgeon uses a specific surgical device" .
+
+csg:worksWithDistributor a owl:ObjectProperty ;
+    rdfs:label "works with distributor" ;
+    rdfs:domain csg:Surgeon ;
+    rdfs:range csg:Distributor ;
+    rdfs:comment "Surgeon works with a distributor for device procurement" .
+
+# Distributor relationships
+csg:servesRegion a owl:ObjectProperty ;
+    rdfs:label "serves region" ;
+    rdfs:domain csg:Distributor ;
+    rdfs:range csg:Region ;
+    rdfs:comment "Distributor serves a geographic region" .
+
+csg:distributesFacility a owl:ObjectProperty ;
+    rdfs:label "distributes to facility" ;
+    rdfs:domain csg:Distributor ;
+    rdfs:range csg:Facility ;
+    rdfs:comment "Distributor serves a medical facility" .
+
+csg:sellsDevice a owl:ObjectProperty ;
+    rdfs:label "sells device" ;
+    rdfs:domain csg:Distributor ;
+    rdfs:range csg:SurgicalDevice ;
+    rdfs:comment "Distributor sells a surgical device" .
+
+# Facility relationships
+csg:locatedInRegion a owl:ObjectProperty ;
+    rdfs:label "located in region" ;
+    rdfs:domain csg:Facility ;
+    rdfs:range csg:Region ;
+    rdfs:comment "Facility is located in a geographic region" .
+
+csg:purchasesFrom a owl:ObjectProperty ;
+    rdfs:label "purchases from" ;
+    rdfs:domain csg:Facility ;
+    rdfs:range csg:Distributor ;
+    rdfs:comment "Facility purchases devices from distributor" .
+
+# Transaction relationships
+csg:involvesSurgeon a owl:ObjectProperty ;
+    rdfs:label "involves surgeon" ;
+    rdfs:domain csg:Transaction ;
+    rdfs:range csg:Surgeon ;
+    rdfs:comment "Transaction involves a surgeon" .
+
+csg:involvesDistributor a owl:ObjectProperty ;
+    rdfs:label "involves distributor" ;
+    rdfs:domain csg:Transaction ;
+    rdfs:range csg:Distributor ;
+    rdfs:comment "Transaction involves a distributor" .
+
+csg:atFacility a owl:ObjectProperty ;
+    rdfs:label "at facility" ;
+    rdfs:domain csg:Transaction ;
+    rdfs:range csg:Facility ;
+    rdfs:comment "Transaction occurred at a facility" .
+
+csg:inRegion a owl:ObjectProperty ;
+    rdfs:label "in region" ;
+    rdfs:domain csg:Transaction ;
+    rdfs:range csg:Region ;
+    rdfs:comment "Transaction occurred in a region" .
+
+csg:hasItemCode a owl:ObjectProperty ;
+    rdfs:label "has item code" ;
+    rdfs:domain csg:Transaction ;
+    rdfs:range csg:ItemCode ;
+    rdfs:comment "Transaction involves a specific item code" .
+
+# ========================================
+# Datatype Properties (Attributes)
+# ========================================
+
+# Person attributes
+csg:personName a owl:DatatypeProperty ;
+    rdfs:label "person name" ;
+    rdfs:domain owl:Thing ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Full name of a person (surgeon or distributor)" .
+
+# Facility attributes
+csg:facilityName a owl:DatatypeProperty ;
+    rdfs:label "facility name" ;
+    rdfs:domain csg:Facility ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Name of the medical facility" .
+
+# Region attributes
+csg:regionName a owl:DatatypeProperty ;
+    rdfs:label "region name" ;
+    rdfs:domain csg:Region ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Name of the geographic region" .
+
+# Device attributes
+csg:deviceName a owl:DatatypeProperty ;
+    rdfs:label "device name" ;
+    rdfs:domain csg:SurgicalDevice ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Name of the surgical device" .
+
+csg:itemCodeValue a owl:DatatypeProperty ;
+    rdfs:label "item code value" ;
+    rdfs:domain csg:ItemCode ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Item code identifier" .
+
+# Financial attributes
+csg:totalSales a owl:DatatypeProperty ;
+    rdfs:label "total sales" ;
+    rdfs:domain csg:Transaction ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "Total sales amount in dollars" .
+
+csg:totalGrossMargin a owl:DatatypeProperty ;
+    rdfs:label "total gross margin" ;
+    rdfs:domain csg:Transaction ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "Total gross margin in dollars" .
+
+csg:surgeryDate a owl:DatatypeProperty ;
+    rdfs:label "surgery date" ;
+    rdfs:domain csg:Transaction ;
+    rdfs:range xsd:date ;
+    rdfs:comment "Date when surgery was performed" .
+
+# Aggregated metrics (for entities)
+csg:lifetimeSales a owl:DatatypeProperty ;
+    rdfs:label "lifetime sales" ;
+    rdfs:domain owl:Thing ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "Total lifetime sales for a surgeon, distributor, or facility" .
+
+csg:lifetimeGrossMargin a owl:DatatypeProperty ;
+    rdfs:label "lifetime gross margin" ;
+    rdfs:domain owl:Thing ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "Total lifetime gross margin for an entity" .
+
+csg:transactionCount a owl:DatatypeProperty ;
+    rdfs:label "transaction count" ;
+    rdfs:domain owl:Thing ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Number of transactions for an entity" .
+
+# ========================================
+# Inference Rules (Property Chains)
+# ========================================
+
+# If a surgeon works with a distributor, and that distributor serves a region,
+# then the surgeon is associated with that region
+csg:associatedWithRegion a owl:ObjectProperty ;
+    rdfs:label "associated with region" ;
+    rdfs:domain csg:Surgeon ;
+    rdfs:range csg:Region ;
+    owl:propertyChainAxiom ( csg:worksWithDistributor csg:servesRegion ) .
+
+# If a surgeon performs surgery at a facility, and that facility is in a region,
+# then the surgeon operates in that region
+csg:operatesInRegion a owl:ObjectProperty ;
+    rdfs:label "operates in region" ;
+    rdfs:domain csg:Surgeon ;
+    rdfs:range csg:Region ;
+    owl:propertyChainAxiom ( csg:performsSurgeryAt csg:locatedInRegion ) .
+
+# ========================================
+# SKOS Concepts for Taxonomies
+# ========================================
+
+csg:RegionTaxonomy a skos:ConceptScheme ;
+    rdfs:label "Geographic Region Taxonomy" ;
+    rdfs:comment "Hierarchical classification of sales regions" .
+
+csg:DeviceTaxonomy a skos:ConceptScheme ;
+    rdfs:label "Surgical Device Taxonomy" ;
+    rdfs:comment "Hierarchical classification of surgical devices" .
+
+# ========================================
+# Annotations for Natural Language Query Mapping
+# ========================================
+
+# Surgeon synonyms for NLP
+csg:Surgeon
+    skos:altLabel "doctor" ;
+    skos:altLabel "physician" ;
+    skos:altLabel "surgeon" ;
+    skos:altLabel "medical professional" .
+
+# Distributor synonyms
+csg:Distributor
+    skos:altLabel "sales rep" ;
+    skos:altLabel "representative" ;
+    skos:altLabel "distributor" ;
+    skos:altLabel "sales person" .
+
+# Financial metric synonyms
+csg:totalSales
+    skos:altLabel "sales" ;
+    skos:altLabel "revenue" ;
+    skos:altLabel "total sales" ;
+    skos:altLabel "sales amount" .
+
+csg:totalGrossMargin
+    skos:altLabel "gross margin" ;
+    skos:altLabel "GM" ;
+    skos:altLabel "margin" ;
+    skos:altLabel "profit" .

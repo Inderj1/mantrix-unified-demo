@@ -29,7 +29,7 @@ class LLMClient:
                 "sql": """SELECT 
   FORMAT_DATE('%Y-%m', order_date) as month,
   SUM(total_amount) as total_sales
-FROM `{project}.{dataset}.sales`
+FROM {project}.{dataset}.sales
 WHERE DATE(order_date) >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 YEAR)
 GROUP BY month
 ORDER BY month"""
@@ -40,7 +40,7 @@ ORDER BY month"""
   customer_id,
   customer_name,
   SUM(revenue) as total_revenue
-FROM `{project}.{dataset}.customers`
+FROM {project}.{dataset}.customers
 GROUP BY customer_id, customer_name
 ORDER BY total_revenue DESC
 LIMIT 10"""
@@ -51,7 +51,7 @@ LIMIT 10"""
   GL_Account,
   GL_Account_Description,
   SUM(GL_Amount_in_CC) as total_amount
-FROM `{project}.{dataset}.table_name`
+FROM {project}.{dataset}.table_name
 WHERE GL_Account IS NOT NULL 
   AND GL_Amount_in_CC IS NOT NULL
 GROUP BY GL_Account, GL_Account_Description
@@ -65,7 +65,7 @@ LIMIT 5"""
   product_name,
   current_inventory,
   reorder_level
-FROM `{project}.{dataset}.inventory`
+FROM {project}.{dataset}.inventory
 WHERE current_inventory < reorder_level
 ORDER BY current_inventory ASC"""
             }
@@ -119,7 +119,7 @@ ORDER BY current_inventory ASC"""
                     "properties": {
                         "sql": {
                             "type": "string",
-                            "description": "The generated BigQuery SQL query"
+                            "description": "The generated PostgreSQL SQL query"
                         },
                         "explanation": {
                             "type": "string",
@@ -215,6 +215,12 @@ ORDER BY current_inventory ASC"""
                     }
                 
                 logger.info("SQL generation completed successfully")
+
+                # Post-process: Remove BigQuery-style backticks for PostgreSQL compatibility
+                if "sql" in result and result["sql"]:
+                    result["sql"] = result["sql"].replace('`', '')
+                    logger.info("Removed backticks from generated SQL")
+
                 # Add confidence score based on complexity
                 result["confidence_score"] = self._calculate_confidence(result, table_schemas)
                 return result
@@ -274,7 +280,7 @@ ORDER BY current_inventory ASC"""
             return error_result
     
     def _build_system_prompt(self, financial_context: Optional[Dict[str, Any]] = None) -> str:
-        base_prompt = f"""You are an expert SQL query generator for Google BigQuery. Your task is to convert natural language questions into optimized BigQuery SQL queries.
+        base_prompt = f"""You are an expert SQL query generator for PostgreSQL. Your task is to convert natural language questions into optimized PostgreSQL SQL queries.
 
 !!!! ABSOLUTELY CRITICAL - REVENUE CALCULATION RULES !!!!
 THIS IS THE MOST IMPORTANT RULE - FOLLOW EXACTLY:
@@ -288,8 +294,8 @@ For ANY query about revenue, sales, or income:
 CORRECT revenue query pattern:
   SELECT EXTRACT(YEAR FROM Posting_Date) as year,
          ROUND(SUM(COALESCE(Gross_Revenue, 0)), 2) as total_revenue
-  FROM `project.dataset.table`
-  WHERE Posting_Date >= DATE_SUB(CURRENT_DATE(), INTERVAL 2 YEAR)
+  FROM table_name
+  WHERE Posting_Date >= CURRENT_DATE - INTERVAL '2 years'
   GROUP BY year
 
 INCORRECT patterns (NEVER USE THESE):
@@ -303,10 +309,11 @@ Revenue column mapping:
 - "gross sales" → SUM(COALESCE(Gross_Sales, 0))
 
 Rules:
-1. Generate valid BigQuery SQL syntax
-2. ALWAYS qualify table names with the dataset: `{settings.google_cloud_project}.{settings.bigquery_dataset}.table_name`
-3. IMPORTANT: If a table name contains hyphens or special characters, wrap the ENTIRE qualified table name in backticks
-4. Optimize queries for performance (use appropriate JOINs, filters, and aggregations)
+1. Generate valid PostgreSQL SQL syntax
+2. Use simple table names without schema qualification (tables are in the public schema)
+3. IMPORTANT: DO NOT use backticks - PostgreSQL uses double quotes for identifiers if needed
+4. Use standard PostgreSQL functions and syntax (NOT BigQuery syntax)
+5. Optimize queries for performance (use appropriate JOINs, filters, and aggregations)
 5. Use CTEs for complex queries to improve readability
 6. Consider using APPROX functions for large datasets when exact results aren't required
 7. Use proper date/timestamp functions for time-based queries
@@ -321,6 +328,61 @@ Rules:
 13. IMPORTANT: Window functions (RANK(), ROW_NUMBER(), etc.) cannot be used in WHERE clauses
     - Use a CTE or subquery to filter on window function results
     - For simple "top N" queries, prefer ORDER BY with LIMIT instead of RANK()
+
+13a. CRITICAL - ORDER BY with Formatted Columns (RANKING QUERIES):
+
+    ⚠️ When using ORDER BY with LIMIT for "top N" queries on formatted currency/percentage columns:
+
+    **WRONG PATTERN** (causes alphabetic sorting on strings like "$8,240" before "$80,333"):
+    ```sql
+    SELECT
+      distributor,
+      '$' || to_char(ROUND(SUM(total_gm), 2), 'FM999,999,999.00') AS gross_margin
+    FROM csg_data
+    GROUP BY distributor
+    ORDER BY gross_margin DESC  -- ❌ This sorts the FORMATTED STRING alphabetically!
+    LIMIT 5
+    ```
+
+    **CORRECT PATTERN** (use CTE and order by raw numeric value):
+    ```sql
+    WITH distributor_metrics AS (
+      SELECT
+        distributor,
+        SUM(total_gm) AS gross_margin_raw,  -- Keep raw numeric value
+        SUM(total_sales) AS revenue_raw
+      FROM csg_data
+      GROUP BY distributor
+      ORDER BY gross_margin_raw DESC  -- ✅ Sort on RAW numeric INSIDE CTE
+      LIMIT 5  -- ✅ LIMIT also goes in CTE
+    )
+    SELECT
+      distributor,
+      '$' || to_char(ROUND(gross_margin_raw, 2), 'FM999,999,999.00') AS gross_margin,
+      '$' || to_char(ROUND(revenue_raw, 2), 'FM999,999,999.00') AS total_revenue
+    FROM distributor_metrics
+    -- NO ORDER BY here - already sorted in CTE!
+    ```
+
+    **KEY RULES:**
+    - For ANY "top N", "bottom N", "highest", "lowest", "best", "worst" query:
+      1. Create CTE with RAW numeric aggregations
+      2. Put ORDER BY + LIMIT in the CTE (on numeric columns)
+      3. Format in outer SELECT (after sorting is done)
+      4. Do NOT add ORDER BY in outer SELECT on formatted columns
+
+    - Queries this applies to:
+      * "show top 5 distributors by revenue"
+      * "who are the most profitable customers"
+      * "rank facilities by sales"
+      * "best performing surgeons"
+      * "highest margin products"
+      * Any query with: top, bottom, best, worst, highest, lowest, rank
+
+    - Why this matters:
+      * String sorting: "$8,240" < "$80,333" (wrong!)
+      * Numeric sorting: 8240 < 80333 (correct!)
+      * Always sort on NUMBERS, format AFTER sorting
 14. COPA Schema Revenue and Margin Rules:
     - Gross Revenue: Use Gross_Revenue column for total gross revenue queries
     - Net Sales: Use Net_Sales column for net sales after deductions
@@ -353,62 +415,66 @@ Rules:
       * MUST use: LTRIM(copa.Sales_Order_KDAUF, '0') = cockpit.SalesDocument_VBELN
       * DO NOT use direct equality: copa.Sales_Order_KDAUF = cockpit.SalesDocument_VBELN (this will match < 0.01% of records!)
     - Correct JOIN example:
-      ```sql
+      sql
       FROM dataset_25m_table copa
       LEFT JOIN sales_order_cockpit_export cockpit
         ON LTRIM(copa.Sales_Order_KDAUF, '0') = cockpit.SalesDocument_VBELN
-      ```
+      
     - This applies to ALL queries joining these two tables
     - Expected match rate with LTRIM: ~85-95% of COPA records
 
-18. CRITICAL - COLUMN FORMATTING RULES (Make Results Readable):
-    ⭐ ALWAYS FORMAT MONETARY VALUES, PERCENTAGES, AND COUNTS ⭐
+18. CRITICAL - COLUMN FORMATTING RULES (PostgreSQL):
 
-    **Currency Columns** - Apply dollar sign AND thousand separators:
+    ⭐ ALWAYS FORMAT MONETARY VALUES AND PERCENTAGES FOR READABILITY ⭐
 
-    CRITICAL FORMAT PATTERN (BigQuery-compatible with thousand separators):
-    CONCAT('$', FORMAT('%\\'d', CAST(FLOOR(column_value) AS INT64)), FORMAT('.%02d', CAST(ROUND((column_value - FLOOR(column_value)) * 100) AS INT64)))
+    **Currency Columns** - Use PostgreSQL to_char() function with dollar sign and thousand separators:
 
-    This pattern ensures exactly 2 decimal places and thousand separators.
+    CORRECT PATTERN for PostgreSQL:
+    '$' || to_char(ROUND(column_value, 2), 'FM999,999,999.00')
 
-    The first parameter MUST be the string '$' (DOLLAR SIGN character)
-    NOT comma, NOT other punctuation, ONLY dollar sign: $
-
-    Apply to:
-    - Revenue, Sales, Gross_Revenue, Net_Sales, Gross_Sales
-    - Cost, COGS, Total_COGS, Expenses, OpEx
+    Apply to these column types:
+    - Revenue, Sales, Gross_Revenue, Net_Sales, Total_Sales
+    - Cost, COGS, Total_COGS, Expenses, OpEx, Std_Cost
     - Price, Amount, Value, Total, Sum
     - Profit, Margin (when not %), Income, EBITDA
-    - Gross, Net (when monetary), Budget, Spend
+    - Gross, Net (when monetary), Gross_Margin
     - Payment, Fee, Charge, Invoice, Freight
     - Discount, Rebate, Commission, Wage, Salary
-    - Tax (when not rate), Asset, Liability, Equity
-    - SAP value fields: VV001, VV002, VV003, etc.
 
-    CORRECT Example (with thousand separators):
-    CONCAT('$', FORMAT('%\\'d', CAST(FLOOR(SUM(COALESCE(Gross_Revenue, 0))) AS INT64)), FORMAT('.%02d', CAST(ROUND((SUM(COALESCE(Gross_Revenue, 0)) - FLOOR(SUM(COALESCE(Gross_Revenue, 0)))) * 100) AS INT64))) as revenue
+    CORRECT Examples:
+    '$' || to_char(ROUND(SUM(total_sales), 2), 'FM999,999,999.00') AS total_revenue
+    '$' || to_char(ROUND(SUM(total_std_cost), 2), 'FM999,999,999.00') AS total_cost
+    '$' || to_char(ROUND(SUM(total_sales) - SUM(total_std_cost), 2), 'FM999,999,999.00') AS gross_margin
 
-    WRONG - DO NOT USE:
-    CONCAT(',', FORMAT(...))                    -- WRONG: comma instead of dollar
-    CONCAT('', FORMAT(...))                     -- WRONG: empty string
-    FORMAT('%\\', d', ...)                       -- WRONG: missing dollar sign
-    CAST(ROUND(..., 2) AS STRING)               -- WRONG: no thousand separators
-    FORMAT('%,.2f', ...)                        -- WRONG: BigQuery doesn't support this
+    **Percentage Columns** - Calculate and append % symbol:
 
-    The character between CONCAT(' and ' MUST be: $
+    CORRECT PATTERN for PostgreSQL:
+    to_char(ROUND(100.0 * numerator / NULLIF(denominator, 0), 2), 'FM999.00') || '%'
 
-    **Percentage Columns** - Apply `CONCAT(CAST(ROUND(column_name, 2) AS STRING), '%')` to:
-    - Margin_Percent, Margin_Pct, Growth_Rate, Change_Percent
+    Apply to:
+    - Margin_Percent, Margin_Pct, Gross_Margin_Pct
+    - Growth_Rate, Change_Percent, Variance_Pct
     - Any column ending in _percent, _pct, _rate
-    - Calculated percentages (growth, variance, ratio)
 
-    Example: `CONCAT(CAST(ROUND(margin_percent, 2) AS STRING), '%') as margin`
+    CORRECT Example:
+    to_char(ROUND(100.0 * SUM(total_gm) / NULLIF(SUM(total_sales), 0), 2), 'FM999.00') || '%' AS gross_margin_pct
 
-    **Numeric Columns** (integers with commas) - Apply `FORMAT('%\\'d', CAST(column_value AS INT64))` to:
+    **Count/Quantity Columns** - No formatting needed:
+    COUNT(*), SUM(quantity), COUNT(DISTINCT customer)
+
+    WRONG - DO NOT USE (these are BigQuery patterns):
+    CAST(... AS INT64)                          -- WRONG: Use INTEGER for PostgreSQL
+    CAST(... AS STRING)                         -- WRONG: Use TEXT or VARCHAR for PostgreSQL
+    FORMAT('%d', ...)                           -- WRONG: Not a PostgreSQL function
+    CONCAT('$', FORMAT(...))                    -- WRONG: BigQuery syntax
+
+    Use PostgreSQL's to_char() function for all formatting.
+
+    **Numeric Columns** (integers with commas) - Apply FORMAT('%\\'d', CAST(column_value AS INT64)) to:
     - Quantity, Qty, Count, Number, Volume
     - Units, Cases, Items, Orders, Transactions
 
-    Example: `FORMAT('%\\'d', CAST(COUNT(DISTINCT customer_id) AS INT64)) as customer_count`
+    Example: FORMAT('%\\'d', CAST(COUNT(DISTINCT customer_id) AS INT64)) as customer_count
 
     **IMPORTANT**:
     - Format EVERY applicable column in SELECT clause
@@ -535,17 +601,17 @@ Financial Query Rules:
 
             # Add JOIN example
             prompt_parts.append("\n\nEXAMPLE MULTI-TABLE QUERY PATTERN:")
-            prompt_parts.append("```sql")
+            prompt_parts.append("sql")
             prompt_parts.append("SELECT")
             prompt_parts.append("    copa.Gross_Revenue,")
             prompt_parts.append("    copa.Customer,")
             prompt_parts.append("    cockpit.DocumentDate_AUDAT,")
             prompt_parts.append("    cockpit.Delivery_VBELN")
-            prompt_parts.append("FROM `project.dataset.dataset_25m_table` copa")
-            prompt_parts.append("LEFT JOIN `project.dataset.sales_order_cockpit_export` cockpit")
+            prompt_parts.append("FROM project.dataset.dataset_25m_table copa")
+            prompt_parts.append("LEFT JOIN project.dataset.sales_order_cockpit_export cockpit")
             prompt_parts.append("    ON LTRIM(copa.Sales_Order_KDAUF, '0') = cockpit.SalesDocument_VBELN")
             prompt_parts.append("WHERE copa.Posting_Date >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 YEAR)")
-            prompt_parts.append("```")
+            prompt_parts.append("")
             prompt_parts.append("\n✓ REMEMBER: Use table aliases (copa, cockpit) to qualify ALL column references")
             prompt_parts.append("✓ REMEMBER: Choose the correct table for each column based on the guide above")
 
@@ -623,7 +689,8 @@ Financial Query Rules:
         # Add the user query
         prompt_parts.append(f"\n\nUser question: {query}")
         prompt_parts.append("\nGenerate the SQL query in the specified JSON format.")
-        prompt_parts.append("\nEnsure the SQL is optimized for BigQuery and follows best practices.")
+        prompt_parts.append("\nEnsure the SQL is optimized for PostgreSQL and follows best practices.")
+        prompt_parts.append("\nIMPORTANT: DO NOT use backticks () in the SQL - use plain table names or double quotes if needed.")
         
         # Store examples used for confidence calculation
         self._last_examples_used = examples
@@ -767,7 +834,7 @@ Financial Query Rules:
     def optimize_query(self, sql: str, performance_stats: Dict[str, Any]) -> Dict[str, Any]:
         """Suggest query optimizations based on performance statistics."""
         try:
-            prompt = f"""Analyze this BigQuery SQL query and suggest optimizations:
+            prompt = f"""Analyze this PostgreSQL SQL query and suggest optimizations:
 
 SQL Query:
 {sql}
@@ -897,7 +964,7 @@ Return a JSON object with:
         SUM(CASE WHEN gl_account BETWEEN '5000' AND '5999' THEN amount ELSE 0 END),
         SUM(CASE WHEN gl_account BETWEEN '4000' AND '4999' THEN amount ELSE 0 END)
     ) * 100 as gross_margin_pct
-FROM `{project}.{dataset}.gl_transactions`
+FROM {project}.{dataset}.gl_transactions
 WHERE DATE_TRUNC(date, QUARTER) = DATE_TRUNC(DATE_SUB(CURRENT_DATE(), INTERVAL 1 QUARTER), QUARTER)
 GROUP BY region
 ORDER BY gross_margin DESC"""
@@ -914,7 +981,7 @@ ORDER BY gross_margin DESC"""
              WHEN gl_account BETWEEN '5000' AND '6999' THEN -amount 
              ELSE 0 END) + 
     SUM(CASE WHEN gl_account IN ('6810', '6820', '6830', '6840', '6850') THEN amount ELSE 0 END) as ebitda
-FROM `{project}.{dataset}.gl_transactions`
+FROM {project}.{dataset}.gl_transactions
 WHERE EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM CURRENT_DATE())"""
                 }
             ]
@@ -933,7 +1000,7 @@ WHERE EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM CURRENT_DATE())"""
     END as cost_component,
     SUM(amount) as total_amount,
     COUNT(DISTINCT gl_account) as account_count
-FROM `{project}.{dataset}.gl_transactions`
+FROM {project}.{dataset}.gl_transactions
 WHERE gl_account BETWEEN '5000' AND '5999'
     AND DATE_TRUNC(date, MONTH) = DATE_TRUNC(CURRENT_DATE(), MONTH)
 GROUP BY cost_component
@@ -951,7 +1018,7 @@ ORDER BY total_amount DESC"""
     END as expense_category,
     SUM(amount) as total_expenses,
     COUNT(*) as transaction_count
-FROM `{project}.{dataset}.gl_transactions`
+FROM {project}.{dataset}.gl_transactions
 WHERE gl_account BETWEEN '6000' AND '6999'
     AND EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM CURRENT_DATE())
 GROUP BY expense_category
@@ -971,7 +1038,7 @@ ORDER BY total_expenses DESC"""
     amount,
     reference_number,
     vendor_name
-FROM `{project}.{dataset}.gl_transactions`
+FROM {project}.{dataset}.gl_transactions
 WHERE LOWER(gl_description) LIKE '%freight%'
     AND EXTRACT(QUARTER FROM date) = 2
     AND EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM CURRENT_DATE())
@@ -985,7 +1052,7 @@ ORDER BY date DESC"""
     gl_description,
     SUM(amount) as total_rent,
     COUNT(*) as payment_count
-FROM `{project}.{dataset}.gl_transactions`
+FROM {project}.{dataset}.gl_transactions
 WHERE gl_account IN ('6300', '6301', '6302')
     OR LOWER(gl_description) LIKE '%office rent%'
 GROUP BY location, gl_account, gl_description

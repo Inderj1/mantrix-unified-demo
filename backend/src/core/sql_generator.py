@@ -12,7 +12,7 @@ from src.core.metrics_precalculation import FinancialMetricsPreCalculator
 from src.core.precalc_integration import PreCalcIntegrator, PreCalcRegistry, QueryDecomposer
 from src.core.table_registry import table_registry, TableDomain
 from src.core.business_config import (
-    BusinessConfigManager, 
+    BusinessConfigManager,
     mapping_registry,
     QueryContextEnhancer
 )
@@ -28,7 +28,15 @@ except ImportError:
     GraphTraversalEngine = None
     get_jena_knowledge_graph = lambda: None
     get_jena_query_resolver = lambda: None
-from src.db.bigquery import BigQueryClient
+
+# CSG Entity Resolver
+try:
+    from src.core.knowledge_graph.csg_entity_resolver import get_entity_resolver
+    CSG_ENTITY_RESOLVER_AVAILABLE = True
+except ImportError:
+    CSG_ENTITY_RESOLVER_AVAILABLE = False
+    get_entity_resolver = lambda x: None
+from src.db.database_client import DatabaseClient as BigQueryClient
 from src.db.weaviate_client import WeaviateClient
 from src.config import settings
 
@@ -155,6 +163,22 @@ class SQLGenerator:
                 self.precalc_integrator = None
         if not hasattr(settings, 'enable_financial_hierarchy'):
             self.enable_financial_features = True  # Enable by default
+
+        # Initialize CSG Entity Resolver
+        self.entity_resolver = None
+        if CSG_ENTITY_RESOLVER_AVAILABLE:
+            try:
+                postgres_config = {
+                    'host': settings.postgres_host,
+                    'port': settings.postgres_port,
+                    'user': settings.postgres_user,
+                    'password': settings.postgres_password,
+                    'database': settings.postgres_database
+                }
+                self.entity_resolver = get_entity_resolver(postgres_config)
+                logger.info("✅ CSG Entity Resolver initialized")
+            except Exception as e:
+                logger.warning(f"Failed to initialize entity resolver: {e}")
         
         # Set LLM client in suggestion service
         self.suggestion_service.llm_client = self.llm_client
@@ -358,14 +382,42 @@ class SQLGenerator:
                         precalc_result["financial_context"] = financial_context
                     return precalc_result
             
-            # Apply industry-specific preprocessing
+            # Apply entity resolution for CSG data FIRST
             processed_query = query
+            entity_hints = {}
+
+            if self.entity_resolver:
+                # Extract potential person names from query
+                import re
+                # Simple name extraction: capitalize words (2+ words likely a name)
+                words = query.split()
+                for i in range(len(words) - 1):
+                    potential_name = f"{words[i]} {words[i+1]}"
+                    # Check if this could be a name (titlecase words)
+                    if words[i][0].isupper() and words[i+1][0].isupper():
+                        entity_type = self.entity_resolver.resolve_entity_type(potential_name)
+                        if entity_type:
+                            column, _ = self.entity_resolver.get_column_for_entity(potential_name)
+                            if column:
+                                entity_hints[potential_name] = {
+                                    'type': entity_type,
+                                    'column': column
+                                }
+                                logger.info(f"🔍 Resolved '{potential_name}' as {entity_type} → use column '{column}'")
+
+                                # Modify query to be more specific
+                                processed_query = query.replace(
+                                    f"{potential_name}",
+                                    f"{potential_name} (a {entity_type})"
+                                )
+
+            # Apply industry-specific preprocessing
             if settings.enable_industry_features and self.industry_manager.active_config:
                 # Translate business terms
-                processed_query = self.industry_manager.translate_business_terms(query)
-                
+                processed_query = self.industry_manager.translate_business_terms(processed_query)
+
                 # Check for matching templates
-                templates = self.industry_manager.get_relevant_templates(query)
+                templates = self.industry_manager.get_relevant_templates(processed_query)
                 if templates:
                     logger.info(f"Found {len(templates)} matching query templates")
             
@@ -471,7 +523,272 @@ class SQLGenerator:
                 # Generate SQL using LLM
                 result = self.llm_client.generate_sql(processed_query, relevant_schemas, **llm_kwargs)
                 result["from_cache"] = False
-            
+
+            # CRITICAL: Remove BigQuery syntax for PostgreSQL compatibility (apply to all SQL)
+            if result.get("sql"):
+                sql = result["sql"]
+                modified = False
+
+                # Remove backticks
+                if '`' in sql:
+                    sql = sql.replace('`', '')
+                    modified = True
+                    logger.info("🔧 Removed BigQuery backticks")
+
+                # Replace BigQuery data types with PostgreSQL
+                if 'INT64' in sql:
+                    sql = sql.replace('INT64', 'INTEGER')
+                    modified = True
+                    logger.info("🔧 Replaced INT64 with INTEGER")
+
+                if 'FLOAT64' in sql:
+                    sql = sql.replace('FLOAT64', 'DOUBLE PRECISION')
+                    modified = True
+
+                # Replace BigQuery SAFE_DIVIDE with NULLIF
+                if 'SAFE_DIVIDE' in sql:
+                    import re
+                    sql = re.sub(r'SAFE_DIVIDE\s*\(([^,]+),\s*([^)]+)\)', r'(\1::numeric / NULLIF(\2, 0))', sql)
+                    modified = True
+                    logger.info("🔧 Replaced SAFE_DIVIDE with NULLIF")
+
+                # Remove complex BigQuery FORMAT/CONCAT expressions
+                if 'FORMAT' in sql or 'CONCAT' in sql:
+                    import re
+
+                    # Replace CONCAT expressions that wrap column names
+                    # Pattern: CONCAT('$', ...) AS alias -> just the column AS alias
+                    # Pattern: CONCAT(column, '%') AS alias -> column AS alias
+
+                    lines = sql.split('\n')
+                    new_lines = []
+
+                    for line in lines:
+                        if 'CONCAT' in line and 'AS' in line:
+                            # Handle CONCAT/FORMAT expressions with potential aggregations
+                            # Pattern: CONCAT('$', FORMAT(..., SUM(column_name), ...), ...) AS alias
+
+                            # Extract alias first - use the LAST occurrence of AS to get the column alias
+                            # (there might be multiple AS keywords like "CAST(... AS STRING) AS column_alias")
+                            alias_matches = re.findall(r'AS\s+(\w+)', line)
+                            if not alias_matches:
+                                new_lines.append(line)
+                                continue
+
+                            original_alias = alias_matches[-1]  # Use the last AS which is the column alias
+                            has_comma = line.rstrip().endswith(',')
+
+                            # Find ALL aggregation function calls in the line (handles nested functions)
+                            # This will match SUM(total_sales) even inside FLOOR(SUM(total_sales))
+                            all_agg_matches = re.findall(r'(SUM|AVG|COUNT|MAX|MIN)\s*\(\s*(?:(\w+)\.)?(\w+)\s*\)', line, re.IGNORECASE)
+
+                            if all_agg_matches:
+                                # Check if this is a percentage/ratio calculation (multiple aggregations with division)
+                                if len(all_agg_matches) >= 2 and ('/' in line or 'NULLIF' in line):
+                                    # This is likely a percentage or ratio calculation - preserve the calculation logic
+                                    # Extract the two columns (numerator and denominator)
+                                    numerator = all_agg_matches[0][2]  # e.g., total_gm
+                                    denominator = all_agg_matches[1][2]  # e.g., total_sales
+
+                                    # Create a percentage calculation
+                                    if '%' in original_alias.lower() or 'pct' in original_alias.lower() or 'percent' in original_alias.lower():
+                                        # Percentage calculation
+                                        alias = original_alias if original_alias.upper() not in ['STRING', 'INTEGER'] else 'gross_margin_pct'
+                                        new_line = f"  ROUND(100.0 * SUM({numerator}) / NULLIF(SUM({denominator}), 0), 2) AS {alias}"
+                                    else:
+                                        # Ratio calculation
+                                        alias = original_alias if original_alias.upper() not in ['STRING', 'INTEGER'] else f"{numerator}_{denominator}_ratio"
+                                        new_line = f"  ROUND(SUM({numerator}) / NULLIF(SUM({denominator}), 0), 2) AS {alias}"
+
+                                    if has_comma:
+                                        new_line += ','
+                                    new_lines.append(new_line)
+                                    modified = True
+                                    logger.info(f"🔧 Simplified percentage/ratio calculation to {new_line.strip()}")
+                                    continue
+                                else:
+                                    # Single aggregation - simple case
+                                    agg_func, table_prefix, column = all_agg_matches[0]
+                                    table_prefix = f"{table_prefix}." if table_prefix else ''
+
+                                    # If alias is a BigQuery data type, use meaningful alias
+                                    if original_alias.upper() in ['INTEGER', 'STRING', 'FLOAT64', 'INT64', 'NUMERIC', 'DECIMAL']:
+                                        alias = f"total_{column}"
+                                    else:
+                                        alias = original_alias
+
+                                    new_line = f"  ROUND({agg_func.upper()}({table_prefix}{column}), 2) AS {alias}"
+                                    if has_comma:
+                                        new_line += ','
+                                    new_lines.append(new_line)
+                                    modified = True
+                                    logger.info(f"🔧 Simplified CONCAT/FORMAT to ROUND({agg_func.upper()}({column}), 2) AS {alias}")
+                                    continue
+                            else:
+                                # No aggregation found - might be a simple column reference
+                                # Try to find the actual column being referenced
+                                identifiers = re.findall(r'\b(total_\w+|gross_\w+|\w+_pct|\w+_margin|revenue|cogs|margin)\b', line)
+
+                                if identifiers:
+                                    col_name = identifiers[0]
+
+                                    if original_alias.upper() in ['INTEGER', 'VARCHAR', 'STRING', 'FLOAT64', 'NUMERIC', 'DECIMAL']:
+                                        new_line = f"  {col_name}"
+                                        logger.info(f"🔧 Removed CONCAT with data type alias {original_alias}, kept column {col_name}")
+                                    else:
+                                        new_line = f"  {col_name} AS {original_alias}"
+                                        logger.info(f"🔧 Removed CONCAT/FORMAT, kept column {col_name} AS {original_alias}")
+
+                                    if has_comma:
+                                        new_line += ','
+                                    new_lines.append(new_line)
+                                    modified = True
+                                    continue
+
+                        if ('CONCAT' in line or 'FORMAT' in line) and 'AS' in line:
+                            # Try to extract the actual column being formatted
+                            # Look for patterns like: csg.column_name or SUM(column_name)
+
+                            # Check if line ends with comma (preserve it)
+                            has_trailing_comma = line.rstrip().endswith(',')
+
+                            # Extract alias first
+                            alias_match = re.search(r'AS\s+(\w+)', line)
+                            if not alias_match:
+                                new_lines.append(line)
+                                continue
+
+                            original_alias = alias_match.group(1)
+
+                            # Find ALL aggregation function calls in the line (handles nested functions)
+                            # This will match SUM(total_sales) even inside FLOOR(SUM(total_sales))
+                            all_agg_matches = re.findall(r'(SUM|AVG|COUNT|MAX|MIN)\s*\(\s*(?:(\w+)\.)?(\w+)\s*\)', line, re.IGNORECASE)
+
+                            if all_agg_matches:
+                                # Use the first aggregation match
+                                agg_func, table_prefix, column = all_agg_matches[0]
+                                table_prefix = f"{table_prefix}." if table_prefix else ''
+
+                                # If alias is a BigQuery data type (INTEGER, STRING, etc.), use column name instead
+                                if original_alias.upper() in ['INTEGER', 'STRING', 'FLOAT64', 'INT64', 'NUMERIC', 'DECIMAL']:
+                                    # Use total_columnname as the alias for aggregated columns
+                                    alias = f"total_{column}"
+                                else:
+                                    alias = original_alias
+
+                                new_line = f"  ROUND({agg_func.upper()}({table_prefix}{column}), 2) AS {alias}"
+                                if has_trailing_comma:
+                                    new_line += ','
+                                new_lines.append(new_line)
+                                modified = True
+                                logger.info(f"🔧 Simplified CONCAT/FORMAT to ROUND({agg_func.upper()}({column}), 2) AS {alias}")
+                                continue
+
+                            # If no aggregation found, check if it's a non-aggregated column (detail query)
+                            col_match = re.search(r'(\w+\.)(\w+)', line)
+                            if col_match:
+                                table_prefix = col_match.group(1)
+                                column = col_match.group(2)
+                                # For detail queries, just use the column name without alias
+                                # (unless it's a meaningful alias, not INTEGER)
+                                new_line = f"  {table_prefix}{column}"
+                                if has_trailing_comma:
+                                    new_line += ','
+                                new_lines.append(new_line)
+                                modified = True
+                                logger.info(f"🔧 Removed FORMAT, kept column {table_prefix}{column}")
+                            else:
+                                # Couldn't parse, keep original
+                                new_lines.append(line)
+                        else:
+                            new_lines.append(line)
+
+                    if modified:
+                        sql = '\n'.join(new_lines)
+                        logger.info(f"🔧 SQL before removing trailing commas: {sql[:200]}")
+                        # Remove trailing commas before FROM/WHERE/GROUP BY
+                        sql = re.sub(r',\s*\n(\s*FROM\s)', r'\n\1', sql, flags=re.IGNORECASE)
+                        sql = re.sub(r',\s*\n(\s*WHERE\s)', r'\n\1', sql, flags=re.IGNORECASE)
+                        sql = re.sub(r',\s*\n(\s*GROUP\s+BY\s)', r'\n\1', sql, flags=re.IGNORECASE)
+                        logger.info(f"🔧 SQL after removing trailing commas: {sql[:200]}")
+
+                if modified:
+                    result["sql"] = sql
+                    logger.info(f"🔧 PostgreSQL compatibility fixes applied")
+
+                # Fix ORDER BY column references and remove duplicate columns
+                if sql:
+                    import re
+
+                    # Extract all column aliases from SELECT clause
+                    select_match = re.search(r'SELECT\s+(.*?)\s+FROM', sql, re.DOTALL | re.IGNORECASE)
+                    if select_match:
+                        select_clause = select_match.group(1)
+
+                        # Find all aliases (pattern: "AS alias" or "AS alias,")
+                        aliases = re.findall(r'\bAS\s+(\w+)\s*[,\n]?', select_clause, re.IGNORECASE)
+
+                        # Remove duplicate aliases (keep first occurrence)
+                        seen_aliases = set()
+                        lines = sql.split('\n')
+                        deduplicated_lines = []
+
+                        for line in lines:
+                            alias_match = re.search(r'\bAS\s+(\w+)', line, re.IGNORECASE)
+                            if alias_match:
+                                alias = alias_match.group(1).lower()
+                                if alias in seen_aliases:
+                                    # Skip duplicate column
+                                    logger.info(f"🔧 Removed duplicate column with alias: {alias}")
+                                    continue
+                                seen_aliases.add(alias)
+                            deduplicated_lines.append(line)
+
+                        sql = '\n'.join(deduplicated_lines)
+
+                        # Now fix ORDER BY references
+                        # Build mapping of common column name variations
+                        alias_map = {}
+                        for alias in aliases:
+                            alias_lower = alias.lower()
+                            # Map variations to actual alias
+                            # e.g., "total_gross_margin" -> "total_total_gm"
+                            if 'gm' in alias_lower or 'margin' in alias_lower:
+                                alias_map['total_gross_margin'] = alias
+                                alias_map['gross_margin'] = alias
+                                alias_map['gm'] = alias
+                            if 'revenue' in alias_lower or 'sales' in alias_lower:
+                                alias_map['total_revenue'] = alias
+                                alias_map['revenue'] = alias
+                                alias_map['total_sales'] = alias
+                                alias_map['sales'] = alias
+                            if 'cost' in alias_lower:
+                                alias_map['total_cost'] = alias
+                                alias_map['cost'] = alias
+                                alias_map['total_std_cost'] = alias
+                                alias_map['std_cost'] = alias
+
+                        # Fix ORDER BY clause
+                        order_by_match = re.search(r'ORDER\s+BY\s+(\w+)', sql, re.IGNORECASE)
+                        if order_by_match:
+                            order_by_col = order_by_match.group(1)
+                            # Check if this column exists in our aliases
+                            if order_by_col not in [a.lower() for a in aliases]:
+                                # Try to find a mapping
+                                if order_by_col.lower() in alias_map:
+                                    correct_alias = alias_map[order_by_col.lower()]
+                                    sql = re.sub(
+                                        rf'ORDER\s+BY\s+{order_by_col}\b',
+                                        f'ORDER BY {correct_alias}',
+                                        sql,
+                                        flags=re.IGNORECASE
+                                    )
+                                    logger.info(f"🔧 Fixed ORDER BY: {order_by_col} -> {correct_alias}")
+                                    modified = True
+
+                    if modified:
+                        result["sql"] = sql
+
             # Post-process SQL to fix revenue column usage
             logger.info(f"Post-processing check: query contains 'revenue'? {('revenue' in query.lower())}")
             if result.get("sql"):
@@ -514,10 +831,17 @@ class SQLGenerator:
                                 result["sql"] = result["sql"].replace(old_pattern, new_pattern)
                                 sql_modified = True
                                 logger.info(f"Replaced pattern: {old_pattern[:50]}...")
-                        
+
+                        # Post-process: Remove BigQuery backticks for PostgreSQL compatibility
+                        if '`' in result["sql"]:
+                            result["sql"] = result["sql"].replace('`', '')
+                            sql_modified = True
+                            logger.info("Removed BigQuery backticks from SQL for PostgreSQL compatibility")
+
                         if sql_modified:
                             logger.info(f"SQL after post-processing (first 200 chars): {result['sql'][:200]}")
-                            result["explanation"] = "Query correctly uses Gross_Revenue column for revenue calculations (auto-corrected)"
+                            if result.get("auto_corrected"):
+                                result["explanation"] = "Query correctly uses Gross_Revenue column for revenue calculations (auto-corrected)"
                             result["auto_corrected"] = True
             
             # Validate the generated SQL (with caching)

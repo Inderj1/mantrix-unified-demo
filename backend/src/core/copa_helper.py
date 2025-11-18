@@ -192,7 +192,7 @@ class COPAQueryHelper:
                 SUM(VV001) as actual_revenue,
                 SUM(VV002) as actual_cost,
                 SUM(VV001 - VV002) as actual_profit
-            FROM `{{project}}.{{dataset}}.CE11000` a
+            FROM {{project}}.{{dataset}}.CE11000` a
             WHERE VERSI = '{actual_version}'
                 {time_filter}
             GROUP BY {dim_group}
@@ -203,7 +203,7 @@ class COPAQueryHelper:
                 SUM(VV001) as plan_revenue,
                 SUM(VV002) as plan_cost,
                 SUM(VV001 - VV002) as plan_profit
-            FROM `{{project}}.{{dataset}}.CE21000` a
+            FROM {{project}}.{{dataset}}.CE21000` a
             WHERE VERSI = '{plan_version}'
                 {time_filter}
             GROUP BY {dim_group}

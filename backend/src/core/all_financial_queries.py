@@ -22,7 +22,7 @@ ADDITIONAL_COMMON_QUERIES = [
     COUNT(DISTINCT Customer) as Customer_Count,
     COUNT(DISTINCT Material_Number) as Product_Count,
     COUNT(*) as Transaction_Count
-FROM `{project}.{dataset}.{table}`
+FROM {table}
 WHERE Posting_Date IS NOT NULL
     AND Gross_Revenue > 0
 GROUP BY Month
@@ -45,7 +45,7 @@ ORDER BY Month DESC""",
         ROUND(AVG(Sales_Margin_of_Gross_Sales), 2) as Avg_Gross_Margin_Pct,
         ROUND(AVG(Sales_Margin_of_Net_Sales), 2) as Avg_Net_Margin_Pct
         
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Fiscal_Year = EXTRACT(YEAR FROM CURRENT_DATE()) - 1
 )
 SELECT 
@@ -70,7 +70,7 @@ FROM pl_summary""",
     ROUND(SUM(COALESCE(Gross_Revenue, 0)), 2) as Total_Revenue,
     ROUND(AVG(COALESCE(Gross_Revenue, 0)), 2) as Avg_Order_Value,
     FIRST_VALUE(Sales_Region) OVER (PARTITION BY Customer ORDER BY COUNT(*) DESC) as Primary_Region
-FROM `{project}.{dataset}.{table}`
+FROM {table}
 WHERE Customer IS NOT NULL
 GROUP BY Customer
 ORDER BY Total_Revenue DESC
@@ -88,7 +88,7 @@ LIMIT 20""",
         ROUND(AVG(Sales_Margin_of_Gross_Sales), 2) as Avg_Gross_Margin,
         COUNT(DISTINCT Customer) as Customer_Count,
         COUNT(DISTINCT Material_Number) as Product_Count
-    FROM `{project}.{dataset}.{table}`
+    FROM {table}
     WHERE Fiscal_Year >= EXTRACT(YEAR FROM CURRENT_DATE()) - 3
     GROUP BY Fiscal_Year
 )
