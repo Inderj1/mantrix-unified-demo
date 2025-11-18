@@ -1344,10 +1344,16 @@ const SimpleChatInterface = () => {
     return (
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" spacing={2} alignItems="flex-start">
-          <Avatar sx={{ bgcolor: 'primary.main' }}>
-            <AIIcon />
-          </Avatar>
-          <Box sx={{ flex: 1, maxWidth: 'calc(100% - 60px)' }}>
+          <img
+            src="/axis-ai4.png"
+            alt="AXIS.AI"
+            style={{
+              width: 72,
+              height: 72,
+              objectFit: 'contain'
+            }}
+          />
+          <Box sx={{ flex: 1, maxWidth: 'calc(100% - 88px)' }}>
             {/* Main message - Enhanced Summary */}
             <Card
               elevation={2}
@@ -1360,21 +1366,7 @@ const SimpleChatInterface = () => {
             >
               <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                 <Stack direction="row" spacing={1.5} alignItems="flex-start">
-                  <InfoIcon sx={{ color: 'primary.main', mt: 0.3, fontSize: 20 }} />
                   <Box sx={{ flex: 1 }}>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{
-                        fontWeight: 600,
-                        color: 'primary.main',
-                        mb: 1,
-                        textTransform: 'uppercase',
-                        fontSize: '0.75rem',
-                        letterSpacing: '0.5px'
-                      }}
-                    >
-                      Query Summary
-                    </Typography>
                     <Typography
                       variant="body2"
                       sx={{
@@ -2166,15 +2158,15 @@ const SimpleChatInterface = () => {
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             {/* Left section */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Avatar
-                sx={{
-                  width: 48,
-                  height: 48,
-                  bgcolor: alpha('#1976d2', 0.1),
+              <img
+                src="/axis-ai4.png"
+                alt="AXIS.AI Logo"
+                style={{
+                  width: 120,
+                  height: 120,
+                  objectFit: 'contain'
                 }}
-              >
-                <AnalyticsIcon sx={{ fontSize: 28, color: '#1976d2' }} />
-              </Avatar>
+              />
               <Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Typography variant="h4" fontWeight={700}>
@@ -2393,9 +2385,15 @@ const SimpleChatInterface = () => {
             
             {loading && (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
-                <Avatar sx={{ bgcolor: 'primary.main' }}>
-                  <AIIcon />
-                </Avatar>
+                <img
+                  src="/axis-ai4.png"
+                  alt="AXIS.AI"
+                  style={{
+                    width: 72,
+                    height: 72,
+                    objectFit: 'contain'
+                  }}
+                />
                 <Box>
                   <CircularProgress size={20} />
                   <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>

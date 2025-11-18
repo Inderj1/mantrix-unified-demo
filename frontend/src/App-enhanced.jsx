@@ -65,6 +65,7 @@ import MarketsAIDashboard from './components/MarketsAIDashboard';
 import CoreAILanding from './components/CoreAILanding';
 import MargenAIDashboard from './components/margenai/MargenAIDashboard';
 import MargenAILanding from './components/MargenAILanding';
+import ReveqAILanding from './components/ReveqAILanding';
 import MargenAITable from './components/margenai/MargenAITable';
 import SegmentAnalytics from './components/margenai/SegmentAnalytics';
 import RevenueSalesAnalytics from './components/margenai/RevenueSalesAnalytics';
@@ -199,7 +200,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [selectedTab, setSelectedTab] = usePersistedState('mantrix-selectedTab', 0);
   const [drawerOpen, setDrawerOpen] = usePersistedState('mantrix-drawerOpen', false);
-  const [coreAIView, setCoreAIView] = useState('landing'); // 'landing', 'margen', 'stox', 'route'
+  const [coreAIView, setCoreAIView] = useState('landing'); // 'landing', 'margen', 'stox', 'route', 'reveq'
   const [stoxView, setStoxView] = usePersistedState('mantrix-stoxView', 'landing'); // 'landing', 'stoxshift'
   const [margenView, setMargenView] = usePersistedState('mantrix-margenView', 'landing'); // 'landing', 'revenue-sales', 'cost-operations', etc.
   const [routeView, setRouteView] = usePersistedState('mantrix-routeView', 'landing'); // 'landing', module IDs
@@ -569,6 +570,8 @@ function App() {
                     } else if (moduleId === 'route') {
                       setCoreAIView('route');
                       setRouteView('landing');
+                    } else if (moduleId === 'reveq') {
+                      setCoreAIView('reveq');
                     }
                   }} />
                 </Box>
@@ -844,6 +847,11 @@ function App() {
                   {!['landing', 'fleet-management', 'route-optimization', 'delivery-tracking', 'performance-analytics', 'fuel-management', 'maintenance-scheduler'].includes(routeView) && (
                     <RouteAI onBack={() => setRouteView('landing')} />
                   )}
+                </Box>
+              </Fade>
+              <Fade in={coreAIView === 'reveq'} timeout={300}>
+                <Box sx={{ display: coreAIView === 'reveq' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
+                  <ReveqAILanding onBack={() => setCoreAIView('landing')} />
                 </Box>
               </Fade>
             </Box>

@@ -123,7 +123,7 @@ ORDER BY current_inventory ASC"""
                         },
                         "explanation": {
                             "type": "string",
-                            "description": "Brief explanation of what the query does"
+                            "description": "Brief explanation written from AXIS.AI agent's perspective, describing what the agent is doing to answer the question. Use first-person language (I'm analyzing..., I'm calculating..., I've identified...) to sound like an AI assistant actively working on the task, not just describing SQL."
                         },
                         "tables_used": {
                             "type": "array",
@@ -197,7 +197,7 @@ ORDER BY current_inventory ASC"""
                     logger.error(f"Unexpected tool response type: {type(raw_result)}")
                     result = {
                         "sql": str(raw_result) if raw_result else "",
-                        "explanation": "Generated SQL query",
+                        "explanation": "I've generated a SQL query to answer your question.",
                         "tables_used": [],
                         "estimated_complexity": "medium",
                         "optimization_notes": ""
@@ -208,7 +208,7 @@ ORDER BY current_inventory ASC"""
                     logger.error(f"Result is still not a dict after processing: {type(result)}")
                     result = {
                         "sql": str(result) if result else "",
-                        "explanation": "Generated SQL query",
+                        "explanation": "I've generated a SQL query to answer your question.",
                         "tables_used": [],
                         "estimated_complexity": "medium",
                         "optimization_notes": ""
@@ -731,7 +731,7 @@ Financial Query Rules:
             logger.error(f"Expected string content, got {type(content)}: {repr(content)}")
             return {
                 "sql": str(content) if content is not None else "",
-                "explanation": "Generated SQL query",
+                "explanation": "I've generated a SQL query to answer your question.",
                 "tables_used": [],
                 "estimated_complexity": "medium",
                 "optimization_notes": "",
@@ -759,7 +759,7 @@ Financial Query Rules:
                 
                 # Ensure required fields exist
                 if "explanation" not in parsed:
-                    parsed["explanation"] = "Generated SQL query"
+                    parsed["explanation"] = "I've generated a SQL query to answer your question."
                 if "tables_used" not in parsed:
                     parsed["tables_used"] = []
                 if "estimated_complexity" not in parsed:
@@ -790,7 +790,7 @@ Financial Query Rules:
                 
                 # Ensure required fields exist
                 if "explanation" not in parsed:
-                    parsed["explanation"] = "Generated SQL query"
+                    parsed["explanation"] = "I've generated a SQL query to answer your question."
                 if "tables_used" not in parsed:
                     parsed["tables_used"] = []
                 if "estimated_complexity" not in parsed:
@@ -803,7 +803,7 @@ Financial Query Rules:
             logger.warning("No JSON found, treating entire content as SQL")
             return {
                 "sql": content.strip(),
-                "explanation": "Query generated from natural language",
+                "explanation": "I've analyzed your question and generated the appropriate SQL query.",
                 "tables_used": [],
                 "estimated_complexity": "medium",
                 "optimization_notes": ""
@@ -814,7 +814,7 @@ Financial Query Rules:
             # Return a basic structure with the content as SQL
             return {
                 "sql": content.strip() if content else "",
-                "explanation": "Query generated from natural language",
+                "explanation": "I've analyzed your question and generated the appropriate SQL query.",
                 "tables_used": [],
                 "estimated_complexity": "medium",
                 "optimization_notes": "",
@@ -824,7 +824,7 @@ Financial Query Rules:
             logger.error(f"Unexpected error in response parsing: {e}")
             return {
                 "sql": content.strip() if isinstance(content, str) and content else "",
-                "explanation": "Generated SQL query",
+                "explanation": "I've generated a SQL query to answer your question.",
                 "tables_used": [],
                 "estimated_complexity": "medium",
                 "optimization_notes": "",

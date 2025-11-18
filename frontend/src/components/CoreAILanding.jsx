@@ -61,6 +61,18 @@ const aiModules = [
     stats: { label: 'Active Vehicles', value: '45' },
     status: 'active',
   },
+  {
+    id: 'reveq',
+    title: 'REVEQ.AI',
+    subtitle: 'Revenue Equipment Intelligence',
+    description: 'Equipment analytics, fleet performance monitoring, and asset utilization optimization',
+    icon: EquipmentIcon,
+    color: '#9c27b0',
+    bgColor: '#f3e5f5',
+    path: '/coreai/reveq',
+    stats: { label: 'Assets Tracked', value: '128' },
+    status: 'active',
+  },
 ];
 
 const CoreAILanding = ({ onTileClick }) => {
