@@ -27,6 +27,8 @@ import {
   useMediaQuery,
   Avatar,
   alpha,
+  Breadcrumbs,
+  Link,
 } from '@mui/material';
 import {
   CloudUpload as UploadIcon,
@@ -47,10 +49,12 @@ import {
   Send as SendIcon,
   Menu as MenuIcon,
   ChevronLeft as ChevronLeftIcon,
+  ArrowBack as ArrowBackIcon,
+  NavigateNext as NavigateNextIcon,
 } from '@mui/icons-material';
 import { apiService } from '../services/api';
 
-const DocumentIntelligence = () => {
+const DocumentIntelligence = ({ onBack }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
@@ -437,31 +441,65 @@ const DocumentIntelligence = () => {
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       {/* Header */}
       <Paper sx={{ p: 2, zIndex: 1, borderRadius: 0 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <IconButton
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            sx={{ display: { xs: 'inline-flex', md: 'inline-flex' } }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Avatar
-              sx={{
-                width: 64,
-                height: 64,
-                bgcolor: alpha('#7c3aed', 0.1),
-              }}
-            >
-              <ArticleIcon sx={{ fontSize: 36, color: '#7c3aed' }} />
-            </Avatar>
-            <Box>
-              <Typography variant="h4" fontWeight={700}>
+        <Box sx={{ maxWidth: 1400, mx: 'auto', px: 2 }}>
+          {/* Breadcrumbs */}
+          {onBack && (
+            <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ mb: 2 }}>
+              <Link
+                onClick={onBack}
+                sx={{
+                  cursor: 'pointer',
+                  color: 'text.secondary',
+                  textDecoration: 'none',
+                  '&:hover': { color: 'primary.main' },
+                }}
+              >
                 Document Intelligence
+              </Link>
+              <Typography color="primary" fontWeight={600}>
+                Document Analysis & Q&A
               </Typography>
-              <Typography variant="body1" color="text.secondary">
-                Upload, analyze, and extract insights from your documents using AI
-              </Typography>
+            </Breadcrumbs>
+          )}
+
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <IconButton
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                sx={{ display: { xs: 'inline-flex', md: 'inline-flex' } }}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Avatar
+                sx={{
+                  width: 56,
+                  height: 56,
+                  bgcolor: alpha('#7c3aed', 0.1),
+                }}
+              >
+                <ArticleIcon sx={{ fontSize: 32, color: '#7c3aed' }} />
+              </Avatar>
+              <Box>
+                <Typography variant="h5" fontWeight={700}>
+                  Document Analysis & Q&A
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Upload, analyze, and extract insights from your documents using AI
+                </Typography>
+              </Box>
             </Box>
+
+            {/* Back Button */}
+            {onBack && (
+              <Button
+                startIcon={<ArrowBackIcon />}
+                onClick={onBack}
+                variant="outlined"
+                sx={{ borderRadius: 2 }}
+              >
+                Back
+              </Button>
+            )}
           </Box>
         </Box>
       </Paper>

@@ -83,7 +83,7 @@ import MarginProfitabilityAnalytics from './components/margenai/MarginProfitabil
 import PLGLExplorerAnalytics from './components/margenai/PLGLExplorerAnalytics';
 import FinancialDriversAnalytics from './components/margenai/FinancialDriversAnalytics';
 import AxisAIDashboard from './components/AxisAIDashboard';
-import DocumentIntelligence from './components/DocumentIntelligence';
+import DocumentIntelligenceLanding from './components/DocumentIntelligenceLanding';
 import ProcessMiningPage from './pages/ProcessMiningPage';
 import ScenarioAIDashboard from './components/ScenarioAIDashboard';
 import ForecastAIDashboard from './components/ForecastAIDashboard';
@@ -1234,8 +1234,8 @@ function App() {
           )}
 
           {/* Document Intelligence Tab */}
-          {selectedTab === 6 && <DocumentIntelligence />}
-          
+          {selectedTab === 6 && <DocumentIntelligenceLanding onBack={() => setSelectedTab(0)} />}
+
           {/* Process Mining Tab */}
           {selectedTab === 7 && <ProcessMiningPage />}
           
