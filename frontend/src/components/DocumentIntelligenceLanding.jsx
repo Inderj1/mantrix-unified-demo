@@ -60,24 +60,6 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
       {/* Header */}
       <Paper elevation={1} sx={{ p: 2, borderRadius: 0, flexShrink: 0 }}>
         <Box sx={{ maxWidth: 1400, mx: 'auto', px: 2 }}>
-          {/* Breadcrumbs */}
-          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ mb: 2 }}>
-            <Link
-              onClick={onBack}
-              sx={{
-                cursor: 'pointer',
-                color: 'text.secondary',
-                textDecoration: 'none',
-                '&:hover': { color: 'primary.main' },
-              }}
-            >
-              Core.AI
-            </Link>
-            <Typography color="primary" fontWeight={600}>
-              Document Intelligence
-            </Typography>
-          </Breadcrumbs>
-
           {/* Title Section */}
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Box>
@@ -104,15 +86,6 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
                 </Box>
               </Box>
             </Box>
-
-            <Button
-              startIcon={<ArrowBackIcon />}
-              onClick={onBack}
-              variant="outlined"
-              sx={{ borderRadius: 2 }}
-            >
-              Back
-            </Button>
           </Box>
         </Box>
       </Paper>

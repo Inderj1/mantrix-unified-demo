@@ -1234,7 +1234,7 @@ function App() {
           )}
 
           {/* Document Intelligence Tab */}
-          {selectedTab === 6 && <DocumentIntelligenceLanding onBack={() => setSelectedTab(0)} />}
+          {selectedTab === 6 && <DocumentIntelligenceLanding />}
 
           {/* Process Mining Tab */}
           {selectedTab === 7 && <ProcessMiningPage />}
