@@ -186,3 +186,8 @@ TODO_PRIVATE.md
 **/.ipynb_checkpoints/
 *.ipynb
 mantrix.tar.gz
+
+# Excel processing directories
+excel-input/
+extracted_data/
+output/
