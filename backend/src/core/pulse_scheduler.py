@@ -1,6 +1,6 @@
 """
 Enterprise Pulse: Background Scheduler
-Executes monitors on their configured schedules
+Executes proactive agents on their configured schedules to ensure business is not impacted
 """
 import asyncio
 import structlog
@@ -14,14 +14,14 @@ logger = structlog.get_logger()
 
 class PulseScheduler:
     """
-    Background scheduler for executing pulse monitors
-    Runs continuously and executes monitors based on their next_run time
+    Background scheduler for executing proactive agents
+    Runs continuously and executes agents based on their schedule to ensure business is not impacted
     """
 
     def __init__(self, check_interval: int = 60):
         """
         Args:
-            check_interval: How often to check for monitors to execute (in seconds)
+            check_interval: How often to check for agents to execute (in seconds)
         """
         self.check_interval = check_interval
         self.pg_client = PostgreSQLClient(database="customer_analytics")
@@ -48,16 +48,16 @@ class PulseScheduler:
         self.running = False
 
     async def _check_and_execute_monitors(self):
-        """Check for monitors that need to run and execute them"""
-        # Get monitors that are due to run
+        """Check for proactive agents that need to run and execute them"""
+        # Get agents that are due to run
         monitors_to_run = self._get_monitors_to_run()
 
         if not monitors_to_run:
             return
 
-        logger.info(f"Found {len(monitors_to_run)} monitors to execute")
+        logger.info(f"Found {len(monitors_to_run)} proactive agents to execute")
 
-        # Execute monitors concurrently
+        # Execute agents concurrently
         tasks = [
             self._execute_monitor_safe(monitor['id'])
             for monitor in monitors_to_run
@@ -66,7 +66,7 @@ class PulseScheduler:
         await asyncio.gather(*tasks, return_exceptions=True)
 
     def _get_monitors_to_run(self) -> List[Dict[str, Any]]:
-        """Get all enabled monitors where next_run <= now"""
+        """Get all enabled proactive agents where next_run <= now"""
         query = """
         SELECT
             id, user_id, name, natural_language_query,
@@ -83,11 +83,11 @@ class PulseScheduler:
         return monitors or []
 
     async def _execute_monitor_safe(self, monitor_id: str):
-        """Execute a monitor with error handling"""
+        """Execute a proactive agent with error handling"""
         try:
-            logger.info(f"Executing monitor {monitor_id}")
+            logger.info(f"Executing proactive agent {monitor_id}")
 
-            # Execute the monitor
+            # Execute the agent
             result = await self.pulse_service.execute_monitor(monitor_id)
 
             # Update next_run time

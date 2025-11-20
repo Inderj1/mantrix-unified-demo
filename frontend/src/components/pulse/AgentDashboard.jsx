@@ -56,13 +56,13 @@ import {
 } from '@mui/icons-material';
 import { DataGrid } from '@mui/x-data-grid';
 
-const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
-  const [monitors, setMonitors] = useState([]);
+const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
+  const [agents, setAgents] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedMonitor, setSelectedMonitor] = useState(null);
+  const [selectedAgent, setSelectedAgent] = useState(null);
   const [refineDialog, setRefineDialog] = useState(false);
   const [refineFeedback, setRefineFeedback] = useState('');
 
@@ -86,7 +86,7 @@ const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
   const loadData = async () => {
     try {
       // Fetch both user data AND demo data for all users
-      const [monitorsRes, alertsRes, statsRes, demoMonitorsRes, demoAlertsRes] = await Promise.all([
+      const [agentsRes, alertsRes, statsRes, demoAgentsRes, demoAlertsRes] = await Promise.all([
         fetch(`/api/v1/pulse/monitors?user_id=${userId}`),
         fetch(`/api/v1/pulse/alerts?user_id=${userId}&limit=50`),
         fetch(`/api/v1/pulse/stats?user_id=${userId}`),
@@ -94,18 +94,18 @@ const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
         fetch(`/api/v1/pulse/alerts?user_id=demo_user&limit=50`),
       ]);
 
-      const [monitorsData, alertsData, statsData, demoMonitorsData, demoAlertsData] = await Promise.all([
-        monitorsRes.json(),
+      const [agentsData, alertsData, statsData, demoAgentsData, demoAlertsData] = await Promise.all([
+        agentsRes.json(),
         alertsRes.json(),
         statsRes.json(),
-        demoMonitorsRes.json(),
+        demoAgentsRes.json(),
         demoAlertsRes.json(),
       ]);
 
       // Merge user data with demo data
-      const userMonitors = monitorsData.success && monitorsData.monitors ? monitorsData.monitors : [];
-      const demoMonitors = demoMonitorsData.success && demoMonitorsData.monitors ? demoMonitorsData.monitors : [];
-      setMonitors([...userMonitors, ...demoMonitors]);
+      const userAgents = agentsData.success && agentsData.monitors ? agentsData.monitors : [];
+      const demoAgents = demoAgentsData.success && demoAgentsData.monitors ? demoAgentsData.monitors : [];
+      setAgents([...userAgents, ...demoAgents]);
 
       const userAlerts = alertsData.success && alertsData.alerts ? alertsData.alerts : [];
       const demoAlerts = demoAlertsData.success && demoAlertsData.alerts ? demoAlertsData.alerts : [];
@@ -119,57 +119,57 @@ const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
     }
   };
 
-  const handleMenuOpen = (event, monitor) => {
+  const handleMenuOpen = (event, agent) => {
     setAnchorEl(event.currentTarget);
-    setSelectedMonitor(monitor);
+    setSelectedAgent(agent);
   };
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedMonitor(null);
+    setSelectedAgent(null);
   };
 
-  const handleToggleMonitor = async (monitor) => {
+  const handleToggleAgent = async (agent) => {
     try {
-      await fetch(`/api/v1/pulse/monitors/${monitor.id}/toggle?enabled=${!monitor.enabled}`, {
+      await fetch(`/api/v1/pulse/monitors/${agent.id}/toggle?enabled=${!agent.enabled}`, {
         method: 'PUT',
       });
       loadData();
     } catch (err) {
-      console.error('Failed to toggle monitor:', err);
+      console.error('Failed to toggle agent:', err);
     }
     handleMenuClose();
   };
 
-  const handleTestMonitor = async (monitor) => {
+  const handleTestAgent = async (agent) => {
     try {
-      await fetch(`/api/v1/pulse/monitors/${monitor.id}/test`, {
+      await fetch(`/api/v1/pulse/monitors/${agent.id}/test`, {
         method: 'POST',
       });
       loadData();
     } catch (err) {
-      console.error('Failed to test monitor:', err);
+      console.error('Failed to test agent:', err);
     }
     handleMenuClose();
   };
 
-  const handleDeleteMonitor = async (monitor) => {
+  const handleDeleteAgent = async (agent) => {
     try {
-      await fetch(`/api/v1/pulse/monitors/${monitor.id}`, {
+      await fetch(`/api/v1/pulse/monitors/${agent.id}`, {
         method: 'DELETE',
       });
       loadData();
     } catch (err) {
-      console.error('Failed to delete monitor:', err);
+      console.error('Failed to delete agent:', err);
     }
     handleMenuClose();
   };
 
-  const handleRefineMonitor = async () => {
-    if (!refineFeedback || !selectedMonitor) return;
+  const handleRefineAgent = async () => {
+    if (!refineFeedback || !selectedAgent) return;
 
     try {
-      await fetch(`/api/v1/pulse/monitors/${selectedMonitor.id}/refine`, {
+      await fetch(`/api/v1/pulse/monitors/${selectedAgent.id}/refine`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ feedback: refineFeedback }),
@@ -178,7 +178,7 @@ const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
       setRefineFeedback('');
       loadData();
     } catch (err) {
-      console.error('Failed to refine monitor:', err);
+      console.error('Failed to refine agent:', err);
     }
   };
 
@@ -206,10 +206,10 @@ const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
     }
   };
 
-  const getHealthScore = (monitor) => {
-    const total = (monitor.true_positives || 0) + (monitor.false_positives || 0);
+  const getHealthScore = (agent) => {
+    const total = (agent.true_positives || 0) + (agent.false_positives || 0);
     if (total === 0) return null;
-    return Math.round(((monitor.true_positives || 0) / total) * 100);
+    return Math.round(((agent.true_positives || 0) / total) * 100);
   };
 
   const getSeverityColor = (severity) => {
@@ -221,9 +221,9 @@ const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
     }
   };
 
-  // Filter, sort, and paginate monitors
-  const filteredAndSortedMonitors = useMemo(() => {
-    let filtered = [...monitors];
+  // Filter, sort, and paginate agents
+  const filteredAndSortedAgents = useMemo(() => {
+    let filtered = [...agents];
 
     // Apply search filter
     if (searchQuery) {
@@ -290,15 +290,15 @@ const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
     });
 
     return filtered;
-  }, [monitors, searchQuery, statusFilter, severityFilter, showDemoOnly, sortBy, sortDirection]);
+  }, [agents, searchQuery, statusFilter, severityFilter, showDemoOnly, sortBy, sortDirection]);
 
   // Paginate
-  const paginatedMonitors = useMemo(() => {
+  const paginatedAgents = useMemo(() => {
     const startIndex = (page - 1) * itemsPerPage;
-    return filteredAndSortedMonitors.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredAndSortedMonitors, page, itemsPerPage]);
+    return filteredAndSortedAgents.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredAndSortedAgents, page, itemsPerPage]);
 
-  const totalPages = Math.ceil(filteredAndSortedMonitors.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredAndSortedAgents.length / itemsPerPage);
 
   if (loading) {
     return (
@@ -310,8 +310,8 @@ const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
 
   const activeAlerts = alerts.filter(a => a.status === 'active');
   const demoAlerts = alerts.filter(a => a.monitor_name && a.monitor_name.includes('[DEMO]'));
-  const demoMonitors = monitors.filter(m => m.name && m.name.includes('[DEMO]'));
-  const hasDemoData = demoAlerts.length > 0 || demoMonitors.length > 0;
+  const demoAgents = agents.filter(m => m.name && m.name.includes('[DEMO]'));
+  const hasDemoData = demoAlerts.length > 0 || demoAgents.length > 0;
 
   return (
     <Box>
@@ -332,16 +332,16 @@ const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
               Enterprise Pulse
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Proactive monitoring with AI-powered insights
+              Proactive agents that execute and ensure business is not impacted
             </Typography>
           </Box>
         </Box>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={onCreateMonitor}
+          onClick={onCreateAgent}
         >
-          Create Monitor
+          Create Agent
         </Button>
       </Box>
 
@@ -353,7 +353,7 @@ const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
               <Box display="flex" alignItems="center" justifyContent="space-between">
                 <Box>
                   <Typography variant="body2" color="text.secondary">
-                    Active Monitors
+                    Active Agents
                   </Typography>
                   <Typography variant="h4" fontWeight={600}>
                     {stats?.monitors?.active_monitors || 0}
@@ -415,7 +415,7 @@ const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
               <Box display="flex" alignItems="center" justifyContent="space-between">
                 <Box>
                   <Typography variant="body2" color="text.secondary">
-                    Total Monitors
+                    Total Agents
                   </Typography>
                   <Typography variant="h4" fontWeight={600}>
                     {stats?.monitors?.total_monitors || 0}
@@ -523,16 +523,16 @@ const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
         </Card>
       )}
 
-      {/* Monitors List */}
+      {/* Agents List */}
       <Card>
         <CardContent>
           <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
             <Box display="flex" alignItems="center" gap={2}>
               <Typography variant="h6" fontWeight={600}>
-                Your Monitors
+                Your Agents
               </Typography>
               <Chip
-                label={`${filteredAndSortedMonitors.length} total`}
+                label={`${filteredAndSortedAgents.length} total`}
                 size="small"
                 color="primary"
                 variant="outlined"
@@ -569,7 +569,7 @@ const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
                 <TextField
                   fullWidth
                   size="small"
-                  placeholder="Search monitors..."
+                  placeholder="Search agents..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   InputProps={{
@@ -654,27 +654,27 @@ const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
 
           <Divider sx={{ mb: 2 }} />
 
-          {filteredAndSortedMonitors.length === 0 ? (
+          {filteredAndSortedAgents.length === 0 ? (
             <Box textAlign="center" py={4}>
               <Typography variant="body2" color="text.secondary" mb={2}>
                 {searchQuery || statusFilter !== 'all' || severityFilter !== 'all' || showDemoOnly
-                  ? 'No monitors match your filters. Try adjusting your search criteria.'
-                  : 'No monitors yet. Create your first monitor to get started!'}
+                  ? 'No agents match your filters. Try adjusting your search criteria.'
+                  : 'No agents yet. Create your first agent to get started!'}
               </Typography>
               {!searchQuery && statusFilter === 'all' && severityFilter === 'all' && !showDemoOnly && (
-                <Button variant="contained" startIcon={<AddIcon />} onClick={onCreateMonitor}>
-                  Create Monitor
+                <Button variant="contained" startIcon={<AddIcon />} onClick={onCreateAgent}>
+                  Create Agent
                 </Button>
               )}
             </Box>
           ) : (
             <>
               <Grid container spacing={viewMode === 'grid' ? 2 : 1}>
-                {paginatedMonitors.map((monitor) => {
-                const healthScore = getHealthScore(monitor);
-                const isDemo = monitor.name && monitor.name.includes('[DEMO]');
+                {paginatedAgents.map((agent) => {
+                const healthScore = getHealthScore(agent);
+                const isDemo = agent.name && agent.name.includes('[DEMO]');
                 return (
-                  <Grid item xs={12} md={viewMode === 'grid' ? 6 : 12} key={monitor.id}>
+                  <Grid item xs={12} md={viewMode === 'grid' ? 6 : 12} key={agent.id}>
                     <Paper
                       variant="outlined"
                       sx={{
@@ -699,29 +699,29 @@ const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
                               />
                             )}
                             <Typography variant="subtitle1" fontWeight={600}>
-                              {monitor.name}
+                              {agent.name}
                             </Typography>
                             <Chip
                               size="small"
-                              label={monitor.enabled ? 'Active' : 'Paused'}
-                              color={monitor.enabled ? 'success' : 'default'}
-                              icon={monitor.enabled ? <CheckCircleIcon /> : <PauseIcon />}
+                              label={agent.enabled ? 'Active' : 'Paused'}
+                              color={agent.enabled ? 'success' : 'default'}
+                              icon={agent.enabled ? <CheckCircleIcon /> : <PauseIcon />}
                             />
                           </Box>
                           <Typography variant="body2" color="text.secondary" mb={1}>
-                            {monitor.natural_language_query}
+                            {agent.natural_language_query}
                           </Typography>
                           <Box display="flex" gap={1} flexWrap="wrap">
                             <Chip
-                              label={monitor.frequency}
+                              label={agent.frequency}
                               size="small"
                               variant="outlined"
                               icon={<ScheduleIcon />}
                             />
                             <Chip
-                              label={monitor.severity}
+                              label={agent.severity}
                               size="small"
-                              color={getSeverityColor(monitor.severity)}
+                              color={getSeverityColor(agent.severity)}
                             />
                             {healthScore !== null && (
                               <Chip
@@ -734,16 +734,16 @@ const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
                         </Box>
                         <IconButton
                           size="small"
-                          onClick={(e) => handleMenuOpen(e, monitor)}
+                          onClick={(e) => handleMenuOpen(e, agent)}
                         >
                           <MoreVertIcon />
                         </IconButton>
                       </Box>
 
-                      {monitor.last_run && (
+                      {agent.last_run && (
                         <Box mt={1} pt={1} borderTop={1} borderColor="divider">
                           <Typography variant="caption" color="text.disabled">
-                            Last run: {new Date(monitor.last_run).toLocaleString()}
+                            Last run: {new Date(agent.last_run).toLocaleString()}
                           </Typography>
                         </Box>
                       )}
@@ -777,23 +777,23 @@ const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
-        <MenuItem onClick={() => handleTestMonitor(selectedMonitor)}>
+        <MenuItem onClick={() => handleTestAgent(selectedAgent)}>
           <PlayArrowIcon fontSize="small" sx={{ mr: 1 }} />
-          Test Now
+          Execute Now
         </MenuItem>
         <MenuItem onClick={() => {
           handleMenuClose();
           setRefineDialog(true);
         }}>
           <EditIcon fontSize="small" sx={{ mr: 1 }} />
-          Refine Query
+          Refine Agent
         </MenuItem>
-        <MenuItem onClick={() => handleToggleMonitor(selectedMonitor)}>
-          {selectedMonitor?.enabled ? <PauseIcon fontSize="small" sx={{ mr: 1 }} /> : <PlayArrowIcon fontSize="small" sx={{ mr: 1 }} />}
-          {selectedMonitor?.enabled ? 'Pause' : 'Resume'}
+        <MenuItem onClick={() => handleToggleAgent(selectedAgent)}>
+          {selectedAgent?.enabled ? <PauseIcon fontSize="small" sx={{ mr: 1 }} /> : <PlayArrowIcon fontSize="small" sx={{ mr: 1 }} />}
+          {selectedAgent?.enabled ? 'Pause' : 'Resume'}
         </MenuItem>
         <Divider />
-        <MenuItem onClick={() => handleDeleteMonitor(selectedMonitor)} sx={{ color: 'error.main' }}>
+        <MenuItem onClick={() => handleDeleteAgent(selectedAgent)} sx={{ color: 'error.main' }}>
           <DeleteIcon fontSize="small" sx={{ mr: 1 }} />
           Delete
         </MenuItem>
@@ -801,10 +801,10 @@ const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
 
       {/* Refine Dialog */}
       <Dialog open={refineDialog} onClose={() => setRefineDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Refine Monitor Query</DialogTitle>
+        <DialogTitle>Refine Agent</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary" mb={2}>
-            Describe how you want to improve this monitor. The AI agent will update the query based on your feedback.
+            Describe how you want to improve this agent. The AI will update the agent's query based on your feedback.
           </Typography>
           <TextField
             fullWidth
@@ -819,10 +819,10 @@ const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
             <Button onClick={() => setRefineDialog(false)}>Cancel</Button>
             <Button
               variant="contained"
-              onClick={handleRefineMonitor}
+              onClick={handleRefineAgent}
               disabled={!refineFeedback}
             >
-              Refine Query
+              Refine Agent
             </Button>
           </Box>
         </DialogContent>
@@ -831,4 +831,4 @@ const MonitorDashboard = ({ userId = 'demo_user', onCreateMonitor }) => {
   );
 };
 
-export default MonitorDashboard;
+export default AgentDashboard;

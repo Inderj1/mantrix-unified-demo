@@ -66,6 +66,13 @@ import CoreAILanding from './components/CoreAILanding';
 import MargenAIDashboard from './components/margenai/MargenAIDashboard';
 import MargenAILanding from './components/MargenAILanding';
 import ReveqAILanding from './components/ReveqAILanding';
+import AssetTracking from './components/reveqai/AssetTracking';
+import RevenueAnalytics from './components/reveqai/RevenueAnalytics';
+import UtilizationMetrics from './components/reveqai/UtilizationMetrics';
+import ReveqPerformanceDashboard from './components/reveqai/PerformanceDashboard';
+import ReveqMaintenanceScheduler from './components/reveqai/MaintenanceScheduler';
+import EfficiencyOptimizer from './components/reveqai/EfficiencyOptimizer';
+import FinancialWorkbench from './components/reveqai/FinancialWorkbench';
 import MargenAITable from './components/margenai/MargenAITable';
 import SegmentAnalytics from './components/margenai/SegmentAnalytics';
 import RevenueSalesAnalytics from './components/margenai/RevenueSalesAnalytics';
@@ -204,6 +211,7 @@ function App() {
   const [stoxView, setStoxView] = usePersistedState('mantrix-stoxView', 'landing'); // 'landing', 'stoxshift'
   const [margenView, setMargenView] = usePersistedState('mantrix-margenView', 'landing'); // 'landing', 'revenue-sales', 'cost-operations', etc.
   const [routeView, setRouteView] = usePersistedState('mantrix-routeView', 'landing'); // 'landing', module IDs
+  const [reveqView, setReveqView] = usePersistedState('mantrix-reveqView', 'landing'); // 'landing', module IDs
   const [currentFioriTile, setCurrentFioriTile] = useState(null); // { tileId, title, moduleId, moduleColor }
   const [axisAIView, setAxisAIView] = useState('landing'); // 'landing', 'forecast', 'budget', 'driver', 'scenario', 'insights'
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
@@ -572,6 +580,7 @@ function App() {
                       setRouteView('landing');
                     } else if (moduleId === 'reveq') {
                       setCoreAIView('reveq');
+                      setReveqView('landing');
                     }
                   }} />
                 </Box>
@@ -851,7 +860,35 @@ function App() {
               </Fade>
               <Fade in={coreAIView === 'reveq'} timeout={300}>
                 <Box sx={{ display: coreAIView === 'reveq' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
-                  <ReveqAILanding onBack={() => setCoreAIView('landing')} />
+                  {reveqView === 'landing' && (
+                    <ReveqAILanding
+                      onBack={() => setCoreAIView('landing')}
+                      onTileClick={(moduleId) => {
+                        setReveqView(moduleId);
+                      }}
+                    />
+                  )}
+                  {reveqView === 'asset-tracking' && (
+                    <AssetTracking onBack={() => setReveqView('landing')} />
+                  )}
+                  {reveqView === 'revenue-analytics' && (
+                    <RevenueAnalytics onBack={() => setReveqView('landing')} />
+                  )}
+                  {reveqView === 'utilization-metrics' && (
+                    <UtilizationMetrics onBack={() => setReveqView('landing')} />
+                  )}
+                  {reveqView === 'performance-dashboard' && (
+                    <ReveqPerformanceDashboard onBack={() => setReveqView('landing')} />
+                  )}
+                  {reveqView === 'maintenance-scheduler' && (
+                    <ReveqMaintenanceScheduler onBack={() => setReveqView('landing')} />
+                  )}
+                  {reveqView === 'efficiency-optimizer' && (
+                    <EfficiencyOptimizer onBack={() => setReveqView('landing')} />
+                  )}
+                  {reveqView === 'financial-workbench' && (
+                    <FinancialWorkbench onBack={() => setReveqView('landing')} />
+                  )}
                 </Box>
               </Fade>
             </Box>

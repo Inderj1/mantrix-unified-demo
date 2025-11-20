@@ -1,6 +1,7 @@
 """
-Enterprise Pulse: Monitor Service
-Leverages existing NLP-to-SQL framework for user-configurable monitoring
+Enterprise Pulse: Agent Service
+Proactive agents that execute queries and ensure business is not impacted.
+Leverages existing NLP-to-SQL framework for user-configurable agent execution.
 """
 import uuid
 import json
@@ -17,7 +18,8 @@ logger = structlog.get_logger()
 
 class PulseMonitorService:
     """
-    Service for creating and managing monitoring queries
+    Service for creating and managing proactive agents
+    Agents execute queries on schedules to ensure business is not impacted
     Uses existing NLP-to-SQL framework
     """
 
@@ -35,19 +37,20 @@ class PulseMonitorService:
         user_context: Optional[Dict] = None
     ) -> Dict[str, Any]:
         """
-        Create a monitor from natural language description
+        Create a proactive agent from natural language description
+        Agents execute queries on schedules to ensure business is not impacted
         Uses existing NLP-to-SQL framework
 
         Args:
             user_id: User identifier
             natural_language: Natural language query (e.g., "Alert me if revenue drops >10%")
-            name: Optional monitor name
+            name: Optional agent name
             user_context: Optional context for query generation
 
         Returns:
             Dict with generated SQL, preview data, and suggestions
         """
-        logger.info(f"Creating monitor from NL: {natural_language}")
+        logger.info(f"Creating proactive agent from NL: {natural_language}")
 
         try:
             # Use existing NLP-to-SQL framework (with Weaviate vector search)
@@ -95,7 +98,8 @@ class PulseMonitorService:
 
     async def save_monitor(self, monitor_config: Dict[str, Any]) -> str:
         """
-        Save a monitor configuration to database
+        Save a proactive agent configuration to database
+        Agent will execute on configured schedule to ensure business is not impacted
 
         Returns:
             Monitor ID (UUID)
@@ -158,7 +162,8 @@ class PulseMonitorService:
 
     async def execute_monitor(self, monitor_id: str) -> Dict[str, Any]:
         """
-        Execute a monitor and check alert conditions
+        Execute a proactive agent to ensure business is not impacted
+        Checks alert conditions and triggers notifications if needed
 
         Returns:
             Execution results including any triggered alerts
@@ -255,15 +260,15 @@ class PulseMonitorService:
         feedback: str
     ) -> Dict[str, Any]:
         """
-        Refine monitor query based on user feedback
-        Uses LLM conversation history to improve the query
+        Refine proactive agent query based on user feedback
+        Uses LLM conversation history to improve the agent's execution query
 
         Args:
-            monitor_id: Monitor ID
+            monitor_id: Agent ID
             feedback: User feedback (e.g., "too many false positives", "add region breakdown")
 
         Returns:
-            Updated monitor configuration with new query
+            Updated agent configuration with improved query
         """
         monitor = self._get_monitor(monitor_id)
         if not monitor:

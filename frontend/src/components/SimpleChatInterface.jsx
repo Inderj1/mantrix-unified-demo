@@ -1703,13 +1703,21 @@ const SimpleChatInterface = () => {
                         for (let i = 0; i < Math.min(5, message.results.length) && (sampleValue === null || sampleValue === undefined); i++) {
                           sampleValue = message.results[i][key];
                         }
-                        
+
                         const isNumeric = typeof sampleValue === 'number';
-                        const isAmount = key.toLowerCase().includes('amount') || 
+
+                        // Check if this is a quantity/count column (should NOT be formatted as currency)
+                        const isQuantity = key.toLowerCase().includes('quantity') ||
+                                         key.toLowerCase().includes('qty') ||
+                                         key.toLowerCase().includes('count') ||
+                                         key.toLowerCase().includes('units');
+
+                        // Check if this is a currency amount column (exclude quantities)
+                        const isAmount = !isQuantity && (key.toLowerCase().includes('amount') ||
                                        key.toLowerCase().includes('total') ||
                                        key.toLowerCase().includes('revenue') ||
                                        key.toLowerCase().includes('cost') ||
-                                       key.toLowerCase().includes('cogs');
+                                       key.toLowerCase().includes('cogs'));
                         const isFirstColumn = index === 0;
                         
                         return {
@@ -2162,19 +2170,19 @@ const SimpleChatInterface = () => {
                 src="/axis-ai4.png"
                 alt="AXIS.AI Logo"
                 style={{
-                  width: 120,
-                  height: 120,
+                  width: 80,
+                  height: 80,
                   objectFit: 'contain'
                 }}
               />
               <Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Typography variant="h4" fontWeight={700}>
+                  <Typography variant="h5" fontWeight={700}>
                     AXIS.AI
                   </Typography>
-                  <Chip label="v2.0 Research" size="small" color="success" sx={{ height: 22 }} />
+                  <Chip label="v2.0 Research" size="small" color="success" sx={{ height: 20 }} />
                 </Box>
-                <Typography variant="body1" color="text.secondary">
+                <Typography variant="body2" color="text.secondary">
                   {mode === 'chat'
                     ? 'Ask questions about your data in natural language'
                     : 'Conduct comprehensive data analysis with AI-powered research'}

@@ -1,5 +1,6 @@
 """
-FastAPI routes for Enterprise Pulse monitoring
+FastAPI routes for Enterprise Pulse
+Proactive agents that execute queries to ensure business is not impacted
 """
 from fastapi import APIRouter, HTTPException, Query
 from typing import List, Dict, Any, Optional
@@ -59,7 +60,8 @@ class AlertFeedbackRequest(BaseModel):
 @router.post("/monitors/create")
 async def create_monitor(request: CreateMonitorRequest):
     """
-    Step 1: Create monitor from natural language
+    Step 1: Create proactive agent from natural language
+    Agent will execute on schedule to ensure business is not impacted
     Returns generated SQL, preview data, and suggestions
     """
     try:
@@ -86,7 +88,8 @@ async def create_monitor(request: CreateMonitorRequest):
 @router.post("/monitors/save")
 async def save_monitor(request: SaveMonitorRequest):
     """
-    Step 2: Save monitor configuration after user review
+    Step 2: Deploy proactive agent after user review
+    Agent will execute on configured schedule to ensure business is not impacted
     """
     try:
         monitor_config = request.dict()
@@ -109,10 +112,10 @@ async def save_monitor(request: SaveMonitorRequest):
 @router.get("/monitors")
 async def list_monitors(
     user_id: str = Query(..., description="User ID"),
-    include_disabled: bool = Query(False, description="Include disabled monitors")
+    include_disabled: bool = Query(False, description="Include disabled agents")
 ):
     """
-    Get all monitors for a user
+    Get all proactive agents for a user
     """
     try:
         monitors = await pulse_service.get_user_monitors(
@@ -163,8 +166,8 @@ async def get_monitor(monitor_id: str):
 @router.post("/monitors/{monitor_id}/refine")
 async def refine_monitor(monitor_id: str, request: RefineMonitorRequest):
     """
-    Refine monitor query based on user feedback
-    Agent regenerates improved query using LLM
+    Refine proactive agent query based on user feedback
+    Agent regenerates improved query using LLM to better ensure business is not impacted
     """
     try:
         result = await pulse_service.refine_query_with_feedback(
@@ -189,7 +192,8 @@ async def refine_monitor(monitor_id: str, request: RefineMonitorRequest):
 @router.post("/monitors/{monitor_id}/test")
 async def test_monitor(monitor_id: str):
     """
-    Test monitor immediately (execute query and check conditions)
+    Execute proactive agent immediately (run query and check conditions)
+    Tests agent to ensure it will protect business operations
     """
     try:
         result = await pulse_service.execute_monitor(monitor_id)

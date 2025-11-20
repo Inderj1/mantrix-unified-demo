@@ -70,7 +70,90 @@ WHERE current_inventory < reorder_level
 ORDER BY current_inventory ASC"""
             }
         ]
-    
+
+    def simplify_explanation(self, explanation: str, enable_technical_mode: bool = False) -> Tuple[str, str]:
+        """
+        Simplify technical SQL explanations to be more user-friendly.
+
+        Returns:
+            Tuple[str, str]: (simplified_explanation, technical_explanation)
+        """
+        technical_explanation = explanation
+
+        if enable_technical_mode:
+            # Return original as both if technical mode is enabled
+            return explanation, technical_explanation
+
+        # Remove overly technical SQL details
+        technical_terms = [
+            "CTE", "Common Table Expression", "WITH clause",
+            "LOWER()", "to_char()", "CONCAT", "FORMAT",
+            "GROUP BY", "ORDER BY", "WHERE clause", "JOIN",
+            "aggregation", "aggregated", "subquery",
+            "PostgreSQL", "case-insensitive", "NULLIF",
+            "descending", "ascending"
+        ]
+
+        simplified = explanation
+
+        # Replace technical phrases with simpler ones
+        replacements = {
+            "I'm generating a SQL query to": "I'm analyzing",
+            "I create a CTE called": "I'm organizing",
+            "First, I create": "I'm looking at",
+            "Then in the main SELECT": "Then I'm showing",
+            "using LOWER() for case-insensitive matching": "matching any capitalization",
+            "case-insensitive": "regardless of capitalization",
+            "GROUP BY": "organized by",
+            "ORDER BY": "sorted by",
+            "descending": "from highest to lowest",
+            "ascending": "from lowest to highest",
+        }
+
+        for old, new in replacements.items():
+            simplified = simplified.replace(old, new)
+
+        # If still too technical after replacements, simplify further but keep business context
+        if len(simplified) > 400 or any(term.lower() in simplified.lower() for term in technical_terms):
+            # Extract key business entities and metrics from the original
+            import re
+
+            # Try to preserve the core business message
+            # Extract entity names in quotes
+            entity_matches = re.findall(r'"([^"]+)"', explanation)
+            entities = [e for e in entity_matches if len(e) < 50]  # Filter out long strings
+
+            # Extract key metrics mentioned
+            metrics = []
+            metric_keywords = ['quantity', 'sales', 'revenue', 'margin', 'gm', 'cost', 'profit', 'total']
+            for keyword in metric_keywords:
+                if keyword in explanation.lower():
+                    metrics.append(keyword)
+
+            # Build a concise but informative explanation
+            if entities and metrics:
+                entity_str = ', '.join(entities[:2])  # Limit to first 2 entities
+                metric_str = ', '.join(set(metrics[:3]))  # Limit to first 3 unique metrics
+                simplified = f"I'm analyzing {metric_str} data for {entity_str}, broken down by the dimensions you requested."
+            elif entities:
+                entity_str = ', '.join(entities[:2])
+                simplified = f"I'm gathering the requested data for {entity_str}."
+            elif metrics:
+                metric_str = ', '.join(set(metrics[:3]))
+                simplified = f"I'm calculating the {metric_str} metrics you requested."
+            elif "distributor" in explanation.lower():
+                simplified = "I'm analyzing distributor sales data to provide the breakdown you requested."
+            elif "customer" in explanation.lower():
+                simplified = "I'm gathering customer data to answer your question."
+            elif "revenue" in explanation.lower() or "sales" in explanation.lower():
+                simplified = "I'm calculating the sales and revenue metrics you requested."
+            elif "total" in explanation.lower():
+                simplified = "I'm computing the totals you asked for."
+            else:
+                simplified = "I'm analyzing the data to provide the information you requested."
+
+        return simplified, technical_explanation
+
     def generate_sql(
         self, 
         user_query: str, 
@@ -123,7 +206,7 @@ ORDER BY current_inventory ASC"""
                         },
                         "explanation": {
                             "type": "string",
-                            "description": "Brief explanation written from AXIS.AI agent's perspective, describing what the agent is doing to answer the question. Use first-person language (I'm analyzing..., I'm calculating..., I've identified...) to sound like an AI assistant actively working on the task, not just describing SQL."
+                            "description": "Brief, user-friendly explanation from AXIS.AI's perspective about what you're doing to answer the question. Focus on the BUSINESS INTENT and high-level approach (e.g., 'I'm analyzing sales data for Audrey Le', 'I'm calculating total revenue across all regions'). Use first-person (I'm..., I've...). Keep it simple - avoid mentioning SQL syntax, CTEs, JOINs, or technical database details. Maximum 2-3 sentences."
                         },
                         "tables_used": {
                             "type": "array",
@@ -221,8 +304,55 @@ ORDER BY current_inventory ASC"""
                     result["sql"] = result["sql"].replace('`', '')
                     logger.info("Removed backticks from generated SQL")
 
+                # Post-process: Fix LOWER() in SELECT/GROUP BY to preserve original casing
+                if "sql" in result and result["sql"]:
+                    import re
+                    sql = result["sql"]
+                    logger.info("POST-PROCESSING: Checking for LOWER() in SELECT/GROUP BY")
+
+                    # Fix pattern: LOWER(column) AS column in SELECT
+                    # Replace with: column (original casing)
+                    text_columns = ['distributor', 'customer', 'customer_name', 'item_name', 'product_name']
+                    for col in text_columns:
+                        # Pattern: LOWER(distributor) AS distributor (with optional comma/whitespace after)
+                        # This will match in SELECT statements
+                        old_sql = sql
+                        sql = re.sub(
+                            rf'LOWER\(\s*{col}\s*\)\s+AS\s+{col}\b',
+                            col,
+                            sql,
+                            flags=re.IGNORECASE
+                        )
+                        if sql != old_sql:
+                            logger.info(f"POST-PROCESSING: Removed LOWER() from SELECT for column: {col}")
+
+                        # Pattern: GROUP BY LOWER(distributor) or , LOWER(distributor)
+                        old_sql = sql
+                        sql = re.sub(
+                            rf'(GROUP\s+BY|,)\s+LOWER\(\s*{col}\s*\)',
+                            rf'\1 {col}',
+                            sql,
+                            flags=re.IGNORECASE
+                        )
+                        if sql != old_sql:
+                            logger.info(f"POST-PROCESSING: Removed LOWER() from GROUP BY for column: {col}")
+
+                    if sql != result["sql"]:
+                        result["sql"] = sql
+                        logger.info("POST-PROCESSING: Successfully fixed LOWER() to preserve original casing")
+
                 # Add confidence score based on complexity
                 result["confidence_score"] = self._calculate_confidence(result, table_schemas)
+
+                # Simplify explanation for end users (keep technical version optional)
+                if "explanation" in result:
+                    simplified, technical = self.simplify_explanation(
+                        result["explanation"],
+                        enable_technical_mode=getattr(settings, 'enable_technical_explanations', False)
+                    )
+                    result["explanation"] = simplified
+                    result["technical_explanation"] = technical
+
                 return result
             else:
                 # Fallback to text parsing if tool use fails
@@ -230,6 +360,16 @@ ORDER BY current_inventory ASC"""
                 if response.content and hasattr(response.content[0], 'text'):
                     result = self._parse_llm_response(response.content[0].text)
                     result["confidence_score"] = self._calculate_confidence(result, table_schemas)
+
+                    # Simplify explanation for end users
+                    if "explanation" in result:
+                        simplified, technical = self.simplify_explanation(
+                            result["explanation"],
+                            enable_technical_mode=getattr(settings, 'enable_technical_explanations', False)
+                        )
+                        result["explanation"] = simplified
+                        result["technical_explanation"] = technical
+
                     return result
                 else:
                     raise ValueError("No valid response from LLM")
@@ -282,6 +422,31 @@ ORDER BY current_inventory ASC"""
     def _build_system_prompt(self, financial_context: Optional[Dict[str, Any]] = None) -> str:
         base_prompt = f"""You are an expert SQL query generator for PostgreSQL. Your task is to convert natural language questions into optimized PostgreSQL SQL queries.
 
+!!!! ABSOLUTELY CRITICAL - CASE-INSENSITIVE TEXT MATCHING !!!!
+⚠️ PostgreSQL string comparisons are CASE-SENSITIVE by default! ⚠️
+
+ALWAYS use case-insensitive matching for text columns:
+- distributor names: WHERE LOWER(distributor) = LOWER('audrey le')
+- customer names: WHERE LOWER(customer_name) = LOWER('John Smith')
+- item names: WHERE LOWER(item_name) ILIKE '%widget%'
+- ANY text column: Use LOWER() on BOTH sides or use ILIKE instead of LIKE/=
+
+⚠️ CRITICAL: Use LOWER() ONLY in WHERE clause, NEVER in SELECT/GROUP BY!
+
+✅ CORRECT - Preserves original casing "Audrey Le" from database:
+   SELECT distributor, item_name, SUM(quantity) AS total
+   FROM csg_data
+   WHERE LOWER(distributor) = LOWER('audrey le')
+   GROUP BY distributor, item_name
+
+❌ WRONG - Outputs lowercase "audrey le" instead of "Audrey Le":
+   SELECT LOWER(distributor) AS distributor, item_name, SUM(quantity) AS total
+   FROM csg_data
+   WHERE LOWER(distributor) = LOWER('audrey le')
+   GROUP BY LOWER(distributor), item_name
+
+The LOWER() function is ONLY for filtering in WHERE clause. NEVER apply it to SELECT or GROUP BY!
+
 !!!! ABSOLUTELY CRITICAL - REVENUE CALCULATION RULES !!!!
 THIS IS THE MOST IMPORTANT RULE - FOLLOW EXACTLY:
 
@@ -310,7 +475,19 @@ Revenue column mapping:
 
 Rules:
 1. Generate valid PostgreSQL SQL syntax
-2. Use simple table names without schema qualification (tables are in the public schema)
+
+2. ⚠️ CRITICAL: When filtering by text (distributor, customer, item names):
+   - Use LOWER() ONLY in WHERE clause for case-insensitive matching
+   - NEVER use LOWER() in SELECT or GROUP BY - this changes the output to lowercase!
+   - Example CORRECT:
+     SELECT distributor, SUM(quantity)
+     WHERE LOWER(distributor) = LOWER('audrey le')
+     GROUP BY distributor
+   - Example WRONG:
+     SELECT LOWER(distributor) AS distributor  -- ❌ This outputs "audrey le" instead of "Audrey Le"
+     GROUP BY LOWER(distributor)  -- ❌ Also wrong!
+
+3. Use simple table names without schema qualification (tables are in the public schema)
 3. IMPORTANT: DO NOT use backticks - PostgreSQL uses double quotes for identifiers if needed
 4. Use standard PostgreSQL functions and syntax (NOT BigQuery syntax)
 5. Optimize queries for performance (use appropriate JOINs, filters, and aggregations)
@@ -459,8 +636,24 @@ Rules:
     CORRECT Example:
     to_char(ROUND(100.0 * SUM(total_gm) / NULLIF(SUM(total_sales), 0), 2), 'FM999.00') || '%' AS gross_margin_pct
 
-    **Count/Quantity Columns** - No formatting needed:
-    COUNT(*), SUM(quantity), COUNT(DISTINCT customer)
+    **Count/Quantity Columns** - ⚠️ NEVER format with $ (currency symbol):
+
+    ❌ WRONG - DO NOT add $ to quantity/count columns:
+    '$' || to_char(SUM(quantity), 'FM999,999,999.00') AS total_quantity  -- WRONG!
+
+    ✅ CORRECT - Return as plain number (PostgreSQL will handle display):
+    SUM(quantity) AS total_quantity
+    CAST(SUM(quantity) AS INTEGER) AS total_quantity
+    COUNT(*) AS row_count
+    COUNT(DISTINCT customer) AS unique_customers
+
+    ✅ CORRECT - Optional: Format with commas but NO $ sign:
+    to_char(SUM(quantity), 'FM999,999,999') AS total_quantity
+
+    Apply to these column types (NO $ SYMBOL):
+    - Quantity, Qty, Count, Number, Volume
+    - Units, Cases, Items, Orders, Transactions
+    - Any column with "_quantity", "_count", "_qty", "_units" in the name
 
     WRONG - DO NOT USE (these are BigQuery patterns):
     CAST(... AS INT64)                          -- WRONG: Use INTEGER for PostgreSQL
@@ -468,13 +661,7 @@ Rules:
     FORMAT('%d', ...)                           -- WRONG: Not a PostgreSQL function
     CONCAT('$', FORMAT(...))                    -- WRONG: BigQuery syntax
 
-    Use PostgreSQL's to_char() function for all formatting.
-
-    **Numeric Columns** (integers with commas) - Apply FORMAT('%\\'d', CAST(column_value AS INT64)) to:
-    - Quantity, Qty, Count, Number, Volume
-    - Units, Cases, Items, Orders, Transactions
-
-    Example: FORMAT('%\\'d', CAST(COUNT(DISTINCT customer_id) AS INT64)) as customer_count
+    Use PostgreSQL's to_char() function for all formatting, but NO $ for quantity/count columns.
 
     **IMPORTANT**:
     - Format EVERY applicable column in SELECT clause
@@ -507,7 +694,52 @@ Rules:
     - Margin: 25.5% (NOT 0.255 or 25.5)
     - Count: 1,234 (NOT 1234)
 
-    ⚠️ DO NOT skip formatting - users expect presentation-ready results!"""
+    ⚠️ DO NOT skip formatting - users expect presentation-ready results!
+
+19. CRITICAL - CASE-INSENSITIVE TEXT MATCHING (PostgreSQL):
+
+    ⭐ ALWAYS USE CASE-INSENSITIVE MATCHING FOR TEXT COMPARISONS ⭐
+
+    When filtering by text columns (distributor, customer, item_name, product, etc.),
+    PostgreSQL string comparisons are CASE-SENSITIVE by default!
+
+    **WRONG PATTERN** (will miss results):
+    ```sql
+    WHERE distributor = 'john smith'  -- ❌ Won't match "John Smith"
+    WHERE item_name = 'widget'        -- ❌ Won't match "Widget" or "WIDGET"
+    ```
+
+    **CORRECT PATTERN** - Use ILIKE or LOWER():
+    ```sql
+    WHERE LOWER(distributor) = LOWER('John Smith')    -- ✅ Case-insensitive exact match
+    WHERE distributor ILIKE 'john smith'              -- ✅ Case-insensitive exact match
+    WHERE LOWER(item_name) LIKE LOWER('%widget%')     -- ✅ Case-insensitive partial match
+    WHERE item_name ILIKE '%widget%'                  -- ✅ Case-insensitive partial match
+    ```
+
+    **Apply to these column types:**
+    - distributor, customer, customer_name, vendor
+    - item_name, item_code, product, product_name, sku
+    - plant, location, region, territory
+    - Any text/VARCHAR column used in WHERE, HAVING, or JOIN conditions
+
+    **KEY RULES:**
+    1. Always use LOWER() on BOTH sides of comparison: LOWER(column) = LOWER('value')
+    2. Or use ILIKE instead of LIKE or = for case-insensitive matching
+    3. When user provides a name like "michael fitzgerald", match it as LOWER('michael fitzgerald')
+    4. Apply to ALL text comparisons, not just distributor names
+
+    **CORRECT Examples:**
+    ```sql
+    -- User asks: "show me sales for Michael Fitzgerald"
+    WHERE LOWER(distributor) = LOWER('Michael Fitzgerald')
+
+    -- User asks: "items containing widget"
+    WHERE LOWER(item_name) LIKE LOWER('%widget%')
+
+    -- User asks: "customers at dallas plant"
+    WHERE LOWER(plant) = LOWER('Dallas')
+    ```"""
 
         # Add financial context if provided
         if financial_context:
@@ -540,7 +772,29 @@ Financial Query Rules:
         join_hints: Optional[List[Dict[str, Any]]] = None
     ) -> str:
         prompt_parts = []
-        
+
+        # Check if query contains names that need case-insensitive matching
+        query_lower = query.lower()
+        name_keywords = ['audrey', 'michael', 'fitzgerald', 'john', 'smith', 'distributor', 'customer', 'for ', 'by ']
+        needs_case_insensitive = any(keyword in query_lower for keyword in name_keywords)
+
+        if needs_case_insensitive:
+            prompt_parts.append("🚨 CRITICAL REQUIREMENT FOR THIS QUERY 🚨")
+            prompt_parts.append("This query filters by names. PostgreSQL is CASE-SENSITIVE!")
+            prompt_parts.append("")
+            prompt_parts.append("✅ CORRECT SQL Pattern:")
+            prompt_parts.append("  SELECT distributor, item_name, SUM(quantity)")
+            prompt_parts.append("  FROM csg_data")
+            prompt_parts.append("  WHERE LOWER(distributor) = LOWER('audrey le')  -- LOWER only here!")
+            prompt_parts.append("  GROUP BY distributor, item_name  -- Original columns, NO LOWER()!")
+            prompt_parts.append("")
+            prompt_parts.append("❌ WRONG - DO NOT USE:")
+            prompt_parts.append("  SELECT LOWER(distributor) AS distributor  -- Converts to lowercase!")
+            prompt_parts.append("  GROUP BY LOWER(distributor)  -- Also wrong!")
+            prompt_parts.append("")
+            prompt_parts.append("Remember: Use '$' || to_char() for currency formatting")
+            prompt_parts.append("")
+
         # Add table schemas
         prompt_parts.append("Available tables and their schemas:")
         for schema in schemas:

@@ -552,6 +552,24 @@ class SQLGenerator:
                     modified = True
                     logger.info("🔧 Replaced SAFE_DIVIDE with NULLIF")
 
+                # FIX: Remove LOWER() from SELECT/GROUP BY to preserve original casing
+                import re
+                text_columns = ['distributor', 'customer', 'customer_name', 'item_name', 'product_name']
+                for col in text_columns:
+                    # Pattern 1: LOWER(distributor) AS distributor in SELECT
+                    pattern1 = rf'LOWER\(\s*{col}\s*\)\s+AS\s+{col}\b'
+                    if re.search(pattern1, sql, re.IGNORECASE):
+                        sql = re.sub(pattern1, col, sql, flags=re.IGNORECASE)
+                        modified = True
+                        logger.info(f"🔧 Removed LOWER({col}) from SELECT to preserve original casing")
+
+                    # Pattern 2: GROUP BY LOWER(distributor) or , LOWER(distributor)
+                    pattern2 = rf'(GROUP\s+BY|,)\s+LOWER\(\s*{col}\s*\)'
+                    if re.search(pattern2, sql, re.IGNORECASE):
+                        sql = re.sub(pattern2, rf'\1 {col}', sql, flags=re.IGNORECASE)
+                        modified = True
+                        logger.info(f"🔧 Removed LOWER({col}) from GROUP BY")
+
                 # Remove complex BigQuery FORMAT/CONCAT expressions
                 if 'FORMAT' in sql or 'CONCAT' in sql:
                     import re
@@ -717,34 +735,84 @@ class SQLGenerator:
                     logger.info(f"🔧 PostgreSQL compatibility fixes applied")
 
                 # Fix ORDER BY column references and remove duplicate columns
+                # NOTE: Only remove duplicates WITHIN each SELECT clause, not across CTEs and main query
                 if sql:
                     import re
 
-                    # Extract all column aliases from SELECT clause
-                    select_match = re.search(r'SELECT\s+(.*?)\s+FROM', sql, re.DOTALL | re.IGNORECASE)
-                    if select_match:
-                        select_clause = select_match.group(1)
+                    # Split SQL into parts: CTEs and main query
+                    # This prevents removing columns from main SELECT that have same alias as CTE columns
+                    cte_pattern = r'(WITH\s+.*?\s+AS\s+\(.*?\))\s*(SELECT\s+.*)'
+                    cte_match = re.match(cte_pattern, sql, re.DOTALL | re.IGNORECASE)
 
-                        # Find all aliases (pattern: "AS alias" or "AS alias,")
-                        aliases = re.findall(r'\bAS\s+(\w+)\s*[,\n]?', select_clause, re.IGNORECASE)
+                    if cte_match:
+                        # Has CTEs - process CTE and main query separately
+                        cte_part = cte_match.group(1)
+                        main_query = cte_match.group(2)
 
-                        # Remove duplicate aliases (keep first occurrence)
-                        seen_aliases = set()
-                        lines = sql.split('\n')
-                        deduplicated_lines = []
+                        # Remove duplicates only within the main SELECT (not comparing with CTE)
+                        select_match = re.search(r'SELECT\s+(.*?)\s+FROM', main_query, re.DOTALL | re.IGNORECASE)
+                        if select_match:
+                            seen_aliases = set()
+                            lines = main_query.split('\n')
+                            deduplicated_lines = []
+                            in_select_clause = False
 
-                        for line in lines:
-                            alias_match = re.search(r'\bAS\s+(\w+)', line, re.IGNORECASE)
-                            if alias_match:
-                                alias = alias_match.group(1).lower()
-                                if alias in seen_aliases:
-                                    # Skip duplicate column
-                                    logger.info(f"🔧 Removed duplicate column with alias: {alias}")
-                                    continue
-                                seen_aliases.add(alias)
-                            deduplicated_lines.append(line)
+                            for line in lines:
+                                # Track if we're in the SELECT clause (before FROM)
+                                if re.match(r'\s*SELECT\b', line, re.IGNORECASE):
+                                    in_select_clause = True
+                                elif re.match(r'\s*FROM\b', line, re.IGNORECASE):
+                                    in_select_clause = False
 
-                        sql = '\n'.join(deduplicated_lines)
+                                # Only check for duplicates within SELECT clause
+                                if in_select_clause:
+                                    alias_match = re.search(r'\bAS\s+(\w+)', line, re.IGNORECASE)
+                                    if alias_match:
+                                        alias = alias_match.group(1).lower()
+                                        if alias in seen_aliases:
+                                            logger.info(f"🔧 Removed duplicate column with alias: {alias} from main SELECT")
+                                            continue
+                                        seen_aliases.add(alias)
+
+                                deduplicated_lines.append(line)
+
+                            sql = cte_part + '\n' + '\n'.join(deduplicated_lines)
+                    else:
+                        # No CTEs - use original logic but only within SELECT clause
+                        select_match = re.search(r'SELECT\s+(.*?)\s+FROM', sql, re.DOTALL | re.IGNORECASE)
+                        if select_match:
+                            seen_aliases = set()
+                            lines = sql.split('\n')
+                            deduplicated_lines = []
+                            in_select_clause = False
+
+                            for line in lines:
+                                # Track if we're in the SELECT clause (before FROM)
+                                if re.match(r'\s*SELECT\b', line, re.IGNORECASE):
+                                    in_select_clause = True
+                                elif re.match(r'\s*FROM\b', line, re.IGNORECASE):
+                                    in_select_clause = False
+
+                                # Only check for duplicates within SELECT clause
+                                if in_select_clause:
+                                    alias_match = re.search(r'\bAS\s+(\w+)', line, re.IGNORECASE)
+                                    if alias_match:
+                                        alias = alias_match.group(1).lower()
+                                        if alias in seen_aliases:
+                                            logger.info(f"🔧 Removed duplicate column with alias: {alias}")
+                                            continue
+                                        seen_aliases.add(alias)
+
+                                deduplicated_lines.append(line)
+
+                            sql = '\n'.join(deduplicated_lines)
+
+                        # Extract all aliases from the final SELECT for ORDER BY fixing
+                        select_match = re.search(r'SELECT\s+(.*?)\s+FROM', sql, re.DOTALL | re.IGNORECASE)
+                        aliases = []
+                        if select_match:
+                            select_clause = select_match.group(1)
+                            aliases = re.findall(r'\bAS\s+(\w+)\s*[,\n]?', select_clause, re.IGNORECASE)
 
                         # Now fix ORDER BY references
                         # Build mapping of common column name variations

@@ -157,14 +157,27 @@ const EnhancedChatMessage = ({ message, aiConfig }) => {
     // DataGrid columns
     console.log('Preparing DataGrid data:', { results, resultsLength: results?.length });
     
-    const columns = results && results.length > 0 
+    const columns = results && results.length > 0
       ? Object.keys(results[0]).map((key) => {
-          const isAmount = key.toLowerCase().includes('amount') || 
-                          key.toLowerCase().includes('revenue') || 
+          // Check if this is a quantity/count column (should NOT be formatted as currency)
+          const isQuantity = key.toLowerCase().includes('quantity') ||
+                            key.toLowerCase().includes('qty') ||
+                            key.toLowerCase().includes('count') ||
+                            key.toLowerCase().includes('units');
+
+          // Check if this is a currency amount column
+          const isAmount = !isQuantity && (
+                          key.toLowerCase().includes('amount') ||
+                          key.toLowerCase().includes('revenue') ||
                           key.toLowerCase().includes('cost') ||
+                          key.toLowerCase().includes('sales') ||
+                          key.toLowerCase().includes('gm') ||
+                          key.toLowerCase().includes('margin') ||
                           key.toLowerCase().includes('total') ||
-                          key.toLowerCase().includes('price');
-          
+                          key.toLowerCase().includes('price'));
+
+          console.log(`Column: ${key}, isQuantity: ${isQuantity}, isAmount: ${isAmount}`);
+
           return {
             field: key,
             headerName: key
@@ -176,6 +189,7 @@ const EnhancedChatMessage = ({ message, aiConfig }) => {
             renderCell: (params) => {
               // Format numbers with commas and currency for amount fields
               if (typeof params.value === 'number') {
+                console.log(`Rendering ${key}: value=${params.value}, isAmount=${isAmount}`);
                 if (isAmount) {
                   return `$${params.value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                 }

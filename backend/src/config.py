@@ -48,6 +48,9 @@ class Settings(BaseSettings):
     industry: str = Field(default="gl_mappings", alias="INDUSTRY")
     enable_industry_features: bool = Field(default=False, alias="ENABLE_INDUSTRY_FEATURES")
 
+    # Explanation Mode - Set to True for technical SQL details, False for user-friendly explanations
+    enable_technical_explanations: bool = Field(default=False, alias="ENABLE_TECHNICAL_EXPLANATIONS")
+
     # MongoDB Configuration
     mongodb_url: str = Field(default="mongodb://localhost:27017", alias="MONGODB_URL")
 

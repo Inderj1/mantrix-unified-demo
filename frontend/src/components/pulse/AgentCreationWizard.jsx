@@ -33,9 +33,9 @@ import {
 } from '@mui/icons-material';
 import { DataGrid } from '@mui/x-data-grid';
 
-const steps = ['Choose Template or Create', 'Configure Monitor', 'Review & Save'];
+const steps = ['Choose Template or Create', 'Configure Agent', 'Review & Deploy'];
 
-const MonitorCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
+const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -44,7 +44,7 @@ const MonitorCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
   const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [naturalLanguage, setNaturalLanguage] = useState('');
-  const [monitorData, setMonitorData] = useState(null);
+  const [agentData, setAgentData] = useState(null);
   const [configuration, setConfiguration] = useState({
     name: '',
     description: '',
@@ -72,7 +72,7 @@ const MonitorCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
 
   const handleNext = async () => {
     if (activeStep === 0) {
-      // Step 1: Create monitor from NL or template
+      // Step 1: Create agent from NL or template
       if (!naturalLanguage && !selectedTemplate) {
         setError('Please enter a query or select a template');
         return;
@@ -99,7 +99,7 @@ const MonitorCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
         const data = await response.json();
 
         if (data.success) {
-          setMonitorData(data.data);
+          setAgentData(data.data);
           setConfiguration({
             name: data.data.name,
             description: '',
@@ -110,22 +110,22 @@ const MonitorCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
           });
           setActiveStep(1);
         } else {
-          setError(data.detail || 'Failed to create monitor');
+          setError(data.detail || 'Failed to create agent');
         }
       } catch (err) {
-        setError('Error creating monitor: ' + err.message);
+        setError('Error creating agent: ' + err.message);
       } finally {
         setLoading(false);
       }
     } else if (activeStep === 1) {
       // Step 2: Review configuration
       if (!configuration.name) {
-        setError('Please enter a monitor name');
+        setError('Please enter an agent name');
         return;
       }
       setActiveStep(2);
     } else if (activeStep === 2) {
-      // Step 3: Save monitor
+      // Step 3: Save agent
       await handleSave();
     }
   };
@@ -147,9 +147,9 @@ const MonitorCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
           user_id: userId,
           name: configuration.name,
           description: configuration.description,
-          natural_language_query: monitorData.natural_language_query,
-          sql_query: monitorData.sql_query,
-          data_source: monitorData.data_source,
+          natural_language_query: agentData.natural_language_query,
+          sql_query: agentData.sql_query,
+          data_source: agentData.data_source,
           alert_condition: configuration.alertCondition,
           severity: configuration.severity,
           frequency: configuration.frequency,
@@ -163,10 +163,10 @@ const MonitorCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
         if (onSave) onSave(data.monitor_id);
         if (onClose) onClose();
       } else {
-        setError(data.detail || 'Failed to save monitor');
+        setError(data.detail || 'Failed to save agent');
       }
     } catch (err) {
-      setError('Error saving monitor: ' + err.message);
+      setError('Error saving agent: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -178,7 +178,7 @@ const MonitorCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
         return (
           <Box>
             <Typography variant="h6" gutterBottom>
-              Create Your Monitor
+              Create Your Proactive Agent
             </Typography>
 
             {/* Quick Templates */}
@@ -229,7 +229,7 @@ const MonitorCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
             <Box>
               <Typography variant="subtitle2" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <TrendingUpIcon fontSize="small" />
-                Describe What You Want to Monitor
+                Describe What You Want the Agent to Execute
               </Typography>
               <TextField
                 fullWidth
@@ -257,14 +257,14 @@ const MonitorCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
         return (
           <Box>
             <Typography variant="h6" gutterBottom>
-              Configure Monitor Settings
+              Configure Agent Settings
             </Typography>
 
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label="Monitor Name"
+                  label="Agent Name"
                   value={configuration.name}
                   onChange={(e) => setConfiguration({ ...configuration, name: e.target.value })}
                   required
@@ -284,10 +284,10 @@ const MonitorCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
 
               <Grid item xs={12} md={4}>
                 <FormControl fullWidth>
-                  <InputLabel>Frequency</InputLabel>
+                  <InputLabel>Execution Frequency</InputLabel>
                   <Select
                     value={configuration.frequency}
-                    label="Frequency"
+                    label="Execution Frequency"
                     onChange={(e) => setConfiguration({ ...configuration, frequency: e.target.value })}
                   >
                     <MenuItem value="real-time">Real-time (1 min)</MenuItem>
@@ -340,15 +340,15 @@ const MonitorCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
               </Grid>
 
               {/* Preview Data */}
-              {monitorData?.preview_data && (
+              {agentData?.preview_data && (
                 <Grid item xs={12}>
                   <Typography variant="subtitle2" gutterBottom>
                     Data Preview
                   </Typography>
                   <Paper variant="outlined" sx={{ p: 2, bgcolor: 'grey.50' }}>
                     <DataGrid
-                      rows={monitorData.preview_data.map((row, idx) => ({ id: idx, ...row }))}
-                      columns={Object.keys(monitorData.preview_data[0] || {}).map(key => ({
+                      rows={agentData.preview_data.map((row, idx) => ({ id: idx, ...row }))}
+                      columns={Object.keys(agentData.preview_data[0] || {}).map(key => ({
                         field: key,
                         headerName: key,
                         flex: 1,
@@ -369,14 +369,14 @@ const MonitorCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
         return (
           <Box>
             <Typography variant="h6" gutterBottom>
-              Review & Confirm
+              Review & Deploy Agent
             </Typography>
 
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Paper variant="outlined" sx={{ p: 2 }}>
                   <Typography variant="subtitle2" color="primary" gutterBottom>
-                    Monitor Details
+                    Agent Details
                   </Typography>
                   <Grid container spacing={1}>
                     <Grid item xs={6}>
@@ -404,10 +404,10 @@ const MonitorCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
                     Query
                   </Typography>
                   <Typography variant="body2" color="text.secondary" mb={1}>
-                    {monitorData?.natural_language_query}
+                    {agentData?.natural_language_query}
                   </Typography>
                   <Paper sx={{ p: 2, bgcolor: 'grey.900', color: 'grey.100', fontFamily: 'monospace', fontSize: 12, overflow: 'auto' }}>
-                    {monitorData?.sql_query}
+                    {agentData?.sql_query}
                   </Paper>
                 </Paper>
               </Grid>
@@ -427,8 +427,8 @@ const MonitorCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
 
               <Grid item xs={12}>
                 <Alert severity="info" icon={<InfoIcon />}>
-                  Monitor will execute <strong>{configuration.frequency}</strong> and alert you when conditions are met.
-                  The agent will learn from your feedback to improve accuracy over time.
+                  This proactive agent will execute <strong>{configuration.frequency}</strong> to ensure business is not impacted.
+                  The agent will learn from your feedback and improve accuracy over time.
                 </Alert>
               </Grid>
             </Grid>
@@ -477,7 +477,7 @@ const MonitorCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
             disabled={loading}
             startIcon={loading ? <CircularProgress size={20} /> : activeStep === 2 ? <CheckCircleIcon /> : null}
           >
-            {loading ? 'Processing...' : activeStep === steps.length - 1 ? 'Create Monitor' : 'Next'}
+            {loading ? 'Processing...' : activeStep === steps.length - 1 ? 'Deploy Agent' : 'Next'}
           </Button>
         </Box>
       </Box>
@@ -485,4 +485,4 @@ const MonitorCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
   );
 };
 
-export default MonitorCreationWizard;
+export default AgentCreationWizard;

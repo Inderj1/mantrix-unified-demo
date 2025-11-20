@@ -116,7 +116,7 @@ const CoreAILanding = ({ onTileClick }) => {
           const isActive = module.status === 'active';
           
           return (
-            <Grid item xs={12} sm={6} md={4} key={module.id}>
+            <Grid item xs={12} sm={6} md={6} key={module.id}>
               <Card
                 sx={{
                   height: '100%',

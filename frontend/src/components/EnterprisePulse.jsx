@@ -5,8 +5,8 @@ import {
   Dialog,
   DialogContent,
 } from '@mui/material';
-import MonitorCreationWizard from './pulse/MonitorCreationWizard';
-import MonitorDashboard from './pulse/MonitorDashboard';
+import AgentCreationWizard from './pulse/AgentCreationWizard';
+import AgentDashboard from './pulse/AgentDashboard';
 
 const EnterprisePulse = () => {
   const { user } = useUser();
@@ -22,7 +22,7 @@ const EnterprisePulse = () => {
       overflowX: 'hidden',
       bgcolor: '#f5f5f5'
     }}>
-      {/* Monitor Creation Wizard Dialog */}
+      {/* Agent Creation Wizard Dialog */}
       <Dialog
         open={showWizard}
         onClose={() => setShowWizard(false)}
@@ -30,7 +30,7 @@ const EnterprisePulse = () => {
         fullWidth
       >
         <DialogContent sx={{ p: 3 }}>
-          <MonitorCreationWizard
+          <AgentCreationWizard
             userId={userId}
             onClose={() => setShowWizard(false)}
             onSave={() => {
@@ -41,9 +41,9 @@ const EnterprisePulse = () => {
       </Dialog>
 
       {/* Main Dashboard */}
-      <MonitorDashboard
+      <AgentDashboard
         userId={userId}
-        onCreateMonitor={() => setShowWizard(true)}
+        onCreateAgent={() => setShowWizard(true)}
       />
     </Box>
   );
