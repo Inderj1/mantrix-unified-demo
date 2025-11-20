@@ -8,11 +8,13 @@ import {
   InputLabel, Accordion, AccordionSummary, AccordionDetails, Fade, Zoom,
   InputAdornment,
 } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
 import {
   CloudUpload, Psychology, Refresh, ArrowBack, NavigateNext, ArrowForward,
   Close, TableChart, Download, Add, Edit, Delete, ExpandMore,
   Layers, DataObject, Chat, AccountTree, Speed, Settings,
   Description, Code, AutoAwesome, PlayArrow, Save, Check, Search,
+  Lightbulb as LightbulbIcon,
 } from '@mui/icons-material';
 import excelProcessorApi from '../services/excelProcessorApi';
 
@@ -22,6 +24,7 @@ const ExcelAIProcessor = ({ onBack }) => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [view, setView] = useState('list'); // 'list', 'create', 'edit', 'execute'
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedFileView, setSelectedFileView] = useState(null); // For file drilldown
 
   // Template builder state
   const [templateBuilder, setTemplateBuilder] = useState({
@@ -45,6 +48,96 @@ const ExcelAIProcessor = ({ onBack }) => {
 
   const fileInputRef = useRef(null);
   const templateFileRef = useRef(null);
+
+  // Sample data for file drilldowns
+  const sampleFileData = {
+    'Invoice Data': {
+      columns: [
+        { field: 'id', headerName: 'ID', width: 70 },
+        { field: 'transactionDate', headerName: 'Transaction Date', width: 130 },
+        { field: 'invoice', headerName: 'Invoice #', width: 100 },
+        { field: 'facility', headerName: 'Facility', width: 200 },
+        { field: 'item', headerName: 'Item', width: 150 },
+        { field: 'quantity', headerName: 'Quantity', width: 100, type: 'number' },
+        { field: 'amount', headerName: 'Amount ($)', width: 120, type: 'number' },
+      ],
+      rows: [
+        { id: 1, transactionDate: '2025-08-15', invoice: 43210, facility: 'Hospital ABC - Main Campus', item: 'MED-12345', quantity: 50, amount: 1250.00 },
+        { id: 2, transactionDate: '2025-08-16', invoice: 43211, facility: 'Clinic XYZ - North', item: 'SURG-67890', quantity: 25, amount: 3750.50 },
+        { id: 3, transactionDate: '2025-08-17', invoice: 43212, facility: 'Medical Center 123', item: 'LAB-11223', quantity: 100, amount: 850.75 },
+        { id: 4, transactionDate: '2025-08-18', invoice: 43213, facility: 'Hospital ABC - East Wing', item: 'PHARM-44556', quantity: 75, amount: 2100.25 },
+        { id: 5, transactionDate: '2025-08-19', invoice: 43214, facility: 'Urgent Care Center', item: 'MED-78901', quantity: 30, amount: 920.00 },
+      ]
+    },
+    'Manufacturing Std Cost': {
+      columns: [
+        { field: 'id', headerName: 'ID', width: 70 },
+        { field: 'itemCode', headerName: 'Item Code', width: 150 },
+        { field: 'description', headerName: 'Description', width: 250 },
+        { field: 'standardCost', headerName: 'Std Cost ($)', width: 130, type: 'number' },
+        { field: 'category', headerName: 'Category', width: 150 },
+        { field: 'uom', headerName: 'UOM', width: 100 },
+      ],
+      rows: [
+        { id: 1, itemCode: 'MED-12345', description: 'Medical Supply - Bandages 4x4', standardCost: 25.00, category: 'Medical Supplies', uom: 'BOX' },
+        { id: 2, itemCode: 'SURG-67890', description: 'Surgical Instrument Set - Basic', standardCost: 150.02, category: 'Surgical', uom: 'SET' },
+        { id: 3, itemCode: 'LAB-11223', description: 'Lab Test Kit - Blood Work', standardCost: 8.51, category: 'Laboratory', uom: 'KIT' },
+        { id: 4, itemCode: 'PHARM-44556', description: 'Pharmaceutical - Pain Relief 500mg', standardCost: 28.00, category: 'Pharmacy', uom: 'BOTTLE' },
+        { id: 5, itemCode: 'MED-78901', description: 'Medical Equipment - Thermometer Digital', standardCost: 30.67, category: 'Medical Supplies', uom: 'EACH' },
+      ]
+    },
+    'Item Data File': {
+      columns: [
+        { field: 'id', headerName: 'ID', width: 70 },
+        { field: 'itemId', headerName: 'Item ID', width: 150 },
+        { field: 'description', headerName: 'Description', width: 300 },
+        { field: 'category', headerName: 'Category', width: 150 },
+        { field: 'subcategory', headerName: 'Subcategory', width: 150 },
+        { field: 'uom', headerName: 'UOM', width: 100 },
+      ],
+      rows: [
+        { id: 1, itemId: 'MED-12345', description: 'Medical Supply - Bandages 4x4 Sterile', category: 'Medical Supplies', subcategory: 'Wound Care', uom: 'BOX' },
+        { id: 2, itemId: 'SURG-67890', description: 'Surgical Instrument Set - Basic Surgery', category: 'Surgical', subcategory: 'Instruments', uom: 'SET' },
+        { id: 3, itemId: 'LAB-11223', description: 'Lab Test Kit - Complete Blood Count', category: 'Laboratory', subcategory: 'Testing', uom: 'KIT' },
+        { id: 4, itemId: 'PHARM-44556', description: 'Pharmaceutical - Pain Relief 500mg Tablets', category: 'Pharmacy', subcategory: 'Pain Management', uom: 'BOTTLE' },
+        { id: 5, itemId: 'MED-78901', description: 'Medical Equipment - Thermometer Digital Infrared', category: 'Medical Supplies', subcategory: 'Diagnostics', uom: 'EACH' },
+      ]
+    },
+    'MSR 2025 Data': {
+      columns: [
+        { field: 'id', headerName: 'ID', width: 70 },
+        { field: 'hospital', headerName: 'Hospital/Facility', width: 250 },
+        { field: 'distributor', headerName: 'Distributor', width: 200 },
+        { field: 'territory', headerName: 'Territory', width: 150 },
+        { field: 'state', headerName: 'State', width: 100 },
+        { field: 'region', headerName: 'Region', width: 120 },
+      ],
+      rows: [
+        { id: 1, hospital: 'Hospital ABC - Main Campus', distributor: 'MedSupply Corp', territory: 'Northeast', state: 'NY', region: 'East' },
+        { id: 2, hospital: 'Clinic XYZ - North', distributor: 'Healthcare Distributors Inc', territory: 'Midwest', state: 'IL', region: 'Central' },
+        { id: 3, hospital: 'Medical Center 123', distributor: 'Cardinal Health', territory: 'Southwest', state: 'TX', region: 'South' },
+        { id: 4, hospital: 'Hospital ABC - East Wing', distributor: 'McKesson Medical', territory: 'Northeast', state: 'NY', region: 'East' },
+        { id: 5, hospital: 'Urgent Care Center', distributor: 'Amerisource Bergen', territory: 'West', state: 'CA', region: 'West' },
+      ]
+    },
+    'Original CGS': {
+      columns: [
+        { field: 'id', headerName: 'ID', width: 70 },
+        { field: 'item', headerName: 'Item', width: 150 },
+        { field: 'distributor', headerName: 'Distributor', width: 200 },
+        { field: 'historicalCost', headerName: 'Historical Cost ($)', width: 150, type: 'number' },
+        { field: 'date', headerName: 'Date', width: 120 },
+        { field: 'facility', headerName: 'Facility', width: 200 },
+      ],
+      rows: [
+        { id: 1, item: 'MED-12345', distributor: 'MedSupply Corp', historicalCost: 24.50, date: '2024-12-15', facility: 'Hospital ABC - Main Campus' },
+        { id: 2, item: 'SURG-67890', distributor: 'Healthcare Distributors Inc', historicalCost: 148.75, date: '2024-11-20', facility: 'Clinic XYZ - North' },
+        { id: 3, item: 'LAB-11223', distributor: 'Cardinal Health', historicalCost: 8.25, date: '2025-01-10', facility: 'Medical Center 123' },
+        { id: 4, item: 'PHARM-44556', distributor: 'McKesson Medical', historicalCost: 27.80, date: '2024-10-05', facility: 'Hospital ABC - East Wing' },
+        { id: 5, item: 'MED-78901', distributor: 'Amerisource Bergen', historicalCost: 30.00, date: '2025-02-14', facility: 'Urgent Care Center' },
+      ]
+    }
+  };
 
   // Load templates from localStorage on mount
   useEffect(() => {
@@ -947,8 +1040,313 @@ const ExcelAIProcessor = ({ onBack }) => {
     </>
   );
 
+  // File Detail View
+  const renderFileDetailView = () => {
+    const fileData = sampleFileData[selectedFileView];
+    if (!fileData) return null;
+
+    return (
+      <Fade in timeout={300}>
+        <Box sx={{
+          background: 'linear-gradient(180deg, rgba(6, 182, 212, 0.05) 0%, rgba(255, 255, 255, 1) 50%)',
+          minHeight: '100%',
+          pb: 4
+        }}>
+          {/* Header with System Identity Badge (STOX.AI style) */}
+          <Box sx={{ mb: 3 }}>
+            <Button
+              startIcon={<ArrowBack />}
+              onClick={() => setSelectedFileView(null)}
+              variant="outlined"
+              size="small"
+              sx={{ mb: 2, borderColor: 'divider' }}
+            >
+              Back to Summary
+            </Button>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+              {/* Colored bar (STOX.AI identity pattern) */}
+              <Box sx={{
+                width: 4,
+                height: 60,
+                background: 'linear-gradient(180deg, #06b6d4 0%, #0891b2 100%)',
+                borderRadius: 2
+              }} />
+              <Box>
+                <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
+                  <Avatar sx={{ width: 32, height: 32, bgcolor: '#06b6d4' }}>
+                    <TableChart sx={{ fontSize: 18 }} />
+                  </Avatar>
+                  <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: '#06b6d4' }}>
+                    {selectedFileView}
+                  </Typography>
+                  <Chip
+                    label={`${fileData.rows.length} Sample Rows`}
+                    size="small"
+                    sx={{
+                      bgcolor: alpha('#06b6d4', 0.1),
+                      color: '#06b6d4',
+                      fontWeight: 600,
+                      fontSize: '0.7rem'
+                    }}
+                  />
+                </Stack>
+                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+                  Sample data showing file structure and content for end-to-end flow understanding
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+
+          {/* Compact Info Cards (STOX.AI style) */}
+          <Grid container spacing={1.5} sx={{ mb: 3 }}>
+            <Grid item xs={12} sm={4}>
+              <Zoom in timeout={200}>
+                <Card sx={{
+                  height: 100,
+                  border: '1px solid',
+                  borderColor: alpha('#06b6d4', 0.15),
+                  borderRadius: 2,
+                  overflow: 'hidden',
+                  position: 'relative',
+                  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 3,
+                    background: 'linear-gradient(90deg, #06b6d4 0%, #0891b2 100%)',
+                    opacity: 0.8,
+                  },
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: `0 12px 24px ${alpha('#06b6d4', 0.15)}`,
+                    borderColor: '#06b6d4',
+                  }
+                }}>
+                  <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                    <DataObject sx={{ fontSize: 28, color: '#06b6d4', mb: 0.5 }} />
+                    <Typography variant="h5" fontWeight={700} color="#06b6d4" sx={{ fontSize: '1.5rem' }}>
+                      {fileData.rows.length}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                      Sample Rows
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Zoom>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Zoom in timeout={250}>
+                <Card sx={{
+                  height: 100,
+                  border: '1px solid',
+                  borderColor: alpha('#8b5cf6', 0.15),
+                  borderRadius: 2,
+                  overflow: 'hidden',
+                  position: 'relative',
+                  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 3,
+                    background: 'linear-gradient(90deg, #8b5cf6 0%, #7c3aed 100%)',
+                    opacity: 0.8,
+                  },
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: `0 12px 24px ${alpha('#8b5cf6', 0.15)}`,
+                    borderColor: '#8b5cf6',
+                  }
+                }}>
+                  <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                    <TableChart sx={{ fontSize: 28, color: '#8b5cf6', mb: 0.5 }} />
+                    <Typography variant="h5" fontWeight={700} color="#8b5cf6" sx={{ fontSize: '1.5rem' }}>
+                      {fileData.columns.length}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                      Total Columns
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Zoom>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Zoom in timeout={300}>
+                <Card sx={{
+                  height: 100,
+                  border: '1px solid',
+                  borderColor: alpha('#10b981', 0.15),
+                  borderRadius: 2,
+                  overflow: 'hidden',
+                  position: 'relative',
+                  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 3,
+                    background: 'linear-gradient(90deg, #10b981 0%, #059669 100%)',
+                    opacity: 0.8,
+                  },
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: `0 12px 24px ${alpha('#10b981', 0.15)}`,
+                    borderColor: '#10b981',
+                  }
+                }}>
+                  <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                    <Check sx={{ fontSize: 28, color: '#10b981', mb: 0.5 }} />
+                    <Typography variant="h5" fontWeight={700} color="#10b981" sx={{ fontSize: '1.5rem' }}>
+                      Active
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                      Processing Status
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Zoom>
+            </Grid>
+          </Grid>
+
+          {/* Data Grid (STOX.AI style with 3px top border) */}
+          <Zoom in timeout={350}>
+            <Card sx={{
+              border: '1px solid',
+              borderColor: alpha('#06b6d4', 0.15),
+              borderRadius: 2,
+              overflow: 'hidden',
+              position: 'relative',
+              transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 3,
+                background: 'linear-gradient(90deg, #06b6d4 0%, #0891b2 100%)',
+                opacity: 0.8,
+              }
+            }}>
+              <CardContent sx={{ p: 2 }}>
+                {/* Header */}
+                <Box sx={{ mb: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
+                    <Avatar sx={{ bgcolor: alpha('#06b6d4', 0.1), width: 32, height: 32 }}>
+                      <Description sx={{ color: '#06b6d4', fontSize: 18 }} />
+                    </Avatar>
+                    <Typography variant="h6" fontWeight={700} color="#06b6d4" sx={{ fontSize: '1rem' }}>
+                      Sample Data Preview
+                    </Typography>
+                  </Box>
+                  <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem', pl: 5.5 }}>
+                    Showing {fileData.rows.length} example records to demonstrate data structure
+                  </Typography>
+                </Box>
+
+                {/* Data Grid */}
+                <Box sx={{ height: 400, width: '100%' }}>
+                  <DataGrid
+                    rows={fileData.rows}
+                    columns={fileData.columns}
+                    pageSize={5}
+                    rowsPerPageOptions={[5]}
+                    disableSelectionOnClick
+                    sx={{
+                      border: 'none',
+                      fontSize: '0.75rem',
+                      '& .MuiDataGrid-cell': {
+                        borderColor: alpha('#06b6d4', 0.08),
+                        py: 0.5,
+                      },
+                      '& .MuiDataGrid-columnHeaders': {
+                        bgcolor: alpha('#06b6d4', 0.05),
+                        color: '#06b6d4',
+                        fontWeight: 700,
+                        fontSize: '0.75rem',
+                        borderColor: alpha('#06b6d4', 0.1),
+                        minHeight: '40px !important',
+                        maxHeight: '40px !important',
+                      },
+                      '& .MuiDataGrid-columnHeaderTitle': {
+                        fontWeight: 700,
+                      },
+                      '& .MuiDataGrid-row': {
+                        transition: 'all 0.2s ease',
+                        '&:hover': {
+                          bgcolor: alpha('#06b6d4', 0.05),
+                          transform: 'scale(1.001)',
+                        },
+                      },
+                      '& .MuiDataGrid-footerContainer': {
+                        borderColor: alpha('#06b6d4', 0.1),
+                        bgcolor: alpha('#06b6d4', 0.02),
+                        minHeight: '40px',
+                      },
+                      '& .MuiTablePagination-root': {
+                        fontSize: '0.7rem',
+                      },
+                    }}
+                  />
+                </Box>
+
+                {/* Info Banner (compact STOX.AI style) */}
+                <Paper sx={{
+                  p: 1.5,
+                  mt: 2,
+                  bgcolor: alpha('#3b82f6', 0.05),
+                  border: '1px solid',
+                  borderColor: alpha('#3b82f6', 0.1),
+                  borderRadius: 1,
+                  borderLeft: '3px solid #3b82f6'
+                }}>
+                  <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+                    <AutoAwesome sx={{ fontSize: 16, color: '#3b82f6', mt: 0.1 }} />
+                    <Box>
+                      <Typography variant="caption" fontWeight={600} color="#3b82f6" sx={{ display: 'block', mb: 0.3, fontSize: '0.7rem' }}>
+                        Processing Context
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', lineHeight: 1.4 }}>
+                        This sample data demonstrates the structure and format of the <strong>{selectedFileView}</strong> file.
+                        During actual processing, the AI will analyze the full dataset and apply the configured business rules and transformations.
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Paper>
+              </CardContent>
+            </Card>
+          </Zoom>
+
+          {/* Info Section (STOX.AI style) */}
+          <Box sx={{ mt: 4, textAlign: 'center' }}>
+            <Stack direction="row" spacing={2} justifyContent="center" alignItems="center">
+              <LightbulbIcon sx={{ color: 'warning.main', fontSize: 20 }} />
+              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
+                Sample data provides end-to-end flow visibility and builds confidence in the AI processing pipeline
+              </Typography>
+            </Stack>
+          </Box>
+        </Box>
+      </Fade>
+    );
+  };
+
   // Template Execute View
-  const renderTemplateExecute = () => (
+  const renderTemplateExecute = () => {
+    // Show file detail view if a file is selected
+    if (selectedFileView) {
+      return renderFileDetailView();
+    }
+
+    return (
     <>
       <Box sx={{ mb: 3 }}>
         <Button
@@ -1225,6 +1623,290 @@ const ExcelAIProcessor = ({ onBack }) => {
               </Stack>
             </Paper>
           </Fade>
+
+          {/* Financial Analysis Summary Section */}
+          {selectedTemplate?.name.toLowerCase().includes('financial') && (
+            <Fade in timeout={500}>
+              <Paper sx={{
+                p: 3,
+                mb: 3,
+                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.02) 0%, rgba(255, 255, 255, 1) 100%)',
+                border: '1px solid',
+                borderColor: alpha('#10b981', 0.1),
+                borderRadius: 2,
+              }}>
+                {/* Header */}
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.5,
+                  mb: 3,
+                  pb: 2,
+                  borderBottom: '2px solid',
+                  borderColor: alpha('#10b981', 0.1)
+                }}>
+                  <Avatar sx={{ bgcolor: alpha('#10b981', 0.1), width: 40, height: 40 }}>
+                    <DataObject sx={{ color: '#10b981', fontSize: 24 }} />
+                  </Avatar>
+                  <Box>
+                    <Typography variant="h6" fontWeight={700} color="#10b981">
+                      Financial Analysis Summary
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Methodology, data sources, and processing logic
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Stack spacing={2}>
+                  {/* Methodology Section */}
+                  <Accordion
+                    defaultExpanded
+                    sx={{
+                      bgcolor: 'white',
+                      '&:before': { display: 'none' },
+                      boxShadow: 'none',
+                      border: '1px solid',
+                      borderColor: alpha('#10b981', 0.1),
+                      borderRadius: '8px !important',
+                      '&.Mui-expanded': {
+                        margin: '0 !important',
+                      }
+                    }}
+                  >
+                    <AccordionSummary
+                      expandIcon={<ExpandMore />}
+                      sx={{
+                        '& .MuiAccordionSummary-content': {
+                          my: 1.5,
+                        }
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <Avatar sx={{ bgcolor: alpha('#10b981', 0.1), width: 32, height: 32 }}>
+                          <Description sx={{ color: '#10b981', fontSize: 18 }} />
+                        </Avatar>
+                        <Typography variant="subtitle1" fontWeight={600}>
+                          Analysis Methodology
+                        </Typography>
+                      </Box>
+                    </AccordionSummary>
+                    <AccordionDetails sx={{ pt: 0 }}>
+                      <Paper sx={{ p: 2, bgcolor: alpha('#10b981', 0.03), border: '1px solid', borderColor: alpha('#10b981', 0.1) }}>
+                        <Typography variant="body2" sx={{ mb: 2, lineHeight: 1.8 }}>
+                          This template processes financial data using a <strong>hybrid approach</strong> that combines multiple data sources:
+                        </Typography>
+                        <Stack spacing={1.5}>
+                          <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}>
+                            <Check sx={{ fontSize: 18, color: '#10b981', mt: 0.2 }} />
+                            <Box>
+                              <Typography variant="body2" fontWeight={600}>Invoice Data Processing</Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                Primary source for transaction records, filtered by date (≤ 2025-08-21) and amount (&gt; 0)
+                              </Typography>
+                            </Box>
+                          </Box>
+                          <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}>
+                            <Check sx={{ fontSize: 18, color: '#10b981', mt: 0.2 }} />
+                            <Box>
+                              <Typography variant="body2" fontWeight={600}>Distributor Mapping</Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                4-priority fallback: CGS Primary → MSR Data → Fuzzy Matching → Name Extraction
+                              </Typography>
+                            </Box>
+                          </Box>
+                          <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}>
+                            <Check sx={{ fontSize: 18, color: '#10b981', mt: 0.2 }} />
+                            <Box>
+                              <Typography variant="body2" fontWeight={600}>Historical Cost Tracking</Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                Cost data retrieved from Original CGS with item-level matching
+                              </Typography>
+                            </Box>
+                          </Box>
+                          <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}>
+                            <Check sx={{ fontSize: 18, color: '#10b981', mt: 0.2 }} />
+                            <Box>
+                              <Typography variant="body2" fontWeight={600}>Financial Metrics Calculation</Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                Computes Total Sales, Total Cost, Gross Margin (GM), and GM% with Excel formulas
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </Stack>
+                      </Paper>
+                    </AccordionDetails>
+                  </Accordion>
+
+                  {/* Input Files Section */}
+                  <Accordion
+                    sx={{
+                      bgcolor: 'white',
+                      '&:before': { display: 'none' },
+                      boxShadow: 'none',
+                      border: '1px solid',
+                      borderColor: alpha('#06b6d4', 0.1),
+                      borderRadius: '8px !important',
+                      '&.Mui-expanded': {
+                        margin: '0 !important',
+                      }
+                    }}
+                  >
+                    <AccordionSummary
+                      expandIcon={<ExpandMore />}
+                      sx={{
+                        '& .MuiAccordionSummary-content': {
+                          my: 1.5,
+                        }
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <Avatar sx={{ bgcolor: alpha('#06b6d4', 0.1), width: 32, height: 32 }}>
+                          <TableChart sx={{ color: '#06b6d4', fontSize: 18 }} />
+                        </Avatar>
+                        <Typography variant="subtitle1" fontWeight={600}>
+                          Input Files & Sample Data
+                        </Typography>
+                      </Box>
+                    </AccordionSummary>
+                    <AccordionDetails sx={{ pt: 0 }}>
+                      <Stack spacing={2}>
+                        {[
+                          { name: 'Invoice Data', rows: '13,636', cols: 'Date, Amount, Facility, Item, Quantity', sample: 'Filtered by Date ≤ 2025-08-21, Amount > 0, Invoice ≤ 43354' },
+                          { name: 'Manufacturing Std Cost', rows: '5,230', cols: 'Item Code, Standard Cost, Category', sample: 'Provides baseline cost data for items' },
+                          { name: 'Item Data File', rows: '12,450', cols: 'Item ID, Description, Category, UOM', sample: 'Master item catalog with descriptions' },
+                          { name: 'MSR 2025 Data', rows: '5,230', cols: 'Hospital, Distributor, Territory, State', sample: 'Distributor mapping for facilities' },
+                          { name: 'Original CGS', rows: '8,920', cols: 'Item, Distributor, Cost, Date', sample: 'Historical cost and distributor data' }
+                        ].map((file, index) => (
+                          <Fade in timeout={600 + index * 100} key={file.name}>
+                            <Paper
+                              onClick={() => setSelectedFileView(file.name)}
+                              sx={{
+                                p: 2,
+                                bgcolor: alpha('#06b6d4', 0.03),
+                                border: '1px solid',
+                                borderColor: alpha('#06b6d4', 0.1),
+                                borderLeft: '3px solid #06b6d4',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                '&:hover': {
+                                  bgcolor: alpha('#06b6d4', 0.08),
+                                  borderColor: '#06b6d4',
+                                  transform: 'translateX(4px)',
+                                  boxShadow: `0 4px 12px ${alpha('#06b6d4', 0.15)}`
+                                }
+                              }}
+                            >
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                  <Typography variant="body2" fontWeight={600} color="#06b6d4">
+                                    {file.name}
+                                  </Typography>
+                                  <ArrowForward sx={{ fontSize: 16, color: '#06b6d4' }} />
+                                </Box>
+                                <Chip
+                                  label={`${file.rows} rows`}
+                                  size="small"
+                                  sx={{
+                                    bgcolor: alpha('#06b6d4', 0.1),
+                                    color: '#06b6d4',
+                                    fontWeight: 600,
+                                    height: 20,
+                                    fontSize: '0.7rem'
+                                  }}
+                                />
+                              </Box>
+                              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                                <strong>Columns:</strong> {file.cols}
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                <strong>Criteria:</strong> {file.sample}
+                              </Typography>
+                            </Paper>
+                          </Fade>
+                        ))}
+                      </Stack>
+                    </AccordionDetails>
+                  </Accordion>
+
+                  {/* Processing Logic Section */}
+                  <Accordion
+                    sx={{
+                      bgcolor: 'white',
+                      '&:before': { display: 'none' },
+                      boxShadow: 'none',
+                      border: '1px solid',
+                      borderColor: alpha('#8b5cf6', 0.1),
+                      borderRadius: '8px !important',
+                      '&.Mui-expanded': {
+                        margin: '0 !important',
+                      }
+                    }}
+                  >
+                    <AccordionSummary
+                      expandIcon={<ExpandMore />}
+                      sx={{
+                        '& .MuiAccordionSummary-content': {
+                          my: 1.5,
+                        }
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <Avatar sx={{ bgcolor: alpha('#8b5cf6', 0.1), width: 32, height: 32 }}>
+                          <Code sx={{ color: '#8b5cf6', fontSize: 18 }} />
+                        </Avatar>
+                        <Typography variant="subtitle1" fontWeight={600}>
+                          Processing Logic & Filters
+                        </Typography>
+                      </Box>
+                    </AccordionSummary>
+                    <AccordionDetails sx={{ pt: 0 }}>
+                      <Paper sx={{ p: 2, bgcolor: alpha('#8b5cf6', 0.03), border: '1px solid', borderColor: alpha('#8b5cf6', 0.1) }}>
+                        <Typography variant="body2" sx={{ mb: 2, lineHeight: 1.8 }}>
+                          The processing pipeline applies the following transformations:
+                        </Typography>
+                        <Stack spacing={2}>
+                          <Box>
+                            <Typography variant="subtitle2" fontWeight={600} color="#8b5cf6" sx={{ mb: 1 }}>
+                              1. Data Filtering
+                            </Typography>
+                            <Stack spacing={0.5} sx={{ pl: 2 }}>
+                              <Typography variant="caption" color="text.secondary">• Date Filter: Transaction_Date ≤ 2025-08-21</Typography>
+                              <Typography variant="caption" color="text.secondary">• Amount Filter: Transactional_Gross_Amt &gt; 0</Typography>
+                              <Typography variant="caption" color="text.secondary">• Invoice Filter: Invoice ≤ 43354</Typography>
+                              <Typography variant="caption" color="text.secondary">• Facility Exclusions: Removes test and duplicate facilities</Typography>
+                            </Stack>
+                          </Box>
+                          <Box>
+                            <Typography variant="subtitle2" fontWeight={600} color="#8b5cf6" sx={{ mb: 1 }}>
+                              2. Distributor Mapping (4-Level Priority)
+                            </Typography>
+                            <Stack spacing={0.5} sx={{ pl: 2 }}>
+                              <Typography variant="caption" color="text.secondary">• Priority 1: CGS Primary Match (Item + Facility)</Typography>
+                              <Typography variant="caption" color="text.secondary">• Priority 2: MSR Data Match (Facility lookup)</Typography>
+                              <Typography variant="caption" color="text.secondary">• Priority 3: Fuzzy Matching (85% similarity threshold)</Typography>
+                              <Typography variant="caption" color="text.secondary">• Priority 4: Name Extraction (Pattern matching)</Typography>
+                            </Stack>
+                          </Box>
+                          <Box>
+                            <Typography variant="subtitle2" fontWeight={600} color="#8b5cf6" sx={{ mb: 1 }}>
+                              3. Financial Calculations
+                            </Typography>
+                            <Stack spacing={0.5} sx={{ pl: 2 }}>
+                              <Typography variant="caption" color="text.secondary">• Total Sales = SUM(Transactional_Gross_Amt)</Typography>
+                              <Typography variant="caption" color="text.secondary">• Total Cost = Historical_Cost × Quantity</Typography>
+                              <Typography variant="caption" color="text.secondary">• Gross Margin (GM) = Total Sales - Total Cost</Typography>
+                              <Typography variant="caption" color="text.secondary">• GM% = (GM / Total Sales) × 100</Typography>
+                            </Stack>
+                          </Box>
+                        </Stack>
+                      </Paper>
+                    </AccordionDetails>
+                  </Accordion>
+                </Stack>
+              </Paper>
+            </Fade>
+          )}
 
           {/* Process Button */}
           <Button
@@ -1554,7 +2236,8 @@ const ExcelAIProcessor = ({ onBack }) => {
         </Grid>
       </Grid>
     </>
-  );
+    );
+  };
 
   return (
     <Box sx={{
