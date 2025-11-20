@@ -6,12 +6,13 @@ import {
   StepLabel, Divider, List, ListItem, ListItemText, ListItemIcon,
   Checkbox, FormControlLabel, Switch, MenuItem, Select, FormControl,
   InputLabel, Accordion, AccordionSummary, AccordionDetails, Fade, Zoom,
+  InputAdornment,
 } from '@mui/material';
 import {
   CloudUpload, Psychology, Refresh, ArrowBack, NavigateNext, ArrowForward,
   Close, TableChart, Download, Add, Edit, Delete, ExpandMore,
   Layers, DataObject, Chat, AccountTree, Speed, Settings,
-  Description, Code, AutoAwesome, PlayArrow, Save, Check,
+  Description, Code, AutoAwesome, PlayArrow, Save, Check, Search,
 } from '@mui/icons-material';
 import excelProcessorApi from '../services/excelProcessorApi';
 
@@ -20,6 +21,7 @@ const ExcelAIProcessor = ({ onBack }) => {
   const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [view, setView] = useState('list'); // 'list', 'create', 'edit', 'execute'
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Template builder state
   const [templateBuilder, setTemplateBuilder] = useState({
@@ -275,7 +277,14 @@ const ExcelAIProcessor = ({ onBack }) => {
   };
 
   // Template List View
-  const renderTemplateList = () => (
+  const renderTemplateList = () => {
+    // Filter templates based on search query
+    const filteredTemplates = templates.filter(template =>
+      template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (template.description && template.description.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+
+    return (
     <>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
@@ -301,6 +310,54 @@ const ExcelAIProcessor = ({ onBack }) => {
           Create New Template
         </Button>
       </Box>
+
+      {/* Search Bar */}
+      {templates.length > 0 && (
+        <Fade in timeout={300}>
+          <Box sx={{ mb: 3 }}>
+            <TextField
+              fullWidth
+              placeholder="Search templates by name or description..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search sx={{ color: '#3b82f6' }} />
+                  </InputAdornment>
+                ),
+                endAdornment: searchQuery && (
+                  <InputAdornment position="end">
+                    <IconButton
+                      size="small"
+                      onClick={() => setSearchQuery('')}
+                      sx={{ color: 'text.secondary' }}
+                    >
+                      <Close fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  bgcolor: 'white',
+                  borderRadius: 2,
+                  '& fieldset': {
+                    borderColor: alpha('#3b82f6', 0.2),
+                    borderWidth: 2,
+                  },
+                  '&:hover fieldset': {
+                    borderColor: alpha('#3b82f6', 0.4),
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#3b82f6',
+                  },
+                },
+              }}
+            />
+          </Box>
+        </Fade>
+      )}
 
       <Grid container spacing={3}>
         {templates.length === 0 && (
@@ -344,7 +401,44 @@ const ExcelAIProcessor = ({ onBack }) => {
           </Grid>
         )}
 
-        {templates.map((template, index) => {
+        {filteredTemplates.length === 0 && templates.length > 0 && (
+          <Grid item xs={12}>
+            <Zoom in timeout={300}>
+              <Paper sx={{
+                p: 6,
+                textAlign: 'center',
+                bgcolor: alpha('#f59e0b', 0.02),
+                border: '2px dashed',
+                borderColor: alpha('#f59e0b', 0.3),
+                borderRadius: 2,
+              }}>
+                <Search sx={{ fontSize: 64, color: alpha('#f59e0b', 0.4), mb: 2 }} />
+                <Typography variant="h6" fontWeight={600} color="text.secondary" sx={{ mb: 1 }}>
+                  No Templates Found
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                  No templates match your search "{searchQuery}". Try a different search term.
+                </Typography>
+                <Button
+                  variant="outlined"
+                  onClick={() => setSearchQuery('')}
+                  sx={{
+                    borderColor: alpha('#f59e0b', 0.3),
+                    color: '#f59e0b',
+                    '&:hover': {
+                      borderColor: '#f59e0b',
+                      bgcolor: alpha('#f59e0b', 0.05),
+                    }
+                  }}
+                >
+                  Clear Search
+                </Button>
+              </Paper>
+            </Zoom>
+          </Grid>
+        )}
+
+        {filteredTemplates.map((template, index) => {
           // Rotate colors for visual variety
           const colors = [
             { main: '#3b82f6', gradient: 'linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)', bg: 'linear-gradient(135deg, rgba(59, 130, 246, 0.02) 0%, rgba(255, 255, 255, 1) 100%)', alpha: alpha('#3b82f6', 0.1) },
@@ -461,7 +555,8 @@ const ExcelAIProcessor = ({ onBack }) => {
         )}
       </Grid>
     </>
-  );
+    );
+  };
 
   // Template Builder View
   const renderTemplateBuilder = () => (
