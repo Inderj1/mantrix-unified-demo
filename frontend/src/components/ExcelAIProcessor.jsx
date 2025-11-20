@@ -46,6 +46,19 @@ const ExcelAIProcessor = ({ onBack }) => {
   const [processingPipeline, setProcessingPipeline] = useState([]);
   const [aiConversation, setAiConversation] = useState([]);
 
+  // Filter configuration for Financial Analysis template
+  const [filterConfig, setFilterConfig] = useState({
+    dateFilterType: 'specific', // 'specific', 'week', 'month', 'year', 'none'
+    specificDate: '2025-08-21',
+    weekStart: '',
+    weekEnd: '',
+    month: '',
+    year: '',
+    invoiceFrom: '',
+    invoiceTo: '43354',
+    amountMin: '0',
+  });
+
   const fileInputRef = useRef(null);
   const templateFileRef = useRef(null);
 
@@ -500,12 +513,12 @@ const ExcelAIProcessor = ({ onBack }) => {
               <Paper sx={{
                 p: 6,
                 textAlign: 'center',
-                bgcolor: alpha('#f59e0b', 0.02),
+                bgcolor: alpha('#64748b', 0.02),
                 border: '2px dashed',
-                borderColor: alpha('#f59e0b', 0.3),
+                borderColor: alpha('#64748b', 0.3),
                 borderRadius: 2,
               }}>
-                <Search sx={{ fontSize: 64, color: alpha('#f59e0b', 0.4), mb: 2 }} />
+                <Search sx={{ fontSize: 64, color: alpha('#64748b', 0.4), mb: 2 }} />
                 <Typography variant="h6" fontWeight={600} color="text.secondary" sx={{ mb: 1 }}>
                   No Templates Found
                 </Typography>
@@ -516,11 +529,11 @@ const ExcelAIProcessor = ({ onBack }) => {
                   variant="outlined"
                   onClick={() => setSearchQuery('')}
                   sx={{
-                    borderColor: alpha('#f59e0b', 0.3),
-                    color: '#f59e0b',
+                    borderColor: alpha('#64748b', 0.3),
+                    color: '#64748b',
                     '&:hover': {
-                      borderColor: '#f59e0b',
-                      bgcolor: alpha('#f59e0b', 0.05),
+                      borderColor: '#64748b',
+                      bgcolor: alpha('#64748b', 0.05),
                     }
                   }}
                 >
@@ -532,11 +545,10 @@ const ExcelAIProcessor = ({ onBack }) => {
         )}
 
         {filteredTemplates.map((template, index) => {
-          // Rotate colors for visual variety
+          // Corporate color palette - blue primary, slate secondary
           const colors = [
-            { main: '#3b82f6', gradient: 'linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)', bg: 'linear-gradient(135deg, rgba(59, 130, 246, 0.02) 0%, rgba(255, 255, 255, 1) 100%)', alpha: alpha('#3b82f6', 0.1) },
-            { main: '#8b5cf6', gradient: 'linear-gradient(90deg, #8b5cf6 0%, #7c3aed 100%)', bg: 'linear-gradient(135deg, rgba(139, 92, 246, 0.02) 0%, rgba(255, 255, 255, 1) 100%)', alpha: alpha('#8b5cf6', 0.1) },
-            { main: '#06b6d4', gradient: 'linear-gradient(90deg, #06b6d4 0%, #0891b2 100%)', bg: 'linear-gradient(135deg, rgba(6, 182, 212, 0.02) 0%, rgba(255, 255, 255, 1) 100%)', alpha: alpha('#06b6d4', 0.1) },
+            { main: '#3b82f6', gradient: 'linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)', bg: 'linear-gradient(135deg, rgba(248, 250, 252, 1) 0%, rgba(255, 255, 255, 1) 100%)', alpha: alpha('#3b82f6', 0.1) },
+            { main: '#64748b', gradient: 'linear-gradient(90deg, #64748b 0%, #475569 100%)', bg: 'linear-gradient(135deg, rgba(248, 250, 252, 1) 0%, rgba(255, 255, 255, 1) 100%)', alpha: alpha('#64748b', 0.1) },
           ];
           const colorScheme = colors[index % colors.length];
 
@@ -1048,7 +1060,7 @@ const ExcelAIProcessor = ({ onBack }) => {
     return (
       <Fade in timeout={300}>
         <Box sx={{
-          background: 'linear-gradient(180deg, rgba(6, 182, 212, 0.05) 0%, rgba(255, 255, 255, 1) 50%)',
+          background: 'linear-gradient(180deg, rgba(248, 250, 252, 1) 0%, rgba(255, 255, 255, 1) 50%)',
           minHeight: '100%',
           pb: 4
         }}>
@@ -1069,23 +1081,23 @@ const ExcelAIProcessor = ({ onBack }) => {
               <Box sx={{
                 width: 4,
                 height: 60,
-                background: 'linear-gradient(180deg, #06b6d4 0%, #0891b2 100%)',
+                background: 'linear-gradient(180deg, #64748b 0%, #475569 100%)',
                 borderRadius: 2
               }} />
               <Box>
                 <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
-                  <Avatar sx={{ width: 32, height: 32, bgcolor: '#06b6d4' }}>
+                  <Avatar sx={{ width: 32, height: 32, bgcolor: '#64748b' }}>
                     <TableChart sx={{ fontSize: 18 }} />
                   </Avatar>
-                  <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: '#06b6d4' }}>
+                  <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: '#64748b' }}>
                     {selectedFileView}
                   </Typography>
                   <Chip
                     label={`${fileData.rows.length} Sample Rows`}
                     size="small"
                     sx={{
-                      bgcolor: alpha('#06b6d4', 0.1),
-                      color: '#06b6d4',
+                      bgcolor: alpha('#64748b', 0.1),
+                      color: '#64748b',
                       fontWeight: 600,
                       fontSize: '0.7rem'
                     }}
@@ -1098,40 +1110,29 @@ const ExcelAIProcessor = ({ onBack }) => {
             </Box>
           </Box>
 
-          {/* Compact Info Cards (STOX.AI style) */}
+          {/* Compact Info Cards */}
           <Grid container spacing={1.5} sx={{ mb: 3 }}>
             <Grid item xs={12} sm={4}>
               <Zoom in timeout={200}>
                 <Card sx={{
-                  height: 100,
+                  height: 80,
                   border: '1px solid',
-                  borderColor: alpha('#06b6d4', 0.15),
+                  borderColor: alpha('#64748b', 0.15),
                   borderRadius: 2,
                   overflow: 'hidden',
-                  position: 'relative',
                   transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: 3,
-                    background: 'linear-gradient(90deg, #06b6d4 0%, #0891b2 100%)',
-                    opacity: 0.8,
-                  },
                   '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: `0 12px 24px ${alpha('#06b6d4', 0.15)}`,
-                    borderColor: '#06b6d4',
+                    transform: 'translateY(-2px)',
+                    boxShadow: `0 8px 16px ${alpha('#64748b', 0.1)}`,
+                    borderColor: '#64748b',
                   }
                 }}>
-                  <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                    <DataObject sx={{ fontSize: 28, color: '#06b6d4', mb: 0.5 }} />
-                    <Typography variant="h5" fontWeight={700} color="#06b6d4" sx={{ fontSize: '1.5rem' }}>
+                  <CardContent sx={{ p: 1.5, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                    <DataObject sx={{ fontSize: 24, color: '#64748b', mb: 0.25 }} />
+                    <Typography variant="h6" fontWeight={700} color="#64748b" sx={{ fontSize: '1.2rem' }}>
                       {fileData.rows.length}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
                       Sample Rows
                     </Typography>
                   </CardContent>
@@ -1141,35 +1142,24 @@ const ExcelAIProcessor = ({ onBack }) => {
             <Grid item xs={12} sm={4}>
               <Zoom in timeout={250}>
                 <Card sx={{
-                  height: 100,
+                  height: 80,
                   border: '1px solid',
-                  borderColor: alpha('#8b5cf6', 0.15),
+                  borderColor: alpha('#3b82f6', 0.15),
                   borderRadius: 2,
                   overflow: 'hidden',
-                  position: 'relative',
                   transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: 3,
-                    background: 'linear-gradient(90deg, #8b5cf6 0%, #7c3aed 100%)',
-                    opacity: 0.8,
-                  },
                   '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: `0 12px 24px ${alpha('#8b5cf6', 0.15)}`,
-                    borderColor: '#8b5cf6',
+                    transform: 'translateY(-2px)',
+                    boxShadow: `0 8px 16px ${alpha('#3b82f6', 0.1)}`,
+                    borderColor: '#3b82f6',
                   }
                 }}>
-                  <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                    <TableChart sx={{ fontSize: 28, color: '#8b5cf6', mb: 0.5 }} />
-                    <Typography variant="h5" fontWeight={700} color="#8b5cf6" sx={{ fontSize: '1.5rem' }}>
+                  <CardContent sx={{ p: 1.5, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                    <TableChart sx={{ fontSize: 24, color: '#3b82f6', mb: 0.25 }} />
+                    <Typography variant="h6" fontWeight={700} color="#3b82f6" sx={{ fontSize: '1.2rem' }}>
                       {fileData.columns.length}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
                       Total Columns
                     </Typography>
                   </CardContent>
@@ -1179,35 +1169,24 @@ const ExcelAIProcessor = ({ onBack }) => {
             <Grid item xs={12} sm={4}>
               <Zoom in timeout={300}>
                 <Card sx={{
-                  height: 100,
+                  height: 80,
                   border: '1px solid',
                   borderColor: alpha('#10b981', 0.15),
                   borderRadius: 2,
                   overflow: 'hidden',
-                  position: 'relative',
                   transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: 3,
-                    background: 'linear-gradient(90deg, #10b981 0%, #059669 100%)',
-                    opacity: 0.8,
-                  },
                   '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: `0 12px 24px ${alpha('#10b981', 0.15)}`,
+                    transform: 'translateY(-2px)',
+                    boxShadow: `0 8px 16px ${alpha('#10b981', 0.1)}`,
                     borderColor: '#10b981',
                   }
                 }}>
-                  <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                    <Check sx={{ fontSize: 28, color: '#10b981', mb: 0.5 }} />
-                    <Typography variant="h5" fontWeight={700} color="#10b981" sx={{ fontSize: '1.5rem' }}>
+                  <CardContent sx={{ p: 1.5, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                    <Check sx={{ fontSize: 24, color: '#10b981', mb: 0.25 }} />
+                    <Typography variant="h6" fontWeight={700} color="#10b981" sx={{ fontSize: '1.2rem' }}>
                       Active
                     </Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
                       Processing Status
                     </Typography>
                   </CardContent>
@@ -1216,83 +1195,72 @@ const ExcelAIProcessor = ({ onBack }) => {
             </Grid>
           </Grid>
 
-          {/* Data Grid (STOX.AI style with 3px top border) */}
+          {/* Data Grid - Compact */}
           <Zoom in timeout={350}>
             <Card sx={{
               border: '1px solid',
-              borderColor: alpha('#06b6d4', 0.15),
+              borderColor: alpha('#64748b', 0.15),
               borderRadius: 2,
               overflow: 'hidden',
-              position: 'relative',
-              transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 3,
-                background: 'linear-gradient(90deg, #06b6d4 0%, #0891b2 100%)',
-                opacity: 0.8,
-              }
             }}>
               <CardContent sx={{ p: 2 }}>
                 {/* Header */}
                 <Box sx={{ mb: 2 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
-                    <Avatar sx={{ bgcolor: alpha('#06b6d4', 0.1), width: 32, height: 32 }}>
-                      <Description sx={{ color: '#06b6d4', fontSize: 18 }} />
+                    <Avatar sx={{ bgcolor: alpha('#64748b', 0.1), width: 28, height: 28 }}>
+                      <Description sx={{ color: '#64748b', fontSize: 16 }} />
                     </Avatar>
-                    <Typography variant="h6" fontWeight={700} color="#06b6d4" sx={{ fontSize: '1rem' }}>
+                    <Typography variant="h6" fontWeight={700} color="#64748b" sx={{ fontSize: '0.9rem' }}>
                       Sample Data Preview
                     </Typography>
                   </Box>
-                  <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem', pl: 5.5 }}>
-                    Showing {fileData.rows.length} example records to demonstrate data structure
+                  <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', pl: 4.5 }}>
+                    {fileData.rows.length} example records
                   </Typography>
                 </Box>
 
                 {/* Data Grid */}
-                <Box sx={{ height: 400, width: '100%' }}>
+                <Box sx={{ height: 350, width: '100%' }}>
                   <DataGrid
                     rows={fileData.rows}
                     columns={fileData.columns}
                     pageSize={5}
                     rowsPerPageOptions={[5]}
                     disableSelectionOnClick
+                    density="compact"
                     sx={{
                       border: 'none',
-                      fontSize: '0.75rem',
+                      fontSize: '0.7rem',
                       '& .MuiDataGrid-cell': {
-                        borderColor: alpha('#06b6d4', 0.08),
-                        py: 0.5,
+                        borderColor: alpha('#64748b', 0.08),
+                        py: 0.25,
                       },
                       '& .MuiDataGrid-columnHeaders': {
-                        bgcolor: alpha('#06b6d4', 0.05),
-                        color: '#06b6d4',
+                        bgcolor: alpha('#64748b', 0.05),
+                        color: '#64748b',
                         fontWeight: 700,
-                        fontSize: '0.75rem',
-                        borderColor: alpha('#06b6d4', 0.1),
-                        minHeight: '40px !important',
-                        maxHeight: '40px !important',
+                        fontSize: '0.7rem',
+                        borderColor: alpha('#64748b', 0.1),
+                        minHeight: '32px !important',
+                        maxHeight: '32px !important',
                       },
                       '& .MuiDataGrid-columnHeaderTitle': {
                         fontWeight: 700,
                       },
                       '& .MuiDataGrid-row': {
-                        transition: 'all 0.2s ease',
+                        minHeight: '32px !important',
+                        maxHeight: '32px !important',
                         '&:hover': {
-                          bgcolor: alpha('#06b6d4', 0.05),
-                          transform: 'scale(1.001)',
+                          bgcolor: alpha('#64748b', 0.05),
                         },
                       },
                       '& .MuiDataGrid-footerContainer': {
-                        borderColor: alpha('#06b6d4', 0.1),
-                        bgcolor: alpha('#06b6d4', 0.02),
-                        minHeight: '40px',
+                        borderColor: alpha('#64748b', 0.1),
+                        bgcolor: alpha('#64748b', 0.02),
+                        minHeight: '36px',
                       },
                       '& .MuiTablePagination-root': {
-                        fontSize: '0.7rem',
+                        fontSize: '0.65rem',
                       },
                     }}
                   />
@@ -1368,6 +1336,238 @@ const ExcelAIProcessor = ({ onBack }) => {
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
+          {/* Filter Configuration for Financial Analysis */}
+          {selectedTemplate?.name.toLowerCase().includes('financial') && (
+            <Fade in timeout={200}>
+              <Paper sx={{
+                p: 3,
+                mb: 3,
+                background: 'linear-gradient(135deg, rgba(248, 250, 252, 1) 0%, rgba(255, 255, 255, 1) 100%)',
+                border: '1px solid',
+                borderColor: alpha('#64748b', 0.1),
+                borderRadius: 2,
+              }}>
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.5,
+                  mb: 3,
+                  pb: 2,
+                  borderBottom: '2px solid',
+                  borderColor: alpha('#64748b', 0.1)
+                }}>
+                  <Avatar sx={{ bgcolor: alpha('#64748b', 0.1), width: 40, height: 40 }}>
+                    <Settings sx={{ color: '#64748b', fontSize: 24 }} />
+                  </Avatar>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="h6" fontWeight={700} color="#64748b">
+                      Filter Configuration
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Configure date and invoice filters (optional - defaults applied if left blank)
+                    </Typography>
+                  </Box>
+                  <Button
+                    size="small"
+                    onClick={() => setFilterConfig({
+                      dateFilterType: 'specific',
+                      specificDate: '2025-08-21',
+                      weekStart: '',
+                      weekEnd: '',
+                      month: '',
+                      year: '',
+                      invoiceFrom: '',
+                      invoiceTo: '43354',
+                      amountMin: '0',
+                    })}
+                    sx={{
+                      color: '#64748b',
+                      fontSize: '0.75rem',
+                      '&:hover': {
+                        bgcolor: alpha('#64748b', 0.1)
+                      }
+                    }}
+                  >
+                    Reset to Defaults
+                  </Button>
+                </Box>
+
+                <Grid container spacing={2}>
+                  {/* Date Filter Section */}
+                  <Grid item xs={12}>
+                    <Typography variant="subtitle2" fontWeight={600} color="#3b82f6" sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <TableChart sx={{ fontSize: 18 }} />
+                      Date Filter
+                    </Typography>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <FormControl fullWidth size="small">
+                          <InputLabel>Filter Type</InputLabel>
+                          <Select
+                            value={filterConfig.dateFilterType}
+                            label="Filter Type"
+                            onChange={(e) => setFilterConfig(prev => ({ ...prev, dateFilterType: e.target.value }))}
+                          >
+                            <MenuItem value="specific">Specific Date</MenuItem>
+                            <MenuItem value="week">Week Range</MenuItem>
+                            <MenuItem value="month">Month</MenuItem>
+                            <MenuItem value="year">Year</MenuItem>
+                            <MenuItem value="none">No Date Filter</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </Grid>
+
+                      {filterConfig.dateFilterType === 'specific' && (
+                        <Grid item xs={12} sm={6} md={4}>
+                          <TextField
+                            fullWidth
+                            size="small"
+                            label="Date (≤)"
+                            type="date"
+                            value={filterConfig.specificDate}
+                            onChange={(e) => setFilterConfig(prev => ({ ...prev, specificDate: e.target.value }))}
+                            InputLabelProps={{ shrink: true }}
+                            helperText="Default: 2025-08-21"
+                          />
+                        </Grid>
+                      )}
+
+                      {filterConfig.dateFilterType === 'week' && (
+                        <>
+                          <Grid item xs={12} sm={6} md={3}>
+                            <TextField
+                              fullWidth
+                              size="small"
+                              label="Week Start"
+                              type="date"
+                              value={filterConfig.weekStart}
+                              onChange={(e) => setFilterConfig(prev => ({ ...prev, weekStart: e.target.value }))}
+                              InputLabelProps={{ shrink: true }}
+                            />
+                          </Grid>
+                          <Grid item xs={12} sm={6} md={3}>
+                            <TextField
+                              fullWidth
+                              size="small"
+                              label="Week End"
+                              type="date"
+                              value={filterConfig.weekEnd}
+                              onChange={(e) => setFilterConfig(prev => ({ ...prev, weekEnd: e.target.value }))}
+                              InputLabelProps={{ shrink: true }}
+                            />
+                          </Grid>
+                        </>
+                      )}
+
+                      {filterConfig.dateFilterType === 'month' && (
+                        <Grid item xs={12} sm={6} md={4}>
+                          <TextField
+                            fullWidth
+                            size="small"
+                            label="Month"
+                            type="month"
+                            value={filterConfig.month}
+                            onChange={(e) => setFilterConfig(prev => ({ ...prev, month: e.target.value }))}
+                            InputLabelProps={{ shrink: true }}
+                          />
+                        </Grid>
+                      )}
+
+                      {filterConfig.dateFilterType === 'year' && (
+                        <Grid item xs={12} sm={6} md={3}>
+                          <TextField
+                            fullWidth
+                            size="small"
+                            label="Year"
+                            type="number"
+                            value={filterConfig.year}
+                            onChange={(e) => setFilterConfig(prev => ({ ...prev, year: e.target.value }))}
+                            placeholder="2025"
+                          />
+                        </Grid>
+                      )}
+                    </Grid>
+                  </Grid>
+
+                  {/* Invoice Range Section */}
+                  <Grid item xs={12}>
+                    <Typography variant="subtitle2" fontWeight={600} color="#3b82f6" sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Description sx={{ fontSize: 18 }} />
+                      Invoice Range (Optional)
+                    </Typography>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          label="Invoice From"
+                          type="number"
+                          value={filterConfig.invoiceFrom}
+                          onChange={(e) => setFilterConfig(prev => ({ ...prev, invoiceFrom: e.target.value }))}
+                          placeholder="Leave blank for all"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          label="Invoice To (≤)"
+                          type="number"
+                          value={filterConfig.invoiceTo}
+                          onChange={(e) => setFilterConfig(prev => ({ ...prev, invoiceTo: e.target.value }))}
+                          helperText="Default: 43354"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          label="Min Amount (>)"
+                          type="number"
+                          value={filterConfig.amountMin}
+                          onChange={(e) => setFilterConfig(prev => ({ ...prev, amountMin: e.target.value }))}
+                          helperText="Default: 0"
+                        />
+                      </Grid>
+                    </Grid>
+                  </Grid>
+
+                  {/* Active Filters Summary */}
+                  <Grid item xs={12}>
+                    <Paper sx={{
+                      p: 1.5,
+                      mt: 1,
+                      bgcolor: alpha('#3b82f6', 0.05),
+                      border: '1px solid',
+                      borderColor: alpha('#3b82f6', 0.1),
+                      borderRadius: 1,
+                      borderLeft: '3px solid #3b82f6'
+                    }}>
+                      <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+                        <AutoAwesome sx={{ fontSize: 16, color: '#3b82f6', mt: 0.1 }} />
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="caption" fontWeight={600} color="#3b82f6" sx={{ display: 'block', mb: 0.5, fontSize: '0.7rem' }}>
+                            Active Filters
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', lineHeight: 1.6 }}>
+                            {filterConfig.dateFilterType === 'specific' && filterConfig.specificDate && `Date ≤ ${filterConfig.specificDate}`}
+                            {filterConfig.dateFilterType === 'week' && filterConfig.weekStart && filterConfig.weekEnd && ` | Week: ${filterConfig.weekStart} to ${filterConfig.weekEnd}`}
+                            {filterConfig.dateFilterType === 'month' && filterConfig.month && ` | Month: ${filterConfig.month}`}
+                            {filterConfig.dateFilterType === 'year' && filterConfig.year && ` | Year: ${filterConfig.year}`}
+                            {filterConfig.dateFilterType === 'none' && 'No date filter'}
+                            {filterConfig.invoiceFrom && ` | Invoice ≥ ${filterConfig.invoiceFrom}`}
+                            {filterConfig.invoiceTo && ` | Invoice ≤ ${filterConfig.invoiceTo}`}
+                            {filterConfig.amountMin && ` | Amount > ${filterConfig.amountMin}`}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Paper>
+                  </Grid>
+                </Grid>
+              </Paper>
+            </Fade>
+          )}
+
           {/* File Upload */}
           <Fade in timeout={300}>
             <Paper sx={{
@@ -1505,9 +1705,9 @@ const ExcelAIProcessor = ({ onBack }) => {
             <Paper sx={{
               p: 3,
               mb: 3,
-              background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.02) 0%, rgba(255, 255, 255, 1) 100%)',
+              background: 'linear-gradient(135deg, rgba(248, 250, 252, 1) 0%, rgba(255, 255, 255, 1) 100%)',
               border: '1px solid',
-              borderColor: alpha('#8b5cf6', 0.1),
+              borderColor: alpha('#64748b', 0.1),
               borderRadius: 2,
             }}>
               {/* Header */}
@@ -1518,13 +1718,13 @@ const ExcelAIProcessor = ({ onBack }) => {
                 mb: 3,
                 pb: 2,
                 borderBottom: '2px solid',
-                borderColor: alpha('#8b5cf6', 0.1)
+                borderColor: alpha('#64748b', 0.1)
               }}>
-                <Avatar sx={{ bgcolor: alpha('#8b5cf6', 0.1), width: 40, height: 40 }}>
-                  <Settings sx={{ color: '#8b5cf6', fontSize: 24 }} />
+                <Avatar sx={{ bgcolor: alpha('#64748b', 0.1), width: 40, height: 40 }}>
+                  <Settings sx={{ color: '#64748b', fontSize: 24 }} />
                 </Avatar>
                 <Box>
-                  <Typography variant="h6" fontWeight={700} color="#8b5cf6">
+                  <Typography variant="h6" fontWeight={700} color="#64748b">
                     Template Configuration
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
@@ -1537,8 +1737,8 @@ const ExcelAIProcessor = ({ onBack }) => {
                 {/* Sheets Section */}
                 <Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                    <TableChart sx={{ fontSize: 18, color: '#06b6d4' }} />
-                    <Typography variant="subtitle2" fontWeight={600} color="#06b6d4">
+                    <TableChart sx={{ fontSize: 18, color: '#3b82f6' }} />
+                    <Typography variant="subtitle2" fontWeight={600} color="#3b82f6">
                       Sheets to Process
                     </Typography>
                   </Box>
@@ -1549,13 +1749,13 @@ const ExcelAIProcessor = ({ onBack }) => {
                           label={sheet.name}
                           size="small"
                           sx={{
-                            bgcolor: alpha('#06b6d4', 0.1),
-                            color: '#06b6d4',
+                            bgcolor: alpha('#3b82f6', 0.1),
+                            color: '#3b82f6',
                             fontWeight: 600,
                             border: '1px solid',
-                            borderColor: alpha('#06b6d4', 0.2),
+                            borderColor: alpha('#3b82f6', 0.2),
                             '&:hover': {
-                              bgcolor: alpha('#06b6d4', 0.2),
+                              bgcolor: alpha('#3b82f6', 0.2),
                               transform: 'scale(1.05)',
                             }
                           }}
@@ -1602,16 +1802,16 @@ const ExcelAIProcessor = ({ onBack }) => {
                 {selectedTemplate?.aiInstructions && (
                   <Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                      <AutoAwesome sx={{ fontSize: 18, color: '#f97316' }} />
-                      <Typography variant="subtitle2" fontWeight={600} color="#f97316">
+                      <AutoAwesome sx={{ fontSize: 18, color: '#64748b' }} />
+                      <Typography variant="subtitle2" fontWeight={600} color="#64748b">
                         AI Instructions
                       </Typography>
                     </Box>
                     <Paper sx={{
                       p: 2,
-                      bgcolor: alpha('#f97316', 0.05),
+                      bgcolor: alpha('#64748b', 0.05),
                       border: '1px solid',
-                      borderColor: alpha('#f97316', 0.1),
+                      borderColor: alpha('#64748b', 0.1),
                       borderRadius: 1.5
                     }}>
                       <Typography variant="body2" color="text.primary" sx={{ fontStyle: 'italic', lineHeight: 1.6 }}>
@@ -1630,9 +1830,9 @@ const ExcelAIProcessor = ({ onBack }) => {
               <Paper sx={{
                 p: 3,
                 mb: 3,
-                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.02) 0%, rgba(255, 255, 255, 1) 100%)',
+                background: 'linear-gradient(135deg, rgba(248, 250, 252, 1) 0%, rgba(255, 255, 255, 1) 100%)',
                 border: '1px solid',
-                borderColor: alpha('#10b981', 0.1),
+                borderColor: alpha('#64748b', 0.1),
                 borderRadius: 2,
               }}>
                 {/* Header */}
@@ -1643,13 +1843,13 @@ const ExcelAIProcessor = ({ onBack }) => {
                   mb: 3,
                   pb: 2,
                   borderBottom: '2px solid',
-                  borderColor: alpha('#10b981', 0.1)
+                  borderColor: alpha('#64748b', 0.1)
                 }}>
-                  <Avatar sx={{ bgcolor: alpha('#10b981', 0.1), width: 40, height: 40 }}>
-                    <DataObject sx={{ color: '#10b981', fontSize: 24 }} />
+                  <Avatar sx={{ bgcolor: alpha('#64748b', 0.1), width: 40, height: 40 }}>
+                    <DataObject sx={{ color: '#64748b', fontSize: 24 }} />
                   </Avatar>
                   <Box>
-                    <Typography variant="h6" fontWeight={700} color="#10b981">
+                    <Typography variant="h6" fontWeight={700} color="#64748b">
                       Financial Analysis Summary
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
@@ -1667,7 +1867,7 @@ const ExcelAIProcessor = ({ onBack }) => {
                       '&:before': { display: 'none' },
                       boxShadow: 'none',
                       border: '1px solid',
-                      borderColor: alpha('#10b981', 0.1),
+                      borderColor: alpha('#3b82f6', 0.1),
                       borderRadius: '8px !important',
                       '&.Mui-expanded': {
                         margin: '0 !important',
@@ -1683,8 +1883,8 @@ const ExcelAIProcessor = ({ onBack }) => {
                       }}
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Avatar sx={{ bgcolor: alpha('#10b981', 0.1), width: 32, height: 32 }}>
-                          <Description sx={{ color: '#10b981', fontSize: 18 }} />
+                        <Avatar sx={{ bgcolor: alpha('#3b82f6', 0.1), width: 32, height: 32 }}>
+                          <Description sx={{ color: '#3b82f6', fontSize: 18 }} />
                         </Avatar>
                         <Typography variant="subtitle1" fontWeight={600}>
                           Analysis Methodology
@@ -1692,7 +1892,7 @@ const ExcelAIProcessor = ({ onBack }) => {
                       </Box>
                     </AccordionSummary>
                     <AccordionDetails sx={{ pt: 0 }}>
-                      <Paper sx={{ p: 2, bgcolor: alpha('#10b981', 0.03), border: '1px solid', borderColor: alpha('#10b981', 0.1) }}>
+                      <Paper sx={{ p: 2, bgcolor: alpha('#3b82f6', 0.03), border: '1px solid', borderColor: alpha('#3b82f6', 0.1) }}>
                         <Typography variant="body2" sx={{ mb: 2, lineHeight: 1.8 }}>
                           This template processes financial data using a <strong>hybrid approach</strong> that combines multiple data sources:
                         </Typography>
@@ -1745,7 +1945,7 @@ const ExcelAIProcessor = ({ onBack }) => {
                       '&:before': { display: 'none' },
                       boxShadow: 'none',
                       border: '1px solid',
-                      borderColor: alpha('#06b6d4', 0.1),
+                      borderColor: alpha('#64748b', 0.1),
                       borderRadius: '8px !important',
                       '&.Mui-expanded': {
                         margin: '0 !important',
@@ -1761,8 +1961,8 @@ const ExcelAIProcessor = ({ onBack }) => {
                       }}
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Avatar sx={{ bgcolor: alpha('#06b6d4', 0.1), width: 32, height: 32 }}>
-                          <TableChart sx={{ color: '#06b6d4', fontSize: 18 }} />
+                        <Avatar sx={{ bgcolor: alpha('#64748b', 0.1), width: 32, height: 32 }}>
+                          <TableChart sx={{ color: '#64748b', fontSize: 18 }} />
                         </Avatar>
                         <Typography variant="subtitle1" fontWeight={600}>
                           Input Files & Sample Data
@@ -1771,45 +1971,69 @@ const ExcelAIProcessor = ({ onBack }) => {
                     </AccordionSummary>
                     <AccordionDetails sx={{ pt: 0 }}>
                       <Stack spacing={2}>
-                        {[
-                          { name: 'Invoice Data', rows: '13,636', cols: 'Date, Amount, Facility, Item, Quantity', sample: 'Filtered by Date ≤ 2025-08-21, Amount > 0, Invoice ≤ 43354' },
-                          { name: 'Manufacturing Std Cost', rows: '5,230', cols: 'Item Code, Standard Cost, Category', sample: 'Provides baseline cost data for items' },
-                          { name: 'Item Data File', rows: '12,450', cols: 'Item ID, Description, Category, UOM', sample: 'Master item catalog with descriptions' },
-                          { name: 'MSR 2025 Data', rows: '5,230', cols: 'Hospital, Distributor, Territory, State', sample: 'Distributor mapping for facilities' },
-                          { name: 'Original CGS', rows: '8,920', cols: 'Item, Distributor, Cost, Date', sample: 'Historical cost and distributor data' }
-                        ].map((file, index) => (
+                        {(() => {
+                          // Generate filter criteria text based on current config
+                          let filterCriteria = [];
+                          if (filterConfig.dateFilterType === 'specific' && filterConfig.specificDate) {
+                            filterCriteria.push(`Date ≤ ${filterConfig.specificDate}`);
+                          } else if (filterConfig.dateFilterType === 'week' && filterConfig.weekStart && filterConfig.weekEnd) {
+                            filterCriteria.push(`Week: ${filterConfig.weekStart} to ${filterConfig.weekEnd}`);
+                          } else if (filterConfig.dateFilterType === 'month' && filterConfig.month) {
+                            filterCriteria.push(`Month: ${filterConfig.month}`);
+                          } else if (filterConfig.dateFilterType === 'year' && filterConfig.year) {
+                            filterCriteria.push(`Year: ${filterConfig.year}`);
+                          }
+                          if (filterConfig.amountMin) {
+                            filterCriteria.push(`Amount > ${filterConfig.amountMin}`);
+                          }
+                          if (filterConfig.invoiceFrom) {
+                            filterCriteria.push(`Invoice ≥ ${filterConfig.invoiceFrom}`);
+                          }
+                          if (filterConfig.invoiceTo) {
+                            filterCriteria.push(`Invoice ≤ ${filterConfig.invoiceTo}`);
+                          }
+                          const filterText = filterCriteria.length > 0 ? `Filtered by ${filterCriteria.join(', ')}` : 'No filters applied';
+
+                          return [
+                            { name: 'Invoice Data', rows: '13,636', cols: 'Date, Amount, Facility, Item, Quantity', sample: filterText },
+                            { name: 'Manufacturing Std Cost', rows: '5,230', cols: 'Item Code, Standard Cost, Category', sample: 'Provides baseline cost data for items' },
+                            { name: 'Item Data File', rows: '12,450', cols: 'Item ID, Description, Category, UOM', sample: 'Master item catalog with descriptions' },
+                            { name: 'MSR 2025 Data', rows: '5,230', cols: 'Hospital, Distributor, Territory, State', sample: 'Distributor mapping for facilities' },
+                            { name: 'Original CGS', rows: '8,920', cols: 'Item, Distributor, Cost, Date', sample: 'Historical cost and distributor data' }
+                          ];
+                        })().map((file, index) => (
                           <Fade in timeout={600 + index * 100} key={file.name}>
                             <Paper
                               onClick={() => setSelectedFileView(file.name)}
                               sx={{
                                 p: 2,
-                                bgcolor: alpha('#06b6d4', 0.03),
+                                bgcolor: alpha('#64748b', 0.03),
                                 border: '1px solid',
-                                borderColor: alpha('#06b6d4', 0.1),
-                                borderLeft: '3px solid #06b6d4',
+                                borderColor: alpha('#64748b', 0.1),
+                                borderLeft: '3px solid #64748b',
                                 cursor: 'pointer',
                                 transition: 'all 0.2s ease',
                                 '&:hover': {
-                                  bgcolor: alpha('#06b6d4', 0.08),
-                                  borderColor: '#06b6d4',
+                                  bgcolor: alpha('#64748b', 0.08),
+                                  borderColor: '#64748b',
                                   transform: 'translateX(4px)',
-                                  boxShadow: `0 4px 12px ${alpha('#06b6d4', 0.15)}`
+                                  boxShadow: `0 4px 12px ${alpha('#64748b', 0.15)}`
                                 }
                               }}
                             >
                               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                  <Typography variant="body2" fontWeight={600} color="#06b6d4">
+                                  <Typography variant="body2" fontWeight={600} color="#64748b">
                                     {file.name}
                                   </Typography>
-                                  <ArrowForward sx={{ fontSize: 16, color: '#06b6d4' }} />
+                                  <ArrowForward sx={{ fontSize: 16, color: '#64748b' }} />
                                 </Box>
                                 <Chip
                                   label={`${file.rows} rows`}
                                   size="small"
                                   sx={{
-                                    bgcolor: alpha('#06b6d4', 0.1),
-                                    color: '#06b6d4',
+                                    bgcolor: alpha('#64748b', 0.1),
+                                    color: '#64748b',
                                     fontWeight: 600,
                                     height: 20,
                                     fontSize: '0.7rem'
@@ -1836,7 +2060,7 @@ const ExcelAIProcessor = ({ onBack }) => {
                       '&:before': { display: 'none' },
                       boxShadow: 'none',
                       border: '1px solid',
-                      borderColor: alpha('#8b5cf6', 0.1),
+                      borderColor: alpha('#64748b', 0.1),
                       borderRadius: '8px !important',
                       '&.Mui-expanded': {
                         margin: '0 !important',
@@ -1852,8 +2076,8 @@ const ExcelAIProcessor = ({ onBack }) => {
                       }}
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Avatar sx={{ bgcolor: alpha('#8b5cf6', 0.1), width: 32, height: 32 }}>
-                          <Code sx={{ color: '#8b5cf6', fontSize: 18 }} />
+                        <Avatar sx={{ bgcolor: alpha('#64748b', 0.1), width: 32, height: 32 }}>
+                          <Code sx={{ color: '#64748b', fontSize: 18 }} />
                         </Avatar>
                         <Typography variant="subtitle1" fontWeight={600}>
                           Processing Logic & Filters
@@ -1861,7 +2085,7 @@ const ExcelAIProcessor = ({ onBack }) => {
                       </Box>
                     </AccordionSummary>
                     <AccordionDetails sx={{ pt: 0 }}>
-                      <Paper sx={{ p: 2, bgcolor: alpha('#8b5cf6', 0.03), border: '1px solid', borderColor: alpha('#8b5cf6', 0.1) }}>
+                      <Paper sx={{ p: 2, bgcolor: alpha('#64748b', 0.03), border: '1px solid', borderColor: alpha('#64748b', 0.1) }}>
                         <Typography variant="body2" sx={{ mb: 2, lineHeight: 1.8 }}>
                           The processing pipeline applies the following transformations:
                         </Typography>
