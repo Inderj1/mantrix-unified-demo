@@ -5,7 +5,7 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions, Stepper, Step,
   StepLabel, Divider, List, ListItem, ListItemText, ListItemIcon,
   Checkbox, FormControlLabel, Switch, MenuItem, Select, FormControl,
-  InputLabel, Accordion, AccordionSummary, AccordionDetails,
+  InputLabel, Accordion, AccordionSummary, AccordionDetails, Fade, Zoom,
 } from '@mui/material';
 import {
   CloudUpload, Psychology, Refresh, ArrowBack, NavigateNext, ArrowForward,
@@ -238,6 +238,42 @@ const ExcelAIProcessor = ({ onBack }) => {
 
   const steps = ['Upload Sample', 'Configure Sheets', 'Business Rules', 'AI Instructions', 'Review & Save'];
 
+  // Custom Step Icon Component
+  const CustomStepIcon = (props) => {
+    const { active, completed, icon } = props;
+
+    const icons = [
+      { icon: CloudUpload, color: '#3b82f6' },
+      { icon: Settings, color: '#06b6d4' },
+      { icon: Code, color: '#8b5cf6' },
+      { icon: AutoAwesome, color: '#f97316' },
+      { icon: Check, color: '#10b981' },
+    ];
+
+    const { icon: IconComponent, color } = icons[Number(icon) - 1];
+
+    return (
+      <Box
+        sx={{
+          width: 40,
+          height: 40,
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          bgcolor: completed ? color : active ? alpha(color, 0.1) : '#f3f4f6',
+          color: completed ? 'white' : active ? color : '#9ca3af',
+          border: '2px solid',
+          borderColor: completed ? color : active ? color : '#e5e7eb',
+          transition: 'all 0.3s ease',
+          transform: active ? 'scale(1.1)' : 'scale(1)',
+        }}
+      >
+        <IconComponent sx={{ fontSize: 20 }} />
+      </Box>
+    );
+  };
+
   // Template List View
   const renderTemplateList = () => (
     <>
@@ -252,7 +288,15 @@ const ExcelAIProcessor = ({ onBack }) => {
           startIcon={<Add />}
           variant="contained"
           onClick={handleCreateTemplate}
-          sx={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}
+          sx={{
+            background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+            boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+            '&:hover': {
+              background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+              transform: 'scale(1.02)',
+              boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
+            }
+          }}
         >
           Create New Template
         </Button>
@@ -261,84 +305,160 @@ const ExcelAIProcessor = ({ onBack }) => {
       <Grid container spacing={3}>
         {templates.length === 0 && (
           <Grid item xs={12}>
-            <Paper sx={{ p: 6, textAlign: 'center', bgcolor: '#fafafa', border: '2px dashed', borderColor: 'divider' }}>
-              <Layers sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
-              <Typography variant="h6" fontWeight={600} color="text.secondary" sx={{ mb: 1 }}>
-                No Templates Created Yet
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                Create your first template to start processing Excel files with AI
-              </Typography>
-              <Button
-                startIcon={<Add />}
-                variant="contained"
-                onClick={handleCreateTemplate}
-                sx={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}
-              >
-                Create Your First Template
-              </Button>
-            </Paper>
+            <Zoom in timeout={300}>
+              <Paper sx={{
+                p: 6,
+                textAlign: 'center',
+                bgcolor: 'linear-gradient(135deg, rgba(59, 130, 246, 0.02) 0%, rgba(255, 255, 255, 1) 100%)',
+                border: '2px dashed',
+                borderColor: alpha('#3b82f6', 0.3),
+                borderRadius: 2,
+                '&:hover': {
+                  borderColor: '#3b82f6',
+                  bgcolor: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(255, 255, 255, 1) 100%)',
+                }
+              }}>
+                <Layers sx={{ fontSize: 64, color: alpha('#3b82f6', 0.4), mb: 2 }} />
+                <Typography variant="h6" fontWeight={600} color="text.secondary" sx={{ mb: 1 }}>
+                  No Templates Created Yet
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                  Create your first template to start processing Excel files with AI
+                </Typography>
+                <Button
+                  startIcon={<Add />}
+                  variant="contained"
+                  onClick={handleCreateTemplate}
+                  sx={{
+                    background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                    '&:hover': {
+                      background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                      transform: 'scale(1.02)',
+                    }
+                  }}
+                >
+                  Create Your First Template
+                </Button>
+              </Paper>
+            </Zoom>
           </Grid>
         )}
 
-        {templates.map(template => (
+        {templates.map((template, index) => {
+          // Rotate colors for visual variety
+          const colors = [
+            { main: '#3b82f6', gradient: 'linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)', bg: 'linear-gradient(135deg, rgba(59, 130, 246, 0.02) 0%, rgba(255, 255, 255, 1) 100%)', alpha: alpha('#3b82f6', 0.1) },
+            { main: '#8b5cf6', gradient: 'linear-gradient(90deg, #8b5cf6 0%, #7c3aed 100%)', bg: 'linear-gradient(135deg, rgba(139, 92, 246, 0.02) 0%, rgba(255, 255, 255, 1) 100%)', alpha: alpha('#8b5cf6', 0.1) },
+            { main: '#06b6d4', gradient: 'linear-gradient(90deg, #06b6d4 0%, #0891b2 100%)', bg: 'linear-gradient(135deg, rgba(6, 182, 212, 0.02) 0%, rgba(255, 255, 255, 1) 100%)', alpha: alpha('#06b6d4', 0.1) },
+          ];
+          const colorScheme = colors[index % colors.length];
+
+          return (
           <Grid item xs={12} md={6} key={template.id}>
-            <Card sx={{
-              border: '1px solid',
-              borderColor: 'divider',
-              '&:hover': { borderColor: 'text.secondary', boxShadow: 2 },
-              transition: 'all 0.3s ease'
-            }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', flex: 1 }}>
-                    <Avatar sx={{ bgcolor: alpha('#3b82f6', 0.1), color: '#3b82f6' }}>
-                      <Layers />
+            <Zoom in timeout={400 + index * 100}>
+              <Card sx={{
+                height: 240,
+                cursor: 'pointer',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                border: '1px solid',
+                borderColor: alpha(colorScheme.main, 0.2),
+                borderRadius: 2,
+                overflow: 'hidden',
+                background: colorScheme.bg,
+                position: 'relative',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '3px',
+                  background: colorScheme.gradient,
+                },
+                '&:hover': {
+                  transform: 'translateY(-6px)',
+                  boxShadow: `0 12px 32px ${alpha(colorScheme.main, 0.2)}`,
+                  borderColor: colorScheme.main,
+                  '& .template-icon': {
+                    transform: 'scale(1.1)',
+                    bgcolor: colorScheme.main,
+                    color: 'white',
+                  },
+                  '& .access-button': {
+                    background: colorScheme.gradient,
+                    color: 'white',
+                    transform: 'translateX(4px)',
+                  },
+                },
+              }}>
+                <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                  {/* Icon and Badge */}
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                    <Avatar
+                      className="template-icon"
+                      sx={{
+                        width: 56,
+                        height: 56,
+                        bgcolor: colorScheme.alpha,
+                        color: colorScheme.main,
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      <Layers sx={{ fontSize: 32 }} />
                     </Avatar>
-                    <Box sx={{ flex: 1 }}>
-                      <Typography variant="h6" fontWeight={600} sx={{ mb: 0.5 }}>
-                        {template.name}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                        {template.description}
-                      </Typography>
-                      <Stack direction="row" spacing={1}>
-                        <Chip label={`${template.sheets.length} Sheets`} size="small" sx={{ fontSize: '0.7rem' }} />
-                        <Chip label={`${template.businessRules.length} Rules`} size="small" sx={{ fontSize: '0.7rem' }} />
-                      </Stack>
+                    <Stack direction="row" spacing={0.5}>
+                      <Chip label={`${template.sheets.length} Sheets`} size="small" sx={{ bgcolor: colorScheme.alpha, color: colorScheme.main, fontWeight: 600, fontSize: '0.7rem', height: 24 }} />
+                      <Chip label={`${template.businessRules.length} Rules`} size="small" sx={{ bgcolor: colorScheme.alpha, color: colorScheme.main, fontWeight: 600, fontSize: '0.7rem', height: 24 }} />
+                    </Stack>
+                  </Box>
+
+                  {/* Title */}
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: colorScheme.main, mb: 1, fontSize: '1.1rem', letterSpacing: '-0.3px' }}>
+                    {template.name}
+                  </Typography>
+
+                  {/* Description */}
+                  <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.5, fontSize: '0.85rem' }}>
+                    {template.description || 'Custom Excel processing template with AI-powered analysis'}
+                  </Typography>
+
+                  {/* Footer */}
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2, pt: 2, borderTop: '1px solid', borderColor: alpha(colorScheme.main, 0.1) }}>
+                    <Stack direction="row" spacing={1}>
+                      <IconButton size="small" onClick={() => { setSelectedTemplate(template); setView('edit'); }} sx={{ border: '1px solid', borderColor: 'divider' }}>
+                        <Edit fontSize="small" />
+                      </IconButton>
+                      <IconButton size="small" onClick={() => deleteTemplate(template.id)} sx={{ border: '1px solid', borderColor: 'divider', color: 'error.main' }}>
+                        <Delete fontSize="small" />
+                      </IconButton>
+                    </Stack>
+                    <Box
+                      className="access-button"
+                      onClick={() => { setSelectedTemplate(template); setView('execute'); }}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 0.5,
+                        bgcolor: colorScheme.alpha,
+                        color: colorScheme.main,
+                        px: 2,
+                        py: 0.75,
+                        borderRadius: 1.5,
+                        fontWeight: 600,
+                        fontSize: '0.8rem',
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      USE
+                      <ArrowForward sx={{ fontSize: 16 }} />
                     </Box>
                   </Box>
-                </Box>
-                <Divider sx={{ my: 2 }} />
-                <Stack direction="row" spacing={1}>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    startIcon={<PlayArrow />}
-                    onClick={() => { setSelectedTemplate(template); setView('execute'); }}
-                    sx={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}
-                  >
-                    Use Template
-                  </Button>
-                  <IconButton
-                    size="small"
-                    onClick={() => { setSelectedTemplate(template); setView('edit'); }}
-                    sx={{ border: '1px solid', borderColor: 'divider' }}
-                  >
-                    <Edit fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={() => deleteTemplate(template.id)}
-                    sx={{ border: '1px solid', borderColor: 'divider', color: 'error.main' }}
-                  >
-                    <Delete fontSize="small" />
-                  </IconButton>
-                </Stack>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Zoom>
           </Grid>
-        ))}
+        )}
+        )}
       </Grid>
     </>
   );
@@ -356,10 +476,25 @@ const ExcelAIProcessor = ({ onBack }) => {
       </Box>
 
       <Paper sx={{ p: 3, mb: 3 }}>
-        <Stepper activeStep={templateBuilder.step} sx={{ mb: 4 }}>
+        <Stepper
+          activeStep={templateBuilder.step}
+          sx={{
+            mb: 4,
+            '& .MuiStepConnector-line': {
+              borderColor: '#e5e7eb',
+              borderTopWidth: 2,
+            },
+            '& .MuiStepConnector-root.Mui-completed .MuiStepConnector-line': {
+              borderColor: '#10b981',
+            },
+            '& .MuiStepConnector-root.Mui-active .MuiStepConnector-line': {
+              borderColor: '#3b82f6',
+            },
+          }}
+        >
           {steps.map((label) => (
             <Step key={label}>
-              <StepLabel>{label}</StepLabel>
+              <StepLabel StepIconComponent={CustomStepIcon}>{label}</StepLabel>
             </Step>
           ))}
         </Stepper>
@@ -741,109 +876,260 @@ const ExcelAIProcessor = ({ onBack }) => {
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
           {/* File Upload */}
-          <Paper sx={{ p: 3, mb: 3 }}>
-            <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-              <CloudUpload sx={{ color: 'text.secondary', mr: 1 }} />Upload Files to Process
-            </Typography>
-            <Box
-              onClick={() => fileInputRef.current?.click()}
-              sx={{
-                border: '2px dashed',
-                borderColor: 'divider',
-                borderRadius: 2,
-                p: 6,
-                textAlign: 'center',
-                cursor: 'pointer',
-                bgcolor: '#fafafa',
-                '&:hover': { bgcolor: '#f5f5f5', borderColor: 'text.secondary' }
-              }}
-            >
-              <TableChart sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-              <Typography variant="body1" fontWeight={500}>Drop Excel files here or click to browse</Typography>
-              <Typography variant="caption" color="text.secondary">Supports .xlsx, .xls, .csv</Typography>
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept=".xlsx,.xls,.csv"
-                onChange={handleFileUpload}
-                style={{ display: 'none' }}
-              />
-            </Box>
-
-            {files.length > 0 && (
-              <Stack spacing={1} sx={{ mt: 3 }}>
-                {files.map(file => (
-                  <Box
-                    key={file.id}
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      p: 2,
-                      bgcolor: '#f9fafb',
-                      borderRadius: 1
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <TableChart sx={{ color: 'text.secondary' }} />
-                      <Box>
-                        <Typography variant="body2" fontWeight={500}>{file.name}</Typography>
-                        <Typography variant="caption" color="text.secondary">{file.size}</Typography>
-                      </Box>
-                    </Box>
-                    <IconButton
-                      size="small"
-                      onClick={() => setFiles(prev => prev.filter(f => f.id !== file.id))}
-                    >
-                      <Close fontSize="small" />
-                    </IconButton>
-                  </Box>
-                ))}
-              </Stack>
-            )}
-          </Paper>
-
-          {/* Template Configuration Display */}
-          <Paper sx={{ p: 3, mb: 3, bgcolor: '#f9fafb', border: '1px solid', borderColor: 'divider' }}>
-            <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-              <Settings sx={{ color: 'text.secondary', mr: 1 }} />Template Configuration
-            </Typography>
-
-            <Stack spacing={2}>
-              <Box>
-                <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Sheets to Process:</Typography>
-                <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
-                  {selectedTemplate?.sheets.map(sheet => (
-                    <Chip key={sheet.name} label={sheet.name} size="small" variant="outlined" />
-                  ))}
-                </Stack>
+          <Fade in timeout={300}>
+            <Paper sx={{
+              p: 3,
+              mb: 3,
+              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.02) 0%, rgba(255, 255, 255, 1) 100%)',
+              border: '1px solid',
+              borderColor: alpha('#3b82f6', 0.1),
+              borderRadius: 2,
+            }}>
+              {/* Header with gradient background */}
+              <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1.5,
+                mb: 3,
+                pb: 2,
+                borderBottom: '2px solid',
+                borderColor: alpha('#3b82f6', 0.1)
+              }}>
+                <Avatar sx={{ bgcolor: alpha('#3b82f6', 0.1), width: 40, height: 40 }}>
+                  <CloudUpload sx={{ color: '#3b82f6', fontSize: 24 }} />
+                </Avatar>
+                <Box>
+                  <Typography variant="h6" fontWeight={700} color="#3b82f6">
+                    Upload Files to Process
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Upload your Excel files for AI-powered processing
+                  </Typography>
+                </Box>
               </Box>
 
-              {selectedTemplate?.businessRules.length > 0 && (
+              <Box
+                onClick={() => fileInputRef.current?.click()}
+                sx={{
+                  border: '2px dashed',
+                  borderColor: alpha('#3b82f6', 0.3),
+                  borderRadius: 2,
+                  p: 6,
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  bgcolor: alpha('#3b82f6', 0.02),
+                  position: 'relative',
+                  overflow: 'hidden',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    bgcolor: alpha('#3b82f6', 0.05),
+                    borderColor: '#3b82f6',
+                    transform: 'scale(1.01)',
+                    '& .upload-icon': {
+                      transform: 'scale(1.1) translateY(-4px)',
+                    }
+                  }
+                }}
+              >
+                <TableChart
+                  className="upload-icon"
+                  sx={{
+                    fontSize: 64,
+                    color: alpha('#3b82f6', 0.4),
+                    mb: 2,
+                    transition: 'all 0.3s ease'
+                  }}
+                />
+                <Typography variant="body1" fontWeight={600} color="#3b82f6" sx={{ mb: 0.5 }}>
+                  Drop Excel files here or click to browse
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Supports .xlsx, .xls, .csv • Multiple files allowed
+                </Typography>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  accept=".xlsx,.xls,.csv"
+                  onChange={handleFileUpload}
+                  style={{ display: 'none' }}
+                />
+              </Box>
+
+              {files.length > 0 && (
+                <Stack spacing={1.5} sx={{ mt: 3 }}>
+                  {files.map((file, index) => (
+                    <Fade in timeout={300 + index * 50} key={file.id}>
+                      <Paper
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          p: 2,
+                          bgcolor: 'white',
+                          border: '1px solid',
+                          borderColor: alpha('#3b82f6', 0.1),
+                          borderRadius: 1.5,
+                          transition: 'all 0.2s ease',
+                          '&:hover': {
+                            borderColor: '#3b82f6',
+                            boxShadow: `0 4px 12px ${alpha('#3b82f6', 0.1)}`,
+                            transform: 'translateX(4px)'
+                          }
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <Avatar sx={{ bgcolor: alpha('#3b82f6', 0.1), width: 36, height: 36 }}>
+                            <Description sx={{ color: '#3b82f6', fontSize: 20 }} />
+                          </Avatar>
+                          <Box>
+                            <Typography variant="body2" fontWeight={600}>{file.name}</Typography>
+                            <Typography variant="caption" color="text.secondary">{file.size}</Typography>
+                          </Box>
+                        </Box>
+                        <IconButton
+                          size="small"
+                          onClick={() => setFiles(prev => prev.filter(f => f.id !== file.id))}
+                          sx={{
+                            color: 'error.main',
+                            '&:hover': {
+                              bgcolor: alpha('#ef4444', 0.1)
+                            }
+                          }}
+                        >
+                          <Close fontSize="small" />
+                        </IconButton>
+                      </Paper>
+                    </Fade>
+                  ))}
+                </Stack>
+              )}
+            </Paper>
+          </Fade>
+
+          {/* Template Configuration Display */}
+          <Fade in timeout={400}>
+            <Paper sx={{
+              p: 3,
+              mb: 3,
+              background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.02) 0%, rgba(255, 255, 255, 1) 100%)',
+              border: '1px solid',
+              borderColor: alpha('#8b5cf6', 0.1),
+              borderRadius: 2,
+            }}>
+              {/* Header */}
+              <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1.5,
+                mb: 3,
+                pb: 2,
+                borderBottom: '2px solid',
+                borderColor: alpha('#8b5cf6', 0.1)
+              }}>
+                <Avatar sx={{ bgcolor: alpha('#8b5cf6', 0.1), width: 40, height: 40 }}>
+                  <Settings sx={{ color: '#8b5cf6', fontSize: 24 }} />
+                </Avatar>
                 <Box>
-                  <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Business Rules:</Typography>
-                  <Stack spacing={1}>
-                    {selectedTemplate.businessRules.map((rule, i) => (
-                      <Box key={i} sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
-                        <Check sx={{ fontSize: 16, color: 'success.main', mt: 0.5 }} />
-                        <Typography variant="body2" color="text.secondary">{rule.name}</Typography>
-                      </Box>
+                  <Typography variant="h6" fontWeight={700} color="#8b5cf6">
+                    Template Configuration
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Settings and rules for this processing template
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Stack spacing={3}>
+                {/* Sheets Section */}
+                <Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                    <TableChart sx={{ fontSize: 18, color: '#06b6d4' }} />
+                    <Typography variant="subtitle2" fontWeight={600} color="#06b6d4">
+                      Sheets to Process
+                    </Typography>
+                  </Box>
+                  <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                    {selectedTemplate?.sheets.map((sheet, index) => (
+                      <Zoom in timeout={500 + index * 50} key={sheet.name}>
+                        <Chip
+                          label={sheet.name}
+                          size="small"
+                          sx={{
+                            bgcolor: alpha('#06b6d4', 0.1),
+                            color: '#06b6d4',
+                            fontWeight: 600,
+                            border: '1px solid',
+                            borderColor: alpha('#06b6d4', 0.2),
+                            '&:hover': {
+                              bgcolor: alpha('#06b6d4', 0.2),
+                              transform: 'scale(1.05)',
+                            }
+                          }}
+                        />
+                      </Zoom>
                     ))}
                   </Stack>
                 </Box>
-              )}
 
-              {selectedTemplate?.aiInstructions && (
-                <Box>
-                  <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>AI Instructions:</Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                    "{selectedTemplate.aiInstructions}"
-                  </Typography>
-                </Box>
-              )}
-            </Stack>
-          </Paper>
+                {/* Business Rules Section */}
+                {selectedTemplate?.businessRules.length > 0 && (
+                  <Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                      <Code sx={{ fontSize: 18, color: '#10b981' }} />
+                      <Typography variant="subtitle2" fontWeight={600} color="#10b981">
+                        Business Rules
+                      </Typography>
+                    </Box>
+                    <Stack spacing={1.5}>
+                      {selectedTemplate.businessRules.map((rule, i) => (
+                        <Fade in timeout={600 + i * 100} key={i}>
+                          <Box sx={{
+                            display: 'flex',
+                            gap: 1.5,
+                            alignItems: 'flex-start',
+                            p: 1.5,
+                            bgcolor: alpha('#10b981', 0.05),
+                            borderRadius: 1,
+                            border: '1px solid',
+                            borderColor: alpha('#10b981', 0.1)
+                          }}>
+                            <Check sx={{ fontSize: 18, color: '#10b981', mt: 0.2 }} />
+                            <Typography variant="body2" color="text.primary" sx={{ flex: 1 }}>
+                              {rule.name}
+                            </Typography>
+                          </Box>
+                        </Fade>
+                      ))}
+                    </Stack>
+                  </Box>
+                )}
+
+                {/* AI Instructions Section */}
+                {selectedTemplate?.aiInstructions && (
+                  <Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                      <AutoAwesome sx={{ fontSize: 18, color: '#f97316' }} />
+                      <Typography variant="subtitle2" fontWeight={600} color="#f97316">
+                        AI Instructions
+                      </Typography>
+                    </Box>
+                    <Paper sx={{
+                      p: 2,
+                      bgcolor: alpha('#f97316', 0.05),
+                      border: '1px solid',
+                      borderColor: alpha('#f97316', 0.1),
+                      borderRadius: 1.5
+                    }}>
+                      <Typography variant="body2" color="text.primary" sx={{ fontStyle: 'italic', lineHeight: 1.6 }}>
+                        "{selectedTemplate.aiInstructions}"
+                      </Typography>
+                    </Paper>
+                  </Box>
+                )}
+              </Stack>
+            </Paper>
+          </Fade>
 
           {/* Process Button */}
           <Button
@@ -853,73 +1139,206 @@ const ExcelAIProcessor = ({ onBack }) => {
             variant="contained"
             size="large"
             startIcon={isProcessing ? <AutoAwesome /> : <PlayArrow />}
-            sx={{ py: 2, fontSize: '1.1rem', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}
+            sx={{
+              py: 2,
+              fontSize: '1.1rem',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+              boxShadow: '0 4px 14px rgba(59, 130, 246, 0.4)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                transform: 'scale(1.02)',
+                boxShadow: '0 6px 20px rgba(59, 130, 246, 0.5)',
+              },
+              '&:disabled': {
+                background: 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)',
+                '& .MuiCircularProgress-root': {
+                  color: 'white'
+                }
+              }
+            }}
           >
             {isProcessing ? 'Processing with AI...' : 'Start AI Processing'}
           </Button>
 
           {/* Results */}
           {processedResults && (
-            <Paper sx={{ p: 3, mt: 3, background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%)' }}>
-              <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>Processing Complete!</Typography>
-              <Grid container spacing={2} sx={{ mb: 2 }}>
-                <Grid item xs={4}>
-                  <Paper sx={{ p: 2, textAlign: 'center' }}>
-                    <Typography variant="caption">Files Processed</Typography>
-                    <Typography variant="h4" fontWeight={700}>{processedResults.filesProcessed}</Typography>
-                  </Paper>
-                </Grid>
-                <Grid item xs={4}>
-                  <Paper sx={{ p: 2, textAlign: 'center' }}>
-                    <Typography variant="caption">Sheets Analyzed</Typography>
-                    <Typography variant="h4" fontWeight={700}>{processedResults.sheetsProcessed}</Typography>
-                  </Paper>
-                </Grid>
-                <Grid item xs={4}>
-                  <Paper sx={{ p: 2, textAlign: 'center' }}>
-                    <Typography variant="caption">Insights</Typography>
-                    <Typography variant="h4" fontWeight={700}>{processedResults.insights.length}</Typography>
-                  </Paper>
-                </Grid>
-              </Grid>
-              <Stack spacing={1} sx={{ mb: 2 }}>
-                {processedResults.insights.map((insight, i) => (
-                  <Box key={i} sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                    <AutoAwesome sx={{ fontSize: 16, color: '#10b981' }} />
-                    <Typography variant="body2">{insight}</Typography>
+            <Zoom in timeout={500}>
+              <Paper sx={{
+                p: 3,
+                mt: 3,
+                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%)',
+                border: '2px solid',
+                borderColor: alpha('#10b981', 0.3),
+                borderRadius: 2,
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '4px',
+                  background: 'linear-gradient(90deg, #10b981 0%, #059669 100%)',
+                }
+              }}>
+                {/* Success Header */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                  <Avatar sx={{
+                    bgcolor: '#10b981',
+                    width: 56,
+                    height: 56,
+                    animation: 'pulse 2s ease-in-out infinite',
+                    '@keyframes pulse': {
+                      '0%, 100%': { transform: 'scale(1)' },
+                      '50%': { transform: 'scale(1.1)' },
+                    },
+                  }}>
+                    <Check sx={{ fontSize: 32 }} />
+                  </Avatar>
+                  <Box>
+                    <Typography variant="h5" fontWeight={700} color="#10b981">Processing Complete!</Typography>
+                    <Typography variant="body2" color="text.secondary">Your Excel file has been successfully processed</Typography>
                   </Box>
-                ))}
-              </Stack>
-              <Button
-                fullWidth
-                variant="contained"
-                startIcon={<Download />}
-                onClick={handleDownload}
-                sx={{ bgcolor: '#10b981', '&:hover': { bgcolor: '#059669' } }}
-              >
-                Download Processed Output
-              </Button>
-            </Paper>
+                </Box>
+
+                {/* Stats Grid */}
+                <Grid container spacing={2} sx={{ mb: 3 }}>
+                  <Grid item xs={4}>
+                    <Zoom in timeout={600}>
+                      <Paper sx={{
+                        p: 2.5,
+                        textAlign: 'center',
+                        background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(255, 255, 255, 1) 100%)',
+                        border: '1px solid',
+                        borderColor: alpha('#3b82f6', 0.2),
+                        transition: 'all 0.3s ease',
+                        '&:hover': { transform: 'translateY(-4px)', boxShadow: 3 }
+                      }}>
+                        <Description sx={{ fontSize: 32, color: '#3b82f6', mb: 1 }} />
+                        <Typography variant="h4" fontWeight={700} color="#3b82f6">{processedResults.filesProcessed}</Typography>
+                        <Typography variant="caption" color="text.secondary">Files Processed</Typography>
+                      </Paper>
+                    </Zoom>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Zoom in timeout={700}>
+                      <Paper sx={{
+                        p: 2.5,
+                        textAlign: 'center',
+                        background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(255, 255, 255, 1) 100%)',
+                        border: '1px solid',
+                        borderColor: alpha('#06b6d4', 0.2),
+                        transition: 'all 0.3s ease',
+                        '&:hover': { transform: 'translateY(-4px)', boxShadow: 3 }
+                      }}>
+                        <TableChart sx={{ fontSize: 32, color: '#06b6d4', mb: 1 }} />
+                        <Typography variant="h4" fontWeight={700} color="#06b6d4">{processedResults.sheetsProcessed}</Typography>
+                        <Typography variant="caption" color="text.secondary">Sheets Analyzed</Typography>
+                      </Paper>
+                    </Zoom>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Zoom in timeout={800}>
+                      <Paper sx={{
+                        p: 2.5,
+                        textAlign: 'center',
+                        background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(255, 255, 255, 1) 100%)',
+                        border: '1px solid',
+                        borderColor: alpha('#8b5cf6', 0.2),
+                        transition: 'all 0.3s ease',
+                        '&:hover': { transform: 'translateY(-4px)', boxShadow: 3 }
+                      }}>
+                        <AutoAwesome sx={{ fontSize: 32, color: '#8b5cf6', mb: 1 }} />
+                        <Typography variant="h4" fontWeight={700} color="#8b5cf6">{processedResults.insights.length}</Typography>
+                        <Typography variant="caption" color="text.secondary">AI Insights</Typography>
+                      </Paper>
+                    </Zoom>
+                  </Grid>
+                </Grid>
+
+                {/* Insights List */}
+                <Paper sx={{ p: 2, mb: 3, bgcolor: 'white', border: '1px solid', borderColor: 'divider' }}>
+                  <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2 }}>Key Insights</Typography>
+                  <Stack spacing={1.5}>
+                    {processedResults.insights.map((insight, i) => (
+                      <Fade in timeout={900 + i * 100} key={i}>
+                        <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}>
+                          <AutoAwesome sx={{ fontSize: 18, color: '#10b981', mt: 0.5 }} />
+                          <Typography variant="body2" sx={{ flex: 1 }}>{insight}</Typography>
+                        </Box>
+                      </Fade>
+                    ))}
+                  </Stack>
+                </Paper>
+
+                {/* Download Button */}
+                <Button
+                  fullWidth
+                  variant="contained"
+                  size="large"
+                  startIcon={<Download />}
+                  onClick={handleDownload}
+                  sx={{
+                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                    py: 1.5,
+                    '&:hover': {
+                      background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                      transform: 'scale(1.02)',
+                    }
+                  }}
+                >
+                  Download Processed Output
+                </Button>
+              </Paper>
+            </Zoom>
           )}
         </Grid>
 
         {/* Right Sidebar */}
         <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 2, mb: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6" fontWeight={600} sx={{ display: 'flex', alignItems: 'center' }}>
-                <Chat sx={{ color: 'text.secondary', mr: 1 }} />AI Assistant
-              </Typography>
-              {aiConversation.length > 0 && (
-                <IconButton
-                  size="small"
-                  onClick={() => setAiConversation([])}
-                  sx={{ color: 'text.secondary' }}
-                >
-                  <Close fontSize="small" />
-                </IconButton>
-              )}
-            </Box>
+          <Fade in timeout={500}>
+            <Paper sx={{
+              p: 2,
+              mb: 3,
+              background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%)',
+              border: '1px solid',
+              borderColor: alpha('#8b5cf6', 0.1),
+              borderRadius: 2,
+            }}>
+              <Box sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                mb: 2,
+                pb: 2,
+                borderBottom: '2px solid',
+                borderColor: alpha('#8b5cf6', 0.1)
+              }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                  <Avatar sx={{ bgcolor: alpha('#8b5cf6', 0.1), width: 36, height: 36 }}>
+                    <Chat sx={{ color: '#8b5cf6', fontSize: 20 }} />
+                  </Avatar>
+                  <Typography variant="h6" fontWeight={700} color="#8b5cf6">
+                    AI Assistant
+                  </Typography>
+                </Box>
+                {aiConversation.length > 0 && (
+                  <IconButton
+                    size="small"
+                    onClick={() => setAiConversation([])}
+                    sx={{
+                      color: 'text.secondary',
+                      '&:hover': {
+                        bgcolor: alpha('#ef4444', 0.1),
+                        color: 'error.main'
+                      }
+                    }}
+                  >
+                    <Close fontSize="small" />
+                  </IconButton>
+                )}
+              </Box>
             <Box sx={{ height: 300, overflow: 'auto', bgcolor: '#f9fafb', borderRadius: 1, p: 2, mb: 2 }}>
               {aiConversation.length === 0 ? (
                 <Typography variant="body2" color="text.secondary" textAlign="center">
@@ -942,57 +1361,125 @@ const ExcelAIProcessor = ({ onBack }) => {
                 </Stack>
               )}
             </Box>
-            <TextField
-              fullWidth
-              placeholder="Ask AI..."
-              size="small"
-              onKeyPress={(e) => {
-                if (e.key === 'Enter' && e.target.value) {
-                  addAIMessage('user', e.target.value);
-                  e.target.value = '';
-                }
-              }}
-            />
-          </Paper>
+              <TextField
+                fullWidth
+                placeholder="Ask AI..."
+                size="small"
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && e.target.value) {
+                    addAIMessage('user', e.target.value);
+                    e.target.value = '';
+                  }
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    bgcolor: 'white',
+                    '&:hover': {
+                      '& > fieldset': {
+                        borderColor: '#8b5cf6',
+                      }
+                    }
+                  }
+                }}
+              />
+            </Paper>
+          </Fade>
 
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-              <AccountTree sx={{ color: 'text.secondary', mr: 1 }} />Processing Pipeline
-            </Typography>
-            <Box sx={{ maxHeight: 400, overflow: 'auto' }}>
-              {processingPipeline.length === 0 ? (
-                <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 4 }}>
-                  No activity yet
+          <Fade in timeout={600}>
+            <Paper sx={{
+              p: 2,
+              background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%)',
+              border: '1px solid',
+              borderColor: alpha('#06b6d4', 0.1),
+              borderRadius: 2,
+            }}>
+              <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1.5,
+                mb: 2,
+                pb: 2,
+                borderBottom: '2px solid',
+                borderColor: alpha('#06b6d4', 0.1)
+              }}>
+                <Avatar sx={{ bgcolor: alpha('#06b6d4', 0.1), width: 36, height: 36 }}>
+                  <AccountTree sx={{ color: '#06b6d4', fontSize: 20 }} />
+                </Avatar>
+                <Typography variant="h6" fontWeight={700} color="#06b6d4">
+                  Processing Pipeline
                 </Typography>
-              ) : (
-                <Stack spacing={1}>
-                  {processingPipeline.map(entry => (
-                    <Paper key={entry.id} sx={{ p: 1.5, bgcolor: '#f9fafb' }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                        <Chip label={entry.type} size="small" sx={{ height: 20, fontSize: '0.7rem' }} />
-                        <Typography variant="caption">{entry.timestamp}</Typography>
-                      </Box>
-                      <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>{entry.message}</Typography>
-                    </Paper>
-                  ))}
-                </Stack>
-              )}
-            </Box>
-          </Paper>
+              </Box>
+              <Box sx={{ maxHeight: 400, overflow: 'auto' }}>
+                {processingPipeline.length === 0 ? (
+                  <Box sx={{ textAlign: 'center', py: 4 }}>
+                    <Speed sx={{ fontSize: 48, color: alpha('#06b6d4', 0.3), mb: 1 }} />
+                    <Typography variant="body2" color="text.secondary">
+                      No activity yet
+                    </Typography>
+                  </Box>
+                ) : (
+                  <Stack spacing={1.5}>
+                    {processingPipeline.map((entry, index) => (
+                      <Fade in timeout={300 + index * 50} key={entry.id}>
+                        <Paper sx={{
+                          p: 1.5,
+                          bgcolor: 'white',
+                          border: '1px solid',
+                          borderColor: alpha('#06b6d4', 0.1),
+                          borderRadius: 1,
+                          borderLeft: '3px solid',
+                          borderLeftColor: entry.type === 'success' ? '#10b981' : entry.type === 'error' ? '#ef4444' : '#06b6d4',
+                          '&:hover': {
+                            boxShadow: 1
+                          }
+                        }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                            <Chip
+                              label={entry.type}
+                              size="small"
+                              sx={{
+                                height: 20,
+                                fontSize: '0.7rem',
+                                fontWeight: 600,
+                                bgcolor: entry.type === 'success' ? alpha('#10b981', 0.1) : entry.type === 'error' ? alpha('#ef4444', 0.1) : alpha('#06b6d4', 0.1),
+                                color: entry.type === 'success' ? '#10b981' : entry.type === 'error' ? '#ef4444' : '#06b6d4',
+                              }}
+                            />
+                            <Typography variant="caption" color="text.secondary">{entry.timestamp}</Typography>
+                          </Box>
+                          <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>{entry.message}</Typography>
+                        </Paper>
+                      </Fade>
+                    ))}
+                  </Stack>
+                )}
+              </Box>
+            </Paper>
+          </Fade>
         </Grid>
       </Grid>
     </>
   );
 
   return (
-    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#fafafa' }}>
+    <Box sx={{
+      height: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      background: 'linear-gradient(180deg, rgba(219, 234, 254, 0.1) 0%, rgba(255, 255, 255, 1) 50%)'
+    }}>
       {/* Header */}
       <Paper elevation={1} sx={{ p: 2, borderRadius: 0, flexShrink: 0 }}>
         <Box sx={{ maxWidth: 1400, mx: 'auto', px: 2 }}>
           <Breadcrumbs separator={<NavigateNext fontSize="small" />} sx={{ mb: 2 }}>
             <Link
               onClick={onBack}
-              sx={{ cursor: 'pointer', color: 'text.secondary', '&:hover': { color: 'primary.main' } }}
+              sx={{
+                cursor: 'pointer',
+                color: 'text.secondary',
+                textDecoration: 'none',
+                '&:hover': { color: 'primary.main' }
+              }}
             >
               Document Intelligence
             </Link>
@@ -1009,7 +1496,18 @@ const ExcelAIProcessor = ({ onBack }) => {
                 </Typography>
               </Box>
             </Box>
-            <Button startIcon={<ArrowBack />} onClick={onBack} variant="outlined">
+            <Button
+              startIcon={<ArrowBack />}
+              onClick={onBack}
+              variant="outlined"
+              sx={{
+                borderRadius: 2,
+                '&:hover': {
+                  transform: 'translateX(-2px)',
+                  transition: 'transform 0.2s ease'
+                }
+              }}
+            >
               Back
             </Button>
           </Box>
