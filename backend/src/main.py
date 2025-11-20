@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 import structlog
 from contextlib import asynccontextmanager
 from src.config import settings
+import os
 from src.api.routes import router
 from src.api.margen_routes import router as margen_router
 from src.api.conversation_routes import router as conversation_router
@@ -16,6 +18,7 @@ from src.api.markets_routes import router as markets_router
 from src.api.stox_routes import router as stox_router
 from src.api.comms_routes import router as comms_router
 from src.api.comms_config_routes import router as comms_config_router
+from src.api.excel_processor_routes import router as excel_processor_router
 
 # Configure structured logging
 structlog.configure(
@@ -129,6 +132,14 @@ app.include_router(markets_router, prefix="/api/v1")
 app.include_router(stox_router)
 app.include_router(comms_router)
 app.include_router(comms_config_router)
+app.include_router(excel_processor_router)
+
+# Mount static files for generated outputs
+# Output directory is at project root, not backend
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+output_dir = os.path.join(project_root, 'output')
+os.makedirs(output_dir, exist_ok=True)
+app.mount("/output", StaticFiles(directory=output_dir), name="output")
 
 
 @app.get("/")
