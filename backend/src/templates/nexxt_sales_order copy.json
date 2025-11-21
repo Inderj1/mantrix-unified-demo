@@ -1,0 +1,38 @@
+{
+  "name": "Nexxt Spine Sales Order",
+  "description": "Standard Nexxt Spine sales order without invoice",
+  "required_fields": [
+    "order_number",
+    "date",
+    "est_ship_date",
+    "customer_number",
+    "customer_name",
+    "customer_address",
+    "bill_to_name",
+    "bill_to_address",
+    "ship_to_name",
+    "ship_to_address",
+    "items",
+    "subtotal",
+    "discount",
+    "freight",
+    "tax",
+    "total"
+  ],
+  "optional_fields": [
+    "patient",
+    "sales_person",
+    "notes",
+    "attention"
+  ],
+  "items_schema": {
+    "required": [
+      "item_code",
+      "description",
+      "quantity",
+      "price",
+      "total"
+    ],
+    "optional": []
+  }
+}

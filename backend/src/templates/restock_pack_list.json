@@ -1,0 +1,30 @@
+{
+  "name": "Restock Pack List",
+  "description": "Packing list for restock orders",
+  "required_fields": [
+    "document_type",
+    "date",
+    "customer_name",
+    "facility_name",
+    "items",
+    "total_items"
+  ],
+  "optional_fields": [
+    "order_number",
+    "dos",
+    "notes",
+    "part_number",
+    "backorders"
+  ],
+  "items_schema": {
+    "required": [
+      "item_code",
+      "description",
+      "quantity"
+    ],
+    "optional": [
+      "location",
+      "lot_number"
+    ]
+  }
+}

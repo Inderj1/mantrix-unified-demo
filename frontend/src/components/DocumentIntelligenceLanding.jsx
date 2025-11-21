@@ -20,9 +20,11 @@ import {
   ArrowBack as ArrowBackIcon,
   Description as DescriptionIcon,
   TableChart as TableChartIcon,
+  PictureAsPdf as PictureAsPdfIcon,
 } from '@mui/icons-material';
 import DocumentIntelligence from './DocumentIntelligence';
 import ExcelAIProcessor from './ExcelAIProcessor';
+import PDFParserStudio from './PDFParserStudio';
 import { apiService } from '../services/api';
 
 const DocumentIntelligenceLanding = ({ onBack }) => {
@@ -54,7 +56,11 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
     return <ExcelAIProcessor onBack={() => setSelectedView(null)} />;
   }
 
-  // Landing page with 2 tiles
+  if (selectedView === 'pdf-parser') {
+    return <PDFParserStudio onBack={() => setSelectedView(null)} />;
+  }
+
+  // Landing page with 3 tiles
   return (
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#fafafa' }}>
       {/* Header */}
@@ -81,7 +87,7 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
                     Document Intelligence
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    AI-powered document analysis and Excel processing
+                    AI-powered document analysis, Excel processing, and PDF extraction
                   </Typography>
                 </Box>
               </Box>
@@ -95,7 +101,7 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
         <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
           <Grid container spacing={4}>
             {/* Tile 1: Document Analysis & Q&A */}
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <Zoom in timeout={400}>
                 <Card
                   sx={{
@@ -229,7 +235,7 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
             </Grid>
 
             {/* Tile 2: Excel AI Processor */}
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <Zoom in timeout={500}>
                 <Card
                   sx={{
@@ -345,6 +351,140 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
                           gap: 0.5,
                           bgcolor: alpha('#3b82f6', 0.1),
                           color: '#3b82f6',
+                          px: 2,
+                          py: 0.75,
+                          borderRadius: 1.5,
+                          fontWeight: 600,
+                          fontSize: '0.8rem',
+                          transition: 'all 0.3s ease'
+                        }}
+                      >
+                        ENTER
+                        <ArrowForwardIcon sx={{ fontSize: 16 }} />
+                      </Box>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Zoom>
+            </Grid>
+
+            {/* Tile 3: PDF Parser Studio */}
+            <Grid item xs={12} md={4}>
+              <Zoom in timeout={600}>
+                <Card
+                  sx={{
+                    height: 280,
+                    cursor: 'pointer',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    border: '1px solid',
+                    borderColor: alpha('#10b981', 0.2),
+                    borderRadius: 2,
+                    overflow: 'hidden',
+                    background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.02) 0%, rgba(255, 255, 255, 1) 100%)',
+                    position: 'relative',
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: '3px',
+                      background: 'linear-gradient(90deg, #10b981 0%, #059669 100%)',
+                    },
+                    '&:hover': {
+                      transform: 'translateY(-6px)',
+                      boxShadow: '0 12px 32px rgba(16, 185, 129, 0.2)',
+                      borderColor: '#10b981',
+                      '& .category-icon': {
+                        transform: 'scale(1.1)',
+                        bgcolor: '#10b981',
+                        color: 'white',
+                      },
+                      '& .access-button': {
+                        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                        color: 'white',
+                        transform: 'translateX(4px)',
+                      },
+                    },
+                  }}
+                  onClick={() => setSelectedView('pdf-parser')}
+                >
+                  <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                    {/* Icon and Badge */}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2.5 }}>
+                      <Avatar
+                        className="category-icon"
+                        sx={{
+                          width: 64,
+                          height: 64,
+                          bgcolor: alpha('#10b981', 0.1),
+                          color: '#10b981',
+                          transition: 'all 0.3s ease',
+                        }}
+                      >
+                        <PictureAsPdfIcon sx={{ fontSize: 36 }} />
+                      </Avatar>
+                      <Chip
+                        label="3 Templates"
+                        size="small"
+                        sx={{
+                          bgcolor: alpha('#10b981', 0.1),
+                          color: '#10b981',
+                          fontWeight: 600,
+                          fontSize: '0.75rem',
+                          height: 26,
+                        }}
+                      />
+                    </Box>
+
+                    {/* Title */}
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: 700,
+                        color: '#10b981',
+                        mb: 1.5,
+                        fontSize: '1.15rem',
+                        letterSpacing: '-0.3px'
+                      }}
+                    >
+                      PDF Parser Studio
+                    </Typography>
+
+                    {/* Description */}
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: 'text.secondary',
+                        mb: 'auto',
+                        lineHeight: 1.6,
+                        fontSize: '0.9rem'
+                      }}
+                    >
+                      Enterprise-grade PDF data extraction pipeline with customizable templates, AI-powered field
+                      recognition, schema validation, and automated CSV transformation workflows.
+                    </Typography>
+
+                    {/* Footer */}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        alignItems: 'center',
+                        mt: 2.5,
+                        pt: 2.5,
+                        borderTop: '1px solid',
+                        borderColor: alpha('#10b981', 0.1)
+                      }}
+                    >
+                      <Box
+                        className="access-button"
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.5,
+                          bgcolor: alpha('#10b981', 0.1),
+                          color: '#10b981',
                           px: 2,
                           py: 0.75,
                           borderRadius: 1.5,

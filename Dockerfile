@@ -46,7 +46,7 @@ RUN pip install --no-cache-dir \
 
 # Copy application code
 COPY backend/src/ ./src/
-COPY configs/ ./configs/
+COPY backend/configs/ ./configs/
 
 # Create necessary directories
 RUN mkdir -p query_logs logs files

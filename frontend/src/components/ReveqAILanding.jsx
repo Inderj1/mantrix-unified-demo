@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Grid,
@@ -14,6 +14,7 @@ import {
   alpha,
   useTheme,
   Zoom,
+  Paper,
 } from '@mui/material';
 import {
   ArrowForward as ArrowForwardIcon,
@@ -26,32 +27,47 @@ import {
   LocalShipping as UtilizationIcon,
   Speed as EfficiencyIcon,
   AccountBalance as FinancialIcon,
+  CompareArrows as LoanerIcon,
+  SwapHoriz as ConsignmentIcon,
 } from '@mui/icons-material';
 
-const reveqModules = [
+// Category definitions for REVEQ.AI
+const categories = [
+  {
+    id: 'loaner',
+    title: 'Loaner Process',
+    subtitle: 'Asset Management & Operations',
+    description: 'Comprehensive loaner equipment management including tracking, utilization, maintenance scheduling, and operational efficiency optimization',
+    icon: LoanerIcon,
+    color: '#3b82f6',
+    gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+    stats: { label: 'Active Loaners', value: '86' },
+  },
+  {
+    id: 'consignment',
+    title: 'Consignment Process',
+    subtitle: 'Revenue & Performance Analytics',
+    description: 'End-to-end consignment analytics with revenue tracking, performance dashboards, and comprehensive financial workbench capabilities',
+    icon: ConsignmentIcon,
+    color: '#64748b',
+    gradient: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
+    stats: { label: 'Consignment Items', value: '42' },
+  },
+];
+
+// Loaner Process Modules
+const loanerModules = [
   {
     id: 'asset-tracking',
     title: 'Asset Tracking',
     subtitle: 'Real-Time Monitoring',
     description: 'Live equipment location, status tracking, and operational visibility across all assets',
     icon: EquipmentIcon,
-    color: '#9c27b0',
-    bgColor: '#f3e5f5',
+    color: '#3b82f6',
+    bgColor: '#eff6ff',
     stats: { label: 'Assets Tracked', value: '128' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%)',
-  },
-  {
-    id: 'revenue-analytics',
-    title: 'Revenue Analytics',
-    subtitle: 'Financial Performance',
-    description: 'Equipment revenue tracking, profitability analysis, and ROI optimization insights',
-    icon: RevenueIcon,
-    color: '#4CAF50',
-    bgColor: '#e8f5e9',
-    stats: { label: 'Monthly Revenue', value: '$2.4M' },
-    status: 'active',
-    gradient: 'linear-gradient(135deg, #4CAF50 0%, #388E3C 100%)',
+    gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
   },
   {
     id: 'utilization-metrics',
@@ -59,23 +75,11 @@ const reveqModules = [
     subtitle: 'Asset Optimization',
     description: 'Equipment utilization rates, idle time analysis, and deployment optimization',
     icon: UtilizationIcon,
-    color: '#FF9800',
-    bgColor: '#fff3e0',
+    color: '#64748b',
+    bgColor: '#f8fafc',
     stats: { label: 'Avg Utilization', value: '87%' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)',
-  },
-  {
-    id: 'performance-dashboard',
-    title: 'Performance Dashboard',
-    subtitle: 'KPIs & Metrics',
-    description: 'Comprehensive performance metrics, efficiency scores, and operational KPIs',
-    icon: PerformanceIcon,
-    color: '#2196F3',
-    bgColor: '#e3f2fd',
-    stats: { label: 'Performance Score', value: '92/100' },
-    status: 'active',
-    gradient: 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)',
+    gradient: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
   },
   {
     id: 'maintenance-scheduler',
@@ -83,11 +87,11 @@ const reveqModules = [
     subtitle: 'Preventive Care',
     description: 'Automated maintenance scheduling, service alerts, and equipment health monitoring',
     icon: MaintenanceIcon,
-    color: '#F44336',
-    bgColor: '#ffebee',
+    color: '#3b82f6',
+    bgColor: '#eff6ff',
     stats: { label: 'Services Due', value: '12' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #F44336 0%, #D32F2F 100%)',
+    gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
   },
   {
     id: 'efficiency-optimizer',
@@ -95,11 +99,39 @@ const reveqModules = [
     subtitle: 'Cost Reduction',
     description: 'Cost optimization recommendations, efficiency improvements, and resource allocation',
     icon: EfficiencyIcon,
-    color: '#607D8B',
-    bgColor: '#eceff1',
+    color: '#64748b',
+    bgColor: '#f8fafc',
     stats: { label: 'Cost Saved', value: '$18.2K' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #607D8B 0%, #455A64 100%)',
+    gradient: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
+  },
+];
+
+// Consignment Process Modules
+const consignmentModules = [
+  {
+    id: 'revenue-analytics',
+    title: 'Revenue Analytics',
+    subtitle: 'Financial Performance',
+    description: 'Equipment revenue tracking, profitability analysis, and ROI optimization insights',
+    icon: RevenueIcon,
+    color: '#3b82f6',
+    bgColor: '#eff6ff',
+    stats: { label: 'Monthly Revenue', value: '$2.4M' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+  },
+  {
+    id: 'performance-dashboard',
+    title: 'Performance Dashboard',
+    subtitle: 'KPIs & Metrics',
+    description: 'Comprehensive performance metrics, efficiency scores, and operational KPIs',
+    icon: PerformanceIcon,
+    color: '#64748b',
+    bgColor: '#f8fafc',
+    stats: { label: 'Performance Score', value: '92/100' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
   },
   {
     id: 'financial-workbench',
@@ -107,16 +139,17 @@ const reveqModules = [
     subtitle: 'Financial Analysis',
     description: 'Comprehensive financial analytics, P&L tracking, budget management, and forecasting',
     icon: FinancialIcon,
-    color: '#00ACC1',
-    bgColor: '#e0f7fa',
+    color: '#3b82f6',
+    bgColor: '#eff6ff',
     stats: { label: 'Active Reports', value: '24' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #00ACC1 0%, #0097A7 100%)',
+    gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
   },
 ];
 
 const ReveqAILanding = ({ onTileClick, onBack }) => {
   const theme = useTheme();
+  const [selectedView, setSelectedView] = useState(null); // null, 'loaner', 'consignment'
 
   const handleTileClick = (moduleId) => {
     console.log('ReveqAI tile clicked:', moduleId);
@@ -124,6 +157,225 @@ const ReveqAILanding = ({ onTileClick, onBack }) => {
       onTileClick(moduleId);
     }
   };
+
+  const handleCategoryClick = (categoryId) => {
+    setSelectedView(categoryId);
+  };
+
+  const handleBackToCategories = () => {
+    setSelectedView(null);
+  };
+
+  // Get current modules based on selected view
+  const getCurrentModules = () => {
+    if (selectedView === 'loaner') return loanerModules;
+    if (selectedView === 'consignment') return consignmentModules;
+    return [];
+  };
+
+  const getCurrentCategory = () => {
+    return categories.find(cat => cat.id === selectedView);
+  };
+
+  // Render Category Selection View
+  if (!selectedView) {
+    return (
+      <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#fafafa' }}>
+        {/* Header */}
+        <Paper elevation={1} sx={{ p: 2, borderRadius: 0, flexShrink: 0 }}>
+          <Box sx={{ maxWidth: 1400, mx: 'auto', px: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                  <img
+                    src="/reveq.png"
+                    alt="REVEQ.AI"
+                    style={{
+                      width: 80,
+                      height: 80,
+                      objectFit: 'contain'
+                    }}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                  <Box>
+                    <Typography variant="h5" fontWeight={700}>
+                      REVEQ.AI
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Revenue Equipment Intelligence Platform
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+              <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">
+                Back to CORE.AI
+              </Button>
+            </Box>
+          </Box>
+        </Paper>
+
+        {/* Main Content */}
+        <Box sx={{ flexGrow: 1, overflow: 'auto', p: 4 }}>
+          <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
+            <Grid container spacing={4}>
+              {categories.map((category, index) => (
+                <Grid item xs={12} md={6} key={category.id}>
+                  <Zoom in timeout={400 + index * 100}>
+                    <Card
+                      sx={{
+                        height: 280,
+                        cursor: 'pointer',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        border: '1px solid',
+                        borderColor: alpha(category.color, 0.2),
+                        borderRadius: 2,
+                        overflow: 'hidden',
+                        background: `linear-gradient(135deg, ${alpha(category.color, 0.02)} 0%, rgba(255, 255, 255, 1) 100%)`,
+                        position: 'relative',
+                        '&::before': {
+                          content: '""',
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          height: '3px',
+                          background: category.gradient,
+                        },
+                        '&:hover': {
+                          transform: 'translateY(-6px)',
+                          boxShadow: `0 12px 32px ${alpha(category.color, 0.2)}`,
+                          borderColor: category.color,
+                          '& .category-icon': {
+                            transform: 'scale(1.1)',
+                            bgcolor: category.color,
+                            color: 'white',
+                          },
+                          '& .access-button': {
+                            background: category.gradient,
+                            color: 'white',
+                            transform: 'translateX(4px)',
+                          },
+                        },
+                      }}
+                      onClick={() => handleCategoryClick(category.id)}
+                    >
+                      <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                        {/* Icon and Badge */}
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2.5 }}>
+                          <Avatar
+                            className="category-icon"
+                            sx={{
+                              width: 64,
+                              height: 64,
+                              bgcolor: alpha(category.color, 0.1),
+                              color: category.color,
+                              transition: 'all 0.3s ease',
+                            }}
+                          >
+                            <category.icon sx={{ fontSize: 36 }} />
+                          </Avatar>
+                          <Chip
+                            label={`${category.stats.value} ${category.stats.label}`}
+                            size="small"
+                            sx={{
+                              bgcolor: alpha(category.color, 0.1),
+                              color: category.color,
+                              fontWeight: 600,
+                              fontSize: '0.75rem',
+                              height: 26,
+                            }}
+                          />
+                        </Box>
+
+                        {/* Title */}
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: 700,
+                            color: category.color,
+                            mb: 1.5,
+                            fontSize: '1.15rem',
+                            letterSpacing: '-0.3px'
+                          }}
+                        >
+                          {category.title}
+                        </Typography>
+
+                        {/* Subtitle */}
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: 'text.secondary',
+                            fontWeight: 600,
+                            mb: 1,
+                            fontSize: '0.85rem'
+                          }}
+                        >
+                          {category.subtitle}
+                        </Typography>
+
+                        {/* Description */}
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: 'text.secondary',
+                            mb: 'auto',
+                            lineHeight: 1.6,
+                            fontSize: '0.9rem'
+                          }}
+                        >
+                          {category.description}
+                        </Typography>
+
+                        {/* Footer */}
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'flex-end',
+                            alignItems: 'center',
+                            mt: 2.5,
+                            pt: 2.5,
+                            borderTop: '1px solid',
+                            borderColor: alpha(category.color, 0.1)
+                          }}
+                        >
+                          <Box
+                            className="access-button"
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.5,
+                              bgcolor: alpha(category.color, 0.1),
+                              color: category.color,
+                              px: 2,
+                              py: 0.75,
+                              borderRadius: 1.5,
+                              fontWeight: 600,
+                              fontSize: '0.8rem',
+                              transition: 'all 0.3s ease'
+                            }}
+                          >
+                            ENTER
+                            <ArrowForwardIcon sx={{ fontSize: 16 }} />
+                          </Box>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </Zoom>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        </Box>
+      </Box>
+    );
+  }
+
+  // Render Module View for Selected Category
+  const currentCategory = getCurrentCategory();
+  const currentModules = getCurrentModules();
 
   return (
     <Box sx={{ p: 3, height: '100%', overflowY: 'auto' }}>
@@ -143,12 +395,24 @@ const ReveqAILanding = ({ onTileClick, onBack }) => {
             >
               CORE.AI
             </Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
+            <Link
+              component="button"
+              variant="body1"
+              onClick={handleBackToCategories}
+              sx={{
+                textDecoration: 'none',
+                color: 'text.primary',
+                '&:hover': { textDecoration: 'underline' },
+              }}
+            >
               REVEQ.AI
+            </Link>
+            <Typography color="primary" variant="body1" fontWeight={600}>
+              {currentCategory?.title}
             </Typography>
           </Breadcrumbs>
-          <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">
-            Back to CORE.AI
+          <Button startIcon={<ArrowBackIcon />} onClick={handleBackToCategories} variant="outlined" size="small">
+            Back to REVEQ.AI
           </Button>
         </Stack>
 
@@ -157,17 +421,17 @@ const ReveqAILanding = ({ onTileClick, onBack }) => {
             sx={{
               width: 64,
               height: 64,
-              bgcolor: alpha('#9c27b0', 0.1),
+              bgcolor: alpha(currentCategory?.color || '#3b82f6', 0.1),
             }}
           >
-            <EquipmentIcon sx={{ fontSize: 36, color: '#9c27b0' }} />
+            {currentCategory && <currentCategory.icon sx={{ fontSize: 36, color: currentCategory.color }} />}
           </Avatar>
           <Box>
             <Typography variant="h4" fontWeight={700}>
-              REVEQ.AI
+              {currentCategory?.title}
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Revenue Equipment Intelligence Platform
+              {currentCategory?.subtitle}
             </Typography>
           </Box>
         </Box>
@@ -175,7 +439,7 @@ const ReveqAILanding = ({ onTileClick, onBack }) => {
 
       {/* Module Tiles */}
       <Grid container spacing={1.5}>
-        {reveqModules.map((module, index) => (
+        {currentModules.map((module, index) => (
           <Grid item xs={12} sm={6} md={4} lg={4} key={module.id}>
             <Zoom in timeout={200 + index * 50}>
               <Card

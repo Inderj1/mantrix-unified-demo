@@ -158,10 +158,7 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
                 sx={{
                   cursor: 'pointer',
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  background: `linear-gradient(135deg, ${alpha(module.color, 0.05)} 0%, ${alpha(
-                    module.color,
-                    0.02
-                  )} 100%)`,
+                  background: 'white',
                   border: `2px solid ${alpha(module.color, 0.1)}`,
                   position: 'relative',
                   overflow: 'hidden',
@@ -191,7 +188,7 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
                       sx={{
                         width: 56,
                         height: 56,
-                        bgcolor: module.bgColor,
+                        bgcolor: 'transparent',
                         border: `2px solid ${alpha(module.color, 0.2)}`,
                       }}
                     >
@@ -210,21 +207,23 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
                             sx={{
                               height: 20,
                               fontSize: '0.7rem',
-                              bgcolor: alpha(module.color, 0.1),
+                              bgcolor: 'transparent',
                               color: module.color,
                               fontWeight: 600,
                               mb: 1,
+                              border: `1px solid ${alpha(module.color, 0.2)}`,
                             }}
                           />
                         </Box>
                         <IconButton
                           className="action-icon"
                           sx={{
-                            bgcolor: alpha(module.color, 0.1),
+                            bgcolor: 'transparent',
                             color: module.color,
                             transition: 'transform 0.2s',
+                            border: `1px solid ${alpha(module.color, 0.2)}`,
                             '&:hover': {
-                              bgcolor: alpha(module.color, 0.2),
+                              bgcolor: alpha(module.color, 0.05),
                             },
                           }}
                         >
@@ -242,7 +241,7 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
                             px: 2,
                             py: 0.5,
                             borderRadius: 1,
-                            bgcolor: alpha(module.color, 0.1),
+                            bgcolor: 'transparent',
                             border: `1px solid ${alpha(module.color, 0.2)}`,
                           }}
                         >
@@ -261,9 +260,10 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
                             sx={{
                               height: 24,
                               fontSize: '0.7rem',
-                              bgcolor: alpha('#10b981', 0.1),
+                              bgcolor: 'transparent',
                               color: '#10b981',
                               fontWeight: 600,
+                              border: `1px solid ${alpha('#10b981', 0.2)}`,
                             }}
                           />
                         )}

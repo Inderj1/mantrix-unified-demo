@@ -19,6 +19,7 @@ from src.api.stox_routes import router as stox_router
 from src.api.comms_routes import router as comms_router
 from src.api.comms_config_routes import router as comms_config_router
 from src.api.excel_processor_routes import router as excel_processor_router
+from src.api.pdf_extraction_routes import router as pdf_extraction_router
 
 # Configure structured logging
 structlog.configure(
@@ -133,6 +134,7 @@ app.include_router(stox_router)
 app.include_router(comms_router)
 app.include_router(comms_config_router)
 app.include_router(excel_processor_router)
+app.include_router(pdf_extraction_router, prefix="/api/v1/pdf")
 
 # Mount static files for generated outputs
 # Output directory is at project root, not backend

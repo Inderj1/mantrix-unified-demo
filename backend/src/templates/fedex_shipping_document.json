@@ -1,0 +1,27 @@
+{
+  "name": "FedEx Consolidated Invoice",
+  "description": "FedEx multi-page invoice with shipment summary and charges",
+  "required_fields": [
+    "invoice_number",
+    "invoice_date",
+    "account_number",
+    "total_fedex_express",
+    "total_other_charges"
+  ],
+  "optional_fields": [
+    "billing_address",
+    "total_pages",
+    "merchandise_sales_subtotal",
+    "electronic_export_information_subtotal",
+    "customer_level_fees_subtotal",
+    "fuel_surcharge_percentage",
+    "date_range_start",
+    "date_range_end",
+    "shipment_count_estimate",
+    "fedex_express_details",
+    "merchandise_sales_details",
+    "electronic_export_information_details",
+    "other_charges_details"
+  ],
+  "items_schema": null
+}
