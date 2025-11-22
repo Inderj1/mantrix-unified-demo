@@ -300,8 +300,8 @@ const UnifiedChatInterface = () => {
     
     return (
       <Box key={aiKey} sx={{ mb: 2 }}>
-        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-          <Avatar sx={{ bgcolor: config.color, width: 32, height: 32 }}>
+        <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
+          <Avatar sx={{ bgcolor: config.color, width: 36, height: 36 }}>
             {config.icon}
           </Avatar>
           <Typography variant="subtitle2" fontWeight="bold">
@@ -314,11 +314,11 @@ const UnifiedChatInterface = () => {
         
         {response.success ? (
           <>
-            <Typography variant="body2" sx={{ mb: 1 }}>
+            <Typography variant="body2" sx={{ mb: 1, ml: 5 }}>
               {response.message}
             </Typography>
             {response.sql && (
-              <Box sx={{ mt: 1 }}>
+              <Box sx={{ mt: 1, ml: 5 }}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
                   <Typography variant="caption" color="text.secondary">
                     Generated SQL
@@ -344,7 +344,7 @@ const UnifiedChatInterface = () => {
             )}
           </>
         ) : (
-          <Alert severity="error" sx={{ py: 0.5 }}>
+          <Alert severity="error" sx={{ py: 0.5, ml: 5 }}>
             {response.error || 'Failed to get response'}
           </Alert>
         )}

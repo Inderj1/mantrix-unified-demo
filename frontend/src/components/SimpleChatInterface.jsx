@@ -2374,7 +2374,7 @@ const SimpleChatInterface = () => {
               },
             },
           }}>
-          <Box sx={{ maxWidth: 1200, mx: 'auto', width: '100%' }}>
+          <Box sx={{ width: '100%' }}>
             {/* Empty state message - only show if truly empty (no welcome message) */}
             {messages.length === 0 && (
               <Box sx={{ textAlign: 'center', py: 4, opacity: 0.6 }}>
@@ -2417,7 +2417,7 @@ const SimpleChatInterface = () => {
 
         {/* Input Area - Fixed */}
         <Paper elevation={3} sx={{ p: 2, borderRadius: 0, flexShrink: 0 }}>
-          <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+          <Box sx={{ width: '100%' }}>
             <Stack direction="row" spacing={2}>
               <TextField
                 fullWidth
