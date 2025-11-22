@@ -38,7 +38,7 @@ const financeModules = [
     subtitle: 'Intelligent Budget Planning',
     description: 'Smart budget allocation, variance analysis, and rolling forecasts with GL account integration',
     icon: BudgetIcon,
-    color: '#4CAF50',
+    color: '#6a6d70',
     bgColor: '#E8F5E9',
     path: '/financeai/budget',
     stats: { label: 'Budget Lines', value: '156' },
@@ -50,7 +50,7 @@ const financeModules = [
     subtitle: 'Driver-Based Planning',
     description: 'Identify key business drivers, perform sensitivity analysis, and create driver-based forecasts',
     icon: DriverIcon,
-    color: '#FF9800',
+    color: '#354a5f',
     bgColor: '#FFF3E0',
     path: '/financeai/driver',
     stats: { label: 'Key Drivers', value: '24' },
@@ -62,7 +62,7 @@ const financeModules = [
     subtitle: 'Scenario Planning & What-If',
     description: 'Interactive scenario modeling, Monte Carlo simulations, and multi-scenario comparison',
     icon: ScenarioIcon,
-    color: '#9C27B0',
+    color: '#0a6ed1',
     bgColor: '#F3E5F5',
     path: '/financeai/scenario',
     stats: { label: 'Active Scenarios', value: '12' },
@@ -74,7 +74,7 @@ const financeModules = [
     subtitle: 'AI-Powered Business Insights',
     description: 'Automated insight generation, anomaly detection, and prescriptive recommendations',
     icon: InsightsIcon,
-    color: '#00BCD4',
+    color: '#1873b4',
     bgColor: '#E0F7FA',
     path: '/financeai/insights',
     stats: { label: 'Daily Insights', value: '45' },
@@ -100,7 +100,7 @@ const FinanceAILanding = ({ onTileClick }) => {
           fontWeight="bold" 
           sx={{ 
             mb: 1,
-            background: 'linear-gradient(45deg, #4CAF50 30%, #81C784 90%)',
+            background: 'linear-gradient(45deg, #6a6d70 30%, #81C784 90%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
           }}
@@ -113,7 +113,7 @@ const FinanceAILanding = ({ onTileClick }) => {
       </Box>
 
       {/* Tiles Grid */}
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
         {financeModules.map((module) => {
           const Icon = module.icon;
           const isActive = module.status === 'active';

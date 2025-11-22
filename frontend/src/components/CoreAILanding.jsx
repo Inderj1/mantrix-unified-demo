@@ -55,7 +55,7 @@ const aiModules = [
     subtitle: 'Fleet & Route Optimization',
     description: 'AI-powered fleet management, route optimization, and logistics intelligence',
     icon: FleetIcon,
-    color: '#FF9800',
+    color: '#354a5f',
     bgColor: '#fff3e0',
     path: '/coreai/route',
     stats: { label: 'Active Vehicles', value: '45' },
@@ -110,7 +110,7 @@ const CoreAILanding = ({ onTileClick }) => {
       </Box>
 
       {/* Tiles Grid */}
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
         {aiModules.map((module) => {
           const Icon = module.icon;
           const isActive = module.status === 'active';

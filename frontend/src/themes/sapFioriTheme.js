@@ -28,52 +28,52 @@ const sapColors = {
   sapTextColorLight: '#6a6d70',
   sapTextColorInverted: '#fff',
   
-  // Chart Colors (for AI dashboards)
-  sapChart1: '#5899da',
-  sapChart2: '#e8743b',
-  sapChart3: '#19a979',
-  sapChart4: '#ed4a7b',
-  sapChart5: '#945ecf',
-  sapChart6: '#13a4b4',
-  sapChart7: '#525df4',
-  sapChart8: '#bf3989',
-  sapChart9: '#6c8893',
-  sapChart10: '#ee6868',
+  // Chart Colors (Corporate Blue/Grey palette only)
+  sapChart1: '#0a6ed1', // Primary blue
+  sapChart2: '#354a5f', // Dark grey-blue
+  sapChart3: '#6a6d70', // Medium grey
+  sapChart4: '#1873b4', // Light blue
+  sapChart5: '#0854a0', // Dark blue
+  sapChart6: '#89919a', // Light grey
+  sapChart7: '#4d7ba8', // Blue-grey
+  sapChart8: '#32363a', // Charcoal
+  sapChart9: '#a9aeb3', // Silver grey
+  sapChart10: '#5f7d99', // Slate blue
 };
 
 // SAP Typography
 const sapTypography = {
-  fontFamily: '"Poppins", "72", "72full", Arial, Helvetica, sans-serif',
+  fontFamily: '"Segoe UI", "72", "72full", Arial, Helvetica, sans-serif',
   fontSize: 14,
   
-  // Headers
+  // Headers - more compact
   h1: {
-    fontSize: '2.25rem', // 36px
-    fontWeight: 300,
+    fontSize: '1.75rem', // 28px
+    fontWeight: 400,
     lineHeight: 1.2,
   },
   h2: {
-    fontSize: '1.875rem', // 30px
-    fontWeight: 300,
+    fontSize: '1.5rem', // 24px
+    fontWeight: 400,
     lineHeight: 1.3,
   },
   h3: {
-    fontSize: '1.5rem', // 24px
-    fontWeight: 400,
-    lineHeight: 1.4,
-  },
-  h4: {
     fontSize: '1.25rem', // 20px
     fontWeight: 400,
     lineHeight: 1.4,
   },
-  h5: {
+  h4: {
     fontSize: '1.125rem', // 18px
-    fontWeight: 400,
+    fontWeight: 500,
+    lineHeight: 1.4,
+  },
+  h5: {
+    fontSize: '1rem', // 16px
+    fontWeight: 500,
     lineHeight: 1.5,
   },
   h6: {
-    fontSize: '1rem', // 16px
+    fontSize: '0.938rem', // 15px
     fontWeight: 600,
     lineHeight: 1.5,
   },
@@ -142,9 +142,9 @@ export const sapFioriTheme = createTheme({
   },
   
   typography: sapTypography,
-  
-  spacing: 4, // Base spacing unit (4px)
-  
+
+  spacing: 4, // Base spacing unit (4px) - more compact
+
   shape: {
     borderRadius: 4, // SAP uses subtle rounded corners
   },
@@ -165,8 +165,9 @@ export const sapFioriTheme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 4,
-          padding: '8px 16px',
+          padding: '6px 12px',
           boxShadow: 'none',
+          fontSize: '0.813rem',
           '&:hover': {
             boxShadow: 'none',
           },
@@ -277,6 +278,34 @@ export const sapFioriTheme = createTheme({
         root: {
           borderRadius: 16,
           fontWeight: 400,
+          height: 24,
+          fontSize: '0.75rem',
+        },
+      },
+    },
+
+    // Card Content
+    MuiCardContent: {
+      styleOverrides: {
+        root: {
+          padding: 12,
+          '&:last-child': {
+            paddingBottom: 12,
+          },
+        },
+      },
+    },
+
+    // Table
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          padding: '8px 12px',
+          fontSize: '0.813rem',
+        },
+        head: {
+          fontWeight: 600,
+          backgroundColor: sapColors.sapBackgroundMedium,
         },
       },
     },

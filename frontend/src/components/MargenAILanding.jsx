@@ -35,11 +35,11 @@ const margenModules = [
     subtitle: 'Financial Performance',
     description: 'Top-line revenue performance, growth trends, and sales analysis by product, customer, channel, and region',
     icon: TrendingUpIcon,
-    color: '#10b981',
+    color: '#6a6d70',
     bgColor: '#d1fae5',
     stats: { label: 'Revenue', value: '$33.5M' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+    gradient: 'linear-gradient(135deg, #6a6d70 0%, #6a6d70 100%)',
   },
   {
     id: 'cost-cogs',
@@ -47,11 +47,11 @@ const margenModules = [
     subtitle: 'Financial Performance',
     description: 'Cost structure breakdown, COGS components, operating expenses, and cost optimization opportunities',
     icon: AccountBalanceIcon,
-    color: '#3b82f6',
+    color: '#0a6ed1',
     bgColor: '#dbeafe',
     stats: { label: 'COGS', value: '$23.3M' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+    gradient: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
   },
   {
     id: 'margin-profitability',
@@ -59,11 +59,11 @@ const margenModules = [
     subtitle: 'Financial Performance',
     description: 'Gross margin, operating margin, contribution analysis, and profitability by segment with margin waterfalls',
     icon: MoneyIcon,
-    color: '#8b5cf6',
+    color: '#354a5f',
     bgColor: '#f3e8ff',
     stats: { label: 'Gross Margin', value: '30.4%' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+    gradient: 'linear-gradient(135deg, #354a5f 0%, #32363a 100%)',
   },
   {
     id: 'pl-gl-explorer',
@@ -133,10 +133,10 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
             sx={{
               width: 64,
               height: 64,
-              bgcolor: alpha('#10b981', 0.1),
+              bgcolor: alpha('#6a6d70', 0.1),
             }}
           >
-            <AssessmentIcon sx={{ fontSize: 36, color: '#10b981' }} />
+            <AssessmentIcon sx={{ fontSize: 36, color: '#6a6d70' }} />
           </Avatar>
           <Box>
             <Typography variant="h4" fontWeight={700}>
@@ -150,9 +150,9 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
       </Box>
 
       {/* Module Tiles */}
-      <Grid container spacing={3} sx={{ maxWidth: 1400, mx: 'auto' }}>
+      <Grid container spacing={2} sx={{ maxWidth: 1400, mx: 'auto' }}>
         {margenModules.map((module, index) => (
-          <Grid item xs={12} md={index < 3 ? 4 : 6} key={module.id}>
+          <Grid item xs={12} sm={6} md={4} lg={4} key={module.id}>
             <Zoom in timeout={400 + index * 100}>
               <Card
                 sx={{
@@ -261,9 +261,9 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
                               height: 24,
                               fontSize: '0.7rem',
                               bgcolor: 'transparent',
-                              color: '#10b981',
+                              color: '#6a6d70',
                               fontWeight: 600,
-                              border: `1px solid ${alpha('#10b981', 0.2)}`,
+                              border: `1px solid ${alpha('#6a6d70', 0.2)}`,
                             }}
                           />
                         )}

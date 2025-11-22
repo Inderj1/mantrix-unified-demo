@@ -44,11 +44,11 @@ const dcSystemModules = [
     subtitle: 'DC Module 1',
     description: 'Aggregate demand forecasts from all store locations and channels for centralized planning',
     icon: TrendingUpIcon,
-    color: '#3b82f6',
+    color: '#0a6ed1',
     bgColor: '#dbeafe',
     stats: { label: 'Locations', value: '450' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+    gradient: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
     view: 'dc'
   },
   {
@@ -70,11 +70,11 @@ const dcSystemModules = [
     subtitle: 'DC Module 3',
     description: 'Optimize inventory positioning and allocation across distribution center network',
     icon: AnalyticsIcon,
-    color: '#10b981',
+    color: '#6a6d70',
     bgColor: '#d1fae5',
     stats: { label: 'SKUs', value: '12K' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+    gradient: 'linear-gradient(135deg, #6a6d70 0%, #6a6d70 100%)',
     view: 'dc'
   },
   {
@@ -83,11 +83,11 @@ const dcSystemModules = [
     subtitle: 'DC Module 4',
     description: 'Multi-level BOM management and component tracking for finished goods assembly',
     icon: AccountTreeIcon,
-    color: '#8b5cf6',
+    color: '#354a5f',
     bgColor: '#f3e8ff',
     stats: { label: 'BOMs', value: '2.1K' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+    gradient: 'linear-gradient(135deg, #354a5f 0%, #32363a 100%)',
     view: 'dc'
   },
   {
@@ -138,11 +138,11 @@ const storeSystemModules = [
     subtitle: 'Tile 0',
     description: 'Compare AI models (ARIMA, ETS, ML), override forecasts, and confirm baseline for Tile 1',
     icon: ScienceIcon,
-    color: '#8b5cf6',
+    color: '#354a5f',
     bgColor: '#f3e8ff',
     stats: { label: 'Models', value: '3' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+    gradient: 'linear-gradient(135deg, #354a5f 0%, #32363a 100%)',
     view: 'store'
   },
   {
@@ -151,11 +151,11 @@ const storeSystemModules = [
     subtitle: 'Tile 1',
     description: 'Confirmed forecast baseline with volatility, price, cost, and margin data for inventory planning',
     icon: TrendingUpIcon,
-    color: '#3b82f6',
+    color: '#0a6ed1',
     bgColor: '#dbeafe',
     stats: { label: 'Forecasts', value: '36' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+    gradient: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
     view: 'store'
   },
   {
@@ -164,11 +164,11 @@ const storeSystemModules = [
     subtitle: 'Tile 2',
     description: 'Measure inventory adequacy vs. forecast, compute safety stock, ROP, and stockout risk',
     icon: ShowChartIcon,
-    color: '#10b981',
+    color: '#6a6d70',
     bgColor: '#d1fae5',
     stats: { label: 'Items', value: '36' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+    gradient: 'linear-gradient(135deg, #6a6d70 0%, #6a6d70 100%)',
     view: 'store'
   },
   {
@@ -190,11 +190,11 @@ const storeSystemModules = [
     subtitle: 'Tile 4',
     description: 'Match store demand to best DC based on availability, freight cost, ETA - create STO/PR in SAP',
     icon: LocalShippingIcon,
-    color: '#2563eb',
+    color: '#0854a0',
     bgColor: '#dbeafe',
     stats: { label: 'STOs', value: '36' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+    gradient: 'linear-gradient(135deg, #0854a0 0%, #1d4ed8 100%)',
     view: 'store'
   },
 ];
@@ -304,7 +304,7 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView = nu
                   cursor: 'pointer',
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   border: '1px solid',
-                  borderColor: alpha('#3b82f6', 0.2),
+                  borderColor: alpha('#0a6ed1', 0.2),
                   borderRadius: 2,
                   overflow: 'hidden',
                   background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.02) 0%, rgba(255, 255, 255, 1) 100%)',
@@ -316,19 +316,19 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView = nu
                     left: 0,
                     right: 0,
                     height: '3px',
-                    background: 'linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)',
+                    background: 'linear-gradient(90deg, #0a6ed1 0%, #0854a0 100%)',
                   },
                   '&:hover': {
                     transform: 'translateY(-6px)',
                     boxShadow: '0 12px 32px rgba(59, 130, 246, 0.2)',
-                    borderColor: '#3b82f6',
+                    borderColor: '#0a6ed1',
                     '& .category-icon': {
                       transform: 'scale(1.1)',
-                      bgcolor: '#3b82f6',
+                      bgcolor: '#0a6ed1',
                       color: 'white',
                     },
                     '& .access-button': {
-                      background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                      background: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
                       color: 'white',
                       transform: 'translateX(4px)',
                     },
@@ -344,8 +344,8 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView = nu
                       sx={{
                         width: 56,
                         height: 56,
-                        bgcolor: alpha('#3b82f6', 0.1),
-                        color: '#3b82f6',
+                        bgcolor: alpha('#0a6ed1', 0.1),
+                        color: '#0a6ed1',
                         transition: 'all 0.3s ease',
                       }}
                     >
@@ -355,8 +355,8 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView = nu
                       label="4 Modules"
                       size="small"
                       sx={{
-                        bgcolor: alpha('#3b82f6', 0.1),
-                        color: '#3b82f6',
+                        bgcolor: alpha('#0a6ed1', 0.1),
+                        color: '#0a6ed1',
                         fontWeight: 600,
                         fontSize: '0.7rem',
                         height: 24,
@@ -365,7 +365,7 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView = nu
                   </Box>
 
                   {/* Title */}
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: '#3b82f6', mb: 1, fontSize: '1.1rem', letterSpacing: '-0.3px' }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: '#0a6ed1', mb: 1, fontSize: '1.1rem', letterSpacing: '-0.3px' }}>
                     Store Level View
                   </Typography>
 
@@ -375,8 +375,8 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView = nu
                   </Typography>
 
                   {/* Footer */}
-                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: 2, pt: 2, borderTop: '1px solid', borderColor: alpha('#3b82f6', 0.1) }}>
-                    <Box className="access-button" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, bgcolor: alpha('#3b82f6', 0.1), color: '#3b82f6', px: 1.5, py: 0.5, borderRadius: 1, fontWeight: 600, fontSize: '0.75rem', transition: 'all 0.3s ease' }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: 2, pt: 2, borderTop: '1px solid', borderColor: alpha('#0a6ed1', 0.1) }}>
+                    <Box className="access-button" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, bgcolor: alpha('#0a6ed1', 0.1), color: '#0a6ed1', px: 1.5, py: 0.5, borderRadius: 1, fontWeight: 600, fontSize: '0.75rem', transition: 'all 0.3s ease' }}>
                       ENTER
                       <ArrowForwardIcon sx={{ fontSize: 14 }} />
                     </Box>
@@ -526,7 +526,7 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView = nu
 
   // Show module tiles for selected view
   const isStoreView = selectedView === 'store';
-  const systemColor = isStoreView ? '#3b82f6' : '#64748b';
+  const systemColor = isStoreView ? '#0a6ed1' : '#64748b';
   const systemBg = isStoreView ? 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)' : 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)';
 
   return (
@@ -561,7 +561,7 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView = nu
           <Box sx={{
             width: 4,
             height: 60,
-            background: isStoreView ? 'linear-gradient(180deg, #3b82f6 0%, #2563eb 100%)' : 'linear-gradient(180deg, #64748b 0%, #475569 100%)',
+            background: isStoreView ? 'linear-gradient(180deg, #0a6ed1 0%, #0854a0 100%)' : 'linear-gradient(180deg, #64748b 0%, #475569 100%)',
             borderRadius: 2
           }} />
           <Box>
