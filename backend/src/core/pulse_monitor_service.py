@@ -6,7 +6,8 @@ Leverages existing NLP-to-SQL framework for user-configurable agent execution.
 import uuid
 import json
 from typing import Dict, List, Any, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
+from decimal import Decimal
 import structlog
 from ..db.postgresql_client import PostgreSQLClient
 from ..db.bigquery import BigQueryClient
@@ -14,6 +15,21 @@ from .sql_generator import SQLGenerator
 from .llm_client import LLMClient
 
 logger = structlog.get_logger()
+
+
+def serialize_for_json(obj):
+    """Recursively serialize objects for JSON, handling Decimal types"""
+    if isinstance(obj, Decimal):
+        return float(obj)
+    elif isinstance(obj, (datetime, date)):
+        return obj.isoformat()
+    elif isinstance(obj, dict):
+        return {k: serialize_for_json(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [serialize_for_json(item) for item in obj]
+    elif hasattr(obj, '__dict__'):
+        return serialize_for_json(obj.__dict__)
+    return obj
 
 
 class PulseMonitorService:
@@ -486,13 +502,16 @@ class PulseMonitorService:
         RETURNING id
         """
 
+        # Serialize alert_data to handle Decimal types
+        serialized_data = serialize_for_json(alert_data)
+
         params = (
             alert_id,
             monitor['id'],
             monitor['severity'],
             title,
             message,
-            json.dumps(alert_data),
+            json.dumps(serialized_data),
             'active'
         )
 
@@ -635,9 +654,11 @@ class PulseMonitorService:
             last_result = %s
         WHERE id = %s
         """
+        # Serialize results to handle Decimal types
+        serialized_results = serialize_for_json(results[:5])
         self.pg_client.execute_query(
             query,
-            (next_run, json.dumps(results[:5]), monitor_id)  # Store first 5 results
+            (next_run, json.dumps(serialized_results), monitor_id)  # Store first 5 results
         )
 
     def _log_execution(
