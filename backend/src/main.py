@@ -7,6 +7,7 @@ from src.config import settings
 import os
 from src.api.routes import router
 from src.api.margen_routes import router as margen_router
+from src.api.margen_csg_routes import router as margen_csg_router
 from src.api.conversation_routes import router as conversation_router
 from src.api.vision_routes import router as vision_router
 from src.api.pulse_routes import router as pulse_router
@@ -20,6 +21,7 @@ from src.api.comms_routes import router as comms_router
 from src.api.comms_config_routes import router as comms_config_router
 from src.api.excel_processor_routes import router as excel_processor_router
 from src.api.pdf_extraction_routes import router as pdf_extraction_router
+from src.api.command_tower_routes import router as command_tower_router
 
 # Configure structured logging
 structlog.configure(
@@ -122,6 +124,7 @@ app.add_middleware(
 # Include API routes
 app.include_router(router, prefix="/api/v1")
 app.include_router(margen_router)
+app.include_router(margen_csg_router)
 app.include_router(conversation_router)
 app.include_router(vision_router)
 app.include_router(pulse_router)
@@ -135,6 +138,7 @@ app.include_router(comms_router)
 app.include_router(comms_config_router)
 app.include_router(excel_processor_router)
 app.include_router(pdf_extraction_router, prefix="/api/v1/pdf")
+app.include_router(command_tower_router)
 
 # Mount static files for generated outputs
 # Output directory is at project root, not backend

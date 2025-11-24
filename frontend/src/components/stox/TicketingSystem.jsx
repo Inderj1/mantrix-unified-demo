@@ -25,18 +25,36 @@ const TicketingSystem = ({ onBack }) => {
   const [statusFilter, setStatusFilter] = useState('All');
   const [typeFilter, setTypeFilter] = useState('All');
   const [priorityFilter, setPriorityFilter] = useState('All');
+  const [moduleFilter, setModuleFilter] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
 
-  const { tickets, loading, refresh } = useTickets({
+  // Filter tickets by module on frontend
+  const { tickets: allTickets, loading, refresh } = useTickets({
     status: statusFilter,
     type: typeFilter,
     priority: priorityFilter,
     searchTerm: searchTerm,
   });
+
+  const tickets = moduleFilter === 'All'
+    ? allTickets
+    : allTickets.filter(t => t.source_module === moduleFilter);
+
+  // Helper function to format ticket ID
+  const formatTicketId = (ticket) => {
+    const modulePrefix = {
+      'MARGEN.AI': 'MARGEN',
+      'REVEQ.AI': 'REVEQ',
+      'Enterprise Pulse': 'PULSE',
+      'STOX.AI': 'STOX',
+    };
+    const prefix = modulePrefix[ticket.source_module] || 'TKT';
+    return `TKT-${prefix}-${String(ticket.ticket_id).padStart(4, '0')}`;
+  };
 
   // Debug logging
   useEffect(() => {
@@ -77,13 +95,53 @@ const TicketingSystem = ({ onBack }) => {
     {
       field: 'ticket_id',
       headerName: 'Ticket ID',
-      minWidth: 150,
+      minWidth: 180,
       flex: 1,
       renderCell: (params) => (
-        <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600, color: '#3b82f6' }}>
-          {params.value}
+        <Typography
+          variant="body2"
+          sx={{
+            fontFamily: 'monospace',
+            fontWeight: 700,
+            color: '#3b82f6',
+            fontSize: '0.85rem',
+            cursor: 'pointer',
+            textDecoration: 'underline',
+            '&:hover': {
+              color: '#1e40af',
+            }
+          }}
+          onClick={() => handleViewDetails(params.row)}
+        >
+          {formatTicketId(params.row)}
         </Typography>
       ),
+    },
+    {
+      field: 'source_module',
+      headerName: 'Module',
+      minWidth: 140,
+      flex: 0.8,
+      renderCell: (params) => {
+        const moduleColors = {
+          'MARGEN.AI': '#1976d2',
+          'REVEQ.AI': '#9c27b0',
+          'Enterprise Pulse': '#ef4444',
+          'STOX.AI': '#10b981',
+        };
+        return (
+          <Chip
+            label={params.value}
+            size="small"
+            sx={{
+              bgcolor: alpha(moduleColors[params.value] || '#64748b', 0.1),
+              color: moduleColors[params.value] || '#64748b',
+              fontWeight: 600,
+              fontSize: '0.7rem',
+            }}
+          />
+        );
+      },
     },
     {
       field: 'ticket_type',
@@ -96,12 +154,26 @@ const TicketingSystem = ({ onBack }) => {
           'FORECAST_OVERRIDE': '#8b5cf6',
           'FINANCIAL_APPROVAL': '#f59e0b',
           'SUPPLIER_ORDER': '#10b981',
+          'MARGEN_ANALYSIS': '#1976d2',
+          'MARGEN_REPORT': '#0d47a1',
+          'REVEQ_MAINTENANCE': '#9c27b0',
+          'REVEQ_UTILIZATION': '#7b1fa2',
+          'PULSE_AGENT_EXEC': '#ef4444',
+          'PULSE_ALERT': '#f97316',
+          'PULSE_CONFIG': '#64748b',
         };
         const typeLabels = {
           'STO_CREATION': 'STO/PR Creation',
           'FORECAST_OVERRIDE': 'Forecast Override',
           'FINANCIAL_APPROVAL': 'Financial Approval',
           'SUPPLIER_ORDER': 'Supplier Order',
+          'MARGEN_ANALYSIS': 'MARGEN Analysis',
+          'MARGEN_REPORT': 'MARGEN Report',
+          'REVEQ_MAINTENANCE': 'REVEQ Maintenance',
+          'REVEQ_UTILIZATION': 'REVEQ Utilization',
+          'PULSE_AGENT_EXEC': 'Pulse Agent Execution',
+          'PULSE_ALERT': 'Pulse Alert',
+          'PULSE_CONFIG': 'Pulse Configuration',
         };
         return (
           <Chip
@@ -118,13 +190,35 @@ const TicketingSystem = ({ onBack }) => {
       },
     },
     {
-      field: 'source_tile',
-      headerName: 'Source Tile',
-      minWidth: 200,
-      flex: 1.5,
+      field: 'title',
+      headerName: 'Operation Title',
+      minWidth: 250,
+      flex: 2,
       renderCell: (params) => (
-        <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
+        <Typography variant="body2" sx={{ fontSize: '0.8rem', fontWeight: 600 }}>
           {params.value}
+        </Typography>
+      ),
+    },
+    {
+      field: 'description',
+      headerName: 'Description',
+      minWidth: 280,
+      flex: 2.5,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+          {params.value}
+        </Typography>
+      ),
+    },
+    {
+      field: 'user_name',
+      headerName: 'User/Agent',
+      minWidth: 150,
+      flex: 1,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ fontSize: '0.75rem' }}>
+          {params.value || 'System'}
         </Typography>
       ),
     },
@@ -185,16 +279,15 @@ const TicketingSystem = ({ onBack }) => {
       },
     },
     {
-      field: 'created_date',
-      headerName: 'Created',
+      field: 'created_at',
+      headerName: 'Timestamp',
       minWidth: 160,
       flex: 1.2,
       renderCell: (params) => (
-        <Typography variant="body2" sx={{ fontSize: '0.75rem' }}>
+        <Typography variant="body2" sx={{ fontSize: '0.75rem', fontFamily: 'monospace' }}>
           {new Date(params.value).toLocaleString('en-US', {
             month: 'short',
             day: 'numeric',
-            year: 'numeric',
             hour: '2-digit',
             minute: '2-digit',
           })}
@@ -312,10 +405,10 @@ const TicketingSystem = ({ onBack }) => {
           <FilterListIcon sx={{ color: 'text.secondary' }} />
           <TextField
             size="small"
-            placeholder="Search by Ticket ID, Store, SKU..."
+            placeholder="Search operations, users, descriptions..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            sx={{ minWidth: 300 }}
+            sx={{ minWidth: 320 }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -325,6 +418,33 @@ const TicketingSystem = ({ onBack }) => {
             }}
           />
           <FormControl size="small" sx={{ minWidth: 150 }}>
+            <InputLabel>Module</InputLabel>
+            <Select value={moduleFilter} onChange={(e) => setModuleFilter(e.target.value)} label="Module">
+              <MenuItem value="All">All Modules</MenuItem>
+              <MenuItem value="MARGEN.AI">MARGEN.AI</MenuItem>
+              <MenuItem value="REVEQ.AI">REVEQ.AI</MenuItem>
+              <MenuItem value="Enterprise Pulse">Enterprise Pulse</MenuItem>
+              <MenuItem value="STOX.AI">STOX.AI</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl size="small" sx={{ minWidth: 150 }}>
+            <InputLabel>Type</InputLabel>
+            <Select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} label="Type">
+              <MenuItem value="All">All Types</MenuItem>
+              <MenuItem value="MARGEN_ANALYSIS">MARGEN Analysis</MenuItem>
+              <MenuItem value="MARGEN_REPORT">MARGEN Report</MenuItem>
+              <MenuItem value="REVEQ_MAINTENANCE">REVEQ Maintenance</MenuItem>
+              <MenuItem value="REVEQ_UTILIZATION">REVEQ Utilization</MenuItem>
+              <MenuItem value="PULSE_AGENT_EXEC">Pulse Agent Exec</MenuItem>
+              <MenuItem value="PULSE_ALERT">Pulse Alert</MenuItem>
+              <MenuItem value="PULSE_CONFIG">Pulse Config</MenuItem>
+              <MenuItem value="STO_CREATION">STO Creation</MenuItem>
+              <MenuItem value="FORECAST_OVERRIDE">Forecast Override</MenuItem>
+              <MenuItem value="FINANCIAL_APPROVAL">Financial Approval</MenuItem>
+              <MenuItem value="SUPPLIER_ORDER">Supplier Order</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl size="small" sx={{ minWidth: 130 }}>
             <InputLabel>Status</InputLabel>
             <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} label="Status">
               <MenuItem value="All">All Statuses</MenuItem>
@@ -335,22 +455,13 @@ const TicketingSystem = ({ onBack }) => {
               <MenuItem value="Cancelled">Cancelled</MenuItem>
             </Select>
           </FormControl>
-          <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>Type</InputLabel>
-            <Select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} label="Type">
-              <MenuItem value="All">All Types</MenuItem>
-              <MenuItem value="STO_CREATION">STO/PR Creation</MenuItem>
-              <MenuItem value="FORECAST_OVERRIDE">Forecast Override</MenuItem>
-              <MenuItem value="FINANCIAL_APPROVAL">Financial Approval</MenuItem>
-              <MenuItem value="SUPPLIER_ORDER">Supplier Order</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl size="small" sx={{ minWidth: 130 }}>
+          <FormControl size="small" sx={{ minWidth: 120 }}>
             <InputLabel>Priority</InputLabel>
             <Select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)} label="Priority">
-              <MenuItem value="All">All Priorities</MenuItem>
+              <MenuItem value="All">All</MenuItem>
+              <MenuItem value="Critical">Critical</MenuItem>
               <MenuItem value="High">High</MenuItem>
-              <MenuItem value="Normal">Normal</MenuItem>
+              <MenuItem value="Medium">Medium</MenuItem>
               <MenuItem value="Low">Low</MenuItem>
             </Select>
           </FormControl>
@@ -403,10 +514,10 @@ const TicketingSystem = ({ onBack }) => {
             <TicketIcon sx={{ color: '#3b82f6' }} />
             <Box>
               <Typography variant="h6" fontWeight={700}>
-                Ticket Details
+                Operation Details
               </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {selectedTicket?.ticket_id}
+              <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+                {selectedTicket && formatTicketId(selectedTicket)}
               </Typography>
             </Box>
           </Stack>
@@ -442,37 +553,37 @@ const TicketingSystem = ({ onBack }) => {
               <Table size="small">
                 <TableBody>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600, width: '30%' }}>Source Tile</TableCell>
-                    <TableCell>{selectedTicket.source_tile}</TableCell>
+                    <TableCell sx={{ fontWeight: 600, width: '30%' }}>Module</TableCell>
+                    <TableCell>{selectedTicket.source_module}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600 }}>Created By</TableCell>
-                    <TableCell>{selectedTicket.created_by}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Source Tile</TableCell>
+                    <TableCell>{selectedTicket.source_tile || 'N/A'}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600 }}>Created Date</TableCell>
-                    <TableCell>{new Date(selectedTicket.created_date).toLocaleString()}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Title</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{selectedTicket.title}</TableCell>
                   </TableRow>
-                  {selectedTicket.completion_date && (
-                    <TableRow>
-                      <TableCell sx={{ fontWeight: 600 }}>Completion Date</TableCell>
-                      <TableCell>{new Date(selectedTicket.completion_date).toLocaleString()}</TableCell>
-                    </TableRow>
-                  )}
-                  {selectedTicket.execution_time_ms && (
-                    <TableRow>
-                      <TableCell sx={{ fontWeight: 600 }}>Execution Time</TableCell>
-                      <TableCell>{(selectedTicket.execution_time_ms / 1000).toFixed(2)} seconds</TableCell>
-                    </TableRow>
-                  )}
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600 }}>Action Taken</TableCell>
-                    <TableCell>{selectedTicket.action_taken}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Description</TableCell>
+                    <TableCell>{selectedTicket.description}</TableCell>
                   </TableRow>
-                  {selectedTicket.result && (
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 600 }}>User/Agent</TableCell>
+                    <TableCell>{selectedTicket.user_name || 'System'}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 600 }}>Created</TableCell>
+                    <TableCell>{new Date(selectedTicket.created_at).toLocaleString()}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 600 }}>Last Updated</TableCell>
+                    <TableCell>{new Date(selectedTicket.updated_at).toLocaleString()}</TableCell>
+                  </TableRow>
+                  {selectedTicket.completed_at && (
                     <TableRow>
-                      <TableCell sx={{ fontWeight: 600 }}>Result</TableCell>
-                      <TableCell>{selectedTicket.result}</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>Completed</TableCell>
+                      <TableCell>{new Date(selectedTicket.completed_at).toLocaleString()}</TableCell>
                     </TableRow>
                   )}
                 </TableBody>
@@ -480,41 +591,32 @@ const TicketingSystem = ({ onBack }) => {
 
               <Divider sx={{ my: 2 }} />
 
-              {/* Metadata */}
+              {/* Operational Metadata */}
               <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>
-                Metadata
+                Operational Details
               </Typography>
-              <Box sx={{ bgcolor: alpha('#64748b', 0.05), p: 2, borderRadius: 1 }}>
-                <Table size="small">
-                  <TableBody>
-                    {selectedTicket.metadata && Object.entries(selectedTicket.metadata).map(([key, value]) => (
-                      <TableRow key={key}>
-                        <TableCell sx={{ fontWeight: 600, width: '40%', border: 'none', py: 0.5 }}>
-                          {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                        </TableCell>
-                        <TableCell sx={{ border: 'none', py: 0.5 }}>
-                          {typeof value === 'number' ? value.toLocaleString() : value}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Box>
-
-              {/* Notes */}
-              {selectedTicket.notes && (
-                <>
-                  <Divider sx={{ my: 2 }} />
-                  <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>
-                    Notes
+              <Box sx={{ bgcolor: alpha('#3b82f6', 0.05), p: 2, borderRadius: 1, border: '1px solid', borderColor: alpha('#3b82f6', 0.2) }}>
+                {selectedTicket.metadata && Object.keys(selectedTicket.metadata).length > 0 ? (
+                  <Table size="small">
+                    <TableBody>
+                      {Object.entries(selectedTicket.metadata).map(([key, value]) => (
+                        <TableRow key={key}>
+                          <TableCell sx={{ fontWeight: 600, width: '40%', border: 'none', py: 0.5 }}>
+                            {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          </TableCell>
+                          <TableCell sx={{ border: 'none', py: 0.5, fontFamily: typeof value === 'number' ? 'monospace' : 'inherit' }}>
+                            {typeof value === 'number' ? value.toLocaleString() : String(value)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                    No additional operational details available
                   </Typography>
-                  <Paper elevation={0} sx={{ p: 2, bgcolor: alpha('#f59e0b', 0.05), border: '1px solid', borderColor: alpha('#f59e0b', 0.2) }}>
-                    <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-                      {selectedTicket.notes}
-                    </Typography>
-                  </Paper>
-                </>
-              )}
+                )}
+              </Box>
             </Box>
           )}
         </DialogContent>
@@ -528,7 +630,7 @@ const TicketingSystem = ({ onBack }) => {
         <DialogTitle>Cancel Ticket</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Are you sure you want to cancel ticket <strong>{selectedTicket?.ticket_id}</strong>?
+            Are you sure you want to cancel operation <strong>{selectedTicket && formatTicketId(selectedTicket)}</strong>?
           </Typography>
           <TextField
             fullWidth

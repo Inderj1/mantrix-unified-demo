@@ -111,10 +111,12 @@ const CoreAILanding = ({ onTileClick }) => {
 
       {/* Tiles Grid */}
       <Grid container spacing={2}>
-        {aiModules.map((module) => {
+        {aiModules
+          .filter((module) => module.id !== 'route')
+          .map((module) => {
           const Icon = module.icon;
           const isActive = module.status === 'active';
-          
+
           return (
             <Grid item xs={12} sm={6} md={6} key={module.id}>
               <Card
