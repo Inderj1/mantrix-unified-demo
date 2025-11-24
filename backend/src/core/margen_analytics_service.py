@@ -10,10 +10,17 @@ logger = structlog.get_logger()
 
 class MargenAnalyticsService(PostgreSQLClient):
     """Extended PostgreSQL client focused on margin analysis and profitability insights"""
-    
+
     def __init__(self):
-        super().__init__()
-        logger.info("MargenAI Analytics Service initialized")
+        # Use mantrix_nexxt database on port 5433
+        super().__init__(
+            host="localhost",
+            port=5433,
+            user="mantrix",
+            password="mantrix123",
+            database="mantrix_nexxt"
+        )
+        logger.info("MargenAI Analytics Service initialized (mantrix_nexxt on port 5433)")
     
     def get_product_margin_overview(self, limit: int = 100, offset: int = 0) -> List[Dict[str, Any]]:
         """Get product-level margin analysis for main table"""

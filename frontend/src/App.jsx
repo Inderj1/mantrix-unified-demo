@@ -13,6 +13,7 @@ import UserProfileManager from './components/UserProfileManager';
 import CommsConfig from './components/CommsConfig';
 import ProtectedRoute from './components/ProtectedRoute';
 import { initializeSettings } from './utils/initializeSettings';
+import AgentConfigPage from './components/pulse/AgentConfigPage';
 
 // Temporary simple pages
 const HistoryPage = () => (
@@ -66,6 +67,7 @@ function App() {
             <Route path="/profile" element={<UserProfileManager />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
             <Route path="/comms/config" element={<CommsConfig />} />
+            <Route path="/pulse/agent/:agentId" element={<AgentConfigPage />} />
           </Routes>
         </Layout>
       </Box>
@@ -155,6 +157,14 @@ function App() {
               element={
                 <ProtectedRoute routePath="/comms/config">
                   <CommsConfig />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/pulse/agent/:agentId"
+              element={
+                <ProtectedRoute routePath="/pulse/agent/:agentId">
+                  <AgentConfigPage />
                 </ProtectedRoute>
               }
             />

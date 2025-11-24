@@ -15,7 +15,13 @@ router = APIRouter(prefix="/api/v1/margen", tags=["margen-analytics"])
 # Initialize services
 margen_service = MargenAnalyticsService()
 chat_service = MargenChatService()
-pg_client = PostgreSQLClient(database="customer_analytics")
+pg_client = PostgreSQLClient(
+    host="localhost",
+    port=5433,
+    user="mantrix",
+    password="mantrix123",
+    database="mantrix_nexxt"
+)
 
 
 # Request/Response models for chat

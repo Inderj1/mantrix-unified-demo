@@ -15,6 +15,8 @@ class EventExtractor:
 
     def __init__(self):
         self.bq_client = BigQueryClient()
+        from ...db.postgresql_client import PostgreSQLClient
+        self.pg_client = PostgreSQLClient(database="mantrix_nexxt")
 
     def extract_o2c_events(
         self,
@@ -220,6 +222,194 @@ class EventExtractor:
         logger.info("Q2C uses O2C data - extend with quote/proposal data when available")
         return self.extract_o2c_events(date_from, date_to, filters)
 
+    def extract_consignment_kit_events(
+        self,
+        date_from: str,
+        date_to: str,
+        filters: Optional[Dict[str, Any]] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Extract Consignment Kit Management events from PostgreSQL
+
+        Args:
+            date_from: Start date (YYYY-MM-DD)
+            date_to: End date (YYYY-MM-DD)
+            filters: Optional filters (hospital, distributor, kit_type, etc.)
+
+        Returns:
+            List of events with structure:
+            - case_id: Kit ID
+            - activity: Activity name
+            - timestamp: Activity timestamp
+            - resource: Owner (Hospital/Distributor/FedEx)
+            - attributes: Additional contextual data
+        """
+        logger.info(f"Extracting Consignment Kit events from {date_from} to {date_to}")
+
+        try:
+            # Build filter clause
+            filter_clause = ""
+            params = [date_from, date_to]
+
+            if filters:
+                conditions = []
+                if filters.get('hospital'):
+                    conditions.append(f"hospital_name LIKE %s")
+                    params.append(f"%{filters['hospital']}%")
+                if filters.get('distributor'):
+                    conditions.append(f"distributor_name LIKE %s")
+                    params.append(f"%{filters['distributor']}%")
+                if filters.get('kit_type'):
+                    conditions.append(f"kit_type = %s")
+                    params.append(filters['kit_type'])
+
+                if conditions:
+                    filter_clause = " AND " + " AND ".join(conditions)
+
+            # Extract events from consignment_kit_process_steps table
+            query = f"""
+            SELECT
+                s.kit_id as case_id,
+                s.step_name as activity,
+                COALESCE(s.completed_at, s.started_at, s.created_at) as timestamp,
+                s.owner as resource,
+                json_build_object(
+                    'hospital', k.hospital_name,
+                    'distributor', k.distributor_name,
+                    'kit_type', k.kit_type,
+                    'step_number', s.step_number,
+                    'duration_hours', s.duration_hours,
+                    'status', s.status
+                )::text as attributes
+            FROM consignment_kit_process_steps s
+            JOIN consignment_kit_tracking k ON s.kit_id = k.kit_id
+            WHERE COALESCE(s.completed_at, s.started_at, s.created_at) >= %s
+            AND COALESCE(s.completed_at, s.started_at, s.created_at) <= %s
+            {filter_clause}
+            ORDER BY s.kit_id, s.step_number, timestamp
+            """
+
+            results = self.pg_client.execute_query(query, tuple(params))
+
+            events = []
+            for row in results:
+                # Parse JSON string attributes
+                import json
+                try:
+                    attributes = json.loads(row['attributes']) if row.get('attributes') else {}
+                except:
+                    attributes = {}
+
+                event = {
+                    'case_id': row['case_id'],
+                    'activity': row['activity'],
+                    'timestamp': row['timestamp'].isoformat() if isinstance(row['timestamp'], datetime) else row['timestamp'],
+                    'resource': row['resource'] or 'System',
+                    'attributes': attributes
+                }
+                events.append(event)
+
+            logger.info(f"Extracted {len(events)} events for {len(set(e['case_id'] for e in events))} cases")
+            return events
+
+        except Exception as e:
+            logger.error(f"Error extracting Consignment Kit events: {e}")
+            raise
+
+    def extract_loaner_process_events(
+        self,
+        date_from: str,
+        date_to: str,
+        filters: Optional[Dict[str, Any]] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Extract Loaner Process events from PostgreSQL
+
+        Args:
+            date_from: Start date (YYYY-MM-DD)
+            date_to: End date (YYYY-MM-DD)
+            filters: Optional filters (hospital, distributor, equipment_type, etc.)
+
+        Returns:
+            List of events with structure:
+            - case_id: Loaner ID
+            - activity: Activity name
+            - timestamp: Activity timestamp
+            - resource: Owner (Hospital/Distributor/FedEx/Both)
+            - attributes: Additional contextual data
+        """
+        logger.info(f"Extracting Loaner Process events from {date_from} to {date_to}")
+
+        try:
+            # Build filter clause
+            filter_clause = ""
+            params = [date_from, date_to]
+
+            if filters:
+                conditions = []
+                if filters.get('hospital'):
+                    conditions.append(f"hospital_name LIKE %s")
+                    params.append(f"%{filters['hospital']}%")
+                if filters.get('distributor'):
+                    conditions.append(f"distributor_name LIKE %s")
+                    params.append(f"%{filters['distributor']}%")
+                if filters.get('equipment_type'):
+                    conditions.append(f"equipment_type = %s")
+                    params.append(filters['equipment_type'])
+
+                if conditions:
+                    filter_clause = " AND " + " AND ".join(conditions)
+
+            # Extract events from loaner_process_steps table
+            query = f"""
+            SELECT
+                s.loaner_id as case_id,
+                s.step_name as activity,
+                COALESCE(s.completed_at, s.started_at, s.created_at) as timestamp,
+                s.owner as resource,
+                json_build_object(
+                    'hospital', l.hospital_name,
+                    'distributor', l.distributor_name,
+                    'equipment_type', l.equipment_type,
+                    'step_number', s.step_number,
+                    'duration_hours', s.duration_hours,
+                    'status', s.status
+                )::text as attributes
+            FROM loaner_process_steps s
+            JOIN loaner_process_tracking l ON s.loaner_id = l.loaner_id
+            WHERE COALESCE(s.completed_at, s.started_at, s.created_at) >= %s
+            AND COALESCE(s.completed_at, s.started_at, s.created_at) <= %s
+            {filter_clause}
+            ORDER BY s.loaner_id, s.step_number, timestamp
+            """
+
+            results = self.pg_client.execute_query(query, tuple(params))
+
+            events = []
+            for row in results:
+                # Parse JSON string attributes
+                import json
+                try:
+                    attributes = json.loads(row['attributes']) if row.get('attributes') else {}
+                except:
+                    attributes = {}
+
+                event = {
+                    'case_id': row['case_id'],
+                    'activity': row['activity'],
+                    'timestamp': row['timestamp'].isoformat() if isinstance(row['timestamp'], datetime) else row['timestamp'],
+                    'resource': row['resource'] or 'System',
+                    'attributes': attributes
+                }
+                events.append(event)
+
+            logger.info(f"Extracted {len(events)} events for {len(set(e['case_id'] for e in events))} cases")
+            return events
+
+        except Exception as e:
+            logger.error(f"Error extracting Loaner Process events: {e}")
+            raise
+
     def get_available_processes(self) -> List[Dict[str, Any]]:
         """
         Return list of processes that can be mined from available data
@@ -238,6 +428,46 @@ class EventExtractor:
                     'Invoice Generated'
                 ],
                 'data_source': 'sales_order_cockpit_export',
+                'supported': True
+            },
+            {
+                'id': 'consignment-kit',
+                'name': 'Consignment Kit Management',
+                'description': 'Hospital-distributor consignment kit lifecycle tracking',
+                'activities': [
+                    'Kit Request',
+                    'Transfer Order',
+                    'Pick & Ship DC',
+                    'Kit in Transit',
+                    'Receipt',
+                    'Surgery',
+                    'Usage Record',
+                    'Ship Replacements',
+                    'Replace Transit',
+                    'Restock Kit',
+                    'Kit Available'
+                ],
+                'data_source': 'consignment_kit_tracking',
+                'supported': True
+            },
+            {
+                'id': 'loaner-process',
+                'name': 'Loaner Process',
+                'description': 'Hospital-distributor loaner equipment lifecycle tracking',
+                'activities': [
+                    'Kit Request',
+                    'Transfer Order',
+                    'Pick & Ship DC',
+                    'Kit in Transit',
+                    'Receipt',
+                    'Surgery',
+                    'Usage Report',
+                    'Return Arrange',
+                    'Return Transit',
+                    'DC Receipt & QC',
+                    'Invoice Process'
+                ],
+                'data_source': 'loaner_process_tracking',
                 'supported': True
             },
             {

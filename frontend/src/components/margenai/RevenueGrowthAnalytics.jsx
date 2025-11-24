@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -12,6 +12,10 @@ import {
   Breadcrumbs,
   Link,
   Chip,
+  Tab,
+  Tabs,
+  Alert,
+  CircularProgress,
   alpha,
   useTheme,
 } from '@mui/material';
@@ -21,169 +25,206 @@ import {
   FileDownload as DownloadIcon,
   NavigateNext as NavigateNextIcon,
   ArrowBack as ArrowBackIcon,
-  ArrowUpward as ArrowUpwardIcon,
-  ArrowDownward as ArrowDownwardIcon,
+  LocalHospital as HospitalIcon,
+  Business as BusinessIcon,
+  LocationOn as LocationIcon,
+  Inventory as ProductIcon,
 } from '@mui/icons-material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { useRevenueGrowth } from '../../hooks/useMargenData';
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from 'recharts';
 import stoxTheme from '../stox/stoxTheme';
+
+const API_BASE = 'http://localhost:8000/api/v1/margen/csg';
 
 const RevenueGrowthAnalytics = ({ onBack }) => {
   const theme = useTheme();
-  const { data: revenueData, loading, refetch } = useRevenueGrowth();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState(0);
 
-  // Calculate KPIs
-  const totalRevenue = revenueData?.reduce((sum, row) => sum + row.revenue, 0) || 0;
-  const avgGrowth = revenueData?.reduce((sum, row) => sum + row.growth_pct, 0) / (revenueData?.length || 1) || 0;
+  // State for data
+  const [summary, setSummary] = useState(null);
+  const [systemData, setSystemData] = useState([]);
+  const [distributorData, setDistributorData] = useState([]);
+  const [surgeonData, setSurgeonData] = useState([]);
+  const [regionData, setRegionData] = useState([]);
+  const [monthlyTrends, setMonthlyTrends] = useState([]);
 
-  const productRevenue = {};
-  revenueData?.forEach(row => {
-    productRevenue[row.product] = (productRevenue[row.product] || 0) + row.revenue;
-  });
-  const topProduct = Object.entries(productRevenue).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Fetch all data in parallel
+      const [summaryRes, systemRes, distRes, surgeonRes, regionRes, trendsRes] = await Promise.all([
+        fetch(`${API_BASE}/revenue/summary`).then(r => r.json()),
+        fetch(`${API_BASE}/revenue/by-system`).then(r => r.json()),
+        fetch(`${API_BASE}/revenue/by-distributor`).then(r => r.json()),
+        fetch(`${API_BASE}/revenue/by-surgeon`).then(r => r.json()),
+        fetch(`${API_BASE}/revenue/by-region`).then(r => r.json()),
+        fetch(`${API_BASE}/revenue/trends/monthly`).then(r => r.json()),
+      ]);
 
-  const channelRevenue = {};
-  revenueData?.forEach(row => {
-    channelRevenue[row.channel] = (channelRevenue[row.channel] || 0) + row.revenue;
-  });
-  const topChannel = Object.entries(channelRevenue).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
+      setSummary(summaryRes.summary);
+      setSystemData(systemRes.systems || []);
+      setDistributorData(distRes.distributors || []);
+      setSurgeonData(surgeonRes.surgeons || []);
+      setRegionData(regionRes.regions || []);
+      setMonthlyTrends(trendsRes.trends || []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const kpiCards = [
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const formatCurrency = (value) => {
+    if (!value) return '$0';
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+
+  const formatPercent = (value) => {
+    if (value === null || value === undefined) return '0%';
+    return `${value.toFixed(1)}%`;
+  };
+
+  // Calculate derived metrics
+  const avgTransactionValue = summary ? (summary.total_revenue / summary.transaction_count) : 0;
+  const totalUnits = systemData.reduce((sum, sys) => sum + (sys.quantity || 0), 0);
+
+  // KPI Cards
+  const kpiCards = summary ? [
     {
       title: 'Total Revenue',
-      value: `$${(totalRevenue / 1000000).toFixed(1)}M`,
+      value: formatCurrency(summary.total_revenue),
+      subtitle: `${summary.transaction_count.toLocaleString()} transactions`,
       color: '#10b981',
       icon: TrendingUpIcon,
     },
     {
-      title: 'Avg YoY Growth',
-      value: `${avgGrowth.toFixed(1)}%`,
-      color: avgGrowth > 0 ? '#10b981' : '#ef4444',
-      icon: avgGrowth > 0 ? ArrowUpwardIcon : ArrowDownwardIcon,
-    },
-    {
-      title: 'Top Product',
-      value: topProduct,
+      title: 'Avg Transaction Value',
+      value: formatCurrency(avgTransactionValue),
+      subtitle: 'Average per transaction',
       color: '#3b82f6',
-      icon: TrendingUpIcon,
+      icon: BusinessIcon,
     },
     {
-      title: 'Top Channel',
-      value: topChannel,
+      title: 'Units Sold',
+      value: totalUnits.toLocaleString(),
+      subtitle: 'Total quantity across all systems',
+      color: '#f97316',
+      icon: ProductIcon,
+    },
+    {
+      title: 'Active Period',
+      value: summary.date_range.start.split('-')[1] + '/' + summary.date_range.start.split('-')[2],
+      subtitle: `to ${summary.date_range.end.split('-')[1]}/${summary.date_range.end.split('-')[2]}/25`,
       color: '#8b5cf6',
-      icon: TrendingUpIcon,
+      icon: LocationIcon,
     },
-  ];
+  ] : [];
 
-  const columns = [
-    {
-      field: 'id',
-      headerName: 'ID',
-      width: 100,
-      renderCell: (params) => (
-        <Typography variant="body2" fontWeight={600} color="primary">
-          {params.value}
-        </Typography>
-      ),
-    },
-    { field: 'period', headerName: 'Period', width: 120 },
-    { field: 'product', headerName: 'Product', width: 180 },
-    { field: 'channel', headerName: 'Channel', width: 140 },
-    { field: 'region', headerName: 'Region', width: 100 },
-    {
-      field: 'revenue',
-      headerName: 'Revenue',
-      width: 130,
-      type: 'number',
-      renderCell: (params) => {
-        const value = params.value;
-        if (value === null || value === undefined || isNaN(value)) {
-          return <Typography variant="body2">-</Typography>;
-        }
-        return (
-          <Typography variant="body2" fontWeight={600}>
-            ${(value / 1000).toFixed(1)}K
+  // Unified DataGrid columns - used for all tabs
+  const getColumns = (viewType) => {
+    const nameField = viewType === 'system' ? 'system' :
+                      viewType === 'distributor' ? 'distributor' :
+                      viewType === 'surgeon' ? 'surgeon' : 'region';
+
+    const nameHeader = viewType === 'system' ? 'Product System' :
+                       viewType === 'distributor' ? 'Distributor' :
+                       viewType === 'surgeon' ? 'Surgeon' : 'Region';
+
+    return [
+      {
+        field: nameField,
+        headerName: nameHeader,
+        width: 200,
+        flex: 1,
+        minWidth: 150,
+      },
+      {
+        field: 'total_revenue',
+        headerName: 'Revenue',
+        width: 140,
+        type: 'number',
+        renderCell: (params) => (
+          <Typography variant="body2" fontWeight={600} color="primary">
+            {formatCurrency(params.value)}
           </Typography>
-        );
+        ),
       },
-    },
-    {
-      field: 'units',
-      headerName: 'Units',
-      width: 100,
-      type: 'number',
-      renderCell: (params) => (
-        <Typography variant="body2">
-          {params.value.toLocaleString()}
-        </Typography>
-      ),
-    },
-    {
-      field: 'avg_price',
-      headerName: 'Avg Price',
-      width: 110,
-      type: 'number',
-      renderCell: (params) => (
-        <Typography variant="body2">
-          ${params.value.toFixed(2)}
-        </Typography>
-      ),
-    },
-    {
-      field: 'growth_pct',
-      headerName: 'Growth %',
-      width: 120,
-      type: 'number',
-      renderCell: (params) => {
-        const value = params.value;
-        const color = value > 10 ? '#10b981' : value > 0 ? '#f59e0b' : '#ef4444';
-        return (
+      {
+        field: 'total_gm',
+        headerName: 'Gross Margin',
+        width: 140,
+        type: 'number',
+        renderCell: (params) => (
+          <Typography variant="body2" fontWeight={600}>
+            {formatCurrency(params.value)}
+          </Typography>
+        ),
+      },
+      {
+        field: 'gm_percent',
+        headerName: 'GM%',
+        width: 100,
+        type: 'number',
+        renderCell: (params) => (
           <Chip
-            label={`${value > 0 ? '+' : ''}${value.toFixed(1)}%`}
+            label={formatPercent(params.value)}
             size="small"
             sx={{
-              bgcolor: alpha(color, 0.1),
-              color: color,
+              bgcolor: params.value > 85 ? alpha('#10b981', 0.1) : alpha('#f59e0b', 0.1),
+              color: params.value > 85 ? '#10b981' : '#f59e0b',
               fontWeight: 600,
-              fontSize: '0.75rem',
             }}
           />
-        );
+        ),
       },
-    },
-    {
-      field: 'trend',
-      headerName: 'Trend',
-      width: 120,
-      renderCell: (params) => {
-        const colorMap = {
-          'Growing': '#10b981',
-          'Stable': '#f59e0b',
-          'Declining': '#ef4444',
-        };
-        const color = colorMap[params.value] || '#6b7280';
-        return (
-          <Chip
-            label={params.value}
-            size="small"
-            sx={{
-              bgcolor: alpha(color, 0.1),
-              color: color,
-              fontWeight: 600,
-              fontSize: '0.75rem',
-            }}
-          />
-        );
+      {
+        field: 'transaction_count',
+        headerName: viewType === 'surgeon' ? 'Procedures' : 'Transactions',
+        width: 120,
+        type: 'number',
       },
-    },
-  ];
-
-  const handleExport = () => {
-    console.log('Exporting revenue data...');
+      ...(viewType !== 'region' ? [{
+        field: 'quantity',
+        headerName: 'Units',
+        width: 100,
+        type: 'number',
+      }] : []),
+    ];
   };
 
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
-    <Box sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: '#f8fafc' }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -204,79 +245,76 @@ const RevenueGrowthAnalytics = ({ onBack }) => {
               Revenue & Growth Analytics
             </Typography>
           </Breadcrumbs>
-          <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">
-            Back
-          </Button>
-        </Stack>
-
-        <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Box
-              sx={{
-                width: 48,
-                height: 48,
-                borderRadius: 2,
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <TrendingUpIcon sx={{ color: 'white', fontSize: 28 }} />
-            </Box>
-            <Box>
-              <Typography variant="h5" fontWeight={700}>
-                Revenue & Growth Analytics
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Top-line revenue performance, growth trends, and sales analysis
-              </Typography>
-            </Box>
-          </Stack>
-
           <Stack direction="row" spacing={1}>
-            <IconButton onClick={refetch} sx={{ bgcolor: alpha('#10b981', 0.1) }}>
-              <RefreshIcon sx={{ color: '#10b981' }} />
-            </IconButton>
-            <IconButton onClick={handleExport} sx={{ bgcolor: alpha('#10b981', 0.1) }}>
-              <DownloadIcon sx={{ color: '#10b981' }} />
-            </IconButton>
+            <Button
+              startIcon={<RefreshIcon />}
+              onClick={fetchData}
+              variant="outlined"
+              size="small"
+            >
+              Refresh
+            </Button>
+            <Button
+              startIcon={<DownloadIcon />}
+              variant="outlined"
+              size="small"
+            >
+              Export
+            </Button>
+            <Button
+              startIcon={<ArrowBackIcon />}
+              onClick={onBack}
+              variant="contained"
+              size="small"
+            >
+              Back
+            </Button>
           </Stack>
         </Stack>
+
+        <Typography variant="h4" fontWeight={700} gutterBottom>
+          Revenue & Growth Analytics
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Top-line revenue performance, growth trends, and sales analysis by product, surgeon, channel, and region
+        </Typography>
       </Box>
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          Error loading data: {error}
+        </Alert>
+      )}
 
       {/* KPI Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         {kpiCards.map((kpi, index) => (
           <Grid item xs={12} sm={6} md={3} key={index}>
-            <Card
-              sx={{
-                background: `linear-gradient(135deg, ${alpha(kpi.color, 0.1)} 0%, ${alpha(kpi.color, 0.05)} 100%)`,
-                border: `1px solid ${alpha(kpi.color, 0.2)}`,
-              }}
-            >
+            <Card sx={{ height: '100%', border: `1px solid ${alpha(kpi.color, 0.2)}` }}>
               <CardContent>
-                <Stack direction="row" alignItems="center" justifyContent="space-between">
+                <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
                   <Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                    <Typography variant="caption" color="text.secondary" gutterBottom>
                       {kpi.title}
                     </Typography>
-                    <Typography variant="h5" fontWeight={700} color={kpi.color}>
+                    <Typography variant="h5" fontWeight={700} sx={{ color: kpi.color, mb: 0.5 }}>
                       {kpi.value}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {kpi.subtitle}
                     </Typography>
                   </Box>
                   <Box
                     sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 1,
-                      bgcolor: alpha(kpi.color, 0.2),
+                      bgcolor: alpha(kpi.color, 0.1),
+                      borderRadius: 2,
+                      p: 1,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}
                   >
-                    <kpi.icon sx={{ color: kpi.color, fontSize: 24 }} />
+                    <kpi.icon sx={{ color: kpi.color, fontSize: 28 }} />
                   </Box>
                 </Stack>
               </CardContent>
@@ -285,28 +323,47 @@ const RevenueGrowthAnalytics = ({ onBack }) => {
         ))}
       </Grid>
 
-      {/* DataGrid */}
-      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <DataGrid
-          rows={revenueData || []}
-          columns={columns}
-          loading={loading}
-          density="compact"
-          slots={{ toolbar: GridToolbar }}
-          slotProps={{
-            toolbar: {
-              showQuickFilter: true,
-              quickFilterProps: { debounceMs: 500 },
-            },
-          }}
-          initialState={{
-            pagination: { paginationModel: { pageSize: 25 } },
-          }}
-          pageSizeOptions={[10, 25, 50, 100]}
-          checkboxSelection
-          disableRowSelectionOnClick
-          sx={stoxTheme.getDataGridSx()}
-        />
+      {/* Tabs for different views */}
+      <Paper sx={{ mb: 3 }}>
+        <Tabs value={activeTab} onChange={(e, v) => setActiveTab(v)} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tab label="By Product System" icon={<ProductIcon />} iconPosition="start" />
+          <Tab label="By Distributor" icon={<BusinessIcon />} iconPosition="start" />
+          <Tab label="By Surgeon" icon={<HospitalIcon />} iconPosition="start" />
+          <Tab label="By Region" icon={<LocationIcon />} iconPosition="start" />
+        </Tabs>
+
+        {/* Unified DataGrid - structure stays consistent across tabs */}
+        <Box sx={{ p: 2, height: 600 }}>
+          <DataGrid
+            rows={
+              activeTab === 0 ? systemData.map((row, idx) => ({ id: idx + 1, ...row })) :
+              activeTab === 1 ? distributorData.map((row, idx) => ({ id: idx + 1, ...row })) :
+              activeTab === 2 ? surgeonData.map((row, idx) => ({ id: idx + 1, ...row })) :
+              regionData.map((row, idx) => ({ id: idx + 1, ...row }))
+            }
+            columns={getColumns(
+              activeTab === 0 ? 'system' :
+              activeTab === 1 ? 'distributor' :
+              activeTab === 2 ? 'surgeon' : 'region'
+            )}
+            loading={loading}
+            density="compact"
+            slots={{ toolbar: GridToolbar }}
+            slotProps={{
+              toolbar: {
+                showQuickFilter: true,
+                quickFilterProps: { debounceMs: 500 },
+              },
+            }}
+            initialState={{
+              pagination: { paginationModel: { pageSize: 25 } },
+            }}
+            pageSizeOptions={[10, 25, 50, 100]}
+            checkboxSelection
+            disableRowSelectionOnClick
+            sx={stoxTheme.getDataGridSx()}
+          />
+        </Box>
       </Paper>
     </Box>
   );

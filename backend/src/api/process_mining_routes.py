@@ -82,6 +82,18 @@ async def discover_process(request: DiscoverProcessRequest):
                 date_to=request.date_to,
                 filters=request.filters
             )
+        elif request.process_type == 'consignment-kit':
+            events = event_extractor.extract_consignment_kit_events(
+                date_from=request.date_from,
+                date_to=request.date_to,
+                filters=request.filters
+            )
+        elif request.process_type == 'loaner-process':
+            events = event_extractor.extract_loaner_process_events(
+                date_from=request.date_from,
+                date_to=request.date_to,
+                filters=request.filters
+            )
         elif request.process_type == 'quote-to-cash':
             events = event_extractor.extract_q2c_events(
                 date_from=request.date_from,

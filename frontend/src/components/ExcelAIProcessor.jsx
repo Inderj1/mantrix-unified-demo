@@ -60,7 +60,9 @@ const ExcelAIProcessor = ({ onBack }) => {
   });
 
   const fileInputRef = useRef(null);
+  const folderInputRef = useRef(null);
   const templateFileRef = useRef(null);
+  const templateFolderRef = useRef(null);
 
   // Sample data for file drilldowns
   const sampleFileData = {
@@ -709,34 +711,67 @@ const ExcelAIProcessor = ({ onBack }) => {
               Upload one or more sample Excel files to analyze their structure and configure your template
             </Typography>
 
-            <Box
-              onClick={() => templateFileRef.current?.click()}
-              sx={{
-                border: '2px dashed',
-                borderColor: 'divider',
-                borderRadius: 2,
-                p: 6,
-                textAlign: 'center',
-                cursor: 'pointer',
-                bgcolor: '#fafafa',
-                '&:hover': { bgcolor: '#f5f5f5', borderColor: 'text.secondary' }
-              }}
-            >
-              <CloudUpload sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-              <Typography variant="body1" fontWeight={500}>
-                Drop Excel files here or click to browse
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Supports .xlsx, .xls, .csv • Multiple files allowed
-              </Typography>
-              <input
-                ref={templateFileRef}
-                type="file"
-                multiple
-                accept=".xlsx,.xls,.csv"
-                onChange={handleTemplateFileUpload}
-                style={{ display: 'none' }}
-              />
+            <Box>
+              <Box
+                onClick={() => templateFileRef.current?.click()}
+                sx={{
+                  border: '2px dashed',
+                  borderColor: 'divider',
+                  borderRadius: 2,
+                  p: 6,
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  bgcolor: '#fafafa',
+                  '&:hover': { bgcolor: '#f5f5f5', borderColor: 'text.secondary' }
+                }}
+              >
+                <CloudUpload sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+                <Typography variant="body1" fontWeight={500}>
+                  Drop Excel files here or click to browse
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Supports .xlsx, .xls, .csv • Multiple files allowed
+                </Typography>
+                <input
+                  ref={templateFileRef}
+                  type="file"
+                  multiple
+                  accept=".xlsx,.xls,.csv"
+                  onChange={handleTemplateFileUpload}
+                  style={{ display: 'none' }}
+                />
+                <input
+                  ref={templateFolderRef}
+                  type="file"
+                  webkitdirectory=""
+                  directory=""
+                  onChange={handleTemplateFileUpload}
+                  style={{ display: 'none' }}
+                />
+              </Box>
+              <Box sx={{ mt: 2, textAlign: 'center' }}>
+                <Button
+                  variant="outlined"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    templateFolderRef.current?.click();
+                  }}
+                  startIcon={<CloudUpload />}
+                  sx={{ mr: 1 }}
+                >
+                  Select Folder
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    templateFileRef.current?.click();
+                  }}
+                  startIcon={<CloudUpload />}
+                >
+                  Select Files
+                </Button>
+              </Box>
             </Box>
 
             {templateBuilder.files.length > 0 && (
@@ -1601,52 +1636,85 @@ const ExcelAIProcessor = ({ onBack }) => {
                 </Box>
               </Box>
 
-              <Box
-                onClick={() => fileInputRef.current?.click()}
-                sx={{
-                  border: '2px dashed',
-                  borderColor: alpha('#3b82f6', 0.3),
-                  borderRadius: 2,
-                  p: 6,
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  bgcolor: alpha('#3b82f6', 0.02),
-                  position: 'relative',
-                  overflow: 'hidden',
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    bgcolor: alpha('#3b82f6', 0.05),
-                    borderColor: '#3b82f6',
-                    transform: 'scale(1.01)',
-                    '& .upload-icon': {
-                      transform: 'scale(1.1) translateY(-4px)',
-                    }
-                  }
-                }}
-              >
-                <TableChart
-                  className="upload-icon"
+              <Box>
+                <Box
+                  onClick={() => fileInputRef.current?.click()}
                   sx={{
-                    fontSize: 64,
-                    color: alpha('#3b82f6', 0.4),
-                    mb: 2,
-                    transition: 'all 0.3s ease'
+                    border: '2px dashed',
+                    borderColor: alpha('#3b82f6', 0.3),
+                    borderRadius: 2,
+                    p: 6,
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    bgcolor: alpha('#3b82f6', 0.02),
+                    position: 'relative',
+                    overflow: 'hidden',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      bgcolor: alpha('#3b82f6', 0.05),
+                      borderColor: '#3b82f6',
+                      transform: 'scale(1.01)',
+                      '& .upload-icon': {
+                        transform: 'scale(1.1) translateY(-4px)',
+                      }
+                    }
                   }}
-                />
-                <Typography variant="body1" fontWeight={600} color="#3b82f6" sx={{ mb: 0.5 }}>
-                  Drop Excel files here or click to browse
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Supports .xlsx, .xls, .csv • Multiple files allowed
-                </Typography>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  multiple
-                  accept=".xlsx,.xls,.csv"
-                  onChange={handleFileUpload}
-                  style={{ display: 'none' }}
-                />
+                >
+                  <TableChart
+                    className="upload-icon"
+                    sx={{
+                      fontSize: 64,
+                      color: alpha('#3b82f6', 0.4),
+                      mb: 2,
+                      transition: 'all 0.3s ease'
+                    }}
+                  />
+                  <Typography variant="body1" fontWeight={600} color="#3b82f6" sx={{ mb: 0.5 }}>
+                    Drop Excel files here or click to browse
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Supports .xlsx, .xls, .csv • Multiple files allowed
+                  </Typography>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept=".xlsx,.xls,.csv"
+                    onChange={handleFileUpload}
+                    style={{ display: 'none' }}
+                  />
+                  <input
+                    ref={folderInputRef}
+                    type="file"
+                    webkitdirectory=""
+                    directory=""
+                    onChange={handleFileUpload}
+                    style={{ display: 'none' }}
+                  />
+                </Box>
+                <Box sx={{ mt: 2, textAlign: 'center' }}>
+                  <Button
+                    variant="outlined"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      folderInputRef.current?.click();
+                    }}
+                    startIcon={<CloudUpload />}
+                    sx={{ mr: 1 }}
+                  >
+                    Select Folder
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      fileInputRef.current?.click();
+                    }}
+                    startIcon={<CloudUpload />}
+                  >
+                    Select Files
+                  </Button>
+                </Box>
               </Box>
 
               {files.length > 0 && (

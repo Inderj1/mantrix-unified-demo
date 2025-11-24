@@ -1,22 +1,45 @@
 """
-PostgreSQL SQL Generator - Lightweight NLP to SQL for PostgreSQL databases
+PostgreSQL SQL Generator - Enhanced NLP to SQL with Weaviate + RDFLib integration
 """
 from typing import List, Dict, Any, Optional
 import structlog
 from src.core.llm_client import LLMClient
 from src.core.cache_manager import CacheManager
 from src.db.postgresql_client import PostgreSQLClient
+from src.db.weaviate_client import WeaviateClient
+from src.core.embeddings import EmbeddingService
+from rdflib import Graph, Namespace, URIRef
+from rdflib.namespace import RDF, RDFS
+from pathlib import Path
 from src.config import settings
 
 logger = structlog.get_logger()
 
+# RDF namespaces
+MANTRIX = Namespace("http://mantrix.ai/ontology#")
+DATA = Namespace("http://mantrix.ai/data/")
+
 
 class PostgreSQLGenerator:
-    """Lightweight SQL generator for PostgreSQL without vector search dependencies"""
-    
-    def __init__(self, database: str = "customer_analytics"):
+    """Enhanced SQL generator with Weaviate for table discovery and RDFLib for column selection"""
+
+    def __init__(self, database: str = "mantrix_nexxt"):
         self.llm_client = LLMClient()
-        self.pg_client = PostgreSQLClient(database=database)
+        self.pg_client = PostgreSQLClient(
+            host="localhost",
+            port=5433,
+            user="mantrix",
+            password="mantrix123",
+            database=database
+        )
+
+        # Initialize Weaviate for table discovery
+        self.weaviate_client = WeaviateClient()
+        self.embedding_service = EmbeddingService()
+
+        # Load RDFLib knowledge graph for column-level semantics
+        self.knowledge_graph = None
+        self._load_knowledge_graph()
         
         # Initialize cache manager if enabled
         self.cache_manager = None
@@ -34,19 +57,113 @@ class PostgreSQLGenerator:
             except Exception as e:
                 logger.warning(f"Failed to initialize cache manager: {e}")
                 self.cache_manager = None
-    
-    def get_table_schemas(self, relevant_tables: Optional[List[str]] = None) -> List[Dict[str, Any]]:
-        """Get schema information for relevant tables"""
+
+    def _load_knowledge_graph(self):
+        """Load RDFLib knowledge graph from TTL file"""
+        try:
+            kg_path = Path(__file__).parent.parent.parent / "mantrix_knowledge_graph.ttl"
+            if kg_path.exists():
+                self.knowledge_graph = Graph()
+                self.knowledge_graph.bind('mantrix', MANTRIX)
+                self.knowledge_graph.bind('data', DATA)
+                self.knowledge_graph.parse(kg_path, format="turtle")
+                logger.info(f"Loaded knowledge graph with {len(self.knowledge_graph)} triples")
+            else:
+                logger.warning(f"Knowledge graph file not found at {kg_path}")
+        except Exception as e:
+            logger.warning(f"Failed to load knowledge graph: {e}")
+
+    def _identify_relevant_tables_with_weaviate(self, query: str, limit: int = 5) -> List[str]:
+        """Use Weaviate vector search to identify relevant tables"""
+        try:
+            # Generate embedding for query
+            query_embedding = self.embedding_service.generate_embedding(query)
+
+            # Search for similar tables
+            similar_tables = self.weaviate_client.search_similar_tables(query_embedding, limit=limit)
+
+            # Extract table names
+            table_names = [table['table_name'] for table in similar_tables]
+
+            logger.info(f"Weaviate identified tables: {table_names}")
+            return table_names
+        except Exception as e:
+            logger.warning(f"Weaviate search failed: {e}, falling back to keyword matching")
+            return self._identify_relevant_tables(query)
+
+    def _filter_relevant_columns_with_rdf(
+        self,
+        query: str,
+        table_name: str,
+        all_columns: List[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
+        """Use RDFLib knowledge graph to identify relevant columns for the query"""
+        if not self.knowledge_graph:
+            return all_columns  # Return all if no KG
+
+        try:
+            query_lower = query.lower()
+            relevant_columns = []
+
+            # Extract entities and metrics from query
+            query_terms = set(query_lower.split())
+
+            # Map query terms to column names via semantic patterns
+            for col in all_columns:
+                col_name = col['name'].lower()
+                col_score = 0
+
+                # Direct match
+                if any(term in col_name for term in query_terms):
+                    col_score += 10
+
+                # Semantic matching for common patterns
+                if 'sales' in query_lower or 'revenue' in query_lower:
+                    if any(x in col_name for x in ['sales', 'revenue', 'amount']):
+                        col_score += 5
+
+                if 'margin' in query_lower or 'profit' in query_lower:
+                    if any(x in col_name for x in ['margin', 'gm', 'profit']):
+                        col_score += 5
+
+                if 'quantity' in query_lower or 'volume' in query_lower:
+                    if 'quantity' in col_name or 'qty' in col_name:
+                        col_score += 5
+
+                # Always include key columns
+                if any(x in col_name for x in ['id', 'date', 'name', 'number', 'distributor', 'surgeon', 'facility']):
+                    col_score += 2
+
+                if col_score > 0:
+                    col['relevance_score'] = col_score
+                    relevant_columns.append(col)
+
+            # Sort by relevance and limit to top 20 columns
+            relevant_columns.sort(key=lambda x: x.get('relevance_score', 0), reverse=True)
+            top_columns = relevant_columns[:20] if len(relevant_columns) > 20 else relevant_columns
+
+            if top_columns:
+                logger.info(f"RDF filtered {len(all_columns)} → {len(top_columns)} columns for {table_name}")
+                return top_columns
+
+            return all_columns  # Fallback to all columns
+
+        except Exception as e:
+            logger.warning(f"RDF column filtering failed: {e}")
+            return all_columns
+
+    def get_table_schemas(self, relevant_tables: Optional[List[str]] = None, query: str = "") -> List[Dict[str, Any]]:
+        """Get schema information for relevant tables with RDFLib column filtering"""
         try:
             # Get all schema info
             all_schemas = self.pg_client.get_schema_info()
-            
+
             # Filter to relevant tables if specified
             if relevant_tables:
                 schemas = {k: v for k, v in all_schemas.items() if k in relevant_tables}
             else:
                 schemas = all_schemas
-            
+
             # Convert to format expected by LLM
             formatted_schemas = []
             for table_name, columns in schemas.items():
@@ -60,14 +177,18 @@ class PostgreSQLGenerator:
                         "description": ""
                     }
                     formatted_columns.append(formatted_col)
-                
+
+                # Apply RDFLib column filtering if query provided
+                if query and self.knowledge_graph:
+                    formatted_columns = self._filter_relevant_columns_with_rdf(query, table_name, formatted_columns)
+
                 schema_dict = {
                     "table_name": table_name,  # LLM client expects table_name
                     "columns": formatted_columns,
                     "description": self._get_table_description(table_name)
                 }
                 formatted_schemas.append(schema_dict)
-            
+
             return formatted_schemas
         except Exception as e:
             logger.error(f"Error getting table schemas: {e}")
@@ -144,12 +265,12 @@ class PostgreSQLGenerator:
                     logger.info("Returning cached PostgreSQL SQL")
                     return json.loads(cached_result)
             
-            # Identify relevant tables
-            relevant_tables = self._identify_relevant_tables(query)[:max_tables]
-            logger.info(f"Identified relevant tables: {relevant_tables}")
-            
-            # Get schemas for relevant tables
-            schemas = self.get_table_schemas(relevant_tables)
+            # Identify relevant tables using Weaviate vector search
+            relevant_tables = self._identify_relevant_tables_with_weaviate(query, limit=max_tables)
+            logger.info(f"Weaviate identified relevant tables: {relevant_tables}")
+
+            # Get schemas for relevant tables with RDFLib column filtering
+            schemas = self.get_table_schemas(relevant_tables, query=query)
             
             if not schemas:
                 return {
@@ -267,23 +388,111 @@ class PostgreSQLGenerator:
                 "error_type": "execution_error"
             }
     
+    def _convert_to_fuzzy_search(self, sql: str, original_query: str) -> Optional[str]:
+        """Convert exact match WHERE clauses to fuzzy LIKE searches"""
+        try:
+            import re
+
+            # Pattern to match WHERE column = 'value' or WHERE LOWER(column) = LOWER('value')
+            # or WHERE column IN (...)
+
+            fuzzy_sql = sql
+
+            # Convert IN clauses to OR with LIKE
+            # Example: WHERE LOWER(item_name) IN (LOWER('Cervical Plate'), LOWER('Pedicle Screw'))
+            # Becomes: WHERE (LOWER(item_name) LIKE '%cervical%plate%' OR LOWER(item_name) LIKE '%pedicle%screw%')
+            in_pattern = r"WHERE\s+LOWER\((\w+)\)\s+IN\s+\((.*?)\)"
+
+            def replace_in_with_like(match):
+                column = match.group(1)
+                values_str = match.group(2)
+
+                # Extract values from IN clause
+                value_pattern = r"LOWER\('([^']+)'\)"
+                values = re.findall(value_pattern, values_str)
+
+                if not values:
+                    return match.group(0)  # Return original if can't parse
+
+                # Create LIKE conditions
+                like_conditions = []
+                for value in values:
+                    # Convert spaces to % for fuzzy matching
+                    fuzzy_value = value.lower().replace(' ', '%')
+                    like_conditions.append(f"LOWER({column}) LIKE '%{fuzzy_value}%'")
+
+                return f"WHERE ({' OR '.join(like_conditions)})"
+
+            fuzzy_sql = re.sub(in_pattern, replace_in_with_like, fuzzy_sql, flags=re.IGNORECASE)
+
+            # Convert simple equality to LIKE
+            # Example: WHERE LOWER(distributor) = LOWER('Audrey Le')
+            # Becomes: WHERE LOWER(distributor) LIKE '%audrey%le%'
+            eq_pattern = r"WHERE\s+LOWER\((\w+)\)\s+=\s+LOWER\('([^']+)'\)"
+
+            def replace_eq_with_like(match):
+                column = match.group(1)
+                value = match.group(2)
+                fuzzy_value = value.lower().replace(' ', '%')
+                return f"WHERE LOWER({column}) LIKE '%{fuzzy_value}%'"
+
+            fuzzy_sql = re.sub(eq_pattern, replace_eq_with_like, fuzzy_sql, flags=re.IGNORECASE)
+
+            if fuzzy_sql != sql:
+                logger.info("Converted exact match query to fuzzy LIKE search")
+                return fuzzy_sql
+
+            return None
+
+        except Exception as e:
+            logger.warning(f"Failed to convert to fuzzy search: {e}")
+            return None
+
     def generate_and_execute(self, query: str, max_tables: int = 3) -> Dict[str, Any]:
-        """Generate SQL from natural language and execute it"""
+        """Generate SQL from natural language and execute it with auto-retry using fuzzy matching"""
         # Generate SQL
         generation_result = self.generate_sql(query, max_tables)
-        
+
         if generation_result.get("error"):
             return generation_result
-        
+
         # Execute SQL
         sql = generation_result.get("sql")
         if sql:
             execution_result = self.execute_sql(sql)
-            
-            # Combine results
+
+            # Check if query returned 0 results and has WHERE clause
+            if (execution_result.get("success") and
+                execution_result.get("row_count", 0) == 0 and
+                "WHERE" in sql.upper()):
+
+                logger.info("Query returned 0 results, attempting fuzzy LIKE search...")
+
+                # Try to convert to fuzzy search
+                fuzzy_sql = self._convert_to_fuzzy_search(sql, query)
+
+                if fuzzy_sql:
+                    # Execute fuzzy query
+                    fuzzy_execution = self.execute_sql(fuzzy_sql)
+
+                    if fuzzy_execution.get("success") and fuzzy_execution.get("row_count", 0) > 0:
+                        # Fuzzy search found results!
+                        logger.info(f"Fuzzy search found {fuzzy_execution.get('row_count')} results")
+
+                        # Return combined result with explanation
+                        return {
+                            **generation_result,
+                            "sql": fuzzy_sql,
+                            "original_sql": sql,
+                            "execution": fuzzy_execution,
+                            "fuzzy_search_applied": True,
+                            "search_note": f"⚠️ No exact matches found. Showing {fuzzy_execution.get('row_count')} results using fuzzy search (LIKE matching)."
+                        }
+
+            # Return original results
             return {
                 **generation_result,
                 "execution": execution_result
             }
-        
+
         return generation_result

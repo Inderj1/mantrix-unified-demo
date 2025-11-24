@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import AgentConfigForm from './AgentConfigForm';
 import {
   Box,
   Grid,
@@ -53,6 +54,8 @@ import {
   ViewModule as ViewModuleIcon,
   Sort as SortIcon,
   Notifications as NotificationsIcon,
+  Settings as SettingsIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 import { DataGrid } from '@mui/x-data-grid';
 
@@ -65,6 +68,7 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [refineDialog, setRefineDialog] = useState(false);
   const [refineFeedback, setRefineFeedback] = useState('');
+  const [configDialog, setConfigDialog] = useState(false);
 
   // Search, Filter, and Pagination state
   const [searchQuery, setSearchQuery] = useState('');
@@ -85,30 +89,38 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
 
   const loadData = async () => {
     try {
-      // Fetch both user data AND demo data for all users
-      const [agentsRes, alertsRes, statsRes, demoAgentsRes, demoAlertsRes] = await Promise.all([
+      // Only fetch demo data if user is not demo_user (to avoid duplicates)
+      const shouldFetchDemo = userId !== 'demo_user';
+
+      const fetchPromises = [
         fetch(`/api/v1/pulse/monitors?user_id=${userId}`),
         fetch(`/api/v1/pulse/alerts?user_id=${userId}&limit=50`),
         fetch(`/api/v1/pulse/stats?user_id=${userId}`),
-        fetch(`/api/v1/pulse/monitors?user_id=demo_user`),
-        fetch(`/api/v1/pulse/alerts?user_id=demo_user&limit=50`),
-      ]);
+      ];
 
-      const [agentsData, alertsData, statsData, demoAgentsData, demoAlertsData] = await Promise.all([
-        agentsRes.json(),
-        alertsRes.json(),
-        statsRes.json(),
-        demoAgentsRes.json(),
-        demoAlertsRes.json(),
-      ]);
+      if (shouldFetchDemo) {
+        fetchPromises.push(
+          fetch(`/api/v1/pulse/monitors?user_id=demo_user`),
+          fetch(`/api/v1/pulse/alerts?user_id=demo_user&limit=50`)
+        );
+      }
 
-      // Merge user data with demo data
+      const responses = await Promise.all(fetchPromises);
+      const [agentsData, alertsData, statsData, demoAgentsData, demoAlertsData] = await Promise.all(
+        responses.map(r => r.json())
+      );
+
+      // Merge user data with demo data (only if demo was fetched)
       const userAgents = agentsData.success && agentsData.monitors ? agentsData.monitors : [];
-      const demoAgents = demoAgentsData.success && demoAgentsData.monitors ? demoAgentsData.monitors : [];
-      setAgents([...userAgents, ...demoAgents]);
+      const demoAgents = shouldFetchDemo && demoAgentsData?.success && demoAgentsData.monitors ? demoAgentsData.monitors : [];
+
+      // Deduplicate by ID to ensure no duplicates
+      const allAgents = [...userAgents, ...demoAgents];
+      const uniqueAgents = Array.from(new Map(allAgents.map(agent => [agent.id, agent])).values());
+      setAgents(uniqueAgents);
 
       const userAlerts = alertsData.success && alertsData.alerts ? alertsData.alerts : [];
-      const demoAlerts = demoAlertsData.success && demoAlertsData.alerts ? demoAlertsData.alerts : [];
+      const demoAlerts = shouldFetchDemo && demoAlertsData?.success && demoAlertsData.alerts ? demoAlertsData.alerts : [];
       setAlerts([...userAlerts, ...demoAlerts]);
 
       if (statsData.success) setStats(statsData);
@@ -126,7 +138,7 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedAgent(null);
+    // Don't reset selectedAgent here - let it persist for dialog usage
   };
 
   const handleToggleAgent = async (agent) => {
@@ -221,6 +233,15 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
     }
   };
 
+  // Category display names and icons for grouping agents
+  const categoryInfo = {
+    supply_chain_operations: { name: '📦 Supply Chain Operations', color: '#1976d2' },
+    asset_health_maintenance: { name: '🔧 Asset Health & Maintenance', color: '#f57c00' },
+    financial_operations: { name: '💰 Financial Operations', color: '#388e3c' },
+    performance_analytics: { name: '📊 Performance Analytics', color: '#7b1fa2' },
+    general: { name: '⚙️ General', color: '#616161' }
+  };
+
   // Filter, sort, and paginate agents
   const filteredAndSortedAgents = useMemo(() => {
     let filtered = [...agents];
@@ -228,11 +249,15 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
     // Apply search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(m =>
-        m.name.toLowerCase().includes(query) ||
-        (m.description && m.description.toLowerCase().includes(query)) ||
-        (m.natural_language_query && m.natural_language_query.toLowerCase().includes(query))
-      );
+      filtered = filtered.filter(m => {
+        const categoryName = m.category ? categoryInfo[m.category]?.name?.toLowerCase() || m.category.toLowerCase() : '';
+        return (
+          m.name.toLowerCase().includes(query) ||
+          (m.description && m.description.toLowerCase().includes(query)) ||
+          (m.natural_language_query && m.natural_language_query.toLowerCase().includes(query)) ||
+          categoryName.includes(query)
+        );
+      });
     }
 
     // Apply status filter
@@ -291,6 +316,19 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
 
     return filtered;
   }, [agents, searchQuery, statusFilter, severityFilter, showDemoOnly, sortBy, sortDirection]);
+
+  // Group agents by category
+  const groupedAgents = useMemo(() => {
+    const groups = {};
+    filteredAndSortedAgents.forEach(agent => {
+      const category = agent.category || 'general';
+      if (!groups[category]) {
+        groups[category] = [];
+      }
+      groups[category].push(agent);
+    });
+    return groups;
+  }, [filteredAndSortedAgents]);
 
   // Paginate
   const paginatedAgents = useMemo(() => {
@@ -669,89 +707,136 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
             </Box>
           ) : (
             <>
-              <Grid container spacing={viewMode === 'grid' ? 2 : 1}>
-                {paginatedAgents.map((agent) => {
-                const healthScore = getHealthScore(agent);
-                const isDemo = agent.name && agent.name.includes('[DEMO]');
-                return (
-                  <Grid item xs={12} md={viewMode === 'grid' ? 6 : 12} key={agent.id}>
-                    <Paper
-                      variant="outlined"
+              {/* Render agents grouped by category */}
+              {Object.entries(groupedAgents).map(([category, categoryAgents]) => (
+                <Box key={category} mb={4}>
+                  {/* Category Header */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      mb: 2,
+                      p: 1.5,
+                      bgcolor: alpha(categoryInfo[category]?.color || '#616161', 0.1),
+                      borderRadius: 1,
+                      borderLeft: `4px solid ${categoryInfo[category]?.color || '#616161'}`
+                    }}
+                  >
+                    <Typography variant="h6" fontWeight={600} sx={{ flex: 1 }}>
+                      {categoryInfo[category]?.name || category}
+                    </Typography>
+                    <Chip
+                      label={`${categoryAgents.length} agent${categoryAgents.length !== 1 ? 's' : ''}`}
+                      size="small"
                       sx={{
-                        p: viewMode === 'grid' ? 2 : 1.5,
-                        ...(isDemo && {
-                          bgcolor: 'rgba(33, 150, 243, 0.03)',
-                          borderColor: 'info.light',
-                          borderWidth: 1.5
-                        })
+                        bgcolor: 'white',
+                        fontWeight: 600
                       }}
-                    >
-                      <Box display="flex" justifyContent="space-between" alignItems="start" mb={1}>
-                        <Box flex={1}>
-                          <Box display="flex" alignItems="center" gap={1} mb={0.5}>
-                            {isDemo && (
-                              <Chip
-                                label="DEMO"
-                                size="small"
-                                color="info"
-                                variant="outlined"
-                                sx={{ fontWeight: 600 }}
-                              />
-                            )}
-                            <Typography variant="subtitle1" fontWeight={600}>
-                              {agent.name}
-                            </Typography>
-                            <Chip
-                              size="small"
-                              label={agent.enabled ? 'Active' : 'Paused'}
-                              color={agent.enabled ? 'success' : 'default'}
-                              icon={agent.enabled ? <CheckCircleIcon /> : <PauseIcon />}
-                            />
-                          </Box>
-                          <Typography variant="body2" color="text.secondary" mb={1}>
-                            {agent.natural_language_query}
-                          </Typography>
-                          <Box display="flex" gap={1} flexWrap="wrap">
-                            <Chip
-                              label={agent.frequency}
-                              size="small"
-                              variant="outlined"
-                              icon={<ScheduleIcon />}
-                            />
-                            <Chip
-                              label={agent.severity}
-                              size="small"
-                              color={getSeverityColor(agent.severity)}
-                            />
-                            {healthScore !== null && (
-                              <Chip
-                                label={`${healthScore}% accuracy`}
-                                size="small"
-                                color={healthScore >= 80 ? 'success' : healthScore >= 60 ? 'warning' : 'error'}
-                              />
-                            )}
-                          </Box>
-                        </Box>
-                        <IconButton
-                          size="small"
-                          onClick={(e) => handleMenuOpen(e, agent)}
-                        >
-                          <MoreVertIcon />
-                        </IconButton>
-                      </Box>
+                    />
+                  </Box>
 
-                      {agent.last_run && (
-                        <Box mt={1} pt={1} borderTop={1} borderColor="divider">
-                          <Typography variant="caption" color="text.disabled">
-                            Last run: {new Date(agent.last_run).toLocaleString()}
-                          </Typography>
-                        </Box>
-                      )}
-                    </Paper>
+                  <Grid container spacing={viewMode === 'grid' ? 2 : 1}>
+                    {categoryAgents.map((agent) => {
+                      const healthScore = getHealthScore(agent);
+                      const isDemo = agent.name && agent.name.includes('[DEMO]');
+                      const notificationConfig = agent.notification_config || {};
+                      const hasNotifications = Object.values(notificationConfig).some(v => v);
+
+                      return (
+                        <Grid item xs={12} md={viewMode === 'grid' ? 6 : 12} key={agent.id}>
+                          <Paper
+                            variant="outlined"
+                            sx={{
+                              p: viewMode === 'grid' ? 2 : 1.5,
+                              ...(isDemo && {
+                                bgcolor: 'rgba(33, 150, 243, 0.03)',
+                                borderColor: 'info.light',
+                                borderWidth: 1.5
+                              })
+                            }}
+                          >
+                            <Box display="flex" justifyContent="space-between" alignItems="start" mb={1}>
+                              <Box flex={1}>
+                                <Box display="flex" alignItems="center" gap={1} mb={0.5}>
+                                  {agent.scope === 'global' && (
+                                    <Chip
+                                      label="GLOBAL"
+                                      size="small"
+                                      color="secondary"
+                                      variant="outlined"
+                                      sx={{ fontWeight: 600 }}
+                                    />
+                                  )}
+                                  {isDemo && (
+                                    <Chip
+                                      label="DEMO"
+                                      size="small"
+                                      color="info"
+                                      variant="outlined"
+                                      sx={{ fontWeight: 600 }}
+                                    />
+                                  )}
+                                  <Typography variant="subtitle1" fontWeight={600}>
+                                    {agent.name}
+                                  </Typography>
+                                  <Chip
+                                    size="small"
+                                    label={agent.enabled ? 'Active' : 'Paused'}
+                                    color={agent.enabled ? 'success' : 'default'}
+                                    icon={agent.enabled ? <CheckCircleIcon /> : <PauseIcon />}
+                                  />
+                                  {hasNotifications && (
+                                    <Tooltip title={`Notifications: ${Object.keys(notificationConfig).filter(k => notificationConfig[k]).join(', ')}`}>
+                                      <NotificationsIcon fontSize="small" color="primary" />
+                                    </Tooltip>
+                                  )}
+                                </Box>
+                                <Typography variant="body2" color="text.secondary" mb={1}>
+                                  {agent.natural_language_query}
+                                </Typography>
+                                <Box display="flex" gap={1} flexWrap="wrap">
+                                  <Chip
+                                    label={agent.frequency}
+                                    size="small"
+                                    variant="outlined"
+                                    icon={<ScheduleIcon />}
+                                  />
+                                  <Chip
+                                    label={agent.severity}
+                                    size="small"
+                                    color={getSeverityColor(agent.severity)}
+                                  />
+                                  {healthScore !== null && (
+                                    <Chip
+                                      label={`${healthScore}% accuracy`}
+                                      size="small"
+                                      color={healthScore >= 80 ? 'success' : healthScore >= 60 ? 'warning' : 'error'}
+                                    />
+                                  )}
+                                </Box>
+                              </Box>
+                              <IconButton
+                                size="small"
+                                onClick={(e) => handleMenuOpen(e, agent)}
+                              >
+                                <MoreVertIcon />
+                              </IconButton>
+                            </Box>
+
+                            {agent.last_run && (
+                              <Box mt={1} pt={1} borderTop={1} borderColor="divider">
+                                <Typography variant="caption" color="text.disabled">
+                                  Last run: {new Date(agent.last_run).toLocaleString()}
+                                </Typography>
+                              </Box>
+                            )}
+                          </Paper>
+                        </Grid>
+                      );
+                    })}
                   </Grid>
-                );
-              })}
-              </Grid>
+                </Box>
+              ))}
 
               {/* Pagination */}
               {totalPages > 1 && (
@@ -777,6 +862,13 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
+        <MenuItem onClick={() => {
+          handleMenuClose();
+          setConfigDialog(true);
+        }}>
+          <SettingsIcon fontSize="small" sx={{ mr: 1 }} />
+          Configure
+        </MenuItem>
         <MenuItem onClick={() => handleTestAgent(selectedAgent)}>
           <PlayArrowIcon fontSize="small" sx={{ mr: 1 }} />
           Execute Now
@@ -825,6 +917,36 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
               Refine Agent
             </Button>
           </Box>
+        </DialogContent>
+      </Dialog>
+
+      {/* Agent Configuration Dialog */}
+      <Dialog open={configDialog} onClose={() => setConfigDialog(false)} maxWidth="lg" fullWidth>
+        <DialogTitle>
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Box display="flex" alignItems="center" gap={1}>
+              <SettingsIcon />
+              <Typography variant="h6">Configure Agent</Typography>
+            </Box>
+            <IconButton onClick={() => setConfigDialog(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          {selectedAgent ? (
+            <AgentConfigForm agent={selectedAgent} onClose={() => {
+              setConfigDialog(false);
+              fetchAgents();
+            }} />
+          ) : (
+            <Box sx={{ p: 3, textAlign: 'center' }}>
+              <CircularProgress />
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                Loading agent configuration...
+              </Typography>
+            </Box>
+          )}
         </DialogContent>
       </Dialog>
     </Box>

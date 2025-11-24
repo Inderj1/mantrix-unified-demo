@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -14,6 +14,10 @@ import {
   Chip,
   alpha,
   useTheme,
+  CircularProgress,
+  Alert,
+  Tab,
+  Tabs,
 } from '@mui/material';
 import {
   AccountBalance as AccountBalanceIcon,
@@ -23,178 +27,202 @@ import {
   ArrowBack as ArrowBackIcon,
   TrendingUp as TrendingUpIcon,
   TrendingDown as TrendingDownIcon,
+  Inventory as ProductIcon,
+  Business as BusinessIcon,
+  Category as CategoryIcon,
 } from '@mui/icons-material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { useCostCOGS } from '../../hooks/useMargenData';
 import stoxTheme from '../stox/stoxTheme';
+
+const API_BASE = 'http://localhost:8000/api/v1/margen/csg';
 
 const CostCOGSAnalytics = ({ onBack }) => {
   const theme = useTheme();
-  const { data: costData, loading, refetch } = useCostCOGS();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState(0);
 
-  // Calculate KPIs
-  const totalCost = costData?.reduce((sum, row) => sum + row.amount, 0) || 0;
-  const totalVariance = costData?.reduce((sum, row) => sum + row.variance, 0) || 0;
+  const [summary, setSummary] = useState(null);
+  const [systemData, setSystemData] = useState([]);
+  const [distributorData, setDistributorData] = useState([]);
+  const [itemData, setItemData] = useState([]);
 
-  const categoryTotals = {};
-  costData?.forEach(row => {
-    categoryTotals[row.cost_category] = (categoryTotals[row.cost_category] || 0) + row.amount;
-  });
-  const topCategory = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [summaryRes, systemRes, distRes, itemRes] = await Promise.all([
+        fetch(`${API_BASE}/cogs/summary`).then(r => r.json()),
+        fetch(`${API_BASE}/cogs/by-system`).then(r => r.json()),
+        fetch(`${API_BASE}/cogs/by-distributor`).then(r => r.json()),
+        fetch(`${API_BASE}/cogs/by-item?limit=100`).then(r => r.json()),
+      ]);
 
-  const overBudgetCount = costData?.filter(row => row.variance > 0).length || 0;
+      setSummary(summaryRes.summary);
+      setSystemData(systemRes.systems || []);
+      setDistributorData(distRes.distributors || []);
+      setItemData(itemRes.items || []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const kpiCards = [
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const formatCurrency = (value) => {
+    if (!value) return '$0';
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+
+  const formatPercent = (value) => {
+    if (value === null || value === undefined) return '0%';
+    return `${value.toFixed(1)}%`;
+  };
+
+  // Calculate derived metrics for KPI cards
+  const totalCost = summary?.total_cogs || 0;
+  const topCategory = systemData.length > 0 ? systemData[0].system : 'N/A';
+
+  // Calculate cost metrics
+  const avgCogsPerTransaction = summary ? (summary.total_cogs / summary.transaction_count) : 0;
+  const totalCogsUnits = systemData.reduce((sum, sys) => sum + (sys.quantity || 0), 0);
+  const avgCogsPerUnit = totalCogsUnits > 0 ? (summary?.total_cogs || 0) / totalCogsUnits : 0;
+
+  const kpiCards = summary ? [
     {
       title: 'Total COGS',
-      value: `$${(totalCost / 1000000).toFixed(1)}M`,
-      color: '#3b82f6',
+      value: formatCurrency(summary.total_cogs),
+      subtitle: `${summary.transaction_count?.toLocaleString()} transactions`,
+      color: '#ef4444',
       icon: AccountBalanceIcon,
     },
     {
-      title: 'Budget Variance',
-      value: `$${(totalVariance / 1000).toFixed(0)}K`,
-      color: totalVariance > 0 ? '#ef4444' : '#10b981',
-      icon: totalVariance > 0 ? TrendingUpIcon : TrendingDownIcon,
-    },
-    {
-      title: 'Top Cost Category',
-      value: topCategory,
-      color: '#8b5cf6',
-      icon: AccountBalanceIcon,
-    },
-    {
-      title: 'Over Budget Items',
-      value: overBudgetCount.toString(),
+      title: 'COGS % of Revenue',
+      value: formatPercent(summary.cogs_percent),
+      subtitle: 'Cost ratio',
       color: '#f59e0b',
-      icon: TrendingUpIcon,
+      icon: TrendingDownIcon,
     },
-  ];
+    {
+      title: 'Highest Cost System',
+      value: topCategory,
+      subtitle: systemData.length > 0 ? formatCurrency(systemData[0].total_cogs) : '$0',
+      color: '#8b5cf6',
+      icon: ProductIcon,
+    },
+    {
+      title: 'Avg COGS per Unit',
+      value: formatCurrency(avgCogsPerUnit),
+      subtitle: `${totalCogsUnits.toLocaleString()} total units`,
+      color: '#3b82f6',
+      icon: CategoryIcon,
+    },
+  ] : [];
 
-  const columns = [
-    {
-      field: 'id',
-      headerName: 'ID',
-      width: 100,
-      renderCell: (params) => (
-        <Typography variant="body2" fontWeight={600} color="primary">
-          {params.value}
-        </Typography>
-      ),
-    },
-    { field: 'period', headerName: 'Period', width: 120 },
-    { field: 'cost_category', headerName: 'Cost Category', width: 180 },
-    {
-      field: 'gl_account',
-      headerName: 'GL Account',
-      width: 120,
-      renderCell: (params) => (
-        <Typography variant="body2" fontFamily="monospace">
-          {params.value}
-        </Typography>
-      ),
-    },
-    { field: 'subcategory', headerName: 'Subcategory', width: 160 },
-    {
-      field: 'amount',
-      headerName: 'Amount',
-      width: 130,
-      type: 'number',
-      renderCell: (params) => {
-        const value = params.value;
-        if (value === null || value === undefined || isNaN(value)) {
-          return <Typography variant="body2">-</Typography>;
-        }
-        return (
-          <Typography variant="body2" fontWeight={600}>
-            ${(value / 1000).toFixed(1)}K
-          </Typography>
-        );
+  // Unified DataGrid columns - used for all tabs
+  const getColumns = (viewType) => {
+    const nameField = viewType === 'system' ? 'system' :
+                      viewType === 'distributor' ? 'distributor' : 'item_code';
+
+    const nameHeader = viewType === 'system' ? 'Product System' :
+                       viewType === 'distributor' ? 'Distributor' : 'Item Code';
+
+    const baseColumns = [
+      {
+        field: nameField,
+        headerName: nameHeader,
+        width: 200,
+        flex: 1,
+        minWidth: 150,
       },
-    },
-    {
-      field: 'pct_of_total',
-      headerName: '% of Total',
-      width: 110,
-      type: 'number',
-      renderCell: (params) => (
-        <Typography variant="body2">
-          {params.value.toFixed(1)}%
-        </Typography>
-      ),
-    },
-    {
-      field: 'vs_budget',
-      headerName: 'vs Budget',
-      width: 120,
-      type: 'number',
-      renderCell: (params) => {
-        const value = params.value;
-        if (value === null || value === undefined || isNaN(value)) {
-          return <Typography variant="body2">-</Typography>;
-        }
-        return (
+      ...(viewType === 'item' ? [{
+        field: 'item_description',
+        headerName: 'Description',
+        width: 250,
+      }] : []),
+      {
+        field: 'total_cogs',
+        headerName: 'Total COGS',
+        width: 130,
+        type: 'number',
+        renderCell: (params) => (
+          <Typography variant="body2" fontWeight={600} color="error">
+            {formatCurrency(params.value)}
+          </Typography>
+        ),
+      },
+      {
+        field: 'total_revenue',
+        headerName: 'Revenue',
+        width: 130,
+        type: 'number',
+        renderCell: (params) => (
           <Typography variant="body2">
-            ${(value / 1000).toFixed(1)}K
+            {formatCurrency(params.value)}
           </Typography>
-        );
+        ),
       },
-    },
-    {
-      field: 'variance',
-      headerName: 'Variance',
-      width: 120,
-      type: 'number',
-      renderCell: (params) => {
-        const value = params.value;
-        if (value === null || value === undefined || isNaN(value)) {
-          return <Typography variant="body2">-</Typography>;
-        }
-        const color = value > 0 ? '#ef4444' : '#10b981';
-        return (
+      {
+        field: 'total_gm',
+        headerName: 'Gross Margin',
+        width: 130,
+        type: 'number',
+        renderCell: (params) => (
+          <Typography variant="body2" fontWeight={600} color="success">
+            {formatCurrency(params.value)}
+          </Typography>
+        ),
+      },
+      {
+        field: 'cogs_percent',
+        headerName: 'COGS %',
+        width: 100,
+        type: 'number',
+        renderCell: (params) => (
           <Chip
-            label={`${value > 0 ? '+' : ''}${(value / 1000).toFixed(1)}K`}
+            label={formatPercent(params.value)}
             size="small"
             sx={{
-              bgcolor: alpha(color, 0.1),
-              color: color,
+              bgcolor: params.value < 10 ? alpha('#10b981', 0.1) : alpha('#ef4444', 0.1),
+              color: params.value < 10 ? '#10b981' : '#ef4444',
               fontWeight: 600,
-              fontSize: '0.75rem',
             }}
           />
-        );
+        ),
       },
-    },
-    {
-      field: 'trend',
-      headerName: 'Trend',
-      width: 120,
-      renderCell: (params) => {
-        const colorMap = {
-          'Increasing': '#ef4444',
-          'Stable': '#f59e0b',
-          'Decreasing': '#10b981',
-        };
-        const color = colorMap[params.value] || '#6b7280';
-        return (
-          <Chip
-            label={params.value}
-            size="small"
-            sx={{
-              bgcolor: alpha(color, 0.1),
-              color: color,
-              fontWeight: 600,
-              fontSize: '0.75rem',
-            }}
-          />
-        );
+      {
+        field: 'transaction_count',
+        headerName: 'Transactions',
+        width: 110,
+        type: 'number',
       },
-    },
-  ];
+      {
+        field: 'quantity',
+        headerName: 'Units',
+        width: 100,
+        type: 'number',
+      },
+    ];
 
-  const handleExport = () => {
-    console.log('Exporting cost data...');
+    return baseColumns;
   };
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -230,7 +258,7 @@ const CostCOGSAnalytics = ({ onBack }) => {
                 width: 48,
                 height: 48,
                 borderRadius: 2,
-                background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -249,15 +277,21 @@ const CostCOGSAnalytics = ({ onBack }) => {
           </Stack>
 
           <Stack direction="row" spacing={1}>
-            <IconButton onClick={refetch} sx={{ bgcolor: alpha('#3b82f6', 0.1) }}>
-              <RefreshIcon sx={{ color: '#3b82f6' }} />
+            <IconButton onClick={fetchData} sx={{ bgcolor: alpha('#ef4444', 0.1) }}>
+              <RefreshIcon sx={{ color: '#ef4444' }} />
             </IconButton>
-            <IconButton onClick={handleExport} sx={{ bgcolor: alpha('#3b82f6', 0.1) }}>
-              <DownloadIcon sx={{ color: '#3b82f6' }} />
+            <IconButton sx={{ bgcolor: alpha('#ef4444', 0.1) }}>
+              <DownloadIcon sx={{ color: '#ef4444' }} />
             </IconButton>
           </Stack>
         </Stack>
       </Box>
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          Error loading data: {error}
+        </Alert>
+      )}
 
       {/* KPI Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
@@ -277,6 +311,9 @@ const CostCOGSAnalytics = ({ onBack }) => {
                     </Typography>
                     <Typography variant="h5" fontWeight={700} color={kpi.color}>
                       {kpi.value}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {kpi.subtitle}
                     </Typography>
                   </Box>
                   <Box
@@ -299,28 +336,44 @@ const CostCOGSAnalytics = ({ onBack }) => {
         ))}
       </Grid>
 
-      {/* DataGrid */}
-      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <DataGrid
-          rows={costData || []}
-          columns={columns}
-          loading={loading}
-          density="compact"
-          slots={{ toolbar: GridToolbar }}
-          slotProps={{
-            toolbar: {
-              showQuickFilter: true,
-              quickFilterProps: { debounceMs: 500 },
-            },
-          }}
-          initialState={{
-            pagination: { paginationModel: { pageSize: 25 } },
-          }}
-          pageSizeOptions={[10, 25, 50, 100]}
-          checkboxSelection
-          disableRowSelectionOnClick
-          sx={stoxTheme.getDataGridSx()}
-        />
+      {/* Tabs for different views */}
+      <Paper sx={{ mb: 3, flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <Tabs value={activeTab} onChange={(e, v) => setActiveTab(v)} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tab label="By Product System" icon={<ProductIcon />} iconPosition="start" />
+          <Tab label="By Distributor" icon={<BusinessIcon />} iconPosition="start" />
+          <Tab label="By Item" icon={<CategoryIcon />} iconPosition="start" />
+        </Tabs>
+
+        {/* Unified DataGrid - structure stays consistent across tabs */}
+        <Box sx={{ p: 2, height: 600 }}>
+          <DataGrid
+            rows={
+              activeTab === 0 ? systemData.map((row, idx) => ({ id: idx + 1, ...row })) :
+              activeTab === 1 ? distributorData.map((row, idx) => ({ id: idx + 1, ...row })) :
+              itemData.map((row, idx) => ({ id: idx + 1, ...row }))
+            }
+            columns={getColumns(
+              activeTab === 0 ? 'system' :
+              activeTab === 1 ? 'distributor' : 'item'
+            )}
+            loading={loading}
+            density="compact"
+            slots={{ toolbar: GridToolbar }}
+            slotProps={{
+              toolbar: {
+                showQuickFilter: true,
+                quickFilterProps: { debounceMs: 500 },
+              },
+            }}
+            initialState={{
+              pagination: { paginationModel: { pageSize: 25 } },
+            }}
+            pageSizeOptions={[10, 25, 50, 100]}
+            checkboxSelection
+            disableRowSelectionOnClick
+            sx={stoxTheme.getDataGridSx()}
+          />
+        </Box>
       </Paper>
     </Box>
   );

@@ -12,8 +12,8 @@ class MargenChatService:
     """Service for processing natural language queries about margin data"""
     
     def __init__(self):
-        # Use PostgreSQL SQL generator for MargenAI queries (customer analytics database only)
-        self.sql_generator = PostgreSQLGenerator(database="customer_analytics")
+        # Use PostgreSQL SQL generator for MargenAI queries (using mantrix_nexxt database)
+        self.sql_generator = PostgreSQLGenerator(database="mantrix_nexxt")
         self.example_queries = self._get_example_queries()
     
     def _get_example_queries(self) -> List[Dict[str, str]]:
@@ -134,29 +134,43 @@ class MargenChatService:
     
     def _format_chat_response(self, original_query: str, result: Dict[str, Any]) -> Dict[str, Any]:
         """Format the SQL result for chat interface display"""
-        
+
         response = {
             "query": original_query,
             "success": not bool(result.get("error")),
             "sql": result.get("sql"),
             "from_cache": result.get("from_cache", False)
         }
-        
+
+        # Include fuzzy search info if present
+        if result.get("fuzzy_search_applied"):
+            response["fuzzy_search_applied"] = True
+            response["original_sql"] = result.get("original_sql")
+            response["search_note"] = result.get("search_note")
+
         if result.get("error"):
             response["error"] = result["error"]
             response["message"] = self._get_error_message(result)
         else:
             execution = result.get("execution", {})
-            
+
             if execution.get("success"):
                 response["data"] = execution.get("data", [])
                 response["columns"] = execution.get("columns", [])
                 response["row_count"] = execution.get("row_count", 0)
-                response["message"] = self._generate_result_summary(
-                    original_query, 
+
+                # Prepend fuzzy search note to message if applicable
+                base_message = self._generate_result_summary(
+                    original_query,
                     execution.get("data", []),
                     execution.get("columns", [])
                 )
+
+                if result.get("fuzzy_search_applied"):
+                    response["message"] = f"{result.get('search_note')}\n\n{base_message}"
+                else:
+                    response["message"] = base_message
+
                 response["visualization_type"] = self._suggest_visualization(
                     original_query,
                     execution.get("columns", [])
@@ -164,7 +178,7 @@ class MargenChatService:
             else:
                 response["error"] = execution.get("error")
                 response["message"] = f"SQL execution failed: {execution.get('error')}"
-        
+
         return response
     
     def _generate_result_summary(self, query: str, data: List[Dict], columns: List[str]) -> str:

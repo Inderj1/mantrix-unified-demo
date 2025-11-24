@@ -203,6 +203,18 @@ async def get_enterprise_summary():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# ========== CONSIGNMENT KIT PROCESS ENDPOINTS ==========
+
+@router.get("/consignment-kit-process")
+async def get_consignment_kit_process():
+    """Get consignment kit process data and statistics"""
+    try:
+        return stox_service.get_consignment_kit_process()
+    except Exception as e:
+        logger.error(f"Failed to get consignment kit process data: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/health")
 async def health_check():
     """Health check endpoint"""

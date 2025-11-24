@@ -41,6 +41,13 @@ class PulseMonitorService:
 
     def __init__(self):
         self.pg_client = PostgreSQLClient(database="customer_analytics")
+        self.mantrix_pg_client = PostgreSQLClient(
+            host="localhost",
+            port=5433,
+            user="mantrix",
+            password="mantrix123",
+            database="mantrix_nexxt"
+        )
         self.bq_client = BigQueryClient()
         self.sql_generator = SQLGenerator()
         self.llm_client = LLMClient()
@@ -346,7 +353,7 @@ class PulseMonitorService:
         user_id: str,
         include_disabled: bool = False
     ) -> List[Dict[str, Any]]:
-        """Get all monitors for a user"""
+        """Get all monitors for a user (includes user-specific and global monitors)"""
         query = """
         SELECT
             id, name, description, natural_language_query,
@@ -354,15 +361,16 @@ class PulseMonitorService:
             severity, frequency, enabled,
             last_run, next_run, query_version,
             false_positives, true_positives, user_rating,
-            created_at, updated_at
+            created_at, updated_at,
+            scope, category, notification_config, notification_recipients
         FROM pulse_monitors
-        WHERE user_id = %s
+        WHERE (user_id = %s OR scope = 'global')
         """
 
         if not include_disabled:
             query += " AND enabled = true"
 
-        query += " ORDER BY created_at DESC"
+        query += " ORDER BY category, scope DESC, created_at DESC"  # Group by category, global first
 
         monitors = self.pg_client.execute_query(query, (user_id,))
         return monitors
@@ -433,7 +441,9 @@ class PulseMonitorService:
         """Execute query against specified data source"""
         if data_source == 'bigquery':
             return self.bq_client.execute_query(sql)
-        else:  # postgresql
+        elif data_source == 'mantrix_nexxt':
+            return self.mantrix_pg_client.execute_query(sql)
+        else:  # postgresql (customer_analytics)
             return self.pg_client.execute_query(sql)
 
     def _evaluate_alert_conditions(
@@ -516,7 +526,139 @@ class PulseMonitorService:
         )
 
         self.pg_client.execute_query(query, params)
+
+        # Send notifications if configured
+        await self._send_notifications(monitor, alert_id, title, message)
+
         return alert_id
+
+    async def _send_notifications(
+        self,
+        monitor: Dict[str, Any],
+        alert_id: str,
+        title: str,
+        message: str
+    ):
+        """Send notifications based on monitor configuration"""
+        notification_config = monitor.get('notification_config', {})
+        notification_recipients = monitor.get('notification_recipients', [])
+
+        if not notification_config:
+            return
+
+        # Email notification
+        if notification_config.get('email'):
+            await self._send_email_notification(
+                monitor, alert_id, title, message, notification_recipients
+            )
+
+        # Slack notification
+        if notification_config.get('slack'):
+            await self._send_slack_notification(
+                monitor, alert_id, title, message
+            )
+
+        # Microsoft Teams notification
+        if notification_config.get('teams'):
+            await self._send_teams_notification(
+                monitor, alert_id, title, message
+            )
+
+        # AI Agent notification (triggers AI agent to analyze and take action)
+        if notification_config.get('ai_agent'):
+            await self._trigger_ai_agent(
+                monitor, alert_id, title, message
+            )
+
+    async def _send_email_notification(
+        self,
+        monitor: Dict[str, Any],
+        alert_id: str,
+        title: str,
+        message: str,
+        recipients: List[str]
+    ):
+        """Send email notification"""
+        try:
+            logger.info(f"📧 Email notification for alert {alert_id}")
+            logger.info(f"   Monitor: {monitor['name']}")
+            logger.info(f"   Severity: {monitor['severity']}")
+            logger.info(f"   Recipients: {recipients if recipients else 'default admins'}")
+            # TODO: Integrate with email service (SendGrid, SES, SMTP)
+            # For now, just log the notification
+        except Exception as e:
+            logger.error(f"Failed to send email notification: {e}")
+
+    async def _send_slack_notification(
+        self,
+        monitor: Dict[str, Any],
+        alert_id: str,
+        title: str,
+        message: str
+    ):
+        """Send Slack notification"""
+        try:
+            logger.info(f"💬 Slack notification for alert {alert_id}")
+            logger.info(f"   Monitor: {monitor['name']}")
+            # TODO: Integrate with Slack webhook
+        except Exception as e:
+            logger.error(f"Failed to send Slack notification: {e}")
+
+    async def _send_teams_notification(
+        self,
+        monitor: Dict[str, Any],
+        alert_id: str,
+        title: str,
+        message: str
+    ):
+        """Send Microsoft Teams notification"""
+        try:
+            logger.info(f"👥 Teams notification for alert {alert_id}")
+            logger.info(f"   Monitor: {monitor['name']}")
+            # TODO: Integrate with Teams webhook
+        except Exception as e:
+            logger.error(f"Failed to send Teams notification: {e}")
+
+    async def _trigger_ai_agent(
+        self,
+        monitor: Dict[str, Any],
+        alert_id: str,
+        title: str,
+        message: str
+    ):
+        """Trigger AI agent to analyze alert and recommend actions"""
+        try:
+            logger.info(f"🤖 AI Agent triggered for alert {alert_id}")
+            logger.info(f"   Monitor: {monitor['name']}")
+            logger.info(f"   Category: {monitor.get('category', 'general')}")
+
+            # Use LLM to analyze the alert and suggest actions
+            analysis_prompt = f"""
+            You are an AI operations assistant analyzing a system alert.
+
+            Alert: {title}
+            Monitor: {monitor['name']}
+            Category: {monitor.get('category', 'general')}
+            Severity: {monitor['severity']}
+
+            Details:
+            {message}
+
+            Please provide:
+            1. Root cause analysis
+            2. Impact assessment
+            3. Recommended immediate actions
+            4. Preventive measures
+
+            Format your response as actionable steps.
+            """
+
+            # TODO: Call LLM for analysis
+            # For now, log the trigger
+            logger.info(f"   AI Analysis would be requested with prompt length: {len(analysis_prompt)}")
+
+        except Exception as e:
+            logger.error(f"Failed to trigger AI agent: {e}")
 
     def _generate_alert_message(
         self,

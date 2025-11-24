@@ -1,0 +1,469 @@
+{
+  "MARGEN.AI_TAB_1_Revenue_Growth_Analytics": {
+    "description": "Top-line revenue performance, growth trends, sales analysis by product, customer, channel, region",
+    "excel_sources": {
+      "#1 - Invoice Data.xlsx": {
+        "sheets": [
+          "data"
+        ],
+        "key_fields": [
+          "Surgeon",
+          "Facility",
+          "Surgery Date",
+          "Inv #",
+          "Item Code",
+          "System",
+          "Quantity",
+          "Price Each",
+          "Amount"
+        ],
+        "usage": "PRIMARY SOURCE - Line-level transaction data for revenue by product, surgeon, facility, date",
+        "metrics_derived": [
+          "Total Revenue by Product/System",
+          "Revenue by Surgeon",
+          "Revenue by Facility",
+          "Revenue Trends over Time (by Surgery Date)",
+          "Average Selling Price by Product",
+          "Quantity Sold Analysis"
+        ]
+      },
+      "csg.xlsx": {
+        "sheets": [
+          "2025 - Summary",
+          "2025 - Data"
+        ],
+        "key_fields": [
+          "Surgeon",
+          "Distributor",
+          "Region",
+          "Facility",
+          "System",
+          "Total Sales"
+        ],
+        "usage": "SECONDARY SOURCE - Aggregated sales with regional and distributor dimensions",
+        "metrics_derived": [
+          "Revenue by Region",
+          "Revenue by Distributor (Channel)",
+          "Revenue by System/Product Line",
+          "Regional Growth Analysis"
+        ]
+      },
+      "#4 - 6 Region - 2025 MSR - Tab 2025 Data.xlsx": {
+        "sheets": [
+          "Annual Sales Summary",
+          "Dollars 2025",
+          "2025 Data",
+          "2024-2022 Data"
+        ],
+        "key_fields": [
+          "Territory",
+          "Distributor",
+          "System Used",
+          "Dollar Total"
+        ],
+        "usage": "Multi-year comparison for growth trends and territory performance",
+        "metrics_derived": [
+          "YoY Growth Analysis (2022-2025)",
+          "Territory-level Revenue",
+          "System Usage Trends",
+          "Monthly Sales Performance vs Budget"
+        ]
+      },
+      "2025 Territories - 6 Regions.xlsx": {
+        "sheets": [
+          "2024 - 6 Regions"
+        ],
+        "key_fields": [
+          "Territory",
+          "State",
+          "Account Manager"
+        ],
+        "usage": "Geographic hierarchy for regional revenue aggregation",
+        "metrics_derived": [
+          "Revenue by State",
+          "Account Manager Performance"
+        ]
+      }
+    }
+  },
+  "MARGEN.AI_TAB_2_Cost_COGS_Analysis": {
+    "description": "Cost structure breakdown, COGS components, operating expenses, cost optimization",
+    "excel_sources": {
+      "#2 - Manufacturing Std Cost.xlsx": {
+        "sheets": [
+          "#2 - Manufacturing Std Cost"
+        ],
+        "key_fields": [
+          "Item No.",
+          "Item Description",
+          "Base Price",
+          "Unit Price"
+        ],
+        "usage": "PRIMARY SOURCE - Standard manufacturing costs for COGS calculation",
+        "metrics_derived": [
+          "Standard Cost by Product",
+          "Cost Structure Analysis",
+          "Cost per Unit",
+          "Total COGS (join with Invoice Data on Item No.)"
+        ]
+      },
+      "#3 - Item Data File.xlsx": {
+        "sheets": [
+          "#3 - Item Data File"
+        ],
+        "key_fields": [
+          "Item No.",
+          "Item Cost",
+          "Last Evaluated Price",
+          "Procurement Method",
+          "Material",
+          "Preferred Vendor"
+        ],
+        "usage": "Extended cost attributes and procurement data",
+        "metrics_derived": [
+          "Item-level Cost Details",
+          "Procurement Method Analysis",
+          "Material Cost Components",
+          "Vendor Cost Analysis"
+        ]
+      },
+      "csg.xlsx": {
+        "sheets": [
+          "2025 - Data"
+        ],
+        "key_fields": [
+          "Item Code",
+          "Std Cost",
+          "Total Std Cost"
+        ],
+        "usage": "Transaction-level standard costs matched to actual sales",
+        "metrics_derived": [
+          "Actual COGS by Transaction",
+          "Cost of Goods Sold Trends",
+          "Cost by Region/Distributor"
+        ]
+      },
+      "Cibolo Spine (Turgon) 2025 Commission (2).xlsx": {
+        "sheets": [
+          "Sheet1"
+        ],
+        "key_fields": [
+          "Dollar Total",
+          "Commission %",
+          "Calculated Commission"
+        ],
+        "usage": "Commission expenses (operating cost component)",
+        "metrics_derived": [
+          "Commission Expense by Distributor",
+          "Variable Cost Analysis"
+        ]
+      },
+      "Leap LLC (Knickerbocker) 2025 Commission (2).xlsx": {
+        "sheets": [
+          "Sheet1"
+        ],
+        "key_fields": [
+          "Dollar Total",
+          "Commission %",
+          "Calculated Commission"
+        ],
+        "usage": "Commission expenses (operating cost component)",
+        "metrics_derived": [
+          "Commission Expense by Distributor",
+          "Variable Cost Analysis"
+        ]
+      },
+      "SOP 6.0-01-10 Distributor Profitability Q3 2025 (3).xlsx": {
+        "sheets": [
+          "Q3 2025"
+        ],
+        "key_fields": [
+          "Principal",
+          "COMMISSION"
+        ],
+        "usage": "Aggregated commission expenses by distributor",
+        "metrics_derived": [
+          "Total Commission Expense by Distributor",
+          "Commission as % of Sales"
+        ]
+      }
+    }
+  },
+  "MARGEN.AI_TAB_3_Margin_Profitability": {
+    "description": "Gross margin, operating margin, contribution analysis, profitability by segment",
+    "excel_sources": {
+      "csg.xlsx": {
+        "sheets": [
+          "2025 - Summary",
+          "2025 - Data"
+        ],
+        "key_fields": [
+          "Total Sales",
+          "Total Std Cost",
+          "Total GM",
+          "Surgeon",
+          "Distributor",
+          "Region",
+          "Facility",
+          "System"
+        ],
+        "usage": "PRIMARY SOURCE - Complete margin analysis at transaction level",
+        "metrics_derived": [
+          "Gross Margin by Product/System",
+          "Gross Margin by Surgeon",
+          "Gross Margin by Distributor",
+          "Gross Margin by Region",
+          "Gross Margin by Facility",
+          "GM% Analysis",
+          "Contribution Margin by Segment"
+        ]
+      },
+      "CGS Review - ASP - System, Units, Facility - '25 8-20-25 9-5.xlsx": {
+        "sheets": [
+          "2025 - Summary",
+          "2025 - Data"
+        ],
+        "key_fields": [
+          "Total Sales",
+          "Total Std Cost",
+          "Total GM",
+          "System",
+          "Facility"
+        ],
+        "usage": "Average Selling Price and margin analysis",
+        "metrics_derived": [
+          "ASP Trends",
+          "Margin Trends by System",
+          "Facility-level Profitability"
+        ]
+      },
+      "SOP 6.0-01-10 Distributor Profitability Q3 2025 (3).xlsx": {
+        "sheets": [
+          "Q3 2025"
+        ],
+        "key_fields": [
+          "Principal",
+          "Sales",
+          "COMMISSION",
+          "Gross Profit"
+        ],
+        "usage": "Distributor-level profitability with commission impact",
+        "metrics_derived": [
+          "Net Profit by Distributor (GM - Commission)",
+          "Profitability Ranking",
+          "ROI by Distributor Channel"
+        ]
+      },
+      "#1 - Invoice Data.xlsx": {
+        "sheets": [
+          "data"
+        ],
+        "key_fields": [
+          "Amount",
+          "Item Code",
+          "Surgeon",
+          "Facility",
+          "System"
+        ],
+        "usage": "Revenue data to calculate margins (when joined with cost data)",
+        "metrics_derived": [
+          "Revenue for margin calculations",
+          "Product mix profitability"
+        ]
+      },
+      "#2 - Manufacturing Std Cost.xlsx": {
+        "sheets": [
+          "#2 - Manufacturing Std Cost"
+        ],
+        "key_fields": [
+          "Item No.",
+          "Unit Price"
+        ],
+        "usage": "Standard costs for margin calculation",
+        "metrics_derived": [
+          "COGS for margin calculations"
+        ]
+      }
+    }
+  },
+  "MARGEN.AI_TAB_4_PL_Statement_GL_Explorer": {
+    "description": "Complete P&L view, GL account detail, variance analysis, financial reconciliation",
+    "excel_sources": {
+      "csg.xlsx": {
+        "sheets": [
+          "2025 - Summary",
+          "2025 - Data"
+        ],
+        "key_fields": [
+          "Surgery Date",
+          "Total Sales",
+          "Total Std Cost",
+          "Total GM"
+        ],
+        "usage": "PRIMARY SOURCE - Transaction-level P&L components",
+        "metrics_derived": [
+          "Revenue (Top Line)",
+          "COGS",
+          "Gross Profit",
+          "Monthly/Quarterly P&L Rollups"
+        ]
+      },
+      "SOP 6.0-01-10 Distributor Profitability Q3 2025 (3).xlsx": {
+        "sheets": [
+          "Q3 2025"
+        ],
+        "key_fields": [
+          "Principal",
+          "July/Aug/Sept Sales",
+          "Q3 Total",
+          "COMMISSION",
+          "Gross Profit"
+        ],
+        "usage": "Quarterly P&L with commission expense line item",
+        "metrics_derived": [
+          "Quarterly Revenue by Distributor",
+          "Operating Expenses (Commission)",
+          "Net Profit by Distributor",
+          "Month-over-Month Variance Analysis"
+        ]
+      },
+      "#4 - 6 Region - 2025 MSR - Tab 2025 Data.xlsx": {
+        "sheets": [
+          "Annual Sales Summary",
+          "Dollars 2025",
+          "2024-2022 Data"
+        ],
+        "key_fields": [
+          "Monthly Dollar Totals",
+          "Budget",
+          "Prior Year"
+        ],
+        "usage": "Budget vs Actual variance analysis",
+        "metrics_derived": [
+          "Budget Variance",
+          "Prior Year Variance",
+          "Forecast Accuracy"
+        ]
+      },
+      "#1 - Invoice Data.xlsx": {
+        "sheets": [
+          "data"
+        ],
+        "key_fields": [
+          "Surgery Date",
+          "Amount",
+          "Inv #"
+        ],
+        "usage": "Detailed GL transactions for reconciliation",
+        "metrics_derived": [
+          "GL Transaction Detail",
+          "Invoice-level Reconciliation",
+          "Revenue Recognition by Date"
+        ]
+      }
+    }
+  },
+  "MARGEN.AI_TAB_5_Financial_Drivers_WhatIf": {
+    "description": "Key value drivers, scenario modeling, sensitivity analysis, forecasted P&L impact",
+    "excel_sources": {
+      "#3 - Item Data File.xlsx": {
+        "sheets": [
+          "#3 - Item Data File"
+        ],
+        "key_fields": [
+          "Item No.",
+          "System Name",
+          "Item Cost",
+          "Last Evaluated Price"
+        ],
+        "usage": "Product master data for scenario modeling (price/cost changes)",
+        "metrics_derived": [
+          "Price Elasticity Inputs",
+          "Cost Change Scenarios",
+          "Product Mix Scenarios"
+        ]
+      },
+      "csg.xlsx": {
+        "sheets": [
+          "2025 - Data"
+        ],
+        "key_fields": [
+          "Quantity",
+          "Price Each",
+          "Std Cost",
+          "Total Sales",
+          "Total GM"
+        ],
+        "usage": "Historical data for trend analysis and forecasting",
+        "metrics_derived": [
+          "Volume Drivers",
+          "Price Drivers",
+          "Cost Drivers",
+          "Baseline for What-If Scenarios"
+        ]
+      },
+      "#4 - 6 Region - 2025 MSR - Tab 2025 Data.xlsx": {
+        "sheets": [
+          "2025 Data",
+          "2024 Data",
+          "2023 Data",
+          "2022 Data"
+        ],
+        "key_fields": [
+          "Surgical Date",
+          "Dollar Total",
+          "System Used"
+        ],
+        "usage": "Multi-year trends for forecasting and scenario planning",
+        "metrics_derived": [
+          "Growth Rate Assumptions",
+          "Seasonality Patterns",
+          "Territory Expansion Scenarios"
+        ]
+      },
+      "SOP 6.0-01-10 Distributor Profitability Q3 2025 (3).xlsx": {
+        "sheets": [
+          "Q3 2025"
+        ],
+        "key_fields": [
+          "Commission %",
+          "Gross Profit"
+        ],
+        "usage": "Commission structure for scenario modeling",
+        "metrics_derived": [
+          "Commission Rate Scenarios",
+          "Distributor Profitability What-If",
+          "Channel Strategy Scenarios"
+        ]
+      },
+      "2025 Territories - 6 Regions.xlsx": {
+        "sheets": [
+          "2024 - 6 Regions"
+        ],
+        "key_fields": [
+          "Territory",
+          "State"
+        ],
+        "usage": "Geographic expansion scenarios",
+        "metrics_derived": [
+          "Territory Expansion Impact",
+          "Geographic Coverage Scenarios"
+        ]
+      },
+      "#2 - Manufacturing Std Cost.xlsx": {
+        "sheets": [
+          "#2 - Manufacturing Std Cost"
+        ],
+        "key_fields": [
+          "Item No.",
+          "Unit Price"
+        ],
+        "usage": "Standard cost baseline for cost reduction scenarios",
+        "metrics_derived": [
+          "Cost Reduction Scenarios",
+          "Margin Impact of Cost Changes"
+        ]
+      }
+    }
+  }
+}

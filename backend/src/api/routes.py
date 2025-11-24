@@ -23,8 +23,8 @@ from src.api.models import (
     ExecuteResearchRequest, ResearchProgressResponse,
     ResearchReportResponse, ResearchInsightResponse, ResearchRecommendationResponse
 )
-from src.core.sql_generator import SQLGenerator
-from src.db.database_client import DatabaseClient as BigQueryClient
+from src.core.postgresql_sql_generator import PostgreSQLGenerator as SQLGenerator
+from src.db.database_client import DatabaseClient as BigQueryClient  # Legacy - no longer used
 from src.db.weaviate_client import WeaviateClient
 from src.core.optimization import (
     MaterializedViewManager, MaterializedViewConfig, MaterializedViewOptimizer,
@@ -259,10 +259,10 @@ async def process_query(
     execution_id = str(uuid.uuid4())
     
     try:
-        # Override dataset if provided
-        if request.dataset:
-            generator.bq_client.dataset_id = request.dataset
-        
+        # Override dataset if provided (PostgreSQL doesn't use dataset concept)
+        # if request.dataset:
+        #     generator.bq_client.dataset_id = request.dataset
+
         # Get options
         options = request.options or {}
         use_vector_search = options.get("use_vector_search", True)

@@ -57,6 +57,17 @@ class AlertFeedbackRequest(BaseModel):
     notes: Optional[str] = None
 
 
+class UpdateMonitorRequest(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    alert_condition: Optional[str] = None
+    severity: Optional[str] = None
+    frequency: Optional[str] = None
+    enabled: Optional[bool] = None
+    notification_config: Optional[Dict[str, bool]] = None
+    notification_recipients: Optional[List[Dict[str, str]]] = None
+
+
 @router.post("/monitors/create")
 async def create_monitor(request: CreateMonitorRequest):
     """
@@ -209,6 +220,85 @@ async def test_monitor(monitor_id: str):
         raise HTTPException(
             status_code=500,
             detail=f"Failed to test monitor: {str(e)}"
+        )
+
+
+@router.put("/monitors/{monitor_id}")
+async def update_monitor(monitor_id: str, request: UpdateMonitorRequest):
+    """
+    Update monitor configuration including notifications, schedules, and alert settings
+    """
+    try:
+        # Build dynamic update query based on provided fields
+        update_fields = []
+        params = []
+
+        if request.name is not None:
+            update_fields.append("name = %s")
+            params.append(request.name)
+
+        if request.description is not None:
+            update_fields.append("description = %s")
+            params.append(request.description)
+
+        if request.alert_condition is not None:
+            update_fields.append("alert_condition = %s")
+            params.append(request.alert_condition)
+
+        if request.severity is not None:
+            update_fields.append("severity = %s")
+            params.append(request.severity)
+
+        if request.frequency is not None:
+            update_fields.append("frequency = %s")
+            params.append(request.frequency)
+
+        if request.enabled is not None:
+            update_fields.append("enabled = %s")
+            params.append(request.enabled)
+
+        if request.notification_config is not None:
+            import json
+            update_fields.append("notification_config = %s")
+            params.append(json.dumps(request.notification_config))
+
+        if request.notification_recipients is not None:
+            import json
+            update_fields.append("notification_recipients = %s")
+            params.append(json.dumps(request.notification_recipients))
+
+        if not update_fields:
+            raise HTTPException(status_code=400, detail="No fields to update")
+
+        update_fields.append("updated_at = CURRENT_TIMESTAMP")
+        params.append(monitor_id)
+
+        query = f"""
+        UPDATE pulse_monitors
+        SET {', '.join(update_fields)}
+        WHERE id = %s
+        RETURNING id, name, description, severity, frequency, enabled,
+                  notification_config, notification_recipients
+        """
+
+        result = pulse_service.pg_client.execute_query(query, tuple(params))
+
+        if not result:
+            raise HTTPException(status_code=404, detail="Monitor not found")
+
+        return {
+            "success": True,
+            "monitor": result[0],
+            "message": "Monitor updated successfully"
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating monitor: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to update monitor: {str(e)}"
         )
 
 
