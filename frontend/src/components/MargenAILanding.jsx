@@ -26,6 +26,7 @@ import {
   Assessment as AssessmentIcon,
   AccountBalance as AccountBalanceIcon,
   Analytics as AnalyticsIcon,
+  QuestionAnswer as ChatIcon,
 } from '@mui/icons-material';
 
 const margenModules = [
@@ -88,6 +89,18 @@ const margenModules = [
     stats: { label: 'Scenarios', value: '8' },
     status: 'active',
     gradient: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+  },
+  {
+    id: 'ask-margen',
+    title: 'ASK.MARGEN',
+    subtitle: 'AI Chat Assistant',
+    description: 'Conversational interface for margin analytics - ask questions about profitability, P&L, COGS, and financial performance in natural language',
+    icon: ChatIcon,
+    color: '#1873b4',
+    bgColor: '#e3f2fd',
+    stats: { label: 'AI Assistant', value: 'Active' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #1873b4 0%, #0a6ed1 100%)',
   },
 ];
 

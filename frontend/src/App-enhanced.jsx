@@ -82,6 +82,7 @@ import CostCOGSAnalytics from './components/margenai/CostCOGSAnalytics';
 import MarginProfitabilityAnalytics from './components/margenai/MarginProfitabilityAnalytics';
 import PLGLExplorerAnalytics from './components/margenai/PLGLExplorerAnalytics';
 import FinancialDriversAnalytics from './components/margenai/FinancialDriversAnalytics';
+import AskMargen from './components/AskMargen';
 import AxisAIDashboard from './components/AxisAIDashboard';
 import DocumentIntelligenceLanding from './components/DocumentIntelligenceLanding';
 import ProcessMiningPage from './pages/ProcessMiningPage';
@@ -610,6 +611,9 @@ function App() {
                   )}
                   {margenView === 'drivers-whatif' && (
                     <FinancialDriversAnalytics onBack={() => setMargenView('landing')} />
+                  )}
+                  {margenView === 'ask-margen' && (
+                    <AskMargen onBack={() => setMargenView('landing')} />
                   )}
                 </Box>
               </Fade>
