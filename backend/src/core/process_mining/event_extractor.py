@@ -428,7 +428,8 @@ class EventExtractor:
                     'Invoice Generated'
                 ],
                 'data_source': 'sales_order_cockpit_export',
-                'supported': True
+                'supported': False,
+                'note': 'Currently disabled'
             },
             {
                 'id': 'consignment-kit',
@@ -476,8 +477,8 @@ class EventExtractor:
                 'description': 'Sales process from quote to revenue',
                 'activities': ['Order Created', 'Goods Delivered', 'Invoice Generated'],
                 'data_source': 'sales_order_cockpit_export',
-                'supported': True,
-                'note': 'Limited to order fulfillment portion (quote data not available)'
+                'supported': False,
+                'note': 'Currently disabled - Limited quote data available'
             },
             {
                 'id': 'procure-to-pay',

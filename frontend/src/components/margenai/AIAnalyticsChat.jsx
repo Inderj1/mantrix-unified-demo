@@ -178,9 +178,9 @@ const AIAnalyticsChat = ({ dashboardData, onBack }) => {
   };
 
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 3 }}>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 1 }}>
       {/* Header with Breadcrumbs */}
-      <Box sx={{ mb: 3 }}>
+      <Box sx={{ mb: 2 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
             <Link
@@ -226,9 +226,9 @@ const AIAnalyticsChat = ({ dashboardData, onBack }) => {
       </Box>
 
       {/* Main Content Area */}
-      <Box sx={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+      <Box sx={{ flex: 1, display: 'flex', overflow: 'hidden', maxHeight: 'calc(100vh - 164px)' }}>
         {/* Chat Messages */}
-        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+        <Box sx={{ flex: 1, overflow: 'auto', px: 2, pt: 1, pb: 0.5 }}>
           <List>
             {messages.map((message) => (
               <ListItem
@@ -318,7 +318,7 @@ const AIAnalyticsChat = ({ dashboardData, onBack }) => {
       </Box>
 
       {/* Input Area */}
-      <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
+      <Box sx={{ px: 2, py: 1.5, borderTop: 1, borderColor: 'divider' }}>
         <Box display="flex" gap={1}>
           <TextField
             fullWidth

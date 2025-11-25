@@ -229,8 +229,14 @@ const AskMargen = ({ onBack }) => {
   const [showDeepResearch, setShowDeepResearch] = useState(false);
   const [deepResearchQuestion, setDeepResearchQuestion] = useState('');
   const initializationRef = useRef(false);
+  const messagesEndRef = useRef(null);
 
   console.log('SimpleChatInterface rendering, mode:', mode, 'userId:', userId);
+
+  // Auto-scroll to latest message
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
 
   // Initialize on mount - wait for user to be loaded
@@ -2186,8 +2192,9 @@ const AskMargen = ({ onBack }) => {
           sx={{
             p: 1,
             borderRadius: 0,
-            position: 'relative',
-            zIndex: 10,
+            position: 'sticky',
+            top: 0,
+            zIndex: 100,
             flexShrink: 0,
             borderBottom: `2px solid ${alpha('#1873b4', 0.2)}`,
             bgcolor: 'white'
@@ -2272,12 +2279,19 @@ const AskMargen = ({ onBack }) => {
         {mode === 'chat' ? (
           <>
             {/* Sub-tabs for Chat Mode */}
-            <Paper sx={{ mx: 2, mt: 1 }}>
-              <Tabs 
-                value={viewMode} 
+            <Paper sx={{
+              mx: 2,
+              mt: 1,
+              position: 'sticky',
+              top: 90,
+              zIndex: 90,
+              bgcolor: 'white'
+            }}>
+              <Tabs
+                value={viewMode}
                 onChange={(e, v) => setViewMode(v)}
-                sx={{ 
-                  borderBottom: 1, 
+                sx={{
+                  borderBottom: 1,
                   borderColor: 'divider',
                   '& .MuiTab-root': {
                     textTransform: 'none',
@@ -2368,15 +2382,11 @@ const AskMargen = ({ onBack }) => {
         <Box
           data-messages-container="true"
           sx={{
-            flexGrow: 1,
-            minHeight: 0, // Important for proper flex behavior
-            overflow: 'auto', // Changed from 'hidden' to 'auto' to enable scrolling
-            p: 2,
+            flex: 1,
+            overflow: 'auto', // Enable scrolling for messages
+            px: 2,
+            py: 1,
             bgcolor: 'transparent',
-            display: 'flex',
-            flexDirection: 'column',
-            // Set a max height to ensure input area is visible
-            maxHeight: 'calc(100vh - 350px)', // Adjust based on header + sample queries + input area height
             // Custom scrollbar styling
             '&::-webkit-scrollbar': {
               width: '8px',
@@ -2429,13 +2439,25 @@ const AskMargen = ({ onBack }) => {
                 </Box>
               </Box>
             )}
+
+            {/* Invisible div for auto-scroll */}
+            <div ref={messagesEndRef} />
           </Box>
         </Box>
 
         <Divider sx={{ flexShrink: 0 }} />
 
-        {/* Input Area - Fixed */}
-        <Paper elevation={3} sx={{ p: 2, borderRadius: 0, flexShrink: 0 }}>
+        {/* Input Area - Fixed at bottom */}
+        <Paper elevation={3} sx={{
+          position: 'sticky',
+          bottom: 0,
+          px: 2,
+          py: 1,
+          borderRadius: 0,
+          flexShrink: 0,
+          bgcolor: 'white',
+          zIndex: 10
+        }}>
           <Box sx={{ width: '100%' }}>
             <Stack direction="row" spacing={2}>
               <TextField

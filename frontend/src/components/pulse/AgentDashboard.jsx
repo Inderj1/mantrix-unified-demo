@@ -56,6 +56,10 @@ import {
   Notifications as NotificationsIcon,
   Settings as SettingsIcon,
   Close as CloseIcon,
+  LocalShipping as LocalShippingIcon,
+  Build as BuildIcon,
+  AccountBalance as AccountBalanceIcon,
+  Analytics as AnalyticsIcon,
 } from '@mui/icons-material';
 import { DataGrid } from '@mui/x-data-grid';
 
@@ -235,11 +239,31 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
 
   // Category display names and icons for grouping agents
   const categoryInfo = {
-    supply_chain_operations: { name: '📦 Supply Chain Operations', color: '#1976d2' },
-    asset_health_maintenance: { name: '🔧 Asset Health & Maintenance', color: '#f57c00' },
-    financial_operations: { name: '💰 Financial Operations', color: '#388e3c' },
-    performance_analytics: { name: '📊 Performance Analytics', color: '#7b1fa2' },
-    general: { name: '⚙️ General', color: '#616161' }
+    supply_chain_operations: {
+      name: 'Supply Chain Operations',
+      icon: LocalShippingIcon,
+      color: '#1976d2'
+    },
+    asset_health_maintenance: {
+      name: 'Asset Health & Maintenance',
+      icon: BuildIcon,
+      color: '#f57c00'
+    },
+    financial_operations: {
+      name: 'Financial Operations',
+      icon: AccountBalanceIcon,
+      color: '#388e3c'
+    },
+    performance_analytics: {
+      name: 'Performance Analytics',
+      icon: AnalyticsIcon,
+      color: '#7b1fa2'
+    },
+    general: {
+      name: 'General',
+      icon: SettingsIcon,
+      color: '#616161'
+    }
   };
 
   // Filter, sort, and paginate agents
@@ -708,32 +732,46 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
           ) : (
             <>
               {/* Render agents grouped by category */}
-              {Object.entries(groupedAgents).map(([category, categoryAgents]) => (
-                <Box key={category} mb={4}>
-                  {/* Category Header */}
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      mb: 2,
-                      p: 1.5,
-                      bgcolor: alpha(categoryInfo[category]?.color || '#616161', 0.1),
-                      borderRadius: 1,
-                      borderLeft: `4px solid ${categoryInfo[category]?.color || '#616161'}`
-                    }}
-                  >
-                    <Typography variant="h6" fontWeight={600} sx={{ flex: 1 }}>
-                      {categoryInfo[category]?.name || category}
-                    </Typography>
-                    <Chip
-                      label={`${categoryAgents.length} agent${categoryAgents.length !== 1 ? 's' : ''}`}
-                      size="small"
+              {Object.entries(groupedAgents).map(([category, categoryAgents]) => {
+                const CategoryIcon = categoryInfo[category]?.icon || SettingsIcon;
+                const categoryColor = categoryInfo[category]?.color || '#616161';
+
+                return (
+                  <Box key={category} mb={4}>
+                    {/* Category Header */}
+                    <Box
                       sx={{
-                        bgcolor: 'white',
-                        fontWeight: 600
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1.5,
+                        mb: 2,
+                        p: 1.5,
+                        bgcolor: alpha(categoryColor, 0.1),
+                        borderRadius: 1,
+                        borderLeft: `4px solid ${categoryColor}`
                       }}
-                    />
-                  </Box>
+                    >
+                      <Avatar
+                        sx={{
+                          width: 40,
+                          height: 40,
+                          bgcolor: alpha(categoryColor, 0.15),
+                        }}
+                      >
+                        <CategoryIcon sx={{ fontSize: 24, color: categoryColor }} />
+                      </Avatar>
+                      <Typography variant="h6" fontWeight={600} sx={{ flex: 1 }}>
+                        {categoryInfo[category]?.name || category}
+                      </Typography>
+                      <Chip
+                        label={`${categoryAgents.length} agent${categoryAgents.length !== 1 ? 's' : ''}`}
+                        size="small"
+                        sx={{
+                          bgcolor: 'white',
+                          fontWeight: 600
+                        }}
+                      />
+                    </Box>
 
                   <Grid container spacing={viewMode === 'grid' ? 2 : 1}>
                     {categoryAgents.map((agent) => {
@@ -836,7 +874,8 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
                     })}
                   </Grid>
                 </Box>
-              ))}
+                );
+              })}
 
               {/* Pagination */}
               {totalPages > 1 && (

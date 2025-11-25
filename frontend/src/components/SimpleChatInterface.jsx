@@ -2346,18 +2346,18 @@ const SimpleChatInterface = () => {
         )}
 
         {/* Messages Area - With Scroll */}
-        <Box 
+        <Box
           data-messages-container="true"
-          sx={{ 
+          sx={{
             flexGrow: 1,
             minHeight: 0, // Important for proper flex behavior
             overflow: 'auto', // Changed from 'hidden' to 'auto' to enable scrolling
-            p: 2,
+            px: 2,
+            pt: 2,
+            pb: 1, // Reduced bottom padding
             bgcolor: 'background.default',
             display: 'flex',
             flexDirection: 'column',
-            // Set a max height to ensure input area is visible
-            maxHeight: 'calc(100vh - 280px)', // Adjust based on header + input area height
             // Custom scrollbar styling
             '&::-webkit-scrollbar': {
               width: '8px',
@@ -2416,7 +2416,7 @@ const SimpleChatInterface = () => {
         <Divider sx={{ flexShrink: 0 }} />
 
         {/* Input Area - Fixed */}
-        <Paper elevation={3} sx={{ p: 2, borderRadius: 0, flexShrink: 0 }}>
+        <Paper elevation={3} sx={{ px: 2, py: 1.5, borderRadius: 0, flexShrink: 0 }}>
           <Box sx={{ width: '100%' }}>
             <Stack direction="row" spacing={2}>
               <TextField

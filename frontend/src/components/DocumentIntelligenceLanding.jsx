@@ -105,43 +105,33 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
               <Zoom in timeout={400}>
                 <Card
                   sx={{
-                    height: 220,
                     cursor: 'pointer',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    border: '1px solid',
-                    borderColor: alpha('#8b5cf6', 0.2),
-                    borderRadius: 1,
-                    overflow: 'hidden',
-                    background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.02) 0%, rgba(255, 255, 255, 1) 100%)',
+                    background: 'white',
+                    border: `2px solid ${alpha('#8b5cf6', 0.1)}`,
                     position: 'relative',
+                    overflow: 'hidden',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: `0 12px 24px ${alpha('#8b5cf6', 0.25)}`,
+                      borderColor: alpha('#8b5cf6', 0.3),
+                      '& .action-icon': {
+                        transform: 'translateX(4px)',
+                      },
+                    },
                     '&::before': {
                       content: '""',
                       position: 'absolute',
                       top: 0,
                       left: 0,
                       right: 0,
-                      height: '2px',
-                      background: 'linear-gradient(90deg, #8b5cf6 0%, #7c3aed 100%)',
-                    },
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: '0 8px 20px rgba(139, 92, 246, 0.15)',
-                      borderColor: '#8b5cf6',
-                      '& .category-icon': {
-                        transform: 'scale(1.05)',
-                        bgcolor: '#8b5cf6',
-                        color: 'white',
-                      },
-                      '& .access-button': {
-                        background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-                        color: 'white',
-                        transform: 'translateX(3px)',
-                      },
+                      height: '4px',
+                      background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
                     },
                   }}
                   onClick={() => setSelectedView('document-analysis')}
                 >
-                  <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                  <CardContent sx={{ p: 3 }}>
                     {/* Icon and Badge */}
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
                       <Avatar
@@ -237,43 +227,33 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
               <Zoom in timeout={500}>
                 <Card
                   sx={{
-                    height: 220,
                     cursor: 'pointer',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    border: '1px solid',
-                    borderColor: alpha('#3b82f6', 0.2),
-                    borderRadius: 1,
-                    overflow: 'hidden',
-                    background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.02) 0%, rgba(255, 255, 255, 1) 100%)',
+                    background: 'white',
+                    border: `2px solid ${alpha('#3b82f6', 0.1)}`,
                     position: 'relative',
+                    overflow: 'hidden',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: `0 12px 24px ${alpha('#3b82f6', 0.25)}`,
+                      borderColor: alpha('#3b82f6', 0.3),
+                      '& .action-icon': {
+                        transform: 'translateX(4px)',
+                      },
+                    },
                     '&::before': {
                       content: '""',
                       position: 'absolute',
                       top: 0,
                       left: 0,
                       right: 0,
-                      height: '2px',
-                      background: 'linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)',
-                    },
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: '0 12px 32px rgba(59, 130, 246, 0.2)',
-                      borderColor: '#3b82f6',
-                      '& .category-icon': {
-                        transform: 'scale(1.1)',
-                        bgcolor: '#3b82f6',
-                        color: 'white',
-                      },
-                      '& .access-button': {
-                        background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-                        color: 'white',
-                        transform: 'translateX(4px)',
-                      },
+                      height: '4px',
+                      background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
                     },
                   }}
                   onClick={() => setSelectedView('excel-processor')}
                 >
-                  <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                  <CardContent sx={{ p: 3 }}>
                     {/* Icon and Badge */}
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
                       <Avatar
@@ -371,43 +351,33 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
               <Zoom in timeout={600}>
                 <Card
                   sx={{
-                    height: 220,
                     cursor: 'pointer',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    border: '1px solid',
-                    borderColor: alpha('#10b981', 0.2),
-                    borderRadius: 1,
-                    overflow: 'hidden',
-                    background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.02) 0%, rgba(255, 255, 255, 1) 100%)',
+                    background: 'white',
+                    border: `2px solid ${alpha('#10b981', 0.1)}`,
                     position: 'relative',
+                    overflow: 'hidden',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: `0 12px 24px ${alpha('#10b981', 0.25)}`,
+                      borderColor: alpha('#10b981', 0.3),
+                      '& .action-icon': {
+                        transform: 'translateX(4px)',
+                      },
+                    },
                     '&::before': {
                       content: '""',
                       position: 'absolute',
                       top: 0,
                       left: 0,
                       right: 0,
-                      height: '2px',
-                      background: 'linear-gradient(90deg, #10b981 0%, #059669 100%)',
-                    },
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: '0 12px 32px rgba(16, 185, 129, 0.2)',
-                      borderColor: '#10b981',
-                      '& .category-icon': {
-                        transform: 'scale(1.1)',
-                        bgcolor: '#10b981',
-                        color: 'white',
-                      },
-                      '& .access-button': {
-                        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                        color: 'white',
-                        transform: 'translateX(4px)',
-                      },
+                      height: '4px',
+                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                     },
                   }}
                   onClick={() => setSelectedView('pdf-parser')}
                 >
-                  <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                  <CardContent sx={{ p: 3 }}>
                     {/* Icon and Badge */}
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
                       <Avatar
