@@ -18,13 +18,13 @@ variable "zone" {
 variable "project_name" {
   description = "Project name for resource naming"
   type        = string
-  default     = "mantrix-madison"
+  default     = "mantrix-nexxt"
 }
 
 variable "domain_name" {
   description = "Domain name for the application"
   type        = string
-  default     = "madisonreed.cloudmantra.ai"
+  default     = "nexxt-mantrix.cloudmantra.ai"
 }
 
 variable "machine_type" {

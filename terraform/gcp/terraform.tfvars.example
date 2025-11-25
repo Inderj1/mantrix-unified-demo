@@ -2,8 +2,8 @@
 project_id   = "your-gcp-project-id"
 region       = "us-central1"
 zone         = "us-central1-a"
-project_name = "mantrix-madison"
-domain_name  = "madisonreed.cloudmantra.ai"
+project_name = "mantrix-nexxt"
+domain_name  = "nexxt-mantrix.cloudmantra.ai"
 
 # Machine Type
 # e2-medium     = 2 vCPU, 4GB RAM (~$30/month) - Recommended for production

@@ -120,7 +120,7 @@ EOF
 cat > /etc/nginx/sites-available/mantrix <<'EOF'
 server {
     listen 80;
-    server_name madisonreed.cloudmantra.ai;
+    server_name nexxt-mantrix.cloudmantra.ai;
 
     client_max_body_size 100M;
 
@@ -182,7 +182,7 @@ echo "Deploying Mantrix Madison Reed..."
 
 # Pull latest code
 cd /opt/mantrix
-git pull origin demo/madison
+git pull origin main
 
 # Build and restart containers
 docker-compose down
@@ -234,8 +234,8 @@ REACT_APP_CLERK_PUBLISHABLE_KEY=your-clerk-key
 CLERK_SECRET_KEY=your-clerk-secret
 
 # Domain
-DOMAIN=madisonreed.cloudmantra.ai
-REACT_APP_API_URL=https://madisonreed.cloudmantra.ai/api
+DOMAIN=nexxt-mantrix.cloudmantra.ai
+REACT_APP_API_URL=https://nexxt-mantrix.cloudmantra.ai/api
 ENV_EOF
 
 echo "========================================="
@@ -244,10 +244,10 @@ echo "========================================="
 echo ""
 echo "Next steps:"
 echo "1. Clone the repository to /opt/mantrix"
-echo "   git clone https://github.com/cloudmantra-ai/mantrix.unified-madison.git /opt/mantrix"
+echo "   git clone https://github.com/cloudmantra-ai/mantrix-unified-nexxt-v1.git /opt/mantrix"
 echo "2. Create .env file from .env.example"
 echo "3. Run docker-compose up -d"
-echo "4. Configure SSL: sudo certbot --nginx -d madisonreed.cloudmantra.ai"
+echo "4. Configure SSL: sudo certbot --nginx -d nexxt-mantrix.cloudmantra.ai"
 echo ""
 echo "Logs: sudo tail -f /var/log/startup-script.log"
 echo "========================================="

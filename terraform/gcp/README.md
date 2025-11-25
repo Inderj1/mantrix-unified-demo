@@ -1,6 +1,6 @@
-# Mantrix Madison Reed - GCP Terraform Deployment
+# Mantrix NEXXT - GCP Terraform Deployment
 
-Deploy Mantrix Madison Reed application on Google Cloud Platform.
+Deploy Mantrix NEXXT application on Google Cloud Platform.
 
 ## Prerequisites
 
@@ -14,7 +14,7 @@ Deploy Mantrix Madison Reed application on Google Cloud Platform.
 - **Machine**: e2-medium (2 vCPU, 4GB RAM)
 - **OS**: Ubuntu 22.04 LTS
 - **Storage**: 30GB SSD
-- **Domain**: madisonreed.cloudmantra.ai
+- **Domain**: nexxt-mantrix.cloudmantra.ai
 - **Cost**: ~$27/month
 
 ## Quick Start
@@ -44,7 +44,7 @@ terraform output instance_public_ip
 ## Post-Deployment
 
 ### 1. Configure DNS
-Point `madisonreed.cloudmantra.ai` to the static IP from `terraform output`
+Point `nexxt-mantrix.cloudmantra.ai` to the static IP from `terraform output`
 
 ### 2. SSH to instance
 ```bash
@@ -54,9 +54,9 @@ ssh ubuntu@<STATIC_IP>
 ### 3. Clone repository
 ```bash
 cd /opt/mantrix
-sudo git clone https://github.com/cloudmantra-ai/mantrix.unified-madison.git .
+sudo git clone https://github.com/cloudmantra-ai/mantrix-unified-nexxt-v1.git .
 sudo chown -R ubuntu:ubuntu /opt/mantrix
-git checkout demo/madison
+git checkout main
 ```
 
 ### 4. Configure environment
@@ -74,11 +74,11 @@ docker-compose up -d
 
 ### 6. Setup SSL
 ```bash
-sudo certbot --nginx -d madisonreed.cloudmantra.ai
+sudo certbot --nginx -d nexxt-mantrix.cloudmantra.ai
 ```
 
 ### 7. Verify
-Visit: https://madisonreed.cloudmantra.ai
+Visit: https://nexxt-mantrix.cloudmantra.ai
 
 ## Management
 
@@ -114,8 +114,8 @@ terraform destroy
 ## Cost Optimization
 
 - Development: Use `e2-small` (~$13/month)
-- Stop when not needed: `gcloud compute instances stop mantrix-madison-vm --zone=us-central1-a`
-- Restart: `gcloud compute instances start mantrix-madison-vm --zone=us-central1-a`
+- Stop when not needed: `gcloud compute instances stop mantrix-nexxt-vm --zone=us-central1-a`
+- Restart: `gcloud compute instances start mantrix-nexxt-vm --zone=us-central1-a`
 
 ## Troubleshooting
 
@@ -130,7 +130,7 @@ ssh ubuntu@<IP> "docker-compose ps"
 ssh ubuntu@<IP> "sudo systemctl status nginx"
 
 # Serial console
-gcloud compute instances get-serial-port-output mantrix-madison-vm --zone=us-central1-a
+gcloud compute instances get-serial-port-output mantrix-nexxt-vm --zone=us-central1-a
 ```
 
 ## Support
