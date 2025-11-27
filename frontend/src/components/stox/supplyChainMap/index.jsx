@@ -292,7 +292,7 @@ export default function SupplyChainMap({ onBack }) {
 
       {/* Left Sidebar */}
       {!isFullScreen && (
-        <Box sx={{ position: 'absolute', top: 48, left: 0, bottom: 0, width: 280, zIndex: 600 }}>
+        <Box sx={{ position: 'absolute', top: 48, left: 0, bottom: 200, width: 280, zIndex: 600 }}>
           <LeftSidebar
             trucks={trucks}
             stores={stores}
@@ -306,7 +306,7 @@ export default function SupplyChainMap({ onBack }) {
 
       {/* Right Panel */}
       {!isFullScreen && (
-        <Box sx={{ position: 'absolute', top: 48, right: 0, bottom: 0, width: 280, zIndex: 600 }}>
+        <Box sx={{ position: 'absolute', top: 48, right: 0, bottom: 200, width: 280, zIndex: 600 }}>
           <RightPanel
             agents={agents}
             actionsToday={autopilotStatus?.actions_today || 0}

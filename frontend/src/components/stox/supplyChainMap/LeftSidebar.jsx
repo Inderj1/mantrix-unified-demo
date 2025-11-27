@@ -7,6 +7,13 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import RouteIcon from '@mui/icons-material/Route';
+import CloudIcon from '@mui/icons-material/Cloud';
+import BuildIcon from '@mui/icons-material/Build';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import BoltIcon from '@mui/icons-material/Bolt';
+import SpeedIcon from '@mui/icons-material/Speed';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 export default function LeftSidebar({
   trucks = [],
@@ -32,12 +39,18 @@ export default function LeftSidebar({
   const pendingActions = aiActions.filter(a => a.status === 'pending-approval').slice(0, 5);
 
   const getAlertIcon = (alertType) => {
-    if (alertType?.includes('weather')) return '🌧️';
-    if (alertType?.includes('inventory')) return '📦';
-    if (alertType?.includes('route')) return '🗺️';
-    if (alertType?.includes('maintenance')) return '🔧';
-    if (alertType?.includes('demand')) return '📈';
-    return '⚠️';
+    if (alertType?.includes('weather')) return <CloudIcon sx={{ fontSize: 16, color: '#64748b' }} />;
+    if (alertType?.includes('inventory')) return <InventoryIcon sx={{ fontSize: 16, color: '#64748b' }} />;
+    if (alertType?.includes('route')) return <RouteIcon sx={{ fontSize: 16, color: '#64748b' }} />;
+    if (alertType?.includes('maintenance')) return <BuildIcon sx={{ fontSize: 16, color: '#64748b' }} />;
+    if (alertType?.includes('demand')) return <TrendingUpIcon sx={{ fontSize: 16, color: '#64748b' }} />;
+    return <WarningAmberIcon sx={{ fontSize: 16, color: '#64748b' }} />;
+  };
+
+  const getActionIcon = (actionType) => {
+    if (actionType === 'transfer') return <SwapHorizIcon sx={{ fontSize: 16, color: '#0284c7' }} />;
+    if (actionType === 'route') return <LocalShippingIcon sx={{ fontSize: 16, color: '#0284c7' }} />;
+    return <BoltIcon sx={{ fontSize: 16, color: '#0284c7' }} />;
   };
 
   return (
@@ -50,7 +63,7 @@ export default function LeftSidebar({
         width: 280,
         bgcolor: 'white',
         borderRight: '1px solid',
-        borderColor: alpha('#64748b', 0.2),
+        borderColor: alpha('#64748b', 0.12),
         zIndex: 1000,
         display: 'flex',
         flexDirection: 'column',
@@ -59,17 +72,18 @@ export default function LeftSidebar({
     >
       {/* Header */}
       <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: alpha('#64748b', 0.15), bgcolor: '#f8fafc' }}>
-        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-          <Box sx={{ width: 8, height: 8, bgcolor: '#10b981', borderRadius: '50%', animation: 'pulse 2s infinite' }} />
-          <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#1e293b' }}>Network Health Monitor</Typography>
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
+          <SpeedIcon sx={{ fontSize: 18, color: '#0284c7' }} />
+          <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: '#1e293b' }}>Network Health</Typography>
+          <Box sx={{ width: 6, height: 6, bgcolor: '#10b981', borderRadius: '50%', ml: 'auto' }} />
         </Stack>
         <Typography sx={{ fontSize: '0.65rem', color: '#64748b' }}>
-          Last Updated: {new Date().toLocaleTimeString()}
+          Updated: {new Date().toLocaleTimeString()}
         </Typography>
       </Box>
 
       {/* Health Metrics */}
-      <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: alpha('#64748b', 0.15), bgcolor: '#f8fafc' }}>
+      <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: alpha('#64748b', 0.15) }}>
         <Stack spacing={1.5}>
           <HealthMetric label="Network Health" value={networkHealth} color="cyan" />
           <HealthMetric label="Service Level" value={serviceLevel} color="blue" />
@@ -82,8 +96,8 @@ export default function LeftSidebar({
         {criticalAlerts.length > 0 && (
           <Box sx={{ mb: 3 }}>
             <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
-              <WarningAmberIcon sx={{ fontSize: 14, color: '#f59e0b' }} />
-              <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              <WarningAmberIcon sx={{ fontSize: 14, color: '#d97706' }} />
+              <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: 0.5 }}>
                 Critical Alerts ({criticalAlerts.length})
               </Typography>
             </Stack>
@@ -95,32 +109,47 @@ export default function LeftSidebar({
                   sx={{
                     p: 1.5,
                     borderRadius: 1,
-                    borderLeft: '3px solid',
-                    borderLeftColor: alert.priority >= 9 ? '#ef4444' : '#f97316',
-                    bgcolor: alert.priority >= 9 ? alpha('#ef4444', 0.05) : alpha('#f97316', 0.05),
+                    border: '1px solid',
+                    borderColor: alert.priority >= 9 ? alpha('#ef4444', 0.3) : alpha('#f97316', 0.3),
+                    bgcolor: alert.priority >= 9 ? alpha('#ef4444', 0.06) : alpha('#f97316', 0.06),
                     cursor: 'pointer',
-                    '&:hover': { bgcolor: alpha('#64748b', 0.1) },
+                    transition: 'all 0.15s ease',
+                    '&:hover': {
+                      bgcolor: alert.priority >= 9 ? alpha('#ef4444', 0.1) : alpha('#f97316', 0.1),
+                      borderColor: alert.priority >= 9 ? alpha('#ef4444', 0.5) : alpha('#f97316', 0.5),
+                    },
                   }}
                 >
-                  <Stack direction="row" spacing={1} alignItems="flex-start">
-                    <Typography sx={{ fontSize: '0.9rem' }}>{getAlertIcon(alert.alert_type)}</Typography>
+                  <Stack direction="row" spacing={1.5} alignItems="flex-start">
+                    <Box sx={{
+                      p: 0.5,
+                      borderRadius: 0.5,
+                      bgcolor: alpha('#64748b', 0.08),
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                      {getAlertIcon(alert.alert_type)}
+                    </Box>
                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: '#1e293b', mb: 0.25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#1e293b', mb: 0.25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {alert.title}
                       </Typography>
-                      <Typography sx={{ fontSize: '0.6rem', color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <Typography sx={{ fontSize: '0.65rem', color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {alert.message}
                       </Typography>
                       <Chip
-                        label={`P${alert.priority}`}
+                        label={`Priority ${alert.priority}`}
                         size="small"
                         sx={{
-                          mt: 0.5,
-                          height: 16,
-                          fontSize: '0.55rem',
-                          fontWeight: 700,
-                          bgcolor: alert.priority >= 9 ? alpha('#ef4444', 0.15) : alpha('#f97316', 0.15),
+                          mt: 0.75,
+                          height: 18,
+                          fontSize: '0.6rem',
+                          fontWeight: 600,
+                          bgcolor: alert.priority >= 9 ? alpha('#ef4444', 0.12) : alpha('#f97316', 0.12),
                           color: alert.priority >= 9 ? '#dc2626' : '#ea580c',
+                          border: '1px solid',
+                          borderColor: alert.priority >= 9 ? alpha('#ef4444', 0.2) : alpha('#f97316', 0.2),
                         }}
                       />
                     </Box>
@@ -141,13 +170,13 @@ export default function LeftSidebar({
             sx={{ mb: 1.5, cursor: 'pointer' }}
           >
             <Stack direction="row" alignItems="center" spacing={1}>
-              <Box sx={{ width: 6, height: 6, bgcolor: '#3b82f6', borderRadius: '50%' }} />
-              <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                AI Action Queue ({pendingActions.length})
+              <BoltIcon sx={{ fontSize: 14, color: '#0284c7' }} />
+              <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                AI Actions ({pendingActions.length})
               </Typography>
             </Stack>
             <IconButton size="small" sx={{ p: 0 }}>
-              {activityCollapsed ? <ExpandMoreIcon sx={{ fontSize: 16 }} /> : <ExpandLessIcon sx={{ fontSize: 16 }} />}
+              {activityCollapsed ? <ExpandMoreIcon sx={{ fontSize: 16, color: '#64748b' }} /> : <ExpandLessIcon sx={{ fontSize: 16, color: '#64748b' }} />}
             </IconButton>
           </Stack>
           <Collapse in={!activityCollapsed}>
@@ -159,34 +188,62 @@ export default function LeftSidebar({
                   sx={{
                     p: 1.5,
                     borderRadius: 1,
-                    bgcolor: alpha('#3b82f6', 0.05),
-                    borderLeft: '3px solid #3b82f6',
+                    bgcolor: alpha('#0ea5e9', 0.06),
+                    border: '1px solid',
+                    borderColor: alpha('#0ea5e9', 0.2),
                     cursor: 'pointer',
-                    '&:hover': { bgcolor: alpha('#3b82f6', 0.1) },
+                    transition: 'all 0.15s ease',
+                    '&:hover': {
+                      bgcolor: alpha('#0ea5e9', 0.1),
+                      borderColor: alpha('#0ea5e9', 0.4),
+                    },
                   }}
                 >
-                  <Stack direction="row" spacing={1} alignItems="flex-start">
-                    <Typography sx={{ fontSize: '0.9rem' }}>
-                      {action.action_type === 'transfer' ? '📦' : action.action_type === 'route' ? '🚛' : '⚡'}
-                    </Typography>
+                  <Stack direction="row" spacing={1.5} alignItems="flex-start">
+                    <Box sx={{
+                      p: 0.5,
+                      borderRadius: 0.5,
+                      bgcolor: alpha('#0ea5e9', 0.12),
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                      {getActionIcon(action.action_type)}
+                    </Box>
                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: '#1e293b', mb: 0.25 }}>
+                      <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#1e293b', mb: 0.25 }}>
                         {action.agent_name}
                       </Typography>
-                      <Typography sx={{ fontSize: '0.6rem', color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                      <Typography sx={{ fontSize: '0.65rem', color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                         {action.description}
                       </Typography>
-                      <Stack direction="row" spacing={0.5} sx={{ mt: 0.5 }}>
+                      <Stack direction="row" spacing={0.5} sx={{ mt: 0.75 }}>
                         <Chip
-                          label={`${action.confidence}% conf`}
+                          label={`${action.confidence}%`}
                           size="small"
-                          sx={{ height: 16, fontSize: '0.5rem', bgcolor: alpha('#10b981', 0.15), color: '#059669' }}
+                          sx={{
+                            height: 18,
+                            fontSize: '0.6rem',
+                            fontWeight: 600,
+                            bgcolor: alpha('#10b981', 0.12),
+                            color: '#059669',
+                            border: '1px solid',
+                            borderColor: alpha('#10b981', 0.2),
+                          }}
                         />
                         {action.cost_saved && (
                           <Chip
                             label={`$${action.cost_saved.toLocaleString()}`}
                             size="small"
-                            sx={{ height: 16, fontSize: '0.5rem', bgcolor: alpha('#3b82f6', 0.15), color: '#2563eb' }}
+                            sx={{
+                              height: 18,
+                              fontSize: '0.6rem',
+                              fontWeight: 600,
+                              bgcolor: alpha('#0ea5e9', 0.12),
+                              color: '#0284c7',
+                              border: '1px solid',
+                              borderColor: alpha('#0ea5e9', 0.2),
+                            }}
                           />
                         )}
                       </Stack>
@@ -195,9 +252,12 @@ export default function LeftSidebar({
                 </Box>
               ))}
               {pendingActions.length === 0 && (
-                <Typography sx={{ fontSize: '0.7rem', color: '#94a3b8', textAlign: 'center', py: 2 }}>
-                  No pending actions
-                </Typography>
+                <Box sx={{ py: 3, textAlign: 'center' }}>
+                  <CheckCircleIcon sx={{ fontSize: 24, color: '#10b981', mb: 0.5 }} />
+                  <Typography sx={{ fontSize: '0.7rem', color: '#64748b' }}>
+                    No pending actions
+                  </Typography>
+                </Box>
               )}
             </Stack>
           </Collapse>
@@ -207,9 +267,9 @@ export default function LeftSidebar({
       {/* Footer Stats */}
       <Box sx={{ p: 2, borderTop: '1px solid', borderColor: alpha('#64748b', 0.15), bgcolor: '#f8fafc' }}>
         <Stack direction="row" spacing={2} justifyContent="space-between">
-          <StatItem icon={<LocalShippingIcon sx={{ fontSize: 14 }} />} label="Active Trucks" value={trucks.filter(t => t.status === 'in-transit').length} />
-          <StatItem icon={<InventoryIcon sx={{ fontSize: 14 }} />} label="Low Stock" value={stores.filter(s => s.stock_level < 30).length} color="error" />
-          <StatItem icon={<RouteIcon sx={{ fontSize: 14 }} />} label="Delayed" value={trucks.filter(t => t.status === 'delayed').length} color="warning" />
+          <StatItem icon={<LocalShippingIcon sx={{ fontSize: 16 }} />} label="Active" value={trucks.filter(t => t.status === 'in-transit').length} color="primary" />
+          <StatItem icon={<InventoryIcon sx={{ fontSize: 16 }} />} label="Low Stock" value={stores.filter(s => s.stock_level < 30).length} color="error" />
+          <StatItem icon={<RouteIcon sx={{ fontSize: 16 }} />} label="Delayed" value={trucks.filter(t => t.status === 'delayed').length} color="warning" />
         </Stack>
       </Box>
     </Box>
@@ -218,30 +278,38 @@ export default function LeftSidebar({
 
 function HealthMetric({ label, value, color }) {
   const colors = {
-    cyan: { text: '#0891b2', bg: alpha('#06b6d4', 0.15), bar: '#06b6d4' },
-    blue: { text: '#2563eb', bg: alpha('#3b82f6', 0.15), bar: '#3b82f6' },
-    orange: { text: '#ea580c', bg: alpha('#f97316', 0.15), bar: '#f97316' },
+    cyan: { text: '#0891b2', bg: alpha('#06b6d4', 0.12), bar: '#06b6d4' },
+    blue: { text: '#0284c7', bg: alpha('#0ea5e9', 0.12), bar: '#0ea5e9' },
+    orange: { text: '#ea580c', bg: alpha('#f97316', 0.12), bar: '#f97316' },
   };
   const c = colors[color] || colors.cyan;
 
   return (
     <Box>
       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.5 }}>
-        <Typography sx={{ fontSize: '0.7rem', color: '#64748b' }}>{label}</Typography>
+        <Typography sx={{ fontSize: '0.75rem', fontWeight: 500, color: '#475569' }}>{label}</Typography>
         <Chip
           label={`${value}%`}
           size="small"
-          sx={{ height: 18, fontSize: '0.65rem', fontWeight: 700, bgcolor: c.bg, color: c.text }}
+          sx={{
+            height: 20,
+            fontSize: '0.7rem',
+            fontWeight: 700,
+            bgcolor: c.bg,
+            color: c.text,
+            border: '1px solid',
+            borderColor: alpha(c.bar, 0.2),
+          }}
         />
       </Stack>
       <LinearProgress
         variant="determinate"
         value={value}
         sx={{
-          height: 4,
-          borderRadius: 2,
-          bgcolor: alpha(c.bar, 0.2),
-          '& .MuiLinearProgress-bar': { bgcolor: c.bar, borderRadius: 2 },
+          height: 6,
+          borderRadius: 3,
+          bgcolor: alpha(c.bar, 0.15),
+          '& .MuiLinearProgress-bar': { bgcolor: c.bar, borderRadius: 3 },
         }}
       />
     </Box>
@@ -250,16 +318,27 @@ function HealthMetric({ label, value, color }) {
 
 function StatItem({ icon, label, value, color = 'primary' }) {
   const colors = {
-    primary: '#3b82f6',
-    error: '#ef4444',
-    warning: '#f97316',
+    primary: { main: '#0284c7', bg: alpha('#0ea5e9', 0.1) },
+    error: { main: '#dc2626', bg: alpha('#ef4444', 0.1) },
+    warning: { main: '#d97706', bg: alpha('#f59e0b', 0.1) },
   };
+  const c = colors[color];
 
   return (
-    <Stack alignItems="center" spacing={0.25}>
-      <Box sx={{ color: colors[color] }}>{icon}</Box>
-      <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: colors[color] }}>{value}</Typography>
-      <Typography sx={{ fontSize: '0.55rem', color: '#64748b', textAlign: 'center' }}>{label}</Typography>
+    <Stack alignItems="center" spacing={0.5}>
+      <Box sx={{
+        color: c.main,
+        p: 0.75,
+        borderRadius: 1,
+        bgcolor: c.bg,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        {icon}
+      </Box>
+      <Typography sx={{ fontSize: '1.1rem', fontWeight: 700, color: c.main }}>{value}</Typography>
+      <Typography sx={{ fontSize: '0.6rem', color: '#64748b', textAlign: 'center' }}>{label}</Typography>
     </Stack>
   );
 }
