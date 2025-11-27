@@ -5,7 +5,6 @@ import {
   Card,
   CardContent,
   Typography,
-  IconButton,
   Chip,
   Avatar,
   Stack,
@@ -13,8 +12,6 @@ import {
   Breadcrumbs,
   Link,
   alpha,
-  useTheme,
-  Fade,
   Zoom,
 } from '@mui/material';
 import {
@@ -22,119 +19,18 @@ import {
   NavigateNext as NavigateNextIcon,
   ArrowBack as ArrowBackIcon,
   Lightbulb as LightbulbIcon,
-  Dashboard as DashboardIcon,
   TrendingUp as TrendingUpIcon,
   Inventory as InventoryIcon,
-  Layers as LayersIcon,
-  AccountTree as AccountTreeIcon,
   LocalShipping as LocalShippingIcon,
-  Store as StoreIcon,
   ShowChart as ShowChartIcon,
-  SwapHoriz as SwapHorizIcon,
-  Factory as FactoryIcon,
-  Warehouse as WarehouseIcon,
   Analytics as AnalyticsIcon,
   Science as ScienceIcon,
 } from '@mui/icons-material';
 
-const dcSystemModules = [
-  {
-    id: 'dc-demand-aggregation',
-    title: 'Forecast Layer',
-    subtitle: 'DC Module 1',
-    description: 'Aggregate demand forecasts from all store locations and channels for centralized planning',
-    icon: TrendingUpIcon,
-    color: '#0a6ed1',
-    bgColor: '#dbeafe',
-    stats: { label: 'Locations', value: '450' },
-    status: 'active',
-    gradient: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
-    view: 'dc'
-  },
-  {
-    id: 'dc-health-monitor',
-    title: 'Health Monitor',
-    subtitle: 'DC Module 2',
-    description: 'Real-time visibility into DC inventory health, stock levels, and availability across network',
-    icon: ShowChartIcon,
-    color: '#06b6d4',
-    bgColor: '#cffafe',
-    stats: { label: 'DCs', value: '8' },
-    status: 'active',
-    gradient: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
-    view: 'dc'
-  },
-  {
-    id: 'dc-optimization',
-    title: 'Safety Stox Layer',
-    subtitle: 'DC Module 3',
-    description: 'Optimize inventory positioning and allocation across distribution center network',
-    icon: AnalyticsIcon,
-    color: '#6a6d70',
-    bgColor: '#d1fae5',
-    stats: { label: 'SKUs', value: '12K' },
-    status: 'active',
-    gradient: 'linear-gradient(135deg, #6a6d70 0%, #6a6d70 100%)',
-    view: 'dc'
-  },
-  {
-    id: 'dc-bom',
-    title: 'Bill of Materials',
-    subtitle: 'DC Module 4',
-    description: 'Multi-level BOM management and component tracking for finished goods assembly',
-    icon: AccountTreeIcon,
-    color: '#354a5f',
-    bgColor: '#f3e8ff',
-    stats: { label: 'BOMs', value: '2.1K' },
-    status: 'active',
-    gradient: 'linear-gradient(135deg, #354a5f 0%, #32363a 100%)',
-    view: 'dc'
-  },
-  {
-    id: 'dc-lot-size',
-    title: 'Lot Size Optimization',
-    subtitle: 'DC Module 5',
-    description: 'Economic order quantity and lot size optimization for procurement efficiency',
-    icon: InventoryIcon,
-    color: '#f97316',
-    bgColor: '#ffedd5',
-    stats: { label: 'Orders', value: '850' },
-    status: 'active',
-    gradient: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
-    view: 'dc'
-  },
-  {
-    id: 'dc-supplier-exec',
-    title: 'Supplier Execution',
-    subtitle: 'DC Module 6',
-    description: 'Supplier collaboration portal with order tracking, delivery management, and performance metrics',
-    icon: LocalShippingIcon,
-    color: '#6366f1',
-    bgColor: '#e0e7ff',
-    stats: { label: 'Suppliers', value: '120' },
-    status: 'active',
-    gradient: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-    view: 'dc'
-  },
-  {
-    id: 'dc-financial-impact',
-    title: 'Financial Impact',
-    subtitle: 'DC Module 7',
-    description: 'Distribution center financial impact analysis with inventory carrying costs and network optimization opportunities',
-    icon: AnalyticsIcon,
-    color: '#f59e0b',
-    bgColor: '#fef3c7',
-    stats: { label: 'Savings', value: '$24M' },
-    status: 'active',
-    gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-    view: 'dc'
-  },
-];
-
 const storeSystemModules = [
   {
     id: 'tile0-forecast-simulation',
-    title: 'Forecast Simulation',
+    title: 'Inventory Health Dashboard',
     subtitle: 'Tile 0',
     description: 'Compare AI models (ARIMA, ETS, ML), override forecasts, and confirm baseline for Tile 1',
     icon: ScienceIcon,
@@ -143,7 +39,6 @@ const storeSystemModules = [
     stats: { label: 'Models', value: '3' },
     status: 'active',
     gradient: 'linear-gradient(135deg, #354a5f 0%, #32363a 100%)',
-    view: 'store'
   },
   {
     id: 'store-forecasting',
@@ -156,7 +51,6 @@ const storeSystemModules = [
     stats: { label: 'Forecasts', value: '36' },
     status: 'active',
     gradient: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
-    view: 'store'
   },
   {
     id: 'store-health-monitor',
@@ -169,7 +63,6 @@ const storeSystemModules = [
     stats: { label: 'Items', value: '36' },
     status: 'active',
     gradient: 'linear-gradient(135deg, #6a6d70 0%, #6a6d70 100%)',
-    view: 'store'
   },
   {
     id: 'store-financial-impact',
@@ -182,7 +75,6 @@ const storeSystemModules = [
     stats: { label: 'Value', value: '$2.5M' },
     status: 'active',
     gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-    view: 'store'
   },
   {
     id: 'store-replenishment',
@@ -195,339 +87,15 @@ const storeSystemModules = [
     stats: { label: 'STOs', value: '36' },
     status: 'active',
     gradient: 'linear-gradient(135deg, #0854a0 0%, #1d4ed8 100%)',
-    view: 'store'
   },
 ];
 
-const stoxModules = [];
-
-const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView = null }) => {
-  const theme = useTheme();
-  const [selectedView, setSelectedView] = React.useState(initialView);
-
-  console.log('StoxAILanding rendering, props:', { hasOnTileClick: !!onTileClick, hasOnBack: !!onBack, initialView });
-
+const StoxAILanding = ({ onTileClick, onBack }) => {
   const handleTileClick = (moduleId) => {
-    console.log('handleTileClick called with moduleId:', moduleId);
     if (onTileClick) {
-      console.log('Calling parent onTileClick with:', moduleId);
       onTileClick(moduleId);
-    } else {
-      console.warn('No onTileClick handler provided');
     }
   };
-
-  const handleViewSelect = (view) => {
-    setSelectedView(view);
-    // Notify parent component about category selection
-    if (onCategorySelect) {
-      onCategorySelect(view);
-    }
-  };
-
-  const handleBackToCategories = () => {
-    setSelectedView(null);
-  };
-
-  // Show category selection view
-  if (!selectedView) {
-    return (
-      <Box sx={{
-        p: 3,
-        height: '100%',
-        overflowY: 'auto',
-        overflowX: 'hidden'
-      }}>
-        {/* Header with Breadcrumbs */}
-        <Box sx={{ mb: 4 }}>
-          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-            <Breadcrumbs
-              separator={<NavigateNextIcon fontSize="small" />}
-            >
-              <Link
-                component="button"
-                variant="body1"
-                onClick={onBack}
-                sx={{
-                  textDecoration: 'none',
-                  color: 'text.primary',
-                  '&:hover': { textDecoration: 'underline' }
-                }}
-              >
-                CORE.AI
-              </Link>
-              <Typography color="primary" variant="body1" fontWeight={600}>
-                STOX.AI
-              </Typography>
-            </Breadcrumbs>
-
-            <Button
-              startIcon={<ArrowBackIcon />}
-              onClick={onBack}
-              variant="outlined"
-              size="small"
-              sx={{ borderColor: 'divider' }}
-            >
-              Back
-            </Button>
-          </Stack>
-
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Avatar
-              sx={{
-                width: 64,
-                height: 64,
-                bgcolor: alpha('#2e7d32', 0.1),
-              }}
-            >
-              <InventoryIcon sx={{ fontSize: 36, color: '#2e7d32' }} />
-            </Avatar>
-            <Box>
-              <Typography variant="h4" fontWeight={700} sx={{ letterSpacing: '-0.5px' }}>
-                STOX.AI
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                Smart Inventory & Supply Chain Optimization Platform
-              </Typography>
-            </Box>
-          </Box>
-        </Box>
-
-        {/* Category Tiles - Compact */}
-        <Grid container spacing={3} sx={{ mt: 1, maxWidth: 1000, mx: 'auto' }}>
-          {/* Store Level View */}
-          <Grid item xs={12} md={6}>
-            <Zoom in timeout={400}>
-              <Card
-                sx={{
-                  height: 220,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  border: '1px solid',
-                  borderColor: alpha('#0a6ed1', 0.2),
-                  borderRadius: 2,
-                  overflow: 'hidden',
-                  background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.02) 0%, rgba(255, 255, 255, 1) 100%)',
-                  position: 'relative',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: '3px',
-                    background: 'linear-gradient(90deg, #0a6ed1 0%, #0854a0 100%)',
-                  },
-                  '&:hover': {
-                    transform: 'translateY(-6px)',
-                    boxShadow: '0 12px 32px rgba(59, 130, 246, 0.2)',
-                    borderColor: '#0a6ed1',
-                    '& .category-icon': {
-                      transform: 'scale(1.1)',
-                      bgcolor: '#0a6ed1',
-                      color: 'white',
-                    },
-                    '& .access-button': {
-                      background: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
-                      color: 'white',
-                      transform: 'translateX(4px)',
-                    },
-                  },
-                }}
-                onClick={() => handleViewSelect('store')}
-              >
-                <CardContent sx={{ p: 2.5, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                  {/* Icon and Badge */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                    <Avatar
-                      className="category-icon"
-                      sx={{
-                        width: 56,
-                        height: 56,
-                        bgcolor: alpha('#0a6ed1', 0.1),
-                        color: '#0a6ed1',
-                        transition: 'all 0.3s ease',
-                      }}
-                    >
-                      <StoreIcon sx={{ fontSize: 32 }} />
-                    </Avatar>
-                    <Chip
-                      label="4 Modules"
-                      size="small"
-                      sx={{
-                        bgcolor: alpha('#0a6ed1', 0.1),
-                        color: '#0a6ed1',
-                        fontWeight: 600,
-                        fontSize: '0.7rem',
-                        height: 24,
-                      }}
-                    />
-                  </Box>
-
-                  {/* Title */}
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: '#0a6ed1', mb: 1, fontSize: '1.1rem', letterSpacing: '-0.3px' }}>
-                    Store Level View
-                  </Typography>
-
-                  {/* Description */}
-                  <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.5, fontSize: '0.85rem' }}>
-                    End-to-end supply chain optimization from demand forecasting to procurement
-                  </Typography>
-
-                  {/* Footer */}
-                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: 2, pt: 2, borderTop: '1px solid', borderColor: alpha('#0a6ed1', 0.1) }}>
-                    <Box className="access-button" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, bgcolor: alpha('#0a6ed1', 0.1), color: '#0a6ed1', px: 1.5, py: 0.5, borderRadius: 1, fontWeight: 600, fontSize: '0.75rem', transition: 'all 0.3s ease' }}>
-                      ENTER
-                      <ArrowForwardIcon sx={{ fontSize: 14 }} />
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Zoom>
-          </Grid>
-
-          {/* Distribution Center System */}
-          <Grid item xs={12} md={6}>
-            <Zoom in timeout={500}>
-              <Card
-                sx={{
-                  height: 220,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  border: '1px solid',
-                  borderColor: alpha('#64748b', 0.2),
-                  borderRadius: 3,
-                  overflow: 'hidden',
-                  background: 'linear-gradient(135deg, rgba(100, 116, 139, 0.02) 0%, rgba(255, 255, 255, 1) 100%)',
-                  position: 'relative',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: '3px',
-                    background: 'linear-gradient(90deg, #94a3b8 0%, #64748b 100%)',
-                  },
-                  '&:hover': {
-                    transform: 'translateY(-6px)',
-                    boxShadow: '0 12px 32px rgba(100, 116, 139, 0.2)',
-                    borderColor: '#64748b',
-                    '& .dc-icon': {
-                      transform: 'scale(1.1)',
-                      bgcolor: '#64748b',
-                      color: 'white',
-                    },
-                    '& .access-button': {
-                      background: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
-                      color: 'white',
-                      transform: 'translateX(4px)',
-                    },
-                  },
-                }}
-                onClick={() => handleViewSelect('dc')}
-              >
-                <CardContent sx={{ p: 2.5, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                  {/* Icon and badge at top */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                    <Avatar
-                      className="dc-icon"
-                      sx={{
-                        width: 56,
-                        height: 56,
-                        bgcolor: alpha('#64748b', 0.1),
-                        color: '#64748b',
-                        transition: 'all 0.3s ease',
-                      }}
-                    >
-                      <WarehouseIcon sx={{ fontSize: 32 }} />
-                    </Avatar>
-                    <Chip
-                      label="7 Modules"
-                      size="small"
-                      sx={{
-                        bgcolor: alpha('#64748b', 0.1),
-                        color: '#475569',
-                        fontWeight: 600,
-                        fontSize: '0.7rem',
-                        height: 24,
-                      }}
-                    />
-                  </Box>
-
-                  {/* Title and description */}
-                  <Box sx={{ flex: 1 }}>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 700,
-                        color: '#64748b',
-                        mb: 1,
-                        fontSize: '1.1rem',
-                        letterSpacing: '-0.3px',
-                      }}
-                    >
-                      Distribution Center System
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'text.secondary',
-                        mb: 'auto',
-                        lineHeight: 1.5,
-                        fontSize: '0.85rem',
-                      }}
-                    >
-                      Comprehensive DC operations and network optimization capabilities
-                    </Typography>
-                  </Box>
-
-                  {/* Footer */}
-                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: 2, pt: 2, borderTop: '1px solid', borderColor: alpha('#64748b', 0.1) }}>
-                    <Box
-                      className="access-button"
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 0.5,
-                        bgcolor: alpha('#64748b', 0.1),
-                        color: '#64748b',
-                        px: 1.5,
-                        py: 0.5,
-                        borderRadius: 1,
-                        fontWeight: 600,
-                        fontSize: '0.75rem',
-                        transition: 'all 0.3s ease',
-                      }}
-                    >
-                      ENTER
-                      <ArrowForwardIcon sx={{ fontSize: 14 }} />
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Zoom>
-          </Grid>
-
-        </Grid>
-
-        {/* Info Section */}
-        <Box sx={{ mt: 6, textAlign: 'center' }}>
-          <Stack direction="row" spacing={2} justifyContent="center" alignItems="center">
-            <LightbulbIcon sx={{ color: 'warning.main' }} />
-            <Typography variant="body2" color="text.secondary">
-              STOX.AI provides intelligent inventory optimization and supply chain analytics powered by advanced AI/ML algorithms
-            </Typography>
-          </Stack>
-        </Box>
-      </Box>
-    );
-  }
-
-  // Show module tiles for selected view
-  const isStoreView = selectedView === 'store';
-  const systemColor = isStoreView ? '#0a6ed1' : '#64748b';
-  const systemBg = isStoreView ? 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)' : 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)';
 
   return (
     <Box sx={{
@@ -535,23 +103,36 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView = nu
       height: '100%',
       overflowY: 'auto',
       overflowX: 'hidden',
-      background: isStoreView ? 'linear-gradient(180deg, rgba(219, 234, 254, 0.1) 0%, rgba(255, 255, 255, 1) 50%)' : 'linear-gradient(180deg, rgba(241, 245, 249, 0.2) 0%, rgba(255, 255, 255, 1) 50%)',
+      background: 'linear-gradient(180deg, rgba(219, 234, 254, 0.1) 0%, rgba(255, 255, 255, 1) 50%)',
     }}>
-      {/* Header with Visual Identity */}
+      {/* Header with Breadcrumbs */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline' } }}>
+            <Link
+              component="button"
+              variant="body1"
+              onClick={onBack}
+              sx={{
+                textDecoration: 'none',
+                color: 'text.primary',
+                '&:hover': { textDecoration: 'underline' }
+              }}
+            >
               CORE.AI
             </Link>
-            <Link component="button" variant="body1" onClick={handleBackToCategories} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline' } }}>
-              STOX.AI
-            </Link>
             <Typography color="primary" variant="body1" fontWeight={600}>
-              {isStoreView ? 'Store Level' : 'Distribution Center'}
+              STOX.AI
             </Typography>
           </Breadcrumbs>
-          <Button startIcon={<ArrowBackIcon />} onClick={handleBackToCategories} variant="outlined" size="small" sx={{ borderColor: 'divider' }}>
+
+          <Button
+            startIcon={<ArrowBackIcon />}
+            onClick={onBack}
+            variant="outlined"
+            size="small"
+            sx={{ borderColor: 'divider' }}
+          >
             Back
           </Button>
         </Stack>
@@ -561,38 +142,38 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView = nu
           <Box sx={{
             width: 4,
             height: 60,
-            background: isStoreView ? 'linear-gradient(180deg, #0a6ed1 0%, #0854a0 100%)' : 'linear-gradient(180deg, #64748b 0%, #475569 100%)',
+            background: 'linear-gradient(180deg, #0a6ed1 0%, #0854a0 100%)',
             borderRadius: 2
           }} />
           <Box>
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
-              <Avatar sx={{ width: 32, height: 32, bgcolor: systemColor }}>
-                {isStoreView ? <StoreIcon sx={{ fontSize: 18 }} /> : <WarehouseIcon sx={{ fontSize: 18 }} />}
+              <Avatar sx={{ width: 32, height: 32, bgcolor: '#0a6ed1' }}>
+                <InventoryIcon sx={{ fontSize: 18 }} />
               </Avatar>
-              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: systemColor }}>
-                {isStoreView ? 'Store Level View' : 'Distribution Center System'}
+              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: '#0a6ed1' }}>
+                STOX.AI
               </Typography>
               <Chip
-                label={isStoreView ? '4 Modules' : '6 Modules'}
+                label="5 Modules"
                 size="small"
                 sx={{
-                  bgcolor: alpha(systemColor, 0.1),
-                  color: systemColor,
+                  bgcolor: alpha('#0a6ed1', 0.1),
+                  color: '#0a6ed1',
                   fontWeight: 600,
                   fontSize: '0.7rem'
                 }}
               />
             </Stack>
             <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
-              {isStoreView ? 'Retail location demand planning and inventory optimization' : 'Network-level supply chain orchestration and fulfillment'}
+              Smart Inventory & Supply Chain Optimization Platform
             </Typography>
           </Box>
         </Box>
       </Box>
 
-      {/* Compact Module Tiles */}
+      {/* Module Tiles */}
       <Grid container spacing={1.5}>
-        {(selectedView === 'dc' ? dcSystemModules : selectedView === 'store' ? storeSystemModules : []).map((module, index) => (
+        {storeSystemModules.map((module, index) => (
           <Grid item xs={12} sm={6} md={4} lg={4} key={module.id}>
             <Zoom in timeout={200 + index * 50}>
               <Card
