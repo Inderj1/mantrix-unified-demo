@@ -15,13 +15,10 @@ import {
   DialogTitle,
   DialogContent,
   TextField,
-  Alert,
   CircularProgress,
   Tooltip,
-  Badge,
   Paper,
   Divider,
-  LinearProgress,
   Pagination,
   InputAdornment,
   FormControl,
@@ -29,8 +26,6 @@ import {
   Select,
   ToggleButtonGroup,
   ToggleButton,
-  Avatar,
-  alpha,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -63,7 +58,6 @@ import {
   Inventory as InventoryIcon,
   ShowChart as ShowChartIcon,
 } from '@mui/icons-material';
-import { DataGrid } from '@mui/x-data-grid';
 
 const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
   const [agents, setAgents] = useState([]);
@@ -404,115 +398,78 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
   return (
     <Box>
       {/* Header with Stats */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Avatar
-            sx={{
-              width: 64,
-              height: 64,
-              bgcolor: alpha('#FF5722', 0.1),
-            }}
-          >
-            <NotificationsIcon sx={{ fontSize: 36, color: '#FF5722' }} />
-          </Avatar>
-          <Box>
-            <Typography variant="h4" fontWeight={700}>
-              Enterprise Pulse
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Proactive agents that execute and ensure business is not impacted
-            </Typography>
-          </Box>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Box>
+          <Typography variant="h5" fontWeight={600}>
+            Enterprise Pulse
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Proactive agents that monitor and protect business operations
+          </Typography>
         </Box>
         <Button
-          variant="contained"
-          startIcon={<AddIcon />}
+          variant="outlined"
+          size="small"
+          startIcon={<AddIcon sx={{ fontSize: 16 }} />}
           onClick={onCreateAgent}
+          sx={{ fontSize: '0.75rem' }}
         >
-          Create Agent
+          New Agent
         </Button>
       </Box>
 
       {/* Stats Cards */}
-      <Grid container spacing={2} mb={3}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    Active Agents
-                  </Typography>
-                  <Typography variant="h4" fontWeight={600}>
-                    {stats?.monitors?.active_monitors || 0}
-                  </Typography>
-                </Box>
-                <Box sx={{ bgcolor: 'primary.light', p: 1.5, borderRadius: 2 }}>
-                  <TrendingUpIcon sx={{ color: 'primary.main' }} />
-                </Box>
-              </Box>
+      <Grid container spacing={1.5} mb={2}>
+        <Grid item xs={6} sm={3}>
+          <Card variant="outlined" sx={{ bgcolor: 'grey.50' }}>
+            <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+              <Typography variant="caption" color="text.secondary">
+                Active Agents
+              </Typography>
+              <Typography variant="h6" fontWeight={600}>
+                {stats?.monitors?.active_monitors || 0}
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    Active Alerts
-                  </Typography>
-                  <Typography variant="h4" fontWeight={600}>
-                    {stats?.alerts?.active_alerts || 0}
-                  </Typography>
-                </Box>
-                <Box sx={{ bgcolor: 'error.light', p: 1.5, borderRadius: 2 }}>
-                  <WarningIcon sx={{ color: 'error.main' }} />
-                </Box>
-              </Box>
+        <Grid item xs={6} sm={3}>
+          <Card variant="outlined" sx={{ bgcolor: 'grey.50' }}>
+            <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+              <Typography variant="caption" color="text.secondary">
+                Active Alerts
+              </Typography>
+              <Typography variant="h6" fontWeight={600}>
+                {stats?.alerts?.active_alerts || 0}
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    Accuracy Rate
-                  </Typography>
-                  <Typography variant="h4" fontWeight={600}>
-                    {stats?.alerts?.true_positives && (stats.alerts.true_positives + stats.alerts.false_positives) > 0
-                      ? Math.round((stats.alerts.true_positives / (stats.alerts.true_positives + stats.alerts.false_positives)) * 100)
-                      : 0}%
-                  </Typography>
-                </Box>
-                <Box sx={{ bgcolor: 'success.light', p: 1.5, borderRadius: 2 }}>
-                  <CheckCircleIcon sx={{ color: 'success.main' }} />
-                </Box>
-              </Box>
+        <Grid item xs={6} sm={3}>
+          <Card variant="outlined" sx={{ bgcolor: 'grey.50' }}>
+            <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+              <Typography variant="caption" color="text.secondary">
+                Accuracy Rate
+              </Typography>
+              <Typography variant="h6" fontWeight={600}>
+                {stats?.alerts?.true_positives && (stats.alerts.true_positives + stats.alerts.false_positives) > 0
+                  ? Math.round((stats.alerts.true_positives / (stats.alerts.true_positives + stats.alerts.false_positives)) * 100)
+                  : 0}%
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    Total Agents
-                  </Typography>
-                  <Typography variant="h4" fontWeight={600}>
-                    {stats?.monitors?.total_monitors || 0}
-                  </Typography>
-                </Box>
-                <Box sx={{ bgcolor: 'info.light', p: 1.5, borderRadius: 2 }}>
-                  <ScheduleIcon sx={{ color: 'info.main' }} />
-                </Box>
-              </Box>
+        <Grid item xs={6} sm={3}>
+          <Card variant="outlined" sx={{ bgcolor: 'grey.50' }}>
+            <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+              <Typography variant="caption" color="text.secondary">
+                Total Agents
+              </Typography>
+              <Typography variant="h6" fontWeight={600}>
+                {stats?.monitors?.total_monitors || 0}
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -520,18 +477,19 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
 
       {/* Active Alerts */}
       {activeAlerts.length > 0 && (
-        <Card sx={{ mb: 3 }}>
-          <CardContent>
-            <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-              <Typography variant="h6" fontWeight={600}>
-                Active Alerts
-              </Typography>
-              <Badge badgeContent={activeAlerts.length} color="error">
-                <WarningIcon />
-              </Badge>
+        <Card variant="outlined" sx={{ mb: 2 }}>
+          <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
+            <Box display="flex" alignItems="center" justifyContent="space-between" mb={1.5}>
+              <Box display="flex" alignItems="center" gap={1}>
+                <WarningIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                <Typography variant="subtitle2" fontWeight={600}>
+                  Active Alerts
+                </Typography>
+              </Box>
+              <Chip label={activeAlerts.length} size="small" color="error" />
             </Box>
             <Divider sx={{ mb: 2 }} />
-            <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
+            <Box sx={{ maxHeight: 250, overflow: 'auto' }}>
               {activeAlerts.map((alert) => {
                 const isDemo = alert.monitor_name && alert.monitor_name.includes('[DEMO]');
                 return (
@@ -539,7 +497,7 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
                     key={alert.id}
                     variant="outlined"
                     sx={{
-                      p: 2,
+                      p: 1.5,
                       mb: 1,
                       ...(isDemo && {
                         bgcolor: 'rgba(33, 150, 243, 0.03)',
@@ -550,56 +508,60 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
                   >
                     <Box display="flex" justifyContent="space-between" alignItems="start">
                       <Box flex={1}>
-                        <Box display="flex" alignItems="center" gap={1} mb={0.5}>
+                        <Box display="flex" alignItems="center" gap={0.5} mb={0.5} flexWrap="wrap">
                           {isDemo && (
                             <Chip
                               label="DEMO"
                               size="small"
                               color="info"
                               variant="outlined"
-                              sx={{ fontWeight: 600 }}
+                              sx={{ height: 18, fontSize: '0.65rem', fontWeight: 600 }}
                             />
                           )}
                           <Chip
                             label={alert.severity}
                             size="small"
+                            variant="outlined"
                             color={getSeverityColor(alert.severity)}
+                            sx={{ height: 18, fontSize: '0.65rem' }}
                           />
-                          <Typography variant="subtitle2" fontWeight={600}>
+                          <Typography variant="body2" fontWeight={600}>
                             {alert.title}
                           </Typography>
                         </Box>
-                        <Typography variant="body2" color="text.secondary" mb={1}>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
                           {alert.message}
                         </Typography>
-                        <Typography variant="caption" color="text.disabled">
+                        <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.7rem' }}>
                           {alert.monitor_name} • {new Date(alert.triggered_at).toLocaleString()}
                         </Typography>
                       </Box>
-                    <Box display="flex" gap={0.5}>
+                    <Box display="flex" gap={0.5} alignItems="center">
                       <Tooltip title="True Positive">
                         <IconButton
                           size="small"
-                          color="success"
                           onClick={() => handleAlertFeedback(alert.id, 'true_positive')}
+                          sx={{ p: 0.5 }}
                         >
-                          <ThumbUpIcon fontSize="small" />
+                          <ThumbUpIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="False Positive">
                         <IconButton
                           size="small"
-                          color="error"
                           onClick={() => handleAlertFeedback(alert.id, 'false_positive')}
+                          sx={{ p: 0.5 }}
                         >
-                          <ThumbDownIcon fontSize="small" />
+                          <ThumbDownIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
                         </IconButton>
                       </Tooltip>
                       <Button
                         size="small"
+                        variant="outlined"
                         onClick={() => handleAcknowledgeAlert(alert.id)}
+                        sx={{ fontSize: '0.7rem', py: 0.25, px: 1, minWidth: 0 }}
                       >
-                        Acknowledge
+                        Ack
                       </Button>
                     </Box>
                   </Box>
@@ -612,19 +574,16 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
       )}
 
       {/* Agents List */}
-      <Card>
-        <CardContent>
-          <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-            <Box display="flex" alignItems="center" gap={2}>
-              <Typography variant="h6" fontWeight={600}>
+      <Card variant="outlined">
+        <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
+          <Box display="flex" alignItems="center" justifyContent="space-between" mb={1.5}>
+            <Box display="flex" alignItems="center" gap={1}>
+              <Typography variant="subtitle2" fontWeight={600}>
                 Your Agents
               </Typography>
-              <Chip
-                label={`${filteredAndSortedAgents.length} total`}
-                size="small"
-                color="primary"
-                variant="outlined"
-              />
+              <Typography variant="caption" color="text.secondary">
+                ({filteredAndSortedAgents.length})
+              </Typography>
             </Box>
             <Box display="flex" gap={1}>
               <ToggleButtonGroup
@@ -651,8 +610,8 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
           </Box>
 
           {/* Search and Filters */}
-          <Box sx={{ mb: 3 }}>
-            <Grid container spacing={2} alignItems="center">
+          <Box sx={{ mb: 2 }}>
+            <Grid container spacing={1.5} alignItems="center">
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -740,18 +699,18 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
             </Grid>
           </Box>
 
-          <Divider sx={{ mb: 2 }} />
+          <Divider sx={{ mb: 1.5 }} />
 
           {filteredAndSortedAgents.length === 0 ? (
-            <Box textAlign="center" py={4}>
-              <Typography variant="body2" color="text.secondary" mb={2}>
+            <Box textAlign="center" py={3}>
+              <Typography variant="caption" color="text.secondary" mb={1.5} sx={{ display: 'block' }}>
                 {searchQuery || statusFilter !== 'all' || severityFilter !== 'all' || showDemoOnly
                   ? 'No agents match your filters. Try adjusting your search criteria.'
                   : 'No agents yet. Create your first agent to get started!'}
               </Typography>
               {!searchQuery && statusFilter === 'all' && severityFilter === 'all' && !showDemoOnly && (
-                <Button variant="contained" startIcon={<AddIcon />} onClick={onCreateAgent}>
-                  Create Agent
+                <Button variant="outlined" size="small" startIcon={<AddIcon sx={{ fontSize: 16 }} />} onClick={onCreateAgent}>
+                  New Agent
                 </Button>
               )}
             </Box>
@@ -763,43 +722,29 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
                 const categoryColor = categoryInfo[category]?.color || '#616161';
 
                 return (
-                  <Box key={category} mb={4}>
+                  <Box key={category} mb={2}>
                     {/* Category Header */}
                     <Box
                       sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 1.5,
-                        mb: 2,
-                        p: 1.5,
-                        bgcolor: alpha(categoryColor, 0.1),
-                        borderRadius: 1,
-                        borderLeft: `4px solid ${categoryColor}`
+                        gap: 0.5,
+                        mb: 1,
+                        pb: 0.5,
+                        borderBottom: '1px solid',
+                        borderColor: 'divider'
                       }}
                     >
-                      <Avatar
-                        sx={{
-                          width: 40,
-                          height: 40,
-                          bgcolor: alpha(categoryColor, 0.15),
-                        }}
-                      >
-                        <CategoryIcon sx={{ fontSize: 24, color: categoryColor }} />
-                      </Avatar>
-                      <Typography variant="h6" fontWeight={600} sx={{ flex: 1 }}>
+                      <CategoryIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+                      <Typography variant="caption" fontWeight={600} sx={{ flex: 1, color: 'text.secondary' }}>
                         {categoryInfo[category]?.name || category}
                       </Typography>
-                      <Chip
-                        label={`${categoryAgents.length} agent${categoryAgents.length !== 1 ? 's' : ''}`}
-                        size="small"
-                        sx={{
-                          bgcolor: 'white',
-                          fontWeight: 600
-                        }}
-                      />
+                      <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.7rem' }}>
+                        {categoryAgents.length}
+                      </Typography>
                     </Box>
 
-                  <Grid container spacing={viewMode === 'grid' ? 2 : 1}>
+                  <Grid container spacing={1.5}>
                     {categoryAgents.map((agent) => {
                       const healthScore = getHealthScore(agent);
                       const isDemo = agent.name && agent.name.includes('[DEMO]');
@@ -811,7 +756,7 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
                           <Paper
                             variant="outlined"
                             sx={{
-                              p: viewMode === 'grid' ? 2 : 1.5,
+                              p: 1.5,
                               ...(isDemo && {
                                 bgcolor: 'rgba(33, 150, 243, 0.03)',
                                 borderColor: 'info.light',
@@ -819,16 +764,15 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
                               })
                             }}
                           >
-                            <Box display="flex" justifyContent="space-between" alignItems="start" mb={1}>
+                            <Box display="flex" justifyContent="space-between" alignItems="start" mb={0.5}>
                               <Box flex={1}>
-                                <Box display="flex" alignItems="center" gap={1} mb={0.5}>
+                                <Box display="flex" alignItems="center" gap={0.5} mb={0.5} flexWrap="wrap">
                                   {agent.scope === 'global' && (
                                     <Chip
                                       label="GLOBAL"
                                       size="small"
-                                      color="secondary"
                                       variant="outlined"
-                                      sx={{ fontWeight: 600 }}
+                                      sx={{ height: 18, fontSize: '0.65rem', fontWeight: 600 }}
                                     />
                                   )}
                                   {isDemo && (
@@ -837,44 +781,48 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
                                       size="small"
                                       color="info"
                                       variant="outlined"
-                                      sx={{ fontWeight: 600 }}
+                                      sx={{ height: 18, fontSize: '0.65rem', fontWeight: 600 }}
                                     />
                                   )}
-                                  <Typography variant="subtitle1" fontWeight={600}>
+                                  <Typography variant="body2" fontWeight={600}>
                                     {agent.name}
                                   </Typography>
                                   <Chip
                                     size="small"
+                                    variant="outlined"
                                     label={agent.enabled ? 'Active' : 'Paused'}
                                     color={agent.enabled ? 'success' : 'default'}
-                                    icon={agent.enabled ? <CheckCircleIcon /> : <PauseIcon />}
+                                    sx={{ height: 18, fontSize: '0.65rem' }}
                                   />
                                   {hasNotifications && (
                                     <Tooltip title={`Notifications: ${Object.keys(notificationConfig).filter(k => notificationConfig[k]).join(', ')}`}>
-                                      <NotificationsIcon fontSize="small" color="primary" />
+                                      <NotificationsIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
                                     </Tooltip>
                                   )}
                                 </Box>
-                                <Typography variant="body2" color="text.secondary" mb={1}>
+                                <Typography variant="caption" color="text.secondary" mb={0.5} sx={{ display: 'block' }}>
                                   {agent.natural_language_query}
                                 </Typography>
-                                <Box display="flex" gap={1} flexWrap="wrap">
+                                <Box display="flex" gap={0.5} flexWrap="wrap">
                                   <Chip
                                     label={agent.frequency}
                                     size="small"
                                     variant="outlined"
-                                    icon={<ScheduleIcon />}
+                                    sx={{ height: 20, fontSize: '0.7rem' }}
                                   />
                                   <Chip
                                     label={agent.severity}
                                     size="small"
+                                    variant="outlined"
                                     color={getSeverityColor(agent.severity)}
+                                    sx={{ height: 20, fontSize: '0.7rem' }}
                                   />
                                   {healthScore !== null && (
                                     <Chip
-                                      label={`${healthScore}% accuracy`}
+                                      label={`${healthScore}%`}
                                       size="small"
-                                      color={healthScore >= 80 ? 'success' : healthScore >= 60 ? 'warning' : 'error'}
+                                      variant="outlined"
+                                      sx={{ height: 20, fontSize: '0.7rem' }}
                                     />
                                   )}
                                 </Box>
