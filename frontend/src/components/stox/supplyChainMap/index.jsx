@@ -204,7 +204,7 @@ export default function SupplyChainMap({ onBack }) {
             <MapIcon sx={{ fontSize: 20, color: '#0ea5e9' }} />
             <Typography sx={{ fontSize: '0.95rem', fontWeight: 700, color: '#1e293b' }}>Supply Chain Map</Typography>
             {USE_MOCK && (
-              <Chip label="DEMO MODE" size="small" sx={{ height: 18, fontSize: '0.55rem', fontWeight: 700, bgcolor: alpha('#f59e0b', 0.15), color: '#d97706' }} />
+              <Chip label="DEMO" size="small" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700, bgcolor: alpha('#f59e0b', 0.15), color: '#d97706' }} />
             )}
           </Stack>
 
@@ -222,16 +222,16 @@ export default function SupplyChainMap({ onBack }) {
             exclusive
             onChange={(e, value) => value && setMapStyle(value)}
             size="small"
-            sx={{ mr: 2 }}
+            sx={{ mr: 1 }}
           >
-            <ToggleButton value="cartodb-light" sx={{ py: 0.5, px: 1.5, fontSize: '0.65rem' }}>Light</ToggleButton>
-            <ToggleButton value="cartodb-dark" sx={{ py: 0.5, px: 1.5, fontSize: '0.65rem' }}>Dark</ToggleButton>
-            <ToggleButton value="esri-light" sx={{ py: 0.5, px: 1.5, fontSize: '0.65rem' }}>ESRI</ToggleButton>
+            <ToggleButton value="cartodb-light" sx={{ py: 0.5, px: 1.5, fontSize: '0.7rem' }}>Light</ToggleButton>
+            <ToggleButton value="cartodb-dark" sx={{ py: 0.5, px: 1.5, fontSize: '0.7rem' }}>Dark</ToggleButton>
+            <ToggleButton value="esri-light" sx={{ py: 0.5, px: 1.5, fontSize: '0.7rem' }}>ESRI</ToggleButton>
           </ToggleButtonGroup>
 
           <Tooltip title="Refresh Data">
-            <IconButton onClick={initializeData} size="small" sx={{ mr: 1 }}>
-              <RefreshIcon sx={{ fontSize: 18 }} />
+            <IconButton onClick={initializeData} size="small">
+              <RefreshIcon sx={{ fontSize: 20 }} />
             </IconButton>
           </Tooltip>
         </Box>
@@ -264,26 +264,26 @@ export default function SupplyChainMap({ onBack }) {
         />
 
         {/* Map Controls */}
-        <Box sx={{ position: 'absolute', top: 16, left: 16, zIndex: 1000 }}>
+        <Box sx={{ position: 'absolute', top: 12, left: 12, zIndex: 1000 }}>
           <Stack spacing={0.5}>
             <Tooltip title="Zoom In" placement="right">
-              <IconButton onClick={handleZoomIn} sx={{ bgcolor: 'white', boxShadow: 1, '&:hover': { bgcolor: '#f1f5f9' } }}>
-                <ZoomInIcon sx={{ fontSize: 18 }} />
+              <IconButton size="small" onClick={handleZoomIn} sx={{ bgcolor: 'white', boxShadow: 1, '&:hover': { bgcolor: '#f1f5f9' } }}>
+                <ZoomInIcon sx={{ fontSize: 20 }} />
               </IconButton>
             </Tooltip>
             <Tooltip title="Zoom Out" placement="right">
-              <IconButton onClick={handleZoomOut} sx={{ bgcolor: 'white', boxShadow: 1, '&:hover': { bgcolor: '#f1f5f9' } }}>
-                <ZoomOutIcon sx={{ fontSize: 18 }} />
+              <IconButton size="small" onClick={handleZoomOut} sx={{ bgcolor: 'white', boxShadow: 1, '&:hover': { bgcolor: '#f1f5f9' } }}>
+                <ZoomOutIcon sx={{ fontSize: 20 }} />
               </IconButton>
             </Tooltip>
             <Tooltip title="Reset View" placement="right">
-              <IconButton onClick={handleResetView} sx={{ bgcolor: 'white', boxShadow: 1, '&:hover': { bgcolor: '#f1f5f9' } }}>
-                <CenterFocusStrongIcon sx={{ fontSize: 18 }} />
+              <IconButton size="small" onClick={handleResetView} sx={{ bgcolor: 'white', boxShadow: 1, '&:hover': { bgcolor: '#f1f5f9' } }}>
+                <CenterFocusStrongIcon sx={{ fontSize: 20 }} />
               </IconButton>
             </Tooltip>
             <Tooltip title={isFullScreen ? 'Exit Fullscreen' : 'Fullscreen'} placement="right">
-              <IconButton onClick={() => setIsFullScreen(!isFullScreen)} sx={{ bgcolor: 'white', boxShadow: 1, '&:hover': { bgcolor: '#f1f5f9' } }}>
-                {isFullScreen ? <FullscreenExitIcon sx={{ fontSize: 18 }} /> : <FullscreenIcon sx={{ fontSize: 18 }} />}
+              <IconButton size="small" onClick={() => setIsFullScreen(!isFullScreen)} sx={{ bgcolor: 'white', boxShadow: 1, '&:hover': { bgcolor: '#f1f5f9' } }}>
+                {isFullScreen ? <FullscreenExitIcon sx={{ fontSize: 20 }} /> : <FullscreenIcon sx={{ fontSize: 20 }} />}
               </IconButton>
             </Tooltip>
           </Stack>
@@ -339,7 +339,7 @@ function FilterToggle({ icon, label, active, onClick }) {
       onClick={onClick}
       sx={{
         height: 24,
-        fontSize: '0.65rem',
+        fontSize: '0.7rem',
         fontWeight: 600,
         bgcolor: active ? alpha('#3b82f6', 0.15) : alpha('#64748b', 0.1),
         color: active ? '#2563eb' : '#64748b',
@@ -347,7 +347,8 @@ function FilterToggle({ icon, label, active, onClick }) {
         borderColor: active ? alpha('#3b82f6', 0.3) : 'transparent',
         cursor: 'pointer',
         '&:hover': { bgcolor: active ? alpha('#3b82f6', 0.2) : alpha('#64748b', 0.15) },
-        '& .MuiChip-icon': { color: 'inherit' },
+        '& .MuiChip-icon': { color: 'inherit', ml: 0.5 },
+        '& .MuiChip-label': { px: 0.75 },
       }}
     />
   );
