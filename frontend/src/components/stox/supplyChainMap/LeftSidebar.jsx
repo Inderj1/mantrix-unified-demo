@@ -63,7 +63,8 @@ export default function LeftSidebar({
         width: 280,
         bgcolor: 'white',
         borderRight: '1px solid',
-        borderColor: alpha('#64748b', 0.12),
+        borderColor: alpha('#64748b', 0.15),
+        boxShadow: '4px 0 16px rgba(0, 0, 0, 0.04)',
         zIndex: 1000,
         display: 'flex',
         flexDirection: 'column',
@@ -71,11 +72,32 @@ export default function LeftSidebar({
       }}
     >
       {/* Header */}
-      <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: alpha('#64748b', 0.15), bgcolor: '#f8fafc' }}>
+      <Box sx={{
+        p: 2,
+        borderBottom: '1px solid',
+        borderColor: alpha('#64748b', 0.15),
+        background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+      }}>
         <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
-          <SpeedIcon sx={{ fontSize: 18, color: '#0284c7' }} />
+          <Box sx={{
+            p: 0.75,
+            borderRadius: 1,
+            background: 'linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <SpeedIcon sx={{ fontSize: 16, color: 'white' }} />
+          </Box>
           <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: '#1e293b' }}>Network Health</Typography>
-          <Box sx={{ width: 6, height: 6, bgcolor: '#10b981', borderRadius: '50%', ml: 'auto' }} />
+          <Box sx={{
+            width: 8,
+            height: 8,
+            bgcolor: '#10b981',
+            borderRadius: '50%',
+            ml: 'auto',
+            boxShadow: '0 0 8px rgba(16, 185, 129, 0.5)',
+          }} />
         </Stack>
         <Typography sx={{ fontSize: '0.65rem', color: '#64748b' }}>
           Updated: {new Date().toLocaleTimeString()}
@@ -91,7 +113,21 @@ export default function LeftSidebar({
       </Box>
 
       {/* Scrollable Content */}
-      <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+      <Box
+        className="scrollbar-hover"
+        sx={{
+          flex: 1,
+          overflow: 'auto',
+          p: 2,
+          '&::-webkit-scrollbar': { width: 6 },
+          '&::-webkit-scrollbar-track': { background: 'transparent' },
+          '&::-webkit-scrollbar-thumb': { background: 'transparent', borderRadius: 3 },
+          '&:hover::-webkit-scrollbar-thumb': { background: 'rgba(100, 116, 139, 0.3)' },
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'transparent transparent',
+          '&:hover': { scrollbarColor: 'rgba(100, 116, 139, 0.3) transparent' },
+        }}
+      >
         {/* Critical Alerts */}
         {criticalAlerts.length > 0 && (
           <Box sx={{ mb: 3 }}>
@@ -265,7 +301,12 @@ export default function LeftSidebar({
       </Box>
 
       {/* Footer Stats */}
-      <Box sx={{ p: 2, borderTop: '1px solid', borderColor: alpha('#64748b', 0.15), bgcolor: '#f8fafc' }}>
+      <Box sx={{
+        p: 2,
+        borderTop: '1px solid',
+        borderColor: alpha('#64748b', 0.15),
+        background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+      }}>
         <Stack direction="row" spacing={2} justifyContent="space-between">
           <StatItem icon={<LocalShippingIcon sx={{ fontSize: 16 }} />} label="Active" value={trucks.filter(t => t.status === 'in-transit').length} color="primary" />
           <StatItem icon={<InventoryIcon sx={{ fontSize: 16 }} />} label="Low Stock" value={stores.filter(s => s.stock_level < 30).length} color="error" />

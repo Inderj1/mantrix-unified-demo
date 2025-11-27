@@ -39,6 +39,7 @@
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.3.8",
     "react-leaflet": "^4.2.1",
+    "react-leaflet-cluster": "^2.1.0",
     "react-pivottable": "^0.11.0",
     "react-plotly.js": "^2.6.0",
     "react-query": "^3.39.3",
@@ -79,6 +80,7 @@
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
+    "playwright": "^1.57.0",
     "vite": "^5.2.7"
   }
 }

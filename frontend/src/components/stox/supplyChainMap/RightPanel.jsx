@@ -1,10 +1,6 @@
 import React from 'react';
 import { Box, Typography, Chip, Stack, Button, Card, CardContent } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import CloudIcon from '@mui/icons-material/Cloud';
-import InventoryIcon from '@mui/icons-material/Inventory';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import RouteIcon from '@mui/icons-material/Route';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
@@ -19,37 +15,37 @@ export default function RightPanel({
   costSavedWeek = 0,
   issuesPrevented = 0,
 }) {
-  // Critical actions that need attention
-  const criticalActions = [
+  // AI proposed actions - automated responses to detected issues
+  const proposedActions = [
     {
       id: '1',
-      type: 'weather-alert',
-      label: 'Weather Alert',
-      description: 'Severe thunderstorms forecast for Tennessee - shipments may be affected',
-      actionLabel: 'View Routes',
-      timeAgo: '2 min ago',
-      severity: 'error',
-      icon: CloudIcon,
+      type: 'auto-reroute',
+      label: 'Auto-Reroute',
+      description: 'Redirect TRK-005 via I-65 to avoid weather delays - saves 2.5 hrs',
+      actionLabel: 'Approve Route',
+      confidence: 94,
+      impact: 'High',
+      icon: RouteIcon,
     },
     {
       id: '2',
-      type: 'low-stock',
-      label: 'Low Stock',
-      description: 'Columbus DC at 45% capacity - RX Energy below reorder point',
-      actionLabel: 'Request Transfer',
-      timeAgo: '5 min ago',
-      severity: 'warning',
-      icon: InventoryIcon,
+      type: 'auto-transfer',
+      label: 'Stock Transfer',
+      description: 'Move 1,200 cases from La Vergne to Columbus DC to prevent stockout',
+      actionLabel: 'Approve Transfer',
+      confidence: 91,
+      impact: 'Medium',
+      icon: SwapHorizIcon,
     },
     {
       id: '3',
-      type: 'delay-risk',
-      label: 'Delay Risk',
-      description: 'AZ-TRK-002 experiencing delays on I-40 corridor',
-      actionLabel: 'Reroute Options',
-      timeAgo: '8 min ago',
-      severity: 'info',
-      icon: AccessTimeIcon,
+      type: 'demand-adjust',
+      label: 'Demand Adjust',
+      description: 'Increase Nashville delivery frequency due to +18% demand forecast',
+      actionLabel: 'Review Plan',
+      confidence: 87,
+      impact: 'Medium',
+      icon: TrendingUpIcon,
     },
   ];
 
@@ -81,11 +77,11 @@ export default function RightPanel({
     },
   ];
 
-  const getSeverityColors = (severity) => {
-    switch (severity) {
-      case 'error': return { bg: alpha('#ef4444', 0.08), border: alpha('#ef4444', 0.25), text: '#dc2626', btn: '#ef4444', iconBg: alpha('#ef4444', 0.12) };
-      case 'warning': return { bg: alpha('#f97316', 0.08), border: alpha('#f97316', 0.25), text: '#ea580c', btn: '#f97316', iconBg: alpha('#f97316', 0.12) };
-      case 'info': return { bg: alpha('#f59e0b', 0.08), border: alpha('#f59e0b', 0.25), text: '#d97706', btn: '#f59e0b', iconBg: alpha('#f59e0b', 0.12) };
+  const getImpactColors = (impact) => {
+    switch (impact) {
+      case 'High': return { bg: alpha('#7c3aed', 0.08), border: alpha('#7c3aed', 0.25), text: '#7c3aed', btn: '#7c3aed', iconBg: alpha('#7c3aed', 0.12) };
+      case 'Medium': return { bg: alpha('#0ea5e9', 0.08), border: alpha('#0ea5e9', 0.25), text: '#0284c7', btn: '#0ea5e9', iconBg: alpha('#0ea5e9', 0.12) };
+      case 'Low': return { bg: alpha('#10b981', 0.08), border: alpha('#10b981', 0.25), text: '#059669', btn: '#10b981', iconBg: alpha('#10b981', 0.12) };
       default: return { bg: alpha('#64748b', 0.08), border: alpha('#64748b', 0.25), text: '#475569', btn: '#64748b', iconBg: alpha('#64748b', 0.12) };
     }
   };
@@ -109,7 +105,8 @@ export default function RightPanel({
         width: 280,
         bgcolor: 'white',
         borderLeft: '1px solid',
-        borderColor: alpha('#64748b', 0.12),
+        borderColor: alpha('#64748b', 0.15),
+        boxShadow: '-4px 0 16px rgba(0, 0, 0, 0.04)',
         zIndex: 1000,
         display: 'flex',
         flexDirection: 'column',
@@ -117,27 +114,54 @@ export default function RightPanel({
       }}
     >
       {/* Header */}
-      <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: alpha('#64748b', 0.15), bgcolor: '#f8fafc' }}>
+      <Box sx={{
+        p: 2,
+        borderBottom: '1px solid',
+        borderColor: alpha('#64748b', 0.15),
+        background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+      }}>
         <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
-          <SmartToyIcon sx={{ fontSize: 18, color: '#0284c7' }} />
+          <Box sx={{
+            p: 0.75,
+            borderRadius: 1,
+            background: 'linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <SmartToyIcon sx={{ fontSize: 16, color: 'white' }} />
+          </Box>
           <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: '#1e293b' }}>AI Control Center</Typography>
         </Stack>
         <Typography sx={{ fontSize: '0.65rem', color: '#64748b' }}>Intelligent Detection & Proposals</Typography>
       </Box>
 
       {/* Scrollable Content */}
-      <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
-        {/* Critical Actions */}
+      <Box
+        sx={{
+          flex: 1,
+          overflow: 'auto',
+          p: 2,
+          '&::-webkit-scrollbar': { width: 6 },
+          '&::-webkit-scrollbar-track': { background: 'transparent' },
+          '&::-webkit-scrollbar-thumb': { background: 'transparent', borderRadius: 3 },
+          '&:hover::-webkit-scrollbar-thumb': { background: 'rgba(100, 116, 139, 0.3)' },
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'transparent transparent',
+          '&:hover': { scrollbarColor: 'rgba(100, 116, 139, 0.3) transparent' },
+        }}
+      >
+        {/* AI Proposed Actions */}
         <Box sx={{ mb: 3 }}>
           <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
-            <WarningAmberIcon sx={{ fontSize: 14, color: '#d97706' }} />
+            <SmartToyIcon sx={{ fontSize: 14, color: '#7c3aed' }} />
             <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-              Critical Actions
+              AI Proposed Actions
             </Typography>
           </Stack>
           <Stack spacing={1.5}>
-            {criticalActions.map((action) => {
-              const colors = getSeverityColors(action.severity);
+            {proposedActions.map((action) => {
+              const colors = getImpactColors(action.impact);
               const IconComponent = action.icon;
               return (
                 <Card
@@ -160,7 +184,17 @@ export default function RightPanel({
                           {action.label}
                         </Typography>
                       </Stack>
-                      <Typography sx={{ fontSize: '0.6rem', color: '#94a3b8' }}>{action.timeAgo}</Typography>
+                      <Chip
+                        label={`${action.confidence}%`}
+                        size="small"
+                        sx={{
+                          height: 18,
+                          fontSize: '0.6rem',
+                          fontWeight: 700,
+                          bgcolor: alpha('#10b981', 0.12),
+                          color: '#059669',
+                        }}
+                      />
                     </Stack>
                     <Typography sx={{ fontSize: '0.75rem', color: '#1e293b', mb: 1.5, lineHeight: 1.4 }}>
                       {action.description}
@@ -252,7 +286,12 @@ export default function RightPanel({
       </Box>
 
       {/* Footer Stats */}
-      <Box sx={{ p: 2, borderTop: '1px solid', borderColor: alpha('#64748b', 0.15), bgcolor: '#f8fafc' }}>
+      <Box sx={{
+        p: 2,
+        borderTop: '1px solid',
+        borderColor: alpha('#64748b', 0.15),
+        background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+      }}>
         <Stack direction="row" spacing={2} justifyContent="space-between">
           <StatItem icon={<BoltIcon sx={{ fontSize: 16 }} />} label="Today" value={actionsToday} color="primary" />
           <StatItem icon={<SavingsIcon sx={{ fontSize: 16 }} />} label="Saved" value={`$${(costSavedWeek / 1000).toFixed(1)}k`} color="success" />

@@ -18,6 +18,9 @@ import MapView from './MapView';
 import LeftSidebar from './LeftSidebar';
 import RightPanel from './RightPanel';
 import BottomPanel from './BottomPanel';
+import FacilityDetailsPanel from './FacilityDetailsPanel';
+import TruckDetailsPanel from './TruckDetailsPanel';
+import AlertDetailsPanel from './AlertDetailsPanel';
 import {
   trucksApi,
   storesApi,
@@ -125,11 +128,14 @@ export default function SupplyChainMap({ onBack }) {
 
   const handleResetView = useCallback(() => {
     if (mapRef.current) {
-      mapRef.current.setView([39.0, -82.0], 6, { animate: true });
+      mapRef.current.setView([39.0, -98.0], 4, { animate: true });
     }
   }, []);
 
   const handleStoreClick = useCallback((store) => {
+    // Close other panels when opening this one
+    setSelectedTruck(null);
+    setSelectedAlert(null);
     setSelectedStore(store);
     if (store && mapRef.current) {
       mapRef.current.setView([store.latitude, store.longitude], 10, { animate: true });
@@ -137,6 +143,9 @@ export default function SupplyChainMap({ onBack }) {
   }, []);
 
   const handleTruckClick = useCallback((truck) => {
+    // Close other panels when opening this one
+    setSelectedStore(null);
+    setSelectedAlert(null);
     setSelectedTruck(truck);
     if (truck && mapRef.current) {
       mapRef.current.setView([truck.latitude, truck.longitude], 12, { animate: true });
@@ -144,10 +153,19 @@ export default function SupplyChainMap({ onBack }) {
   }, []);
 
   const handleAlertClick = useCallback((alert) => {
+    // Close other panels when opening this one
+    setSelectedStore(null);
+    setSelectedTruck(null);
     setSelectedAlert(alert);
     if (alert && mapRef.current) {
       mapRef.current.setView([alert.latitude, alert.longitude], 10, { animate: true });
     }
+  }, []);
+
+  const handleCloseDetailsPanel = useCallback(() => {
+    setSelectedStore(null);
+    setSelectedTruck(null);
+    setSelectedAlert(null);
   }, []);
 
   const handleFilterChange = (filter) => {
@@ -189,8 +207,10 @@ export default function SupplyChainMap({ onBack }) {
             right: 0,
             height: 48,
             bgcolor: 'white',
+            background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
             borderBottom: '1px solid',
-            borderColor: alpha('#64748b', 0.2),
+            borderColor: alpha('#64748b', 0.15),
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
             zIndex: 1100,
             display: 'flex',
             alignItems: 'center',
@@ -200,8 +220,18 @@ export default function SupplyChainMap({ onBack }) {
           <IconButton onClick={onBack} size="small" sx={{ mr: 1 }}>
             <ArrowBackIcon sx={{ fontSize: 20 }} />
           </IconButton>
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <MapIcon sx={{ fontSize: 20, color: '#0ea5e9' }} />
+          <Stack direction="row" alignItems="center" spacing={1.5}>
+            <Box sx={{
+              p: 0.75,
+              borderRadius: 1,
+              background: 'linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 2px 6px rgba(14, 165, 233, 0.3)',
+            }}>
+              <MapIcon sx={{ fontSize: 18, color: 'white' }} />
+            </Box>
             <Typography sx={{ fontSize: '0.95rem', fontWeight: 700, color: '#1e293b' }}>Supply Chain Map</Typography>
             {USE_MOCK && (
               <Chip label="DEMO" size="small" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700, bgcolor: alpha('#f59e0b', 0.15), color: '#d97706' }} />
@@ -222,11 +252,81 @@ export default function SupplyChainMap({ onBack }) {
             exclusive
             onChange={(e, value) => value && setMapStyle(value)}
             size="small"
-            sx={{ mr: 1 }}
+            sx={{
+              mr: 1,
+              bgcolor: alpha('#64748b', 0.08),
+              borderRadius: 1.5,
+              p: 0.5,
+              '& .MuiToggleButtonGroup-grouped': {
+                border: 'none',
+                borderRadius: '8px !important',
+                mx: 0.5,
+              },
+            }}
           >
-            <ToggleButton value="cartodb-light" sx={{ py: 0.5, px: 1.5, fontSize: '0.7rem' }}>Light</ToggleButton>
-            <ToggleButton value="cartodb-dark" sx={{ py: 0.5, px: 1.5, fontSize: '0.7rem' }}>Dark</ToggleButton>
-            <ToggleButton value="esri-light" sx={{ py: 0.5, px: 1.5, fontSize: '0.7rem' }}>ESRI</ToggleButton>
+            <ToggleButton
+              value="cartodb-light"
+              sx={{
+                py: 0.75,
+                px: 2.5,
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                color: '#64748b',
+                textTransform: 'none',
+                minWidth: 70,
+                '&.Mui-selected': {
+                  bgcolor: 'white',
+                  color: '#1e293b',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                  '&:hover': { bgcolor: 'white' },
+                },
+                '&:hover': { bgcolor: alpha('#64748b', 0.1) },
+              }}
+            >
+              Light
+            </ToggleButton>
+            <ToggleButton
+              value="cartodb-dark"
+              sx={{
+                py: 0.75,
+                px: 2.5,
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                color: '#64748b',
+                textTransform: 'none',
+                minWidth: 70,
+                '&.Mui-selected': {
+                  bgcolor: 'white',
+                  color: '#1e293b',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                  '&:hover': { bgcolor: 'white' },
+                },
+                '&:hover': { bgcolor: alpha('#64748b', 0.1) },
+              }}
+            >
+              Dark
+            </ToggleButton>
+            <ToggleButton
+              value="esri-light"
+              sx={{
+                py: 0.75,
+                px: 2.5,
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                color: '#64748b',
+                textTransform: 'none',
+                minWidth: 70,
+                '&.Mui-selected': {
+                  bgcolor: 'white',
+                  color: '#1e293b',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                  '&:hover': { bgcolor: 'white' },
+                },
+                '&:hover': { bgcolor: alpha('#64748b', 0.1) },
+              }}
+            >
+              ESRI
+            </ToggleButton>
           </ToggleButtonGroup>
 
           <Tooltip title="Refresh Data">
@@ -246,6 +346,7 @@ export default function SupplyChainMap({ onBack }) {
           right: isFullScreen ? 0 : 280,
           bottom: isFullScreen ? 0 : 200,
           zIndex: 500,
+          overflow: 'hidden',
         }}
       >
         <MapView
@@ -261,6 +362,7 @@ export default function SupplyChainMap({ onBack }) {
           onStoreClick={handleStoreClick}
           onTruckClick={handleTruckClick}
           onAlertClick={handleAlertClick}
+          isFullScreen={isFullScreen}
         />
 
         {/* Map Controls */}
@@ -325,6 +427,31 @@ export default function SupplyChainMap({ onBack }) {
           onReject={handleRejectAction}
         />
       )}
+
+      {/* Detail Panels */}
+      {selectedStore && (
+        <FacilityDetailsPanel
+          store={selectedStore}
+          alerts={alerts}
+          trucks={trucks}
+          onClose={handleCloseDetailsPanel}
+        />
+      )}
+
+      {selectedTruck && (
+        <TruckDetailsPanel
+          truck={selectedTruck}
+          alerts={alerts}
+          onClose={handleCloseDetailsPanel}
+        />
+      )}
+
+      {selectedAlert && (
+        <AlertDetailsPanel
+          alert={selectedAlert}
+          onClose={handleCloseDetailsPanel}
+        />
+      )}
     </Box>
   );
 }
@@ -338,17 +465,18 @@ function FilterToggle({ icon, label, active, onClick }) {
       size="small"
       onClick={onClick}
       sx={{
-        height: 24,
-        fontSize: '0.7rem',
+        height: 32,
+        fontSize: '0.75rem',
         fontWeight: 600,
-        bgcolor: active ? alpha('#3b82f6', 0.15) : alpha('#64748b', 0.1),
+        bgcolor: active ? alpha('#3b82f6', 0.15) : alpha('#64748b', 0.08),
         color: active ? '#2563eb' : '#64748b',
         border: '1px solid',
         borderColor: active ? alpha('#3b82f6', 0.3) : 'transparent',
+        borderRadius: 2,
         cursor: 'pointer',
-        '&:hover': { bgcolor: active ? alpha('#3b82f6', 0.2) : alpha('#64748b', 0.15) },
-        '& .MuiChip-icon': { color: 'inherit', ml: 0.5 },
-        '& .MuiChip-label': { px: 0.75 },
+        '&:hover': { bgcolor: active ? alpha('#3b82f6', 0.2) : alpha('#64748b', 0.12) },
+        '& .MuiChip-icon': { color: 'inherit', ml: 1 },
+        '& .MuiChip-label': { px: 1.5 },
       }}
     />
   );

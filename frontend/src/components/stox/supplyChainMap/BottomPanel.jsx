@@ -98,7 +98,8 @@ export default function BottomPanel({
         bottom: 0,
         bgcolor: 'white',
         borderTop: '1px solid',
-        borderColor: alpha('#64748b', 0.12),
+        borderColor: alpha('#64748b', 0.15),
+        boxShadow: '0 -4px 16px rgba(0, 0, 0, 0.04)',
         zIndex: 1000,
         transition: 'height 0.3s ease',
         height: collapsed ? 40 : 200,
@@ -112,14 +113,23 @@ export default function BottomPanel({
           justifyContent: 'space-between',
           px: 2,
           py: 0.75,
-          bgcolor: '#f8fafc',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
           borderBottom: '1px solid',
           borderColor: alpha('#64748b', 0.15),
         }}
       >
         <Stack direction="row" alignItems="center" spacing={3}>
           <Stack direction="row" alignItems="center" spacing={1}>
-            <LightbulbIcon sx={{ fontSize: 16, color: '#0284c7' }} />
+            <Box sx={{
+              p: 0.5,
+              borderRadius: 0.75,
+              background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+              <LightbulbIcon sx={{ fontSize: 14, color: 'white' }} />
+            </Box>
             <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#1e293b' }}>
               Insights Engine
             </Typography>
@@ -148,8 +158,21 @@ export default function BottomPanel({
 
       {/* Content */}
       <Collapse in={!collapsed}>
-        <Box sx={{ p: 2, height: 152, overflow: 'auto' }}>
-          <Grid container spacing={1.5}>
+        <Box
+          sx={{
+            p: 1.5,
+            height: 160,
+            overflow: 'auto',
+            '&::-webkit-scrollbar': { width: 6, height: 6 },
+            '&::-webkit-scrollbar-track': { background: 'transparent' },
+            '&::-webkit-scrollbar-thumb': { background: 'transparent', borderRadius: 3 },
+            '&:hover::-webkit-scrollbar-thumb': { background: 'rgba(100, 116, 139, 0.3)' },
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'transparent transparent',
+            '&:hover': { scrollbarColor: 'rgba(100, 116, 139, 0.3) transparent' },
+          }}
+        >
+          <Grid container spacing={1}>
             {insights.map((insight) => {
               const colors = getCategoryColor(insight.categoryColor);
               const IconComponent = insight.icon;
@@ -157,8 +180,9 @@ export default function BottomPanel({
                 <Grid item xs={12} sm={6} md={4} lg={2} key={insight.id}>
                   <Box
                     sx={{
-                      p: 1.5,
+                      p: 1.25,
                       height: '100%',
+                      minHeight: 120,
                       bgcolor: colors.bg,
                       border: '1px solid',
                       borderColor: colors.border,
@@ -173,7 +197,7 @@ export default function BottomPanel({
                       },
                     }}
                   >
-                    <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 0.75 }}>
+                    <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 0.5 }}>
                       <Box sx={{ p: 0.25, borderRadius: 0.5, bgcolor: colors.iconBg, display: 'flex' }}>
                         <IconComponent sx={{ fontSize: 14, color: colors.text }} />
                       </Box>
@@ -181,7 +205,7 @@ export default function BottomPanel({
                         {insight.category}
                       </Typography>
                     </Stack>
-                    <Typography sx={{ fontSize: '0.65rem', color: '#475569', lineHeight: 1.4, flex: 1, mb: 0.5 }}>
+                    <Typography sx={{ fontSize: '0.65rem', color: '#475569', lineHeight: 1.35, flex: 1, mb: 0.5 }}>
                       {insight.description}
                     </Typography>
                     <Chip
