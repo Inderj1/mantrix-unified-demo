@@ -25,6 +25,7 @@ import {
   ShowChart as ShowChartIcon,
   Analytics as AnalyticsIcon,
   Science as ScienceIcon,
+  Map as MapIcon,
 } from '@mui/icons-material';
 
 const storeSystemModules = [
@@ -87,6 +88,18 @@ const storeSystemModules = [
     stats: { label: 'STOs', value: '36' },
     status: 'active',
     gradient: 'linear-gradient(135deg, #0854a0 0%, #1d4ed8 100%)',
+  },
+  {
+    id: 'supply-chain-map',
+    title: 'Supply Chain Map',
+    subtitle: 'Network Visibility',
+    description: 'Real-time fleet tracking, inventory monitoring, and AI-powered supply chain optimization',
+    icon: MapIcon,
+    color: '#0ea5e9',
+    bgColor: '#e0f2fe',
+    stats: { label: 'Live Tracking', value: '24/7' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
   },
 ];
 
@@ -154,7 +167,7 @@ const StoxAILanding = ({ onTileClick, onBack }) => {
                 STOX.AI
               </Typography>
               <Chip
-                label="5 Modules"
+                label="6 Modules"
                 size="small"
                 sx={{
                   bgcolor: alpha('#0a6ed1', 0.1),

@@ -112,6 +112,7 @@ import StoreHealthMonitor from './components/stox/StoreHealthMonitor.jsx';
 import StoreOptimization from './components/stox/StoreOptimization.jsx';
 import StoreReplenishment from './components/stox/StoreReplenishment.jsx';
 import StoreFinancialImpact from './components/stox/StoreFinancialImpact.jsx';
+import SupplyChainMap from './components/stox/supplyChainMap/index.jsx';
 import DCDemandAggregation from './components/stox/DCDemandAggregation.jsx';
 import DCHealthMonitor from './components/stox/DCHealthMonitor.jsx';
 import DCOptimization from './components/stox/DCOptimization.jsx';
@@ -751,6 +752,9 @@ function App() {
                   )}
                   {stoxView === 'store-financial-impact' && (
                     <StoreFinancialImpact onBack={() => setStoxView('store-modules')} />
+                  )}
+                  {stoxView === 'supply-chain-map' && (
+                    <SupplyChainMap onBack={() => setStoxView('landing')} />
                   )}
                   {/* DC System Modules */}
                   {stoxView === 'dc-demand-aggregation' && (
