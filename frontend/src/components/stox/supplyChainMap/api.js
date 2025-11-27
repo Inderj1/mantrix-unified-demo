@@ -172,7 +172,7 @@ export function generateAIActions(trucks, stores, alerts) {
         id: `action-route-${truck.truck_id}`,
         timestamp: new Date(),
         agent_id: 'route-optimizer',
-        agent_name: 'Ruute.AI',
+        agent_name: 'Route.AI',
         action_type: 'route',
         description: `Route optimization available for ${truck.truck_id}`,
         predicted_impact: 10,

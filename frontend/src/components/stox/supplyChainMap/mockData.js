@@ -496,7 +496,7 @@ export const mockAlerts = [
 export const mockAgents = [
   {
     id: 'route-optimizer',
-    name: 'Ruute.AI',
+    name: 'Route.AI',
     icon: '🚛',
     type: 'route-optimizer',
     color: '#3b82f6',
@@ -564,7 +564,7 @@ export const mockAIActions = [
     id: 'action-002',
     timestamp: new Date(Date.now() - 12 * 60000),
     agent_id: 'route-optimizer',
-    agent_name: 'Ruute.AI',
+    agent_name: 'Route.AI',
     action_type: 'route',
     description: 'Reroute AZ-TRK-002 via US-290 to avoid I-10 congestion',
     predicted_impact: 8,

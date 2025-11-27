@@ -15,7 +15,7 @@ export default function AlertDetailsPanel({ alert, onClose }) {
   // Map agent types to AI agent info
   const getAIAgentInfo = (agentId) => {
     const agentMap = {
-      'route-optimizer': { name: 'Ruute.AI', icon: LocalShippingIcon, specialty: 'Route Optimization', color: '#3b82f6' },
+      'route-optimizer': { name: 'Route.AI', icon: LocalShippingIcon, specialty: 'Route Optimization', color: '#3b82f6' },
       'inventory-manager': { name: 'Stox.AI', icon: InventoryIcon, specialty: 'Inventory Management', color: '#8b5cf6' },
       'demand-forecaster': { name: 'Markets.AI', icon: CloudIcon, specialty: 'External Factors - Weather, Tariffs, Events', color: '#06b6d4' },
       'cost-optimizer': { name: 'Cost.AI', icon: TrendingUpIcon, specialty: 'Cost Optimization', color: '#10b981' },

@@ -300,7 +300,7 @@ export default function TruckDetailsPanel({ truck, alerts = [], onClose }) {
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1.5 }}>
               <SmartToyIcon sx={{ fontSize: 20, color: '#0284c7' }} />
               <Box sx={{ flex: 1 }}>
-                <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#0284c7' }}>Ruute.AI</Typography>
+                <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#0284c7' }}>Route.AI</Typography>
                 <Typography sx={{ fontSize: '0.6rem', color: '#64748b' }}>Route Optimization</Typography>
               </Box>
               <Box sx={{ width: 8, height: 8, bgcolor: '#0284c7', borderRadius: '50%', animation: 'pulse 2s infinite' }} />

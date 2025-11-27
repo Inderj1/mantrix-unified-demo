@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Box, Typography, Chip, Stack, IconButton, Grid, Collapse } from '@mui/material';
+import React from 'react';
+import { Box, Typography, Stack, IconButton } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -18,8 +18,12 @@ export default function BottomPanel({
   onApprove,
   onReject,
   onActionClick,
+  collapsed = false,
+  onToggleCollapsed,
 }) {
-  const [collapsed, setCollapsed] = useState(false);
+  const handleToggle = () => {
+    onToggleCollapsed?.(!collapsed);
+  };
 
   const totalSavedToday = completedActions.reduce((sum, action) => sum + (action.cost_saved || 0), 0);
   const successfulActions = completedActions.filter(a => a.status === 'completed').length;
@@ -30,61 +34,61 @@ export default function BottomPanel({
     {
       id: 1,
       icon: TrendingUpIcon,
-      category: 'Demand Forecast',
+      category: 'Demand',
       categoryColor: 'blue',
-      description: 'Northeast demand +18% next week due to summer heat wave forecast',
+      description: 'Northeast +18% next week - heat wave',
       confidence: 87,
     },
     {
       id: 2,
       icon: WarningAmberIcon,
-      category: 'Risk Alert',
+      category: 'Risk',
       categoryColor: 'orange',
-      description: 'Weather delays expected on I-40 corridor Thu-Fri affecting 3 trucks',
+      description: 'I-40 delays Thu-Fri, 3 trucks affected',
       confidence: 92,
     },
     {
       id: 3,
       icon: SavingsIcon,
-      category: 'Cost Optimization',
+      category: 'Savings',
       categoryColor: 'emerald',
-      description: 'Consolidate Midwest routes to save $3.8K/week in fuel costs',
+      description: 'Consolidate Midwest - save $3.8K/wk',
       confidence: 94,
     },
     {
       id: 4,
       icon: InventoryIcon,
-      category: 'Inventory Alert',
+      category: 'Stock',
       categoryColor: 'purple',
-      description: 'Columbus DC reaches reorder point for RX Energy in 2 days',
+      description: 'Columbus DC - RX Energy low in 2d',
       confidence: 89,
     },
     {
       id: 5,
       icon: LocalShippingIcon,
-      category: 'Route Efficiency',
+      category: 'Route',
       categoryColor: 'cyan',
-      description: 'Alternative route saves 45 min on AZ-TRK-002 delivery to Nashville',
+      description: 'Alt route saves 45min - Nashville',
       confidence: 96,
     },
     {
       id: 6,
       icon: AccessTimeIcon,
-      category: 'Capacity Planning',
+      category: 'Capacity',
       categoryColor: 'amber',
-      description: 'Woodbury DC at 85% - recommend additional capacity for peak season',
+      description: 'Woodbury at 85% - add capacity',
       confidence: 85,
     },
   ];
 
   const getCategoryColor = (color) => {
     const colors = {
-      blue: { bg: alpha('#0ea5e9', 0.1), border: alpha('#0ea5e9', 0.25), text: '#0284c7', iconBg: alpha('#0ea5e9', 0.15) },
-      orange: { bg: alpha('#f97316', 0.1), border: alpha('#f97316', 0.25), text: '#ea580c', iconBg: alpha('#f97316', 0.15) },
-      emerald: { bg: alpha('#10b981', 0.1), border: alpha('#10b981', 0.25), text: '#059669', iconBg: alpha('#10b981', 0.15) },
-      purple: { bg: alpha('#8b5cf6', 0.1), border: alpha('#8b5cf6', 0.25), text: '#7c3aed', iconBg: alpha('#8b5cf6', 0.15) },
-      cyan: { bg: alpha('#06b6d4', 0.1), border: alpha('#06b6d4', 0.25), text: '#0891b2', iconBg: alpha('#06b6d4', 0.15) },
-      amber: { bg: alpha('#f59e0b', 0.1), border: alpha('#f59e0b', 0.25), text: '#d97706', iconBg: alpha('#f59e0b', 0.15) },
+      blue: { bg: alpha('#0ea5e9', 0.08), border: alpha('#0ea5e9', 0.2), text: '#0284c7', iconBg: alpha('#0ea5e9', 0.12) },
+      orange: { bg: alpha('#f97316', 0.08), border: alpha('#f97316', 0.2), text: '#ea580c', iconBg: alpha('#f97316', 0.12) },
+      emerald: { bg: alpha('#10b981', 0.08), border: alpha('#10b981', 0.2), text: '#059669', iconBg: alpha('#10b981', 0.12) },
+      purple: { bg: alpha('#8b5cf6', 0.08), border: alpha('#8b5cf6', 0.2), text: '#7c3aed', iconBg: alpha('#8b5cf6', 0.12) },
+      cyan: { bg: alpha('#06b6d4', 0.08), border: alpha('#06b6d4', 0.2), text: '#0891b2', iconBg: alpha('#06b6d4', 0.12) },
+      amber: { bg: alpha('#f59e0b', 0.08), border: alpha('#f59e0b', 0.2), text: '#d97706', iconBg: alpha('#f59e0b', 0.12) },
     };
     return colors[color] || colors.blue;
   };
@@ -99,10 +103,10 @@ export default function BottomPanel({
         bgcolor: 'white',
         borderTop: '1px solid',
         borderColor: alpha('#64748b', 0.15),
-        boxShadow: '0 -4px 16px rgba(0, 0, 0, 0.04)',
+        boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.03)',
         zIndex: 1000,
         transition: 'height 0.3s ease',
-        height: collapsed ? 40 : 200,
+        height: collapsed ? 32 : 100,
       }}
     >
       {/* Header */}
@@ -111,124 +115,117 @@ export default function BottomPanel({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          px: 2,
-          py: 0.75,
+          px: 1.5,
+          py: 0.5,
           background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-          borderBottom: '1px solid',
-          borderColor: alpha('#64748b', 0.15),
+          borderBottom: collapsed ? 'none' : '1px solid',
+          borderColor: alpha('#64748b', 0.1),
+          height: 32,
         }}
       >
-        <Stack direction="row" alignItems="center" spacing={3}>
-          <Stack direction="row" alignItems="center" spacing={1}>
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <Stack direction="row" alignItems="center" spacing={0.75}>
             <Box sx={{
-              p: 0.5,
-              borderRadius: 0.75,
+              p: 0.375,
+              borderRadius: 0.5,
               background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-              <LightbulbIcon sx={{ fontSize: 14, color: 'white' }} />
+              <LightbulbIcon sx={{ fontSize: 12, color: 'white' }} />
             </Box>
-            <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#1e293b' }}>
+            <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: '#1e293b' }}>
               Insights Engine
             </Typography>
           </Stack>
 
-          <Stack direction="row" spacing={3}>
-            <Stack direction="row" alignItems="center" spacing={0.75}>
-              <CheckCircleIcon sx={{ fontSize: 14, color: '#0891b2' }} />
-              <Typography sx={{ fontSize: '0.7rem', color: '#64748b' }}>
-                Success: <span style={{ color: '#0891b2', fontWeight: 700 }}>{successRate}%</span>
+          <Stack direction="row" spacing={2}>
+            <Stack direction="row" alignItems="center" spacing={0.5}>
+              <CheckCircleIcon sx={{ fontSize: 12, color: '#0891b2' }} />
+              <Typography sx={{ fontSize: '0.65rem', color: '#64748b' }}>
+                <span style={{ color: '#0891b2', fontWeight: 600 }}>{successRate}%</span>
               </Typography>
             </Stack>
-            <Stack direction="row" alignItems="center" spacing={0.75}>
-              <SavingsIcon sx={{ fontSize: 14, color: '#059669' }} />
-              <Typography sx={{ fontSize: '0.7rem', color: '#64748b' }}>
-                Saved: <span style={{ color: '#059669', fontWeight: 700 }}>${totalSavedToday.toLocaleString()}</span>
+            <Stack direction="row" alignItems="center" spacing={0.5}>
+              <SavingsIcon sx={{ fontSize: 12, color: '#059669' }} />
+              <Typography sx={{ fontSize: '0.65rem', color: '#64748b' }}>
+                <span style={{ color: '#059669', fontWeight: 600 }}>${totalSavedToday.toLocaleString()}</span>
               </Typography>
             </Stack>
           </Stack>
         </Stack>
 
-        <IconButton size="small" onClick={() => setCollapsed(!collapsed)} sx={{ p: 0.5 }}>
-          {collapsed ? <ExpandLessIcon sx={{ fontSize: 18, color: '#64748b' }} /> : <ExpandMoreIcon sx={{ fontSize: 18, color: '#64748b' }} />}
+        <IconButton size="small" onClick={handleToggle} sx={{ p: 0.25 }}>
+          {collapsed ? <ExpandLessIcon sx={{ fontSize: 16, color: '#64748b' }} /> : <ExpandMoreIcon sx={{ fontSize: 16, color: '#64748b' }} />}
         </IconButton>
       </Box>
 
-      {/* Content */}
-      <Collapse in={!collapsed}>
+      {/* Content - Horizontal scrolling cards */}
+      {!collapsed && (
         <Box
           sx={{
-            p: 1.5,
-            height: 160,
-            overflow: 'auto',
-            '&::-webkit-scrollbar': { width: 6, height: 6 },
+            display: 'flex',
+            gap: 1,
+            p: 1,
+            height: 68,
+            overflowX: 'auto',
+            overflowY: 'hidden',
+            '&::-webkit-scrollbar': { height: 4 },
             '&::-webkit-scrollbar-track': { background: 'transparent' },
-            '&::-webkit-scrollbar-thumb': { background: 'transparent', borderRadius: 3 },
+            '&::-webkit-scrollbar-thumb': { background: 'transparent', borderRadius: 2 },
             '&:hover::-webkit-scrollbar-thumb': { background: 'rgba(100, 116, 139, 0.3)' },
             scrollbarWidth: 'thin',
             scrollbarColor: 'transparent transparent',
             '&:hover': { scrollbarColor: 'rgba(100, 116, 139, 0.3) transparent' },
           }}
         >
-          <Grid container spacing={1}>
-            {insights.map((insight) => {
-              const colors = getCategoryColor(insight.categoryColor);
-              const IconComponent = insight.icon;
-              return (
-                <Grid item xs={12} sm={6} md={4} lg={2} key={insight.id}>
-                  <Box
-                    sx={{
-                      p: 1.25,
-                      height: '100%',
-                      minHeight: 120,
-                      bgcolor: colors.bg,
-                      border: '1px solid',
-                      borderColor: colors.border,
-                      borderRadius: 1,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s ease',
-                      '&:hover': {
-                        bgcolor: alpha(colors.text, 0.15),
-                        borderColor: alpha(colors.text, 0.4),
-                      },
-                    }}
-                  >
-                    <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 0.5 }}>
-                      <Box sx={{ p: 0.25, borderRadius: 0.5, bgcolor: colors.iconBg, display: 'flex' }}>
-                        <IconComponent sx={{ fontSize: 14, color: colors.text }} />
-                      </Box>
-                      <Typography sx={{ fontSize: '0.6rem', fontWeight: 700, color: colors.text, textTransform: 'uppercase', letterSpacing: 0.3 }}>
-                        {insight.category}
-                      </Typography>
-                    </Stack>
-                    <Typography sx={{ fontSize: '0.65rem', color: '#475569', lineHeight: 1.35, flex: 1, mb: 0.5 }}>
-                      {insight.description}
+          {insights.map((insight) => {
+            const colors = getCategoryColor(insight.categoryColor);
+            const IconComponent = insight.icon;
+            return (
+              <Box
+                key={insight.id}
+                sx={{
+                  minWidth: 180,
+                  maxWidth: 180,
+                  p: 0.75,
+                  bgcolor: colors.bg,
+                  border: '1px solid',
+                  borderColor: colors.border,
+                  borderRadius: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  flexShrink: 0,
+                  '&:hover': {
+                    bgcolor: alpha(colors.text, 0.12),
+                    borderColor: alpha(colors.text, 0.35),
+                  },
+                }}
+              >
+                <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 0.25 }}>
+                  <Stack direction="row" alignItems="center" spacing={0.5}>
+                    <Box sx={{ p: 0.25, borderRadius: 0.375, bgcolor: colors.iconBg, display: 'flex' }}>
+                      <IconComponent sx={{ fontSize: 11, color: colors.text }} />
+                    </Box>
+                    <Typography sx={{ fontSize: '0.55rem', fontWeight: 700, color: colors.text, textTransform: 'uppercase', letterSpacing: 0.2 }}>
+                      {insight.category}
                     </Typography>
-                    <Chip
-                      label={`${insight.confidence}% confidence`}
-                      size="small"
-                      sx={{
-                        height: 16,
-                        fontSize: '0.55rem',
-                        fontWeight: 600,
-                        bgcolor: alpha(colors.text, 0.1),
-                        color: colors.text,
-                        border: '1px solid',
-                        borderColor: alpha(colors.text, 0.15),
-                        alignSelf: 'flex-start',
-                      }}
-                    />
-                  </Box>
-                </Grid>
-              );
-            })}
-          </Grid>
+                  </Stack>
+                  <Typography sx={{ fontSize: '0.5rem', fontWeight: 600, color: colors.text, opacity: 0.8 }}>
+                    {insight.confidence}%
+                  </Typography>
+                </Stack>
+                <Typography sx={{ fontSize: '0.6rem', color: '#475569', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                  {insight.description}
+                </Typography>
+              </Box>
+            );
+          })}
         </Box>
-      </Collapse>
+      )}
     </Box>
   );
 }

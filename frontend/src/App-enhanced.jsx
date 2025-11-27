@@ -518,7 +518,7 @@ function App() {
 
   return (
     <ThemeProvider theme={currentTheme}>
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: (selectedTab === 1 && coreAIView === 'stox' && stoxView === 'supply-chain-map') ? 'white' : 'background.default' }}>
       {/* Enhanced Sidebar */}
       <EnhancedSidebar
         drawerOpen={drawerOpen}
@@ -552,12 +552,12 @@ function App() {
         </AppBar>
 
         <Container maxWidth="xl" sx={{
-          mt: 3,
-          mb: 3,
+          mt: (selectedTab === 1 && coreAIView === 'stox' && stoxView === 'supply-chain-map') ? 0 : 3,
+          mb: (selectedTab === 1 && coreAIView === 'stox' && stoxView === 'supply-chain-map') ? 0 : 3,
           flexGrow: 1,
           overflow: 'hidden',
           width: '100%',
-          px: { xs: 2, sm: 3 }
+          px: (selectedTab === 1 && coreAIView === 'stox' && stoxView === 'supply-chain-map') ? 0 : { xs: 2, sm: 3 }
         }}>
           {/* Unified Chat Interface */}
           {selectedTab === 0 && <SimpleChatInterface />}
@@ -565,7 +565,7 @@ function App() {
           {/* CORE.AI Tab - Operational AI */}
           {selectedTab === 1 && (
             <Box sx={{
-              height: 'calc(100vh - 180px)',
+              height: (coreAIView === 'stox' && stoxView === 'supply-chain-map') ? 'calc(100vh - 64px)' : 'calc(100vh - 180px)',
               overflow: 'hidden',
               width: '100%'
             }}>

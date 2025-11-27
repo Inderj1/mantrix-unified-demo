@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Typography, Chip, Stack, Button, Card, CardContent } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
@@ -8,6 +8,7 @@ import SmartToyIcon from '@mui/icons-material/SmartToy';
 import BoltIcon from '@mui/icons-material/Bolt';
 import SavingsIcon from '@mui/icons-material/Savings';
 import SecurityIcon from '@mui/icons-material/Security';
+import SAPPlanningModal from './SAPPlanningModal';
 
 export default function RightPanel({
   agents = [],
@@ -76,6 +77,21 @@ export default function RightPanel({
       color: 'cyan',
     },
   ];
+
+  // State for SAP Planning Modal
+  const [sapModalOpen, setSapModalOpen] = useState(false);
+  const [selectedAction, setSelectedAction] = useState(null);
+
+  const handleActionClick = (action) => {
+    setSelectedAction(action);
+    setSapModalOpen(true);
+  };
+
+  const handleSAPSave = (action, planData) => {
+    console.log('Saving to SAP:', action, planData);
+    // Here you would make an API call to sync with SAP
+    // For now, we just close the modal
+  };
 
   const getImpactColors = (impact) => {
     switch (impact) {
@@ -203,6 +219,7 @@ export default function RightPanel({
                       fullWidth
                       size="small"
                       variant="contained"
+                      onClick={() => handleActionClick(action)}
                       sx={{
                         bgcolor: colors.btn,
                         color: 'white',
@@ -298,6 +315,14 @@ export default function RightPanel({
           <StatItem icon={<SecurityIcon sx={{ fontSize: 16 }} />} label="Prevented" value={issuesPrevented} color="info" />
         </Stack>
       </Box>
+
+      {/* SAP Planning Modal */}
+      <SAPPlanningModal
+        open={sapModalOpen}
+        action={selectedAction}
+        onClose={() => setSapModalOpen(false)}
+        onSaveToSAP={handleSAPSave}
+      />
     </Box>
   );
 }
