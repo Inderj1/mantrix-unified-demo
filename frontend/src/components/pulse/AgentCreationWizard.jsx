@@ -30,10 +30,23 @@ import {
   Speed as SpeedIcon,
   Info as InfoIcon,
   CheckCircle as CheckCircleIcon,
+  Inventory as InventoryIcon,
+  ShowChart as ShowChartIcon,
+  LocalShipping as LocalShippingIcon,
+  AttachMoney as AttachMoneyIcon,
 } from '@mui/icons-material';
 import { DataGrid } from '@mui/x-data-grid';
 
 const steps = ['Choose Template or Create', 'Configure Agent', 'Review & Deploy'];
+
+// Category definitions for AI agents
+const categories = [
+  { id: 'all', label: 'All Templates', icon: AutoAwesomeIcon, color: '#6366f1' },
+  { id: 'stox', label: 'Stox.AI', icon: InventoryIcon, color: '#8b5cf6', description: 'Inventory & Supply Chain' },
+  { id: 'margen', label: 'Margen.AI', icon: ShowChartIcon, color: '#10b981', description: 'Margin Intelligence' },
+  { id: 'coo', label: 'Operations', icon: LocalShippingIcon, color: '#0ea5e9', description: 'Operations & Logistics' },
+  { id: 'cfo', label: 'Finance', icon: AttachMoneyIcon, color: '#f59e0b', description: 'Financial Monitoring' },
+];
 
 const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
   const [activeStep, setActiveStep] = useState(0);
@@ -45,6 +58,7 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [naturalLanguage, setNaturalLanguage] = useState('');
   const [agentData, setAgentData] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [configuration, setConfiguration] = useState({
     name: '',
     description: '',
@@ -68,6 +82,16 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
     } catch (err) {
       console.error('Failed to load templates:', err);
     }
+  };
+
+  // Filter templates by selected category
+  const filteredTemplates = selectedCategory === 'all'
+    ? templates
+    : templates.filter(t => t.category === selectedCategory);
+
+  // Get category info for a template
+  const getCategoryInfo = (categoryId) => {
+    return categories.find(c => c.id === categoryId) || categories[0];
   };
 
   const handleNext = async () => {
@@ -181,45 +205,99 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
               Create Your Proactive Agent
             </Typography>
 
+            {/* Category Tabs */}
+            <Box mb={3}>
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
+                {categories.map((cat) => {
+                  const IconComponent = cat.icon;
+                  const isSelected = selectedCategory === cat.id;
+                  return (
+                    <Chip
+                      key={cat.id}
+                      icon={<IconComponent sx={{ fontSize: 18, color: isSelected ? 'white' : cat.color }} />}
+                      label={cat.label}
+                      onClick={() => setSelectedCategory(cat.id)}
+                      sx={{
+                        bgcolor: isSelected ? cat.color : 'transparent',
+                        color: isSelected ? 'white' : 'text.primary',
+                        border: `1px solid ${isSelected ? cat.color : 'divider'}`,
+                        fontWeight: isSelected ? 600 : 400,
+                        '&:hover': {
+                          bgcolor: isSelected ? cat.color : `${cat.color}15`,
+                        },
+                      }}
+                    />
+                  );
+                })}
+              </Box>
+              {selectedCategory !== 'all' && (
+                <Typography variant="caption" color="text.secondary">
+                  {categories.find(c => c.id === selectedCategory)?.description}
+                </Typography>
+              )}
+            </Box>
+
             {/* Quick Templates */}
-            {templates.length > 0 && (
+            {filteredTemplates.length > 0 && (
               <Box mb={3}>
-                <Typography variant="subtitle2" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <AutoAwesomeIcon fontSize="small" />
-                  Quick Start Templates
+                <Typography variant="subtitle2" gutterBottom>
+                  {selectedCategory === 'all' ? 'Quick Start Templates' : `${categories.find(c => c.id === selectedCategory)?.label} Templates`}
                 </Typography>
                 <Grid container spacing={2}>
-                  {templates.slice(0, 6).map((template) => (
-                    <Grid item xs={12} md={6} key={template.id}>
-                      <Card
-                        variant="outlined"
-                        sx={{
-                          cursor: 'pointer',
-                          border: selectedTemplate?.id === template.id ? 2 : 1,
-                          borderColor: selectedTemplate?.id === template.id ? 'primary.main' : 'divider',
-                          transition: 'all 0.2s',
-                          '&:hover': { borderColor: 'primary.main', bgcolor: 'action.hover' }
-                        }}
-                        onClick={() => {
-                          setSelectedTemplate(template);
-                          setNaturalLanguage('');
-                        }}
-                      >
-                        <CardContent>
-                          <Typography variant="subtitle1" fontWeight={600} mb={1}>
-                            {template.name}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary" mb={1}>
-                            {template.description}
-                          </Typography>
-                          <Typography variant="caption" color="text.disabled">
-                            {template.default_frequency} · {template.default_severity} severity
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  ))}
+                  {filteredTemplates.slice(0, 6).map((template) => {
+                    const catInfo = getCategoryInfo(template.category);
+                    return (
+                      <Grid item xs={12} md={6} key={template.id}>
+                        <Card
+                          variant="outlined"
+                          sx={{
+                            cursor: 'pointer',
+                            border: selectedTemplate?.id === template.id ? 2 : 1,
+                            borderColor: selectedTemplate?.id === template.id ? catInfo.color : 'divider',
+                            transition: 'all 0.2s',
+                            '&:hover': { borderColor: catInfo.color, bgcolor: 'action.hover' }
+                          }}
+                          onClick={() => {
+                            setSelectedTemplate(template);
+                            setNaturalLanguage('');
+                          }}
+                        >
+                          <CardContent>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                              <Typography variant="subtitle1" fontWeight={600}>
+                                {template.name}
+                              </Typography>
+                              <Chip
+                                size="small"
+                                label={catInfo.label}
+                                sx={{
+                                  bgcolor: `${catInfo.color}15`,
+                                  color: catInfo.color,
+                                  fontSize: '0.65rem',
+                                  height: 20,
+                                }}
+                              />
+                            </Box>
+                            <Typography variant="body2" color="text.secondary" mb={1}>
+                              {template.description}
+                            </Typography>
+                            <Typography variant="caption" color="text.disabled">
+                              {template.default_frequency} · {template.default_severity} severity
+                            </Typography>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                    );
+                  })}
                 </Grid>
+              </Box>
+            )}
+
+            {filteredTemplates.length === 0 && templates.length > 0 && (
+              <Box mb={3} sx={{ textAlign: 'center', py: 4 }}>
+                <Typography color="text.secondary">
+                  No templates found for this category. Try selecting a different category or create a custom agent below.
+                </Typography>
               </Box>
             )}
 
@@ -227,8 +305,7 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
 
             {/* Custom Query */}
             <Box>
-              <Typography variant="subtitle2" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <TrendingUpIcon fontSize="small" />
+              <Typography variant="subtitle2" gutterBottom>
                 Describe What You Want the Agent to Execute
               </Typography>
               <TextField
@@ -246,7 +323,7 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
               />
               <Box mt={1}>
                 <Typography variant="caption" color="text.secondary">
-                  💡 Try: "Show inventory levels below safety stock", "Track gross margin by region monthly", "Monitor late deliveries over 3 days"
+                  Try: "Show inventory levels below safety stock", "Track gross margin by region monthly", "Monitor late deliveries over 3 days"
                 </Typography>
               </Box>
             </Box>

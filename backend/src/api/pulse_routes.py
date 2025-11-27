@@ -522,7 +522,7 @@ async def get_monitor_templates(
 
         query += " ORDER BY category, usage_count DESC"
 
-        templates = pulse_service.pg_client.execute_query(
+        templates = pulse_service.mantrix_pg_client.execute_query(
             query,
             tuple(params) if params else None
         )

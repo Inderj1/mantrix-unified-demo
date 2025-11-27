@@ -60,6 +60,8 @@ import {
   Build as BuildIcon,
   AccountBalance as AccountBalanceIcon,
   Analytics as AnalyticsIcon,
+  Inventory as InventoryIcon,
+  ShowChart as ShowChartIcon,
 } from '@mui/icons-material';
 import { DataGrid } from '@mui/x-data-grid';
 
@@ -239,6 +241,18 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
 
   // Category display names and icons for grouping agents
   const categoryInfo = {
+    stox: {
+      name: 'Stox.AI',
+      icon: InventoryIcon,
+      color: '#8b5cf6',
+      description: 'Inventory & Supply Chain'
+    },
+    margen: {
+      name: 'Margen.AI',
+      icon: ShowChartIcon,
+      color: '#10b981',
+      description: 'Margin Intelligence'
+    },
     supply_chain_operations: {
       name: 'Supply Chain Operations',
       icon: LocalShippingIcon,
@@ -258,6 +272,18 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
       name: 'Performance Analytics',
       icon: AnalyticsIcon,
       color: '#7b1fa2'
+    },
+    coo: {
+      name: 'Operations',
+      icon: LocalShippingIcon,
+      color: '#0ea5e9',
+      description: 'Operations & Logistics'
+    },
+    cfo: {
+      name: 'Finance',
+      icon: AccountBalanceIcon,
+      color: '#f59e0b',
+      description: 'Financial Monitoring'
     },
     general: {
       name: 'General',
