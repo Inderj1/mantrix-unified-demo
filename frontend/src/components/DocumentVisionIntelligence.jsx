@@ -422,7 +422,7 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
               <DocumentIcon sx={{ fontSize: 40, color: '#0a6ed1' }} />
               <Box>
                 <Typography variant="h5" fontWeight={600}>
-                  VISION.AI - Document Intelligence
+                  VISION STUDIO
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   AI-powered OCR and document processing platform

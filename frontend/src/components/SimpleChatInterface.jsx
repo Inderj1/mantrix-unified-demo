@@ -2014,27 +2014,30 @@ const SimpleChatInterface = () => {
                             elevation={0}
                             sx={{
                               p: 1.5,
-                              bgcolor: isActive ? 'primary.light' : 'grey.100',
+                              bgcolor: isActive ? alpha('#0a6ed1', 0.1) : 'grey.50',
                               cursor: 'pointer',
                               border: isActive ? '2px solid' : '1px solid',
-                              borderColor: isActive ? 'primary.main' : 'divider',
+                              borderColor: isActive ? '#0a6ed1' : alpha('#000', 0.08),
+                              borderRadius: 1.5,
                               transition: 'all 0.15s ease-in-out',
+                              overflow: 'hidden',
                               '&:hover': {
-                                bgcolor: isActive ? 'primary.light' : 'grey.200',
-                                transform: 'translateX(-2px)',
+                                bgcolor: isActive ? alpha('#0a6ed1', 0.15) : 'grey.100',
+                                borderColor: isActive ? '#0a6ed1' : alpha('#0a6ed1', 0.3),
                               },
                             }}
                           >
-                            <Stack direction="row" spacing={1} alignItems="center">
-                              <Box sx={{ flex: 1 }} onClick={() => loadConversation(conv.conversation_id || conv.conversationId)}>
+                            <Stack direction="row" spacing={1} alignItems="center" sx={{ overflow: 'hidden' }}>
+                              <Box sx={{ flex: 1, minWidth: 0, overflow: 'hidden' }} onClick={() => loadConversation(conv.conversation_id || conv.conversationId)}>
                                 <Stack spacing={0.5}>
                                   <Typography
                                     variant="subtitle2"
-                                    fontWeight={isActive ? 'bold' : 'medium'}
+                                    fontWeight={isActive ? 600 : 500}
                                     sx={{
                                       overflow: 'hidden',
                                       textOverflow: 'ellipsis',
                                       whiteSpace: 'nowrap',
+                                      color: isActive ? '#0a6ed1' : 'text.primary',
                                     }}
                                   >
                                     {displayTitle}
@@ -2043,13 +2046,14 @@ const SimpleChatInterface = () => {
                                   {preview && (
                                     <Typography
                                       variant="caption"
-                                      color="text.secondary"
                                       sx={{
                                         overflow: 'hidden',
                                         textOverflow: 'ellipsis',
                                         whiteSpace: 'nowrap',
                                         fontSize: '0.7rem',
-                                        fontStyle: 'italic'
+                                        fontStyle: 'italic',
+                                        color: 'text.secondary',
+                                        display: 'block',
                                       }}
                                     >
                                       {preview}{preview.length >= 60 ? '...' : ''}
@@ -2057,7 +2061,7 @@ const SimpleChatInterface = () => {
                                   )}
 
                                   <Stack direction="row" spacing={1} alignItems="center">
-                                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
+                                    <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.secondary' }}>
                                       {new Date(conv.updated_at || conv.updatedAt).toLocaleDateString(undefined, {
                                         month: 'short',
                                         day: 'numeric',
@@ -2069,7 +2073,13 @@ const SimpleChatInterface = () => {
                                       <Chip
                                         size="small"
                                         label={`${messageCount}`}
-                                        sx={{ height: 16, fontSize: '0.65rem', minWidth: 20 }}
+                                        sx={{
+                                          height: 16,
+                                          fontSize: '0.65rem',
+                                          minWidth: 20,
+                                          bgcolor: alpha('#0a6ed1', 0.1),
+                                          color: '#0a6ed1',
+                                        }}
                                       />
                                     )}
                                   </Stack>
@@ -2084,7 +2094,8 @@ const SimpleChatInterface = () => {
                                   }
                                 }}
                                 sx={{
-                                  opacity: 0.5,
+                                  opacity: 0.4,
+                                  flexShrink: 0,
                                   '&:hover': {
                                     opacity: 1,
                                     color: 'error.main'
@@ -2145,18 +2156,20 @@ const SimpleChatInterface = () => {
   );
 
   return (
-    <Box sx={{ 
-      height: '100vh', 
-      display: 'flex', 
-      position: 'relative', 
+    <Box sx={{
+      height: '100%',
+      minHeight: 0,
+      display: 'flex',
+      position: 'relative',
       overflow: 'hidden'
     }}>
       {/* Main Content Area */}
-      <Box sx={{ 
-        flex: 1, 
+      <Box sx={{
+        flex: 1,
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
+        minHeight: 0,
         overflow: 'hidden',
         mr: historyOpen ? '320px' : '48px',
         transition: 'margin-right 0.2s ease-in-out',
@@ -2374,7 +2387,7 @@ const SimpleChatInterface = () => {
               },
             },
           }}>
-          <Box sx={{ width: '100%' }}>
+          <Box sx={{ width: '100%', pt: 2 }}>
             {/* Empty state message - only show if truly empty (no welcome message) */}
             {messages.length === 0 && (
               <Box sx={{ textAlign: 'center', py: 4, opacity: 0.6 }}>

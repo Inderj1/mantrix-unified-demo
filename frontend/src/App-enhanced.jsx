@@ -562,7 +562,11 @@ function App() {
           px: (selectedTab === 1 && coreAIView === 'stox' && stoxView === 'supply-chain-map') ? 0 : { xs: 2, sm: 3 }
         }}>
           {/* Unified Chat Interface */}
-          {selectedTab === 0 && <SimpleChatInterface />}
+          {selectedTab === 0 && (
+            <Box sx={{ height: 'calc(100vh - 180px)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              <SimpleChatInterface />
+            </Box>
+          )}
 
           {/* CORE.AI Tab - Operational AI */}
           {selectedTab === 1 && (

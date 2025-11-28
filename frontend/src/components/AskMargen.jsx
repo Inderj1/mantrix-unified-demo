@@ -2038,27 +2038,30 @@ const AskMargen = ({ onBack }) => {
                             elevation={0}
                             sx={{
                               p: 1.5,
-                              bgcolor: isActive ? 'primary.light' : 'grey.100',
+                              bgcolor: isActive ? alpha('#1873b4', 0.1) : 'grey.50',
                               cursor: 'pointer',
                               border: isActive ? '2px solid' : '1px solid',
-                              borderColor: isActive ? 'primary.main' : 'divider',
+                              borderColor: isActive ? '#1873b4' : alpha('#000', 0.08),
+                              borderRadius: 1.5,
                               transition: 'all 0.15s ease-in-out',
+                              overflow: 'hidden',
                               '&:hover': {
-                                bgcolor: isActive ? 'primary.light' : 'grey.200',
-                                transform: 'translateX(-2px)',
+                                bgcolor: isActive ? alpha('#1873b4', 0.15) : 'grey.100',
+                                borderColor: isActive ? '#1873b4' : alpha('#1873b4', 0.3),
                               },
                             }}
                           >
-                            <Stack direction="row" spacing={1} alignItems="center">
-                              <Box sx={{ flex: 1 }} onClick={() => loadConversation(conv.conversation_id || conv.conversationId)}>
+                            <Stack direction="row" spacing={1} alignItems="center" sx={{ overflow: 'hidden' }}>
+                              <Box sx={{ flex: 1, minWidth: 0, overflow: 'hidden' }} onClick={() => loadConversation(conv.conversation_id || conv.conversationId)}>
                                 <Stack spacing={0.5}>
                                   <Typography
                                     variant="subtitle2"
-                                    fontWeight={isActive ? 'bold' : 'medium'}
+                                    fontWeight={isActive ? 600 : 500}
                                     sx={{
                                       overflow: 'hidden',
                                       textOverflow: 'ellipsis',
                                       whiteSpace: 'nowrap',
+                                      color: isActive ? '#1873b4' : 'text.primary',
                                     }}
                                   >
                                     {displayTitle}
@@ -2067,13 +2070,14 @@ const AskMargen = ({ onBack }) => {
                                   {preview && (
                                     <Typography
                                       variant="caption"
-                                      color="text.secondary"
                                       sx={{
                                         overflow: 'hidden',
                                         textOverflow: 'ellipsis',
                                         whiteSpace: 'nowrap',
                                         fontSize: '0.7rem',
-                                        fontStyle: 'italic'
+                                        fontStyle: 'italic',
+                                        color: 'text.secondary',
+                                        display: 'block',
                                       }}
                                     >
                                       {preview}{preview.length >= 60 ? '...' : ''}
@@ -2081,7 +2085,7 @@ const AskMargen = ({ onBack }) => {
                                   )}
 
                                   <Stack direction="row" spacing={1} alignItems="center">
-                                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
+                                    <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.secondary' }}>
                                       {new Date(conv.updated_at || conv.updatedAt).toLocaleDateString(undefined, {
                                         month: 'short',
                                         day: 'numeric',
@@ -2093,7 +2097,13 @@ const AskMargen = ({ onBack }) => {
                                       <Chip
                                         size="small"
                                         label={`${messageCount}`}
-                                        sx={{ height: 16, fontSize: '0.65rem', minWidth: 20 }}
+                                        sx={{
+                                          height: 16,
+                                          fontSize: '0.65rem',
+                                          minWidth: 20,
+                                          bgcolor: alpha('#1873b4', 0.1),
+                                          color: '#1873b4',
+                                        }}
                                       />
                                     )}
                                   </Stack>
@@ -2108,7 +2118,8 @@ const AskMargen = ({ onBack }) => {
                                   }
                                 }}
                                 sx={{
-                                  opacity: 0.5,
+                                  opacity: 0.4,
+                                  flexShrink: 0,
                                   '&:hover': {
                                     opacity: 1,
                                     color: 'error.main'
