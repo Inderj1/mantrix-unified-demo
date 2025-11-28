@@ -728,26 +728,54 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
                 const categoryColor = categoryInfo[category]?.color || '#616161';
 
                 return (
-                  <Box key={category} mb={2}>
+                  <Box key={category} mb={3}>
                     {/* Category Header */}
                     <Box
                       sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 0.5,
-                        mb: 1,
-                        pb: 0.5,
-                        borderBottom: '1px solid',
-                        borderColor: 'divider'
+                        gap: 1,
+                        mb: 1.5,
+                        py: 1,
+                        px: 1.5,
+                        borderRadius: 1,
+                        background: 'linear-gradient(135deg, rgba(10, 110, 209, 0.08) 0%, rgba(53, 74, 95, 0.04) 100%)',
+                        borderLeft: '4px solid #0a6ed1',
                       }}
                     >
-                      <CategoryIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
-                      <Typography variant="caption" fontWeight={600} sx={{ flex: 1, color: 'text.secondary' }}>
-                        {categoryInfo[category]?.name || category}
-                      </Typography>
-                      <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.7rem' }}>
-                        {categoryAgents.length}
-                      </Typography>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: 28,
+                          height: 28,
+                          borderRadius: '6px',
+                          bgcolor: 'rgba(10, 110, 209, 0.12)',
+                        }}
+                      >
+                        <CategoryIcon sx={{ fontSize: 16, color: '#0a6ed1' }} />
+                      </Box>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#354a5f', letterSpacing: '0.5px' }}>
+                          {categoryInfo[category]?.name || category}
+                        </Typography>
+                        <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#64748b' }}>
+                          {categoryInfo[category]?.description || ''}
+                        </Typography>
+                      </Box>
+                      <Chip
+                        label={`${categoryAgents.length} ${categoryAgents.length === 1 ? 'Monitor' : 'Monitors'}`}
+                        size="small"
+                        sx={{
+                          height: 22,
+                          fontSize: '0.7rem',
+                          fontWeight: 600,
+                          bgcolor: 'rgba(10, 110, 209, 0.1)',
+                          color: '#0854a0',
+                          border: '1px solid rgba(10, 110, 209, 0.2)',
+                        }}
+                      />
                     </Box>
 
                   <Grid container spacing={1.5}>
