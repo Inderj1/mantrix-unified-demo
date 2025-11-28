@@ -334,7 +334,7 @@ const TicketingSystem = ({ onBack }) => {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <TicketIcon sx={{ fontSize: 40, color: '#10b981' }} />
           <Box sx={{ flex: 1 }}>
-            <Typography variant="h4" fontWeight={700}>
+            <Typography variant="h5" fontWeight={600}>
               COMMAND TOWER
             </Typography>
             <Typography variant="body2" color="text.secondary">

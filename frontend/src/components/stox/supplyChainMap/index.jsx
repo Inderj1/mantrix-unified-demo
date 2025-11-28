@@ -348,24 +348,26 @@ export default function SupplyChainMap({ onBack }) {
           bottom: isFullScreen ? 0 : (bottomPanelCollapsed ? 32 : 100),
           zIndex: 500,
           overflow: 'hidden',
-          transition: 'bottom 0.3s ease',
         }}
       >
-        <MapView
-          trucks={trucks}
-          stores={stores}
-          alerts={alerts}
-          showTrucks={filters.trucks}
-          showStores={filters.stores}
-          showRoutes={filters.routes}
-          showAlerts={filters.alerts}
-          onMapReady={handleMapReady}
-          mapStyle={mapStyle}
-          onStoreClick={handleStoreClick}
-          onTruckClick={handleTruckClick}
-          onAlertClick={handleAlertClick}
-          isFullScreen={isFullScreen}
-        />
+        <Box sx={{ width: '100%', height: '100%', position: 'relative' }}>
+          <MapView
+            key={`map-${isFullScreen}-${bottomPanelCollapsed}`}
+            trucks={trucks}
+            stores={stores}
+            alerts={alerts}
+            showTrucks={filters.trucks}
+            showStores={filters.stores}
+            showRoutes={filters.routes}
+            showAlerts={filters.alerts}
+            onMapReady={handleMapReady}
+            mapStyle={mapStyle}
+            onStoreClick={handleStoreClick}
+            onTruckClick={handleTruckClick}
+            onAlertClick={handleAlertClick}
+            isFullScreen={isFullScreen}
+          />
+        </Box>
 
         {/* Map Controls */}
         <Box sx={{ position: 'absolute', top: 12, left: 12, zIndex: 1000 }}>

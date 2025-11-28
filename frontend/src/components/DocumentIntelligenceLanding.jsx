@@ -21,6 +21,7 @@ import {
   Description as DescriptionIcon,
   TableChart as TableChartIcon,
   PictureAsPdf as PictureAsPdfIcon,
+  Hub as HubIcon,
 } from '@mui/icons-material';
 import DocumentIntelligence from './DocumentIntelligence';
 import ExcelAIProcessor from './ExcelAIProcessor';
@@ -69,19 +70,8 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
           {/* Title Section */}
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <img
-                  src="/docintel.png"
-                  alt="Document Intelligence"
-                  style={{
-                    width: 64,
-                    height: 64,
-                    objectFit: 'contain'
-                  }}
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                  }}
-                />
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <HubIcon sx={{ fontSize: 40, color: '#8b5cf6' }} />
                 <Box>
                   <Typography variant="h5" fontWeight={600}>
                     Document Intelligence
@@ -104,16 +94,17 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
             <Grid item xs={12} md={4}>
               <Zoom in timeout={400}>
                 <Card
+                  variant="outlined"
                   sx={{
                     cursor: 'pointer',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     background: 'white',
-                    border: `2px solid ${alpha('#8b5cf6', 0.1)}`,
+                    border: `1px solid ${alpha('#8b5cf6', 0.15)}`,
                     position: 'relative',
                     overflow: 'hidden',
                     '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: `0 12px 24px ${alpha('#8b5cf6', 0.25)}`,
+                      transform: 'translateY(-4px)',
+                      boxShadow: `0 8px 16px ${alpha('#8b5cf6', 0.15)}`,
                       borderColor: alpha('#8b5cf6', 0.3),
                       '& .action-icon': {
                         transform: 'translateX(4px)',
@@ -125,36 +116,26 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
                       top: 0,
                       left: 0,
                       right: 0,
-                      height: '4px',
+                      height: '3px',
                       background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
                     },
                   }}
                   onClick={() => setSelectedView('document-analysis')}
                 >
-                  <CardContent sx={{ p: 3 }}>
+                  <CardContent sx={{ p: 2 }}>
                     {/* Icon and Badge */}
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                      <Avatar
-                        className="category-icon"
-                        sx={{
-                          width: 48,
-                          height: 48,
-                          bgcolor: alpha('#8b5cf6', 0.1),
-                          color: '#8b5cf6',
-                          transition: 'all 0.3s ease',
-                        }}
-                      >
-                        <DescriptionIcon sx={{ fontSize: 28 }} />
-                      </Avatar>
+                      <DescriptionIcon sx={{ fontSize: 40, color: '#8b5cf6' }} />
                       <Chip
                         label={loading ? '...' : `${documentCount} Docs`}
                         size="small"
+                        variant="outlined"
                         sx={{
-                          bgcolor: alpha('#8b5cf6', 0.1),
+                          borderColor: alpha('#8b5cf6', 0.3),
                           color: '#8b5cf6',
                           fontWeight: 600,
-                          fontSize: '0.7rem',
-                          height: 22,
+                          fontSize: '0.65rem',
+                          height: 20,
                         }}
                       />
                     </Box>
@@ -226,16 +207,17 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
             <Grid item xs={12} md={4}>
               <Zoom in timeout={500}>
                 <Card
+                  variant="outlined"
                   sx={{
                     cursor: 'pointer',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     background: 'white',
-                    border: `2px solid ${alpha('#3b82f6', 0.1)}`,
+                    border: `1px solid ${alpha('#3b82f6', 0.15)}`,
                     position: 'relative',
                     overflow: 'hidden',
                     '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: `0 12px 24px ${alpha('#3b82f6', 0.25)}`,
+                      transform: 'translateY(-4px)',
+                      boxShadow: `0 8px 16px ${alpha('#3b82f6', 0.15)}`,
                       borderColor: alpha('#3b82f6', 0.3),
                       '& .action-icon': {
                         transform: 'translateX(4px)',
@@ -247,36 +229,26 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
                       top: 0,
                       left: 0,
                       right: 0,
-                      height: '4px',
+                      height: '3px',
                       background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
                     },
                   }}
                   onClick={() => setSelectedView('excel-processor')}
                 >
-                  <CardContent sx={{ p: 3 }}>
+                  <CardContent sx={{ p: 2 }}>
                     {/* Icon and Badge */}
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                      <Avatar
-                        className="category-icon"
-                        sx={{
-                          width: 48,
-                          height: 48,
-                          bgcolor: alpha('#3b82f6', 0.1),
-                          color: '#3b82f6',
-                          transition: 'all 0.3s ease',
-                        }}
-                      >
-                        <TableChartIcon sx={{ fontSize: 28 }} />
-                      </Avatar>
+                      <TableChartIcon sx={{ fontSize: 40, color: '#3b82f6' }} />
                       <Chip
                         label="3 Templates"
                         size="small"
+                        variant="outlined"
                         sx={{
-                          bgcolor: alpha('#3b82f6', 0.1),
+                          borderColor: alpha('#3b82f6', 0.3),
                           color: '#3b82f6',
                           fontWeight: 600,
-                          fontSize: '0.7rem',
-                          height: 22,
+                          fontSize: '0.65rem',
+                          height: 20,
                         }}
                       />
                     </Box>
@@ -350,16 +322,17 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
             <Grid item xs={12} md={4}>
               <Zoom in timeout={600}>
                 <Card
+                  variant="outlined"
                   sx={{
                     cursor: 'pointer',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     background: 'white',
-                    border: `2px solid ${alpha('#10b981', 0.1)}`,
+                    border: `1px solid ${alpha('#10b981', 0.15)}`,
                     position: 'relative',
                     overflow: 'hidden',
                     '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: `0 12px 24px ${alpha('#10b981', 0.25)}`,
+                      transform: 'translateY(-4px)',
+                      boxShadow: `0 8px 16px ${alpha('#10b981', 0.15)}`,
                       borderColor: alpha('#10b981', 0.3),
                       '& .action-icon': {
                         transform: 'translateX(4px)',
@@ -371,36 +344,26 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
                       top: 0,
                       left: 0,
                       right: 0,
-                      height: '4px',
+                      height: '3px',
                       background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                     },
                   }}
                   onClick={() => setSelectedView('pdf-parser')}
                 >
-                  <CardContent sx={{ p: 3 }}>
+                  <CardContent sx={{ p: 2 }}>
                     {/* Icon and Badge */}
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                      <Avatar
-                        className="category-icon"
-                        sx={{
-                          width: 48,
-                          height: 48,
-                          bgcolor: alpha('#10b981', 0.1),
-                          color: '#10b981',
-                          transition: 'all 0.3s ease',
-                        }}
-                      >
-                        <PictureAsPdfIcon sx={{ fontSize: 28 }} />
-                      </Avatar>
+                      <PictureAsPdfIcon sx={{ fontSize: 40, color: '#10b981' }} />
                       <Chip
                         label="3 Templates"
                         size="small"
+                        variant="outlined"
                         sx={{
-                          bgcolor: alpha('#10b981', 0.1),
+                          borderColor: alpha('#10b981', 0.3),
                           color: '#10b981',
                           fontWeight: 600,
-                          fontSize: '0.7rem',
-                          height: 22,
+                          fontSize: '0.65rem',
+                          height: 20,
                         }}
                       />
                     </Box>

@@ -34,7 +34,6 @@ import {
   Assessment as AssessmentIcon,
   Lightbulb as LightbulbIcon,
   Inventory as InventoryIcon,
-  ArrowForward as ArrowForwardIcon,
   Settings as SettingsIcon,
   Speed as SpeedIcon,
 } from '@mui/icons-material';
@@ -54,30 +53,6 @@ import stoxTheme from './stoxTheme';
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, ChartTooltip, Legend, Filler);
-
-// Helper function to get status color
-const getStatusColor = (status) => {
-  switch (status) {
-    case 'High Risk': return { bg: alpha('#ef4444', 0.12), color: '#dc2626', dot: '#ef4444' };
-    case 'Moderate': return { bg: alpha('#f59e0b', 0.12), color: '#d97706', dot: '#f59e0b' };
-    case 'Healthy': return { bg: alpha('#10b981', 0.12), color: '#059669', dot: '#10b981' };
-    default: return { bg: alpha('#64748b', 0.12), color: '#475569', dot: '#64748b' };
-  }
-};
-
-// Helper function to get metric color based on thresholds
-const getMetricColor = (value, thresholds, inverse = false) => {
-  // For inverse metrics (like lost sales), lower is better
-  if (inverse) {
-    if (value <= thresholds.good) return { color: '#059669', dot: '#10b981' };
-    if (value <= thresholds.warning) return { color: '#d97706', dot: '#f59e0b' };
-    return { color: '#dc2626', dot: '#ef4444' };
-  }
-  // For normal metrics, higher is better
-  if (value >= thresholds.good) return { color: '#059669', dot: '#10b981' };
-  if (value >= thresholds.warning) return { color: '#d97706', dot: '#f59e0b' };
-  return { color: '#dc2626', dot: '#ef4444' };
-};
 
 // Format currency
 const formatCurrency = (value) => {
@@ -415,30 +390,12 @@ const Tile0ForecastSimulation = ({ onBack }) => {
     setSelectedSku(null);
   };
 
-  // DataGrid columns for inventory health
+  // DataGrid columns for inventory health (styled to match Tile 4)
   const columns = [
-    {
-      field: 'material',
-      headerName: 'Material / Plant',
-      minWidth: 200,
-      flex: 1.5,
-      renderCell: (params) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <Box sx={{
-            width: 36, height: 36, borderRadius: 1,
-            bgcolor: alpha('#64748b', 0.1),
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '1.1rem'
-          }}>
-            {params.row.icon}
-          </Box>
-          <Box>
-            <Typography sx={{ fontWeight: 600, fontSize: '0.85rem' }}>{params.row.material}</Typography>
-            <Typography sx={{ fontSize: '0.7rem', color: '#64748b' }}>{params.row.plant} • {params.row.abcXyz}</Typography>
-          </Box>
-        </Box>
-      ),
-    },
+    { field: 'id', headerName: 'Material ID', minWidth: 130, flex: 1 },
+    { field: 'material', headerName: 'Material', minWidth: 180, flex: 1.4 },
+    { field: 'plant', headerName: 'Plant', minWidth: 140, flex: 1.1, align: 'center', headerAlign: 'center' },
+    { field: 'abcXyz', headerName: 'ABC/XYZ', minWidth: 100, flex: 0.8, align: 'center', headerAlign: 'center' },
     {
       field: 'status',
       headerName: 'Overall Status',
@@ -446,119 +403,94 @@ const Tile0ForecastSimulation = ({ onBack }) => {
       flex: 1,
       align: 'center',
       headerAlign: 'center',
-      renderCell: (params) => {
-        const statusColor = getStatusColor(params.value);
-        return (
-          <Chip
-            label={params.value}
-            size="small"
-            icon={<Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: statusColor.dot, boxShadow: `0 0 6px ${statusColor.dot}` }} />}
-            sx={{
-              bgcolor: statusColor.bg,
-              color: statusColor.color,
-              fontWeight: 600,
-              fontSize: '0.75rem',
-              '& .MuiChip-icon': { ml: 0.5 }
-            }}
-          />
-        );
-      },
+      renderCell: (params) => (
+        <Chip
+          label={params.value}
+          size="small"
+          color={params.value === 'Healthy' ? 'success' : params.value === 'Moderate' ? 'warning' : 'error'}
+          sx={{ fontWeight: 600 }}
+        />
+      ),
     },
     {
       field: 'lostSales',
       headerName: 'Lost Sales ($)',
       minWidth: 130,
       flex: 1,
+      type: 'number',
       align: 'center',
       headerAlign: 'center',
-      renderHeader: () => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <span>Lost Sales ($)</span>
-          <Chip label="R" size="small" sx={{ height: 16, fontSize: '0.6rem', bgcolor: alpha('#f59e0b', 0.2), color: '#d97706' }} />
-        </Box>
+      renderCell: (params) => (
+        <Chip
+          label={params.value >= 1000000 ? `$${(params.value / 1000000).toFixed(1)}M` : params.value >= 1000 ? `$${(params.value / 1000).toFixed(0)}k` : `$${params.value}`}
+          size="small"
+          sx={{
+            fontWeight: 700,
+            bgcolor: params.value > 500000 ? alpha('#ef4444', 0.12) : params.value > 50000 ? alpha('#f59e0b', 0.12) : alpha('#10b981', 0.12),
+            color: params.value > 500000 ? '#dc2626' : params.value > 50000 ? '#d97706' : '#059669',
+          }}
+        />
       ),
-      renderCell: (params) => {
-        const metricColor = getMetricColor(params.value, { good: 50000, warning: 500000 }, true);
-        return (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography sx={{ fontWeight: 600, color: metricColor.color, fontSize: '0.85rem' }}>
-              {params.value >= 1000000 ? `${(params.value / 1000000).toFixed(1)}M` : params.value >= 1000 ? `${(params.value / 1000).toFixed(0)}k` : params.value}
-            </Typography>
-            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: metricColor.dot }} />
-          </Box>
-        );
-      },
     },
     {
       field: 'excessInventory',
       headerName: 'Excess Inv ($)',
       minWidth: 130,
       flex: 1,
+      type: 'number',
       align: 'center',
       headerAlign: 'center',
-      renderHeader: () => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <span>Excess Inv ($)</span>
-          <Chip label="S" size="small" sx={{ height: 16, fontSize: '0.6rem', bgcolor: alpha('#06b6d4', 0.2), color: '#0891b2' }} />
-        </Box>
+      renderCell: (params) => (
+        <Chip
+          label={params.value >= 1000000 ? `$${(params.value / 1000000).toFixed(1)}M` : `$${(params.value / 1000).toFixed(0)}k`}
+          size="small"
+          sx={{
+            fontWeight: 700,
+            bgcolor: params.value > 1000000 ? alpha('#ef4444', 0.12) : params.value > 200000 ? alpha('#f59e0b', 0.12) : alpha('#10b981', 0.12),
+            color: params.value > 1000000 ? '#dc2626' : params.value > 200000 ? '#d97706' : '#059669',
+          }}
+        />
       ),
-      renderCell: (params) => {
-        const metricColor = getMetricColor(params.value, { good: 200000, warning: 1000000 }, true);
-        return (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography sx={{ fontWeight: 600, color: metricColor.color, fontSize: '0.85rem' }}>
-              {params.value >= 1000000 ? `${(params.value / 1000000).toFixed(1)}M` : `${(params.value / 1000).toFixed(1)}M`}
-            </Typography>
-            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: metricColor.dot }} />
-          </Box>
-        );
-      },
     },
     {
       field: 'inventoryQuality',
-      headerName: 'Inv. Quality (%)',
+      headerName: 'Inv Quality (%)',
       minWidth: 130,
       flex: 1,
+      type: 'number',
       align: 'center',
       headerAlign: 'center',
-      renderHeader: () => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <span>Inv. Quality (%)</span>
-          <Chip label="S" size="small" sx={{ height: 16, fontSize: '0.6rem', bgcolor: alpha('#06b6d4', 0.2), color: '#0891b2' }} />
-        </Box>
+      renderCell: (params) => (
+        <Chip
+          label={`${params.value}%`}
+          size="small"
+          sx={{
+            fontWeight: 700,
+            bgcolor: params.value >= 90 ? alpha('#10b981', 0.12) : params.value >= 70 ? alpha('#f59e0b', 0.12) : alpha('#ef4444', 0.12),
+            color: params.value >= 90 ? '#059669' : params.value >= 70 ? '#d97706' : '#dc2626',
+          }}
+        />
       ),
-      renderCell: (params) => {
-        const metricColor = getMetricColor(params.value, { good: 90, warning: 70 });
-        return (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography sx={{ fontWeight: 600, color: metricColor.color, fontSize: '0.85rem' }}>{params.value}%</Typography>
-            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: metricColor.dot }} />
-          </Box>
-        );
-      },
     },
     {
       field: 'forecastAccuracy',
       headerName: 'Forecast Acc (%)',
       minWidth: 140,
       flex: 1,
+      type: 'number',
       align: 'center',
       headerAlign: 'center',
-      renderHeader: () => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <span>Forecast Acc (%)</span>
-          <Chip label="R" size="small" sx={{ height: 16, fontSize: '0.6rem', bgcolor: alpha('#f59e0b', 0.2), color: '#d97706' }} />
-        </Box>
+      renderCell: (params) => (
+        <Chip
+          label={`${params.value}%`}
+          size="small"
+          sx={{
+            fontWeight: 700,
+            bgcolor: params.value >= 85 ? alpha('#10b981', 0.12) : params.value >= 70 ? alpha('#f59e0b', 0.12) : alpha('#ef4444', 0.12),
+            color: params.value >= 85 ? '#059669' : params.value >= 70 ? '#d97706' : '#dc2626',
+          }}
+        />
       ),
-      renderCell: (params) => {
-        const metricColor = getMetricColor(params.value, { good: 85, warning: 70 });
-        return (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography sx={{ fontWeight: 600, color: metricColor.color, fontSize: '0.85rem' }}>{params.value}%</Typography>
-            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: metricColor.dot }} />
-          </Box>
-        );
-      },
     },
     {
       field: 'demandVolatility',
@@ -567,78 +499,50 @@ const Tile0ForecastSimulation = ({ onBack }) => {
       flex: 1,
       align: 'center',
       headerAlign: 'center',
-      renderHeader: () => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <span>Demand Volatility</span>
-          <Chip label="R" size="small" sx={{ height: 16, fontSize: '0.6rem', bgcolor: alpha('#f59e0b', 0.2), color: '#d97706' }} />
-        </Box>
+      renderCell: (params) => (
+        <Chip
+          label={params.value}
+          size="small"
+          color={params.value === 'Low' ? 'success' : params.value === 'Medium' ? 'warning' : 'error'}
+          sx={{ fontWeight: 600 }}
+        />
       ),
-      renderCell: (params) => {
-        const colorMap = { 'Low': '#059669', 'Medium': '#d97706', 'High': '#dc2626' };
-        const dotMap = { 'Low': '#10b981', 'Medium': '#f59e0b', 'High': '#ef4444' };
-        return (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography sx={{ fontWeight: 600, color: colorMap[params.value], fontSize: '0.85rem' }}>{params.value}</Typography>
-            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: dotMap[params.value] }} />
-          </Box>
-        );
-      },
     },
     {
       field: 'demandAtRisk',
       headerName: 'Demand at Risk ($)',
       minWidth: 150,
       flex: 1,
+      type: 'number',
       align: 'center',
       headerAlign: 'center',
-      renderHeader: () => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <span>Demand at Risk ($)</span>
-          <Chip label="F" size="small" sx={{ height: 16, fontSize: '0.6rem', bgcolor: alpha('#10b981', 0.2), color: '#059669' }} />
-        </Box>
+      renderCell: (params) => (
+        <Chip
+          label={params.value === 0 ? '$0' : params.value >= 1000 ? `$${(params.value / 1000).toFixed(0)}k` : `$${params.value}`}
+          size="small"
+          sx={{
+            fontWeight: 700,
+            bgcolor: params.value > 100000 ? alpha('#ef4444', 0.12) : params.value > 0 ? alpha('#f59e0b', 0.12) : alpha('#10b981', 0.12),
+            color: params.value > 100000 ? '#dc2626' : params.value > 0 ? '#d97706' : '#059669',
+          }}
+        />
       ),
-      renderCell: (params) => {
-        const metricColor = getMetricColor(params.value, { good: 0, warning: 100000 }, true);
-        return (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography sx={{ fontWeight: 600, color: metricColor.color, fontSize: '0.85rem' }}>
-              {params.value === 0 ? '0' : params.value >= 1000 ? `${(params.value / 1000).toFixed(0)}k` : params.value}
-            </Typography>
-            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: metricColor.dot }} />
-          </Box>
-        );
-      },
     },
     {
       field: 'gmroi',
       headerName: 'GMROI',
       minWidth: 100,
       flex: 0.8,
-      align: 'center',
-      headerAlign: 'center',
-      renderHeader: () => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <span>GMROI</span>
-          <Chip label="R" size="small" sx={{ height: 16, fontSize: '0.6rem', bgcolor: alpha('#f59e0b', 0.2), color: '#d97706' }} />
-        </Box>
-      ),
-      renderCell: (params) => {
-        const metricColor = getMetricColor(params.value, { good: 2.0, warning: 1.0 });
-        return (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography sx={{ fontWeight: 600, color: metricColor.color, fontSize: '0.85rem' }}>{params.value.toFixed(1)}×</Typography>
-            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: metricColor.dot }} />
-          </Box>
-        );
-      },
-    },
-    {
-      field: 'actions',
-      headerName: '',
-      width: 50,
-      sortable: false,
-      renderCell: () => (
-        <ArrowForwardIcon sx={{ color: '#0ea5e9', fontSize: 18, opacity: 0.6 }} />
+      renderCell: (params) => (
+        <Chip
+          label={`${params.value.toFixed(1)}×`}
+          size="small"
+          sx={{
+            fontWeight: 700,
+            bgcolor: params.value >= 2.0 ? alpha('#10b981', 0.12) : params.value >= 1.0 ? alpha('#f59e0b', 0.12) : alpha('#ef4444', 0.12),
+            color: params.value >= 2.0 ? '#059669' : params.value >= 1.0 ? '#d97706' : '#dc2626',
+          }}
+        />
       ),
     },
   ];
@@ -1120,8 +1024,8 @@ const Tile0ForecastSimulation = ({ onBack }) => {
         {!selectedSku && (
           <>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-              <InventoryIcon sx={{ fontSize: 32, color: '#0ea5e9' }} />
-              <Typography variant="h4" fontWeight={700}>Inventory Health Dashboard</Typography>
+              <InventoryIcon sx={{ fontSize: 40, color: '#0ea5e9' }} />
+              <Typography variant="h5" fontWeight={600}>Inventory Health Dashboard</Typography>
             </Stack>
             <Typography variant="body2" color="text.secondary">
               Monitor SKU health metrics, identify risks, and review AI-powered optimization recommendations
@@ -1138,7 +1042,7 @@ const Tile0ForecastSimulation = ({ onBack }) => {
           {metrics && (
             <Grid container spacing={2} sx={{ mb: 3 }}>
               <Grid item xs={12} sm={6} md={2.4}>
-                <Card sx={{ borderLeft: `4px solid #ef4444`, background: `linear-gradient(135deg, ${alpha('#ef4444', 0.08)} 0%, ${alpha('#ef4444', 0.02)} 100%)` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #ef4444` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                     <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>High Risk SKUs</Typography>
                     <Typography variant="h4" fontWeight={700} color="#dc2626">{metrics.highRisk}</Typography>
@@ -1147,7 +1051,7 @@ const Tile0ForecastSimulation = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2.4}>
-                <Card sx={{ borderLeft: `4px solid #f59e0b`, background: `linear-gradient(135deg, ${alpha('#f59e0b', 0.08)} 0%, ${alpha('#f59e0b', 0.02)} 100%)` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #f59e0b` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                     <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Moderate Risk</Typography>
                     <Typography variant="h4" fontWeight={700} color="#d97706">{metrics.moderate}</Typography>
@@ -1156,7 +1060,7 @@ const Tile0ForecastSimulation = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2.4}>
-                <Card sx={{ borderLeft: `4px solid #10b981`, background: `linear-gradient(135deg, ${alpha('#10b981', 0.08)} 0%, ${alpha('#10b981', 0.02)} 100%)` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #10b981` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                     <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Healthy SKUs</Typography>
                     <Typography variant="h4" fontWeight={700} color="#059669">{metrics.healthy}</Typography>
@@ -1165,7 +1069,7 @@ const Tile0ForecastSimulation = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2.4}>
-                <Card sx={{ borderLeft: `4px solid #0ea5e9`, background: `linear-gradient(135deg, ${alpha('#0ea5e9', 0.08)} 0%, ${alpha('#0ea5e9', 0.02)} 100%)` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #0ea5e9` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                     <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Total Lost Sales</Typography>
                     <Typography variant="h4" fontWeight={700} color="#0284c7">{formatCurrency(metrics.totalLostSales)}</Typography>
@@ -1174,7 +1078,7 @@ const Tile0ForecastSimulation = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2.4}>
-                <Card sx={{ borderLeft: `4px solid #0ea5e9`, background: `linear-gradient(135deg, ${alpha('#0ea5e9', 0.08)} 0%, ${alpha('#0ea5e9', 0.02)} 100%)` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #0ea5e9` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                     <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Excess Inventory</Typography>
                     <Typography variant="h4" fontWeight={700} color="#0284c7">{formatCurrency(metrics.totalExcess)}</Typography>
@@ -1215,11 +1119,12 @@ const Tile0ForecastSimulation = ({ onBack }) => {
               density="compact"
               slots={{ toolbar: GridToolbar }}
               slotProps={{ toolbar: { showQuickFilter: true, quickFilterProps: { debounceMs: 500 } } }}
-              initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
-              pageSizeOptions={[5, 10, 25]}
+              initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
+              pageSizeOptions={[10, 25, 50, 100]}
+              checkboxSelection
               disableRowSelectionOnClick
               onRowClick={handleRowClick}
-              sx={stoxTheme.getDataGridSx({ clickable: true })}
+              sx={stoxTheme.getDataGridSx()}
             />
           </Paper>
 

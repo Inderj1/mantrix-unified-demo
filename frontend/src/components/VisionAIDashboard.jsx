@@ -732,33 +732,41 @@ const VisionAIDashboard = ({ onBack }) => {
             <IconButton onClick={onBack} size="small">
               <ArrowBackIcon />
             </IconButton>
-            <Typography variant="h5" fontWeight={600}>
-              Vision AI - Inventory Management
-            </Typography>
-            <Chip 
-              label="Stock & Inventory" 
-              color="primary" 
-              size="small" 
+            <VisibilityIcon sx={{ fontSize: 40, color: '#00BCD4' }} />
+            <Box>
+              <Typography variant="h5" fontWeight={600}>
+                Vision AI - Inventory Management
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                AI-powered inventory scanning, labeling, and management
+              </Typography>
+            </Box>
+            <Chip
+              label="Stock & Inventory"
+              variant="outlined"
+              size="small"
               icon={<InventoryIcon />}
             />
           </Stack>
           
-          <Stack direction="row" spacing={2}>
+          <Stack direction="row" spacing={1}>
             <Chip
               icon={<CheckCircleIcon />}
               label={`Model: ${activeModel}`}
-              color="success"
               variant="outlined"
+              size="small"
             />
             <Chip
               icon={<SpeedIcon />}
               label={`${statistics.processingTime}ms`}
               variant="outlined"
+              size="small"
             />
             <Chip
               icon={<AssessmentIcon />}
               label={`Accuracy: ${(statistics.accuracy * 100).toFixed(1)}%`}
               variant="outlined"
+              size="small"
             />
           </Stack>
         </Stack>
@@ -1346,35 +1354,35 @@ const VisionAIDashboard = ({ onBack }) => {
                   
                   <Grid container spacing={2}>
                     <Grid item xs={6}>
-                      <Card sx={{ p: 2, bgcolor: alpha(theme.palette.primary.main, 0.05) }}>
-                        <Typography variant="body2" color="text.secondary">
+                      <Card variant="outlined" sx={{ p: 1.5 }}>
+                        <Typography variant="caption" color="text.secondary">
                           Training Images
                         </Typography>
-                        <Typography variant="h6">0</Typography>
+                        <Typography variant="body1" fontWeight={600}>0</Typography>
                       </Card>
                     </Grid>
                     <Grid item xs={6}>
-                      <Card sx={{ p: 2, bgcolor: alpha(theme.palette.success.main, 0.05) }}>
-                        <Typography variant="body2" color="text.secondary">
+                      <Card variant="outlined" sx={{ p: 1.5 }}>
+                        <Typography variant="caption" color="text.secondary">
                           Validation Images
                         </Typography>
-                        <Typography variant="h6">0</Typography>
+                        <Typography variant="body1" fontWeight={600}>0</Typography>
                       </Card>
                     </Grid>
                     <Grid item xs={6}>
-                      <Card sx={{ p: 2, bgcolor: alpha(theme.palette.warning.main, 0.05) }}>
-                        <Typography variant="body2" color="text.secondary">
+                      <Card variant="outlined" sx={{ p: 1.5 }}>
+                        <Typography variant="caption" color="text.secondary">
                           Product Classes
                         </Typography>
-                        <Typography variant="h6">0</Typography>
+                        <Typography variant="body1" fontWeight={600}>0</Typography>
                       </Card>
                     </Grid>
                     <Grid item xs={6}>
-                      <Card sx={{ p: 2, bgcolor: alpha(theme.palette.info.main, 0.05) }}>
-                        <Typography variant="body2" color="text.secondary">
+                      <Card variant="outlined" sx={{ p: 1.5 }}>
+                        <Typography variant="caption" color="text.secondary">
                           Total Annotations
                         </Typography>
-                        <Typography variant="h6">0</Typography>
+                        <Typography variant="body1" fontWeight={600}>0</Typography>
                       </Card>
                     </Grid>
                   </Grid>

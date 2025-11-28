@@ -26,6 +26,8 @@ import {
   Select,
   ToggleButtonGroup,
   ToggleButton,
+  Avatar,
+  alpha,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -57,6 +59,7 @@ import {
   Analytics as AnalyticsIcon,
   Inventory as InventoryIcon,
   ShowChart as ShowChartIcon,
+  Radar as RadarIcon,
 } from '@mui/icons-material';
 
 const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
@@ -399,13 +402,16 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
     <Box>
       {/* Header with Stats */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Box>
-          <Typography variant="h5" fontWeight={600}>
-            Enterprise Pulse
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Proactive agents that monitor and protect business operations
-          </Typography>
+        <Box display="flex" alignItems="center" gap={2}>
+          <RadarIcon sx={{ fontSize: 40, color: '#0a6ed1' }} />
+          <Box>
+            <Typography variant="h5" fontWeight={600}>
+              Enterprise Pulse
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Proactive agents that monitor and protect business operations
+            </Typography>
+          </Box>
         </Box>
         <Button
           variant="outlined"

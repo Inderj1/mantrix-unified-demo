@@ -781,20 +781,12 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
         <Box sx={{ mb: 4 }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Avatar
-                sx={{
-                  width: 64,
-                  height: 64,
-                  bgcolor: alpha('#2196F3', 0.1),
-                }}
-              >
-                <EmailIcon sx={{ fontSize: 36, color: '#2196F3' }} />
-              </Avatar>
+              <EmailIcon sx={{ fontSize: 40, color: '#E91E63' }} />
               <Box>
-                <Typography variant="h4" fontWeight={700}>
+                <Typography variant="h5" fontWeight={600}>
                   EMAIL INTEL
                 </Typography>
-                <Typography variant="body1" color="text.secondary">
+                <Typography variant="body2" color="text.secondary">
                   Configurable Communication Intelligence Platform
                 </Typography>
               </Box>
@@ -847,8 +839,9 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
             return (
               <Grid item xs={12} sm={6} md={4} key={type.id}>
                 <Card
+                  variant="outlined"
                   sx={{
-                    height: 200,
+                    height: 180,
                     cursor: 'pointer',
                     transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                     border: '1px solid',
@@ -868,12 +861,10 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
                     },
                     '&:hover': {
                       transform: 'translateY(-4px)',
-                      boxShadow: `0 12px 24px ${alpha(color, 0.15)}`,
+                      boxShadow: `0 8px 16px ${alpha(color, 0.15)}`,
                       borderColor: color,
                       '& .module-icon': {
-                        transform: 'scale(1.15)',
-                        bgcolor: color,
-                        color: 'white',
+                        transform: 'scale(1.1)',
                       },
                       '& .module-arrow': {
                         opacity: 1,
@@ -885,18 +876,7 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
                 >
                   <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                      <Avatar
-                        className="module-icon"
-                        sx={{
-                          width: 40,
-                          height: 40,
-                          bgcolor: alpha(color, 0.1),
-                          color: color,
-                          transition: 'all 0.3s ease',
-                        }}
-                      >
-                        <IconComponent sx={{ fontSize: 22 }} />
-                      </Avatar>
+                      <IconComponent sx={{ fontSize: 40, color: color }} />
                       {type.isCustom && (
                         <Box sx={{ display: 'flex', gap: 0.5 }}>
                           <IconButton
@@ -922,15 +902,15 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
                         </Box>
                       )}
                     </Box>
-                    <Typography variant="body1" sx={{ fontWeight: 700, color: color, mb: 0.5, fontSize: '0.9rem', lineHeight: 1.3 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: color, mb: 0.5, fontSize: '0.938rem' }}>
                       {type.display_name}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.5, fontSize: '0.813rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {type.description}
                     </Typography>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha(color, 0.1) }}>
-                      <Chip label={`${stats[type.name] || 0} Communications`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha(color, 0.08), color: color, fontWeight: 600 }} />
-                      <OpenInNewIcon className="module-arrow" sx={{ color: color, fontSize: 18, opacity: 0.5, transition: 'all 0.3s ease' }} />
+                      <Chip label={`${stats[type.name] || 0} Comms`} size="small" variant="outlined" sx={{ height: 20, fontSize: '0.65rem', borderColor: alpha(color, 0.3), color: color, fontWeight: 600 }} />
+                      <OpenInNewIcon className="module-arrow" sx={{ color: color, fontSize: 16, opacity: 0.5, transition: 'all 0.3s ease' }} />
                     </Box>
                   </CardContent>
                 </Card>
@@ -942,11 +922,12 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
           {!searchQuery && (
             <Grid item xs={12} sm={6} md={4}>
               <Card
+                variant="outlined"
                 sx={{
-                  height: 200,
+                  height: 180,
                   cursor: 'pointer',
                   transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                  border: '2px dashed',
+                  border: '1px dashed',
                   borderColor: 'divider',
                   borderRadius: 2,
                   display: 'flex',
@@ -961,19 +942,8 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
                 onClick={handleAddCustomType}
               >
                 <CardContent sx={{ textAlign: 'center' }}>
-                  <Avatar
-                    sx={{
-                      width: 56,
-                      height: 56,
-                      bgcolor: alpha(theme.palette.primary.main, 0.1),
-                      color: 'primary.main',
-                      mx: 'auto',
-                      mb: 2,
-                    }}
-                  >
-                    <AddIcon sx={{ fontSize: 32 }} />
-                  </Avatar>
-                  <Typography variant="body1" fontWeight={600} color="primary">
+                  <AddIcon sx={{ fontSize: 40, color: theme.palette.primary.main, mb: 1 }} />
+                  <Typography variant="body2" fontWeight={600} color="primary">
                     Add Custom Type
                   </Typography>
                   <Typography variant="caption" color="text.secondary">

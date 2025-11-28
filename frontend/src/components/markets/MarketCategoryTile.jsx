@@ -58,17 +58,18 @@ const MarketCategoryTile = ({
 
   return (
     <Card
+      variant="outlined"
       sx={{
         height: '100%',
         cursor: enabled ? 'pointer' : 'not-allowed',
         opacity: enabled ? 1 : 0.6,
-        border: '2px solid',
+        border: '1px solid',
         borderColor: getBorderColor(),
-        transition: 'all 0.3s ease',
+        transition: 'all 0.25s ease',
         position: 'relative',
         '&:hover': enabled ? {
           transform: 'translateY(-4px)',
-          boxShadow: 4,
+          boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
           borderColor: '#bdbdbd',
         } : {},
       }}
@@ -95,27 +96,14 @@ const MarketCategoryTile = ({
         </Box>
 
         {/* Category Icon */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 48,
-            height: 48,
-            borderRadius: 2,
-            bgcolor: '#f5f5f5',
-            mb: 1.5,
-          }}
-        >
-          <IconComponent sx={{ fontSize: 28, color: '#666666' }} />
-        </Box>
+        <IconComponent sx={{ fontSize: 40, color: '#666666', mb: 1.5 }} />
 
         {/* Category Name */}
         <Typography
-          variant="h6"
+          variant="body1"
           sx={{
             fontWeight: 600,
-            fontSize: '0.95rem',
+            fontSize: '0.875rem',
             mb: 0.25,
             color: enabled ? 'text.primary' : 'text.disabled',
           }}
@@ -160,8 +148,8 @@ const MarketCategoryTile = ({
               <Chip
                 label={signalCount === 0 ? 'No Alerts' : `${signalCount} Alert${signalCount > 1 ? 's' : ''}`}
                 size="small"
+                variant="outlined"
                 sx={{
-                  bgcolor: '#f5f5f5',
                   color: 'text.secondary',
                   fontWeight: 500,
                   height: 20,
@@ -195,13 +183,13 @@ const MarketCategoryTile = ({
               <Chip
                 label={severityLevel.label}
                 size="small"
+                variant="outlined"
                 sx={{
                   height: 18,
                   fontSize: '0.6rem',
                   fontWeight: 600,
-                  bgcolor: severityLevel.bgColor,
+                  borderColor: severityLevel.color,
                   color: severityLevel.color,
-                  border: `1px solid ${severityLevel.color}`,
                 }}
               />
             </Box>
@@ -214,10 +202,10 @@ const MarketCategoryTile = ({
             <Chip
               label="Disabled"
               size="small"
+              variant="outlined"
               sx={{
                 height: 18,
                 fontSize: '0.6rem',
-                bgcolor: '#f5f5f5',
                 color: 'text.disabled',
               }}
             />

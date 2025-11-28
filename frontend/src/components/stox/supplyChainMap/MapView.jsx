@@ -167,15 +167,12 @@ function MapEventHandler({ onMapReady, isFullScreen }) {
   useEffect(() => {
     if (onMapReady) onMapReady(map);
 
-    // Invalidate size on mount and after a short delay to ensure proper rendering
-    const timer = setTimeout(() => {
-      map.invalidateSize();
-    }, 100);
-
-    // Additional delay for initial load
-    const timer2 = setTimeout(() => {
-      map.invalidateSize();
-    }, 500);
+    // Invalidate size multiple times to handle race conditions
+    const timers = [50, 100, 250, 500, 1000].map((delay) =>
+      setTimeout(() => {
+        map.invalidateSize();
+      }, delay)
+    );
 
     // Handle window resize
     const handleResize = () => {
@@ -183,28 +180,34 @@ function MapEventHandler({ onMapReady, isFullScreen }) {
     };
     window.addEventListener('resize', handleResize);
 
+    // Use ResizeObserver to detect container size changes
+    const container = map.getContainer();
+    let resizeObserver;
+    if (container && typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => {
+        map.invalidateSize();
+      });
+      resizeObserver.observe(container);
+    }
+
     return () => {
-      clearTimeout(timer);
-      clearTimeout(timer2);
+      timers.forEach(clearTimeout);
       window.removeEventListener('resize', handleResize);
+      if (resizeObserver) resizeObserver.disconnect();
     };
   }, [map, onMapReady]);
 
   // Re-invalidate when fullscreen state changes
   useEffect(() => {
     // Wait for DOM to update after fullscreen toggle
-    const timer = setTimeout(() => {
-      map.invalidateSize();
-    }, 50);
-
-    // Additional invalidation to ensure tiles load properly
-    const timer2 = setTimeout(() => {
-      map.invalidateSize();
-    }, 200);
+    const timers = [50, 100, 200, 400].map((delay) =>
+      setTimeout(() => {
+        map.invalidateSize();
+      }, delay)
+    );
 
     return () => {
-      clearTimeout(timer);
-      clearTimeout(timer2);
+      timers.forEach(clearTimeout);
     };
   }, [map, isFullScreen]);
 

@@ -118,63 +118,37 @@ const MarketsAIDashboard = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, p: 3 }}>
       {/* Header */}
       <Paper
+        elevation={1}
         sx={{
-          p: 3,
-          background: '#ffffff',
-          borderRadius: 2,
-          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-          border: '1px solid #e5e7eb',
+          p: 2,
+          borderRadius: 0,
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Avatar
-              sx={{
-                width: 64,
-                height: 64,
-                bgcolor: alpha('#FF5722', 0.1),
-              }}
-            >
-              <RadarIcon sx={{ fontSize: 36, color: '#FF5722' }} />
-            </Avatar>
+            <RadarIcon sx={{ fontSize: 40, color: '#FF5722' }} />
             <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography variant="h4" fontWeight={700}>
-                  MARKETS.AI
-                </Typography>
-                <Chip
-                  label="Market Intelligence"
-                  size="small"
-                  sx={{
-                    height: 22,
-                    bgcolor: '#fef3c7',
-                    color: '#d97706',
-                    fontWeight: 600,
-                    border: '1px solid #fde68a',
-                  }}
-                />
-              </Box>
-              <Typography variant="body1" color="text.secondary">
+              <Typography variant="h5" fontWeight={600}>
+                MARKETS.AI
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
                 Comprehensive market signal monitoring across 15 categories
               </Typography>
             </Box>
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {isScanning && (
               <Chip
                 label="Scanning..."
                 size="small"
+                variant="outlined"
                 icon={<RefreshIcon />}
-                sx={{ bgcolor: '#e3f2fd', color: '#2196f3' }}
               />
             )}
             <Tooltip title="Configure Categories">
               <IconButton
                 onClick={() => setConfigPanelOpen(true)}
-                sx={{
-                  bgcolor: '#f5f5f5',
-                  '&:hover': { bgcolor: '#e0e0e0' },
-                }}
+                size="small"
               >
                 <SettingsIcon />
               </IconButton>
@@ -184,14 +158,14 @@ const MarketsAIDashboard = () => {
       </Paper>
 
       {/* Global Summary Metrics */}
-      <Grid container spacing={2}>
+      <Grid container spacing={1.5}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: '#fff3e0', height: '100%' }}>
-            <CardContent>
-              <Typography variant="caption" color="text.secondary" gutterBottom>
+          <Card variant="outlined" sx={{ height: '100%' }}>
+            <CardContent sx={{ py: 1.5, px: 2 }}>
+              <Typography variant="caption" color="text.secondary">
                 Active Categories
               </Typography>
-              <Typography variant="h4" fontWeight={700} color="#ff9800">
+              <Typography variant="h5" fontWeight={600}>
                 {enabledCategories.length} / {categories.length}
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -202,12 +176,12 @@ const MarketsAIDashboard = () => {
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: '#ffebee', height: '100%' }}>
-            <CardContent>
-              <Typography variant="caption" color="text.secondary" gutterBottom>
+          <Card variant="outlined" sx={{ height: '100%' }}>
+            <CardContent sx={{ py: 1.5, px: 2 }}>
+              <Typography variant="caption" color="text.secondary">
                 Critical Signals
               </Typography>
-              <Typography variant="h4" fontWeight={700} color="#f44336">
+              <Typography variant="h5" fontWeight={600} color="error.main">
                 {criticalSignals.length}
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -218,15 +192,15 @@ const MarketsAIDashboard = () => {
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: '#e8f5e9', height: '100%' }}>
-            <CardContent>
-              <Typography variant="caption" color="text.secondary" gutterBottom>
+          <Card variant="outlined" sx={{ height: '100%' }}>
+            <CardContent sx={{ py: 1.5, px: 2 }}>
+              <Typography variant="caption" color="text.secondary">
                 Total Business Impact
               </Typography>
               <Typography
-                variant="h4"
-                fontWeight={700}
-                sx={{ color: totalImpact >= 0 ? '#4caf50' : '#f44336' }}
+                variant="h5"
+                fontWeight={600}
+                sx={{ color: totalImpact >= 0 ? 'success.main' : 'error.main' }}
               >
                 {formatCurrency(totalImpact)}
               </Typography>
@@ -238,12 +212,12 @@ const MarketsAIDashboard = () => {
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: '#e3f2fd', height: '100%' }}>
-            <CardContent>
-              <Typography variant="caption" color="text.secondary" gutterBottom>
+          <Card variant="outlined" sx={{ height: '100%' }}>
+            <CardContent sx={{ py: 1.5, px: 2 }}>
+              <Typography variant="caption" color="text.secondary">
                 Active Signals
               </Typography>
-              <Typography variant="h4" fontWeight={700} color="#2196f3">
+              <Typography variant="h5" fontWeight={600}>
                 {totalActiveSignals}
               </Typography>
               <Typography variant="caption" color="text.secondary">

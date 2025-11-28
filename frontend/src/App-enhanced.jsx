@@ -113,6 +113,8 @@ import StoreOptimization from './components/stox/StoreOptimization.jsx';
 import StoreReplenishment from './components/stox/StoreReplenishment.jsx';
 import StoreFinancialImpact from './components/stox/StoreFinancialImpact.jsx';
 import SupplyChainMap from './components/stox/supplyChainMap/index.jsx';
+import DemandIntelligence from './components/stox/DemandIntelligence.jsx';
+import ForecastingEngine from './components/stox/ForecastingEngine.jsx';
 import DCDemandAggregation from './components/stox/DCDemandAggregation.jsx';
 import DCHealthMonitor from './components/stox/DCHealthMonitor.jsx';
 import DCOptimization from './components/stox/DCOptimization.jsx';
@@ -684,7 +686,7 @@ function App() {
                         } else if (moduleId === 'executive-command') {
                           console.log('Setting stoxView to: executive-command');
                           setStoxView('executive-command');
-                        } else if (['demand-flow', 'demand-forecasting', 'outbound-replenishment', 'dc-inventory', 'supply-planning', 'bom-explosion', 'component-consolidation', 'analytics-whatif', 'tile0-forecast-simulation', 'store-forecasting', 'store-health-monitor', 'store-optimization', 'store-replenishment', 'store-financial-impact', 'supply-chain-map', 'dc-demand-aggregation', 'dc-health-monitor', 'dc-optimization', 'dc-bom', 'dc-lot-size', 'dc-supplier-exec', 'dc-financial-impact'].includes(moduleId)) {
+                        } else if (['demand-flow', 'demand-forecasting', 'outbound-replenishment', 'dc-inventory', 'supply-planning', 'bom-explosion', 'component-consolidation', 'analytics-whatif', 'tile0-forecast-simulation', 'store-forecasting', 'store-health-monitor', 'store-optimization', 'store-replenishment', 'store-financial-impact', 'supply-chain-map', 'dc-demand-aggregation', 'dc-health-monitor', 'dc-optimization', 'dc-bom', 'dc-lot-size', 'dc-supplier-exec', 'dc-financial-impact', 'demand-intelligence', 'forecasting-engine'].includes(moduleId)) {
                           console.log('Setting stoxView to module tiles:', moduleId);
                           setStoxView(moduleId);
                         }
@@ -755,6 +757,12 @@ function App() {
                   )}
                   {stoxView === 'supply-chain-map' && (
                     <SupplyChainMap onBack={() => setStoxView('landing')} />
+                  )}
+                  {stoxView === 'demand-intelligence' && (
+                    <DemandIntelligence onBack={() => setStoxView('landing')} />
+                  )}
+                  {stoxView === 'forecasting-engine' && (
+                    <ForecastingEngine onBack={() => setStoxView('landing')} />
                   )}
                   {/* DC System Modules */}
                   {stoxView === 'dc-demand-aggregation' && (

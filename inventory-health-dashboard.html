@@ -1,0 +1,2130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STOX.AI | Inventory Health Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --border-color: #475569;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --cyan-400: #22d3ee;
+            --cyan-500: #06b6d4;
+            --emerald-400: #34d399;
+            --emerald-500: #10b981;
+            --amber-400: #fbbf24;
+            --amber-500: #f59e0b;
+            --red-400: #f87171;
+            --red-500: #ef4444;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 24px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .logo {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--cyan-500), var(--emerald-500));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .brand h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--cyan-400);
+        }
+        
+        .brand p {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .refresh-info {
+            text-align: right;
+        }
+        
+        .refresh-info .label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .refresh-info .time {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 12px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: rgba(6, 182, 212, 0.2);
+            color: var(--cyan-400);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: rgba(6, 182, 212, 0.3);
+        }
+        
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .summary-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .summary-card .label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        .summary-card .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .summary-card .sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        
+        .summary-card.critical { border-left: 3px solid var(--red-500); }
+        .summary-card.warning { border-left: 3px solid var(--amber-500); }
+        .summary-card.good { border-left: 3px solid var(--emerald-500); }
+        .summary-card.neutral { border-left: 3px solid var(--cyan-500); }
+        
+        /* Table Section */
+        .table-section {
+            background: rgba(30, 41, 59, 0.3);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            border-radius: 16px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        .table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+        }
+        
+        .table-header h2 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .table-header h2 span {
+            color: var(--cyan-400);
+        }
+        
+        .legend {
+            display: flex;
+            gap: 16px;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+        
+        .legend span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        /* Data Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            padding: 16px 12px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: rgba(15, 23, 42, 0.5);
+            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+        }
+        
+        .data-table th .type-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 8px;
+            margin-left: 4px;
+        }
+        
+        .type-badge.snapshot { background: rgba(6, 182, 212, 0.2); color: var(--cyan-400); }
+        .type-badge.rolling { background: rgba(251, 191, 36, 0.2); color: var(--amber-400); }
+        .type-badge.forward { background: rgba(16, 185, 129, 0.2); color: var(--emerald-400); }
+        
+        .data-table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.2);
+            font-size: 13px;
+        }
+        
+        .data-table tr {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .data-table tr:hover {
+            background: rgba(6, 182, 212, 0.05);
+        }
+        
+        .data-table tr:hover td:first-child {
+            color: var(--cyan-400);
+        }
+        
+        /* Material Cell */
+        .material-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .material-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            background: rgba(71, 85, 105, 0.3);
+        }
+        
+        .material-info .name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .material-info .desc {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+        
+        /* Status Indicators */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .status-badge.high-risk {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--red-400);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .status-badge.moderate {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--amber-400);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+        
+        .status-badge.healthy {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--emerald-400);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .status-dot.red { background: var(--red-500); box-shadow: 0 0 8px var(--red-500); }
+        .status-dot.yellow { background: var(--amber-500); box-shadow: 0 0 8px var(--amber-500); }
+        .status-dot.green { background: var(--emerald-500); box-shadow: 0 0 8px var(--emerald-500); }
+        
+        /* Metric Cells */
+        .metric-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .metric-value {
+            font-weight: 600;
+        }
+        
+        .metric-value.good { color: var(--emerald-400); }
+        .metric-value.warning { color: var(--amber-400); }
+        .metric-value.critical { color: var(--red-400); }
+        .metric-value.neutral { color: var(--text-primary); }
+        
+        .indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .indicator.green { background: var(--emerald-500); }
+        .indicator.yellow { background: var(--amber-500); }
+        .indicator.red { background: var(--red-500); }
+        
+        /* Drill icon */
+        .drill-icon {
+            opacity: 0;
+            transition: all 0.2s;
+            color: var(--cyan-400);
+        }
+        
+        .data-table tr:hover .drill-icon {
+            opacity: 1;
+            transform: translateX(4px);
+        }
+        
+        /* ABC/XYZ Badge */
+        .class-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--cyan-400);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+        
+        /* Detail View */
+        .detail-view {
+            display: none;
+        }
+        
+        .detail-view.active {
+            display: block;
+        }
+        
+        .list-view {
+            display: block;
+        }
+        
+        .list-view.hidden {
+            display: none;
+        }
+        
+        /* Back Button */
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 12px;
+            margin-bottom: 24px;
+            transition: all 0.2s;
+        }
+        
+        .back-btn:hover {
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--cyan-400);
+            border-color: rgba(6, 182, 212, 0.3);
+        }
+        
+        /* Detail Header */
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .detail-logo {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--cyan-500), var(--emerald-500));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+        
+        .detail-title h1 {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .detail-title h1 .material-id {
+            color: var(--cyan-400);
+        }
+        
+        .detail-title h1 .divider {
+            color: var(--text-muted);
+        }
+        
+        .detail-title h1 .plant-id {
+            color: var(--text-secondary);
+        }
+        
+        .detail-title p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        
+        /* Detail Grid */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr 0.8fr;
+            gap: 24px;
+        }
+        
+        .detail-card {
+            background: rgba(30, 41, 59, 0.3);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .detail-card h3 {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .detail-card h3 .icon {
+            color: var(--cyan-400);
+        }
+        
+        .detail-card h3 .sap-badge {
+            margin-left: auto;
+            font-size: 9px;
+            font-weight: 500;
+            color: rgba(6, 182, 212, 0.6);
+            background: rgba(6, 182, 212, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        
+        /* Health Gauge */
+        .health-gauge-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+        }
+        
+        .health-gauge {
+            position: relative;
+            width: 140px;
+            height: 140px;
+        }
+        
+        .health-gauge svg {
+            transform: rotate(-90deg);
+        }
+        
+        .health-gauge .score-display {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .health-gauge .score-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .health-gauge .score-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        /* Health Components */
+        .health-components {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        
+        .health-component {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px;
+            border-radius: 6px;
+            background: rgba(15, 23, 42, 0.3);
+        }
+        
+        .health-component .name {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+        
+        .health-component .value {
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .health-component .value.good { color: var(--emerald-400); }
+        .health-component .value.warning { color: var(--amber-400); }
+        .health-component .value.critical { color: var(--red-400); }
+        
+        /* Inventory Position */
+        .position-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .position-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .position-item .label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .position-item .value {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .position-item .value.warning { color: var(--amber-400); }
+        .position-item .value.critical { color: var(--red-400); }
+        .position-item .value.info { color: var(--cyan-400); }
+        
+        .position-total {
+            border-top: 1px solid rgba(71, 85, 105, 0.3);
+            padding-top: 12px;
+            margin-top: 8px;
+        }
+        
+        .position-total .value {
+            font-size: 18px;
+        }
+        
+        /* Stock Level Bar */
+        .stock-level-bar {
+            margin-top: 24px;
+        }
+        
+        .stock-bar {
+            height: 32px;
+            background: rgba(71, 85, 105, 0.3);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stock-zone {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+        }
+        
+        .stock-zone.danger {
+            background: linear-gradient(90deg, rgba(239, 68, 68, 0.6), rgba(239, 68, 68, 0.3));
+        }
+        
+        .stock-zone.warning {
+            background: linear-gradient(90deg, rgba(251, 191, 36, 0.6), rgba(251, 191, 36, 0.3));
+        }
+        
+        .stock-zone.safe {
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.6), rgba(16, 185, 129, 0.3));
+        }
+        
+        .stock-indicator {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: white;
+            box-shadow: 0 0 10px white;
+        }
+        
+        .stock-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 9px;
+            color: var(--text-muted);
+        }
+        
+        /* Charts */
+        .chart-container {
+            height: 180px;
+            margin: 16px 0;
+        }
+        
+        .chart-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(71, 85, 105, 0.3);
+        }
+        
+        .chart-stat {
+            text-align: center;
+        }
+        
+        .chart-stat .value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .chart-stat .value.warning { color: var(--amber-400); }
+        .chart-stat .value.info { color: var(--cyan-400); }
+        
+        .chart-stat .label {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+        
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+        }
+        
+        .metric-card {
+            padding: 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            transition: all 0.2s;
+        }
+        
+        .metric-card:hover {
+            transform: scale(1.02);
+        }
+        
+        .metric-card.good {
+            background: rgba(16, 185, 129, 0.05);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        
+        .metric-card.warning {
+            background: rgba(251, 191, 36, 0.05);
+            border-color: rgba(251, 191, 36, 0.3);
+        }
+        
+        .metric-card.critical {
+            background: rgba(239, 68, 68, 0.05);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+        
+        .metric-card.neutral {
+            background: rgba(71, 85, 105, 0.1);
+        }
+        
+        .metric-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .metric-card-header .label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .metric-card-header .label .icon {
+            font-size: 14px;
+        }
+        
+        .metric-card-header .sap {
+            font-size: 9px;
+            color: rgba(6, 182, 212, 0.6);
+            background: rgba(6, 182, 212, 0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        
+        .metric-card .main-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .metric-card .main-value .unit {
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin-left: 4px;
+        }
+        
+        .metric-card .trend {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+        
+        .metric-card .trend.up { color: var(--emerald-400); }
+        .metric-card .trend.down { color: var(--red-400); }
+        .metric-card .trend.stable { color: var(--text-muted); }
+        
+        /* Risk Alerts */
+        .risk-alerts {
+            margin-bottom: 24px;
+        }
+        
+        .risk-alert {
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+        
+        .risk-alert.high {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .risk-alert.medium {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+        
+        .risk-alert-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .risk-alert-header .title {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .risk-alert.high .title { color: var(--red-400); }
+        .risk-alert.medium .title { color: var(--amber-400); }
+        
+        .risk-alert-header .probability {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        
+        .risk-alert .impact {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        
+        .risk-alert .action {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: var(--cyan-400);
+            margin-top: 8px;
+            cursor: pointer;
+        }
+        
+        .risk-alert .action:hover {
+            color: var(--cyan-500);
+        }
+        
+        /* AI Recommendations */
+        .recommendations {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .recommendation {
+            padding: 16px;
+            border-radius: 10px;
+            border-left: 4px solid;
+            background: rgba(15, 23, 42, 0.3);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .recommendation:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        
+        .recommendation.critical {
+            border-left-color: var(--red-500);
+            background: rgba(239, 68, 68, 0.05);
+        }
+        
+        .recommendation.high {
+            border-left-color: var(--amber-500);
+            background: rgba(251, 191, 36, 0.05);
+        }
+        
+        .recommendation.medium {
+            border-left-color: var(--cyan-500);
+            background: rgba(6, 182, 212, 0.05);
+        }
+        
+        .rec-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+        
+        .rec-header .category {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .rec-header .priority-badge {
+            font-size: 9px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            text-transform: uppercase;
+        }
+        
+        .priority-badge.critical {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--red-400);
+        }
+        
+        .priority-badge.high {
+            background: rgba(251, 191, 36, 0.2);
+            color: var(--amber-400);
+        }
+        
+        .priority-badge.medium {
+            background: rgba(6, 182, 212, 0.2);
+            color: var(--cyan-400);
+        }
+        
+        .rec-header .impact {
+            text-align: right;
+        }
+        
+        .rec-header .impact .value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--emerald-400);
+        }
+        
+        .rec-header .impact .confidence {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+        
+        .rec-change {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            font-size: 12px;
+        }
+        
+        .rec-change .current {
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+        
+        .rec-change .arrow {
+            color: var(--text-muted);
+        }
+        
+        .rec-change .recommended {
+            color: var(--emerald-400);
+            font-weight: 600;
+        }
+        
+        .rec-rationale {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-top: 12px;
+        }
+        
+        /* Vendor Lead Times */
+        .vendors {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .vendor-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .vendor-item .info .name {
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+        
+        .vendor-item .info .times {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+        
+        .vendor-item .reliability {
+            text-align: right;
+        }
+        
+        .vendor-item .reliability .value {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .vendor-item .reliability .value.good { color: var(--emerald-400); }
+        .vendor-item .reliability .value.warning { color: var(--amber-400); }
+        .vendor-item .reliability .value.critical { color: var(--red-400); }
+        
+        .vendor-item .reliability .label {
+            font-size: 9px;
+            color: var(--text-muted);
+        }
+        
+        .vendor-tip {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            font-size: 11px;
+            color: var(--emerald-400);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* MRP Parameters Section */
+        .mrp-section {
+            margin-top: 24px;
+        }
+        
+        .mrp-params {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 12px;
+        }
+        
+        .mrp-param {
+            padding: 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            background: rgba(30, 41, 59, 0.3);
+        }
+        
+        .mrp-param.changed {
+            border-color: rgba(6, 182, 212, 0.3);
+            background: rgba(6, 182, 212, 0.05);
+        }
+        
+        .mrp-param-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .mrp-param-header .field {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--cyan-400);
+        }
+        
+        .mrp-param-header .change-icon {
+            color: var(--cyan-400);
+            font-size: 12px;
+        }
+        
+        .mrp-param .label {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        
+        .mrp-param .values {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .mrp-param .values .current {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+        
+        .mrp-param .values .arrow {
+            color: var(--text-muted);
+            font-size: 10px;
+        }
+        
+        .mrp-param .values .optimal {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--emerald-400);
+        }
+        
+        .mrp-param .values .same {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        /* Footer */
+        .footer {
+            margin-top: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        
+        .footer .info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .detail-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .mrp-params {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .mrp-params {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo">📦</div>
+                <div class="brand">
+                    <h1>STOX.AI</h1>
+                    <p>Inventory Health Dashboard</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="refresh-info">
+                    <div class="label">Last Refresh</div>
+                    <div class="time">Nov 26, 2025 14:32 CST</div>
+                </div>
+                <button class="btn btn-primary">
+                    🔄 Refresh
+                </button>
+            </div>
+        </div>
+        
+        <!-- List View -->
+        <div class="list-view" id="listView">
+            <!-- Summary Cards -->
+            <div class="summary-grid">
+                <div class="summary-card critical">
+                    <div class="label">High Risk SKUs</div>
+                    <div class="value">2</div>
+                    <div class="sub">Immediate attention required</div>
+                </div>
+                <div class="summary-card warning">
+                    <div class="label">Moderate Risk</div>
+                    <div class="value">2</div>
+                    <div class="sub">Monitor closely</div>
+                </div>
+                <div class="summary-card good">
+                    <div class="label">Healthy SKUs</div>
+                    <div class="value">1</div>
+                    <div class="sub">On track</div>
+                </div>
+                <div class="summary-card neutral">
+                    <div class="label">Total Lost Sales</div>
+                    <div class="value">$1.45M</div>
+                    <div class="sub">Rolling 12 months</div>
+                </div>
+                <div class="summary-card neutral">
+                    <div class="label">Excess Inventory</div>
+                    <div class="value">$3.0M</div>
+                    <div class="sub">Capital at risk</div>
+                </div>
+            </div>
+            
+            <!-- Table Section -->
+            <div class="table-section">
+                <div class="table-header">
+                    <h2><span>📊</span> Sample Inventory Health Dashboard Metrics</h2>
+                    <div class="legend">
+                        <span><span class="type-badge snapshot">S</span> Snapshot</span>
+                        <span><span class="type-badge rolling">R</span> Rolling</span>
+                        <span><span class="type-badge forward">F</span> Forward</span>
+                    </div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Material / Plant</th>
+                            <th>Overall Status</th>
+                            <th>Lost Sales ($) <span class="type-badge rolling">R</span></th>
+                            <th>Excess Inv ($) <span class="type-badge snapshot">S</span></th>
+                            <th>Inv. Quality (%) <span class="type-badge snapshot">S</span></th>
+                            <th>Forecast Acc (%) <span class="type-badge rolling">R</span></th>
+                            <th>Demand Volatility <span class="type-badge rolling">R</span></th>
+                            <th>Demand at Risk ($) <span class="type-badge forward">F</span></th>
+                            <th>GMROI <span class="type-badge rolling">R</span></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr onclick="showDetail('SKU-A')">
+                            <td>
+                                <div class="material-cell">
+                                    <div class="material-icon">🔧</div>
+                                    <div class="material-info">
+                                        <div class="name">SKU A</div>
+                                        <div class="desc">Plant 1 • A/Y</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-badge high-risk">
+                                    <span class="status-dot red"></span>
+                                    High Risk
+                                </span>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value critical">1.2M</span>
+                                    <span class="indicator red"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value good">0.1M</span>
+                                    <span class="indicator green"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value good">95%</span>
+                                    <span class="indicator green"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value critical">60%</span>
+                                    <span class="indicator red"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value critical">High</span>
+                                    <span class="indicator red"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value critical">500k</span>
+                                    <span class="indicator red"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value critical">0.8×</span>
+                                    <span class="indicator red"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="drill-icon">→</span>
+                            </td>
+                        </tr>
+                        <tr onclick="showDetail('SKU-B')">
+                            <td>
+                                <div class="material-cell">
+                                    <div class="material-icon">⚙️</div>
+                                    <div class="material-info">
+                                        <div class="name">SKU B</div>
+                                        <div class="desc">Plant 1 • B/X</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-badge high-risk">
+                                    <span class="status-dot red"></span>
+                                    High Risk
+                                </span>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value good">50k</span>
+                                    <span class="indicator green"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value critical">2.0M</span>
+                                    <span class="indicator red"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value critical">60%</span>
+                                    <span class="indicator red"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value warning">75%</span>
+                                    <span class="indicator yellow"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value good">Low</span>
+                                    <span class="indicator green"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value good">0</span>
+                                    <span class="indicator green"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value critical">0.9×</span>
+                                    <span class="indicator red"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="drill-icon">→</span>
+                            </td>
+                        </tr>
+                        <tr onclick="showDetail('SKU-C')">
+                            <td>
+                                <div class="material-cell">
+                                    <div class="material-icon">📦</div>
+                                    <div class="material-info">
+                                        <div class="name">SKU C</div>
+                                        <div class="desc">Plant 2 • A/X</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-badge healthy">
+                                    <span class="status-dot green"></span>
+                                    Healthy
+                                </span>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value good">0</span>
+                                    <span class="indicator green"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value good">0.3M</span>
+                                    <span class="indicator green"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value good">98%</span>
+                                    <span class="indicator green"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value good">90%</span>
+                                    <span class="indicator green"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value good">Low</span>
+                                    <span class="indicator green"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value good">0</span>
+                                    <span class="indicator green"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value good">3.0×</span>
+                                    <span class="indicator green"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="drill-icon">→</span>
+                            </td>
+                        </tr>
+                        <tr onclick="showDetail('SKU-D')">
+                            <td>
+                                <div class="material-cell">
+                                    <div class="material-icon">🔩</div>
+                                    <div class="material-info">
+                                        <div class="name">SKU D</div>
+                                        <div class="desc">Plant 2 • B/Y</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-badge moderate">
+                                    <span class="status-dot yellow"></span>
+                                    Moderate
+                                </span>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value warning">0.2M</span>
+                                    <span class="indicator yellow"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value warning">0.5M</span>
+                                    <span class="indicator yellow"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value warning">80%</span>
+                                    <span class="indicator yellow"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value warning">70%</span>
+                                    <span class="indicator yellow"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value warning">Medium</span>
+                                    <span class="indicator yellow"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value warning">100k</span>
+                                    <span class="indicator yellow"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value warning">1.5×</span>
+                                    <span class="indicator yellow"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="drill-icon">→</span>
+                            </td>
+                        </tr>
+                        <tr onclick="showDetail('SKU-E')">
+                            <td>
+                                <div class="material-cell">
+                                    <div class="material-icon">🛠️</div>
+                                    <div class="material-info">
+                                        <div class="name">SKU E</div>
+                                        <div class="desc">Plant 3 • A/Z</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-badge moderate">
+                                    <span class="status-dot yellow"></span>
+                                    Moderate
+                                </span>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value good">0</span>
+                                    <span class="indicator green"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value good">0.1M</span>
+                                    <span class="indicator green"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value good">95%</span>
+                                    <span class="indicator green"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value warning">80%</span>
+                                    <span class="indicator yellow"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value critical">High</span>
+                                    <span class="indicator red"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value warning">200k</span>
+                                    <span class="indicator yellow"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-cell">
+                                    <span class="metric-value good">2.5×</span>
+                                    <span class="indicator green"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="drill-icon">→</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Legend Note -->
+            <div style="margin-top: 24px; padding: 16px; background: rgba(30, 41, 59, 0.3); border-radius: 10px; border: 1px solid rgba(71, 85, 105, 0.3);">
+                <div style="font-size: 11px; color: var(--text-muted); line-height: 1.6;">
+                    <strong style="color: var(--text-secondary);">Legend:</strong> (S) = Snapshot (point-in-time) • (R) = Rolling (trailing period) • (F) = Forward-Looking (forecast/at-risk)
+                    <br><br>
+                    <strong style="color: var(--text-secondary);">Thresholds:</strong> 
+                    <span style="color: var(--emerald-400);">●</span> Green = Good | 
+                    <span style="color: var(--amber-400);">●</span> Yellow = Caution | 
+                    <span style="color: var(--red-400);">●</span> Red = Urgent
+                </div>
+            </div>
+        </div>
+        
+        <!-- Detail View -->
+        <div class="detail-view" id="detailView">
+            <button class="back-btn" onclick="showList()">
+                ← Back to Overview
+            </button>
+            
+            <div class="detail-header">
+                <div class="detail-logo">📦</div>
+                <div class="detail-title">
+                    <h1>
+                        <span class="material-id" id="detailMaterialId">MAT-4521</span>
+                        <span class="divider">|</span>
+                        <span class="plant-id" id="detailPlantId">Plant 1000</span>
+                        <span class="class-badge" id="detailClass">A/Y</span>
+                    </h1>
+                    <p id="detailDescription">Hydraulic Pump Assembly - Industrial Grade</p>
+                </div>
+            </div>
+            
+            <!-- Detail Grid -->
+            <div class="detail-grid">
+                <!-- Left Column -->
+                <div style="display: flex; flex-direction: column; gap: 24px;">
+                    <!-- Health Score -->
+                    <div class="detail-card">
+                        <h3>
+                            <span class="icon">🧠</span>
+                            Inventory Health Score
+                            <span class="sap-badge">AI-COMPUTED</span>
+                        </h3>
+                        <div class="health-gauge-container">
+                            <div class="health-gauge">
+                                <svg width="140" height="140">
+                                    <circle cx="70" cy="70" r="54" stroke="#1e293b" stroke-width="12" fill="none" />
+                                    <circle cx="70" cy="70" r="54" stroke="#f59e0b" stroke-width="12" fill="none"
+                                        stroke-dasharray="339.3" stroke-dashoffset="67.86" stroke-linecap="round" />
+                                </svg>
+                                <div class="score-display">
+                                    <span class="score-value">76</span>
+                                    <span class="score-label">HEALTH</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="health-components">
+                            <div class="health-component">
+                                <span class="name">Service Level</span>
+                                <span class="value warning">88</span>
+                            </div>
+                            <div class="health-component">
+                                <span class="name">Inv. Efficiency</span>
+                                <span class="value warning">72</span>
+                            </div>
+                            <div class="health-component">
+                                <span class="name">Forecast Acc.</span>
+                                <span class="value warning">81</span>
+                            </div>
+                            <div class="health-component">
+                                <span class="name">Supplier Rel.</span>
+                                <span class="value warning">77</span>
+                            </div>
+                            <div class="health-component">
+                                <span class="name">Param Optimal.</span>
+                                <span class="value critical">45</span>
+                            </div>
+                            <div class="health-component">
+                                <span class="name">Data Quality</span>
+                                <span class="value good">92</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Inventory Position -->
+                    <div class="detail-card">
+                        <h3>
+                            <span class="icon">📊</span>
+                            Inventory Position
+                            <span class="sap-badge">MARD • MARC</span>
+                        </h3>
+                        <div class="position-items">
+                            <div class="position-item">
+                                <span class="label">Unrestricted</span>
+                                <span class="value">485 EA</span>
+                            </div>
+                            <div class="position-item">
+                                <span class="label">Quality Inspection</span>
+                                <span class="value warning">32 EA</span>
+                            </div>
+                            <div class="position-item">
+                                <span class="label">Blocked</span>
+                                <span class="value critical">8 EA</span>
+                            </div>
+                            <div class="position-item">
+                                <span class="label">In Transit</span>
+                                <span class="value info">120 EA</span>
+                            </div>
+                            <div class="position-item position-total">
+                                <span class="label" style="font-weight: 600; color: var(--text-secondary);">Total Available</span>
+                                <span class="value">605 EA</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stock-level-bar">
+                            <div class="stock-bar">
+                                <div class="stock-zone danger" style="left: 0; width: 25%;"></div>
+                                <div class="stock-zone warning" style="left: 25%; width: 35%;"></div>
+                                <div class="stock-zone safe" style="left: 60%; width: 40%;"></div>
+                                <div class="stock-indicator" style="left: 24.25%;"></div>
+                            </div>
+                            <div class="stock-labels">
+                                <span>0</span>
+                                <span>SS: 500</span>
+                                <span>ROP: 1,200</span>
+                                <span>Max: 2,000</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Center Column -->
+                <div style="display: flex; flex-direction: column; gap: 24px;">
+                    <!-- Demand & Forecast -->
+                    <div class="detail-card">
+                        <h3>
+                            <span class="icon">📈</span>
+                            Demand & AI Forecast
+                            <span class="sap-badge">MVER • VBAP</span>
+                        </h3>
+                        <div class="chart-container">
+                            <canvas id="demandChart"></canvas>
+                        </div>
+                        <div class="chart-stats">
+                            <div class="chart-stat">
+                                <div class="value">81%</div>
+                                <div class="label">Forecast Acc.</div>
+                            </div>
+                            <div class="chart-stat">
+                                <div class="value warning">0.85</div>
+                                <div class="label">Demand CV</div>
+                            </div>
+                            <div class="chart-stat">
+                                <div class="value info">Y</div>
+                                <div class="label">XYZ Class</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Stock Trend -->
+                    <div class="detail-card">
+                        <h3>
+                            <span class="icon">📉</span>
+                            Stock Position Trend
+                            <span class="sap-badge">MSEG/MKPF</span>
+                        </h3>
+                        <div class="chart-container">
+                            <canvas id="stockChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Key Metrics -->
+                    <div class="metrics-grid">
+                        <div class="metric-card warning">
+                            <div class="metric-card-header">
+                                <span class="label"><span class="icon">⏱️</span> Days Coverage</span>
+                                <span class="sap">MARD/MVER</span>
+                            </div>
+                            <div class="main-value">18.2<span class="unit">days</span></div>
+                            <div class="trend down">↓ -2.3 vs last week</div>
+                        </div>
+                        <div class="metric-card warning">
+                            <div class="metric-card-header">
+                                <span class="label"><span class="icon">🎯</span> Service Level</span>
+                                <span class="sap">VBAP/LIPS</span>
+                            </div>
+                            <div class="main-value">94.2%</div>
+                            <div class="trend up">↑ +1.8% MTD</div>
+                        </div>
+                        <div class="metric-card neutral">
+                            <div class="metric-card-header">
+                                <span class="label"><span class="icon">💰</span> Inventory Value</span>
+                                <span class="sap">MBEW</span>
+                            </div>
+                            <div class="main-value">$605k</div>
+                            <div class="trend down">↓ -$45k from peak</div>
+                        </div>
+                        <div class="metric-card warning">
+                            <div class="metric-card-header">
+                                <span class="label"><span class="icon">⚡</span> Turnover Rate</span>
+                            </div>
+                            <div class="main-value">6.2×<span class="unit">/year</span></div>
+                            <div class="trend stable">Target: 8×</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Column -->
+                <div style="display: flex; flex-direction: column; gap: 24px;">
+                    <!-- Risk Alerts -->
+                    <div class="detail-card" style="border-color: rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.03);">
+                        <h3 style="color: var(--red-400);">
+                            <span class="icon">⚠️</span>
+                            Active Risk Alerts
+                        </h3>
+                        <div class="risk-alerts">
+                            <div class="risk-alert high">
+                                <div class="risk-alert-header">
+                                    <span class="title">Stockout risk in 12 days</span>
+                                    <span class="probability">73%</span>
+                                </div>
+                                <div class="impact">$125k demand at risk</div>
+                                <div class="action">⚡ Expedite PO 4500123456</div>
+                            </div>
+                            <div class="risk-alert medium">
+                                <div class="risk-alert-header">
+                                    <span class="title">Potential excess after Q1</span>
+                                    <span class="probability">45%</span>
+                                </div>
+                                <div class="impact">$89k excess value</div>
+                                <div class="action">⚡ Review Q2 demand signals</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- AI Recommendations -->
+                    <div class="detail-card">
+                        <h3>
+                            <span class="icon">🧠</span>
+                            AI Recommendations
+                            <span style="margin-left: auto; color: var(--emerald-400); font-size: 11px;">$517k savings</span>
+                        </h3>
+                        <div class="recommendations">
+                            <div class="recommendation critical">
+                                <div class="rec-header">
+                                    <div class="category">
+                                        Safety Stock
+                                        <span class="priority-badge critical">CRITICAL</span>
+                                    </div>
+                                    <div class="impact">
+                                        <div class="value">-$224k</div>
+                                        <div class="confidence">94% confidence</div>
+                                    </div>
+                                </div>
+                                <div class="rec-change">
+                                    <span class="current">500 EA</span>
+                                    <span class="arrow">→</span>
+                                    <span class="recommended">320 EA</span>
+                                </div>
+                                <div class="rec-rationale">Demand CV of 0.85 and 94% reliable vendor available. Current safety stock provides 18.7 days coverage vs required 12 days at 98% SL.</div>
+                            </div>
+                            <div class="recommendation high">
+                                <div class="rec-header">
+                                    <div class="category">
+                                        Reorder Point
+                                        <span class="priority-badge high">HIGH</span>
+                                    </div>
+                                    <div class="impact">
+                                        <div class="value">-$274k</div>
+                                        <div class="confidence">91% confidence</div>
+                                    </div>
+                                </div>
+                                <div class="rec-change">
+                                    <span class="current">1,200 EA</span>
+                                    <span class="arrow">→</span>
+                                    <span class="recommended">980 EA</span>
+                                </div>
+                                <div class="rec-rationale">Based on actual lead time of 15 days from V1003 and demand during lead time of 680 EA.</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Vendor Lead Times -->
+                    <div class="detail-card">
+                        <h3>
+                            <span class="icon">🚚</span>
+                            Vendor Lead Times
+                            <span class="sap-badge">EKBE • EINE</span>
+                        </h3>
+                        <div class="vendors">
+                            <div class="vendor-item">
+                                <div class="info">
+                                    <div class="name">V1001</div>
+                                    <div class="times">Plan: 14d → Actual: 18d</div>
+                                </div>
+                                <div class="reliability">
+                                    <div class="value warning">72%</div>
+                                    <div class="label">reliability</div>
+                                </div>
+                            </div>
+                            <div class="vendor-item">
+                                <div class="info">
+                                    <div class="name">V1002</div>
+                                    <div class="times">Plan: 14d → Actual: 21d</div>
+                                </div>
+                                <div class="reliability">
+                                    <div class="value critical">65%</div>
+                                    <div class="label">reliability</div>
+                                </div>
+                            </div>
+                            <div class="vendor-item">
+                                <div class="info">
+                                    <div class="name">V1003</div>
+                                    <div class="times">Plan: 14d → Actual: 15d</div>
+                                </div>
+                                <div class="reliability">
+                                    <div class="value good">94%</div>
+                                    <div class="label">reliability</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="vendor-tip">
+                            ✓ Recommend switching to V1003 as primary vendor
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- MRP Parameters Section -->
+            <div class="mrp-section">
+                <div class="detail-card">
+                    <h3>
+                        <span class="icon">⚙️</span>
+                        MRP Parameters: Current vs AI-Optimized
+                        <span class="sap-badge">MARC Fields</span>
+                        <button class="btn btn-primary" style="margin-left: auto; padding: 6px 12px;">
+                            ⚡ Apply to SAP
+                        </button>
+                    </h3>
+                    <div class="mrp-params">
+                        <div class="mrp-param">
+                            <div class="mrp-param-header">
+                                <span class="field">DISMM</span>
+                            </div>
+                            <div class="label">MRP Type</div>
+                            <div class="values">
+                                <span class="same">VB</span>
+                            </div>
+                        </div>
+                        <div class="mrp-param changed">
+                            <div class="mrp-param-header">
+                                <span class="field">DISLS</span>
+                                <span class="change-icon">⚡</span>
+                            </div>
+                            <div class="label">Lot Size</div>
+                            <div class="values">
+                                <span class="current">FX</span>
+                                <span class="arrow">→</span>
+                                <span class="optimal">EQ</span>
+                            </div>
+                        </div>
+                        <div class="mrp-param changed">
+                            <div class="mrp-param-header">
+                                <span class="field">EISBE</span>
+                                <span class="change-icon">⚡</span>
+                            </div>
+                            <div class="label">Safety Stock</div>
+                            <div class="values">
+                                <span class="current">500</span>
+                                <span class="arrow">→</span>
+                                <span class="optimal">320</span>
+                            </div>
+                        </div>
+                        <div class="mrp-param changed">
+                            <div class="mrp-param-header">
+                                <span class="field">MINBE</span>
+                                <span class="change-icon">⚡</span>
+                            </div>
+                            <div class="label">Reorder Point</div>
+                            <div class="values">
+                                <span class="current">1,200</span>
+                                <span class="arrow">→</span>
+                                <span class="optimal">980</span>
+                            </div>
+                        </div>
+                        <div class="mrp-param changed">
+                            <div class="mrp-param-header">
+                                <span class="field">PLIFZ</span>
+                                <span class="change-icon">⚡</span>
+                            </div>
+                            <div class="label">Planned LT</div>
+                            <div class="values">
+                                <span class="current">14</span>
+                                <span class="arrow">→</span>
+                                <span class="optimal">21</span>
+                            </div>
+                        </div>
+                        <div class="mrp-param">
+                            <div class="mrp-param-header">
+                                <span class="field">BSTMI</span>
+                            </div>
+                            <div class="label">Min Lot</div>
+                            <div class="values">
+                                <span class="same">100</span>
+                            </div>
+                        </div>
+                        <div class="mrp-param changed">
+                            <div class="mrp-param-header">
+                                <span class="field">BSTMA</span>
+                                <span class="change-icon">⚡</span>
+                            </div>
+                            <div class="label">Max Lot</div>
+                            <div class="values">
+                                <span class="current">1,000</span>
+                                <span class="arrow">→</span>
+                                <span class="optimal">800</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="info">
+                <span>STOX.AI Inventory Intelligence</span>
+                <span>•</span>
+                <span>Model v2.4.1</span>
+                <span>•</span>
+                <span>Confidence Threshold: 85%</span>
+            </div>
+            <div>© 2025 Cloud Mantra LLC</div>
+        </div>
+    </div>
+    
+    <script>
+        // View toggling
+        function showDetail(sku) {
+            document.getElementById('listView').classList.add('hidden');
+            document.getElementById('detailView').classList.add('active');
+            
+            // Update detail content based on SKU (in real app, this would fetch data)
+            const skuData = {
+                'SKU-A': { id: 'SKU A', plant: 'Plant 1', class: 'A/Y', desc: 'Hydraulic Pump Assembly - Industrial Grade' },
+                'SKU-B': { id: 'SKU B', plant: 'Plant 1', class: 'B/X', desc: 'Bearing Set - Industrial' },
+                'SKU-C': { id: 'SKU C', plant: 'Plant 2', class: 'A/X', desc: 'Electronic Control Module' },
+                'SKU-D': { id: 'SKU D', plant: 'Plant 2', class: 'B/Y', desc: 'Gasket Kit - Premium' },
+                'SKU-E': { id: 'SKU E', plant: 'Plant 3', class: 'A/Z', desc: 'Valve Assembly - High Pressure' }
+            };
+            
+            const data = skuData[sku] || skuData['SKU-A'];
+            document.getElementById('detailMaterialId').textContent = data.id;
+            document.getElementById('detailPlantId').textContent = data.plant;
+            document.getElementById('detailClass').textContent = data.class;
+            document.getElementById('detailDescription').textContent = data.desc;
+            
+            // Initialize charts
+            setTimeout(initCharts, 100);
+        }
+        
+        function showList() {
+            document.getElementById('listView').classList.remove('hidden');
+            document.getElementById('detailView').classList.remove('active');
+        }
+        
+        // Chart initialization
+        function initCharts() {
+            // Demand Chart
+            const demandCtx = document.getElementById('demandChart');
+            if (demandCtx && !demandCtx.chart) {
+                demandCtx.chart = new Chart(demandCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'],
+                        datasets: [
+                            {
+                                label: 'Actual',
+                                data: [420, 385, 510, 445, 478, 502, null, null, null],
+                                borderColor: '#06b6d4',
+                                backgroundColor: 'transparent',
+                                borderWidth: 2,
+                                pointBackgroundColor: '#06b6d4',
+                                pointRadius: 4,
+                                tension: 0.3
+                            },
+                            {
+                                label: 'Forecast',
+                                data: [400, 410, 430, 450, 460, 480, 520, 485, 510],
+                                borderColor: '#10b981',
+                                backgroundColor: 'transparent',
+                                borderWidth: 2,
+                                borderDash: [5, 5],
+                                pointRadius: 0,
+                                tension: 0.3
+                            },
+                            {
+                                label: 'Upper',
+                                data: [440, 450, 470, 495, 505, 530, 575, 535, 565],
+                                borderColor: 'transparent',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                fill: '+1',
+                                pointRadius: 0,
+                                tension: 0.3
+                            },
+                            {
+                                label: 'Lower',
+                                data: [360, 370, 390, 405, 415, 430, 465, 435, 455],
+                                borderColor: 'transparent',
+                                backgroundColor: 'transparent',
+                                pointRadius: 0,
+                                tension: 0.3
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: 'rgba(71, 85, 105, 0.2)' },
+                                ticks: { color: '#64748b', font: { size: 10 } }
+                            },
+                            y: {
+                                grid: { color: 'rgba(71, 85, 105, 0.2)' },
+                                ticks: { color: '#64748b', font: { size: 10 } }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Stock Chart
+            const stockCtx = document.getElementById('stockChart');
+            if (stockCtx && !stockCtx.chart) {
+                stockCtx.chart = new Chart(stockCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['W44', 'W45', 'W46', 'W47', 'W48', 'W49'],
+                        datasets: [
+                            {
+                                label: 'Stock',
+                                data: [680, 585, 475, 850, 762, 525],
+                                borderColor: '#06b6d4',
+                                backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.3
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            annotation: {
+                                annotations: {
+                                    ropLine: {
+                                        type: 'line',
+                                        yMin: 1200,
+                                        yMax: 1200,
+                                        borderColor: '#f59e0b',
+                                        borderWidth: 1,
+                                        borderDash: [5, 5]
+                                    },
+                                    ssLine: {
+                                        type: 'line',
+                                        yMin: 500,
+                                        yMax: 500,
+                                        borderColor: '#ef4444',
+                                        borderWidth: 1,
+                                        borderDash: [5, 5]
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: 'rgba(71, 85, 105, 0.2)' },
+                                ticks: { color: '#64748b', font: { size: 10 } }
+                            },
+                            y: {
+                                grid: { color: 'rgba(71, 85, 105, 0.2)' },
+                                ticks: { color: '#64748b', font: { size: 10 } },
+                                suggestedMax: 1400
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
