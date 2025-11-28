@@ -616,7 +616,9 @@ function App() {
                     <FinancialDriversAnalytics onBack={() => setMargenView('landing')} />
                   )}
                   {margenView === 'ask-margen' && (
-                    <AskMargen onBack={() => setMargenView('landing')} />
+                    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                      <AskMargen onBack={() => setMargenView('landing')} />
+                    </Box>
                   )}
                 </Box>
               </Fade>

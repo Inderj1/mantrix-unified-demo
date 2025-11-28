@@ -18,6 +18,7 @@ import {
   DialogActions,
   Avatar,
   alpha,
+  Stack,
 } from '@mui/material';
 import {
   Settings as SettingsIcon,
@@ -26,6 +27,7 @@ import {
   TrendingUp as TrendingUpIcon,
   TrendingDown as TrendingDownIcon,
   Close as CloseIcon,
+  Lightbulb as LightbulbIcon,
 } from '@mui/icons-material';
 import { getCategoriesArray, getCategoryById } from './markets/CategoryIcons';
 import MarketCategoryTile from './markets/MarketCategoryTile';
@@ -37,6 +39,7 @@ import { usePersistedState } from '../hooks/usePersistedState';
 /**
  * MarketsAIDashboard - Main dashboard for market intelligence
  * Tile-based layout showing all 15 market signal categories
+ * Updated styling to match STOX.AI and MARGEN.AI
  */
 const MarketsAIDashboard = () => {
   const categories = getCategoriesArray();
@@ -115,60 +118,105 @@ const MarketsAIDashboard = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, p: 3 }}>
+    <Box sx={{
+      p: 3,
+      height: '100%',
+      overflowY: 'auto',
+      overflowX: 'hidden',
+      background: 'linear-gradient(180deg, rgba(10, 110, 209, 0.05) 0%, rgba(255, 255, 255, 1) 50%)',
+    }}>
       {/* Header */}
-      <Paper
-        elevation={1}
-        sx={{
-          p: 2,
-          borderRadius: 0,
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <RadarIcon sx={{ fontSize: 40, color: '#FF5722' }} />
-            <Box>
-              <Typography variant="h5" fontWeight={600}>
+      <Box sx={{ mb: 3 }}>
+        {/* System Identity Badge */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+          <Box sx={{
+            width: 4,
+            height: 60,
+            background: 'linear-gradient(180deg, #0a6ed1 0%, #354a5f 100%)',
+            borderRadius: 2
+          }} />
+          <Box sx={{ flex: 1 }}>
+            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
+              <Avatar sx={{ width: 32, height: 32, bgcolor: '#0a6ed1' }}>
+                <RadarIcon sx={{ fontSize: 18 }} />
+              </Avatar>
+              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: '#0a6ed1' }}>
                 MARKETS.AI
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Comprehensive market signal monitoring across 15 categories
-              </Typography>
-            </Box>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {isScanning && (
               <Chip
-                label="Scanning..."
+                label="15 Categories"
                 size="small"
-                variant="outlined"
-                icon={<RefreshIcon />}
+                sx={{
+                  bgcolor: alpha('#0a6ed1', 0.1),
+                  color: '#0a6ed1',
+                  fontWeight: 600,
+                  fontSize: '0.7rem'
+                }}
               />
-            )}
-            <Tooltip title="Configure Categories">
-              <IconButton
-                onClick={() => setConfigPanelOpen(true)}
-                size="small"
-              >
-                <SettingsIcon />
-              </IconButton>
-            </Tooltip>
+              {isScanning && (
+                <Chip
+                  label="Scanning..."
+                  size="small"
+                  icon={<RefreshIcon sx={{ fontSize: 14 }} />}
+                  sx={{
+                    bgcolor: alpha('#64748b', 0.1),
+                    color: '#64748b',
+                    fontWeight: 500,
+                    fontSize: '0.7rem',
+                    '& .MuiChip-icon': { color: '#64748b' }
+                  }}
+                />
+              )}
+            </Stack>
+            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+              Comprehensive market signal monitoring across 15 intelligence categories
+            </Typography>
           </Box>
+          <Tooltip title="Configure Categories">
+            <IconButton
+              onClick={() => setConfigPanelOpen(true)}
+              size="small"
+              sx={{
+                bgcolor: alpha('#0a6ed1', 0.1),
+                '&:hover': { bgcolor: alpha('#0a6ed1', 0.2) }
+              }}
+            >
+              <SettingsIcon sx={{ color: '#0a6ed1' }} />
+            </IconButton>
+          </Tooltip>
         </Box>
-      </Paper>
+      </Box>
 
       {/* Global Summary Metrics */}
-      <Grid container spacing={1.5}>
+      <Grid container spacing={1.5} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card variant="outlined" sx={{ height: '100%' }}>
+          <Card
+            variant="outlined"
+            sx={{
+              height: '100%',
+              border: '1px solid',
+              borderColor: alpha('#0a6ed1', 0.15),
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 3,
+                background: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
+              },
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
             <CardContent sx={{ py: 1.5, px: 2 }}>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
                 Active Categories
               </Typography>
-              <Typography variant="h5" fontWeight={600}>
+              <Typography variant="h5" fontWeight={700} sx={{ color: '#0a6ed1' }}>
                 {enabledCategories.length} / {categories.length}
               </Typography>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
                 Monitoring enabled
               </Typography>
             </CardContent>
@@ -176,15 +224,33 @@ const MarketsAIDashboard = () => {
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card variant="outlined" sx={{ height: '100%' }}>
+          <Card
+            variant="outlined"
+            sx={{
+              height: '100%',
+              border: '1px solid',
+              borderColor: alpha('#354a5f', 0.15),
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 3,
+                background: 'linear-gradient(135deg, #354a5f 0%, #32363a 100%)',
+              },
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
             <CardContent sx={{ py: 1.5, px: 2 }}>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
                 Critical Signals
               </Typography>
-              <Typography variant="h5" fontWeight={600} color="error.main">
+              <Typography variant="h5" fontWeight={700} color="error.main">
                 {criticalSignals.length}
               </Typography>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
                 Require immediate action
               </Typography>
             </CardContent>
@@ -192,19 +258,37 @@ const MarketsAIDashboard = () => {
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card variant="outlined" sx={{ height: '100%' }}>
+          <Card
+            variant="outlined"
+            sx={{
+              height: '100%',
+              border: '1px solid',
+              borderColor: alpha('#64748b', 0.15),
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 3,
+                background: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
+              },
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
             <CardContent sx={{ py: 1.5, px: 2 }}>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
                 Total Business Impact
               </Typography>
               <Typography
                 variant="h5"
-                fontWeight={600}
+                fontWeight={700}
                 sx={{ color: totalImpact >= 0 ? 'success.main' : 'error.main' }}
               >
                 {formatCurrency(totalImpact)}
               </Typography>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
                 {totalImpact >= 0 ? 'Opportunity value' : 'At risk'}
               </Typography>
             </CardContent>
@@ -212,15 +296,33 @@ const MarketsAIDashboard = () => {
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card variant="outlined" sx={{ height: '100%' }}>
+          <Card
+            variant="outlined"
+            sx={{
+              height: '100%',
+              border: '1px solid',
+              borderColor: alpha('#0854a0', 0.15),
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 3,
+                background: 'linear-gradient(135deg, #0854a0 0%, #1d4ed8 100%)',
+              },
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
             <CardContent sx={{ py: 1.5, px: 2 }}>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
                 Active Signals
               </Typography>
-              <Typography variant="h5" fontWeight={600}>
+              <Typography variant="h5" fontWeight={700} sx={{ color: '#0854a0' }}>
                 {totalActiveSignals}
               </Typography>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
                 Across all categories
               </Typography>
             </CardContent>
@@ -230,12 +332,12 @@ const MarketsAIDashboard = () => {
 
       {/* Category Tiles Grid */}
       <Box>
-        <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
+        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, color: '#354a5f' }}>
           Market Signal Categories
         </Typography>
 
-        <Grid container spacing={2}>
-          {categories.map((category) => {
+        <Grid container spacing={1.5}>
+          {categories.map((category, index) => {
             const isEnabled = enabledCategories.includes(category.id);
             const signalCount = isEnabled ? getSignalCount(category.id) : 0;
             const highestSeverity = isEnabled ? getHighestSeverity(category.id) : 0;
@@ -250,11 +352,22 @@ const MarketsAIDashboard = () => {
                   trend={null}
                   onClick={() => isEnabled && handleTileClick(category.id)}
                   onConfigClick={() => setConfigPanelOpen(true)}
+                  index={index}
                 />
               </Grid>
             );
           })}
         </Grid>
+      </Box>
+
+      {/* Footer Info */}
+      <Box sx={{ mt: 6, textAlign: 'center' }}>
+        <Stack direction="row" spacing={2} justifyContent="center" alignItems="center">
+          <LightbulbIcon sx={{ color: 'warning.main' }} />
+          <Typography variant="body2" color="text.secondary">
+            MARKETS.AI provides comprehensive market signal monitoring powered by real-time data analytics
+          </Typography>
+        </Stack>
       </Box>
 
       {/* Category Detail Dialog */}

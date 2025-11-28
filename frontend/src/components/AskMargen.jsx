@@ -2170,7 +2170,8 @@ const AskMargen = ({ onBack }) => {
 
   return (
     <Box sx={{
-      height: '100vh',
+      height: '100%',
+      minHeight: 0,
       display: 'flex',
       position: 'relative',
       overflow: 'hidden',
@@ -2182,6 +2183,7 @@ const AskMargen = ({ onBack }) => {
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
+        minHeight: 0,
         overflow: 'hidden',
         mr: historyOpen ? '320px' : '48px',
         transition: 'margin-right 0.2s ease-in-out',
@@ -2383,6 +2385,7 @@ const AskMargen = ({ onBack }) => {
           data-messages-container="true"
           sx={{
             flex: 1,
+            minHeight: 0, // Critical for flex child to respect parent height
             overflow: 'auto', // Enable scrolling for messages
             px: 2,
             py: 1,
@@ -2403,7 +2406,7 @@ const AskMargen = ({ onBack }) => {
               },
             },
           }}>
-          <Box sx={{ width: '100%' }}>
+          <Box sx={{ width: '100%', pt: 2 }}>
             {/* Empty state message - only show if truly empty (no welcome message) */}
             {messages.length === 0 && (
               <Box sx={{ textAlign: 'center', py: 4, opacity: 0.6 }}>

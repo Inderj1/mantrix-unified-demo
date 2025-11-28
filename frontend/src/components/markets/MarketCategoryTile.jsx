@@ -5,12 +5,12 @@ import {
   Typography,
   Box,
   Chip,
-  Badge,
-  IconButton,
-  Tooltip,
+  Avatar,
+  alpha,
+  Zoom,
 } from '@mui/material';
 import {
-  Settings as SettingsIcon,
+  ArrowForward as ArrowForwardIcon,
   TrendingUp as TrendingUpIcon,
   TrendingDown as TrendingDownIcon,
 } from '@mui/icons-material';
@@ -18,6 +18,7 @@ import { getSeverityLevel } from './CategoryIcons';
 
 /**
  * MarketCategoryTile - Individual tile for each market signal category
+ * Styled to match STOX.AI and MARGEN.AI tile appearance
  *
  * Props:
  * - category: Category object from MARKET_CATEGORIES
@@ -26,6 +27,7 @@ import { getSeverityLevel } from './CategoryIcons';
  * - highestSeverity: Highest severity score among signals
  * - onClick: Handler when tile is clicked
  * - onConfigClick: Handler for config icon click
+ * - index: Index for staggered animation
  */
 const MarketCategoryTile = ({
   category,
@@ -35,184 +37,124 @@ const MarketCategoryTile = ({
   trend = null, // 'up', 'down', or null
   onClick,
   onConfigClick,
+  index = 0,
 }) => {
   const IconComponent = category.icon;
   const severityLevel = getSeverityLevel(highestSeverity);
 
-  // Determine tile border color based on severity - light theme
-  const getBorderColor = () => {
-    if (!enabled) return '#e0e0e0';
-    if (signalCount === 0) return '#e0e0e0';
-    if (highestSeverity >= 80) return '#ffcdd2'; // light red
-    if (highestSeverity >= 60) return '#ffe0b2'; // light orange
-    return '#e3f2fd'; // light blue
-  };
-
-  // Determine badge color
-  const getBadgeColor = () => {
-    if (highestSeverity >= 80) return 'error';
-    if (highestSeverity >= 60) return 'warning';
-    if (highestSeverity >= 40) return 'info';
-    return 'success';
-  };
-
   return (
-    <Card
-      variant="outlined"
-      sx={{
-        height: '100%',
-        cursor: enabled ? 'pointer' : 'not-allowed',
-        opacity: enabled ? 1 : 0.6,
-        border: '1px solid',
-        borderColor: getBorderColor(),
-        transition: 'all 0.25s ease',
-        position: 'relative',
-        '&:hover': enabled ? {
-          transform: 'translateY(-4px)',
-          boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
-          borderColor: '#bdbdbd',
-        } : {},
-      }}
-      onClick={enabled ? onClick : undefined}
-    >
-      <CardContent sx={{ pb: 1.5, p: 1.5 }}>
-        {/* Config Icon */}
-        <Box sx={{ position: 'absolute', top: 6, right: 6 }}>
-          <Tooltip title="Configure category">
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                onConfigClick?.();
-              }}
+    <Zoom in timeout={200 + index * 50}>
+      <Card
+        sx={{
+          height: 200,
+          cursor: enabled ? 'pointer' : 'default',
+          opacity: enabled ? 1 : 0.6,
+          transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+          border: '1px solid',
+          borderColor: alpha(category.color, 0.15),
+          borderRadius: 2,
+          overflow: 'hidden',
+          position: 'relative',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 3,
+            background: category.gradient || `linear-gradient(135deg, ${category.color} 0%, ${alpha(category.color, 0.7)} 100%)`,
+            opacity: 0.8,
+          },
+          '&:hover': enabled ? {
+            transform: 'translateY(-4px)',
+            boxShadow: `0 12px 24px ${alpha(category.color, 0.15)}`,
+            borderColor: category.color,
+            '& .module-icon': {
+              transform: 'scale(1.15)',
+              bgcolor: category.color,
+              color: 'white',
+            },
+            '& .module-arrow': {
+              opacity: 1,
+              transform: 'translateX(4px)',
+            },
+          } : {},
+        }}
+        onClick={enabled ? onClick : undefined}
+      >
+        <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+          {/* Icon and Status */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
+            <Avatar
+              className="module-icon"
               sx={{
-                opacity: 0.6,
-                '&:hover': { opacity: 1 }
+                width: 40,
+                height: 40,
+                bgcolor: alpha(category.color, 0.1),
+                color: category.color,
+                transition: 'all 0.3s ease',
               }}
             >
-              <SettingsIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        </Box>
-
-        {/* Category Icon */}
-        <IconComponent sx={{ fontSize: 40, color: '#666666', mb: 1.5 }} />
-
-        {/* Category Name */}
-        <Typography
-          variant="body1"
-          sx={{
-            fontWeight: 600,
-            fontSize: '0.875rem',
-            mb: 0.25,
-            color: enabled ? 'text.primary' : 'text.disabled',
-          }}
-        >
-          {category.name}
-        </Typography>
-
-        {/* Description */}
-        <Typography
-          variant="caption"
-          sx={{
-            color: 'text.secondary',
-            mb: 1.5,
-            minHeight: 32,
-            fontSize: '0.7rem',
-            lineHeight: 1.4,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-          }}
-        >
-          {category.description}
-        </Typography>
-
-        {/* Metrics Row */}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1.5 }}>
-          {/* Alert Count Badge */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Badge
-              badgeContent={signalCount}
-              color={getBadgeColor()}
-              max={99}
-              sx={{
-                '& .MuiBadge-badge': {
-                  fontWeight: 600,
-                  fontSize: '0.65rem',
-                }
-              }}
-            >
-              <Chip
-                label={signalCount === 0 ? 'No Alerts' : `${signalCount} Alert${signalCount > 1 ? 's' : ''}`}
-                size="small"
-                variant="outlined"
-                sx={{
-                  color: 'text.secondary',
-                  fontWeight: 500,
-                  height: 20,
-                  fontSize: '0.7rem',
-                }}
-              />
-            </Badge>
-          </Box>
-
-          {/* Trend Indicator */}
-          {trend && enabled && signalCount > 0 && (
-            <Tooltip title={trend === 'up' ? 'Severity increasing' : 'Severity decreasing'}>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                {trend === 'up' ? (
-                  <TrendingUpIcon sx={{ fontSize: 20, color: '#f44336' }} />
-                ) : (
-                  <TrendingDownIcon sx={{ fontSize: 20, color: '#4caf50' }} />
-                )}
-              </Box>
-            </Tooltip>
-          )}
-        </Box>
-
-        {/* Severity Level Indicator */}
-        {enabled && signalCount > 0 && (
-          <Box sx={{ mt: 1, pt: 1, borderTop: '1px solid #e0e0e0' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
-                Highest:
-              </Typography>
+              <IconComponent sx={{ fontSize: 22 }} />
+            </Avatar>
+            {!enabled && (
+              <Chip label="Disabled" size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha('#64748b', 0.1), color: '#64748b', fontWeight: 600 }} />
+            )}
+            {enabled && signalCount > 0 && highestSeverity >= 60 && (
               <Chip
                 label={severityLevel.label}
                 size="small"
-                variant="outlined"
                 sx={{
-                  height: 18,
-                  fontSize: '0.6rem',
-                  fontWeight: 600,
-                  borderColor: severityLevel.color,
+                  height: 20,
+                  fontSize: '0.65rem',
+                  bgcolor: alpha(severityLevel.color, 0.1),
                   color: severityLevel.color,
+                  fontWeight: 600
                 }}
               />
-            </Box>
+            )}
           </Box>
-        )}
 
-        {/* Disabled State */}
-        {!enabled && (
-          <Box sx={{ mt: 1, pt: 1, borderTop: '1px solid #e0e0e0' }}>
-            <Chip
-              label="Disabled"
-              size="small"
-              variant="outlined"
-              sx={{
-                height: 18,
-                fontSize: '0.6rem',
-                color: 'text.disabled',
-              }}
-            />
+          {/* Title */}
+          <Typography variant="body1" sx={{ fontWeight: 700, color: category.color, mb: 0.5, fontSize: '0.9rem', lineHeight: 1.3 }}>
+            {category.name}
+          </Typography>
+
+          {/* Description */}
+          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+            {category.description}
+          </Typography>
+
+          {/* Footer */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha(category.color, 0.1) }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Chip
+                label={signalCount === 0 ? 'No Alerts' : `${signalCount} Alert${signalCount > 1 ? 's' : ''}`}
+                size="small"
+                sx={{
+                  height: 22,
+                  fontSize: '0.65rem',
+                  bgcolor: alpha(category.color, 0.08),
+                  color: category.color,
+                  fontWeight: 600
+                }}
+              />
+              {/* Trend Indicator */}
+              {trend && enabled && signalCount > 0 && (
+                trend === 'up' ? (
+                  <TrendingUpIcon sx={{ fontSize: 16, color: '#f44336' }} />
+                ) : (
+                  <TrendingDownIcon sx={{ fontSize: 16, color: '#4caf50' }} />
+                )
+              )}
+            </Box>
+            {enabled && (
+              <ArrowForwardIcon className="module-arrow" sx={{ color: category.color, fontSize: 18, opacity: 0.5, transition: 'all 0.3s ease' }} />
+            )}
           </Box>
-        )}
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </Zoom>
   );
 };
 

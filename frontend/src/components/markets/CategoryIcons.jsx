@@ -20,6 +20,7 @@ import {
 /**
  * Market Signal Categories Configuration
  * Defines all 15 market intelligence categories with icons, colors, and metadata
+ * Updated to use blue/grey color palette matching STOX.AI and MARGEN.AI
  */
 
 export const MARKET_CATEGORIES = {
@@ -28,7 +29,8 @@ export const MARKET_CATEGORIES = {
     name: 'Weather & Climate',
     icon: WeatherIcon,
     emoji: '🌤️',
-    color: '#2196F3',
+    color: '#0a6ed1',
+    gradient: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
     description: 'Hurricanes, droughts, temperature anomalies, natural disasters',
     subcategories: ['Hurricanes', 'Droughts', 'Temperature Anomalies', 'Natural Disasters', 'Agricultural Impact']
   },
@@ -37,7 +39,8 @@ export const MARKET_CATEGORIES = {
     name: 'Economic Indicators',
     icon: EconomicIcon,
     emoji: '📊',
-    color: '#4CAF50',
+    color: '#354a5f',
+    gradient: 'linear-gradient(135deg, #354a5f 0%, #32363a 100%)',
     description: 'GDP, inflation, interest rates, currency exchange, commodity prices',
     subcategories: ['GDP & Inflation', 'Interest Rates', 'Currency Exchange', 'Commodity Prices', 'Stock Indices']
   },
@@ -46,7 +49,8 @@ export const MARKET_CATEGORIES = {
     name: 'Tariffs & Trade',
     icon: TradeIcon,
     emoji: '🚢',
-    color: '#00BCD4',
+    color: '#0854a0',
+    gradient: 'linear-gradient(135deg, #0854a0 0%, #1d4ed8 100%)',
     description: 'Import/export tariffs, trade agreements, customs, sanctions',
     subcategories: ['Import Tariffs', 'Export Tariffs', 'Trade Agreements', 'Customs Regulations', 'Shipping Costs']
   },
@@ -55,7 +59,8 @@ export const MARKET_CATEGORIES = {
     name: 'Competitor Intelligence',
     icon: CompetitorIcon,
     emoji: '🎯',
-    color: '#FF5722',
+    color: '#64748b',
+    gradient: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
     description: 'Product launches, pricing, market share, M&A activity',
     subcategories: ['Product Launches', 'Pricing Changes', 'Market Share', 'M&A Activity', 'Customer Reviews']
   },
@@ -64,7 +69,8 @@ export const MARKET_CATEGORIES = {
     name: 'Social Media & Trends',
     icon: SocialIcon,
     emoji: '📱',
-    color: '#E91E63',
+    color: '#0ea5e9',
+    gradient: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
     description: 'Brand sentiment, viral trends, influencers, demographics',
     subcategories: ['Brand Sentiment', 'Viral Trends', 'Influencer Campaigns', 'Trending Products', 'Demographics']
   },
@@ -73,7 +79,8 @@ export const MARKET_CATEGORIES = {
     name: 'News & Media',
     icon: NewsIcon,
     emoji: '📰',
-    color: '#9C27B0',
+    color: '#1e3a5f',
+    gradient: 'linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%)',
     description: 'Industry news, regulatory announcements, corporate news, crises',
     subcategories: ['Industry News', 'Regulatory News', 'Corporate News', 'Crisis Events', 'Tech Disruption']
   },
@@ -82,7 +89,8 @@ export const MARKET_CATEGORIES = {
     name: 'Marketing & Advertising',
     icon: MarketingIcon,
     emoji: '📢',
-    color: '#FF9800',
+    color: '#475569',
+    gradient: 'linear-gradient(135deg, #475569 0%, #334155 100%)',
     description: 'Ad spend, campaign ROI, search trends, digital marketing',
     subcategories: ['Ad Spend', 'Campaign ROI', 'Search Trends', 'Email Marketing', 'Digital Performance']
   },
@@ -91,7 +99,8 @@ export const MARKET_CATEGORIES = {
     name: 'Supply Chain & Logistics',
     icon: SupplyChainIcon,
     emoji: '📦',
-    color: '#795548',
+    color: '#0a6ed1',
+    gradient: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
     description: 'Port congestion, supplier health, transportation costs, inventory',
     subcategories: ['Port Congestion', 'Supplier Health', 'Transportation Costs', 'Inventory Levels', 'Lead Times']
   },
@@ -100,7 +109,8 @@ export const MARKET_CATEGORIES = {
     name: 'Regulatory & Legal',
     icon: RegulatoryIcon,
     emoji: '⚖️',
-    color: '#607D8B',
+    color: '#334155',
+    gradient: 'linear-gradient(135deg, #334155 0%, #1e293b 100%)',
     description: 'New regulations, environmental mandates, labor laws, tax policy',
     subcategories: ['New Regulations', 'Environmental', 'Labor Laws', 'Tax Policy', 'Data Privacy']
   },
@@ -109,7 +119,8 @@ export const MARKET_CATEGORIES = {
     name: 'Technology & Innovation',
     icon: TechnologyIcon,
     emoji: '💡',
-    color: '#FFC107',
+    color: '#0854a0',
+    gradient: 'linear-gradient(135deg, #0854a0 0%, #1d4ed8 100%)',
     description: 'Emerging tech, patents, R&D spending, automation trends',
     subcategories: ['Emerging Tech', 'Patent Activity', 'R&D Spending', 'Disruptive Tech', 'Automation']
   },
@@ -118,7 +129,8 @@ export const MARKET_CATEGORIES = {
     name: 'Energy & Sustainability',
     icon: EnergyIcon,
     emoji: '⚡',
-    color: '#8BC34A',
+    color: '#64748b',
+    gradient: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
     description: 'Energy prices, renewable adoption, carbon pricing, ESG',
     subcategories: ['Energy Prices', 'Renewable Energy', 'Carbon Pricing', 'ESG Requirements', 'Green Regulations']
   },
@@ -127,7 +139,8 @@ export const MARKET_CATEGORIES = {
     name: 'Labor & Workforce',
     icon: LaborIcon,
     emoji: '👥',
-    color: '#3F51B5',
+    color: '#354a5f',
+    gradient: 'linear-gradient(135deg, #354a5f 0%, #32363a 100%)',
     description: 'Labor shortages, wage inflation, remote work, strikes',
     subcategories: ['Labor Shortages', 'Wage Inflation', 'Remote Work', 'Labor Strikes', 'Talent Competition']
   },
@@ -136,7 +149,8 @@ export const MARKET_CATEGORIES = {
     name: 'Geopolitical Events',
     icon: GeopoliticalIcon,
     emoji: '🌍',
-    color: '#009688',
+    color: '#0ea5e9',
+    gradient: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
     description: 'Political stability, conflicts, diplomatic relations, security',
     subcategories: ['Political Stability', 'Conflicts', 'Diplomatic Relations', 'Migration', 'Security Threats']
   },
@@ -145,7 +159,8 @@ export const MARKET_CATEGORIES = {
     name: 'Health & Pandemic',
     icon: HealthIcon,
     emoji: '🏥',
-    color: '#F44336',
+    color: '#1e3a5f',
+    gradient: 'linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%)',
     description: 'Disease outbreaks, healthcare costs, public health policies',
     subcategories: ['Disease Outbreaks', 'Healthcare Costs', 'Public Health Policies', 'Workplace Safety']
   },
@@ -154,7 +169,8 @@ export const MARKET_CATEGORIES = {
     name: 'Real Estate & Facilities',
     icon: RealEstateIcon,
     emoji: '🏢',
-    color: '#673AB7',
+    color: '#475569',
+    gradient: 'linear-gradient(135deg, #475569 0%, #334155 100%)',
     description: 'Commercial rates, property values, construction costs, zoning',
     subcategories: ['Commercial Rates', 'Property Values', 'Construction Costs', 'Zoning Changes']
   },
