@@ -69,15 +69,15 @@ CREATE INDEX IF NOT EXISTS idx_communications_status ON comms_ai.communications(
 CREATE INDEX IF NOT EXISTS idx_communications_created_at ON comms_ai.communications(created_at);
 CREATE INDEX IF NOT EXISTS idx_field_definitions_type ON comms_ai.field_definitions(communication_type_id);
 
--- Insert default communication types
+-- Insert default communication types (Blue/Grey theme)
 INSERT INTO comms_ai.communication_types (name, display_name, description, icon, color, tab_order) VALUES
-('vendor_communications', 'Vendor Communications', 'Track communications with suppliers and vendors', 'Business', '#FF9800', 1),
-('customer_inquiries', 'Customer Inquiries', 'Monitor and respond to customer inquiries', 'Person', '#4CAF50', 2),
-('order_validations', 'Order Validations', 'Validate order confirmations against ERP data', 'Receipt', '#9C27B0', 3),
-('escalations', 'Escalations', 'Track issues requiring immediate attention', 'Notifications', '#F44336', 4),
-('sales_orders', 'Sales Orders', 'Track and manage sales orders', 'ShoppingCart', '#2196F3', 5),
-('inventory_alerts', 'Inventory Alerts', 'Monitor inventory levels and alerts', 'Inventory', '#00BCD4', 6),
-('email_campaigns', 'Email Campaigns', 'Track email marketing campaigns', 'Email', '#673AB7', 7)
+('vendor_communications', 'Vendor Communications', 'Track communications with suppliers and vendors', 'Business', '#0a6ed1', 1),
+('customer_inquiries', 'Customer Inquiries', 'Monitor and respond to customer inquiries', 'Person', '#0854a0', 2),
+('order_validations', 'Order Validations', 'Validate order confirmations against ERP data', 'Receipt', '#64748b', 3),
+('escalations', 'Escalations', 'Track issues requiring immediate attention', 'Notifications', '#354a5f', 4),
+('sales_orders', 'Sales Orders', 'Track and manage sales orders', 'ShoppingCart', '#0ea5e9', 5),
+('inventory_alerts', 'Inventory Alerts', 'Monitor inventory levels and alerts', 'Inventory', '#1e3a5f', 6),
+('email_campaigns', 'Email Campaigns', 'Track email marketing campaigns', 'Email', '#475569', 7)
 ON CONFLICT (name) DO NOTHING;
 
 -- Insert field definitions for Vendor Communications

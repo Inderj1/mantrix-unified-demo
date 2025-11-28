@@ -299,47 +299,57 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
     data: null,
   });
 
-  // Sample configuration data
+  // Sample configuration data (Blue/Grey theme)
   const sampleConfig = {
     types: [
       {
         id: 1,
-        name: 'customer-inquiries',
-        display_name: 'Customer Inquiries',
-        description: 'Track and manage customer questions and support requests',
-        icon: 'Person',
-        color: '#2196F3',
+        name: 'vendor_communications',
+        display_name: 'Vendor Communications',
+        description: 'Track communications with suppliers and vendors',
+        icon: 'Business',
+        color: '#0a6ed1',
         tab_order: 1,
         is_active: true
       },
       {
         id: 2,
-        name: 'vendor-communications',
-        display_name: 'Vendor Communications',
-        description: 'Manage communications with suppliers and vendors',
-        icon: 'Business',
-        color: '#FF9800',
+        name: 'customer_inquiries',
+        display_name: 'Customer Inquiries',
+        description: 'Monitor and respond to customer inquiries',
+        icon: 'Person',
+        color: '#0854a0',
         tab_order: 2,
         is_active: true
       },
       {
         id: 3,
-        name: 'invoice-notifications',
-        display_name: 'Invoice Notifications',
-        description: 'Track invoices and payment notifications',
-        icon: 'Receipt',
-        color: '#4CAF50',
+        name: 'escalations',
+        display_name: 'Escalations',
+        description: 'Track issues requiring immediate attention',
+        icon: 'Notifications',
+        color: '#64748b',
         tab_order: 3,
         is_active: true
       },
       {
         id: 4,
-        name: 'order-confirmations',
-        display_name: 'Order Confirmations',
-        description: 'Monitor order confirmations and delivery updates',
-        icon: 'ShoppingCart',
-        color: '#9C27B0',
+        name: 'inventory_alerts',
+        display_name: 'Inventory Alerts',
+        description: 'Monitor inventory levels and alerts',
+        icon: 'Inventory',
+        color: '#354a5f',
         tab_order: 4,
+        is_active: true
+      },
+      {
+        id: 5,
+        name: 'email_campaigns',
+        display_name: 'Email Campaigns',
+        description: 'Track email marketing campaigns',
+        icon: 'Email',
+        color: '#0ea5e9',
+        tab_order: 5,
         is_active: true
       }
     ],
@@ -781,7 +791,7 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
         <Box sx={{ mb: 4 }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <EmailIcon sx={{ fontSize: 40, color: '#E91E63' }} />
+              <EmailIcon sx={{ fontSize: 40, color: '#0a6ed1' }} />
               <Box>
                 <Typography variant="h5" fontWeight={600}>
                   EMAIL INTEL
@@ -833,7 +843,7 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
         <Grid container spacing={1.5}>
           {filteredTypes.map((type, index) => {
             const IconComponent = getIconComponent(type.icon);
-            const colors = ['#2196F3', '#FF9800', '#4CAF50', '#9C27B0'];
+            const colors = ['#0a6ed1', '#0854a0', '#64748b', '#354a5f'];
             const color = type.color || colors[index % colors.length];
 
             return (

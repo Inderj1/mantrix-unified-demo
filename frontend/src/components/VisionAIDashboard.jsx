@@ -159,7 +159,7 @@ const InventoryPieChart = withTooltip(({ data, width, height, tooltipData, toolt
 
   const colorScale = scaleOrdinal({
     domain: data.map(d => d.category),
-    range: ['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#F44336', '#00BCD4'],
+    range: ['#0a6ed1', '#0854a0', '#64748b', '#354a5f', '#0ea5e9', '#1e3a5f'],
   });
 
   return (
@@ -732,7 +732,7 @@ const VisionAIDashboard = ({ onBack }) => {
             <IconButton onClick={onBack} size="small">
               <ArrowBackIcon />
             </IconButton>
-            <VisibilityIcon sx={{ fontSize: 40, color: '#00BCD4' }} />
+            <VisibilityIcon sx={{ fontSize: 40, color: '#0a6ed1' }} />
             <Box>
               <Typography variant="h5" fontWeight={600}>
                 Vision AI - Inventory Management

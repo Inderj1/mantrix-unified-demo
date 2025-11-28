@@ -46,16 +46,16 @@ const availableIcons = [
 ];
 
 const availableColors = [
-  { name: 'Blue', value: '#2196F3' },
-  { name: 'Orange', value: '#FF9800' },
-  { name: 'Green', value: '#4CAF50' },
-  { name: 'Purple', value: '#9C27B0' },
-  { name: 'Red', value: '#F44336' },
-  { name: 'Teal', value: '#009688' },
-  { name: 'Pink', value: '#E91E63' },
-  { name: 'Indigo', value: '#3F51B5' },
-  { name: 'Cyan', value: '#00BCD4' },
-  { name: 'Lime', value: '#CDDC39' },
+  { name: 'Blue', value: '#0a6ed1' },
+  { name: 'Dark Blue', value: '#0854a0' },
+  { name: 'Slate', value: '#64748b' },
+  { name: 'Blue Grey', value: '#354a5f' },
+  { name: 'Light Blue', value: '#0ea5e9' },
+  { name: 'Navy', value: '#1e3a5f' },
+  { name: 'Steel', value: '#475569' },
+  { name: 'Grey', value: '#6b7280' },
+  { name: 'Dark Slate', value: '#334155' },
+  { name: 'Charcoal', value: '#1e293b' },
 ];
 
 const CustomTypeConfig = ({ open, onClose, onSave, editType = null, moduleType = 'email' }) => {
@@ -63,7 +63,7 @@ const CustomTypeConfig = ({ open, onClose, onSave, editType = null, moduleType =
     display_name: '',
     description: '',
     icon: 'Email',
-    color: '#2196F3',
+    color: '#0a6ed1',
   });
 
   useEffect(() => {
@@ -72,14 +72,14 @@ const CustomTypeConfig = ({ open, onClose, onSave, editType = null, moduleType =
         display_name: editType.display_name || '',
         description: editType.description || '',
         icon: editType.icon || 'Email',
-        color: editType.color || '#2196F3',
+        color: editType.color || '#0a6ed1',
       });
     } else {
       setFormData({
         display_name: '',
         description: '',
         icon: 'Email',
-        color: '#2196F3',
+        color: '#0a6ed1',
       });
     }
   }, [editType, open]);

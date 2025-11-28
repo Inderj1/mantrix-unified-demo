@@ -39,8 +39,6 @@ import {
   Description as InvoiceIcon,
   LocalShipping as ShippingIcon,
   Inventory as InventoryIcon,
-  ShoppingCart as OrderIcon,
-  AccountBalance as BankIcon,
   Business as ContractIcon,
   Assignment as DocumentIcon,
   Refresh as RefreshIcon,
@@ -107,24 +105,6 @@ const generateDocumentData = (docType, count = 15) => {
       currency: 'USD',
     })),
 
-    'purchase-orders': Array.from({ length: count }, (_, i) => ({
-      id: i + 1,
-      document_id: `PO-${20000 + i}`,
-      vendor_name: ['Acme Corp', 'Widget Co', 'Parts Unlimited', 'Supply Chain Pro', 'Manufacturing Direct'][i % 5],
-      po_date: new Date(baseDate - i * 86400000).toLocaleDateString(),
-      delivery_date: new Date(baseDate + (i * 7 + 14) * 86400000).toLocaleDateString(),
-      total_value: (Math.random() * 100000 + 10000).toFixed(2),
-      items_count: Math.floor(Math.random() * 25) + 1,
-      status: ['Open', 'Partially Received', 'Received', 'Invoiced'][i % 4],
-      ocr_confidence: (93 + Math.random() * 6).toFixed(1) + '%',
-      validation_status: ['Validated', 'Pending Review'][i % 2],
-      requestor: ['John Doe', 'Jane Smith', 'Bob Johnson', 'Alice Williams'][i % 4],
-      department: ['Procurement', 'Operations', 'Manufacturing', 'IT'][i % 4],
-      image_url: '/sample/po-' + (i % 2 + 1) + '.png',
-      approval_status: ['Approved', 'Pending Approval'][i % 2],
-      shipping_address: 'Extracted',
-    })),
-
     'receipts': Array.from({ length: count }, (_, i) => ({
       id: i + 1,
       document_id: `RCP-${30000 + i}`,
@@ -179,23 +159,6 @@ const generateDocumentData = (docType, count = 15) => {
       last_scanned: new Date(baseDate - Math.random() * 7 * 86400000).toLocaleDateString(),
     })),
 
-    'financial-documents': Array.from({ length: count }, (_, i) => ({
-      id: i + 1,
-      document_id: `FIN-${60000 + i}`,
-      document_type: ['Bank Statement', 'Check', 'Wire Transfer', 'Payment Receipt', 'Tax Document'][i % 5],
-      date: new Date(baseDate - i * 86400000).toLocaleDateString(),
-      amount: (Math.random() * 100000 + 1000).toFixed(2),
-      account_number: `****${Math.floor(Math.random() * 9000) + 1000}`,
-      transaction_id: `TXN-${Math.floor(Math.random() * 1000000000)}`,
-      payee: ['Tech Supplies Inc', 'Office Pro', 'Utility Company', 'Payroll Services', 'Tax Authority'][i % 5],
-      status: ['Reconciled', 'Pending', 'Cleared'][i % 3],
-      ocr_confidence: (91 + Math.random() * 8).toFixed(1) + '%',
-      validation_status: ['Validated', 'Under Review'][i % 2],
-      extracted_fields: ['Amount', 'Date', 'Account', 'Reference'],
-      matched_transaction: i % 2 === 0,
-      category: ['Operating Expense', 'Capital Expenditure', 'Revenue', 'Tax'][i % 4],
-      image_url: '/sample/financial-' + (i % 2 + 1) + '.png',
-    })),
   };
 
   return documentData[docType] || [];
@@ -224,47 +187,31 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
       display_name: 'Invoices',
       description: 'AI-extracted invoice data with automatic PO matching',
       icon: InvoiceIcon,
-      color: '#2196F3',
+      color: '#0a6ed1',
     },
     {
       id: 2,
-      name: 'purchase-orders',
-      display_name: 'Purchase Orders',
-      description: 'Automated PO processing and approval workflows',
-      icon: OrderIcon,
-      color: '#FF9800',
-    },
-    {
-      id: 3,
       name: 'receipts',
       display_name: 'Receipts',
       description: 'Expense receipt scanning and categorization',
       icon: ReceiptIcon,
-      color: '#4CAF50',
+      color: '#0854a0',
     },
     {
-      id: 4,
+      id: 3,
       name: 'shipping-documents',
       display_name: 'Shipping Documents',
       description: 'Shipping label and tracking document extraction',
       icon: ShippingIcon,
-      color: '#9C27B0',
+      color: '#64748b',
     },
     {
-      id: 5,
+      id: 4,
       name: 'inventory-labels',
       display_name: 'Inventory Labels',
       description: 'Barcode, QR code, and label data extraction',
       icon: InventoryIcon,
-      color: '#00BCD4',
-    },
-    {
-      id: 6,
-      name: 'financial-documents',
-      display_name: 'Financial Documents',
-      description: 'Bank statements, checks, and payment processing',
-      icon: BankIcon,
-      color: '#E91E63',
+      color: '#354a5f',
     },
   ];
 
@@ -414,18 +361,6 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
         { field: 'validation_status', headerName: 'Validation', width: 140 },
         { field: 'matched_po', headerName: 'Matched PO', width: 130 },
       ],
-      'purchase-orders': [
-        { field: 'document_id', headerName: 'PO #', width: 130 },
-        { field: 'vendor_name', headerName: 'Vendor', width: 200 },
-        { field: 'po_date', headerName: 'PO Date', width: 120 },
-        { field: 'total_value', headerName: 'Value', width: 120, renderCell: (params) => `$${params.value}` },
-        { field: 'items_count', headerName: 'Items', width: 90 },
-        { field: 'status', headerName: 'Status', width: 150, renderCell: (params) => (
-          <Chip label={params.value} size="small" sx={{ bgcolor: alpha(getStatusColor(params.value), 0.1), color: getStatusColor(params.value) }} />
-        )},
-        { field: 'ocr_confidence', headerName: 'OCR Confidence', width: 140 },
-        { field: 'department', headerName: 'Department', width: 130 },
-      ],
       'receipts': [
         { field: 'document_id', headerName: 'Receipt #', width: 140 },
         { field: 'merchant_name', headerName: 'Merchant', width: 180 },
@@ -462,18 +397,6 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
         )},
         { field: 'ocr_confidence', headerName: 'OCR Confidence', width: 140 },
       ],
-      'financial-documents': [
-        { field: 'document_id', headerName: 'Document #', width: 140 },
-        { field: 'document_type', headerName: 'Type', width: 150 },
-        { field: 'date', headerName: 'Date', width: 120 },
-        { field: 'amount', headerName: 'Amount', width: 130, renderCell: (params) => `$${params.value}` },
-        { field: 'payee', headerName: 'Payee', width: 180 },
-        { field: 'status', headerName: 'Status', width: 130, renderCell: (params) => (
-          <Chip label={params.value} size="small" sx={{ bgcolor: alpha(getStatusColor(params.value), 0.1), color: getStatusColor(params.value) }} />
-        )},
-        { field: 'category', headerName: 'Category', width: 160 },
-        { field: 'ocr_confidence', headerName: 'OCR Confidence', width: 140 },
-      ],
     };
 
     return [...commonColumns, ...(typeSpecificColumns[typeName] || [])];
@@ -496,7 +419,7 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
         <Box sx={{ mb: 4 }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <DocumentIcon sx={{ fontSize: 40, color: '#9C27B0' }} />
+              <DocumentIcon sx={{ fontSize: 40, color: '#0a6ed1' }} />
               <Box>
                 <Typography variant="h5" fontWeight={600}>
                   VISION.AI - Document Intelligence

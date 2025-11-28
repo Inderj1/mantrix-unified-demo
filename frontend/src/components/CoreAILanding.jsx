@@ -5,23 +5,20 @@ import {
   Card,
   CardContent,
   Typography,
-  IconButton,
   Chip,
   alpha,
-  useTheme,
   Avatar,
+  Stack,
+  Zoom,
 } from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon,
-  Analytics as AnalyticsIcon,
   Inventory as InventoryIcon,
-  AccountTree as FlowIcon,
-  Speed as OptimaIcon,
   Speed as SpeedIcon,
-  Security as SecurityIcon,
   ArrowForward as ArrowForwardIcon,
   LocalShipping as FleetIcon,
   Engineering as EquipmentIcon,
+  Lightbulb as LightbulbIcon,
 } from '@mui/icons-material';
 
 const aiModules = [
@@ -31,11 +28,11 @@ const aiModules = [
     subtitle: 'Margin Analytics & Revenue Intelligence',
     description: 'Advanced financial analytics, customer segmentation, and revenue optimization',
     icon: TrendingUpIcon,
-    color: '#1976d2',
-    bgColor: '#e3f2fd',
-    path: '/coreai/margen',
-    stats: { label: 'Active Models', value: '12' },
+    color: '#0a6ed1',
+    bgColor: '#dbeafe',
+    stats: { label: 'Models', value: '12' },
     status: 'active',
+    gradient: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
   },
   {
     id: 'stox',
@@ -43,11 +40,11 @@ const aiModules = [
     subtitle: 'Smart Inventory Optimization',
     description: 'Inventory management, demand forecasting, and supply chain optimization',
     icon: InventoryIcon,
-    color: '#2e7d32',
-    bgColor: '#e8f5e9',
-    path: '/coreai/stox',
-    stats: { label: 'SKUs Managed', value: '2.5K' },
+    color: '#354a5f',
+    bgColor: '#f1f5f9',
+    stats: { label: 'SKUs', value: '2.5K' },
     status: 'active',
+    gradient: 'linear-gradient(135deg, #354a5f 0%, #32363a 100%)',
   },
   {
     id: 'route',
@@ -55,11 +52,11 @@ const aiModules = [
     subtitle: 'Fleet & Route Optimization',
     description: 'AI-powered fleet management, route optimization, and logistics intelligence',
     icon: FleetIcon,
-    color: '#354a5f',
-    bgColor: '#fff3e0',
-    path: '/coreai/route',
-    stats: { label: 'Active Vehicles', value: '45' },
+    color: '#64748b',
+    bgColor: '#f1f5f9',
+    stats: { label: 'Vehicles', value: '45' },
     status: 'active',
+    gradient: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
   },
   {
     id: 'reveq',
@@ -67,17 +64,15 @@ const aiModules = [
     subtitle: 'Revenue Equipment Intelligence',
     description: 'Equipment analytics, fleet performance monitoring, and asset utilization optimization',
     icon: EquipmentIcon,
-    color: '#9c27b0',
-    bgColor: '#f3e5f5',
-    path: '/coreai/reveq',
-    stats: { label: 'Assets Tracked', value: '128' },
+    color: '#0854a0',
+    bgColor: '#dbeafe',
+    stats: { label: 'Assets', value: '128' },
     status: 'active',
+    gradient: 'linear-gradient(135deg, #0854a0 0%, #1d4ed8 100%)',
   },
 ];
 
 const CoreAILanding = ({ onTileClick }) => {
-  const theme = useTheme();
-
   const handleTileClick = (module) => {
     if (module.status === 'active' && onTileClick) {
       onTileClick(module.id);
@@ -85,181 +80,151 @@ const CoreAILanding = ({ onTileClick }) => {
   };
 
   return (
-    <Box sx={{ p: 3, maxWidth: 1400, mx: 'auto' }}>
+    <Box sx={{
+      p: 3,
+      height: '100%',
+      overflowY: 'auto',
+      overflowX: 'hidden',
+      background: 'linear-gradient(180deg, rgba(10, 110, 209, 0.05) 0%, rgba(255, 255, 255, 1) 50%)',
+    }}>
       {/* Header */}
-      <Box sx={{ mb: 4 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-          <Avatar
-            sx={{
-              width: 64,
-              height: 64,
-              bgcolor: alpha(theme.palette.primary.main, 0.1),
-            }}
-          >
-            <SpeedIcon sx={{ fontSize: 36, color: theme.palette.primary.main }} />
-          </Avatar>
+      <Box sx={{ mb: 3 }}>
+        {/* System Identity Badge */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+          <Box sx={{
+            width: 4,
+            height: 60,
+            background: 'linear-gradient(180deg, #0a6ed1 0%, #354a5f 100%)',
+            borderRadius: 2
+          }} />
           <Box>
-            <Typography variant="h4" fontWeight={700}>
-              CORE.AI
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Operational Intelligence Suite
+            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
+              <Avatar sx={{ width: 32, height: 32, bgcolor: '#0a6ed1' }}>
+                <SpeedIcon sx={{ fontSize: 18 }} />
+              </Avatar>
+              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: '#0a6ed1' }}>
+                CORE.AI
+              </Typography>
+              <Chip
+                label="4 Modules"
+                size="small"
+                sx={{
+                  bgcolor: alpha('#0a6ed1', 0.1),
+                  color: '#0a6ed1',
+                  fontWeight: 600,
+                  fontSize: '0.7rem'
+                }}
+              />
+            </Stack>
+            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+              Operational Intelligence Suite - AI-powered analytics and optimization platform
             </Typography>
           </Box>
         </Box>
       </Box>
 
-      {/* Tiles Grid */}
-      <Grid container spacing={2}>
+      {/* Module Tiles - Matching Stox.AI/Margen.AI styling */}
+      <Grid container spacing={1.5}>
         {aiModules
           .filter((module) => module.id !== 'route')
-          .map((module) => {
-          const Icon = module.icon;
-          const isActive = module.status === 'active';
-
-          return (
-            <Grid item xs={12} sm={6} md={6} key={module.id}>
+          .map((module, index) => (
+          <Grid item xs={12} sm={6} md={4} lg={4} key={module.id}>
+            <Zoom in timeout={200 + index * 50}>
               <Card
                 sx={{
-                  height: '100%',
-                  cursor: isActive ? 'pointer' : 'default',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  height: 200,
+                  cursor: module.status === 'active' ? 'pointer' : 'default',
+                  opacity: module.status === 'coming-soon' ? 0.7 : 1,
+                  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                  border: '1px solid',
+                  borderColor: alpha(module.color, 0.15),
+                  borderRadius: 2,
+                  overflow: 'hidden',
                   position: 'relative',
-                  overflow: 'visible',
-                  border: '2px solid',
-                  borderColor: isActive ? 'transparent' : 'divider',
-                  opacity: isActive ? 1 : 0.8,
-                  background: isActive 
-                    ? `linear-gradient(135deg, ${alpha(module.bgColor, 0.3)} 0%, ${alpha(module.bgColor, 0.1)} 100%)`
-                    : 'background.paper',
-                  '&:hover': isActive ? {
-                    transform: 'translateY(-8px) scale(1.02)',
-                    boxShadow: `0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)`,
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 3,
+                    background: module.gradient,
+                    opacity: 0.8,
+                  },
+                  '&:hover': module.status === 'active' ? {
+                    transform: 'translateY(-4px)',
+                    boxShadow: `0 12px 24px ${alpha(module.color, 0.15)}`,
                     borderColor: module.color,
-                    '& .arrow-icon': {
-                      transform: 'translateX(8px)',
-                      color: module.color,
-                    },
                     '& .module-icon': {
-                      transform: 'scale(1.1)',
+                      transform: 'scale(1.15)',
+                      bgcolor: module.color,
+                      color: 'white',
+                    },
+                    '& .module-arrow': {
+                      opacity: 1,
+                      transform: 'translateX(4px)',
                     },
                   } : {},
                 }}
                 onClick={() => handleTileClick(module)}
               >
-                <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                  {/* Status Chip */}
-                  {!isActive && (
-                    <Box sx={{ position: 'absolute', top: 12, right: 12 }}>
-                      <Chip
-                        label="Coming Soon"
-                        size="small"
-                        sx={{
-                          backgroundColor: alpha(module.color, 0.1),
-                          color: module.color,
-                          fontWeight: 500,
-                          fontSize: '0.75rem',
-                        }}
-                      />
-                    </Box>
-                  )}
-
-                  {/* Icon and Title */}
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2, minHeight: 80 }}>
-                    <Box
+                <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                  {/* Icon and Status */}
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
+                    <Avatar
                       className="module-icon"
                       sx={{
-                        width: 56,
-                        height: 56,
-                        borderRadius: 2,
-                        backgroundColor: module.bgColor,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        mr: 2,
-                        transition: 'transform 0.3s ease',
+                        width: 40,
+                        height: 40,
+                        bgcolor: alpha(module.color, 0.1),
+                        color: module.color,
+                        transition: 'all 0.3s ease',
                       }}
                     >
-                      <Icon sx={{ fontSize: 32, color: module.color }} />
-                    </Box>
-                    <Box sx={{ flex: 1 }}>
-                      <Typography
-                        variant="h5"
-                        fontWeight="bold"
-                        sx={{
-                          color: isActive ? 'text.primary' : 'text.secondary',
-                          mb: 0.5,
-                          lineHeight: 1.2,
-                        }}
-                      >
-                        {module.title}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ fontWeight: 500, lineHeight: 1.4 }}
-                      >
-                        {module.subtitle}
-                      </Typography>
-                    </Box>
+                      <module.icon sx={{ fontSize: 22 }} />
+                    </Avatar>
+                    {module.status === 'coming-soon' && (
+                      <Chip label="Soon" size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha('#64748b', 0.1), color: '#64748b', fontWeight: 600 }} />
+                    )}
                   </Box>
 
+                  {/* Title */}
+                  <Typography variant="body1" sx={{ fontWeight: 700, color: module.color, mb: 0.5, fontSize: '0.9rem', lineHeight: 1.3 }}>
+                    {module.title}
+                  </Typography>
+
+                  {/* Subtitle */}
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500, mb: 1, fontSize: '0.7rem', opacity: 0.8 }}>
+                    {module.subtitle}
+                  </Typography>
+
                   {/* Description */}
-                  <Typography 
-                    variant="body2" 
-                    color="text.secondary" 
-                    sx={{ 
-                      mb: 3, 
-                      flex: 1,
-                      lineHeight: 1.6,
-                    }}
-                  >
+                  <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                     {module.description}
                   </Typography>
 
-                  {/* Stats and Action */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Box>
-                      <Typography variant="caption" color="text.secondary">
-                        {module.stats.label}
-                      </Typography>
-                      <Typography variant="h6" fontWeight="bold" color={module.color}>
-                        {module.stats.value}
-                      </Typography>
-                    </Box>
-                    {isActive && (
-                      <IconButton
-                        size="small"
-                        sx={{
-                          backgroundColor: alpha(module.color, 0.1),
-                          color: module.color,
-                          '&:hover': {
-                            backgroundColor: alpha(module.color, 0.2),
-                          },
-                        }}
-                      >
-                        <ArrowForwardIcon 
-                          className="arrow-icon" 
-                          sx={{ 
-                            fontSize: 20,
-                            transition: 'transform 0.2s ease',
-                          }} 
-                        />
-                      </IconButton>
+                  {/* Footer */}
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha(module.color, 0.1) }}>
+                    <Chip label={`${module.stats.value} ${module.stats.label}`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha(module.color, 0.08), color: module.color, fontWeight: 600 }} />
+                    {module.status === 'active' && (
+                      <ArrowForwardIcon className="module-arrow" sx={{ color: module.color, fontSize: 18, opacity: 0.5, transition: 'all 0.3s ease' }} />
                     )}
                   </Box>
                 </CardContent>
               </Card>
-            </Grid>
-          );
-        })}
+            </Zoom>
+          </Grid>
+        ))}
       </Grid>
 
       {/* Footer Info */}
       <Box sx={{ mt: 6, textAlign: 'center' }}>
-        <Typography variant="body2" color="text.secondary">
-          Powered by advanced machine learning and real-time data analytics
-        </Typography>
+        <Stack direction="row" spacing={2} justifyContent="center" alignItems="center">
+          <LightbulbIcon sx={{ color: 'warning.main' }} />
+          <Typography variant="body2" color="text.secondary">
+            Powered by advanced machine learning and real-time data analytics
+          </Typography>
+        </Stack>
       </Box>
     </Box>
   );
