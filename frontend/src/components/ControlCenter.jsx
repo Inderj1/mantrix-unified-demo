@@ -2,14 +2,12 @@ import React, { useState } from 'react';
 import {
   Box,
   Paper,
-  Tabs,
-  Tab,
   Typography,
   Stack,
   Chip,
   Avatar,
   IconButton,
-  useTheme,
+  Grid,
   alpha,
 } from '@mui/material';
 import {
@@ -21,6 +19,10 @@ import {
   Warning as WarningIcon,
   Error as ErrorIcon,
   Refresh as RefreshIcon,
+  Email as EmailIcon,
+  Speed as SpeedIcon,
+  Security as SecurityIcon,
+  CloudQueue as CloudIcon,
 } from '@mui/icons-material';
 
 // Import the components
@@ -31,179 +33,325 @@ import UserProfileManager from './UserProfileManager';
 import CommsConfig from './CommsConfig';
 
 const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
-  const theme = useTheme();
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = [
     {
       label: 'Data Sources',
+      description: 'Database & API connections',
       icon: <StorageIcon />,
       component: <DataSourcesConnections />,
       status: 'healthy',
       badge: '9 Active',
+      color: '#0a6ed1',
     },
     {
       label: 'System Health',
+      description: 'Performance monitoring',
       icon: <MonitorIcon />,
       component: <SystemHealthMonitoring />,
       status: 'healthy',
       badge: '99.9%',
+      color: '#0854a0',
     },
     {
       label: 'Settings',
+      description: 'Platform configuration',
       icon: <SettingsIcon />,
       component: <PlatformSettings />,
       status: 'healthy',
       badge: 'Config',
+      color: '#354a5f',
     },
     {
       label: 'AI Persona',
+      description: 'User profile & preferences',
       icon: <PersonaIcon />,
       component: <UserProfileManager />,
       status: 'healthy',
       badge: 'Profile',
+      color: '#475569',
     },
     {
       label: 'COMMS Config',
-      icon: <SettingsIcon />,
+      description: 'Email & notifications',
+      icon: <EmailIcon />,
       component: <CommsConfig />,
       status: 'healthy',
       badge: 'Comms',
+      color: '#64748b',
     },
   ];
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'healthy': return theme.palette.success.main;
-      case 'warning': return theme.palette.warning.main;
-      case 'error': return theme.palette.error.main;
-      case 'building': return theme.palette.grey[400];
-      default: return theme.palette.grey[500];
+      case 'healthy': return '#10b981';
+      case 'warning': return '#f59e0b';
+      case 'error': return '#ef4444';
+      case 'building': return '#94a3b8';
+      default: return '#64748b';
     }
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'healthy': return <CheckCircleIcon sx={{ fontSize: 16 }} />;
-      case 'warning': return <WarningIcon sx={{ fontSize: 16 }} />;
-      case 'building': return <HubIcon sx={{ fontSize: 16 }} />;
+      case 'healthy': return <CheckCircleIcon sx={{ fontSize: 14 }} />;
+      case 'warning': return <WarningIcon sx={{ fontSize: 14 }} />;
+      case 'error': return <ErrorIcon sx={{ fontSize: 14 }} />;
       default: return null;
     }
   };
 
+  // Summary stats
+  const summaryStats = [
+    { label: 'Services Online', value: '12', icon: <CloudIcon />, color: '#10b981' },
+    { label: 'API Latency', value: '45ms', icon: <SpeedIcon />, color: '#0a6ed1' },
+    { label: 'Uptime', value: '99.9%', icon: <MonitorIcon />, color: '#0854a0' },
+    { label: 'Security', value: 'Secure', icon: <SecurityIcon />, color: '#354a5f' },
+  ];
+
   return (
-    <Box>
+    <Box sx={{ minHeight: '100%', bgcolor: '#f8fbfd' }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
-        <Stack direction="row" alignItems="center" justifyContent="space-between">
+        <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={2}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Avatar
+            <Box
               sx={{
-                width: 64,
-                height: 64,
-                bgcolor: alpha('#1976d2', 0.1),
+                width: 56,
+                height: 56,
+                borderRadius: 2,
+                background: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 14px rgba(10, 110, 209, 0.3)',
               }}
             >
-              <SettingsIcon sx={{ fontSize: 36, color: '#1976d2' }} />
-            </Avatar>
+              <SettingsIcon sx={{ fontSize: 28, color: '#fff' }} />
+            </Box>
             <Box>
-              <Typography variant="h4" fontWeight={700}>
+              <Typography variant="h4" fontWeight={700} sx={{ color: '#1e293b' }}>
                 Control Center
               </Typography>
-              <Typography variant="body1" color="text.secondary">
+              <Typography variant="body2" sx={{ color: '#64748b' }}>
                 Centralized platform management and monitoring dashboard
               </Typography>
             </Box>
           </Box>
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack direction="row" spacing={1.5} alignItems="center">
             <Chip
               size="small"
-              icon={apiHealth?.status === 'healthy' ? <CheckCircleIcon /> : <ErrorIcon />}
+              icon={apiHealth?.status === 'healthy' ? <CheckCircleIcon sx={{ fontSize: 16 }} /> : <ErrorIcon sx={{ fontSize: 16 }} />}
               label={`API: ${apiHealth?.status || 'Unknown'}`}
-              color={apiHealth?.status === 'healthy' ? 'success' : 'error'}
-              variant="outlined"
+              sx={{
+                bgcolor: apiHealth?.status === 'healthy' ? alpha('#10b981', 0.1) : alpha('#ef4444', 0.1),
+                color: apiHealth?.status === 'healthy' ? '#10b981' : '#ef4444',
+                border: `1px solid ${apiHealth?.status === 'healthy' ? alpha('#10b981', 0.3) : alpha('#ef4444', 0.3)}`,
+                fontWeight: 600,
+                '& .MuiChip-icon': { color: 'inherit' },
+              }}
             />
             <Chip
               size="small"
-              icon={<CheckCircleIcon />}
+              icon={<CheckCircleIcon sx={{ fontSize: 16 }} />}
               label="DB: Connected"
-              color="success"
-              variant="outlined"
+              sx={{
+                bgcolor: alpha('#10b981', 0.1),
+                color: '#10b981',
+                border: `1px solid ${alpha('#10b981', 0.3)}`,
+                fontWeight: 600,
+                '& .MuiChip-icon': { color: 'inherit' },
+              }}
             />
-            <IconButton color="primary" onClick={onRefreshStatus} size="small">
-              <RefreshIcon />
+            <IconButton
+              onClick={onRefreshStatus}
+              size="small"
+              sx={{
+                bgcolor: alpha('#0a6ed1', 0.1),
+                color: '#0a6ed1',
+                '&:hover': { bgcolor: alpha('#0a6ed1', 0.2) },
+              }}
+            >
+              <RefreshIcon fontSize="small" />
             </IconButton>
           </Stack>
         </Stack>
       </Box>
 
-      {/* Tab Navigation */}
-      <Paper sx={{ mb: 3 }}>
-        <Tabs
-          value={activeTab}
-          onChange={(e, v) => setActiveTab(v)}
-          variant="scrollable"
-          scrollButtons="auto"
-          sx={{
-            '& .MuiTab-root': {
-              minHeight: 72,
-              textTransform: 'none',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              px: 3,
-            },
-            '& .MuiTabs-indicator': {
-              height: 3,
-            },
-          }}
-        >
-          {tabs.map((tab, index) => (
-            <Tab
-              key={index}
-              icon={
-                <Stack direction="row" spacing={1.5} alignItems="center">
-                  <Avatar
+      {/* Summary Stats */}
+      <Grid container spacing={2} sx={{ mb: 4 }}>
+        {summaryStats.map((stat, index) => (
+          <Grid item xs={6} sm={3} key={index}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2,
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: alpha('#0a6ed1', 0.1),
+                background: '#fff',
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 3,
+                  background: `linear-gradient(90deg, ${stat.color} 0%, ${alpha(stat.color, 0.5)} 100%)`,
+                },
+              }}
+            >
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 500 }}>
+                    {stat.label}
+                  </Typography>
+                  <Typography variant="h5" fontWeight={700} sx={{ color: '#1e293b' }}>
+                    {stat.value}
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 1.5,
+                    bgcolor: alpha(stat.color, 0.1),
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: stat.color,
+                  }}
+                >
+                  {stat.icon}
+                </Box>
+              </Stack>
+            </Paper>
+          </Grid>
+        ))}
+      </Grid>
+
+      {/* Tab Navigation - Tile Style */}
+      <Grid container spacing={2} sx={{ mb: 4 }}>
+        {tabs.map((tab, index) => (
+          <Grid item xs={12} sm={6} md={2.4} key={index}>
+            <Paper
+              elevation={0}
+              onClick={() => !tab.disabled && setActiveTab(index)}
+              sx={{
+                p: 2,
+                borderRadius: 2,
+                cursor: tab.disabled ? 'not-allowed' : 'pointer',
+                border: '2px solid',
+                borderColor: activeTab === index ? '#0a6ed1' : alpha('#0a6ed1', 0.1),
+                background: activeTab === index
+                  ? 'linear-gradient(135deg, rgba(10, 110, 209, 0.08) 0%, rgba(8, 84, 160, 0.04) 100%)'
+                  : '#fff',
+                opacity: tab.disabled ? 0.5 : 1,
+                transition: 'all 0.2s ease',
+                position: 'relative',
+                overflow: 'hidden',
+                '&:hover': !tab.disabled && {
+                  borderColor: '#0a6ed1',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 4px 12px rgba(10, 110, 209, 0.15)',
+                },
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 3,
+                  background: activeTab === index
+                    ? `linear-gradient(90deg, ${tab.color} 0%, ${alpha(tab.color, 0.5)} 100%)`
+                    : 'transparent',
+                },
+              }}
+            >
+              <Stack direction="row" spacing={1.5} alignItems="center">
+                <Box
+                  sx={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 1.5,
+                    bgcolor: activeTab === index ? alpha(tab.color, 0.15) : alpha('#64748b', 0.08),
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: activeTab === index ? tab.color : '#64748b',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  {React.cloneElement(tab.icon, { sx: { fontSize: 22 } })}
+                </Box>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Stack direction="row" spacing={0.5} alignItems="center">
+                    <Typography
+                      variant="subtitle2"
+                      fontWeight={600}
+                      sx={{
+                        color: activeTab === index ? '#1e293b' : '#475569',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {tab.label}
+                    </Typography>
+                    <Box sx={{ color: getStatusColor(tab.status) }}>
+                      {getStatusIcon(tab.status)}
+                    </Box>
+                  </Stack>
+                  <Typography
+                    variant="caption"
                     sx={{
-                      width: 40,
-                      height: 40,
-                      bgcolor: alpha(getStatusColor(tab.status), 0.1),
-                      color: getStatusColor(tab.status),
+                      color: '#94a3b8',
+                      display: 'block',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
                     }}
                   >
-                    {tab.icon}
-                  </Avatar>
-                  <Box sx={{ textAlign: 'left' }}>
-                    <Stack direction="row" spacing={0.5} alignItems="center">
-                      <Typography variant="body2" fontWeight={600}>
-                        {tab.label}
-                      </Typography>
-                      {getStatusIcon(tab.status)}
-                    </Stack>
-                    <Chip
-                      label={tab.badge}
-                      size="small"
-                      sx={{
-                        height: 20,
-                        fontSize: '0.7rem',
-                        bgcolor: alpha(getStatusColor(tab.status), 0.1),
-                        color: getStatusColor(tab.status),
-                        fontWeight: 600,
-                      }}
-                    />
-                  </Box>
-                </Stack>
-              }
-              iconPosition="start"
-              disabled={tab.status === 'building'}
-            />
-          ))}
-        </Tabs>
-      </Paper>
+                    {tab.description}
+                  </Typography>
+                </Box>
+              </Stack>
+              <Box sx={{ mt: 1.5 }}>
+                <Chip
+                  label={tab.badge}
+                  size="small"
+                  sx={{
+                    height: 22,
+                    fontSize: '0.7rem',
+                    fontWeight: 600,
+                    bgcolor: activeTab === index ? alpha(tab.color, 0.12) : alpha('#64748b', 0.08),
+                    color: activeTab === index ? tab.color : '#64748b',
+                    border: 'none',
+                  }}
+                />
+              </Box>
+            </Paper>
+          </Grid>
+        ))}
+      </Grid>
 
       {/* Tab Content */}
-      <Box>
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          borderRadius: 2,
+          border: '1px solid',
+          borderColor: alpha('#0a6ed1', 0.1),
+          background: '#fff',
+          minHeight: 400,
+        }}
+      >
         {tabs[activeTab].component}
-      </Box>
+      </Paper>
     </Box>
   );
 };

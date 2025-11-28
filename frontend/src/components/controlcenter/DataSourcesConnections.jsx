@@ -15,17 +15,11 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  ListItemSecondaryAction,
   Switch,
   FormControlLabel,
   Alert,
   Tabs,
   Tab,
-  Divider,
   Avatar,
   LinearProgress,
   MenuItem,
@@ -33,10 +27,8 @@ import {
   FormControl,
   InputLabel,
   Tooltip,
-  Badge,
-  useTheme,
-  alpha,
   CircularProgress,
+  alpha,
 } from '@mui/material';
 import {
   Storage as DatabaseIcon,
@@ -45,19 +37,11 @@ import {
   Hub as HubIcon,
   Memory as StorageIcon,
   Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
   CheckCircle as CheckCircleIcon,
   Error as ErrorIcon,
   Warning as WarningIcon,
   Refresh as RefreshIcon,
-  Key as KeyIcon,
-  Link as LinkIcon,
-  Settings as SettingsIcon,
-  CheckCircle as TestIcon,
   Circle as CircleIcon,
-  VpnKey as VpnKeyIcon,
-  ContentCopy as CopyIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
   CloudQueue as BigQueryIcon,
@@ -65,173 +49,13 @@ import {
   AutoAwesome as OpenAIIcon,
   AccountTree as SupersetIcon,
   DataUsage as DataUsageIcon,
+  Link as LinkIcon,
 } from '@mui/icons-material';
 
 // Import DataCatalog component
 import DataCatalog from '../DataCatalog';
 
-// Mock data for connections
-const connections = {
-  databases: [
-    {
-      id: 'bigquery-prod',
-      name: 'BigQuery Production',
-      type: 'bigquery',
-      icon: <BigQueryIcon />,
-      status: 'connected',
-      host: 'arizona-beverages.us-central1',
-      database: 'analytics_prod',
-      lastSync: '2 minutes ago',
-      tables: 156,
-      size: '2.4 TB',
-      config: {
-        project: 'arizona-beverages',
-        dataset: 'analytics_prod',
-        location: 'us-central1',
-      },
-    },
-    {
-      id: 'postgres-staging',
-      name: 'PostgreSQL Staging',
-      type: 'postgresql',
-      icon: <DatabaseIcon />,
-      status: 'connected',
-      host: 'pg-staging.arizona.internal',
-      database: 'staging_db',
-      lastSync: '5 minutes ago',
-      tables: 89,
-      size: '156 GB',
-      config: {
-        host: 'pg-staging.arizona.internal',
-        port: 5432,
-        ssl: true,
-      },
-    },
-    {
-      id: 'mongodb-conversations',
-      name: 'MongoDB Conversations',
-      type: 'mongodb',
-      icon: <StorageIcon />,
-      status: 'connected',
-      host: 'mongodb://localhost:27017',
-      database: 'conversations',
-      lastSync: 'Real-time',
-      collections: 12,
-      size: '8.3 GB',
-      config: {
-        replicaSet: 'rs0',
-        authSource: 'admin',
-      },
-    },
-    {
-      id: 'snowflake-analytics',
-      name: 'Snowflake Analytics',
-      type: 'snowflake',
-      icon: <CloudIcon />,
-      status: 'disconnected',
-      host: 'arizona.snowflakecomputing.com',
-      database: 'ANALYTICS',
-      lastSync: 'Never',
-      tables: 0,
-      size: '0 B',
-      config: {
-        account: 'arizona',
-        warehouse: 'COMPUTE_WH',
-        role: 'ANALYTICS_ROLE',
-      },
-    },
-  ],
-  apis: [
-    {
-      id: 'anthropic-claude',
-      name: 'Anthropic Claude',
-      type: 'llm',
-      icon: <AnthropicIcon />,
-      status: 'connected',
-      endpoint: 'https://api.anthropic.com/v1',
-      model: 'claude-3-opus-20240229',
-      usage: {
-        requests: 12450,
-        tokens: 8.5,
-        cost: 127.50,
-      },
-      quotaUsed: 42,
-      quotaLimit: 100000,
-    },
-    {
-      id: 'openai-embeddings',
-      name: 'OpenAI Embeddings',
-      type: 'embeddings',
-      icon: <OpenAIIcon />,
-      status: 'connected',
-      endpoint: 'https://api.openai.com/v1',
-      model: 'text-embedding-3-small',
-      usage: {
-        requests: 34500,
-        tokens: 12.3,
-        cost: 4.85,
-      },
-      quotaUsed: 12,
-      quotaLimit: 1000000,
-    },
-    {
-      id: 'google-cloud',
-      name: 'Google Cloud Platform',
-      type: 'cloud',
-      icon: <CloudIcon />,
-      status: 'connected',
-      endpoint: 'https://bigquery.googleapis.com',
-      project: 'arizona-beverages',
-      services: ['BigQuery', 'Cloud Storage', 'Cloud Functions'],
-      billing: {
-        current: 2450.00,
-        projected: 3200.00,
-        limit: 5000.00,
-      },
-    },
-  ],
-  integrations: [
-    {
-      id: 'weaviate-vector',
-      name: 'Weaviate Vector DB',
-      type: 'vectordb',
-      icon: <HubIcon />,
-      status: 'warning',
-      endpoint: 'http://localhost:8080',
-      schemas: 24,
-      objects: 156000,
-      indexSize: '2.1 GB',
-      message: 'High memory usage detected',
-    },
-    {
-      id: 'redis-cache',
-      name: 'Redis Cache',
-      type: 'cache',
-      icon: <StorageIcon />,
-      status: 'connected',
-      endpoint: 'redis://localhost:6379',
-      memory: '4.2 GB',
-      keys: 45600,
-      hitRate: 94.5,
-      evictions: 120,
-    },
-    {
-      id: 'apache-superset',
-      name: 'Apache Superset',
-      type: 'bi',
-      icon: <SupersetIcon />,
-      status: 'connected',
-      endpoint: 'http://localhost:8088',
-      dashboards: 12,
-      charts: 89,
-      users: 45,
-      lastSync: '10 minutes ago',
-    },
-  ],
-};
-
 const DataSourcesConnections = () => {
-  const theme = useTheme();
   const [activeTab, setActiveTab] = useState(0);
   const [selectedConnection, setSelectedConnection] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -241,10 +65,24 @@ const DataSourcesConnections = () => {
   const [connections, setConnections] = useState({ databases: [], apis: [], integrations: [] });
   const [loading, setLoading] = useState(true);
 
-  // Fetch data sources from API
+  // Blue/grey color palette
+  const colors = {
+    primary: '#0a6ed1',
+    secondary: '#0854a0',
+    dark: '#354a5f',
+    slate: '#475569',
+    grey: '#64748b',
+    light: '#94a3b8',
+    success: '#10b981',
+    warning: '#f59e0b',
+    error: '#ef4444',
+    text: '#1e293b',
+    bg: '#f8fbfd',
+  };
+
   useEffect(() => {
     fetchDataSources();
-    const interval = setInterval(fetchDataSources, 30000); // Refresh every 30s
+    const interval = setInterval(fetchDataSources, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -254,7 +92,6 @@ const DataSourcesConnections = () => {
       const data = await response.json();
 
       if (data.success && data.data_sources) {
-        // Enrich data with icons and UI properties
         const enrichedData = {
           databases: data.data_sources.databases.map(db => ({
             ...db,
@@ -297,7 +134,6 @@ const DataSourcesConnections = () => {
 
   const handleTestConnection = async (connection) => {
     setTestingConnection(true);
-    // Simulate connection test
     setTimeout(() => {
       setTestingConnection(false);
       alert(`Connection test ${connection.status === 'connected' ? 'successful' : 'failed'}`);
@@ -318,10 +154,10 @@ const DataSourcesConnections = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'connected': return theme.palette.success.main;
-      case 'warning': return theme.palette.warning.main;
-      case 'disconnected': return theme.palette.error.main;
-      default: return theme.palette.grey[500];
+      case 'connected': return colors.success;
+      case 'warning': return colors.warning;
+      case 'disconnected': return colors.error;
+      default: return colors.grey;
     }
   };
 
@@ -336,79 +172,118 @@ const DataSourcesConnections = () => {
 
   const renderDatabaseCard = (db) => (
     <Grid item xs={12} md={6} key={db.id}>
-      <Card sx={{ height: '100%' }}>
-        <CardContent>
+      <Card
+        elevation={0}
+        sx={{
+          height: '100%',
+          border: '1px solid',
+          borderColor: alpha(colors.primary, 0.1),
+          borderRadius: 2,
+          position: 'relative',
+          overflow: 'hidden',
+          transition: 'all 0.2s ease',
+          '&:hover': {
+            borderColor: colors.primary,
+            boxShadow: `0 4px 12px ${alpha(colors.primary, 0.15)}`,
+          },
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 3,
+            background: `linear-gradient(90deg, ${getStatusColor(db.status)} 0%, ${alpha(getStatusColor(db.status), 0.5)} 100%)`,
+          },
+        }}
+      >
+        <CardContent sx={{ pt: 2.5 }}>
           <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Avatar
+              <Box
                 sx={{
-                  bgcolor: alpha(getStatusColor(db.status), 0.1),
-                  color: getStatusColor(db.status),
+                  width: 48,
+                  height: 48,
+                  borderRadius: 1.5,
+                  bgcolor: alpha(colors.primary, 0.1),
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: colors.primary,
                 }}
               >
                 {db.icon}
-              </Avatar>
+              </Box>
               <Box>
-                <Typography variant="h6" fontWeight={600}>
+                <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
                   {db.name}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="caption" sx={{ color: colors.grey }}>
                   {db.host}
                 </Typography>
               </Box>
             </Box>
             <Chip
               size="small"
-              icon={getStatusIcon(db.status)}
+              icon={React.cloneElement(getStatusIcon(db.status), { sx: { fontSize: 14 } })}
               label={db.status}
-              color={db.status === 'connected' ? 'success' : 'error'}
+              sx={{
+                height: 24,
+                bgcolor: alpha(getStatusColor(db.status), 0.1),
+                color: getStatusColor(db.status),
+                border: `1px solid ${alpha(getStatusColor(db.status), 0.3)}`,
+                fontWeight: 600,
+                fontSize: '0.7rem',
+                textTransform: 'capitalize',
+                '& .MuiChip-icon': { color: 'inherit' },
+              }}
             />
           </Stack>
 
           <Box sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={6}>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: colors.light, fontWeight: 500 }}>
                   Database
                 </Typography>
-                <Typography variant="body2" fontWeight={500}>
+                <Typography variant="body2" fontWeight={500} sx={{ color: colors.dark }}>
                   {db.database}
                 </Typography>
               </Grid>
               <Grid item xs={6}>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: colors.light, fontWeight: 500 }}>
                   Last Sync
                 </Typography>
-                <Typography variant="body2" fontWeight={500}>
+                <Typography variant="body2" fontWeight={500} sx={{ color: colors.dark }}>
                   {db.lastSync}
                 </Typography>
               </Grid>
               {db.tables !== undefined && (
                 <Grid item xs={6}>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" sx={{ color: colors.light, fontWeight: 500 }}>
                     Tables
                   </Typography>
-                  <Typography variant="body2" fontWeight={500}>
+                  <Typography variant="body2" fontWeight={500} sx={{ color: colors.dark }}>
                     {db.tables}
                   </Typography>
                 </Grid>
               )}
               {db.collections !== undefined && (
                 <Grid item xs={6}>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" sx={{ color: colors.light, fontWeight: 500 }}>
                     Collections
                   </Typography>
-                  <Typography variant="body2" fontWeight={500}>
+                  <Typography variant="body2" fontWeight={500} sx={{ color: colors.dark }}>
                     {db.collections}
                   </Typography>
                 </Grid>
               )}
               {db.size && (
                 <Grid item xs={6}>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" sx={{ color: colors.light, fontWeight: 500 }}>
                     Size
                   </Typography>
-                  <Typography variant="body2" fontWeight={500}>
+                  <Typography variant="body2" fontWeight={500} sx={{ color: colors.dark }}>
                     {db.size}
                   </Typography>
                 </Grid>
@@ -422,92 +297,6 @@ const DataSourcesConnections = () => {
               )}
             </Grid>
           </Box>
-
-        </CardContent>
-      </Card>
-    </Grid>
-  );
-
-  const renderAPICard = (api) => (
-    <Grid item xs={12} md={4} key={api.id}>
-      <Card sx={{ height: '100%' }}>
-        <CardContent>
-          <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <Avatar
-                sx={{
-                  bgcolor: alpha(theme.palette.primary.main, 0.1),
-                  color: theme.palette.primary.main,
-                }}
-              >
-                {api.icon}
-              </Avatar>
-              <Box>
-                <Typography variant="subtitle1" fontWeight={600}>
-                  {api.name}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {api.model || api.type}
-                </Typography>
-              </Box>
-            </Box>
-            <Tooltip title={api.status}>
-              <Box sx={{ color: getStatusColor(api.status) }}>
-                {getStatusIcon(api.status)}
-              </Box>
-            </Tooltip>
-          </Stack>
-
-          {api.usage && (
-            <Box sx={{ mt: 3 }}>
-              <Typography variant="caption" color="text.secondary">
-                API Usage
-              </Typography>
-              <Box sx={{ mt: 1 }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  <Typography variant="body2">
-                    {api.usage.requests.toLocaleString()} requests
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    ${api.usage.cost.toFixed(2)}
-                  </Typography>
-                </Stack>
-                <LinearProgress
-                  variant="determinate"
-                  value={api.quotaUsed}
-                  sx={{ mt: 1, height: 6, borderRadius: 3 }}
-                />
-                <Typography variant="caption" color="text.secondary">
-                  {api.quotaUsed}% of {(api.quotaLimit / 1000).toFixed(0)}K quota
-                </Typography>
-              </Box>
-            </Box>
-          )}
-
-          {api.billing && (
-            <Box sx={{ mt: 3 }}>
-              <Typography variant="caption" color="text.secondary">
-                Monthly Billing
-              </Typography>
-              <Box sx={{ mt: 1 }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  <Typography variant="body2" fontWeight={500}>
-                    ${api.billing.current.toLocaleString()}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    of ${api.billing.limit.toLocaleString()}
-                  </Typography>
-                </Stack>
-                <LinearProgress
-                  variant="determinate"
-                  value={(api.billing.current / api.billing.limit) * 100}
-                  sx={{ mt: 1, height: 6, borderRadius: 3 }}
-                  color={api.billing.current > api.billing.limit * 0.8 ? 'warning' : 'primary'}
-                />
-              </Box>
-            </Box>
-          )}
-
         </CardContent>
       </Card>
     </Grid>
@@ -515,98 +304,128 @@ const DataSourcesConnections = () => {
 
   const renderIntegrationCard = (integration) => (
     <Grid item xs={12} md={4} key={integration.id}>
-      <Card sx={{ height: '100%' }}>
-        <CardContent>
+      <Card
+        elevation={0}
+        sx={{
+          height: '100%',
+          border: '1px solid',
+          borderColor: alpha(colors.primary, 0.1),
+          borderRadius: 2,
+          position: 'relative',
+          overflow: 'hidden',
+          transition: 'all 0.2s ease',
+          '&:hover': {
+            borderColor: colors.primary,
+            boxShadow: `0 4px 12px ${alpha(colors.primary, 0.15)}`,
+          },
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 3,
+            background: `linear-gradient(90deg, ${getStatusColor(integration.status)} 0%, ${alpha(getStatusColor(integration.status), 0.5)} 100%)`,
+          },
+        }}
+      >
+        <CardContent sx={{ pt: 2.5 }}>
           <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <Avatar
+              <Box
                 sx={{
-                  bgcolor: alpha(getStatusColor(integration.status), 0.1),
-                  color: getStatusColor(integration.status),
+                  width: 40,
+                  height: 40,
+                  borderRadius: 1.5,
+                  bgcolor: alpha(colors.primary, 0.1),
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: colors.primary,
                 }}
               >
                 {integration.icon}
-              </Avatar>
+              </Box>
               <Box>
-                <Typography variant="subtitle1" fontWeight={600}>
+                <Typography variant="subtitle2" fontWeight={600} sx={{ color: colors.text }}>
                   {integration.name}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: colors.grey, fontSize: '0.7rem' }}>
                   {integration.endpoint}
                 </Typography>
               </Box>
             </Box>
             <Tooltip title={integration.status}>
               <Box sx={{ color: getStatusColor(integration.status) }}>
-                {getStatusIcon(integration.status)}
+                {React.cloneElement(getStatusIcon(integration.status), { sx: { fontSize: 18 } })}
               </Box>
             </Tooltip>
           </Stack>
 
           {integration.message && (
-            <Alert severity="warning" sx={{ mt: 2, py: 0 }}>
-              <Typography variant="caption">{integration.message}</Typography>
+            <Alert severity="warning" sx={{ mt: 2, py: 0.5, '& .MuiAlert-message': { fontSize: '0.75rem' } }}>
+              {integration.message}
             </Alert>
           )}
 
-          <Box sx={{ mt: 3 }}>
+          <Box sx={{ mt: 2 }}>
             <Grid container spacing={1}>
               {(integration.memory || integration.memory_used_mb !== undefined) && (
                 <Grid item xs={6}>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" sx={{ color: colors.light, fontWeight: 500 }}>
                     Memory
                   </Typography>
-                  <Typography variant="body2" fontWeight={500}>
+                  <Typography variant="body2" fontWeight={500} sx={{ color: colors.dark }}>
                     {integration.memory || `${integration.memory_used_mb} MB`}
                   </Typography>
                 </Grid>
               )}
               {integration.keys !== undefined && (
                 <Grid item xs={6}>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" sx={{ color: colors.light, fontWeight: 500 }}>
                     Keys
                   </Typography>
-                  <Typography variant="body2" fontWeight={500}>
+                  <Typography variant="body2" fontWeight={500} sx={{ color: colors.dark }}>
                     {integration.keys}
                   </Typography>
                 </Grid>
               )}
               {integration.hitRate && (
                 <Grid item xs={6}>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" sx={{ color: colors.light, fontWeight: 500 }}>
                     Hit Rate
                   </Typography>
-                  <Typography variant="body2" fontWeight={500}>
+                  <Typography variant="body2" fontWeight={500} sx={{ color: colors.dark }}>
                     {integration.hitRate}%
                   </Typography>
                 </Grid>
               )}
               {(integration.schemas !== undefined || integration.collections !== undefined) && (
                 <Grid item xs={6}>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" sx={{ color: colors.light, fontWeight: 500 }}>
                     {integration.schemas !== undefined ? 'Schemas' : 'Collections'}
                   </Typography>
-                  <Typography variant="body2" fontWeight={500}>
+                  <Typography variant="body2" fontWeight={500} sx={{ color: colors.dark }}>
                     {integration.schemas || integration.collections}
                   </Typography>
                 </Grid>
               )}
               {integration.dashboards && (
                 <Grid item xs={6}>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" sx={{ color: colors.light, fontWeight: 500 }}>
                     Dashboards
                   </Typography>
-                  <Typography variant="body2" fontWeight={500}>
+                  <Typography variant="body2" fontWeight={500} sx={{ color: colors.dark }}>
                     {integration.dashboards}
                   </Typography>
                 </Grid>
               )}
               {integration.objects && (
                 <Grid item xs={6}>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" sx={{ color: colors.light, fontWeight: 500 }}>
                     Objects
                   </Typography>
-                  <Typography variant="body2" fontWeight={500}>
+                  <Typography variant="body2" fontWeight={500} sx={{ color: colors.dark }}>
                     {integration.objects.toLocaleString()}
                   </Typography>
                 </Grid>
@@ -620,7 +439,6 @@ const DataSourcesConnections = () => {
               )}
             </Grid>
           </Box>
-
         </CardContent>
       </Card>
     </Grid>
@@ -629,7 +447,7 @@ const DataSourcesConnections = () => {
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
-        <CircularProgress />
+        <CircularProgress sx={{ color: colors.primary }} />
       </Box>
     );
   }
@@ -639,93 +457,205 @@ const DataSourcesConnections = () => {
       {/* Header */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box>
-          <Typography variant="h5" fontWeight={600} gutterBottom>
+          <Typography variant="h6" fontWeight={600} sx={{ color: colors.text }}>
             Data Sources & Connections
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: colors.grey }}>
             Manage database connections, API integrations, and external services
           </Typography>
         </Box>
       </Box>
 
       {/* Summary Cards */}
-      <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={6} md={4}>
-          <Card>
-            <CardContent>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Box>
-                  <Typography variant="h4" fontWeight={600}>
-                    {connections.databases.length}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Databases
-                  </Typography>
-                </Box>
-                <DatabaseIcon sx={{ fontSize: 40, color: 'primary.light' }} />
-              </Stack>
-            </CardContent>
-          </Card>
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid item xs={12} sm={4}>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: alpha(colors.primary, 0.1),
+              position: 'relative',
+              overflow: 'hidden',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 3,
+                background: `linear-gradient(90deg, ${colors.primary} 0%, ${alpha(colors.primary, 0.5)} 100%)`,
+              },
+            }}
+          >
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Box>
+                <Typography variant="h4" fontWeight={700} sx={{ color: colors.text }}>
+                  {connections.databases.length}
+                </Typography>
+                <Typography variant="body2" sx={{ color: colors.grey }}>
+                  Databases
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 1.5,
+                  bgcolor: alpha(colors.primary, 0.1),
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: colors.primary,
+                }}
+              >
+                <DatabaseIcon />
+              </Box>
+            </Stack>
+          </Paper>
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <Card>
-            <CardContent>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Box>
-                  <Typography variant="h4" fontWeight={600}>
-                    {connections.integrations.length}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Integrations
-                  </Typography>
-                </Box>
-                <LinkIcon sx={{ fontSize: 40, color: 'success.light' }} />
-              </Stack>
-            </CardContent>
-          </Card>
+        <Grid item xs={12} sm={4}>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: alpha(colors.primary, 0.1),
+              position: 'relative',
+              overflow: 'hidden',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 3,
+                background: `linear-gradient(90deg, ${colors.secondary} 0%, ${alpha(colors.secondary, 0.5)} 100%)`,
+              },
+            }}
+          >
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Box>
+                <Typography variant="h4" fontWeight={700} sx={{ color: colors.text }}>
+                  {connections.integrations.length}
+                </Typography>
+                <Typography variant="body2" sx={{ color: colors.grey }}>
+                  Integrations
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 1.5,
+                  bgcolor: alpha(colors.secondary, 0.1),
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: colors.secondary,
+                }}
+              >
+                <LinkIcon />
+              </Box>
+            </Stack>
+          </Paper>
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <Card>
-            <CardContent>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Box>
-                  <Typography variant="h4" fontWeight={600} color="success.main">
-                    {connections.databases.filter(d => d.status === 'connected').length +
-                     connections.integrations.filter(i => i.status === 'connected' || i.status === 'healthy').length}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Active
-                  </Typography>
-                </Box>
-                <CheckCircleIcon sx={{ fontSize: 40, color: 'success.light' }} />
-              </Stack>
-            </CardContent>
-          </Card>
+        <Grid item xs={12} sm={4}>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: alpha(colors.primary, 0.1),
+              position: 'relative',
+              overflow: 'hidden',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 3,
+                background: `linear-gradient(90deg, ${colors.success} 0%, ${alpha(colors.success, 0.5)} 100%)`,
+              },
+            }}
+          >
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Box>
+                <Typography variant="h4" fontWeight={700} sx={{ color: colors.success }}>
+                  {connections.databases.filter(d => d.status === 'connected').length +
+                   connections.integrations.filter(i => i.status === 'connected' || i.status === 'healthy').length}
+                </Typography>
+                <Typography variant="body2" sx={{ color: colors.grey }}>
+                  Active
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 1.5,
+                  bgcolor: alpha(colors.success, 0.1),
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: colors.success,
+                }}
+              >
+                <CheckCircleIcon />
+              </Box>
+            </Stack>
+          </Paper>
         </Grid>
       </Grid>
 
       {/* Tabs */}
-      <Paper sx={{ mb: 3 }}>
+      <Paper
+        elevation={0}
+        sx={{
+          mb: 3,
+          borderRadius: 2,
+          border: '1px solid',
+          borderColor: alpha(colors.primary, 0.1),
+        }}
+      >
         <Tabs
           value={activeTab}
           onChange={(e, v) => setActiveTab(v)}
           variant="fullWidth"
+          sx={{
+            '& .MuiTab-root': {
+              textTransform: 'none',
+              fontWeight: 600,
+              color: colors.grey,
+              '&.Mui-selected': {
+                color: colors.primary,
+              },
+            },
+            '& .MuiTabs-indicator': {
+              bgcolor: colors.primary,
+              height: 3,
+            },
+          }}
         >
-          <Tab label="Databases" icon={<DatabaseIcon />} iconPosition="start" />
-          <Tab label="Integrations" icon={<LinkIcon />} iconPosition="start" />
-          <Tab label="Data Catalog" icon={<DataUsageIcon />} iconPosition="start" />
+          <Tab label="Databases" icon={<DatabaseIcon sx={{ fontSize: 18 }} />} iconPosition="start" />
+          <Tab label="Integrations" icon={<LinkIcon sx={{ fontSize: 18 }} />} iconPosition="start" />
+          <Tab label="Data Catalog" icon={<DataUsageIcon sx={{ fontSize: 18 }} />} iconPosition="start" />
         </Tabs>
       </Paper>
 
       {/* Tab Content */}
       {activeTab === 0 && (
-        <Grid container spacing={3}>
+        <Grid container spacing={2}>
           {connections.databases.map(renderDatabaseCard)}
         </Grid>
       )}
 
       {activeTab === 1 && (
-        <Grid container spacing={3}>
+        <Grid container spacing={2}>
           {connections.integrations.map(renderIntegrationCard)}
         </Grid>
       )}
@@ -738,7 +668,7 @@ const DataSourcesConnections = () => {
 
       {/* Connection Dialog */}
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>
+        <DialogTitle sx={{ color: colors.text, fontWeight: 600 }}>
           {editMode ? 'Edit Connection' : 'Add New Connection'}
         </DialogTitle>
         <DialogContent>
@@ -796,16 +726,29 @@ const DataSourcesConnections = () => {
             </Stack>
           </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setDialogOpen(false)} sx={{ color: colors.grey }}>
+            Cancel
+          </Button>
           <Button
             variant="outlined"
-            startIcon={<TestIcon />}
+            startIcon={<CheckCircleIcon />}
             disabled={testingConnection}
+            sx={{
+              borderColor: colors.primary,
+              color: colors.primary,
+              '&:hover': { borderColor: colors.secondary, bgcolor: alpha(colors.primary, 0.05) },
+            }}
           >
             Test Connection
           </Button>
-          <Button variant="contained">
+          <Button
+            variant="contained"
+            sx={{
+              bgcolor: colors.primary,
+              '&:hover': { bgcolor: colors.secondary },
+            }}
+          >
             {editMode ? 'Save Changes' : 'Add Connection'}
           </Button>
         </DialogActions>

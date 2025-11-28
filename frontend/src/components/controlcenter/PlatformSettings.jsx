@@ -4,13 +4,10 @@ import {
   Paper,
   Typography,
   Grid,
-  Card,
-  CardContent,
   Switch,
   FormControlLabel,
   TextField,
   Button,
-  Divider,
   Stack,
   Chip,
   Select,
@@ -25,13 +22,11 @@ import {
   TableRow,
   IconButton,
   alpha,
-  useTheme,
 } from '@mui/material';
 import {
   Notifications as NotificationsIcon,
-  Security as SecurityIcon,
-  Schedule as ScheduleIcon,
   Settings as SettingsIcon,
+  Schedule as ScheduleIcon,
   PlayArrow as PlayIcon,
   Pause as PauseIcon,
   Delete as DeleteIcon,
@@ -39,8 +34,22 @@ import {
   Edit as EditIcon,
 } from '@mui/icons-material';
 
+// Blue/grey color palette
+const colors = {
+  primary: '#0a6ed1',
+  secondary: '#0854a0',
+  dark: '#354a5f',
+  slate: '#475569',
+  grey: '#64748b',
+  light: '#94a3b8',
+  success: '#10b981',
+  warning: '#f59e0b',
+  error: '#ef4444',
+  text: '#1e293b',
+  bg: '#f8fbfd',
+};
+
 const PlatformSettings = () => {
-  const theme = useTheme();
   const [settings, setSettings] = useState({
     emailNotifications: true,
     slackNotifications: false,
@@ -86,14 +95,10 @@ const PlatformSettings = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'active':
-        return theme.palette.success.main;
-      case 'paused':
-        return theme.palette.warning.main;
-      case 'failed':
-        return theme.palette.error.main;
-      default:
-        return theme.palette.grey[500];
+      case 'active': return colors.success;
+      case 'paused': return colors.warning;
+      case 'failed': return colors.error;
+      default: return colors.grey;
     }
   };
 
@@ -102,37 +107,80 @@ const PlatformSettings = () => {
       <Grid container spacing={3}>
         {/* General Settings */}
         <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3 }}>
-            <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-              <SettingsIcon color="primary" />
-              <Typography variant="h6">General Settings</Typography>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 3,
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: alpha(colors.primary, 0.1),
+              position: 'relative',
+              overflow: 'hidden',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 3,
+                background: `linear-gradient(90deg, ${colors.primary} 0%, ${alpha(colors.primary, 0.5)} 100%)`,
+              },
+            }}
+          >
+            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
+              <Box
+                sx={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 1.5,
+                  bgcolor: alpha(colors.primary, 0.1),
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: colors.primary,
+                }}
+              >
+                <SettingsIcon sx={{ fontSize: 20 }} />
+              </Box>
+              <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
+                General Settings
+              </Typography>
             </Stack>
-            <Stack spacing={2}>
+            <Stack spacing={2.5}>
               <FormControlLabel
                 control={
                   <Switch
                     checked={settings.autoRefresh}
                     onChange={handleSettingChange('autoRefresh')}
+                    sx={{
+                      '& .MuiSwitch-switchBase.Mui-checked': { color: colors.primary },
+                      '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: colors.primary },
+                    }}
                   />
                 }
-                label="Auto-refresh dashboards"
+                label={<Typography variant="body2" sx={{ color: colors.dark }}>Auto-refresh dashboards</Typography>}
               />
               <FormControlLabel
                 control={
                   <Switch
                     checked={settings.darkMode}
                     onChange={handleSettingChange('darkMode')}
+                    disabled
                   />
                 }
-                label="Dark mode (coming soon)"
-                disabled
+                label={<Typography variant="body2" sx={{ color: colors.light }}>Dark mode (coming soon)</Typography>}
               />
               <FormControl fullWidth size="small">
-                <InputLabel>Data Retention (days)</InputLabel>
+                <InputLabel sx={{ color: colors.grey }}>Data Retention (days)</InputLabel>
                 <Select
                   value={settings.dataRetention}
                   label="Data Retention (days)"
                   onChange={handleSettingChange('dataRetention')}
+                  sx={{
+                    '& .MuiOutlinedInput-notchedOutline': { borderColor: alpha(colors.primary, 0.2) },
+                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary },
+                  }}
                 >
                   <MenuItem value={30}>30 days</MenuItem>
                   <MenuItem value={60}>60 days</MenuItem>
@@ -142,11 +190,16 @@ const PlatformSettings = () => {
                 </Select>
               </FormControl>
               <FormControl fullWidth size="small">
-                <InputLabel>Cache Expiry (hours)</InputLabel>
+                <InputLabel sx={{ color: colors.grey }}>Cache Expiry (hours)</InputLabel>
                 <Select
                   value={settings.cacheExpiry}
                   label="Cache Expiry (hours)"
                   onChange={handleSettingChange('cacheExpiry')}
+                  sx={{
+                    '& .MuiOutlinedInput-notchedOutline': { borderColor: alpha(colors.primary, 0.2) },
+                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary },
+                  }}
                 >
                   <MenuItem value={1}>1 hour</MenuItem>
                   <MenuItem value={6}>6 hours</MenuItem>
@@ -161,29 +214,71 @@ const PlatformSettings = () => {
 
         {/* Notification Settings */}
         <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3 }}>
-            <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-              <NotificationsIcon color="primary" />
-              <Typography variant="h6">Notifications</Typography>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 3,
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: alpha(colors.primary, 0.1),
+              position: 'relative',
+              overflow: 'hidden',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 3,
+                background: `linear-gradient(90deg, ${colors.secondary} 0%, ${alpha(colors.secondary, 0.5)} 100%)`,
+              },
+            }}
+          >
+            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
+              <Box
+                sx={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 1.5,
+                  bgcolor: alpha(colors.secondary, 0.1),
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: colors.secondary,
+                }}
+              >
+                <NotificationsIcon sx={{ fontSize: 20 }} />
+              </Box>
+              <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
+                Notifications
+              </Typography>
             </Stack>
-            <Stack spacing={2}>
+            <Stack spacing={2.5}>
               <FormControlLabel
                 control={
                   <Switch
                     checked={settings.emailNotifications}
                     onChange={handleSettingChange('emailNotifications')}
+                    sx={{
+                      '& .MuiSwitch-switchBase.Mui-checked': { color: colors.primary },
+                      '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: colors.primary },
+                    }}
                   />
                 }
-                label="Email notifications"
+                label={<Typography variant="body2" sx={{ color: colors.dark }}>Email notifications</Typography>}
               />
               <FormControlLabel
                 control={
                   <Switch
                     checked={settings.slackNotifications}
                     onChange={handleSettingChange('slackNotifications')}
+                    sx={{
+                      '& .MuiSwitch-switchBase.Mui-checked': { color: colors.primary },
+                      '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: colors.primary },
+                    }}
                   />
                 }
-                label="Slack notifications"
+                label={<Typography variant="body2" sx={{ color: colors.dark }}>Slack notifications</Typography>}
               />
               <TextField
                 fullWidth
@@ -191,6 +286,13 @@ const PlatformSettings = () => {
                 label="Notification Email"
                 defaultValue="admin@example.com"
                 helperText="Receive alerts and reports"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': { borderColor: alpha(colors.primary, 0.2) },
+                    '&:hover fieldset': { borderColor: colors.primary },
+                    '&.Mui-focused fieldset': { borderColor: colors.primary },
+                  },
+                }}
               />
               <TextField
                 fullWidth
@@ -198,6 +300,13 @@ const PlatformSettings = () => {
                 label="Slack Webhook URL"
                 placeholder="https://hooks.slack.com/..."
                 helperText="Optional Slack integration"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': { borderColor: alpha(colors.primary, 0.2) },
+                    '&:hover fieldset': { borderColor: colors.primary },
+                    '&.Mui-focused fieldset': { borderColor: colors.primary },
+                  },
+                }}
               />
             </Stack>
           </Paper>
@@ -205,13 +314,55 @@ const PlatformSettings = () => {
 
         {/* Automation Jobs */}
         <Grid item xs={12}>
-          <Paper sx={{ p: 3 }}>
-            <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
-              <Stack direction="row" spacing={2} alignItems="center">
-                <ScheduleIcon color="primary" />
-                <Typography variant="h6">Automation & Scheduling</Typography>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 3,
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: alpha(colors.primary, 0.1),
+              position: 'relative',
+              overflow: 'hidden',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 3,
+                background: `linear-gradient(90deg, ${colors.dark} 0%, ${alpha(colors.dark, 0.5)} 100%)`,
+              },
+            }}
+          >
+            <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
+              <Stack direction="row" spacing={1.5} alignItems="center">
+                <Box
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 1.5,
+                    bgcolor: alpha(colors.dark, 0.1),
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: colors.dark,
+                  }}
+                >
+                  <ScheduleIcon sx={{ fontSize: 20 }} />
+                </Box>
+                <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
+                  Automation & Scheduling
+                </Typography>
               </Stack>
-              <Button startIcon={<AddIcon />} variant="contained" size="small">
+              <Button
+                startIcon={<AddIcon />}
+                variant="contained"
+                size="small"
+                sx={{
+                  bgcolor: colors.primary,
+                  '&:hover': { bgcolor: colors.secondary },
+                }}
+              >
                 New Job
               </Button>
             </Stack>
@@ -219,24 +370,31 @@ const PlatformSettings = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Job Name</TableCell>
-                    <TableCell>Schedule</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Last Run</TableCell>
-                    <TableCell>Next Run</TableCell>
-                    <TableCell align="right">Actions</TableCell>
+                    <TableCell sx={{ color: colors.grey, fontWeight: 600, borderBottom: `1px solid ${alpha(colors.primary, 0.1)}` }}>Job Name</TableCell>
+                    <TableCell sx={{ color: colors.grey, fontWeight: 600, borderBottom: `1px solid ${alpha(colors.primary, 0.1)}` }}>Schedule</TableCell>
+                    <TableCell sx={{ color: colors.grey, fontWeight: 600, borderBottom: `1px solid ${alpha(colors.primary, 0.1)}` }}>Status</TableCell>
+                    <TableCell sx={{ color: colors.grey, fontWeight: 600, borderBottom: `1px solid ${alpha(colors.primary, 0.1)}` }}>Last Run</TableCell>
+                    <TableCell sx={{ color: colors.grey, fontWeight: 600, borderBottom: `1px solid ${alpha(colors.primary, 0.1)}` }}>Next Run</TableCell>
+                    <TableCell align="right" sx={{ color: colors.grey, fontWeight: 600, borderBottom: `1px solid ${alpha(colors.primary, 0.1)}` }}>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {automationJobs.map((job) => (
-                    <TableRow key={job.id} hover>
+                    <TableRow
+                      key={job.id}
+                      hover
+                      sx={{
+                        '&:hover': { bgcolor: alpha(colors.primary, 0.03) },
+                        '& td': { borderBottom: `1px solid ${alpha(colors.primary, 0.05)}` },
+                      }}
+                    >
                       <TableCell>
-                        <Typography variant="body2" fontWeight={600}>
+                        <Typography variant="body2" fontWeight={600} sx={{ color: colors.text }}>
                           {job.name}
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{ color: colors.grey }}>
                           {job.schedule}
                         </Typography>
                       </TableCell>
@@ -245,31 +403,52 @@ const PlatformSettings = () => {
                           label={job.status}
                           size="small"
                           sx={{
+                            height: 24,
                             bgcolor: alpha(getStatusColor(job.status), 0.1),
                             color: getStatusColor(job.status),
+                            fontWeight: 600,
+                            fontSize: '0.7rem',
                             textTransform: 'capitalize',
                           }}
                         />
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{ color: colors.grey }}>
                           {job.lastRun}
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{ color: colors.grey }}>
                           {job.nextRun}
                         </Typography>
                       </TableCell>
                       <TableCell align="right">
-                        <Stack direction="row" spacing={1} justifyContent="flex-end">
-                          <IconButton size="small" color="primary">
+                        <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                          <IconButton
+                            size="small"
+                            sx={{
+                              color: colors.primary,
+                              '&:hover': { bgcolor: alpha(colors.primary, 0.1) },
+                            }}
+                          >
                             {job.status === 'active' ? <PauseIcon fontSize="small" /> : <PlayIcon fontSize="small" />}
                           </IconButton>
-                          <IconButton size="small" color="primary">
+                          <IconButton
+                            size="small"
+                            sx={{
+                              color: colors.primary,
+                              '&:hover': { bgcolor: alpha(colors.primary, 0.1) },
+                            }}
+                          >
                             <EditIcon fontSize="small" />
                           </IconButton>
-                          <IconButton size="small" color="error">
+                          <IconButton
+                            size="small"
+                            sx={{
+                              color: colors.error,
+                              '&:hover': { bgcolor: alpha(colors.error, 0.1) },
+                            }}
+                          >
                             <DeleteIcon fontSize="small" />
                           </IconButton>
                         </Stack>
@@ -285,8 +464,25 @@ const PlatformSettings = () => {
         {/* Save Button */}
         <Grid item xs={12}>
           <Stack direction="row" spacing={2} justifyContent="flex-end">
-            <Button variant="outlined">Reset to Defaults</Button>
-            <Button variant="contained">Save Settings</Button>
+            <Button
+              variant="outlined"
+              sx={{
+                borderColor: colors.grey,
+                color: colors.grey,
+                '&:hover': { borderColor: colors.dark, bgcolor: alpha(colors.grey, 0.05) },
+              }}
+            >
+              Reset to Defaults
+            </Button>
+            <Button
+              variant="contained"
+              sx={{
+                bgcolor: colors.primary,
+                '&:hover': { bgcolor: colors.secondary },
+              }}
+            >
+              Save Settings
+            </Button>
           </Stack>
         </Grid>
       </Grid>

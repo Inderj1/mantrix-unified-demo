@@ -14,14 +14,31 @@ import {
   Chip,
   Alert,
   Paper,
-  Divider,
   Stack,
-  Autocomplete
+  Autocomplete,
+  alpha,
 } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import SaveIcon from '@mui/icons-material/Save';
+import WorkIcon from '@mui/icons-material/Work';
+import TuneIcon from '@mui/icons-material/Tune';
 import { useUser } from '@clerk/clerk-react';
 import { apiService } from '../services/api';
+
+// Blue/grey color palette
+const colors = {
+  primary: '#0a6ed1',
+  secondary: '#0854a0',
+  dark: '#354a5f',
+  slate: '#475569',
+  grey: '#64748b',
+  light: '#94a3b8',
+  success: '#10b981',
+  warning: '#f59e0b',
+  error: '#ef4444',
+  text: '#1e293b',
+  bg: '#f8fbfd',
+};
 
 const UserProfileManager = () => {
   const { user } = useUser();
@@ -32,9 +49,8 @@ const UserProfileManager = () => {
   const [saveStatus, setSaveStatus] = useState({ show: false, type: '', message: '' });
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  // Form state - persona based, not user based
   const [formData, setFormData] = useState({
-    user_id: 'persona', // Fixed ID for persona
+    user_id: 'persona',
     name: '',
     email: '',
     role: 'custom',
@@ -66,10 +82,8 @@ const UserProfileManager = () => {
     { value: 'heatmap', label: 'Heatmap' }
   ];
 
-  // Auto-populate from Clerk user data
   useEffect(() => {
     if (user && !profile) {
-      // Only auto-populate if no existing profile and fields are empty
       if (!formData.name && !formData.email) {
         const userName = user.fullName || user.firstName || '';
         const userEmail = user.primaryEmailAddress?.emailAddress || '';
@@ -91,7 +105,6 @@ const UserProfileManager = () => {
   const loadRoleTemplates = async () => {
     try {
       const response = await apiService.getUserProfileTemplates();
-      // Handle both array response and object with data property
       const templates = Array.isArray(response.data) ? response.data : response.data || response;
       setRoleTemplates(Array.isArray(templates) ? templates : []);
     } catch (error) {
@@ -124,7 +137,6 @@ const UserProfileManager = () => {
     setSelectedRole(role);
     setHasUnsavedChanges(true);
 
-    // Find the template for this role
     const template = roleTemplates.find(t => t.role === role);
     if (template && role !== 'custom') {
       setFormData({
@@ -157,10 +169,8 @@ const UserProfileManager = () => {
     try {
       let response;
       if (profile) {
-        // Update existing persona
         response = await apiService.updateUserProfile('persona', formData);
       } else {
-        // Create new persona
         response = await apiService.createUserProfile(formData);
       }
 
@@ -190,180 +200,385 @@ const UserProfileManager = () => {
   const currentTemplate = getRoleTemplate(selectedRole);
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box>
       <Stack spacing={3}>
         {/* Header */}
         <Box>
-          <Typography variant="h4" sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
-            <PersonIcon sx={{ mr: 1, fontSize: 32 }} />
-            AI Persona
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1 }}>
+            <Box
+              sx={{
+                width: 40,
+                height: 40,
+                borderRadius: 1.5,
+                bgcolor: alpha(colors.primary, 0.1),
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: colors.primary,
+              }}
+            >
+              <PersonIcon sx={{ fontSize: 22 }} />
+            </Box>
+            <Typography variant="h6" fontWeight={600} sx={{ color: colors.text }}>
+              AI Persona
+            </Typography>
+          </Stack>
+          <Typography variant="body2" sx={{ color: colors.grey }}>
             Select your business role to get personalized AI insights tailored to your perspective
           </Typography>
         </Box>
 
         {/* Save Status Alert */}
         {saveStatus.show && (
-          <Alert severity={saveStatus.type} onClose={() => setSaveStatus({ show: false, type: '', message: '' })}>
+          <Alert
+            severity={saveStatus.type}
+            onClose={() => setSaveStatus({ show: false, type: '', message: '' })}
+            sx={{
+              borderRadius: 2,
+              '& .MuiAlert-icon': { color: saveStatus.type === 'success' ? colors.success : colors.error },
+            }}
+          >
             {saveStatus.message}
           </Alert>
         )}
 
         {/* Basic Information */}
-        <Card>
-          <CardContent>
-            <Typography variant="h6" sx={{ mb: 2 }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            borderRadius: 2,
+            border: '1px solid',
+            borderColor: alpha(colors.primary, 0.1),
+            position: 'relative',
+            overflow: 'hidden',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 3,
+              background: `linear-gradient(90deg, ${colors.primary} 0%, ${alpha(colors.primary, 0.5)} 100%)`,
+            },
+          }}
+        >
+          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
+            <Box
+              sx={{
+                width: 32,
+                height: 32,
+                borderRadius: 1,
+                bgcolor: alpha(colors.primary, 0.1),
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: colors.primary,
+              }}
+            >
+              <PersonIcon sx={{ fontSize: 18 }} />
+            </Box>
+            <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
               Basic Information
             </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Name"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Department"
-                  value={formData.department}
-                  onChange={(e) => handleInputChange('department', e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Reporting Frequency</InputLabel>
-                  <Select
-                    value={formData.reporting_frequency}
-                    label="Reporting Frequency"
-                    onChange={(e) => handleInputChange('reporting_frequency', e.target.value)}
-                  >
-                    <MenuItem value="daily">Daily</MenuItem>
-                    <MenuItem value="weekly">Weekly</MenuItem>
-                    <MenuItem value="monthly">Monthly</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
+          </Stack>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Name"
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': { borderColor: alpha(colors.primary, 0.2) },
+                    '&:hover fieldset': { borderColor: colors.primary },
+                    '&.Mui-focused fieldset': { borderColor: colors.primary },
+                  },
+                }}
+              />
             </Grid>
-          </CardContent>
-        </Card>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': { borderColor: alpha(colors.primary, 0.2) },
+                    '&:hover fieldset': { borderColor: colors.primary },
+                    '&.Mui-focused fieldset': { borderColor: colors.primary },
+                  },
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Department"
+                value={formData.department}
+                onChange={(e) => handleInputChange('department', e.target.value)}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': { borderColor: alpha(colors.primary, 0.2) },
+                    '&:hover fieldset': { borderColor: colors.primary },
+                    '&.Mui-focused fieldset': { borderColor: colors.primary },
+                  },
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth>
+                <InputLabel>Reporting Frequency</InputLabel>
+                <Select
+                  value={formData.reporting_frequency}
+                  label="Reporting Frequency"
+                  onChange={(e) => handleInputChange('reporting_frequency', e.target.value)}
+                  sx={{
+                    '& .MuiOutlinedInput-notchedOutline': { borderColor: alpha(colors.primary, 0.2) },
+                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary },
+                  }}
+                >
+                  <MenuItem value="daily">Daily</MenuItem>
+                  <MenuItem value="weekly">Weekly</MenuItem>
+                  <MenuItem value="monthly">Monthly</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+        </Paper>
 
         {/* Role Selection */}
-        <Card>
-          <CardContent>
-            <Typography variant="h6" sx={{ mb: 2 }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            borderRadius: 2,
+            border: '1px solid',
+            borderColor: alpha(colors.primary, 0.1),
+            position: 'relative',
+            overflow: 'hidden',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 3,
+              background: `linear-gradient(90deg, ${colors.secondary} 0%, ${alpha(colors.secondary, 0.5)} 100%)`,
+            },
+          }}
+        >
+          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
+            <Box
+              sx={{
+                width: 32,
+                height: 32,
+                borderRadius: 1,
+                bgcolor: alpha(colors.secondary, 0.1),
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: colors.secondary,
+              }}
+            >
+              <WorkIcon sx={{ fontSize: 18 }} />
+            </Box>
+            <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
               Role & Expertise
             </Typography>
-            <FormControl fullWidth>
-              <InputLabel>Role</InputLabel>
-              <Select
-                value={selectedRole}
-                label="Role"
-                onChange={handleRoleChange}
-              >
-                <MenuItem value="custom">Custom</MenuItem>
-                {roleTemplates.map((template) => (
-                  <MenuItem key={template.role} value={template.role}>
-                    {template.display_name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+          </Stack>
+          <FormControl fullWidth>
+            <InputLabel>Role</InputLabel>
+            <Select
+              value={selectedRole}
+              label="Role"
+              onChange={handleRoleChange}
+              sx={{
+                '& .MuiOutlinedInput-notchedOutline': { borderColor: alpha(colors.primary, 0.2) },
+                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary },
+              }}
+            >
+              <MenuItem value="custom">Custom</MenuItem>
+              {roleTemplates.map((template) => (
+                <MenuItem key={template.role} value={template.role}>
+                  {template.display_name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-            {currentTemplate && currentTemplate.role !== 'custom' && (
-              <Paper sx={{ mt: 2, p: 2, bgcolor: 'grey.50' }}>
-                <Typography variant="body2" color="text.secondary">
-                  {currentTemplate.description}
-                </Typography>
-              </Paper>
-            )}
-          </CardContent>
-        </Card>
+          {currentTemplate && currentTemplate.role !== 'custom' && (
+            <Paper
+              elevation={0}
+              sx={{
+                mt: 2,
+                p: 2,
+                bgcolor: alpha(colors.primary, 0.05),
+                border: `1px solid ${alpha(colors.primary, 0.1)}`,
+                borderRadius: 1.5,
+              }}
+            >
+              <Typography variant="body2" sx={{ color: colors.grey }}>
+                {currentTemplate.description}
+              </Typography>
+            </Paper>
+          )}
+        </Paper>
 
         {/* Preferences */}
-        <Card>
-          <CardContent>
-            <Typography variant="h6" sx={{ mb: 2 }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            borderRadius: 2,
+            border: '1px solid',
+            borderColor: alpha(colors.primary, 0.1),
+            position: 'relative',
+            overflow: 'hidden',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 3,
+              background: `linear-gradient(90deg, ${colors.dark} 0%, ${alpha(colors.dark, 0.5)} 100%)`,
+            },
+          }}
+        >
+          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
+            <Box
+              sx={{
+                width: 32,
+                height: 32,
+                borderRadius: 1,
+                bgcolor: alpha(colors.dark, 0.1),
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: colors.dark,
+              }}
+            >
+              <TuneIcon sx={{ fontSize: 18 }} />
+            </Box>
+            <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
               Insight Preferences
             </Typography>
-            <Stack spacing={3}>
-              <Autocomplete
-                multiple
-                options={insightFocusOptions}
-                getOptionLabel={(option) => option.label}
-                value={insightFocusOptions.filter(opt => formData.insight_focuses.includes(opt.value))}
-                onChange={(event, newValue) => {
-                  handleInputChange('insight_focuses', newValue.map(v => v.value));
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Focus Areas"
-                    placeholder="Select areas of interest"
+          </Stack>
+          <Stack spacing={3}>
+            <Autocomplete
+              multiple
+              options={insightFocusOptions}
+              getOptionLabel={(option) => option.label}
+              value={insightFocusOptions.filter(opt => formData.insight_focuses.includes(opt.value))}
+              onChange={(event, newValue) => {
+                handleInputChange('insight_focuses', newValue.map(v => v.value));
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Focus Areas"
+                  placeholder="Select areas of interest"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: alpha(colors.primary, 0.2) },
+                      '&:hover fieldset': { borderColor: colors.primary },
+                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                    },
+                  }}
+                />
+              )}
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => (
+                  <Chip
+                    label={option.label}
+                    {...getTagProps({ index })}
+                    sx={{
+                      bgcolor: alpha(colors.primary, 0.1),
+                      color: colors.primary,
+                      '& .MuiChip-deleteIcon': { color: colors.primary },
+                    }}
                   />
-                )}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => (
-                    <Chip label={option.label} {...getTagProps({ index })} />
-                  ))
-                }
-              />
+                ))
+              }
+            />
 
-              <TextField
-                fullWidth
-                label="Key Metrics"
-                placeholder="Enter metrics separated by commas (e.g., revenue, profit, margin)"
-                value={formData.key_metrics.join(', ')}
-                onChange={(e) => handleInputChange('key_metrics', e.target.value.split(',').map(m => m.trim()).filter(m => m))}
-                helperText="These metrics will be highlighted in your insights"
-              />
+            <TextField
+              fullWidth
+              label="Key Metrics"
+              placeholder="Enter metrics separated by commas (e.g., revenue, profit, margin)"
+              value={formData.key_metrics.join(', ')}
+              onChange={(e) => handleInputChange('key_metrics', e.target.value.split(',').map(m => m.trim()).filter(m => m))}
+              helperText="These metrics will be highlighted in your insights"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: alpha(colors.primary, 0.2) },
+                  '&:hover fieldset': { borderColor: colors.primary },
+                  '&.Mui-focused fieldset': { borderColor: colors.primary },
+                },
+              }}
+            />
 
-              <Autocomplete
-                multiple
-                options={visualizationOptions}
-                getOptionLabel={(option) => option.label}
-                value={visualizationOptions.filter(opt => formData.preferred_visualizations.includes(opt.value))}
-                onChange={(event, newValue) => {
-                  handleInputChange('preferred_visualizations', newValue.map(v => v.value));
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Preferred Visualizations"
-                    placeholder="Select chart types"
+            <Autocomplete
+              multiple
+              options={visualizationOptions}
+              getOptionLabel={(option) => option.label}
+              value={visualizationOptions.filter(opt => formData.preferred_visualizations.includes(opt.value))}
+              onChange={(event, newValue) => {
+                handleInputChange('preferred_visualizations', newValue.map(v => v.value));
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Preferred Visualizations"
+                  placeholder="Select chart types"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: alpha(colors.primary, 0.2) },
+                      '&:hover fieldset': { borderColor: colors.primary },
+                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                    },
+                  }}
+                />
+              )}
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => (
+                  <Chip
+                    label={option.label}
+                    {...getTagProps({ index })}
+                    sx={{
+                      bgcolor: alpha(colors.secondary, 0.1),
+                      color: colors.secondary,
+                      '& .MuiChip-deleteIcon': { color: colors.secondary },
+                    }}
                   />
-                )}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => (
-                    <Chip label={option.label} {...getTagProps({ index })} />
-                  ))
-                }
-              />
+                ))
+              }
+            />
 
-              <TextField
-                fullWidth
-                multiline
-                rows={4}
-                label="Additional Context"
-                placeholder="Add any additional context that should be considered when generating insights..."
-                value={formData.custom_context}
-                onChange={(e) => handleInputChange('custom_context', e.target.value)}
-              />
-            </Stack>
-          </CardContent>
-        </Card>
+            <TextField
+              fullWidth
+              multiline
+              rows={4}
+              label="Additional Context"
+              placeholder="Add any additional context that should be considered when generating insights..."
+              value={formData.custom_context}
+              onChange={(e) => handleInputChange('custom_context', e.target.value)}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: alpha(colors.primary, 0.2) },
+                  '&:hover fieldset': { borderColor: colors.primary },
+                  '&.Mui-focused fieldset': { borderColor: colors.primary },
+                },
+              }}
+            />
+          </Stack>
+        </Paper>
 
         {/* Save Button */}
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -373,6 +588,11 @@ const UserProfileManager = () => {
             startIcon={<SaveIcon />}
             onClick={handleSaveProfile}
             disabled={loading || !hasUnsavedChanges}
+            sx={{
+              bgcolor: colors.primary,
+              '&:hover': { bgcolor: colors.secondary },
+              '&.Mui-disabled': { bgcolor: alpha(colors.grey, 0.3) },
+            }}
           >
             {loading ? 'Saving...' : hasUnsavedChanges ? 'Save Persona' : 'Saved'}
           </Button>

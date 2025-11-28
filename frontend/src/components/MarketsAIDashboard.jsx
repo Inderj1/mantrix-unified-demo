@@ -64,10 +64,27 @@ const MarketsAIDashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Calculate global metrics
-  const totalImpact = getTotalImpact();
-  const criticalSignals = getCriticalSignals();
-  const totalActiveSignals = Object.values(mockMarketSignals).flat().length;
+  // Calculate global metrics - only for enabled categories
+  const hasEnabledCategories = enabledCategories.length > 0;
+
+  // Filter signals to only include enabled categories
+  const enabledCategorySignals = hasEnabledCategories
+    ? Object.entries(mockMarketSignals)
+        .filter(([category]) => enabledCategories.includes(category))
+        .flatMap(([, signals]) => signals)
+    : [];
+
+  const totalImpact = hasEnabledCategories
+    ? enabledCategorySignals.reduce((sum, signal) => sum + (signal.impactValue || 0), 0)
+    : 0;
+
+  const criticalSignals = hasEnabledCategories
+    ? enabledCategorySignals.filter(s => s.severity === 'critical')
+    : [];
+
+  const totalActiveSignals = hasEnabledCategories
+    ? enabledCategorySignals.length
+    : 0;
 
   // Get signal count per category
   const getSignalCount = (categoryId) => {

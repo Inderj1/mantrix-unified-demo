@@ -22,6 +22,7 @@ import {
   Alert,
   Tabs,
   Tab,
+  alpha,
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import {
@@ -29,7 +30,24 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Settings as SettingsIcon,
+  Email as EmailIcon,
+  ViewList as ViewListIcon,
 } from '@mui/icons-material';
+
+// Blue/grey color palette
+const colors = {
+  primary: '#0a6ed1',
+  secondary: '#0854a0',
+  dark: '#354a5f',
+  slate: '#475569',
+  grey: '#64748b',
+  light: '#94a3b8',
+  success: '#10b981',
+  warning: '#f59e0b',
+  error: '#ef4444',
+  text: '#1e293b',
+  bg: '#f8fbfd',
+};
 
 const CommsConfig = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -43,18 +61,16 @@ const CommsConfig = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  // Form states for communication type
   const [typeForm, setTypeForm] = useState({
     name: '',
     display_name: '',
     description: '',
     icon: 'Email',
-    color: '#2196F3',
+    color: '#0a6ed1',
     tab_order: 0,
     is_active: true,
   });
 
-  // Form states for field definition
   const [fieldForm, setFieldForm] = useState({
     field_name: '',
     display_name: '',
@@ -205,7 +221,7 @@ const CommsConfig = () => {
       display_name: '',
       description: '',
       icon: 'Email',
-      color: '#2196F3',
+      color: '#0a6ed1',
       tab_order: 0,
       is_active: true,
     });
@@ -239,8 +255,26 @@ const CommsConfig = () => {
   };
 
   const typeColumns = [
-    { field: 'display_name', headerName: 'Display Name', width: 200 },
-    { field: 'name', headerName: 'System Name', width: 200 },
+    {
+      field: 'display_name',
+      headerName: 'Display Name',
+      width: 200,
+      renderCell: (params) => (
+        <Typography variant="body2" fontWeight={500} sx={{ color: colors.text }}>
+          {params.value}
+        </Typography>
+      ),
+    },
+    {
+      field: 'name',
+      headerName: 'System Name',
+      width: 200,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ color: colors.grey }}>
+          {params.value}
+        </Typography>
+      ),
+    },
     { field: 'icon', headerName: 'Icon', width: 120 },
     {
       field: 'color',
@@ -249,7 +283,7 @@ const CommsConfig = () => {
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Box sx={{ width: 20, height: 20, bgcolor: params.value, borderRadius: 1 }} />
-          {params.value}
+          <Typography variant="caption" sx={{ color: colors.grey }}>{params.value}</Typography>
         </Box>
       ),
     },
@@ -258,18 +292,38 @@ const CommsConfig = () => {
       field: 'is_active',
       headerName: 'Active',
       width: 100,
-      renderCell: (params) => <Chip label={params.value ? 'Yes' : 'No'} size="small" color={params.value ? 'success' : 'default'} />,
+      renderCell: (params) => (
+        <Chip
+          label={params.value ? 'Yes' : 'No'}
+          size="small"
+          sx={{
+            height: 24,
+            bgcolor: params.value ? alpha(colors.success, 0.1) : alpha(colors.grey, 0.1),
+            color: params.value ? colors.success : colors.grey,
+            fontWeight: 600,
+            fontSize: '0.7rem',
+          }}
+        />
+      ),
     },
     {
       field: 'actions',
       headerName: 'Actions',
       width: 150,
       renderCell: (params) => (
-        <Stack direction="row" spacing={1}>
-          <IconButton size="small" onClick={() => handleEditType(params.row)}>
+        <Stack direction="row" spacing={0.5}>
+          <IconButton
+            size="small"
+            onClick={() => handleEditType(params.row)}
+            sx={{ color: colors.primary, '&:hover': { bgcolor: alpha(colors.primary, 0.1) } }}
+          >
             <EditIcon fontSize="small" />
           </IconButton>
-          <IconButton size="small" onClick={() => handleDeleteType(params.row.id)}>
+          <IconButton
+            size="small"
+            onClick={() => handleDeleteType(params.row.id)}
+            sx={{ color: colors.error, '&:hover': { bgcolor: alpha(colors.error, 0.1) } }}
+          >
             <DeleteIcon fontSize="small" />
           </IconButton>
         </Stack>
@@ -278,27 +332,82 @@ const CommsConfig = () => {
   ];
 
   const fieldColumns = [
-    { field: 'display_name', headerName: 'Display Name', width: 200 },
-    { field: 'field_name', headerName: 'Field Name', width: 150 },
-    { field: 'field_type', headerName: 'Type', width: 120 },
+    {
+      field: 'display_name',
+      headerName: 'Display Name',
+      width: 200,
+      renderCell: (params) => (
+        <Typography variant="body2" fontWeight={500} sx={{ color: colors.text }}>
+          {params.value}
+        </Typography>
+      ),
+    },
+    {
+      field: 'field_name',
+      headerName: 'Field Name',
+      width: 150,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ color: colors.grey }}>
+          {params.value}
+        </Typography>
+      ),
+    },
+    {
+      field: 'field_type',
+      headerName: 'Type',
+      width: 120,
+      renderCell: (params) => (
+        <Chip
+          label={params.value}
+          size="small"
+          sx={{
+            height: 22,
+            bgcolor: alpha(colors.primary, 0.1),
+            color: colors.primary,
+            fontWeight: 500,
+            fontSize: '0.7rem',
+          }}
+        />
+      ),
+    },
     { field: 'column_width', headerName: 'Width', width: 100 },
     { field: 'column_order', headerName: 'Order', width: 100 },
     {
       field: 'is_required',
       headerName: 'Required',
       width: 100,
-      renderCell: (params) => <Chip label={params.value ? 'Yes' : 'No'} size="small" />,
+      renderCell: (params) => (
+        <Chip
+          label={params.value ? 'Yes' : 'No'}
+          size="small"
+          sx={{
+            height: 22,
+            bgcolor: params.value ? alpha(colors.warning, 0.1) : alpha(colors.grey, 0.1),
+            color: params.value ? colors.warning : colors.grey,
+            fontWeight: 500,
+            fontSize: '0.7rem',
+          }}
+        />
+      ),
     },
     {
       field: 'actions',
       headerName: 'Actions',
       width: 150,
       renderCell: (params) => (
-        <Stack direction="row" spacing={1}>
-          <IconButton size="small" onClick={() => handleEditField(params.row)}>
+        <Stack direction="row" spacing={0.5}>
+          <IconButton
+            size="small"
+            onClick={() => handleEditField(params.row)}
+            sx={{ color: colors.primary, '&:hover': { bgcolor: alpha(colors.primary, 0.1) } }}
+          >
             <EditIcon fontSize="small" />
           </IconButton>
-          <IconButton size="small" onClick={() => handleDeleteField(params.row.id)}>
+          <IconButton
+            size="small"
+            onClick={() => handleDeleteField(params.row.id)}
+            sx={{ color: colors.error, '&:hover': { bgcolor: alpha(colors.error, 0.1) } }}
+          >
             <DeleteIcon fontSize="small" />
           </IconButton>
         </Stack>
@@ -308,64 +417,172 @@ const CommsConfig = () => {
 
   return (
     <Box>
-      <Box sx={{ mb: 4 }}>
+      {/* Header */}
+      <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
-            <Typography variant="h4" fontWeight={700} gutterBottom>
-              EMAIL INTEL Configuration
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1 }}>
+              <Box
+                sx={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 1.5,
+                  bgcolor: alpha(colors.primary, 0.1),
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: colors.primary,
+                }}
+              >
+                <SettingsIcon sx={{ fontSize: 22 }} />
+              </Box>
+              <Typography variant="h6" fontWeight={600} sx={{ color: colors.text }}>
+                EMAIL INTEL Configuration
+              </Typography>
+            </Stack>
+            <Typography variant="body2" sx={{ color: colors.grey }}>
               Configure communication types and custom fields
             </Typography>
           </Box>
-          <SettingsIcon sx={{ fontSize: 40, color: 'primary.main' }} />
         </Stack>
       </Box>
 
-      {error && <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>{error}</Alert>}
-      {success && <Alert severity="success" sx={{ mb: 3 }} onClose={() => setSuccess(null)}>{success}</Alert>}
+      {error && (
+        <Alert
+          severity="error"
+          sx={{ mb: 3, borderRadius: 2 }}
+          onClose={() => setError(null)}
+        >
+          {error}
+        </Alert>
+      )}
+      {success && (
+        <Alert
+          severity="success"
+          sx={{ mb: 3, borderRadius: 2 }}
+          onClose={() => setSuccess(null)}
+        >
+          {success}
+        </Alert>
+      )}
 
-      <Paper sx={{ mb: 3 }}>
-        <Tabs value={activeTab} onChange={(e, v) => setActiveTab(v)}>
-          <Tab label="Communication Types" />
-          <Tab label="Field Definitions" disabled={!selectedType} />
+      <Paper
+        elevation={0}
+        sx={{
+          mb: 3,
+          borderRadius: 2,
+          border: '1px solid',
+          borderColor: alpha(colors.primary, 0.1),
+        }}
+      >
+        <Tabs
+          value={activeTab}
+          onChange={(e, v) => setActiveTab(v)}
+          sx={{
+            '& .MuiTab-root': {
+              textTransform: 'none',
+              fontWeight: 600,
+              color: colors.grey,
+              '&.Mui-selected': { color: colors.primary },
+            },
+            '& .MuiTabs-indicator': { bgcolor: colors.primary, height: 3 },
+          }}
+        >
+          <Tab label="Communication Types" icon={<EmailIcon sx={{ fontSize: 18 }} />} iconPosition="start" />
+          <Tab label="Field Definitions" icon={<ViewListIcon sx={{ fontSize: 18 }} />} iconPosition="start" disabled={!selectedType} />
         </Tabs>
       </Paper>
 
       {activeTab === 0 && (
-        <Paper>
-          <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="h6">Communication Types</Typography>
-            <Button startIcon={<AddIcon />} variant="contained" onClick={() => { resetTypeForm(); setOpenTypeDialog(true); }}>
+        <Paper
+          elevation={0}
+          sx={{
+            borderRadius: 2,
+            border: '1px solid',
+            borderColor: alpha(colors.primary, 0.1),
+            overflow: 'hidden',
+          }}
+        >
+          <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${alpha(colors.primary, 0.1)}` }}>
+            <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
+              Communication Types
+            </Typography>
+            <Button
+              startIcon={<AddIcon />}
+              variant="contained"
+              size="small"
+              onClick={() => { resetTypeForm(); setOpenTypeDialog(true); }}
+              sx={{ bgcolor: colors.primary, '&:hover': { bgcolor: colors.secondary } }}
+            >
               Add Type
             </Button>
           </Box>
-          <Box sx={{ height: 500 }}>
+          <Box sx={{ height: 450 }}>
             <DataGrid
               rows={communicationTypes}
               columns={typeColumns}
               pageSize={10}
               onRowClick={(params) => setSelectedType(params.row)}
-              sx={{ border: 'none' }}
+              sx={{
+                border: 'none',
+                '& .MuiDataGrid-columnHeaders': {
+                  bgcolor: alpha(colors.primary, 0.03),
+                  borderBottom: `1px solid ${alpha(colors.primary, 0.1)}`,
+                },
+                '& .MuiDataGrid-cell': {
+                  borderBottom: `1px solid ${alpha(colors.primary, 0.05)}`,
+                },
+                '& .MuiDataGrid-row:hover': {
+                  bgcolor: alpha(colors.primary, 0.03),
+                },
+              }}
             />
           </Box>
         </Paper>
       )}
 
       {activeTab === 1 && selectedType && (
-        <Paper>
-          <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="h6">Fields for: {selectedType.display_name}</Typography>
-            <Button startIcon={<AddIcon />} variant="contained" onClick={() => { resetFieldForm(); setOpenFieldDialog(true); }}>
+        <Paper
+          elevation={0}
+          sx={{
+            borderRadius: 2,
+            border: '1px solid',
+            borderColor: alpha(colors.primary, 0.1),
+            overflow: 'hidden',
+          }}
+        >
+          <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${alpha(colors.primary, 0.1)}` }}>
+            <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
+              Fields for: {selectedType.display_name}
+            </Typography>
+            <Button
+              startIcon={<AddIcon />}
+              variant="contained"
+              size="small"
+              onClick={() => { resetFieldForm(); setOpenFieldDialog(true); }}
+              sx={{ bgcolor: colors.primary, '&:hover': { bgcolor: colors.secondary } }}
+            >
               Add Field
             </Button>
           </Box>
-          <Box sx={{ height: 500 }}>
+          <Box sx={{ height: 450 }}>
             <DataGrid
               rows={fields}
               columns={fieldColumns}
               pageSize={10}
-              sx={{ border: 'none' }}
+              sx={{
+                border: 'none',
+                '& .MuiDataGrid-columnHeaders': {
+                  bgcolor: alpha(colors.primary, 0.03),
+                  borderBottom: `1px solid ${alpha(colors.primary, 0.1)}`,
+                },
+                '& .MuiDataGrid-cell': {
+                  borderBottom: `1px solid ${alpha(colors.primary, 0.05)}`,
+                },
+                '& .MuiDataGrid-row:hover': {
+                  bgcolor: alpha(colors.primary, 0.03),
+                },
+              }}
             />
           </Box>
         </Paper>
@@ -373,20 +590,36 @@ const CommsConfig = () => {
 
       {/* Type Dialog */}
       <Dialog open={openTypeDialog} onClose={() => setOpenTypeDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingType ? 'Edit' : 'Add'} Communication Type</DialogTitle>
+        <DialogTitle sx={{ color: colors.text, fontWeight: 600 }}>
+          {editingType ? 'Edit' : 'Add'} Communication Type
+        </DialogTitle>
         <DialogContent>
-          <Stack spacing={2} sx={{ mt: 1 }}>
+          <Stack spacing={2.5} sx={{ mt: 1 }}>
             <TextField
               label="System Name"
               value={typeForm.name}
               onChange={(e) => setTypeForm({ ...typeForm, name: e.target.value.replace(/\s/g, '_').toLowerCase() })}
               fullWidth
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: alpha(colors.primary, 0.2) },
+                  '&:hover fieldset': { borderColor: colors.primary },
+                  '&.Mui-focused fieldset': { borderColor: colors.primary },
+                },
+              }}
             />
             <TextField
               label="Display Name"
               value={typeForm.display_name}
               onChange={(e) => setTypeForm({ ...typeForm, display_name: e.target.value })}
               fullWidth
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: alpha(colors.primary, 0.2) },
+                  '&:hover fieldset': { borderColor: colors.primary },
+                  '&.Mui-focused fieldset': { borderColor: colors.primary },
+                },
+              }}
             />
             <TextField
               label="Description"
@@ -395,10 +628,26 @@ const CommsConfig = () => {
               multiline
               rows={2}
               fullWidth
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: alpha(colors.primary, 0.2) },
+                  '&:hover fieldset': { borderColor: colors.primary },
+                  '&.Mui-focused fieldset': { borderColor: colors.primary },
+                },
+              }}
             />
             <FormControl fullWidth>
               <InputLabel>Icon</InputLabel>
-              <Select value={typeForm.icon} onChange={(e) => setTypeForm({ ...typeForm, icon: e.target.value })}>
+              <Select
+                value={typeForm.icon}
+                onChange={(e) => setTypeForm({ ...typeForm, icon: e.target.value })}
+                label="Icon"
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': { borderColor: alpha(colors.primary, 0.2) },
+                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary },
+                }}
+              >
                 {iconOptions.map(icon => <MenuItem key={icon} value={icon}>{icon}</MenuItem>)}
               </Select>
             </FormControl>
@@ -415,22 +664,48 @@ const CommsConfig = () => {
               value={typeForm.tab_order}
               onChange={(e) => setTypeForm({ ...typeForm, tab_order: parseInt(e.target.value) })}
               fullWidth
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: alpha(colors.primary, 0.2) },
+                  '&:hover fieldset': { borderColor: colors.primary },
+                  '&.Mui-focused fieldset': { borderColor: colors.primary },
+                },
+              }}
             />
             <FormControlLabel
-              control={<Switch checked={typeForm.is_active} onChange={(e) => setTypeForm({ ...typeForm, is_active: e.target.checked })} />}
+              control={
+                <Switch
+                  checked={typeForm.is_active}
+                  onChange={(e) => setTypeForm({ ...typeForm, is_active: e.target.checked })}
+                  sx={{
+                    '& .MuiSwitch-switchBase.Mui-checked': { color: colors.primary },
+                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: colors.primary },
+                  }}
+                />
+              }
               label="Active"
             />
           </Stack>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenTypeDialog(false)}>Cancel</Button>
-          <Button onClick={handleSaveType} variant="contained">Save</Button>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setOpenTypeDialog(false)} sx={{ color: colors.grey }}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSaveType}
+            variant="contained"
+            sx={{ bgcolor: colors.primary, '&:hover': { bgcolor: colors.secondary } }}
+          >
+            Save
+          </Button>
         </DialogActions>
       </Dialog>
 
       {/* Field Dialog */}
       <Dialog open={openFieldDialog} onClose={() => setOpenFieldDialog(false)} maxWidth="md" fullWidth>
-        <DialogTitle>{editingField ? 'Edit' : 'Add'} Field</DialogTitle>
+        <DialogTitle sx={{ color: colors.text, fontWeight: 600 }}>
+          {editingField ? 'Edit' : 'Add'} Field
+        </DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={6}>
@@ -439,6 +714,13 @@ const CommsConfig = () => {
                 value={fieldForm.field_name}
                 onChange={(e) => setFieldForm({ ...fieldForm, field_name: e.target.value.replace(/\s/g, '_').toLowerCase() })}
                 fullWidth
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': { borderColor: alpha(colors.primary, 0.2) },
+                    '&:hover fieldset': { borderColor: colors.primary },
+                    '&.Mui-focused fieldset': { borderColor: colors.primary },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={6}>
@@ -447,12 +729,28 @@ const CommsConfig = () => {
                 value={fieldForm.display_name}
                 onChange={(e) => setFieldForm({ ...fieldForm, display_name: e.target.value })}
                 fullWidth
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': { borderColor: alpha(colors.primary, 0.2) },
+                    '&:hover fieldset': { borderColor: colors.primary },
+                    '&.Mui-focused fieldset': { borderColor: colors.primary },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={6}>
               <FormControl fullWidth>
                 <InputLabel>Field Type</InputLabel>
-                <Select value={fieldForm.field_type} onChange={(e) => setFieldForm({ ...fieldForm, field_type: e.target.value })}>
+                <Select
+                  value={fieldForm.field_type}
+                  onChange={(e) => setFieldForm({ ...fieldForm, field_type: e.target.value })}
+                  label="Field Type"
+                  sx={{
+                    '& .MuiOutlinedInput-notchedOutline': { borderColor: alpha(colors.primary, 0.2) },
+                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary },
+                  }}
+                >
                   {fieldTypes.map(type => <MenuItem key={type} value={type}>{type}</MenuItem>)}
                 </Select>
               </FormControl>
@@ -464,6 +762,13 @@ const CommsConfig = () => {
                 value={fieldForm.column_width}
                 onChange={(e) => setFieldForm({ ...fieldForm, column_width: parseInt(e.target.value) })}
                 fullWidth
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': { borderColor: alpha(colors.primary, 0.2) },
+                    '&:hover fieldset': { borderColor: colors.primary },
+                    '&.Mui-focused fieldset': { borderColor: colors.primary },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={3}>
@@ -473,6 +778,13 @@ const CommsConfig = () => {
                 value={fieldForm.column_order}
                 onChange={(e) => setFieldForm({ ...fieldForm, column_order: parseInt(e.target.value) })}
                 fullWidth
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': { borderColor: alpha(colors.primary, 0.2) },
+                    '&:hover fieldset': { borderColor: colors.primary },
+                    '&.Mui-focused fieldset': { borderColor: colors.primary },
+                  },
+                }}
               />
             </Grid>
             {fieldForm.field_type === 'dropdown' && (
@@ -482,38 +794,89 @@ const CommsConfig = () => {
                   value={fieldForm.dropdown_options?.join(', ') || ''}
                   onChange={(e) => setFieldForm({ ...fieldForm, dropdown_options: e.target.value.split(',').map(s => s.trim()) })}
                   fullWidth
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: alpha(colors.primary, 0.2) },
+                      '&:hover fieldset': { borderColor: colors.primary },
+                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                    },
+                  }}
                 />
               </Grid>
             )}
             <Grid item xs={3}>
               <FormControlLabel
-                control={<Switch checked={fieldForm.is_required} onChange={(e) => setFieldForm({ ...fieldForm, is_required: e.target.checked })} />}
+                control={
+                  <Switch
+                    checked={fieldForm.is_required}
+                    onChange={(e) => setFieldForm({ ...fieldForm, is_required: e.target.checked })}
+                    sx={{
+                      '& .MuiSwitch-switchBase.Mui-checked': { color: colors.primary },
+                      '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: colors.primary },
+                    }}
+                  />
+                }
                 label="Required"
               />
             </Grid>
             <Grid item xs={3}>
               <FormControlLabel
-                control={<Switch checked={fieldForm.is_searchable} onChange={(e) => setFieldForm({ ...fieldForm, is_searchable: e.target.checked })} />}
+                control={
+                  <Switch
+                    checked={fieldForm.is_searchable}
+                    onChange={(e) => setFieldForm({ ...fieldForm, is_searchable: e.target.checked })}
+                    sx={{
+                      '& .MuiSwitch-switchBase.Mui-checked': { color: colors.primary },
+                      '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: colors.primary },
+                    }}
+                  />
+                }
                 label="Searchable"
               />
             </Grid>
             <Grid item xs={3}>
               <FormControlLabel
-                control={<Switch checked={fieldForm.is_filterable} onChange={(e) => setFieldForm({ ...fieldForm, is_filterable: e.target.checked })} />}
+                control={
+                  <Switch
+                    checked={fieldForm.is_filterable}
+                    onChange={(e) => setFieldForm({ ...fieldForm, is_filterable: e.target.checked })}
+                    sx={{
+                      '& .MuiSwitch-switchBase.Mui-checked': { color: colors.primary },
+                      '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: colors.primary },
+                    }}
+                  />
+                }
                 label="Filterable"
               />
             </Grid>
             <Grid item xs={3}>
               <FormControlLabel
-                control={<Switch checked={fieldForm.is_sortable} onChange={(e) => setFieldForm({ ...fieldForm, is_sortable: e.target.checked })} />}
+                control={
+                  <Switch
+                    checked={fieldForm.is_sortable}
+                    onChange={(e) => setFieldForm({ ...fieldForm, is_sortable: e.target.checked })}
+                    sx={{
+                      '& .MuiSwitch-switchBase.Mui-checked': { color: colors.primary },
+                      '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: colors.primary },
+                    }}
+                  />
+                }
                 label="Sortable"
               />
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenFieldDialog(false)}>Cancel</Button>
-          <Button onClick={handleSaveField} variant="contained">Save</Button>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setOpenFieldDialog(false)} sx={{ color: colors.grey }}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSaveField}
+            variant="contained"
+            sx={{ bgcolor: colors.primary, '&:hover': { bgcolor: colors.secondary } }}
+          >
+            Save
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

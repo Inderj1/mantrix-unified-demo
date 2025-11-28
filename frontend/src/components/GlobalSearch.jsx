@@ -294,10 +294,15 @@ const GlobalSearch = ({ onNavigate }) => {
       >
         <SearchIcon sx={{ color: 'text.secondary', mr: 1 }} />
         <TextField
-          ref={inputRef}
+          inputRef={inputRef}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={handleKeyDown}
+          onFocus={() => {
+            if (searchQuery.trim() && searchResults.length > 0) {
+              setIsOpen(true);
+            }
+          }}
           placeholder="Search anything..."
           fullWidth
           variant="standard"

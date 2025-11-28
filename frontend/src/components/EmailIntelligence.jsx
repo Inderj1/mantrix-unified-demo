@@ -117,6 +117,9 @@ const iconMap = {
 
 // Sample data generator
 const generateSampleData = (typeName, count = 10) => {
+  // Normalize type name (handle both underscore and hyphen formats)
+  const normalizedName = typeName.replace(/_/g, '-').toLowerCase();
+
   const sampleData = {
     'customer-inquiries': Array.from({ length: count }, (_, i) => ({
       id: i + 1,
@@ -268,9 +271,149 @@ const generateSampleData = (typeName, count = 10) => {
       content: `Order confirmation for ${Math.floor(Math.random() * 20) + 1} items. Total value: $${(Math.random() * 100000 + 5000).toFixed(2)}. Estimated delivery: ${new Date(Date.now() + (i * 3 + 7) * 86400000).toLocaleDateString()}.`,
       payment_status: ['pending', 'completed', 'processing'][i % 3],
     })),
+
+    'escalations': Array.from({ length: count }, (_, i) => ({
+      id: i + 1,
+      ticket_id: 'ESC-' + (30000 + i),
+      customer_name: ['Acme Corp', 'TechStart Inc', 'Global Retail', 'Enterprise Solutions', 'Mega Manufacturing', 'Financial Services Ltd', 'Healthcare Plus', 'Education First', 'Logistics Pro', 'Energy Systems'][i % 10],
+      customer_email: ['support@acme.com', 'help@techstart.io', 'service@globalretail.com', 'it@enterprise.com', 'ops@megaman.com', 'contact@finserv.com', 'admin@healthplus.org', 'support@edufirst.edu', 'helpdesk@logipro.com', 'service@energy.com'][i % 10],
+      subject: [
+        'CRITICAL: Production System Down - Immediate Attention Required',
+        'URGENT: Data Loss Incident - Recovery Needed',
+        'HIGH PRIORITY: Security Breach Detected',
+        'ESCALATION: SLA Breach - Premium Customer',
+        'CRITICAL: Payment Gateway Failures',
+        'URGENT: API Rate Limiting Affecting Operations',
+        'HIGH: Customer Data Export Blocked',
+        'CRITICAL: Database Connection Pool Exhausted',
+        'URGENT: Third-Party Integration Broken',
+        'ESCALATION: Executive Customer Complaint'
+      ][i % 10],
+      severity: ['critical', 'high', 'critical', 'high', 'critical', 'medium', 'high', 'critical', 'high', 'critical'][i % 10],
+      status: ['open', 'in_progress', 'pending_vendor', 'escalated_l3', 'resolved'][i % 5],
+      priority: ['P1', 'P1', 'P2', 'P1', 'P2'][i % 5],
+      assigned_to: ['Senior Engineer', 'Tech Lead', 'System Admin', 'DevOps Lead', 'Support Manager'][i % 5],
+      escalation_level: ['L2', 'L3', 'L2', 'L3', 'Management'][i % 5],
+      time_in_queue: [15, 45, 120, 30, 90, 60, 180, 25, 75, 240][i % 10] + ' mins',
+      sla_remaining: [2, 4, 1, 6, 0.5, 3, 8, 1.5, 5, 0][i % 10] + ' hours',
+      impact: ['Critical Business Impact', 'Major Business Impact', 'Moderate Impact', 'Minor Impact'][i % 4],
+      affected_users: [5000, 2500, 1000, 500, 250, 100, 50, 25, 10000, 750][i % 10],
+      created_date: new Date(Date.now() - i * 3600000).toLocaleString(),
+      last_update: new Date(Date.now() - i * 1800000).toLocaleString(),
+      content: [
+        'CRITICAL ESCALATION\n\nOur production environment is completely down affecting all 5,000+ users. No one can access the application.\n\nTimeline:\n- 10:15 AM: First reports of slowness\n- 10:30 AM: Complete outage\n- 10:45 AM: Initial troubleshooting started\n- 11:00 AM: Escalated to L3\n\nImpact: Revenue loss estimated at $50K/hour\nAffected Systems: All production servers\n\nImmediate action required!',
+        'Data Loss Incident Report\n\nWe have identified potential data loss in our analytics database:\n- Affected tables: user_analytics, event_logs\n- Time range: Last 6 hours\n- Records potentially affected: ~500,000\n\nRecovery process initiated. Need senior DBA support immediately.',
+        'Security Alert - Potential Breach\n\nOur security monitoring system has detected:\n- Unusual login attempts from foreign IPs\n- Potential data exfiltration activity\n- 3 compromised user accounts identified\n\nImmediate security review required. All affected accounts locked.',
+        'SLA Breach Notice\n\nPremium customer Acme Corp (ARR: $500K) has experienced:\n- 3 service disruptions this month\n- Current incident duration: 4 hours\n- SLA guarantee: 99.9% uptime\n\nExecutive involvement may be required.',
+        'Payment Processing Emergency\n\nMultiple payment failures reported:\n- Failed transactions: 150+\n- Total value at risk: $75,000\n- Gateway timeout errors increasing\n\nPayment team and vendor coordination needed urgently.'
+      ][i % 5],
+      tags: [['critical', 'production'], ['data-loss', 'recovery'], ['security', 'breach'], ['sla', 'premium'], ['payments', 'urgent']][i % 5],
+      sentiment: 'urgent',
+    })),
+
+    'inventory-alerts': Array.from({ length: count }, (_, i) => ({
+      id: i + 1,
+      alert_id: 'INV-ALERT-' + (40000 + i),
+      sku: ['SKU-' + (1001 + i), 'SKU-' + (2001 + i), 'SKU-' + (3001 + i)][i % 3],
+      product_name: [
+        'Industrial Motor Assembly',
+        'Electronic Control Panel',
+        'Steel Reinforcement Bars',
+        'Hydraulic Pump Unit',
+        'Electrical Wiring Harness',
+        'Pneumatic Valve Set',
+        'Aluminum Extruded Profiles',
+        'Precision Ball Bearings',
+        'Thermal Insulation Panels',
+        'Safety Equipment Kit'
+      ][i % 10],
+      warehouse: ['DC-East', 'DC-West', 'DC-Central', 'DC-North', 'DC-South'][i % 5],
+      alert_type: ['low_stock', 'overstock', 'reorder_point', 'expiring_soon', 'damaged_inventory', 'stockout_risk'][i % 6],
+      current_stock: [15, 5000, 45, 0, 250, 80, 1200, 30, 500, 10][i % 10],
+      reorder_point: [50, 500, 100, 25, 200, 100, 400, 50, 300, 50][i % 10],
+      max_stock: [500, 2000, 1000, 250, 1000, 500, 2000, 500, 1500, 500][i % 10],
+      days_of_supply: [3, 45, 7, 0, 15, 10, 60, 5, 25, 2][i % 10],
+      status: ['critical', 'warning', 'info', 'critical', 'warning'][i % 5],
+      priority: ['high', 'medium', 'low', 'high', 'medium'][i % 5],
+      supplier: ['Tech Supplies Inc', 'Global Manufacturing', 'Quality Parts Ltd', 'Logistics Pro', 'Materials Direct'][i % 5],
+      lead_time: [7, 14, 21, 10, 5, 30, 3, 15, 28, 2][i % 10] + ' days',
+      estimated_stockout: new Date(Date.now() + (i + 1) * 86400000 * 3).toLocaleDateString(),
+      cost_impact: (Math.random() * 50000 + 5000).toFixed(2),
+      recommended_action: [
+        'Place emergency order - 500 units needed',
+        'Consider redistribution from DC-West',
+        'Standard reorder - follow procurement process',
+        'Immediate attention - customer orders at risk',
+        'Review sales forecast and adjust reorder quantity'
+      ][i % 5],
+      created_date: new Date(Date.now() - i * 86400000).toLocaleDateString(),
+      content: [
+        'STOCK ALERT: Industrial Motor Assembly\n\nCurrent stock has dropped below critical threshold.\n\nCurrent Level: 15 units\nReorder Point: 50 units\nDaily Usage: 8 units\nDays Until Stockout: 2 days\n\nOpen Customer Orders: 45 units\nBackorder Risk: HIGH\n\nRecommended Action:\n1. Place emergency order with Tech Supplies Inc\n2. Quantity needed: 200 units minimum\n3. Request expedited shipping (2-3 days)\n4. Cost: Estimated $24,500\n\nAlternative: Check inventory at DC-West (current stock: 120 units)',
+        'OVERSTOCK ALERT: Electronic Control Panel\n\nInventory levels exceed optimal range.\n\nCurrent Stock: 5,000 units\nMax Stock Level: 2,000 units\nOverstock Quantity: 3,000 units\n\nCarrying Cost Impact: $15,000/month\nStorage Space Used: 450 sq ft\n\nRecommended Actions:\n1. Halt incoming orders for 60 days\n2. Run promotional campaign to increase sales\n3. Consider redistribution to other DCs\n4. Review forecast accuracy for this SKU',
+        'EXPIRING INVENTORY ALERT\n\nBatch approaching expiration date.\n\nProduct: Safety Equipment Kit\nBatch #: BTH-2024-0158\nQuantity: 250 units\nExpiration Date: ' + new Date(Date.now() + 30 * 86400000).toLocaleDateString() + '\n\nDays Until Expiry: 30 days\nCurrent Value: $37,500\n\nRecommended Actions:\n1. Prioritize for outbound orders\n2. Offer discount to key accounts\n3. Consider donation program if unsold\n4. Update shelf-life management policy'
+      ][i % 3],
+      attachments: i % 4 === 0 ? 1 : 0,
+    })),
+
+    'email-campaigns': Array.from({ length: count }, (_, i) => ({
+      id: i + 1,
+      campaign_id: 'CAMP-' + (50000 + i),
+      campaign_name: [
+        'Q1 2024 Product Launch',
+        'Black Friday Sale Announcement',
+        'Customer Loyalty Rewards',
+        'New Feature Release',
+        'Quarterly Newsletter',
+        'Referral Program Launch',
+        'Webinar Invitation',
+        'Year-End Thank You',
+        'Service Update Notice',
+        'Re-engagement Campaign'
+      ][i % 10],
+      subject_line: [
+        'Introducing Our Revolutionary New Product Line!',
+        '🔥 Black Friday: Up to 70% Off Everything!',
+        'You\'ve Earned 500 Bonus Points!',
+        'New Features Just Dropped - See What\'s New',
+        'Your Monthly Industry Insights Are Here',
+        'Refer a Friend, Get $50 Credit',
+        'Join Us: Exclusive Webinar on AI Trends',
+        'Thank You for an Amazing Year!',
+        'Important: Scheduled Maintenance Notice',
+        'We Miss You! Here\'s 20% Off Your Next Order'
+      ][i % 10],
+      sender: ['marketing@company.com', 'news@company.com', 'rewards@company.com', 'product@company.com', 'support@company.com'][i % 5],
+      status: ['sent', 'scheduled', 'draft', 'completed', 'paused'][i % 5],
+      audience_segment: ['All Customers', 'Premium Users', 'New Signups', 'Inactive Users', 'Enterprise Clients'][i % 5],
+      recipients_count: [50000, 25000, 10000, 5000, 1500][i % 5],
+      sent_date: new Date(Date.now() - i * 86400000 * 3).toLocaleDateString(),
+      open_rate: (Math.random() * 30 + 15).toFixed(1) + '%',
+      click_rate: (Math.random() * 10 + 2).toFixed(1) + '%',
+      bounce_rate: (Math.random() * 3 + 0.5).toFixed(2) + '%',
+      unsubscribe_rate: (Math.random() * 0.5 + 0.1).toFixed(2) + '%',
+      revenue_generated: (Math.random() * 100000 + 10000).toFixed(2),
+      conversions: Math.floor(Math.random() * 500 + 50),
+      a_b_test: i % 3 === 0 ? 'Yes' : 'No',
+      winning_variant: i % 3 === 0 ? ['A', 'B'][i % 2] : '-',
+      created_by: ['Sarah Marketing', 'John Content', 'Lisa Design', 'Mike Analytics', 'Anna Strategy'][i % 5],
+      content: [
+        'Email Campaign Performance Report\n\nCampaign: Q1 2024 Product Launch\nSent: ' + new Date(Date.now() - 5 * 86400000).toLocaleDateString() + '\n\nKey Metrics:\n- Recipients: 50,000\n- Delivered: 49,250 (98.5%)\n- Opens: 12,313 (25.0%)\n- Unique Clicks: 2,463 (5.0%)\n- Conversions: 246 (0.5%)\n- Revenue: $73,800\n\nTop Performing Segments:\n1. Premium Users - 32% open rate\n2. Enterprise - 28% open rate\n3. Recent Purchasers - 26% open rate\n\nSubject Line A/B Test Results:\n- Variant A: "New Products Just Dropped!" - 23% open\n- Variant B: "Introducing Our Revolutionary New Product Line!" - 27% open ✓\n\nRecommendations:\n1. Send follow-up to non-openers\n2. Create targeted campaign for high-engagement segment\n3. Test emoji usage in future subject lines',
+        'Campaign Brief: Black Friday Sale\n\nObjective: Drive Q4 revenue through largest annual sale event\n\nTarget Audience:\n- All active customers (last 12 months)\n- Segmented by purchase history\n- Personalized discount tiers\n\nCreative Strategy:\n- Subject: Urgency + Value proposition\n- Hero image: Product collage with % off\n- CTA: Shop Now buttons throughout\n- Mobile-optimized design\n\nSend Schedule:\n- Teaser: Nov 20\n- Main Campaign: Nov 24 (7 AM)\n- Reminder: Nov 24 (2 PM)\n- Last Chance: Nov 25 (10 AM)\n\nBudget: $15,000\nExpected Revenue: $750,000\nExpected ROI: 50x',
+        'Monthly Newsletter Performance\n\nNewsletter: January 2024 Industry Insights\n\nContent Sections Performance:\n1. Industry News - 45% of clicks\n2. Product Updates - 30% of clicks\n3. Tips & Tutorials - 15% of clicks\n4. Customer Spotlight - 10% of clicks\n\nDevice Breakdown:\n- Desktop: 55%\n- Mobile: 40%\n- Tablet: 5%\n\nBest Performing Link:\n"2024 Market Trends Report" - 1,245 clicks\n\nSubscriber Growth:\n- New subscribers: +450\n- Unsubscribes: -28\n- Net growth: +422 (1.7%)\n\nNext Issue Focus:\nAI & Automation trends based on reader survey feedback'
+      ][i % 3],
+      tags: [['product-launch', 'q1'], ['sale', 'promotion'], ['loyalty', 'rewards'], ['feature', 'announcement'], ['newsletter', 'monthly']][i % 5],
+    })),
   };
 
-  return sampleData[typeName] || [];
+  // Also add aliases for underscore versions
+  sampleData['vendor_communications'] = sampleData['vendor-communications'];
+  sampleData['customer_inquiries'] = sampleData['customer-inquiries'];
+  sampleData['invoice_notifications'] = sampleData['invoice-notifications'];
+  sampleData['order_confirmations'] = sampleData['order-confirmations'];
+  sampleData['inventory_alerts'] = sampleData['inventory-alerts'];
+  sampleData['email_campaigns'] = sampleData['email-campaigns'];
+
+  return sampleData[normalizedName] || sampleData[typeName] || [];
 };
 
 const EmailIntelligence = ({ onNavigateToConfig }) => {
@@ -306,7 +449,7 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
         id: 1,
         name: 'vendor_communications',
         display_name: 'Vendor Communications',
-        description: 'Track communications with suppliers and vendors',
+        description: 'Track communications with suppliers and vendors including POs, invoices, and shipments',
         icon: 'Business',
         color: '#0a6ed1',
         tab_order: 1,
@@ -316,7 +459,7 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
         id: 2,
         name: 'customer_inquiries',
         display_name: 'Customer Inquiries',
-        description: 'Monitor and respond to customer inquiries',
+        description: 'Monitor and respond to customer support requests and inquiries',
         icon: 'Person',
         color: '#0854a0',
         tab_order: 2,
@@ -326,9 +469,9 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
         id: 3,
         name: 'escalations',
         display_name: 'Escalations',
-        description: 'Track issues requiring immediate attention',
+        description: 'Track critical issues requiring immediate attention and SLA management',
         icon: 'Notifications',
-        color: '#64748b',
+        color: '#dc2626',
         tab_order: 3,
         is_active: true
       },
@@ -336,7 +479,7 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
         id: 4,
         name: 'inventory_alerts',
         display_name: 'Inventory Alerts',
-        description: 'Monitor inventory levels and alerts',
+        description: 'Monitor stock levels, reorder points, and inventory health alerts',
         icon: 'Inventory',
         color: '#354a5f',
         tab_order: 4,
@@ -346,7 +489,7 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
         id: 5,
         name: 'email_campaigns',
         display_name: 'Email Campaigns',
-        description: 'Track email marketing campaigns',
+        description: 'Track email marketing performance, open rates, and conversions',
         icon: 'Email',
         color: '#0ea5e9',
         tab_order: 5,
@@ -354,45 +497,60 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
       }
     ],
     fields: {
+      // Type 1: Vendor Communications
       1: [
-        { id: 1, communication_type_id: 1, field_name: 'customer_name', display_name: 'Customer Name', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 1, column_width: 180 },
-        { id: 2, communication_type_id: 1, field_name: 'customer_email', display_name: 'Email', field_type: 'email', is_sortable: true, is_filterable: true, column_order: 2, column_width: 200 },
+        { id: 1, communication_type_id: 1, field_name: 'vendor_name', display_name: 'Vendor Name', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 1, column_width: 200 },
+        { id: 2, communication_type_id: 1, field_name: 'vendor_email', display_name: 'Email', field_type: 'email', is_sortable: true, is_filterable: true, column_order: 2, column_width: 200 },
         { id: 3, communication_type_id: 1, field_name: 'subject', display_name: 'Subject', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 3, column_width: 250 },
-        { id: 4, communication_type_id: 1, field_name: 'inquiry_type', display_name: 'Type', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 4, column_width: 120 },
+        { id: 4, communication_type_id: 1, field_name: 'communication_type', display_name: 'Type', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 4, column_width: 150 },
         { id: 5, communication_type_id: 1, field_name: 'status', display_name: 'Status', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 5, column_width: 130 },
-        { id: 6, communication_type_id: 1, field_name: 'priority', display_name: 'Priority', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 6, column_width: 120 },
-        { id: 7, communication_type_id: 1, field_name: 'sentiment', display_name: 'Sentiment', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 7, column_width: 120 },
-        { id: 8, communication_type_id: 1, field_name: 'received_date', display_name: 'Received', field_type: 'date', is_sortable: true, is_filterable: true, column_order: 8, column_width: 130 }
+        { id: 6, communication_type_id: 1, field_name: 'amount', display_name: 'Amount', field_type: 'currency', is_sortable: true, is_filterable: true, column_order: 6, column_width: 130 },
+        { id: 7, communication_type_id: 1, field_name: 'urgency', display_name: 'Urgency', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 7, column_width: 120 },
+        { id: 8, communication_type_id: 1, field_name: 'date', display_name: 'Date', field_type: 'date', is_sortable: true, is_filterable: true, column_order: 8, column_width: 130 }
       ],
+      // Type 2: Customer Inquiries
       2: [
-        { id: 9, communication_type_id: 2, field_name: 'vendor_name', display_name: 'Vendor Name', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 1, column_width: 200 },
-        { id: 10, communication_type_id: 2, field_name: 'vendor_email', display_name: 'Email', field_type: 'email', is_sortable: true, is_filterable: true, column_order: 2, column_width: 200 },
+        { id: 9, communication_type_id: 2, field_name: 'customer_name', display_name: 'Customer Name', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 1, column_width: 180 },
+        { id: 10, communication_type_id: 2, field_name: 'customer_email', display_name: 'Email', field_type: 'email', is_sortable: true, is_filterable: true, column_order: 2, column_width: 200 },
         { id: 11, communication_type_id: 2, field_name: 'subject', display_name: 'Subject', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 3, column_width: 250 },
-        { id: 12, communication_type_id: 2, field_name: 'communication_type', display_name: 'Type', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 4, column_width: 150 },
+        { id: 12, communication_type_id: 2, field_name: 'inquiry_type', display_name: 'Type', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 4, column_width: 120 },
         { id: 13, communication_type_id: 2, field_name: 'status', display_name: 'Status', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 5, column_width: 130 },
-        { id: 14, communication_type_id: 2, field_name: 'amount', display_name: 'Amount', field_type: 'currency', is_sortable: true, is_filterable: true, column_order: 6, column_width: 130 },
-        { id: 15, communication_type_id: 2, field_name: 'urgency', display_name: 'Urgency', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 7, column_width: 120 },
-        { id: 16, communication_type_id: 2, field_name: 'date', display_name: 'Date', field_type: 'date', is_sortable: true, is_filterable: true, column_order: 8, column_width: 130 }
+        { id: 14, communication_type_id: 2, field_name: 'priority', display_name: 'Priority', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 6, column_width: 120 },
+        { id: 15, communication_type_id: 2, field_name: 'sentiment', display_name: 'Sentiment', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 7, column_width: 120 },
+        { id: 16, communication_type_id: 2, field_name: 'received_date', display_name: 'Received', field_type: 'date', is_sortable: true, is_filterable: true, column_order: 8, column_width: 130 }
       ],
+      // Type 3: Escalations
       3: [
-        { id: 17, communication_type_id: 3, field_name: 'invoice_number', display_name: 'Invoice #', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 1, column_width: 150 },
-        { id: 18, communication_type_id: 3, field_name: 'vendor_name', display_name: 'Vendor', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 2, column_width: 200 },
-        { id: 19, communication_type_id: 3, field_name: 'invoice_amount', display_name: 'Amount', field_type: 'currency', is_sortable: true, is_filterable: true, column_order: 3, column_width: 150 },
-        { id: 20, communication_type_id: 3, field_name: 'due_date', display_name: 'Due Date', field_type: 'date', is_sortable: true, is_filterable: true, column_order: 4, column_width: 130 },
+        { id: 17, communication_type_id: 3, field_name: 'ticket_id', display_name: 'Ticket ID', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 1, column_width: 130 },
+        { id: 18, communication_type_id: 3, field_name: 'customer_name', display_name: 'Customer', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 2, column_width: 180 },
+        { id: 19, communication_type_id: 3, field_name: 'subject', display_name: 'Subject', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 3, column_width: 280 },
+        { id: 20, communication_type_id: 3, field_name: 'severity', display_name: 'Severity', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 4, column_width: 110 },
         { id: 21, communication_type_id: 3, field_name: 'status', display_name: 'Status', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 5, column_width: 130 },
-        { id: 22, communication_type_id: 3, field_name: 'payment_terms', display_name: 'Payment Terms', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 6, column_width: 140 },
-        { id: 23, communication_type_id: 3, field_name: 'match_status', display_name: 'Match Status', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 7, column_width: 140 },
-        { id: 24, communication_type_id: 3, field_name: 'received_date', display_name: 'Received', field_type: 'date', is_sortable: true, is_filterable: true, column_order: 8, column_width: 130 }
+        { id: 22, communication_type_id: 3, field_name: 'escalation_level', display_name: 'Level', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 6, column_width: 100 },
+        { id: 23, communication_type_id: 3, field_name: 'sla_remaining', display_name: 'SLA Remaining', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 7, column_width: 130 },
+        { id: 24, communication_type_id: 3, field_name: 'assigned_to', display_name: 'Assigned To', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 8, column_width: 140 }
       ],
+      // Type 4: Inventory Alerts
       4: [
-        { id: 25, communication_type_id: 4, field_name: 'order_number', display_name: 'Order #', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 1, column_width: 150 },
-        { id: 26, communication_type_id: 4, field_name: 'customer_name', display_name: 'Customer', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 2, column_width: 200 },
-        { id: 27, communication_type_id: 4, field_name: 'order_total', display_name: 'Total', field_type: 'currency', is_sortable: true, is_filterable: true, column_order: 3, column_width: 150 },
-        { id: 28, communication_type_id: 4, field_name: 'items_count', display_name: 'Items', field_type: 'number', is_sortable: true, is_filterable: true, column_order: 4, column_width: 100 },
-        { id: 29, communication_type_id: 4, field_name: 'status', display_name: 'Status', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 5, column_width: 130 },
-        { id: 30, communication_type_id: 4, field_name: 'payment_status', display_name: 'Payment', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 6, column_width: 130 },
-        { id: 31, communication_type_id: 4, field_name: 'order_date', display_name: 'Order Date', field_type: 'date', is_sortable: true, is_filterable: true, column_order: 7, column_width: 130 },
-        { id: 32, communication_type_id: 4, field_name: 'delivery_date', display_name: 'Delivery Date', field_type: 'date', is_sortable: true, is_filterable: true, column_order: 8, column_width: 140 }
+        { id: 25, communication_type_id: 4, field_name: 'alert_id', display_name: 'Alert ID', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 1, column_width: 140 },
+        { id: 26, communication_type_id: 4, field_name: 'product_name', display_name: 'Product', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 2, column_width: 200 },
+        { id: 27, communication_type_id: 4, field_name: 'warehouse', display_name: 'Warehouse', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 3, column_width: 120 },
+        { id: 28, communication_type_id: 4, field_name: 'alert_type', display_name: 'Alert Type', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 4, column_width: 140 },
+        { id: 29, communication_type_id: 4, field_name: 'current_stock', display_name: 'Stock', field_type: 'number', is_sortable: true, is_filterable: true, column_order: 5, column_width: 100 },
+        { id: 30, communication_type_id: 4, field_name: 'status', display_name: 'Status', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 6, column_width: 120 },
+        { id: 31, communication_type_id: 4, field_name: 'days_of_supply', display_name: 'Days Supply', field_type: 'number', is_sortable: true, is_filterable: true, column_order: 7, column_width: 110 },
+        { id: 32, communication_type_id: 4, field_name: 'cost_impact', display_name: 'Cost Impact', field_type: 'currency', is_sortable: true, is_filterable: true, column_order: 8, column_width: 130 }
+      ],
+      // Type 5: Email Campaigns
+      5: [
+        { id: 33, communication_type_id: 5, field_name: 'campaign_id', display_name: 'Campaign ID', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 1, column_width: 130 },
+        { id: 34, communication_type_id: 5, field_name: 'campaign_name', display_name: 'Campaign', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 2, column_width: 200 },
+        { id: 35, communication_type_id: 5, field_name: 'status', display_name: 'Status', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 3, column_width: 120 },
+        { id: 36, communication_type_id: 5, field_name: 'audience_segment', display_name: 'Audience', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 4, column_width: 150 },
+        { id: 37, communication_type_id: 5, field_name: 'recipients_count', display_name: 'Recipients', field_type: 'number', is_sortable: true, is_filterable: true, column_order: 5, column_width: 120 },
+        { id: 38, communication_type_id: 5, field_name: 'open_rate', display_name: 'Open Rate', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 6, column_width: 110 },
+        { id: 39, communication_type_id: 5, field_name: 'click_rate', display_name: 'Click Rate', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 7, column_width: 110 },
+        { id: 40, communication_type_id: 5, field_name: 'revenue_generated', display_name: 'Revenue', field_type: 'currency', is_sortable: true, is_filterable: true, column_order: 8, column_width: 130 }
       ]
     }
   };

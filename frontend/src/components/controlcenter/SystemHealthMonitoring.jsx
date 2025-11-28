@@ -9,10 +9,6 @@ import {
   Stack,
   Chip,
   LinearProgress,
-  IconButton,
-  Tooltip,
-  Alert,
-  AlertTitle,
   Button,
   Divider,
   List,
@@ -20,7 +16,7 @@ import {
   ListItemIcon,
   ListItemText,
   CircularProgress,
-  useTheme,
+  Tooltip,
   alpha,
 } from '@mui/material';
 import {
@@ -29,17 +25,13 @@ import {
   Warning as WarningIcon,
   Refresh as RefreshIcon,
   TrendingUp as TrendingUpIcon,
-  TrendingDown as TrendingDownIcon,
   Speed as SpeedIcon,
   Storage as StorageIcon,
   Memory as MemoryIcon,
   CloudQueue as CloudIcon,
   Api as ApiIcon,
-  Storage as DatabaseIcon,
   Hub as HubIcon,
-  AccountTree as AccountTreeIcon,
   Notifications as NotificationsIcon,
-  MoreVert as MoreVertIcon,
   Circle as CircleIcon,
 } from '@mui/icons-material';
 import {
@@ -47,17 +39,27 @@ import {
   Line,
   AreaChart,
   Area,
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip as ChartTooltip,
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
 } from 'recharts';
+
+// Blue/grey color palette
+const colors = {
+  primary: '#0a6ed1',
+  secondary: '#0854a0',
+  dark: '#354a5f',
+  slate: '#475569',
+  grey: '#64748b',
+  light: '#94a3b8',
+  success: '#10b981',
+  warning: '#f59e0b',
+  error: '#ef4444',
+  text: '#1e293b',
+  bg: '#f8fbfd',
+};
 
 // Service icon mapping
 const getServiceIcon = (serviceType) => {
@@ -66,12 +68,11 @@ const getServiceIcon = (serviceType) => {
     case 'database': return <CloudIcon />;
     case 'cache': return <StorageIcon />;
     case 'vectordb': return <HubIcon />;
-    default: return <DatabaseIcon />;
+    default: return <StorageIcon />;
   }
 };
 
 const SystemHealthMonitoring = () => {
-  const theme = useTheme();
   const [systemHealth, setSystemHealth] = useState(null);
   const [services, setServices] = useState([]);
   const [metricsData, setMetricsData] = useState([]);
@@ -81,7 +82,6 @@ const SystemHealthMonitoring = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch system health data
   const fetchSystemHealth = async () => {
     try {
       const response = await fetch('/api/v1/control-center/system-health');
@@ -99,14 +99,12 @@ const SystemHealthMonitoring = () => {
     }
   };
 
-  // Fetch services
   const fetchServices = async () => {
     try {
       const response = await fetch('/api/v1/control-center/services');
       const data = await response.json();
 
       if (data.success) {
-        // Transform services to include icons
         const transformedServices = data.services.map(service => ({
           ...service,
           icon: getServiceIcon(service.type),
@@ -118,7 +116,6 @@ const SystemHealthMonitoring = () => {
     }
   };
 
-  // Fetch metrics history
   const fetchMetricsHistory = async () => {
     try {
       const response = await fetch('/api/v1/control-center/metrics-history?hours=1');
@@ -132,14 +129,12 @@ const SystemHealthMonitoring = () => {
     }
   };
 
-  // Initial load
   useEffect(() => {
     fetchSystemHealth();
     fetchServices();
     fetchMetricsHistory();
   }, []);
 
-  // Auto-refresh data every 30 seconds
   useEffect(() => {
     if (!autoRefresh) return;
 
@@ -165,10 +160,10 @@ const SystemHealthMonitoring = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'healthy': return theme.palette.success.main;
-      case 'warning': return theme.palette.warning.main;
-      case 'error': return theme.palette.error.main;
-      default: return theme.palette.grey[500];
+      case 'healthy': return colors.success;
+      case 'warning': return colors.warning;
+      case 'error': return colors.error;
+      default: return colors.grey;
     }
   };
 
@@ -181,24 +176,11 @@ const SystemHealthMonitoring = () => {
     }
   };
 
-  const overallHealth = {
-    total: services.length,
-    healthy: services.filter(s => s.status === 'healthy' || s.status === 'connected').length,
-    warning: services.filter(s => s.status === 'warning').length,
-    error: services.filter(s => s.status === 'error').length,
-  };
-
-  const healthData = [
-    { name: 'Healthy', value: overallHealth.healthy, color: theme.palette.success.main },
-    { name: 'Warning', value: overallHealth.warning, color: theme.palette.warning.main },
-    { name: 'Error', value: overallHealth.error, color: theme.palette.error.main },
-  ];
-
   if (loading) {
     return (
       <Box sx={{ textAlign: 'center', py: 4 }}>
-        <CircularProgress size={60} />
-        <Typography variant="h6" sx={{ mt: 2 }}>
+        <CircularProgress size={60} sx={{ color: colors.primary }} />
+        <Typography variant="h6" sx={{ mt: 2, color: colors.grey }}>
           Loading system health...
         </Typography>
       </Box>
@@ -207,9 +189,9 @@ const SystemHealthMonitoring = () => {
 
   if (error) {
     return (
-      <Alert severity="error" sx={{ mb: 2 }}>
-        {error}
-      </Alert>
+      <Paper elevation={0} sx={{ p: 3, bgcolor: alpha(colors.error, 0.1), border: `1px solid ${alpha(colors.error, 0.3)}`, borderRadius: 2 }}>
+        <Typography sx={{ color: colors.error }}>{error}</Typography>
+      </Paper>
     );
   }
 
@@ -218,26 +200,37 @@ const SystemHealthMonitoring = () => {
       {/* Header */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box>
-          <Typography variant="h5" fontWeight={600} gutterBottom>
+          <Typography variant="h6" fontWeight={600} sx={{ color: colors.text }}>
             System Health & Monitoring
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: colors.grey }}>
             Real-time monitoring of all platform services and resources
           </Typography>
         </Box>
         <Stack direction="row" spacing={2}>
           <Chip
             label={autoRefresh ? "Auto-refresh ON" : "Auto-refresh OFF"}
-            color={autoRefresh ? "success" : "default"}
             onClick={() => setAutoRefresh(!autoRefresh)}
             size="small"
+            sx={{
+              bgcolor: autoRefresh ? alpha(colors.success, 0.1) : alpha(colors.grey, 0.1),
+              color: autoRefresh ? colors.success : colors.grey,
+              border: `1px solid ${autoRefresh ? alpha(colors.success, 0.3) : alpha(colors.grey, 0.3)}`,
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
           />
           <Button
             variant="outlined"
-            startIcon={refreshing ? <CircularProgress size={16} /> : <RefreshIcon />}
+            startIcon={refreshing ? <CircularProgress size={16} sx={{ color: colors.primary }} /> : <RefreshIcon />}
             onClick={handleRefresh}
             disabled={refreshing}
             size="small"
+            sx={{
+              borderColor: colors.primary,
+              color: colors.primary,
+              '&:hover': { borderColor: colors.secondary, bgcolor: alpha(colors.primary, 0.05) },
+            }}
           >
             Refresh
           </Button>
@@ -245,158 +238,245 @@ const SystemHealthMonitoring = () => {
       </Box>
 
       {/* Overall Health Summary */}
-      <Grid container spacing={3} sx={{ mb: 3 }}>
+      <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} md={3}>
-          <Card>
-            <CardContent>
-              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-                <Typography variant="subtitle2" color="text.secondary">
-                  System Status
-                </Typography>
-                <CheckCircleIcon color="success" />
-              </Stack>
-              <Typography variant="h4" fontWeight={600}>
-                {systemHealth?.health_score || 0}%
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: alpha(colors.primary, 0.1),
+              position: 'relative',
+              overflow: 'hidden',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 3,
+                background: `linear-gradient(90deg, ${colors.success} 0%, ${alpha(colors.success, 0.5)} 100%)`,
+              },
+            }}
+          >
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
+              <Typography variant="caption" sx={{ color: colors.grey, fontWeight: 500 }}>
+                System Status
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Services Operational
-              </Typography>
-              <LinearProgress
-                variant="determinate"
-                value={systemHealth?.health_score || 0}
-                sx={{ mt: 2, height: 6, borderRadius: 3 }}
-                color="success"
-              />
-            </CardContent>
-          </Card>
+              <CheckCircleIcon sx={{ color: colors.success, fontSize: 20 }} />
+            </Stack>
+            <Typography variant="h4" fontWeight={700} sx={{ color: colors.text }}>
+              {systemHealth?.health_score || 0}%
+            </Typography>
+            <Typography variant="caption" sx={{ color: colors.light }}>
+              Services Operational
+            </Typography>
+            <LinearProgress
+              variant="determinate"
+              value={systemHealth?.health_score || 0}
+              sx={{
+                mt: 1.5,
+                height: 6,
+                borderRadius: 3,
+                bgcolor: alpha(colors.success, 0.1),
+                '& .MuiLinearProgress-bar': { bgcolor: colors.success, borderRadius: 3 },
+              }}
+            />
+          </Paper>
         </Grid>
 
         <Grid item xs={12} md={3}>
-          <Card>
-            <CardContent>
-              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-                <Typography variant="subtitle2" color="text.secondary">
-                  Average Uptime
-                </Typography>
-                <TrendingUpIcon color="primary" />
-              </Stack>
-              <Typography variant="h4" fontWeight={600}>
-                {systemHealth?.system_metrics?.cpu?.percent || 0}%
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: alpha(colors.primary, 0.1),
+              position: 'relative',
+              overflow: 'hidden',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 3,
+                background: `linear-gradient(90deg, ${colors.primary} 0%, ${alpha(colors.primary, 0.5)} 100%)`,
+              },
+            }}
+          >
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
+              <Typography variant="caption" sx={{ color: colors.grey, fontWeight: 500 }}>
                 CPU Usage
               </Typography>
-              <Stack direction="row" spacing={0.5} sx={{ mt: 2 }}>
-                <Chip label={`${systemHealth?.system_metrics?.cpu?.cores || 0} cores`} size="small" />
-              </Stack>
-            </CardContent>
-          </Card>
+              <TrendingUpIcon sx={{ color: colors.primary, fontSize: 20 }} />
+            </Stack>
+            <Typography variant="h4" fontWeight={700} sx={{ color: colors.text }}>
+              {systemHealth?.system_metrics?.cpu?.percent || 0}%
+            </Typography>
+            <Stack direction="row" spacing={0.5} sx={{ mt: 1 }}>
+              <Chip
+                label={`${systemHealth?.system_metrics?.cpu?.cores || 0} cores`}
+                size="small"
+                sx={{
+                  height: 22,
+                  fontSize: '0.7rem',
+                  bgcolor: alpha(colors.primary, 0.1),
+                  color: colors.primary,
+                }}
+              />
+            </Stack>
+          </Paper>
         </Grid>
 
         <Grid item xs={12} md={3}>
-          <Card>
-            <CardContent>
-              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-                <Typography variant="subtitle2" color="text.secondary">
-                  Total Requests
-                </Typography>
-                <SpeedIcon color="info" />
-              </Stack>
-              <Typography variant="h4" fontWeight={600}>
-                {systemHealth?.system_metrics?.memory?.percent || 0}%
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: alpha(colors.primary, 0.1),
+              position: 'relative',
+              overflow: 'hidden',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 3,
+                background: `linear-gradient(90deg, ${colors.secondary} 0%, ${alpha(colors.secondary, 0.5)} 100%)`,
+              },
+            }}
+          >
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
+              <Typography variant="caption" sx={{ color: colors.grey, fontWeight: 500 }}>
                 Memory Usage
               </Typography>
-              <Box sx={{ mt: 2 }}>
-                <Stack direction="row" alignItems="center" spacing={1}>
-                  <Typography variant="body2">
-                    {systemHealth?.system_metrics?.memory?.used_gb || 0}GB / {systemHealth?.system_metrics?.memory?.total_gb || 0}GB
-                  </Typography>
-                </Stack>
-              </Box>
-            </CardContent>
-          </Card>
+              <SpeedIcon sx={{ color: colors.secondary, fontSize: 20 }} />
+            </Stack>
+            <Typography variant="h4" fontWeight={700} sx={{ color: colors.text }}>
+              {systemHealth?.system_metrics?.memory?.percent || 0}%
+            </Typography>
+            <Typography variant="caption" sx={{ color: colors.light }}>
+              {systemHealth?.system_metrics?.memory?.used_gb || 0}GB / {systemHealth?.system_metrics?.memory?.total_gb || 0}GB
+            </Typography>
+          </Paper>
         </Grid>
 
         <Grid item xs={12} md={3}>
-          <Card>
-            <CardContent>
-              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-                <Typography variant="subtitle2" color="text.secondary">
-                  Error Rate
-                </Typography>
-                <ErrorIcon color="error" />
-              </Stack>
-              <Typography variant="h4" fontWeight={600}>
-                {systemHealth?.system_metrics?.disk?.percent || 0}%
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: alpha(colors.primary, 0.1),
+              position: 'relative',
+              overflow: 'hidden',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 3,
+                background: `linear-gradient(90deg, ${colors.dark} 0%, ${alpha(colors.dark, 0.5)} 100%)`,
+              },
+            }}
+          >
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
+              <Typography variant="caption" sx={{ color: colors.grey, fontWeight: 500 }}>
                 Disk Usage
               </Typography>
-              <Box sx={{ mt: 2 }}>
-                <Stack direction="row" alignItems="center" spacing={1}>
-                  <Typography variant="body2">
-                    {systemHealth?.system_metrics?.disk?.used_gb || 0}GB / {systemHealth?.system_metrics?.disk?.total_gb || 0}GB
-                  </Typography>
-                </Stack>
-              </Box>
-            </CardContent>
-          </Card>
+              <StorageIcon sx={{ color: colors.dark, fontSize: 20 }} />
+            </Stack>
+            <Typography variant="h4" fontWeight={700} sx={{ color: colors.text }}>
+              {systemHealth?.system_metrics?.disk?.percent || 0}%
+            </Typography>
+            <Typography variant="caption" sx={{ color: colors.light }}>
+              {systemHealth?.system_metrics?.disk?.used_gb || 0}GB / {systemHealth?.system_metrics?.disk?.total_gb || 0}GB
+            </Typography>
+          </Paper>
         </Grid>
       </Grid>
 
       {/* Service Health Grid */}
-      <Paper sx={{ p: 3, mb: 3 }}>
-        <Typography variant="h6" gutterBottom>
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          mb: 3,
+          borderRadius: 2,
+          border: '1px solid',
+          borderColor: alpha(colors.primary, 0.1),
+        }}
+      >
+        <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text, mb: 2 }}>
           Service Health Status
         </Typography>
-        <Grid container spacing={2} sx={{ mt: 1 }}>
+        <Grid container spacing={2}>
           {services.map((service) => (
             <Grid item xs={12} sm={6} md={4} key={service.id}>
               <Card
+                elevation={0}
                 sx={{
                   border: '1px solid',
-                  borderColor: alpha(getStatusColor(service.status), 0.3),
+                  borderColor: alpha(getStatusColor(service.status), 0.2),
                   bgcolor: alpha(getStatusColor(service.status), 0.02),
+                  borderRadius: 2,
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
+                  position: 'relative',
+                  overflow: 'hidden',
                   '&:hover': {
                     transform: 'translateY(-2px)',
-                    boxShadow: 2,
+                    boxShadow: `0 4px 12px ${alpha(colors.primary, 0.15)}`,
+                  },
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 3,
+                    background: `linear-gradient(90deg, ${getStatusColor(service.status)} 0%, ${alpha(getStatusColor(service.status), 0.5)} 100%)`,
                   },
                 }}
                 onClick={() => setSelectedService(service)}
               >
-                <CardContent>
+                <CardContent sx={{ pt: 2.5 }}>
                   <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                       <Box
                         sx={{
                           width: 40,
                           height: 40,
-                          borderRadius: 2,
-                          bgcolor: alpha(getStatusColor(service.status), 0.1),
+                          borderRadius: 1.5,
+                          bgcolor: alpha(colors.primary, 0.1),
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: getStatusColor(service.status),
+                          color: colors.primary,
                         }}
                       >
                         {service.icon}
                       </Box>
                       <Box>
-                        <Typography variant="subtitle1" fontWeight={600}>
+                        <Typography variant="subtitle2" fontWeight={600} sx={{ color: colors.text }}>
                           {service.name}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography variant="caption" sx={{ color: colors.grey, fontSize: '0.7rem' }}>
                           {service.endpoint || 'Local Service'}
                         </Typography>
                       </Box>
                     </Box>
                     <Tooltip title={service.status}>
                       <Box sx={{ color: getStatusColor(service.status) }}>
-                        {getStatusIcon(service.status)}
+                        {React.cloneElement(getStatusIcon(service.status), { sx: { fontSize: 18 } })}
                       </Box>
                     </Tooltip>
                   </Stack>
@@ -405,57 +485,57 @@ const SystemHealthMonitoring = () => {
                     <Grid container spacing={1}>
                       {service.latency_ms !== undefined && (
                         <Grid item xs={6}>
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="caption" sx={{ color: colors.light, fontWeight: 500 }}>
                             Latency
                           </Typography>
-                          <Typography variant="body2" fontWeight={500}>
+                          <Typography variant="body2" fontWeight={500} sx={{ color: colors.dark }}>
                             {service.latency_ms}ms
                           </Typography>
                         </Grid>
                       )}
                       {service.tables !== undefined && (
                         <Grid item xs={6}>
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="caption" sx={{ color: colors.light, fontWeight: 500 }}>
                             Tables
                           </Typography>
-                          <Typography variant="body2" fontWeight={500}>
+                          <Typography variant="body2" fontWeight={500} sx={{ color: colors.dark }}>
                             {service.tables}
                           </Typography>
                         </Grid>
                       )}
                       {service.memory_used_mb !== undefined && (
                         <Grid item xs={6}>
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="caption" sx={{ color: colors.light, fontWeight: 500 }}>
                             Memory
                           </Typography>
-                          <Typography variant="body2" fontWeight={500}>
+                          <Typography variant="body2" fontWeight={500} sx={{ color: colors.dark }}>
                             {service.memory_used_mb}MB
                           </Typography>
                         </Grid>
                       )}
                       {service.connected_clients !== undefined && (
                         <Grid item xs={6}>
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="caption" sx={{ color: colors.light, fontWeight: 500 }}>
                             Clients
                           </Typography>
-                          <Typography variant="body2" fontWeight={500}>
+                          <Typography variant="body2" fontWeight={500} sx={{ color: colors.dark }}>
                             {service.connected_clients}
                           </Typography>
                         </Grid>
                       )}
                       {service.schemas !== undefined && (
                         <Grid item xs={6}>
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="caption" sx={{ color: colors.light, fontWeight: 500 }}>
                             Schemas
                           </Typography>
-                          <Typography variant="body2" fontWeight={500}>
+                          <Typography variant="body2" fontWeight={500} sx={{ color: colors.dark }}>
                             {service.schemas}
                           </Typography>
                         </Grid>
                       )}
                       {service.error && (
                         <Grid item xs={12}>
-                          <Typography variant="caption" color="error.main">
+                          <Typography variant="caption" sx={{ color: colors.error }}>
                             {service.error}
                           </Typography>
                         </Grid>
@@ -464,9 +544,20 @@ const SystemHealthMonitoring = () => {
                   </Box>
 
                   {service.message && (
-                    <Alert severity="warning" sx={{ mt: 2, py: 0 }}>
-                      <Typography variant="caption">{service.message}</Typography>
-                    </Alert>
+                    <Paper
+                      elevation={0}
+                      sx={{
+                        mt: 2,
+                        p: 1,
+                        bgcolor: alpha(colors.warning, 0.1),
+                        border: `1px solid ${alpha(colors.warning, 0.3)}`,
+                        borderRadius: 1,
+                      }}
+                    >
+                      <Typography variant="caption" sx={{ color: colors.warning }}>
+                        {service.message}
+                      </Typography>
+                    </Paper>
                   )}
                 </CardContent>
               </Card>
@@ -476,23 +567,37 @@ const SystemHealthMonitoring = () => {
       </Paper>
 
       {/* Performance Metrics */}
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
         <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 3,
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: alpha(colors.primary, 0.1),
+            }}
+          >
+            <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text, mb: 2 }}>
               System Performance
             </Typography>
-            <Box sx={{ height: 300, mt: 2 }}>
+            <Box sx={{ height: 250 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={metricsData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.5)} />
-                  <XAxis dataKey="time" fontSize={12} />
-                  <YAxis fontSize={12} />
-                  <ChartTooltip />
+                  <CartesianGrid strokeDasharray="3 3" stroke={alpha(colors.grey, 0.2)} />
+                  <XAxis dataKey="time" fontSize={11} stroke={colors.light} />
+                  <YAxis fontSize={11} stroke={colors.light} />
+                  <ChartTooltip
+                    contentStyle={{
+                      backgroundColor: '#fff',
+                      border: `1px solid ${alpha(colors.primary, 0.2)}`,
+                      borderRadius: 8,
+                    }}
+                  />
                   <Line
                     type="monotone"
                     dataKey="cpu"
-                    stroke={theme.palette.primary.main}
+                    stroke={colors.primary}
                     strokeWidth={2}
                     name="CPU %"
                     dot={false}
@@ -500,7 +605,7 @@ const SystemHealthMonitoring = () => {
                   <Line
                     type="monotone"
                     dataKey="memory"
-                    stroke={theme.palette.secondary.main}
+                    stroke={colors.secondary}
                     strokeWidth={2}
                     name="Memory %"
                     dot={false}
@@ -512,30 +617,44 @@ const SystemHealthMonitoring = () => {
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 3,
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: alpha(colors.primary, 0.1),
+            }}
+          >
+            <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text, mb: 2 }}>
               Request Volume & Latency
             </Typography>
-            <Box sx={{ height: 300, mt: 2 }}>
+            <Box sx={{ height: 250 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={metricsData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.5)} />
-                  <XAxis dataKey="time" fontSize={12} />
-                  <YAxis fontSize={12} />
-                  <ChartTooltip />
+                  <CartesianGrid strokeDasharray="3 3" stroke={alpha(colors.grey, 0.2)} />
+                  <XAxis dataKey="time" fontSize={11} stroke={colors.light} />
+                  <YAxis fontSize={11} stroke={colors.light} />
+                  <ChartTooltip
+                    contentStyle={{
+                      backgroundColor: '#fff',
+                      border: `1px solid ${alpha(colors.primary, 0.2)}`,
+                      borderRadius: 8,
+                    }}
+                  />
                   <Area
                     type="monotone"
                     dataKey="requests"
-                    stroke={theme.palette.success.main}
-                    fill={alpha(theme.palette.success.main, 0.2)}
+                    stroke={colors.success}
+                    fill={alpha(colors.success, 0.2)}
                     strokeWidth={2}
                     name="Requests/min"
                   />
                   <Area
                     type="monotone"
                     dataKey="latency"
-                    stroke={theme.palette.warning.main}
-                    fill={alpha(theme.palette.warning.main, 0.2)}
+                    stroke={colors.warning}
+                    fill={alpha(colors.warning, 0.2)}
                     strokeWidth={2}
                     name="Latency (ms)"
                   />
@@ -547,43 +666,76 @@ const SystemHealthMonitoring = () => {
       </Grid>
 
       {/* Recent Alerts */}
-      <Paper sx={{ p: 3, mt: 3 }}>
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          mt: 3,
+          borderRadius: 2,
+          border: '1px solid',
+          borderColor: alpha(colors.primary, 0.1),
+        }}
+      >
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-          <Typography variant="h6">
+          <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
             Recent Alerts
           </Typography>
-          <Button startIcon={<NotificationsIcon />} size="small">
+          <Button
+            startIcon={<NotificationsIcon />}
+            size="small"
+            sx={{ color: colors.primary }}
+          >
             Configure Alerts
           </Button>
         </Stack>
-        <List>
-          <ListItem>
+        <List disablePadding>
+          <ListItem
+            sx={{
+              bgcolor: alpha(colors.warning, 0.05),
+              borderRadius: 1.5,
+              mb: 1,
+              border: `1px solid ${alpha(colors.warning, 0.2)}`,
+            }}
+          >
             <ListItemIcon>
-              <WarningIcon color="warning" />
+              <WarningIcon sx={{ color: colors.warning }} />
             </ListItemIcon>
             <ListItemText
-              primary="High latency detected on Weaviate Vector DB"
-              secondary="2 minutes ago - Average response time exceeded 200ms threshold"
+              primary={<Typography variant="body2" fontWeight={500} sx={{ color: colors.text }}>High latency detected on Weaviate Vector DB</Typography>}
+              secondary={<Typography variant="caption" sx={{ color: colors.grey }}>2 minutes ago - Average response time exceeded 200ms threshold</Typography>}
             />
           </ListItem>
-          <Divider />
-          <ListItem>
+          <Divider sx={{ my: 1 }} />
+          <ListItem
+            sx={{
+              bgcolor: alpha(colors.success, 0.05),
+              borderRadius: 1.5,
+              mb: 1,
+              border: `1px solid ${alpha(colors.success, 0.2)}`,
+            }}
+          >
             <ListItemIcon>
-              <CheckCircleIcon color="success" />
+              <CheckCircleIcon sx={{ color: colors.success }} />
             </ListItemIcon>
             <ListItemText
-              primary="Redis cache memory usage normalized"
-              secondary="15 minutes ago - Memory usage dropped below 80% threshold"
+              primary={<Typography variant="body2" fontWeight={500} sx={{ color: colors.text }}>Redis cache memory usage normalized</Typography>}
+              secondary={<Typography variant="caption" sx={{ color: colors.grey }}>15 minutes ago - Memory usage dropped below 80% threshold</Typography>}
             />
           </ListItem>
-          <Divider />
-          <ListItem>
+          <Divider sx={{ my: 1 }} />
+          <ListItem
+            sx={{
+              bgcolor: alpha(colors.error, 0.05),
+              borderRadius: 1.5,
+              border: `1px solid ${alpha(colors.error, 0.2)}`,
+            }}
+          >
             <ListItemIcon>
-              <ErrorIcon color="error" />
+              <ErrorIcon sx={{ color: colors.error }} />
             </ListItemIcon>
             <ListItemText
-              primary="API endpoint /api/v1/query experienced timeout"
-              secondary="1 hour ago - Query execution exceeded 30 second limit"
+              primary={<Typography variant="body2" fontWeight={500} sx={{ color: colors.text }}>API endpoint /api/v1/query experienced timeout</Typography>}
+              secondary={<Typography variant="caption" sx={{ color: colors.grey }}>1 hour ago - Query execution exceeded 30 second limit</Typography>}
             />
           </ListItem>
         </List>
