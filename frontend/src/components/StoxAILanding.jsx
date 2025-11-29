@@ -26,13 +26,72 @@ import {
   Analytics as AnalyticsIcon,
   Science as ScienceIcon,
   Map as MapIcon,
+  Hub as HubIcon,
+  Factory as FactoryIcon,
+  HealthAndSafety as HealthAndSafetyIcon,
+  Schedule as ScheduleIcon,
+  AttachMoney as AttachMoneyIcon,
+  Tune as TuneIcon,
+  Settings as SettingsIcon,
+  PlayCircle as PlayCircleIcon,
+  Recommend as RecommendIcon,
+  CloudSync as CloudSyncIcon,
+  Speed as SpeedIcon,
 } from '@mui/icons-material';
 
 const storeSystemModules = [
   {
+    id: 'sap-data-hub',
+    title: 'SAP Data Hub',
+    subtitle: 'Tile 0 - Infrastructure',
+    description: 'Monitor SAP system connections, data quality scores, extraction jobs, and ODQ delta queues',
+    icon: HubIcon,
+    color: '#0891b2',
+    bgColor: '#cffafe',
+    stats: { label: 'Systems', value: '4' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #0891b2 0%, #0e7490 100%)',
+  },
+  {
+    id: 'plant-inventory-intelligence',
+    title: 'Plant Inventory Intelligence',
+    subtitle: 'Tile 1 - Foundation',
+    description: 'Plant-level inventory analytics, SLOB analysis, GMROI tracking, and ABC/XYZ segmentation',
+    icon: FactoryIcon,
+    color: '#10b981',
+    bgColor: '#d1fae5',
+    stats: { label: 'Plants', value: '4' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+  },
+  {
+    id: 'inventory-health-check',
+    title: 'Inventory Health Check',
+    subtitle: 'Tile 2 - Diagnostics',
+    description: 'SKU-level health scores, excess analysis, coverage metrics, and ABC/XYZ classification',
+    icon: HealthAndSafetyIcon,
+    color: '#ef4444',
+    bgColor: '#fee2e2',
+    stats: { label: 'SKUs', value: '12' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+  },
+  {
+    id: 'supply-lead-time',
+    title: 'Supply & Lead Time',
+    subtitle: 'Tile 4 - Procurement',
+    description: 'Vendor lead time analysis, OTD tracking, variability metrics, and safety stock recommendations',
+    icon: ScheduleIcon,
+    color: '#f59e0b',
+    bgColor: '#fef3c7',
+    stats: { label: 'Vendors', value: '8' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+  },
+  {
     id: 'tile0-forecast-simulation',
     title: 'Inventory Health Dashboard',
-    subtitle: 'Tile 0',
+    subtitle: 'Tile 3',
     description: 'Compare AI models (ARIMA, ETS, ML), override forecasts, and confirm baseline for Tile 1',
     icon: ScienceIcon,
     color: '#354a5f',
@@ -167,7 +226,7 @@ const StoxAILanding = ({ onTileClick, onBack }) => {
                 STOX.AI
               </Typography>
               <Chip
-                label="6 Modules"
+                label={`${storeSystemModules.length} Modules`}
                 size="small"
                 sx={{
                   bgcolor: alpha('#0a6ed1', 0.1),

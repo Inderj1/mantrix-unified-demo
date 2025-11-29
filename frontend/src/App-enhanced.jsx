@@ -115,6 +115,10 @@ import StoreFinancialImpact from './components/stox/StoreFinancialImpact.jsx';
 import SupplyChainMap from './components/stox/supplyChainMap/index.jsx';
 import DemandIntelligence from './components/stox/DemandIntelligence.jsx';
 import ForecastingEngine from './components/stox/ForecastingEngine.jsx';
+import SAPDataHub from './components/stox/SAPDataHub.jsx';
+import PlantInventoryIntelligence from './components/stox/PlantInventoryIntelligence.jsx';
+import InventoryHealthCheck from './components/stox/InventoryHealthCheck.jsx';
+import SupplyLeadTime from './components/stox/SupplyLeadTime.jsx';
 import DCDemandAggregation from './components/stox/DCDemandAggregation.jsx';
 import DCHealthMonitor from './components/stox/DCHealthMonitor.jsx';
 import DCOptimization from './components/stox/DCOptimization.jsx';
@@ -692,7 +696,7 @@ function App() {
                         } else if (moduleId === 'executive-command') {
                           console.log('Setting stoxView to: executive-command');
                           setStoxView('executive-command');
-                        } else if (['demand-flow', 'demand-forecasting', 'outbound-replenishment', 'dc-inventory', 'supply-planning', 'bom-explosion', 'component-consolidation', 'analytics-whatif', 'tile0-forecast-simulation', 'store-forecasting', 'store-health-monitor', 'store-optimization', 'store-replenishment', 'store-financial-impact', 'supply-chain-map', 'dc-demand-aggregation', 'dc-health-monitor', 'dc-optimization', 'dc-bom', 'dc-lot-size', 'dc-supplier-exec', 'dc-financial-impact', 'demand-intelligence', 'forecasting-engine'].includes(moduleId)) {
+                        } else if (['demand-flow', 'demand-forecasting', 'outbound-replenishment', 'dc-inventory', 'supply-planning', 'bom-explosion', 'component-consolidation', 'analytics-whatif', 'tile0-forecast-simulation', 'store-forecasting', 'store-health-monitor', 'store-optimization', 'store-replenishment', 'store-financial-impact', 'supply-chain-map', 'dc-demand-aggregation', 'dc-health-monitor', 'dc-optimization', 'dc-bom', 'dc-lot-size', 'dc-supplier-exec', 'dc-financial-impact', 'demand-intelligence', 'forecasting-engine', 'sap-data-hub', 'plant-inventory-intelligence', 'inventory-health-check', 'supply-lead-time'].includes(moduleId)) {
                           console.log('Setting stoxView to module tiles:', moduleId);
                           setStoxView(moduleId);
                         }
@@ -769,6 +773,18 @@ function App() {
                   )}
                   {stoxView === 'forecasting-engine' && (
                     <ForecastingEngine onBack={() => setStoxView('landing')} />
+                  )}
+                  {stoxView === 'sap-data-hub' && (
+                    <SAPDataHub onBack={() => setStoxView('landing')} />
+                  )}
+                  {stoxView === 'plant-inventory-intelligence' && (
+                    <PlantInventoryIntelligence onBack={() => setStoxView('landing')} />
+                  )}
+                  {stoxView === 'inventory-health-check' && (
+                    <InventoryHealthCheck onBack={() => setStoxView('landing')} />
+                  )}
+                  {stoxView === 'supply-lead-time' && (
+                    <SupplyLeadTime onBack={() => setStoxView('landing')} />
                   )}
                   {/* DC System Modules */}
                   {stoxView === 'dc-demand-aggregation' && (
