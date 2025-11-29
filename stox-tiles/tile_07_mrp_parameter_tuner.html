@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STOX.AI | Tile 7 - MRP Parameter Tuner</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0f172a; --bg-secondary: #1e293b; --border-color: #475569;
+            --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
+            --wharton-blue: #004785; --wharton-maroon: #990000;
+            --cyan-400: #22d3ee; --cyan-500: #06b6d4;
+            --emerald-400: #34d399; --emerald-500: #10b981;
+            --amber-400: #fbbf24; --amber-500: #f59e0b;
+            --red-400: #f87171; --red-500: #ef4444;
+        }
+        body { font-family: 'JetBrains Mono', monospace; background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); color: var(--text-primary); min-height: 100vh; padding: 24px; }
+        .container { max-width: 1600px; margin: 0 auto; }
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+        .logo-section { display: flex; align-items: center; gap: 16px; }
+        .logo { width: 48px; height: 48px; background: linear-gradient(135deg, var(--wharton-blue), var(--wharton-maroon)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .brand h1 { font-size: 24px; font-weight: 700; color: var(--cyan-400); }
+        .brand p { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
+        .tile-badge { background: linear-gradient(135deg, var(--wharton-blue), var(--wharton-maroon)); padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+        .summary-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 32px; }
+        .summary-card { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 12px; padding: 20px; backdrop-filter: blur(10px); }
+        .summary-card .label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .summary-card .value { font-size: 28px; font-weight: 700; color: var(--text-primary); }
+        .summary-card .sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .summary-card.good { border-left: 3px solid var(--emerald-500); }
+        .summary-card.warning { border-left: 3px solid var(--amber-500); }
+        .summary-card.critical { border-left: 3px solid var(--red-500); }
+        .summary-card.neutral { border-left: 3px solid var(--cyan-500); }
+        .table-section { background: rgba(30, 41, 59, 0.3); border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 16px; overflow: hidden; backdrop-filter: blur(10px); }
+        .table-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid rgba(71, 85, 105, 0.3); background: linear-gradient(90deg, rgba(0, 71, 133, 0.2), rgba(153, 0, 0, 0.2)); }
+        .table-header h2 { font-size: 14px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+        .table-header h2 span { color: var(--cyan-400); }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th { padding: 16px 12px; text-align: left; font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; background: rgba(15, 23, 42, 0.5); border-bottom: 1px solid rgba(71, 85, 105, 0.3); }
+        .data-table td { padding: 16px 12px; border-bottom: 1px solid rgba(71, 85, 105, 0.2); font-size: 13px; }
+        .data-table tr { cursor: pointer; transition: all 0.2s; }
+        .data-table tr:hover { background: rgba(6, 182, 212, 0.05); }
+        .data-table tr:hover td:first-child { color: var(--cyan-400); }
+        .scenario-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+        .scenario-badge.best { background: rgba(16, 185, 129, 0.15); color: var(--emerald-400); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .scenario-badge.base { background: rgba(6, 182, 212, 0.15); color: var(--cyan-400); border: 1px solid rgba(6, 182, 212, 0.3); }
+        .scenario-badge.worst { background: rgba(239, 68, 68, 0.15); color: var(--red-400); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .metric-value { font-weight: 600; }
+        .metric-value.good { color: var(--emerald-400); }
+        .metric-value.warning { color: var(--amber-400); }
+        .metric-value.critical { color: var(--red-400); }
+        .drill-icon { opacity: 0; transition: all 0.2s; color: var(--cyan-400); }
+        .data-table tr:hover .drill-icon { opacity: 1; transform: translateX(4px); }
+        .detail-view { display: none; }
+        .detail-view.active { display: block; }
+        .list-view { display: block; }
+        .list-view.hidden { display: none; }
+        .back-btn { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 8px; color: var(--text-secondary); cursor: pointer; font-family: inherit; font-size: 12px; margin-bottom: 24px; transition: all 0.2s; }
+        .back-btn:hover { background: rgba(6, 182, 212, 0.1); color: var(--cyan-400); border-color: rgba(6, 182, 212, 0.3); }
+        .detail-header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+        .detail-logo { width: 56px; height: 56px; background: linear-gradient(135deg, var(--wharton-blue), var(--wharton-maroon)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .detail-title h1 { font-size: 24px; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+        .detail-title h1 .material-id { color: var(--cyan-400); }
+        .detail-title h1 .plant-id { color: var(--text-secondary); }
+        .detail-title p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+        .detail-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 24px; }
+        .detail-card { background: rgba(30, 41, 59, 0.3); border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 16px; padding: 24px; backdrop-filter: blur(10px); }
+        .detail-card h3 { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+        .detail-card h3 .icon { color: var(--cyan-400); }
+        .detail-card h3 .sap-badge { margin-left: auto; font-size: 9px; font-weight: 500; color: rgba(6, 182, 212, 0.6); background: rgba(6, 182, 212, 0.1); padding: 2px 8px; border-radius: 4px; }
+        .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(71, 85, 105, 0.2); }
+        .info-row:last-child { border-bottom: none; }
+        .info-row .label { font-size: 12px; color: var(--text-muted); }
+        .info-row .value { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .chart-container { height: 250px; margin: 16px 0; }
+        .scenario-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+        .scenario-card { padding: 16px; border-radius: 10px; text-align: center; }
+        .scenario-card.best { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .scenario-card.base { background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); }
+        .scenario-card.worst { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .scenario-card .title { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .scenario-card .value { font-size: 20px; font-weight: 700; }
+        .scenario-card.best .value { color: var(--emerald-400); }
+        .scenario-card.base .value { color: var(--cyan-400); }
+        .scenario-card.worst .value { color: var(--red-400); }
+        .footer { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(71, 85, 105, 0.2); font-size: 11px; color: var(--text-muted); }
+        .footer .info { display: flex; gap: 16px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo">🎛️</div>
+                <div class="brand">
+                    <h1>STOX.AI</h1>
+                    <p>MRP Parameter Tuner (Master Engine)</p>
+                </div>
+            </div>
+            <div class="tile-badge">TILE 7 — GLOBAL OPTIMIZER</div>
+        </div>
+
+        <div class="list-view" id="listView">
+            <div class="summary-grid">
+                <div class="summary-card good">
+                    <div class="label">Inventory Reduction</div>
+                    <div class="value">$2.8M</div>
+                    <div class="sub">Projected annual</div>
+                </div>
+                <div class="summary-card good">
+                    <div class="label">Carrying Cost Saved</div>
+                    <div class="value">$420K</div>
+                    <div class="sub">Annual savings</div>
+                </div>
+                <div class="summary-card good">
+                    <div class="label">Stockout Avoided</div>
+                    <div class="value">$180K</div>
+                    <div class="sub">Cost avoided</div>
+                </div>
+                <div class="summary-card neutral">
+                    <div class="label">Monte Carlo Runs</div>
+                    <div class="value">10K</div>
+                    <div class="sub">Simulations / SKU</div>
+                </div>
+                <div class="summary-card good">
+                    <div class="label">Net Annual Savings</div>
+                    <div class="value">$3.4M</div>
+                    <div class="sub">Total impact</div>
+                </div>
+            </div>
+
+            <div class="table-section">
+                <div class="table-header">
+                    <h2><span>🎛️</span> Monte Carlo Optimization Results by SKU / Plant</h2>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Material</th>
+                            <th>Plant</th>
+                            <th>Inv Reduction $</th>
+                            <th>Carrying Saved $</th>
+                            <th>Stockout Avoided $</th>
+                            <th>SL Δ</th>
+                            <th>Turns Δ</th>
+                            <th>Net Savings $</th>
+                            <th>Confidence</th>
+                            <th>Risk</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr onclick="showDetail('MAT-001')">
+                            <td><strong>MAT-001</strong></td>
+                            <td>P1000</td>
+                            <td><span class="metric-value good">-$156K</span></td>
+                            <td><span class="metric-value good">-$23.4K</span></td>
+                            <td><span class="metric-value good">$2.1K</span></td>
+                            <td><span class="metric-value warning">-1.5%</span></td>
+                            <td><span class="metric-value good">+0.8</span></td>
+                            <td><span class="metric-value good">$23.8K</span></td>
+                            <td><span class="metric-value good">94%</span></td>
+                            <td><span class="scenario-badge best">Low</span></td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                        <tr onclick="showDetail('MAT-002')">
+                            <td><strong>MAT-002</strong></td>
+                            <td>P1000</td>
+                            <td><span class="metric-value good">-$452K</span></td>
+                            <td><span class="metric-value good">-$67.8K</span></td>
+                            <td><span class="metric-value good">$8.5K</span></td>
+                            <td><span class="metric-value warning">-2.2%</span></td>
+                            <td><span class="metric-value good">+1.2</span></td>
+                            <td><span class="metric-value good">$76.2K</span></td>
+                            <td><span class="metric-value good">91%</span></td>
+                            <td><span class="scenario-badge best">Low</span></td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                        <tr onclick="showDetail('MAT-003')">
+                            <td><strong>MAT-003</strong></td>
+                            <td>P2000</td>
+                            <td><span class="metric-value good">-$1.25M</span></td>
+                            <td><span class="metric-value good">-$187K</span></td>
+                            <td><span class="metric-value critical">-$12K</span></td>
+                            <td><span class="metric-value critical">-4.1%</span></td>
+                            <td><span class="metric-value good">+2.8</span></td>
+                            <td><span class="metric-value good">$218K</span></td>
+                            <td><span class="metric-value warning">78%</span></td>
+                            <td><span class="scenario-badge base">Med</span></td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                        <tr onclick="showDetail('MAT-004')">
+                            <td><strong>MAT-004</strong></td>
+                            <td>P2000</td>
+                            <td><span class="metric-value critical">+$84K</span></td>
+                            <td><span class="metric-value critical">+$12.6K</span></td>
+                            <td><span class="metric-value good">$45K</span></td>
+                            <td><span class="metric-value good">+7.5%</span></td>
+                            <td><span class="metric-value warning">-0.3</span></td>
+                            <td><span class="metric-value good">$32.4K</span></td>
+                            <td><span class="metric-value good">89%</span></td>
+                            <td><span class="scenario-badge best">Low</span></td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                        <tr onclick="showDetail('MAT-005')">
+                            <td><strong>MAT-005</strong></td>
+                            <td>P3000</td>
+                            <td><span class="metric-value good">-$890K</span></td>
+                            <td><span class="metric-value good">-$133K</span></td>
+                            <td><span class="metric-value critical">-$8K</span></td>
+                            <td><span class="metric-value critical">-15%</span></td>
+                            <td><span class="metric-value good">+4.2</span></td>
+                            <td><span class="metric-value good">$181K</span></td>
+                            <td><span class="metric-value warning">72%</span></td>
+                            <td><span class="scenario-badge worst">High</span></td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="detail-view" id="detailView">
+            <button class="back-btn" onclick="showList()">← Back to List</button>
+            
+            <div class="detail-header">
+                <div class="detail-logo">🎛️</div>
+                <div class="detail-title">
+                    <h1>
+                        <span class="material-id" id="detailMaterial">MAT-001</span>
+                        <span style="color: var(--text-muted)">|</span>
+                        <span class="plant-id" id="detailPlant">P1000</span>
+                    </h1>
+                    <p id="detailDesc">Monte Carlo Optimization Results</p>
+                </div>
+            </div>
+
+            <div class="detail-grid">
+                <div class="detail-card">
+                    <h3><span class="icon">📊</span> Current vs Optimal Parameters<span class="sap-badge">MARC</span></h3>
+                    <div class="info-row">
+                        <span class="label">DISMM (MRP Type)</span>
+                        <span class="value">PD → PD</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">DISLS (Lot Size)</span>
+                        <span class="value">EQ → EQ</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">EISBE (Safety Stock)</span>
+                        <span class="value">500 → <span style="color:var(--emerald-400)">420</span></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">MINBE (Reorder Point)</span>
+                        <span class="value">800 → <span style="color:var(--emerald-400)">720</span></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">PLIFZ (Planned LT)</span>
+                        <span class="value">14 → <span style="color:var(--amber-400)">16</span></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">BSTMI / BSTMA</span>
+                        <span class="value">100 / 1000</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">MABST (Max Stock)</span>
+                        <span class="value">2000 → <span style="color:var(--emerald-400)">1800</span></span>
+                    </div>
+                    <div class="info-row" style="margin-top: 16px; border-top: 1px solid rgba(71,85,105,0.3); padding-top: 16px;">
+                        <span class="label"><strong>Total Gap ($)</strong></span>
+                        <span class="value" style="color: var(--emerald-400);"><strong>-$156K</strong></span>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">🎲</span> Monte Carlo Simulation Results</h3>
+                    <div class="chart-container">
+                        <canvas id="monteCarloChart"></canvas>
+                    </div>
+                    <div class="scenario-grid">
+                        <div class="scenario-card best">
+                            <div class="title">Best Case</div>
+                            <div class="value">$32K</div>
+                        </div>
+                        <div class="scenario-card base">
+                            <div class="title">Base Case</div>
+                            <div class="value">$23.8K</div>
+                        </div>
+                        <div class="scenario-card worst">
+                            <div class="title">Worst Case</div>
+                            <div class="value">$12K</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-grid" style="margin-top: 24px; grid-template-columns: 1fr 1fr 1fr;">
+                <div class="detail-card">
+                    <h3><span class="icon">📈</span> Projected Impact</h3>
+                    <div class="info-row">
+                        <span class="label">Inventory Reduction</span>
+                        <span class="value" style="color: var(--emerald-400);">-$156K</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Carrying Cost Saved</span>
+                        <span class="value" style="color: var(--emerald-400);">-$23.4K</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Stockout Cost Avoided</span>
+                        <span class="value" style="color: var(--emerald-400);">$2.1K</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Net Annual Savings</span>
+                        <span class="value" style="color: var(--cyan-400);"><strong>$23.8K</strong></span>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📊</span> Service & Turns</h3>
+                    <div class="info-row">
+                        <span class="label">Current Service Level</span>
+                        <span class="value">98.5%</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Projected Service Level</span>
+                        <span class="value" style="color: var(--emerald-400);">97.0%</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Service Level Δ</span>
+                        <span class="value" style="color: var(--amber-400);">-1.5%</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Turns Improvement</span>
+                        <span class="value" style="color: var(--emerald-400);">+0.8</span>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⚠️</span> Risk Assessment</h3>
+                    <div class="info-row">
+                        <span class="label">Confidence Score</span>
+                        <span class="value" style="color: var(--emerald-400);">94%</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Risk Score</span>
+                        <span class="value" style="color: var(--emerald-400);">Low</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Sensitivity</span>
+                        <span class="value">Demand: Med, Supply: Low</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Service Level Range</span>
+                        <span class="value">95.5% - 98.2%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="info">
+                <span>STOX.AI Master Tuner</span>
+                <span>•</span>
+                <span>Tile 7 of 10</span>
+                <span>•</span>
+                <span>Layer: Global Optimizer</span>
+            </div>
+            <div>© 2025 Cloud Mantra LLC</div>
+        </div>
+    </div>
+
+    <script>
+        function showDetail(material) {
+            document.getElementById('listView').classList.add('hidden');
+            document.getElementById('detailView').classList.add('active');
+            
+            const matData = {
+                'MAT-001': { material: 'MAT-001', plant: 'P1000', desc: 'Monte Carlo Optimization Results' },
+                'MAT-002': { material: 'MAT-002', plant: 'P1000', desc: 'Monte Carlo Optimization Results' },
+                'MAT-003': { material: 'MAT-003', plant: 'P2000', desc: 'Monte Carlo Optimization Results' },
+                'MAT-004': { material: 'MAT-004', plant: 'P2000', desc: 'Monte Carlo Optimization Results' },
+                'MAT-005': { material: 'MAT-005', plant: 'P3000', desc: 'Monte Carlo Optimization Results' }
+            };
+            
+            const data = matData[material] || matData['MAT-001'];
+            document.getElementById('detailMaterial').textContent = data.material;
+            document.getElementById('detailPlant').textContent = data.plant;
+            document.getElementById('detailDesc').textContent = data.desc;
+            
+            setTimeout(initCharts, 100);
+        }
+        
+        function showList() {
+            document.getElementById('listView').classList.remove('hidden');
+            document.getElementById('detailView').classList.remove('active');
+        }
+        
+        function initCharts() {
+            const ctx = document.getElementById('monteCarloChart');
+            if (ctx && !ctx.chart) {
+                // Generate normal distribution data
+                const labels = [];
+                const data = [];
+                for (let i = 8; i <= 38; i += 2) {
+                    labels.push('$' + i + 'K');
+                    const x = (i - 23.8) / 5;
+                    data.push(Math.exp(-0.5 * x * x) * 100);
+                }
+                
+                ctx.chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Probability',
+                            data: data,
+                            backgroundColor: data.map((v, i) => {
+                                const val = 8 + i * 2;
+                                if (val >= 20 && val <= 28) return 'rgba(6, 182, 212, 0.6)';
+                                if (val >= 14 && val < 20) return 'rgba(251, 191, 36, 0.6)';
+                                if (val > 28 && val <= 34) return 'rgba(16, 185, 129, 0.6)';
+                                return 'rgba(71, 85, 105, 0.4)';
+                            }),
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 9 } } },
+                            y: { display: false }
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

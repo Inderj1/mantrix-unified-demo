@@ -483,27 +483,18 @@ const TicketingSystem = ({ onBack }) => {
           getRowId={(row) => row.ticket_id}
           loading={loading}
           density="compact"
-          pageSize={25}
-          rowsPerPageOptions={[10, 25, 50, 100]}
-          disableSelectionOnClick
-          components={{ Toolbar: GridToolbar }}
-          componentsProps={{
+          initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
+          pageSizeOptions={[10, 25, 50, 100]}
+          disableRowSelectionOnClick
+          checkboxSelection
+          slots={{ toolbar: GridToolbar }}
+          slotProps={{
             toolbar: {
               showQuickFilter: true,
               quickFilterProps: { debounceMs: 500 },
             },
           }}
-          sx={{
-            border: 'none',
-            '& .MuiDataGrid-cell': {
-              fontSize: '0.8rem',
-            },
-            '& .MuiDataGrid-columnHeaders': {
-              bgcolor: alpha('#3b82f6', 0.05),
-              fontSize: '0.75rem',
-              fontWeight: 700,
-            },
-          }}
+          sx={stoxTheme.getDataGridSx({ clickable: true })}
         />
       </Paper>
 

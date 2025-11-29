@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STOX.AI | Tile 6 - MRP Parameter Optimizer</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0f172a; --bg-secondary: #1e293b; --border-color: #475569;
+            --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
+            --wharton-blue: #004785; --wharton-maroon: #990000;
+            --cyan-400: #22d3ee; --cyan-500: #06b6d4;
+            --emerald-400: #34d399; --emerald-500: #10b981;
+            --amber-400: #fbbf24; --amber-500: #f59e0b;
+            --red-400: #f87171; --red-500: #ef4444;
+        }
+        body { font-family: 'JetBrains Mono', monospace; background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); color: var(--text-primary); min-height: 100vh; padding: 24px; }
+        .container { max-width: 1700px; margin: 0 auto; }
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+        .logo-section { display: flex; align-items: center; gap: 16px; }
+        .logo { width: 48px; height: 48px; background: linear-gradient(135deg, var(--wharton-blue), var(--wharton-maroon)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .brand h1 { font-size: 24px; font-weight: 700; color: var(--cyan-400); }
+        .brand p { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
+        .tile-badge { background: linear-gradient(135deg, var(--wharton-blue), var(--wharton-maroon)); padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+        .summary-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-bottom: 32px; }
+        .summary-card { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 12px; padding: 20px; backdrop-filter: blur(10px); }
+        .summary-card .label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .summary-card .value { font-size: 24px; font-weight: 700; color: var(--text-primary); }
+        .summary-card .sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .summary-card.good { border-left: 3px solid var(--emerald-500); }
+        .summary-card.warning { border-left: 3px solid var(--amber-500); }
+        .summary-card.critical { border-left: 3px solid var(--red-500); }
+        .summary-card.neutral { border-left: 3px solid var(--cyan-500); }
+        .table-section { background: rgba(30, 41, 59, 0.3); border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 16px; overflow: hidden; backdrop-filter: blur(10px); }
+        .table-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid rgba(71, 85, 105, 0.3); background: linear-gradient(90deg, rgba(0, 71, 133, 0.2), rgba(153, 0, 0, 0.2)); }
+        .table-header h2 { font-size: 14px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+        .table-header h2 span { color: var(--cyan-400); }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th { padding: 14px 10px; text-align: left; font-size: 9px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; background: rgba(15, 23, 42, 0.5); border-bottom: 1px solid rgba(71, 85, 105, 0.3); }
+        .data-table td { padding: 14px 10px; border-bottom: 1px solid rgba(71, 85, 105, 0.2); font-size: 12px; }
+        .data-table tr { cursor: pointer; transition: all 0.2s; }
+        .data-table tr:hover { background: rgba(6, 182, 212, 0.05); }
+        .data-table tr:hover td:first-child { color: var(--cyan-400); }
+        .param-change { display: flex; align-items: center; gap: 4px; font-size: 11px; }
+        .param-change .current { color: var(--text-muted); text-decoration: line-through; }
+        .param-change .arrow { color: var(--text-muted); }
+        .param-change .optimal { color: var(--emerald-400); font-weight: 600; }
+        .param-change .same { color: var(--text-secondary); }
+        .delta-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+        .delta-badge.positive { background: rgba(239, 68, 68, 0.15); color: var(--red-400); }
+        .delta-badge.negative { background: rgba(16, 185, 129, 0.15); color: var(--emerald-400); }
+        .delta-badge.neutral { background: rgba(71, 85, 105, 0.3); color: var(--text-secondary); }
+        .metric-value { font-weight: 600; }
+        .metric-value.good { color: var(--emerald-400); }
+        .metric-value.warning { color: var(--amber-400); }
+        .metric-value.critical { color: var(--red-400); }
+        .drill-icon { opacity: 0; transition: all 0.2s; color: var(--cyan-400); }
+        .data-table tr:hover .drill-icon { opacity: 1; transform: translateX(4px); }
+        .detail-view { display: none; }
+        .detail-view.active { display: block; }
+        .list-view { display: block; }
+        .list-view.hidden { display: none; }
+        .back-btn { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 8px; color: var(--text-secondary); cursor: pointer; font-family: inherit; font-size: 12px; margin-bottom: 24px; transition: all 0.2s; }
+        .back-btn:hover { background: rgba(6, 182, 212, 0.1); color: var(--cyan-400); border-color: rgba(6, 182, 212, 0.3); }
+        .detail-header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+        .detail-logo { width: 56px; height: 56px; background: linear-gradient(135deg, var(--wharton-blue), var(--wharton-maroon)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .detail-title h1 { font-size: 24px; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+        .detail-title h1 .material-id { color: var(--cyan-400); }
+        .detail-title h1 .plant-id { color: var(--text-secondary); }
+        .detail-title p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .detail-card { background: rgba(30, 41, 59, 0.3); border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 16px; padding: 24px; backdrop-filter: blur(10px); }
+        .detail-card h3 { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+        .detail-card h3 .icon { color: var(--cyan-400); }
+        .detail-card h3 .sap-badge { margin-left: auto; font-size: 9px; font-weight: 500; color: rgba(6, 182, 212, 0.6); background: rgba(6, 182, 212, 0.1); padding: 2px 8px; border-radius: 4px; }
+        .param-row { display: grid; grid-template-columns: 100px 80px 80px 80px 100px; gap: 8px; padding: 12px 0; border-bottom: 1px solid rgba(71, 85, 105, 0.2); align-items: center; }
+        .param-row:last-child { border-bottom: none; }
+        .param-row .label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+        .param-row .value { font-size: 12px; font-weight: 600; text-align: center; }
+        .param-header { display: grid; grid-template-columns: 100px 80px 80px 80px 100px; gap: 8px; padding: 8px 0; border-bottom: 1px solid rgba(71, 85, 105, 0.3); margin-bottom: 8px; }
+        .param-header span { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; text-align: center; }
+        .param-header span:first-child { text-align: left; }
+        .footer { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(71, 85, 105, 0.2); font-size: 11px; color: var(--text-muted); }
+        .footer .info { display: flex; gap: 16px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo">⚙️</div>
+                <div class="brand">
+                    <h1>STOX.AI</h1>
+                    <p>MRP Parameter Optimizer</p>
+                </div>
+            </div>
+            <div class="tile-badge">TILE 6 — OPTIMIZATION</div>
+        </div>
+
+        <div class="list-view" id="listView">
+            <div class="summary-grid">
+                <div class="summary-card good">
+                    <div class="label">SS Savings</div>
+                    <div class="value">$1.2M</div>
+                    <div class="sub">Potential annual</div>
+                </div>
+                <div class="summary-card good">
+                    <div class="label">Lot Size Savings</div>
+                    <div class="value">$480K</div>
+                    <div class="sub">Order cost reduction</div>
+                </div>
+                <div class="summary-card good">
+                    <div class="label">ROP Corrections</div>
+                    <div class="value">342</div>
+                    <div class="sub">SKUs to optimize</div>
+                </div>
+                <div class="summary-card warning">
+                    <div class="label">MRP Type Changes</div>
+                    <div class="value">89</div>
+                    <div class="sub">Recommended</div>
+                </div>
+                <div class="summary-card neutral">
+                    <div class="label">PLIFZ Corrections</div>
+                    <div class="value">156</div>
+                    <div class="sub">Lead time updates</div>
+                </div>
+                <div class="summary-card good">
+                    <div class="label">Net $ Impact</div>
+                    <div class="value">$2.1M</div>
+                    <div class="sub">Annual savings</div>
+                </div>
+            </div>
+
+            <div class="table-section">
+                <div class="table-header">
+                    <h2><span>⚙️</span> Parameter Optimization: Current vs Optimal with $ Impact</h2>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Material</th>
+                            <th>Plant</th>
+                            <th>EISBE (SS)</th>
+                            <th>Δ SS $</th>
+                            <th>DISLS (Lot)</th>
+                            <th>Δ Lot $</th>
+                            <th>MINBE (ROP)</th>
+                            <th>Δ ROP $</th>
+                            <th>PLIFZ (LT)</th>
+                            <th>DISMM (Type)</th>
+                            <th>Conf</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr onclick="showDetail('MAT-001')">
+                            <td><strong>MAT-001</strong></td>
+                            <td>P1000</td>
+                            <td><span class="param-change"><span class="current">500</span><span class="arrow">→</span><span class="optimal">420</span></span></td>
+                            <td><span class="delta-badge negative">-$15.6K</span></td>
+                            <td><span class="param-change"><span class="same">EQ 200</span></span></td>
+                            <td><span class="delta-badge neutral">$0</span></td>
+                            <td><span class="param-change"><span class="current">800</span><span class="arrow">→</span><span class="optimal">720</span></span></td>
+                            <td><span class="delta-badge negative">-$8.2K</span></td>
+                            <td><span class="param-change"><span class="current">14</span><span class="arrow">→</span><span class="optimal">16</span></span></td>
+                            <td><span class="param-change"><span class="same">PD</span></span></td>
+                            <td><span class="metric-value good">94%</span></td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                        <tr onclick="showDetail('MAT-002')">
+                            <td><strong>MAT-002</strong></td>
+                            <td>P1000</td>
+                            <td><span class="param-change"><span class="current">850</span><span class="arrow">→</span><span class="optimal">620</span></span></td>
+                            <td><span class="delta-badge negative">-$45.2K</span></td>
+                            <td><span class="param-change"><span class="current">FX 500</span><span class="arrow">→</span><span class="optimal">EQ 320</span></span></td>
+                            <td><span class="delta-badge negative">-$12.4K</span></td>
+                            <td><span class="param-change"><span class="current">1200</span><span class="arrow">→</span><span class="optimal">980</span></span></td>
+                            <td><span class="delta-badge negative">-$18.6K</span></td>
+                            <td><span class="param-change"><span class="current">21</span><span class="arrow">→</span><span class="optimal">24</span></span></td>
+                            <td><span class="param-change"><span class="same">PD</span></span></td>
+                            <td><span class="metric-value good">91%</span></td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                        <tr onclick="showDetail('MAT-003')">
+                            <td><strong>MAT-003</strong></td>
+                            <td>P2000</td>
+                            <td><span class="param-change"><span class="current">1200</span><span class="arrow">→</span><span class="optimal">450</span></span></td>
+                            <td><span class="delta-badge negative">-$125K</span></td>
+                            <td><span class="param-change"><span class="current">TB</span><span class="arrow">→</span><span class="optimal">WB</span></span></td>
+                            <td><span class="delta-badge negative">-$8.5K</span></td>
+                            <td><span class="param-change"><span class="current">2500</span><span class="arrow">→</span><span class="optimal">1200</span></span></td>
+                            <td><span class="delta-badge negative">-$85K</span></td>
+                            <td><span class="param-change"><span class="current">30</span><span class="arrow">→</span><span class="optimal">45</span></span></td>
+                            <td><span class="param-change"><span class="current">PD</span><span class="arrow">→</span><span class="optimal">VB</span></span></td>
+                            <td><span class="metric-value warning">78%</span></td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                        <tr onclick="showDetail('MAT-004')">
+                            <td><strong>MAT-004</strong></td>
+                            <td>P2000</td>
+                            <td><span class="param-change"><span class="current">180</span><span class="arrow">→</span><span class="optimal">320</span></span></td>
+                            <td><span class="delta-badge positive">+$8.4K</span></td>
+                            <td><span class="param-change"><span class="same">EQ 100</span></span></td>
+                            <td><span class="delta-badge neutral">$0</span></td>
+                            <td><span class="param-change"><span class="current">350</span><span class="arrow">→</span><span class="optimal">520</span></span></td>
+                            <td><span class="delta-badge positive">+$4.2K</span></td>
+                            <td><span class="param-change"><span class="same">14</span></span></td>
+                            <td><span class="param-change"><span class="current">VB</span><span class="arrow">→</span><span class="optimal">PD</span></span></td>
+                            <td><span class="metric-value good">89%</span></td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                        <tr onclick="showDetail('MAT-005')">
+                            <td><strong>MAT-005</strong></td>
+                            <td>P3000</td>
+                            <td><span class="param-change"><span class="current">2500</span><span class="arrow">→</span><span class="optimal">800</span></span></td>
+                            <td><span class="delta-badge negative">-$89K</span></td>
+                            <td><span class="param-change"><span class="current">FX 1000</span><span class="arrow">→</span><span class="optimal">EQ 250</span></span></td>
+                            <td><span class="delta-badge negative">-$24K</span></td>
+                            <td><span class="param-change"><span class="current">3500</span><span class="arrow">→</span><span class="optimal">1100</span></span></td>
+                            <td><span class="delta-badge negative">-$68K</span></td>
+                            <td><span class="param-change"><span class="current">21</span><span class="arrow">→</span><span class="optimal">28</span></span></td>
+                            <td><span class="param-change"><span class="current">PD</span><span class="arrow">→</span><span class="optimal">ND</span></span></td>
+                            <td><span class="metric-value warning">72%</span></td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="detail-view" id="detailView">
+            <button class="back-btn" onclick="showList()">← Back to List</button>
+            
+            <div class="detail-header">
+                <div class="detail-logo">⚙️</div>
+                <div class="detail-title">
+                    <h1>
+                        <span class="material-id" id="detailMaterial">MAT-001</span>
+                        <span style="color: var(--text-muted)">|</span>
+                        <span class="plant-id" id="detailPlant">P1000</span>
+                    </h1>
+                    <p id="detailDesc">Full MRP Parameter Optimization</p>
+                </div>
+            </div>
+
+            <div class="detail-grid">
+                <div class="detail-card">
+                    <h3><span class="icon">🛡️</span> Safety Stock Optimization<span class="sap-badge">EISBE</span></h3>
+                    <div class="param-header">
+                        <span>Parameter</span>
+                        <span>Current</span>
+                        <span>Optimal</span>
+                        <span>Δ Units</span>
+                        <span>Δ $</span>
+                    </div>
+                    <div class="param-row">
+                        <span class="label">EISBE</span>
+                        <span class="value">500</span>
+                        <span class="value" style="color: var(--emerald-400);">420</span>
+                        <span class="value" style="color: var(--emerald-400);">-80</span>
+                        <span class="value"><span class="delta-badge negative">-$15.6K</span></span>
+                    </div>
+                    <div class="param-row">
+                        <span class="label">SS Method</span>
+                        <span class="value" colspan="4">Normal Distribution</span>
+                    </div>
+                    <div class="param-row">
+                        <span class="label">Supplier Adj</span>
+                        <span class="value" colspan="4">+5% (Reliability: 95.2%)</span>
+                    </div>
+                    <div class="param-row">
+                        <span class="label">Seasonal Adj</span>
+                        <span class="value" colspan="4">None Required</span>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📦</span> Lot Size Optimization<span class="sap-badge">DISLS/BSTMI/BSTMA</span></h3>
+                    <div class="param-header">
+                        <span>Parameter</span>
+                        <span>Current</span>
+                        <span>Optimal</span>
+                        <span>Δ Units</span>
+                        <span>Δ $</span>
+                    </div>
+                    <div class="param-row">
+                        <span class="label">DISLS</span>
+                        <span class="value">EQ</span>
+                        <span class="value">EQ</span>
+                        <span class="value">—</span>
+                        <span class="value"><span class="delta-badge neutral">$0</span></span>
+                    </div>
+                    <div class="param-row">
+                        <span class="label">Lot Qty</span>
+                        <span class="value">200</span>
+                        <span class="value">200</span>
+                        <span class="value">0</span>
+                        <span class="value"><span class="delta-badge neutral">$0</span></span>
+                    </div>
+                    <div class="param-row">
+                        <span class="label">Method</span>
+                        <span class="value" colspan="4">EOQ (Optimal)</span>
+                    </div>
+                    <div class="param-row">
+                        <span class="label">MOQ</span>
+                        <span class="value" colspan="4">100 (Constraint Met)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-grid" style="margin-top: 24px;">
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span> Reorder Point Optimization<span class="sap-badge">MINBE</span></h3>
+                    <div class="param-header">
+                        <span>Parameter</span>
+                        <span>Current</span>
+                        <span>Optimal</span>
+                        <span>Δ Units</span>
+                        <span>Δ $</span>
+                    </div>
+                    <div class="param-row">
+                        <span class="label">MINBE</span>
+                        <span class="value">800</span>
+                        <span class="value" style="color: var(--emerald-400);">720</span>
+                        <span class="value" style="color: var(--emerald-400);">-80</span>
+                        <span class="value"><span class="delta-badge negative">-$8.2K</span></span>
+                    </div>
+                    <div class="param-row">
+                        <span class="label">Coverage</span>
+                        <span class="value">52 days</span>
+                        <span class="value">45 days</span>
+                        <span class="value">-7 days</span>
+                        <span class="value">—</span>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⏱️</span> Lead Time & MRP Type<span class="sap-badge">PLIFZ/DISMM</span></h3>
+                    <div class="param-header">
+                        <span>Parameter</span>
+                        <span>Current</span>
+                        <span>Optimal</span>
+                        <span>Δ</span>
+                        <span>Impact</span>
+                    </div>
+                    <div class="param-row">
+                        <span class="label">PLIFZ</span>
+                        <span class="value">14 days</span>
+                        <span class="value" style="color: var(--amber-400);">16 days</span>
+                        <span class="value">+2 days</span>
+                        <span class="value">Buffer ↑</span>
+                    </div>
+                    <div class="param-row">
+                        <span class="label">DISMM</span>
+                        <span class="value">PD</span>
+                        <span class="value">PD</span>
+                        <span class="value">—</span>
+                        <span class="value">No Change</span>
+                    </div>
+                    <div class="param-row">
+                        <span class="label">Rationale</span>
+                        <span class="value" colspan="4">CV=0.18, Smooth demand, Forecast suitable</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card" style="margin-top: 24px;">
+                <h3><span class="icon">💰</span> Total $ Impact Summary</h3>
+                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; text-align: center; padding: 20px 0;">
+                    <div>
+                        <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">SS Savings</div>
+                        <div style="font-size: 24px; font-weight: 700; color: var(--emerald-400);">-$15.6K</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Lot Size Savings</div>
+                        <div style="font-size: 24px; font-weight: 700; color: var(--text-secondary);">$0</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">ROP Savings</div>
+                        <div style="font-size: 24px; font-weight: 700; color: var(--emerald-400);">-$8.2K</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Confidence</div>
+                        <div style="font-size: 24px; font-weight: 700; color: var(--emerald-400);">94%</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Net Annual Savings</div>
+                        <div style="font-size: 24px; font-weight: 700; color: var(--cyan-400);">-$23.8K</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="info">
+                <span>STOX.AI Parameter Optimizer</span>
+                <span>•</span>
+                <span>Tile 6 of 10</span>
+                <span>•</span>
+                <span>Layer: Optimization</span>
+            </div>
+            <div>© 2025 Cloud Mantra LLC</div>
+        </div>
+    </div>
+
+    <script>
+        function showDetail(material) {
+            document.getElementById('listView').classList.add('hidden');
+            document.getElementById('detailView').classList.add('active');
+            
+            const matData = {
+                'MAT-001': { material: 'MAT-001', plant: 'P1000', desc: 'Full MRP Parameter Optimization' },
+                'MAT-002': { material: 'MAT-002', plant: 'P1000', desc: 'Full MRP Parameter Optimization' },
+                'MAT-003': { material: 'MAT-003', plant: 'P2000', desc: 'Full MRP Parameter Optimization' },
+                'MAT-004': { material: 'MAT-004', plant: 'P2000', desc: 'Full MRP Parameter Optimization' },
+                'MAT-005': { material: 'MAT-005', plant: 'P3000', desc: 'Full MRP Parameter Optimization' }
+            };
+            
+            const data = matData[material] || matData['MAT-001'];
+            document.getElementById('detailMaterial').textContent = data.material;
+            document.getElementById('detailPlant').textContent = data.plant;
+            document.getElementById('detailDesc').textContent = data.desc;
+        }
+        
+        function showList() {
+            document.getElementById('listView').classList.remove('hidden');
+            document.getElementById('detailView').classList.remove('active');
+        }
+    </script>
+</body>
+</html>

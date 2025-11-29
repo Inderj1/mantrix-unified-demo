@@ -428,8 +428,7 @@ class EventExtractor:
                     'Invoice Generated'
                 ],
                 'data_source': 'sales_order_cockpit_export',
-                'supported': False,
-                'note': 'Currently disabled'
+                'supported': True
             },
             {
                 'id': 'consignment-kit',
@@ -477,16 +476,21 @@ class EventExtractor:
                 'description': 'Sales process from quote to revenue',
                 'activities': ['Order Created', 'Goods Delivered', 'Invoice Generated'],
                 'data_source': 'sales_order_cockpit_export',
-                'supported': False,
-                'note': 'Currently disabled - Limited quote data available'
+                'supported': True
             },
             {
                 'id': 'procure-to-pay',
                 'name': 'Procure-to-Pay (P2P)',
                 'description': 'Complete procurement lifecycle',
-                'activities': [],
-                'data_source': None,
-                'supported': False,
-                'note': 'Procurement data not available in current dataset'
+                'activities': [
+                    'Purchase Requisition',
+                    'PO Created',
+                    'PO Approved',
+                    'Goods Receipt',
+                    'Invoice Receipt',
+                    'Payment'
+                ],
+                'data_source': 'procurement_data',
+                'supported': True
             }
         ]

@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STOX.AI - Demand Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0F172A;
+            --bg-secondary: #1E293B;
+            --bg-tertiary: #334155;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --cyan: #06B6D4;
+            --cyan-dark: #0891B2;
+            --emerald: #10B981;
+            --amber: #F59E0B;
+            --red: #EF4444;
+            --purple: #8B5CF6;
+            --pink: #EC4899;
+            --wharton-blue: #004785;
+            --wharton-maroon: #A90533;
+            --border: #475569;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-left h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--cyan);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .header-left p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .view-toggle {
+            display: flex;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 4px;
+        }
+
+        .view-btn {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .view-btn.active {
+            background: var(--cyan);
+            color: var(--bg-primary);
+            font-weight: 600;
+        }
+
+        /* Summary Cards */
+        .summary-strip {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .summary-card:hover {
+            border-color: var(--cyan);
+            transform: translateY(-2px);
+        }
+
+        .summary-card .label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .summary-card .value {
+            font-size: 28px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .summary-card .subtext {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .summary-card.risk-high .value { color: var(--red); }
+        .summary-card.risk-medium .value { color: var(--amber); }
+        .summary-card.risk-low .value { color: var(--emerald); }
+        .summary-card.info .value { color: var(--cyan); }
+        .summary-card.purple .value { color: var(--purple); }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .filter-group select {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--cyan);
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            max-width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--cyan);
+        }
+
+        /* Main Table */
+        .table-container {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table thead {
+            background: var(--bg-tertiary);
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table th {
+            padding: 14px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .data-table th .sap-field {
+            display: block;
+            font-size: 9px;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-top: 2px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .data-table tbody tr {
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .data-table tbody tr:hover {
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        .data-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .data-table .material-cell {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--cyan);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-smooth { background: rgba(16, 185, 129, 0.2); color: var(--emerald); }
+        .badge-seasonal { background: rgba(139, 92, 246, 0.2); color: var(--purple); }
+        .badge-erratic { background: rgba(239, 68, 68, 0.2); color: var(--red); }
+        .badge-intermittent { background: rgba(245, 158, 11, 0.2); color: var(--amber); }
+        .badge-lumpy { background: rgba(236, 72, 153, 0.2); color: var(--pink); }
+
+        .badge-a { background: rgba(239, 68, 68, 0.2); color: var(--red); }
+        .badge-b { background: rgba(245, 158, 11, 0.2); color: var(--amber); }
+        .badge-c { background: rgba(100, 116, 139, 0.2); color: var(--text-secondary); }
+
+        .badge-x { background: rgba(16, 185, 129, 0.2); color: var(--emerald); }
+        .badge-y { background: rgba(245, 158, 11, 0.2); color: var(--amber); }
+        .badge-z { background: rgba(239, 68, 68, 0.2); color: var(--red); }
+
+        /* Indicators */
+        .indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .indicator-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .indicator-dot.green { background: var(--emerald); }
+        .indicator-dot.yellow { background: var(--amber); }
+        .indicator-dot.red { background: var(--red); }
+
+        .trend-up { color: var(--emerald); }
+        .trend-stable { color: var(--text-secondary); }
+        .trend-down { color: var(--red); }
+
+        /* Risk Score Gauge */
+        .risk-score {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .risk-bar {
+            width: 60px;
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .risk-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .risk-bar-fill.low { background: var(--emerald); }
+        .risk-bar-fill.medium { background: var(--amber); }
+        .risk-bar-fill.high { background: var(--red); }
+
+        .risk-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Detail View */
+        .detail-view {
+            display: none;
+        }
+
+        .detail-view.active {
+            display: block;
+        }
+
+        .list-view.hidden {
+            display: none;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 20px;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            border-color: var(--cyan);
+            background: var(--bg-tertiary);
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+
+        .detail-title {
+            font-size: 24px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--cyan);
+        }
+
+        .detail-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .detail-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .detail-card h3 {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-card h3 .icon {
+            font-size: 18px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .metric-label .sap-ref {
+            display: block;
+            font-size: 10px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .metric-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Charts placeholder */
+        .chart-container {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chart-placeholder {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        /* Demand Pattern Visualization */
+        .pattern-viz {
+            display: flex;
+            gap: 4px;
+            height: 40px;
+            align-items: flex-end;
+        }
+
+        .pattern-bar {
+            width: 20px;
+            background: var(--cyan);
+            border-radius: 2px 2px 0 0;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .pattern-bar:hover {
+            opacity: 1;
+        }
+
+        .pattern-bar.anomaly {
+            background: var(--red);
+        }
+
+        .pattern-bar.peak {
+            background: var(--purple);
+        }
+
+        /* Navigation Cards */
+        .nav-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .nav-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-card:hover {
+            border-color: var(--cyan);
+            transform: translateY(-2px);
+        }
+
+        .nav-card .nav-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .nav-card .nav-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .nav-card .nav-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Seasonality Radar */
+        .seasonality-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 4px;
+        }
+
+        .season-cell {
+            text-align: center;
+            padding: 8px 4px;
+            border-radius: 4px;
+            font-size: 10px;
+        }
+
+        .season-cell .month {
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .season-cell .index {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+
+        .season-cell.peak {
+            background: rgba(139, 92, 246, 0.3);
+        }
+
+        .season-cell.low {
+            background: rgba(100, 116, 139, 0.2);
+        }
+
+        .season-cell.normal {
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        /* Forecast Accuracy */
+        .accuracy-display {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .accuracy-value {
+            font-size: 48px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .accuracy-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 12px;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <h1>📊 Demand Intelligence</h1>
+                <p>Layer 2: Diagnostics — Understand demand patterns and behavior</p>
+            </div>
+            <div class="header-right">
+                <div class="view-toggle">
+                    <button class="view-btn active" data-view="sku-plant">SKU-Plant</button>
+                    <button class="view-btn" data-view="sku">SKU</button>
+                    <button class="view-btn" data-view="plant">Plant</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Strip -->
+        <div class="summary-strip">
+            <div class="summary-card risk-high">
+                <div class="label">🔴 High Risk (Z-Class)</div>
+                <div class="value">47</div>
+                <div class="subtext">SKUs need attention</div>
+            </div>
+            <div class="summary-card risk-medium">
+                <div class="label">📈 Trending Up</div>
+                <div class="value">23</div>
+                <div class="subtext">&gt; +10% YoY growth</div>
+            </div>
+            <div class="summary-card risk-low">
+                <div class="label">📉 Declining</div>
+                <div class="value">31</div>
+                <div class="subtext">&lt; -10% YoY decline</div>
+            </div>
+            <div class="summary-card purple">
+                <div class="label">⚡ Intermittent</div>
+                <div class="value">89</div>
+                <div class="subtext">ADI ≥ 1.32</div>
+            </div>
+            <div class="summary-card info">
+                <div class="label">🚨 Anomalies</div>
+                <div class="value">12</div>
+                <div class="subtext">Events this month</div>
+            </div>
+            <div class="summary-card risk-medium">
+                <div class="label">🔄 Reclass Needed</div>
+                <div class="value">18</div>
+                <div class="subtext">ABC/XYZ changed</div>
+            </div>
+        </div>
+
+        <!-- List View -->
+        <div class="list-view" id="listView">
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label>Plant:</label>
+                    <select id="filterPlant">
+                        <option value="all">All Plants</option>
+                        <option value="P100">P100 - US East</option>
+                        <option value="P200">P200 - US West</option>
+                        <option value="P300">P300 - EU</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Pattern:</label>
+                    <select id="filterPattern">
+                        <option value="all">All Patterns</option>
+                        <option value="smooth">Smooth</option>
+                        <option value="seasonal">Seasonal</option>
+                        <option value="erratic">Erratic</option>
+                        <option value="intermittent">Intermittent</option>
+                        <option value="lumpy">Lumpy</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>ABC:</label>
+                    <select id="filterABC">
+                        <option value="all">All</option>
+                        <option value="A">A (High Value)</option>
+                        <option value="B">B (Medium)</option>
+                        <option value="C">C (Low)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>XYZ:</label>
+                    <select id="filterXYZ">
+                        <option value="all">All</option>
+                        <option value="X">X (Stable)</option>
+                        <option value="Y">Y (Variable)</option>
+                        <option value="Z">Z (Erratic)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Risk:</label>
+                    <select id="filterRisk">
+                        <option value="all">All</option>
+                        <option value="high">🔴 High (&gt;60)</option>
+                        <option value="medium">🟡 Medium (30-60)</option>
+                        <option value="low">🟢 Low (&lt;30)</option>
+                    </select>
+                </div>
+                <div class="search-box">
+                    <input type="text" placeholder="Search material..." id="searchInput">
+                </div>
+            </div>
+
+            <!-- Data Table -->
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Material<span class="sap-field">MARA.MATNR</span></th>
+                            <th>Plant<span class="sap-field">MARC.WERKS</span></th>
+                            <th>Pattern<span class="sap-field">Calculated</span></th>
+                            <th>CV<span class="sap-field">MVER.MNG01-12</span></th>
+                            <th>ADI<span class="sap-field">MVER/MSEG</span></th>
+                            <th>Trend<span class="sap-field">MVER (Regr)</span></th>
+                            <th>Seasonality<span class="sap-field">MVER Multi-Yr</span></th>
+                            <th>Anomalies<span class="sap-field">MSEG Z-Score</span></th>
+                            <th>ABC<span class="sap-field">MBEW+MVER</span></th>
+                            <th>XYZ<span class="sap-field">CV Thresh</span></th>
+                            <th>Risk Score<span class="sap-field">Composite</span></th>
+                            <th>Fcst Acc<span class="sap-field">From FE</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Data rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Detail View -->
+        <div class="detail-view" id="detailView">
+            <button class="back-btn" onclick="showListView()">
+                ← Back to List
+            </button>
+
+            <div class="detail-header">
+                <div>
+                    <div class="detail-title" id="detailMaterial">MAT-4521-HYD</div>
+                    <div class="detail-subtitle" id="detailSubtitle">Hydraulic Actuator | Plant P100 - US East</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="badge badge-seasonal" id="detailPatternBadge">Seasonal</div>
+                    <div style="margin-top: 8px;">
+                        <span class="badge badge-a" id="detailABCBadge">A</span>
+                        <span class="badge badge-x" id="detailXYZBadge">X</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-grid">
+                <!-- Demand Risk Score Card -->
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span> Demand Risk Score</h3>
+                    <div class="accuracy-display">
+                        <div class="accuracy-value" id="detailRiskScore" style="color: var(--emerald);">25</div>
+                        <div class="accuracy-label">Low Risk</div>
+                    </div>
+                    <div style="margin-top: 16px;">
+                        <div class="metric-row">
+                            <span class="metric-label">CV Risk (25%)</span>
+                            <span class="metric-value" id="detailCVRisk">5.5</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Intermittency (15%)</span>
+                            <span class="metric-value" id="detailIntRisk">0</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Trend Instability (15%)</span>
+                            <span class="metric-value" id="detailTrendRisk">4.2</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Forecast Uncertainty (20%)</span>
+                            <span class="metric-value" id="detailFcstRisk">7.6</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Anomaly Freq (15%)</span>
+                            <span class="metric-value" id="detailAnomalyRisk">1.2</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Coverage Gap (10%)</span>
+                            <span class="metric-value" id="detailCovRisk">6.2</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Demand Metrics Card -->
+                <div class="detail-card">
+                    <h3><span class="icon">📊</span> Demand Metrics</h3>
+                    <div class="metric-row">
+                        <span class="metric-label">Coefficient of Variation (CV)<span class="sap-ref">MVER.MNG01-12</span></span>
+                        <span class="metric-value" id="detailCV">0.44</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Mean Monthly Demand<span class="sap-ref">AVG(MVER.MNGxx)</span></span>
+                        <span class="metric-value" id="detailMean">425 EA</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Standard Deviation<span class="sap-ref">Calculated</span></span>
+                        <span class="metric-value" id="detailStdDev">186.4</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">ADI (Intermittency)<span class="sap-ref">MVER Zero Periods</span></span>
+                        <span class="metric-value" id="detailADI">1.0</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Trend<span class="sap-ref">Linear Regression</span></span>
+                        <span class="metric-value trend-up" id="detailTrend">↑ +18%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">R² (Trend Fit)<span class="sap-ref">Calculated</span></span>
+                        <span class="metric-value" id="detailR2">0.72</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Anomalies (6mo)<span class="sap-ref">MSEG Z&gt;2.5</span></span>
+                        <span class="metric-value" id="detailAnomalies">1</span>
+                    </div>
+                </div>
+
+                <!-- Classification Card -->
+                <div class="detail-card">
+                    <h3><span class="icon">🏷️</span> Classification</h3>
+                    <div class="metric-row">
+                        <span class="metric-label">Demand Pattern<span class="sap-ref">CV+ADI+Trend</span></span>
+                        <span class="metric-value" id="detailPattern">Seasonal</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">ABC Class<span class="sap-ref">MBEW.VERPR × Σ(MVER)</span></span>
+                        <span class="metric-value" id="detailABC">A (High Value)</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">XYZ Class<span class="sap-ref">CV Thresholds</span></span>
+                        <span class="metric-value" id="detailXYZ">X (Predictable)</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Annual Value<span class="sap-ref">Calculated</span></span>
+                        <span class="metric-value" id="detailValue">$1.25M</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">SAP ABC (Static)<span class="sap-ref">MARC.MAABC</span></span>
+                        <span class="metric-value" id="detailSAPABC">A</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Forecast Accuracy<span class="sap-ref">From Fcst Engine</span></span>
+                        <span class="metric-value" id="detailFcstAcc">78%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Recommended Model<span class="sap-ref">Auto-Selected</span></span>
+                        <span class="metric-value" id="detailModel">Holt-Winters</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seasonality Profile -->
+            <div class="detail-card" style="margin-bottom: 20px;">
+                <h3><span class="icon">📅</span> Seasonality Profile</h3>
+                <div class="seasonality-grid" id="seasonalityGrid">
+                    <!-- Will be populated by JS -->
+                </div>
+            </div>
+
+            <!-- Demand History Chart -->
+            <div class="detail-card" style="margin-bottom: 20px;">
+                <h3><span class="icon">📈</span> Demand History (12 Months)</h3>
+                <div class="pattern-viz" id="demandChart">
+                    <!-- Will be populated by JS -->
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 8px; padding: 0 4px;">
+                    <span style="font-size: 10px; color: var(--text-muted);">Jan</span>
+                    <span style="font-size: 10px; color: var(--text-muted);">Feb</span>
+                    <span style="font-size: 10px; color: var(--text-muted);">Mar</span>
+                    <span style="font-size: 10px; color: var(--text-muted);">Apr</span>
+                    <span style="font-size: 10px; color: var(--text-muted);">May</span>
+                    <span style="font-size: 10px; color: var(--text-muted);">Jun</span>
+                    <span style="font-size: 10px; color: var(--text-muted);">Jul</span>
+                    <span style="font-size: 10px; color: var(--text-muted);">Aug</span>
+                    <span style="font-size: 10px; color: var(--text-muted);">Sep</span>
+                    <span style="font-size: 10px; color: var(--text-muted);">Oct</span>
+                    <span style="font-size: 10px; color: var(--text-muted);">Nov</span>
+                    <span style="font-size: 10px; color: var(--text-muted);">Dec</span>
+                </div>
+            </div>
+
+            <!-- Navigation to Other Tiles -->
+            <div class="nav-cards">
+                <div class="nav-card" onclick="alert('Navigate to Forecasting Engine')">
+                    <div class="nav-icon">🔮</div>
+                    <div class="nav-title">Forecasting Engine</div>
+                    <div class="nav-desc">View AI-generated forecasts and confidence intervals</div>
+                </div>
+                <div class="nav-card" onclick="alert('Navigate to Inventory Health')">
+                    <div class="nav-icon">🏥</div>
+                    <div class="nav-title">Inventory Health Check</div>
+                    <div class="nav-desc">See current stock position and health metrics</div>
+                </div>
+                <div class="nav-card" onclick="alert('Navigate to MRP Tuner')">
+                    <div class="nav-icon">🎛️</div>
+                    <div class="nav-title">MRP Parameter Tuner</div>
+                    <div class="nav-desc">Optimize safety stock and reorder points</div>
+                </div>
+                <div class="nav-card" onclick="alert('Navigate to Supply Analytics')">
+                    <div class="nav-icon">🚚</div>
+                    <div class="nav-title">Supply & Lead Time</div>
+                    <div class="nav-desc">Analyze vendor performance and RLT variance</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            STOX.AI Demand Intelligence | Cloud Mantra LLC | Data refreshed: <span id="refreshTime"></span>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        const demandData = [
+            {
+                material: 'MAT-4521-HYD',
+                description: 'Hydraulic Actuator',
+                plant: 'P100',
+                plantName: 'US East',
+                pattern: 'Seasonal',
+                cv: 0.44,
+                adi: 1.0,
+                trend: '+18%',
+                trendDir: 'up',
+                seasonality: 'Nov-Dec Peak',
+                anomalies: 1,
+                abc: 'A',
+                xyz: 'X',
+                riskScore: 25,
+                fcstAcc: 78,
+                monthlyDemand: [320, 280, 410, 290, 350, 380, 420, 310, 280, 450, 890, 720],
+                seasonIndex: [0.75, 0.66, 0.96, 0.68, 0.82, 0.89, 0.99, 0.73, 0.66, 1.06, 2.09, 1.69],
+                mean: 425,
+                stdDev: 186.4,
+                r2: 0.72,
+                annualValue: '$1.25M',
+                sapABC: 'A',
+                model: 'Holt-Winters',
+                riskBreakdown: { cv: 5.5, int: 0, trend: 4.2, fcst: 7.6, anomaly: 1.2, cov: 6.2 }
+            },
+            {
+                material: 'MAT-7892-BRG',
+                description: 'Bearing Assembly',
+                plant: 'P100',
+                plantName: 'US East',
+                pattern: 'Smooth',
+                cv: 0.12,
+                adi: 1.0,
+                trend: '-22%',
+                trendDir: 'down',
+                seasonality: 'None',
+                anomalies: 0,
+                abc: 'B',
+                xyz: 'X',
+                riskScore: 4,
+                fcstAcc: 95,
+                monthlyDemand: [180, 175, 168, 165, 158, 152, 148, 142, 138, 132, 128, 124],
+                seasonIndex: [1.19, 1.16, 1.11, 1.09, 1.05, 1.01, 0.98, 0.94, 0.91, 0.87, 0.85, 0.82],
+                mean: 151,
+                stdDev: 18.2,
+                r2: 0.98,
+                annualValue: '$154K',
+                sapABC: 'B',
+                model: 'Holt Linear',
+                riskBreakdown: { cv: 1.5, int: 0, trend: 0.3, fcst: 2.6, anomaly: 0, cov: 0 }
+            },
+            {
+                material: 'MAT-3341-ELC',
+                description: 'Electronic Controller',
+                plant: 'P200',
+                plantName: 'US West',
+                pattern: 'Erratic',
+                cv: 1.42,
+                adi: 1.1,
+                trend: '+5%',
+                trendDir: 'stable',
+                seasonality: 'None',
+                anomalies: 3,
+                abc: 'A',
+                xyz: 'Z',
+                riskScore: 72,
+                fcstAcc: 58,
+                monthlyDemand: [450, 120, 680, 230, 890, 150, 420, 780, 110, 560, 340, 920],
+                seasonIndex: [0.94, 0.25, 1.42, 0.48, 1.86, 0.31, 0.88, 1.63, 0.23, 1.17, 0.71, 1.92],
+                mean: 471,
+                stdDev: 285.2,
+                r2: 0.15,
+                annualValue: '$2.1M',
+                sapABC: 'A',
+                model: 'Ensemble',
+                riskBreakdown: { cv: 17.8, int: 0.8, trend: 12.8, fcst: 24.0, anomaly: 6.3, cov: 10.0 }
+            },
+            {
+                material: 'MAT-5567-SPR',
+                description: 'Spare Part Kit',
+                plant: 'P100',
+                plantName: 'US East',
+                pattern: 'Intermittent',
+                cv: 0.85,
+                adi: 2.4,
+                trend: '+2%',
+                trendDir: 'stable',
+                seasonality: 'None',
+                anomalies: 0,
+                abc: 'C',
+                xyz: 'Y',
+                riskScore: 45,
+                fcstAcc: 62,
+                monthlyDemand: [0, 45, 0, 0, 38, 0, 52, 0, 0, 41, 0, 48],
+                seasonIndex: [0, 1.01, 0, 0, 0.85, 0, 1.17, 0, 0, 0.92, 0, 1.08],
+                mean: 18.7,
+                stdDev: 22.1,
+                r2: 0.42,
+                annualValue: '$28K',
+                sapABC: 'C',
+                model: 'Croston',
+                riskBreakdown: { cv: 10.6, int: 12.5, trend: 8.7, fcst: 8.2, anomaly: 0, cov: 5.0 }
+            },
+            {
+                material: 'MAT-9921-FLT',
+                description: 'Filter Assembly',
+                plant: 'P300',
+                plantName: 'EU',
+                pattern: 'Lumpy',
+                cv: 1.65,
+                adi: 1.8,
+                trend: '-8%',
+                trendDir: 'down',
+                seasonality: 'Q4 Peak',
+                anomalies: 2,
+                abc: 'B',
+                xyz: 'Z',
+                riskScore: 68,
+                fcstAcc: 48,
+                monthlyDemand: [0, 280, 0, 150, 0, 0, 420, 0, 0, 180, 650, 0],
+                seasonIndex: [0, 1.67, 0, 0.89, 0, 0, 2.50, 0, 0, 1.07, 3.87, 0],
+                mean: 140,
+                stdDev: 206.5,
+                r2: 0.28,
+                annualValue: '$245K',
+                sapABC: 'B',
+                model: 'Bootstrap',
+                riskBreakdown: { cv: 20.6, int: 15.0, trend: 10.8, fcst: 12.4, anomaly: 5.0, cov: 4.0 }
+            }
+        ];
+
+        // Render table
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.onclick = () => showDetail(row);
+
+                const patternClass = `badge-${row.pattern.toLowerCase()}`;
+                const abcClass = `badge-${row.abc.toLowerCase()}`;
+                const xyzClass = `badge-${row.xyz.toLowerCase()}`;
+                
+                const trendClass = row.trendDir === 'up' ? 'trend-up' : 
+                                   row.trendDir === 'down' ? 'trend-down' : 'trend-stable';
+                const trendArrow = row.trendDir === 'up' ? '↑' : 
+                                   row.trendDir === 'down' ? '↓' : '→';
+
+                const riskClass = row.riskScore > 60 ? 'high' : row.riskScore > 30 ? 'medium' : 'low';
+                const riskColor = row.riskScore > 60 ? 'var(--red)' : row.riskScore > 30 ? 'var(--amber)' : 'var(--emerald)';
+
+                const cvIndicator = row.cv > 1.0 ? 'red' : row.cv > 0.5 ? 'yellow' : 'green';
+                const adiIndicator = row.adi >= 1.32 ? 'red' : 'green';
+                const anomalyIndicator = row.anomalies > 2 ? 'red' : row.anomalies > 0 ? 'yellow' : 'green';
+                const fcstIndicator = row.fcstAcc > 85 ? 'green' : row.fcstAcc > 70 ? 'yellow' : 'red';
+
+                tr.innerHTML = `
+                    <td class="material-cell">${row.material}</td>
+                    <td>${row.plant}</td>
+                    <td><span class="badge ${patternClass}">${row.pattern}</span></td>
+                    <td>
+                        <span class="indicator">
+                            <span class="indicator-dot ${cvIndicator}"></span>
+                            ${row.cv.toFixed(2)}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="indicator">
+                            <span class="indicator-dot ${adiIndicator}"></span>
+                            ${row.adi.toFixed(1)}
+                        </span>
+                    </td>
+                    <td class="${trendClass}">${trendArrow} ${row.trend}</td>
+                    <td>${row.seasonality}</td>
+                    <td>
+                        <span class="indicator">
+                            <span class="indicator-dot ${anomalyIndicator}"></span>
+                            ${row.anomalies}
+                        </span>
+                    </td>
+                    <td><span class="badge ${abcClass}">${row.abc}</span></td>
+                    <td><span class="badge ${xyzClass}">${row.xyz}</span></td>
+                    <td>
+                        <div class="risk-score">
+                            <div class="risk-bar">
+                                <div class="risk-bar-fill ${riskClass}" style="width: ${row.riskScore}%"></div>
+                            </div>
+                            <span class="risk-value" style="color: ${riskColor}">${row.riskScore}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="indicator">
+                            <span class="indicator-dot ${fcstIndicator}"></span>
+                            ${row.fcstAcc}%
+                        </span>
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Show detail view
+        function showDetail(row) {
+            document.getElementById('listView').classList.add('hidden');
+            document.getElementById('detailView').classList.add('active');
+
+            // Update header
+            document.getElementById('detailMaterial').textContent = row.material;
+            document.getElementById('detailSubtitle').textContent = `${row.description} | Plant ${row.plant} - ${row.plantName}`;
+
+            // Update badges
+            const patternBadge = document.getElementById('detailPatternBadge');
+            patternBadge.textContent = row.pattern;
+            patternBadge.className = `badge badge-${row.pattern.toLowerCase()}`;
+
+            document.getElementById('detailABCBadge').textContent = row.abc;
+            document.getElementById('detailABCBadge').className = `badge badge-${row.abc.toLowerCase()}`;
+            document.getElementById('detailXYZBadge').textContent = row.xyz;
+            document.getElementById('detailXYZBadge').className = `badge badge-${row.xyz.toLowerCase()}`;
+
+            // Risk Score
+            const riskScore = document.getElementById('detailRiskScore');
+            riskScore.textContent = row.riskScore;
+            riskScore.style.color = row.riskScore > 60 ? 'var(--red)' : row.riskScore > 30 ? 'var(--amber)' : 'var(--emerald)';
+
+            // Risk breakdown
+            document.getElementById('detailCVRisk').textContent = row.riskBreakdown.cv.toFixed(1);
+            document.getElementById('detailIntRisk').textContent = row.riskBreakdown.int.toFixed(1);
+            document.getElementById('detailTrendRisk').textContent = row.riskBreakdown.trend.toFixed(1);
+            document.getElementById('detailFcstRisk').textContent = row.riskBreakdown.fcst.toFixed(1);
+            document.getElementById('detailAnomalyRisk').textContent = row.riskBreakdown.anomaly.toFixed(1);
+            document.getElementById('detailCovRisk').textContent = row.riskBreakdown.cov.toFixed(1);
+
+            // Metrics
+            document.getElementById('detailCV').textContent = row.cv.toFixed(2);
+            document.getElementById('detailMean').textContent = `${row.mean} EA`;
+            document.getElementById('detailStdDev').textContent = row.stdDev.toFixed(1);
+            document.getElementById('detailADI').textContent = row.adi.toFixed(1);
+
+            const trendEl = document.getElementById('detailTrend');
+            const trendArrow = row.trendDir === 'up' ? '↑' : row.trendDir === 'down' ? '↓' : '→';
+            trendEl.textContent = `${trendArrow} ${row.trend}`;
+            trendEl.className = `metric-value trend-${row.trendDir}`;
+
+            document.getElementById('detailR2').textContent = row.r2.toFixed(2);
+            document.getElementById('detailAnomalies').textContent = row.anomalies;
+
+            // Classification
+            document.getElementById('detailPattern').textContent = row.pattern;
+            document.getElementById('detailABC').textContent = `${row.abc} (${row.abc === 'A' ? 'High Value' : row.abc === 'B' ? 'Medium' : 'Low'})`;
+            document.getElementById('detailXYZ').textContent = `${row.xyz} (${row.xyz === 'X' ? 'Predictable' : row.xyz === 'Y' ? 'Variable' : 'Erratic'})`;
+            document.getElementById('detailValue').textContent = row.annualValue;
+            document.getElementById('detailSAPABC').textContent = row.sapABC;
+            document.getElementById('detailFcstAcc').textContent = `${row.fcstAcc}%`;
+            document.getElementById('detailModel').textContent = row.model;
+
+            // Seasonality grid
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const seasonGrid = document.getElementById('seasonalityGrid');
+            seasonGrid.innerHTML = '';
+            row.seasonIndex.forEach((idx, i) => {
+                const cellClass = idx > 1.3 ? 'peak' : idx < 0.7 ? 'low' : 'normal';
+                const cell = document.createElement('div');
+                cell.className = `season-cell ${idx === 0 ? '' : cellClass}`;
+                cell.innerHTML = `
+                    <div class="month">${months[i]}</div>
+                    <div class="index">${idx.toFixed(2)}</div>
+                `;
+                seasonGrid.appendChild(cell);
+            });
+
+            // Demand chart
+            const chartContainer = document.getElementById('demandChart');
+            chartContainer.innerHTML = '';
+            const maxDemand = Math.max(...row.monthlyDemand);
+            row.monthlyDemand.forEach((demand, i) => {
+                const bar = document.createElement('div');
+                bar.className = 'pattern-bar';
+                if (row.seasonIndex[i] > 1.3) bar.classList.add('peak');
+                if (i === row.monthlyDemand.indexOf(Math.max(...row.monthlyDemand.slice(-6))) && row.anomalies > 0) {
+                    bar.classList.add('anomaly');
+                }
+                bar.style.height = `${(demand / maxDemand) * 100}%`;
+                bar.style.flex = '1';
+                bar.title = `${months[i]}: ${demand} EA`;
+                chartContainer.appendChild(bar);
+            });
+        }
+
+        // Show list view
+        function showListView() {
+            document.getElementById('listView').classList.remove('hidden');
+            document.getElementById('detailView').classList.remove('active');
+        }
+
+        // Initialize
+        document.getElementById('refreshTime').textContent = new Date().toLocaleString();
+        renderTable(demandData);
+
+        // View toggle
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = demandData.filter(row => 
+                row.material.toLowerCase().includes(term) ||
+                row.description.toLowerCase().includes(term)
+            );
+            renderTable(filtered);
+        });
+
+        // Filter functionality
+        ['filterPlant', 'filterPattern', 'filterABC', 'filterXYZ', 'filterRisk'].forEach(id => {
+            document.getElementById(id).addEventListener('change', applyFilters);
+        });
+
+        function applyFilters() {
+            let filtered = [...demandData];
+
+            const plant = document.getElementById('filterPlant').value;
+            const pattern = document.getElementById('filterPattern').value;
+            const abc = document.getElementById('filterABC').value;
+            const xyz = document.getElementById('filterXYZ').value;
+            const risk = document.getElementById('filterRisk').value;
+
+            if (plant !== 'all') filtered = filtered.filter(r => r.plant === plant);
+            if (pattern !== 'all') filtered = filtered.filter(r => r.pattern.toLowerCase() === pattern);
+            if (abc !== 'all') filtered = filtered.filter(r => r.abc === abc);
+            if (xyz !== 'all') filtered = filtered.filter(r => r.xyz === xyz);
+            if (risk === 'high') filtered = filtered.filter(r => r.riskScore > 60);
+            if (risk === 'medium') filtered = filtered.filter(r => r.riskScore >= 30 && r.riskScore <= 60);
+            if (risk === 'low') filtered = filtered.filter(r => r.riskScore < 30);
+
+            renderTable(filtered);
+        }
+    </script>
+</body>
+</html>

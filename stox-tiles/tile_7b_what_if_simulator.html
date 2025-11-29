@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STOX.AI | Tile 7B - What-If Simulator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-tertiary: #1e293b;
+            --border-color: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --wharton-blue: #004785;
+            --wharton-maroon: #990000;
+            --cyan-400: #22d3ee;
+            --cyan-500: #06b6d4;
+            --emerald-400: #34d399;
+            --emerald-500: #10b981;
+            --amber-400: #fbbf24;
+            --amber-500: #f59e0b;
+            --red-400: #f87171;
+            --red-500: #ef4444;
+            --purple-400: #a78bfa;
+            --purple-500: #8b5cf6;
+            --pink-400: #f472b6;
+            --current-color: #64748b;
+            --stoxai-color: #10b981;
+            --user-color: #8b5cf6;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-primary);
+            background-image: 
+                radial-gradient(ellipse at 20% 20%, rgba(0, 71, 133, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(153, 0, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 70%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 24px;
+        }
+        
+        .container { max-width: 1800px; margin: 0 auto; }
+        
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+        }
+        
+        .logo-section { display: flex; align-items: center; gap: 16px; }
+        
+        .logo {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, var(--wharton-blue), var(--wharton-maroon));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            box-shadow: 0 8px 32px rgba(0, 71, 133, 0.3);
+        }
+        
+        .brand h1 {
+            font-size: 26px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--cyan-400), var(--emerald-400));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .brand p {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-top: 2px;
+        }
+        
+        .tile-badge {
+            background: linear-gradient(135deg, var(--purple-500), var(--pink-400));
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+        }
+        
+        /* SKU Selector */
+        .selector-bar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .selector-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .selector-group label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .selector-group select {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            cursor: pointer;
+            min-width: 180px;
+            transition: all 0.2s;
+        }
+        
+        .selector-group select:hover {
+            border-color: var(--cyan-500);
+        }
+        
+        .selector-group select:focus {
+            outline: none;
+            border-color: var(--cyan-400);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+        }
+        
+        .run-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, var(--emerald-500), var(--cyan-500));
+            border: none;
+            border-radius: 10px;
+            color: var(--bg-primary);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .run-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+        }
+        
+        .run-btn:active {
+            transform: translateY(0);
+        }
+        
+        .run-btn.running {
+            background: linear-gradient(135deg, var(--amber-500), var(--red-500));
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .monte-carlo-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-left: auto;
+        }
+        
+        .monte-carlo-toggle label {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .toggle-switch.active {
+            background: var(--emerald-500);
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            background: var(--text-primary);
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        
+        .toggle-switch.active::after {
+            left: 23px;
+        }
+        
+        .mc-runs {
+            font-size: 12px;
+            color: var(--emerald-400);
+            font-weight: 600;
+        }
+        
+        /* Three Panel Layout */
+        .panels-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .panel {
+            background: rgba(17, 24, 39, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+        
+        .panel:hover {
+            border-color: rgba(71, 85, 105, 0.5);
+        }
+        
+        .panel.current { border-top: 3px solid var(--current-color); }
+        .panel.stoxai { border-top: 3px solid var(--stoxai-color); }
+        .panel.user { border-top: 3px solid var(--user-color); }
+        
+        .panel-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .panel.current .panel-header { background: rgba(100, 116, 139, 0.1); }
+        .panel.stoxai .panel-header { background: rgba(16, 185, 129, 0.1); }
+        .panel.user .panel-header { background: rgba(139, 92, 246, 0.1); }
+        
+        .panel-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .panel-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        .panel.current .panel-icon { background: rgba(100, 116, 139, 0.2); }
+        .panel.stoxai .panel-icon { background: rgba(16, 185, 129, 0.2); }
+        .panel.user .panel-icon { background: rgba(139, 92, 246, 0.2); }
+        
+        .panel-title h3 {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .panel.current .panel-title h3 { color: var(--current-color); }
+        .panel.stoxai .panel-title h3 { color: var(--stoxai-color); }
+        .panel.user .panel-title h3 { color: var(--user-color); }
+        
+        .panel-subtitle {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .panel-body {
+            padding: 20px;
+        }
+        
+        /* Parameter Rows */
+        .param-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.2);
+        }
+        
+        .param-row:last-child { border-bottom: none; }
+        
+        .param-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .param-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .param-value.highlight-good { color: var(--emerald-400); }
+        .param-value.highlight-bad { color: var(--red-400); }
+        .param-value.highlight-warning { color: var(--amber-400); }
+        
+        .param-source {
+            font-size: 9px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        
+        /* User Input Controls */
+        .param-input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+        }
+        
+        .param-input {
+            width: 100px;
+            padding: 8px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: right;
+            transition: all 0.2s;
+        }
+        
+        .param-input:hover {
+            border-color: var(--purple-400);
+        }
+        
+        .param-input:focus {
+            outline: none;
+            border-color: var(--purple-400);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+        }
+        
+        .param-slider {
+            width: 100px;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: var(--bg-tertiary);
+            border-radius: 2px;
+            cursor: pointer;
+        }
+        
+        .param-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            background: var(--purple-400);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .param-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
+        }
+        
+        /* Chart Section */
+        .chart-section {
+            background: rgba(17, 24, 39, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .chart-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .chart-title h2 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .chart-title .icon {
+            font-size: 20px;
+        }
+        
+        .chart-legend {
+            display: flex;
+            gap: 24px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .legend-item:hover { color: var(--text-primary); }
+        
+        .legend-item.disabled {
+            opacity: 0.4;
+        }
+        
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+        
+        .legend-dot.current { background: var(--current-color); }
+        .legend-dot.stoxai { background: var(--stoxai-color); }
+        .legend-dot.user { background: var(--user-color); }
+        .legend-dot.safety { background: var(--amber-400); border: 2px dashed var(--amber-400); background: transparent; }
+        
+        .chart-container {
+            height: 320px;
+            position: relative;
+        }
+        
+        .time-range-selector {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .time-btn {
+            padding: 6px 14px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-muted);
+            font-family: inherit;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .time-btn:hover {
+            border-color: var(--cyan-500);
+            color: var(--text-secondary);
+        }
+        
+        .time-btn.active {
+            background: var(--cyan-500);
+            border-color: var(--cyan-500);
+            color: var(--bg-primary);
+            font-weight: 600;
+        }
+        
+        /* Results Section */
+        .results-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .result-card {
+            background: rgba(17, 24, 39, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        .result-card.current { border-top: 3px solid var(--current-color); }
+        .result-card.stoxai { border-top: 3px solid var(--stoxai-color); }
+        .result-card.user { border-top: 3px solid var(--user-color); }
+        
+        .result-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .result-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .status-badge.stockout {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--red-400);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .status-badge.optimal {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--emerald-400);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .status-badge.excess {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--amber-400);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+        
+        .status-icon {
+            font-size: 24px;
+        }
+        
+        .result-body {
+            padding: 20px;
+        }
+        
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.15);
+        }
+        
+        .result-row:last-child { border-bottom: none; }
+        
+        .result-label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .result-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .result-total {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 2px solid rgba(71, 85, 105, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .result-total .label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .result-total .value {
+            font-size: 22px;
+            font-weight: 700;
+        }
+        
+        .result-card.current .result-total .value { color: var(--red-400); }
+        .result-card.stoxai .result-total .value { color: var(--emerald-400); }
+        .result-card.user .result-total .value { color: var(--purple-400); }
+        
+        /* Savings Banner */
+        .savings-banner {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.15));
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 20px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .savings-banner .icon { font-size: 28px; }
+        
+        .savings-banner .text {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+        
+        .savings-banner .amount {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--emerald-400);
+        }
+        
+        .savings-banner .vs {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        /* Footer */
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(71, 85, 105, 0.2);
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        
+        .footer-info { display: flex; gap: 20px; }
+        
+        .export-btns { display: flex; gap: 12px; }
+        
+        .export-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .export-btn:hover {
+            border-color: var(--cyan-500);
+            color: var(--cyan-400);
+        }
+        
+        /* Comparison Arrow */
+        .comparison-indicator {
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 4px;
+        }
+        
+        .comparison-indicator.better {
+            color: var(--emerald-400);
+        }
+        
+        .comparison-indicator.worse {
+            color: var(--red-400);
+        }
+        
+        .comparison-indicator.same {
+            color: var(--text-muted);
+        }
+        
+        /* Animations */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .panel, .chart-section, .result-card, .savings-banner {
+            animation: slideIn 0.5s ease-out forwards;
+        }
+        
+        .panel:nth-child(1) { animation-delay: 0.1s; }
+        .panel:nth-child(2) { animation-delay: 0.2s; }
+        .panel:nth-child(3) { animation-delay: 0.3s; }
+        
+        .result-card:nth-child(1) { animation-delay: 0.4s; }
+        .result-card:nth-child(2) { animation-delay: 0.5s; }
+        .result-card:nth-child(3) { animation-delay: 0.6s; }
+        
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .panels-container, .results-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-section">
+                <div class="logo">🔮</div>
+                <div class="brand">
+                    <h1>STOX.AI</h1>
+                    <p>What-If Simulator</p>
+                </div>
+            </div>
+            <div class="tile-badge">TILE 7B — SCENARIO ANALYSIS</div>
+        </header>
+        
+        <!-- Selector Bar -->
+        <div class="selector-bar">
+            <div class="selector-group">
+                <label>Material</label>
+                <select id="materialSelect">
+                    <option value="MAT-7842">MAT-7842 — Hydraulic Pump</option>
+                    <option value="MAT-3156">MAT-3156 — Bearing Assembly</option>
+                    <option value="MAT-9023">MAT-9023 — Control Module</option>
+                    <option value="MAT-4471">MAT-4471 — Valve Kit</option>
+                    <option value="MAT-6689">MAT-6689 — Gasket Set</option>
+                </select>
+            </div>
+            <div class="selector-group">
+                <label>Plant</label>
+                <select id="plantSelect">
+                    <option value="P1000">P1000 — Chicago</option>
+                    <option value="P2000">P2000 — Detroit</option>
+                    <option value="P3000">P3000 — Phoenix</option>
+                    <option value="P4000">P4000 — Atlanta</option>
+                </select>
+            </div>
+            <button class="run-btn" id="runSimulation">
+                <span>▶</span> Run Simulation
+            </button>
+            <div class="monte-carlo-toggle">
+                <label>Monte Carlo</label>
+                <div class="toggle-switch active" id="mcToggle"></div>
+                <span class="mc-runs">10K runs</span>
+            </div>
+        </div>
+        
+        <!-- Three Panels -->
+        <div class="panels-container">
+            <!-- Panel 1: Current State -->
+            <div class="panel current">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <div class="panel-icon">📊</div>
+                        <div>
+                            <h3>Current State</h3>
+                            <div class="panel-subtitle">SAP S/4HANA Values</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">Safety Stock</div>
+                            <div class="param-source">MARC-EISBE</div>
+                        </div>
+                        <div class="param-value">130</div>
+                    </div>
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">Reorder Point</div>
+                            <div class="param-source">MARC-MINBE</div>
+                        </div>
+                        <div class="param-value">1,130</div>
+                    </div>
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">Planned Lead Time</div>
+                            <div class="param-source">MARC-PLIFZ</div>
+                        </div>
+                        <div class="param-value">10 days</div>
+                    </div>
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">GR Processing Time</div>
+                            <div class="param-source">MARC-WEBAZ</div>
+                        </div>
+                        <div class="param-value">2 days</div>
+                    </div>
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">Lot Size (Fixed)</div>
+                            <div class="param-source">MARC-BSTFE</div>
+                        </div>
+                        <div class="param-value">500</div>
+                    </div>
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">Service Level (Actual)</div>
+                            <div class="param-source">Calculated</div>
+                        </div>
+                        <div class="param-value highlight-bad">85%</div>
+                    </div>
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">MRP Type</div>
+                            <div class="param-source">MARC-DISMM</div>
+                        </div>
+                        <div class="param-value">PD</div>
+                    </div>
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">Lot Sizing Procedure</div>
+                            <div class="param-source">MARC-DISLS</div>
+                        </div>
+                        <div class="param-value">FX</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Panel 2: STOX.AI Recommended -->
+            <div class="panel stoxai">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <div class="panel-icon">🤖</div>
+                        <div>
+                            <h3>STOX.AI Recommended</h3>
+                            <div class="panel-subtitle">ML-Optimized Parameters</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">Safety Stock</div>
+                            <div class="param-source">z × σ_LTD (Monte Carlo)</div>
+                        </div>
+                        <div>
+                            <div class="param-value highlight-good">163</div>
+                            <div class="comparison-indicator better">↑ +25% vs Current</div>
+                        </div>
+                    </div>
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">Reorder Point</div>
+                            <div class="param-source">μ_LTD + Safety Stock</div>
+                        </div>
+                        <div>
+                            <div class="param-value highlight-good">1,423</div>
+                            <div class="comparison-indicator better">↑ +26% vs Current</div>
+                        </div>
+                    </div>
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">Predicted Lead Time</div>
+                            <div class="param-source">ML Model (EKBE)</div>
+                        </div>
+                        <div>
+                            <div class="param-value highlight-warning">12 days</div>
+                            <div class="comparison-indicator worse">↑ +2 days actual</div>
+                        </div>
+                    </div>
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">GR Processing Time</div>
+                            <div class="param-source">Historical Avg</div>
+                        </div>
+                        <div class="param-value">2 days</div>
+                    </div>
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">Optimal Lot Size</div>
+                            <div class="param-source">EOQ + Constraints</div>
+                        </div>
+                        <div>
+                            <div class="param-value">450</div>
+                            <div class="comparison-indicator better">↓ -10% carrying cost</div>
+                        </div>
+                    </div>
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">Target Service Level</div>
+                            <div class="param-source">User Setting</div>
+                        </div>
+                        <div class="param-value highlight-good">95%</div>
+                    </div>
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">Recommended MRP Type</div>
+                            <div class="param-source">Pattern Analysis</div>
+                        </div>
+                        <div class="param-value">PD</div>
+                    </div>
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">Recommended Lot Sizing</div>
+                            <div class="param-source">Optimization</div>
+                        </div>
+                        <div class="param-value">TB</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Panel 3: User Custom -->
+            <div class="panel user">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <div class="panel-icon">✏️</div>
+                        <div>
+                            <h3>User Custom</h3>
+                            <div class="panel-subtitle">Your What-If Scenario</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">Safety Stock</div>
+                        </div>
+                        <div class="param-input-group">
+                            <input type="number" class="param-input" id="userSS" value="200">
+                            <input type="range" class="param-slider" id="userSSSlider" min="0" max="500" value="200">
+                        </div>
+                    </div>
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">Reorder Point</div>
+                        </div>
+                        <div class="param-input-group">
+                            <input type="number" class="param-input" id="userROP" value="1500">
+                            <input type="range" class="param-slider" id="userROPSlider" min="500" max="3000" value="1500">
+                        </div>
+                    </div>
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">Lead Time (days)</div>
+                        </div>
+                        <div class="param-input-group">
+                            <input type="number" class="param-input" id="userLT" value="12">
+                            <input type="range" class="param-slider" id="userLTSlider" min="1" max="60" value="12">
+                        </div>
+                    </div>
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">GR Processing (days)</div>
+                        </div>
+                        <div class="param-input-group">
+                            <input type="number" class="param-input" id="userGR" value="2">
+                            <input type="range" class="param-slider" id="userGRSlider" min="0" max="10" value="2">
+                        </div>
+                    </div>
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">Lot Size</div>
+                        </div>
+                        <div class="param-input-group">
+                            <input type="number" class="param-input" id="userLot" value="500">
+                            <input type="range" class="param-slider" id="userLotSlider" min="50" max="2000" value="500">
+                        </div>
+                    </div>
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">Service Level Target</div>
+                        </div>
+                        <div class="param-input-group">
+                            <input type="number" class="param-input" id="userSL" value="95" min="80" max="99">
+                            <input type="range" class="param-slider" id="userSLSlider" min="80" max="99" value="95">
+                        </div>
+                    </div>
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">Demand Variability</div>
+                        </div>
+                        <div class="param-input-group">
+                            <input type="number" class="param-input" id="userDemandVar" value="0" min="-50" max="50">
+                            <input type="range" class="param-slider" id="userDemandVarSlider" min="-50" max="50" value="0">
+                        </div>
+                    </div>
+                    <div class="param-row">
+                        <div>
+                            <div class="param-label">Lead Time Variability</div>
+                        </div>
+                        <div class="param-input-group">
+                            <input type="number" class="param-input" id="userLTVar" value="0" min="-50" max="50">
+                            <input type="range" class="param-slider" id="userLTVarSlider" min="-50" max="50" value="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chart Section -->
+        <div class="chart-section">
+            <div class="chart-header">
+                <div class="chart-title">
+                    <span class="icon">📈</span>
+                    <h2>Inventory Level Simulation</h2>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item" data-series="current">
+                        <div class="legend-dot current"></div>
+                        <span>Current (SAP)</span>
+                    </div>
+                    <div class="legend-item" data-series="stoxai">
+                        <div class="legend-dot stoxai"></div>
+                        <span>STOX.AI</span>
+                    </div>
+                    <div class="legend-item" data-series="user">
+                        <div class="legend-dot user"></div>
+                        <span>User Custom</span>
+                    </div>
+                    <div class="legend-item" data-series="safety">
+                        <div class="legend-dot safety"></div>
+                        <span>Safety Stock</span>
+                    </div>
+                </div>
+                <div class="time-range-selector">
+                    <button class="time-btn active" data-days="30">30 Days</button>
+                    <button class="time-btn" data-days="60">60 Days</button>
+                    <button class="time-btn" data-days="90">90 Days</button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="simulationChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Results Section -->
+        <div class="results-container">
+            <!-- Current Results -->
+            <div class="result-card current">
+                <div class="result-header">
+                    <div class="result-status">
+                        <span class="status-badge stockout">Stockout</span>
+                        <span class="status-icon">❌</span>
+                    </div>
+                </div>
+                <div class="result-body">
+                    <div class="result-row">
+                        <span class="result-label">Stockout Days</span>
+                        <span class="result-value" style="color: var(--red-400);">3 days</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Stockout Events</span>
+                        <span class="result-value" style="color: var(--red-400);">2</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Avg Inventory</span>
+                        <span class="result-value">$84,200</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Max Inventory</span>
+                        <span class="result-value">$142,000</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Inventory Turns</span>
+                        <span class="result-value">5.8x</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Carrying Cost</span>
+                        <span class="result-value">$12,630/yr</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Stockout Cost</span>
+                        <span class="result-value" style="color: var(--red-400);">$45,000</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Service Level</span>
+                        <span class="result-value" style="color: var(--red-400);">85%</span>
+                    </div>
+                    <div class="result-total">
+                        <span class="label">Total Annual Cost</span>
+                        <span class="value">$57,630</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- STOX.AI Results -->
+            <div class="result-card stoxai">
+                <div class="result-header">
+                    <div class="result-status">
+                        <span class="status-badge optimal">Optimal</span>
+                        <span class="status-icon">✅</span>
+                    </div>
+                </div>
+                <div class="result-body">
+                    <div class="result-row">
+                        <span class="result-label">Stockout Days</span>
+                        <span class="result-value" style="color: var(--emerald-400);">0 days</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Stockout Events</span>
+                        <span class="result-value" style="color: var(--emerald-400);">0</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Avg Inventory</span>
+                        <span class="result-value">$96,400</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Max Inventory</span>
+                        <span class="result-value">$156,000</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Inventory Turns</span>
+                        <span class="result-value">5.1x</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Carrying Cost</span>
+                        <span class="result-value">$14,460/yr</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Stockout Cost</span>
+                        <span class="result-value" style="color: var(--emerald-400);">$0</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Service Level</span>
+                        <span class="result-value" style="color: var(--emerald-400);">95%</span>
+                    </div>
+                    <div class="result-total">
+                        <span class="label">Total Annual Cost</span>
+                        <span class="value">$14,460</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Results -->
+            <div class="result-card user">
+                <div class="result-header">
+                    <div class="result-status">
+                        <span class="status-badge excess">Excess</span>
+                        <span class="status-icon">⚠️</span>
+                    </div>
+                </div>
+                <div class="result-body">
+                    <div class="result-row">
+                        <span class="result-label">Stockout Days</span>
+                        <span class="result-value" style="color: var(--emerald-400);">0 days</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Stockout Events</span>
+                        <span class="result-value" style="color: var(--emerald-400);">0</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Avg Inventory</span>
+                        <span class="result-value">$142,000</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Max Inventory</span>
+                        <span class="result-value">$198,000</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Inventory Turns</span>
+                        <span class="result-value" style="color: var(--amber-400);">3.4x</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Carrying Cost</span>
+                        <span class="result-value" style="color: var(--amber-400);">$21,300/yr</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Stockout Cost</span>
+                        <span class="result-value" style="color: var(--emerald-400);">$0</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Service Level</span>
+                        <span class="result-value" style="color: var(--emerald-400);">99%</span>
+                    </div>
+                    <div class="result-total">
+                        <span class="label">Total Annual Cost</span>
+                        <span class="value">$21,300</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Savings Banner -->
+        <div class="savings-banner">
+            <span class="icon">💰</span>
+            <span class="text">STOX.AI saves</span>
+            <span class="amount">$43,170/year</span>
+            <span class="vs">vs Current SAP parameters for this SKU</span>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-info">
+                <span>STOX.AI What-If Simulator</span>
+                <span>•</span>
+                <span>Tile 7B</span>
+                <span>•</span>
+                <span>Monte Carlo: 10,000 simulations</span>
+                <span>•</span>
+                <span>Last Run: <span id="lastRunTime">--</span></span>
+            </div>
+            <div class="export-btns">
+                <button class="export-btn">📊 Export Excel</button>
+                <button class="export-btn">📄 Generate Report</button>
+                <button class="export-btn">📤 Push to SAP (MD02)</button>
+            </div>
+        </footer>
+    </div>
+    
+    <script>
+        // Simulation Data
+        const simulationData = {
+            days: 30,
+            safetyStock: 130,
+            current: [],
+            stoxai: [],
+            user: []
+        };
+        
+        // Generate simulation data
+        function generateSimulationData(days, params) {
+            const data = [];
+            let inventory = params.startingInventory;
+            const dailyDemand = params.avgDailyDemand;
+            const demandVariability = params.demandVariability || 0.2;
+            let daysSinceOrder = 0;
+            let orderPending = false;
+            let orderArrivalDay = -1;
+            
+            for (let day = 1; day <= days; day++) {
+                // Random demand with variability
+                const demand = Math.round(dailyDemand * (1 + (Math.random() - 0.5) * 2 * demandVariability));
+                
+                // Consume inventory
+                inventory -= demand;
+                
+                // Check if we need to reorder
+                if (inventory <= params.reorderPoint && !orderPending) {
+                    orderPending = true;
+                    orderArrivalDay = day + params.leadTime + Math.round((Math.random() - 0.5) * params.leadTimeVariability);
+                }
+                
+                // Receive order
+                if (orderPending && day >= orderArrivalDay) {
+                    inventory += params.lotSize;
+                    orderPending = false;
+                }
+                
+                data.push({
+                    day: day,
+                    inventory: Math.max(inventory, -200), // Allow negative to show stockout
+                    demand: demand,
+                    stockout: inventory < 0
+                });
+            }
+            
+            return data;
+        }
+        
+        // Current SAP parameters
+        const currentParams = {
+            startingInventory: 1200,
+            avgDailyDemand: 85,
+            demandVariability: 0.25,
+            reorderPoint: 1130,
+            safetyStock: 130,
+            leadTime: 10,
+            leadTimeVariability: 4,
+            lotSize: 500
+        };
+        
+        // STOX.AI optimized parameters
+        const stoxaiParams = {
+            startingInventory: 1450,
+            avgDailyDemand: 85,
+            demandVariability: 0.25,
+            reorderPoint: 1423,
+            safetyStock: 163,
+            leadTime: 12,
+            leadTimeVariability: 3,
+            lotSize: 450
+        };
+        
+        // User custom parameters (initial)
+        let userParams = {
+            startingInventory: 1600,
+            avgDailyDemand: 85,
+            demandVariability: 0.25,
+            reorderPoint: 1500,
+            safetyStock: 200,
+            leadTime: 12,
+            leadTimeVariability: 3,
+            lotSize: 500
+        };
+        
+        // Generate initial data
+        simulationData.current = generateSimulationData(30, currentParams);
+        simulationData.stoxai = generateSimulationData(30, stoxaiParams);
+        simulationData.user = generateSimulationData(30, userParams);
+        
+        // Chart setup
+        const ctx = document.getElementById('simulationChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 30}, (_, i) => `Day ${i + 1}`),
+                datasets: [
+                    {
+                        label: 'Current (SAP)',
+                        data: simulationData.current.map(d => d.inventory),
+                        borderColor: '#64748b',
+                        backgroundColor: 'rgba(100, 116, 139, 0.1)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.3,
+                        pointRadius: 2,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: 'STOX.AI',
+                        data: simulationData.stoxai.map(d => d.inventory),
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: 'User Custom',
+                        data: simulationData.user.map(d => d.inventory),
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.3,
+                        pointRadius: 2,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: 'Safety Stock',
+                        data: Array(30).fill(163),
+                        borderColor: '#fbbf24',
+                        borderWidth: 2,
+                        borderDash: [8, 4],
+                        fill: false,
+                        pointRadius: 0,
+                        pointHoverRadius: 0
+                    },
+                    {
+                        label: 'Zero Line',
+                        data: Array(30).fill(0),
+                        borderColor: '#ef4444',
+                        borderWidth: 1,
+                        borderDash: [4, 4],
+                        fill: false,
+                        pointRadius: 0,
+                        pointHoverRadius: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        titleColor: '#f8fafc',
+                        bodyColor: '#94a3b8',
+                        borderColor: '#334155',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                if (context.datasetIndex === 3) return `Safety Stock: ${context.raw}`;
+                                if (context.datasetIndex === 4) return null;
+                                const value = context.raw;
+                                const status = value < 0 ? ' ⚠️ STOCKOUT' : '';
+                                return `${context.dataset.label}: ${value.toLocaleString()} units${status}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(71, 85, 105, 0.2)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            font: { size: 10 },
+                            maxRotation: 0,
+                            callback: function(val, index) {
+                                return index % 5 === 0 ? this.getLabelForValue(val) : '';
+                            }
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(71, 85, 105, 0.2)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            font: { size: 10 },
+                            callback: function(value) {
+                                return value.toLocaleString();
+                            }
+                        },
+                        min: -200
+                    }
+                }
+            }
+        });
+        
+        // Slider sync
+        const sliderPairs = [
+            ['userSS', 'userSSSlider'],
+            ['userROP', 'userROPSlider'],
+            ['userLT', 'userLTSlider'],
+            ['userGR', 'userGRSlider'],
+            ['userLot', 'userLotSlider'],
+            ['userSL', 'userSLSlider'],
+            ['userDemandVar', 'userDemandVarSlider'],
+            ['userLTVar', 'userLTVarSlider']
+        ];
+        
+        sliderPairs.forEach(([inputId, sliderId]) => {
+            const input = document.getElementById(inputId);
+            const slider = document.getElementById(sliderId);
+            
+            input.addEventListener('input', () => {
+                slider.value = input.value;
+            });
+            
+            slider.addEventListener('input', () => {
+                input.value = slider.value;
+            });
+        });
+        
+        // Monte Carlo toggle
+        const mcToggle = document.getElementById('mcToggle');
+        mcToggle.addEventListener('click', () => {
+            mcToggle.classList.toggle('active');
+            document.querySelector('.mc-runs').textContent = mcToggle.classList.contains('active') ? '10K runs' : 'Off';
+        });
+        
+        // Run simulation button
+        const runBtn = document.getElementById('runSimulation');
+        runBtn.addEventListener('click', () => {
+            runBtn.classList.add('running');
+            runBtn.innerHTML = '<span>⏳</span> Simulating...';
+            
+            setTimeout(() => {
+                // Update user params
+                userParams = {
+                    startingInventory: parseInt(document.getElementById('userROP').value) + 100,
+                    avgDailyDemand: 85,
+                    demandVariability: 0.25 * (1 + parseInt(document.getElementById('userDemandVar').value) / 100),
+                    reorderPoint: parseInt(document.getElementById('userROP').value),
+                    safetyStock: parseInt(document.getElementById('userSS').value),
+                    leadTime: parseInt(document.getElementById('userLT').value),
+                    leadTimeVariability: 3 * (1 + parseInt(document.getElementById('userLTVar').value) / 100),
+                    lotSize: parseInt(document.getElementById('userLot').value)
+                };
+                
+                // Regenerate data
+                simulationData.current = generateSimulationData(30, currentParams);
+                simulationData.stoxai = generateSimulationData(30, stoxaiParams);
+                simulationData.user = generateSimulationData(30, userParams);
+                
+                // Update chart
+                chart.data.datasets[0].data = simulationData.current.map(d => d.inventory);
+                chart.data.datasets[1].data = simulationData.stoxai.map(d => d.inventory);
+                chart.data.datasets[2].data = simulationData.user.map(d => d.inventory);
+                chart.data.datasets[3].data = Array(30).fill(parseInt(document.getElementById('userSS').value));
+                chart.update();
+                
+                // Update last run time
+                document.getElementById('lastRunTime').textContent = new Date().toLocaleTimeString();
+                
+                runBtn.classList.remove('running');
+                runBtn.innerHTML = '<span>▶</span> Run Simulation';
+            }, 1500);
+        });
+        
+        // Time range buttons
+        document.querySelectorAll('.time-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                // In production, this would regenerate data for the selected time range
+            });
+        });
+        
+        // Legend toggle
+        document.querySelectorAll('.legend-item').forEach((item, index) => {
+            item.addEventListener('click', () => {
+                item.classList.toggle('disabled');
+                const meta = chart.getDatasetMeta(index);
+                meta.hidden = !meta.hidden;
+                chart.update();
+            });
+        });
+        
+        // Initialize last run time
+        document.getElementById('lastRunTime').textContent = new Date().toLocaleTimeString();
+    </script>
+</body>
+</html>

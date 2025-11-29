@@ -25,10 +25,13 @@ import SmsIcon from '@mui/icons-material/Sms';
 import PhoneIcon from '@mui/icons-material/Phone';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 
-const AgentConfigForm = ({ agent, onClose }) => {
+const AgentConfigForm = ({ agent, onClose, isNew = false }) => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+
+  // Core fields are read-only for existing agents
+  const isReadOnly = !isNew && agent?.id;
 
   const [config, setConfig] = useState({
     name: '',
@@ -162,6 +165,11 @@ const AgentConfigForm = ({ agent, onClose }) => {
                 label="Agent Name"
                 value={config.name}
                 onChange={(e) => setConfig({ ...config, name: e.target.value })}
+                disabled={isReadOnly}
+                InputProps={{
+                  readOnly: isReadOnly,
+                }}
+                helperText={isReadOnly ? "Agent name cannot be modified" : ""}
               />
             </Grid>
 
@@ -173,6 +181,11 @@ const AgentConfigForm = ({ agent, onClose }) => {
                 label="Description"
                 value={config.description}
                 onChange={(e) => setConfig({ ...config, description: e.target.value })}
+                disabled={isReadOnly}
+                InputProps={{
+                  readOnly: isReadOnly,
+                }}
+                helperText={isReadOnly ? "Description cannot be modified" : ""}
               />
             </Grid>
 
@@ -214,7 +227,11 @@ const AgentConfigForm = ({ agent, onClose }) => {
                 label="Alert Condition"
                 value={config.alert_condition}
                 onChange={(e) => setConfig({ ...config, alert_condition: e.target.value })}
-                helperText="SQL condition to trigger alert (e.g., count > 5, value < 1000)"
+                disabled={isReadOnly}
+                InputProps={{
+                  readOnly: isReadOnly,
+                }}
+                helperText={isReadOnly ? "Alert condition cannot be modified" : "SQL condition to trigger alert (e.g., count > 5, value < 1000)"}
               />
             </Grid>
 

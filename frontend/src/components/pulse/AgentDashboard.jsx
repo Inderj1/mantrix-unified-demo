@@ -19,16 +19,15 @@ import {
   Tooltip,
   Paper,
   Divider,
-  Pagination,
   InputAdornment,
   FormControl,
   InputLabel,
   Select,
-  ToggleButtonGroup,
-  ToggleButton,
   Avatar,
   alpha,
 } from '@mui/material';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import stoxTheme from '../stox/stoxTheme';
 import {
   Add as AddIcon,
   MoreVert as MoreVertIcon,
@@ -47,10 +46,6 @@ import {
   Info as InfoIcon,
   Search as SearchIcon,
   FilterList as FilterListIcon,
-  ViewList as ViewListIcon,
-  ViewModule as ViewModuleIcon,
-  Sort as SortIcon,
-  Notifications as NotificationsIcon,
   Settings as SettingsIcon,
   Close as CloseIcon,
   LocalShipping as LocalShippingIcon,
@@ -78,11 +73,6 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [severityFilter, setSeverityFilter] = useState('all');
   const [showDemoOnly, setShowDemoOnly] = useState(false);
-  const [sortBy, setSortBy] = useState('name');
-  const [sortDirection, setSortDirection] = useState('asc');
-  const [viewMode, setViewMode] = useState('grid');
-  const [page, setPage] = useState(1);
-  const [itemsPerPage] = useState(12);
 
   useEffect(() => {
     loadData();
@@ -221,12 +211,6 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
     }
   };
 
-  const getHealthScore = (agent) => {
-    const total = (agent.true_positives || 0) + (agent.false_positives || 0);
-    if (total === 0) return null;
-    return Math.round(((agent.true_positives || 0) / total) * 100);
-  };
-
   const getSeverityColor = (severity) => {
     switch (severity) {
       case 'high': return 'error';
@@ -280,7 +264,7 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
       name: 'Finance',
       icon: AccountBalanceIcon,
       color: '#f59e0b',
-      description: 'Financial Monitoring'
+      description: 'Financial Agents'
     },
     general: {
       name: 'General',
@@ -289,7 +273,7 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
     }
   };
 
-  // Filter, sort, and paginate agents
+  // Filter agents (sorting handled by DataGrid)
   const filteredAndSortedAgents = useMemo(() => {
     let filtered = [...agents];
 
@@ -324,66 +308,130 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
       filtered = filtered.filter(m => m.name && m.name.includes('[DEMO]'));
     }
 
-    // Apply sorting
-    filtered.sort((a, b) => {
-      let aVal, bVal;
-
-      switch (sortBy) {
-        case 'name':
-          aVal = a.name || '';
-          bVal = b.name || '';
-          break;
-        case 'last_run':
-          aVal = a.last_run ? new Date(a.last_run).getTime() : 0;
-          bVal = b.last_run ? new Date(b.last_run).getTime() : 0;
-          break;
-        case 'created':
-          aVal = a.created_at ? new Date(a.created_at).getTime() : 0;
-          bVal = b.created_at ? new Date(b.created_at).getTime() : 0;
-          break;
-        case 'severity':
-          const severityOrder = { high: 3, medium: 2, low: 1 };
-          aVal = severityOrder[a.severity] || 0;
-          bVal = severityOrder[b.severity] || 0;
-          break;
-        case 'accuracy':
-          const aTotal = (a.true_positives || 0) + (a.false_positives || 0);
-          const bTotal = (b.true_positives || 0) + (b.false_positives || 0);
-          aVal = aTotal > 0 ? (a.true_positives || 0) / aTotal : 0;
-          bVal = bTotal > 0 ? (b.true_positives || 0) / bTotal : 0;
-          break;
-        default:
-          return 0;
-      }
-
-      if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
-      if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
-      return 0;
-    });
-
     return filtered;
-  }, [agents, searchQuery, statusFilter, severityFilter, showDemoOnly, sortBy, sortDirection]);
+  }, [agents, searchQuery, statusFilter, severityFilter, showDemoOnly]);
 
-  // Group agents by category
-  const groupedAgents = useMemo(() => {
-    const groups = {};
-    filteredAndSortedAgents.forEach(agent => {
-      const category = agent.category || 'general';
-      if (!groups[category]) {
-        groups[category] = [];
-      }
-      groups[category].push(agent);
-    });
-    return groups;
-  }, [filteredAndSortedAgents]);
-
-  // Paginate
-  const paginatedAgents = useMemo(() => {
-    const startIndex = (page - 1) * itemsPerPage;
-    return filteredAndSortedAgents.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredAndSortedAgents, page, itemsPerPage]);
-
-  const totalPages = Math.ceil(filteredAndSortedAgents.length / itemsPerPage);
+  // DataGrid columns configuration
+  const columns = useMemo(() => [
+    {
+      field: 'name',
+      headerName: 'Agent Name',
+      flex: 2,
+      minWidth: 280,
+      renderCell: (params) => {
+        const isDemo = params.row.name?.includes('[DEMO]');
+        const isGlobal = params.row.scope === 'global';
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            {isGlobal && <Chip label="GLOBAL" size="small" color="default" sx={{ height: 18, fontSize: '0.65rem' }} />}
+            {isDemo && <Chip label="DEMO" size="small" color="info" sx={{ height: 18, fontSize: '0.65rem' }} />}
+            <Typography variant="body2" fontWeight={600}>{params.value}</Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: 'natural_language_query',
+      headerName: 'Query',
+      flex: 3,
+      minWidth: 350,
+      renderCell: (params) => (
+        <Tooltip title={params.value || ''}>
+          <Typography variant="body2" color="text.secondary" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {params.value}
+          </Typography>
+        </Tooltip>
+      ),
+    },
+    {
+      field: 'category',
+      headerName: 'Category',
+      width: 160,
+      renderCell: (params) => {
+        const CategoryIcon = categoryInfo[params.value]?.icon || SettingsIcon;
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <CategoryIcon sx={{ fontSize: 16, color: '#0a6ed1' }} />
+            <Typography variant="body2">{categoryInfo[params.value]?.name || params.value || 'General'}</Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: 'enabled',
+      headerName: 'Status',
+      width: 100,
+      renderCell: (params) => (
+        <Chip
+          label={params.value ? 'Active' : 'Paused'}
+          size="small"
+          color={params.value ? 'success' : 'default'}
+          sx={{ height: 22, fontSize: '0.7rem' }}
+        />
+      ),
+    },
+    {
+      field: 'severity',
+      headerName: 'Severity',
+      width: 100,
+      renderCell: (params) => (
+        <Chip
+          label={params.value}
+          size="small"
+          color={getSeverityColor(params.value)}
+          sx={{ height: 22, fontSize: '0.7rem' }}
+        />
+      ),
+    },
+    {
+      field: 'frequency',
+      headerName: 'Frequency',
+      width: 100,
+      renderCell: (params) => (
+        <Chip label={params.value} size="small" variant="outlined" sx={{ height: 22, fontSize: '0.7rem' }} />
+      ),
+    },
+    {
+      field: 'accuracy',
+      headerName: 'Accuracy',
+      width: 90,
+      valueGetter: (params) => {
+        const row = params.row;
+        const total = (row?.true_positives || 0) + (row?.false_positives || 0);
+        return total > 0 ? Math.round((row?.true_positives || 0) / total * 100) : null;
+      },
+      renderCell: (params) => params.value !== null ? (
+        <Chip label={`${params.value}%`} size="small" color="info" sx={{ height: 22, fontSize: '0.7rem' }} />
+      ) : <Typography variant="body2" color="text.disabled">—</Typography>,
+    },
+    {
+      field: 'last_run',
+      headerName: 'Last Run',
+      width: 150,
+      renderCell: (params) => params.value ? (
+        <Typography variant="caption" color="text.secondary">
+          {new Date(params.value).toLocaleString()}
+        </Typography>
+      ) : <Typography variant="body2" color="text.disabled">—</Typography>,
+    },
+    {
+      field: 'actions',
+      headerName: '',
+      width: 50,
+      sortable: false,
+      renderCell: (params) => (
+        <IconButton
+          size="small"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleMenuOpen(e, params.row);
+          }}
+        >
+          <MoreVertIcon />
+        </IconButton>
+      ),
+    },
+  ], []);
 
   // Blue/grey color palette
   const colors = {
@@ -401,8 +449,8 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
 
   // Calculate stats from agents data if API stats are empty
   const computedStats = useMemo(() => {
-    const activeMonitors = agents.filter(a => a.enabled).length;
-    const totalMonitors = agents.length;
+    const activeAgents = agents.filter(a => a.enabled).length;
+    const totalAgents = agents.length;
     const activeAlertsCount = alerts.filter(a => a.status === 'active').length;
     const truePositives = agents.reduce((sum, a) => sum + (a.true_positives || 0), 0);
     const falsePositives = agents.reduce((sum, a) => sum + (a.false_positives || 0), 0);
@@ -410,8 +458,8 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
     const accuracyRate = total > 0 ? Math.round((truePositives / total) * 100) : 95; // Default to 95% if no data
 
     return {
-      activeMonitors: stats?.monitors?.active_monitors || activeMonitors || 8,
-      totalMonitors: stats?.monitors?.total_monitors || totalMonitors || 12,
+      activeAgents: stats?.monitors?.active_monitors || activeAgents || 8,
+      totalAgents: stats?.monitors?.total_monitors || totalAgents || 12,
       activeAlerts: stats?.alerts?.active_alerts || activeAlertsCount || 3,
       accuracyRate: stats?.alerts?.true_positives
         ? Math.round((stats.alerts.true_positives / (stats.alerts.true_positives + stats.alerts.false_positives)) * 100)
@@ -504,7 +552,7 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
                   Active Agents
                 </Typography>
                 <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
-                  {computedStats.activeMonitors}
+                  {computedStats.activeAgents}
                 </Typography>
               </Box>
               <Box
@@ -648,7 +696,7 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
                   Total Agents
                 </Typography>
                 <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
-                  {computedStats.totalMonitors}
+                  {computedStats.totalAgents}
                 </Typography>
               </Box>
               <Box
@@ -780,28 +828,9 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
                 ({filteredAndSortedAgents.length})
               </Typography>
             </Box>
-            <Box display="flex" gap={1}>
-              <ToggleButtonGroup
-                value={viewMode}
-                exclusive
-                onChange={(e, newMode) => newMode && setViewMode(newMode)}
-                size="small"
-              >
-                <ToggleButton value="grid">
-                  <Tooltip title="Grid View">
-                    <ViewModuleIcon fontSize="small" />
-                  </Tooltip>
-                </ToggleButton>
-                <ToggleButton value="list">
-                  <Tooltip title="List View">
-                    <ViewListIcon fontSize="small" />
-                  </Tooltip>
-                </ToggleButton>
-              </ToggleButtonGroup>
-              <IconButton onClick={loadData} size="small">
-                <RefreshIcon />
-              </IconButton>
-            </Box>
+            <IconButton onClick={loadData} size="small">
+              <RefreshIcon />
+            </IconButton>
           </Box>
 
           {/* Search and Filters */}
@@ -853,242 +882,44 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent }) => {
                 </FormControl>
               </Grid>
               <Grid item xs={6} md={2}>
-                <FormControl fullWidth size="small">
-                  <InputLabel>Sort By</InputLabel>
-                  <Select
-                    value={sortBy}
-                    label="Sort By"
-                    onChange={(e) => setSortBy(e.target.value)}
+                <Tooltip title="Show Demo Only">
+                  <IconButton
+                    size="small"
+                    color={showDemoOnly ? 'primary' : 'default'}
+                    onClick={() => setShowDemoOnly(!showDemoOnly)}
+                    sx={{ border: '1px solid', borderColor: showDemoOnly ? 'primary.main' : 'divider' }}
                   >
-                    <MenuItem value="name">Name</MenuItem>
-                    <MenuItem value="last_run">Last Run</MenuItem>
-                    <MenuItem value="created">Created Date</MenuItem>
-                    <MenuItem value="severity">Severity</MenuItem>
-                    <MenuItem value="accuracy">Accuracy</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6} md={2}>
-                <Box display="flex" gap={1}>
-                  <Tooltip title={`Sort ${sortDirection === 'asc' ? 'Descending' : 'Ascending'}`}>
-                    <IconButton
-                      size="small"
-                      onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
-                      sx={{ border: '1px solid', borderColor: 'divider' }}
-                    >
-                      <SortIcon fontSize="small" sx={{ transform: sortDirection === 'desc' ? 'rotate(180deg)' : 'none' }} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Show Demo Only">
-                    <IconButton
-                      size="small"
-                      color={showDemoOnly ? 'primary' : 'default'}
-                      onClick={() => setShowDemoOnly(!showDemoOnly)}
-                      sx={{ border: '1px solid', borderColor: showDemoOnly ? 'primary.main' : 'divider' }}
-                    >
-                      <FilterListIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
+                    <FilterListIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
               </Grid>
             </Grid>
           </Box>
 
           <Divider sx={{ mb: 1.5 }} />
 
-          {filteredAndSortedAgents.length === 0 ? (
-            <Box textAlign="center" py={3}>
-              <Typography variant="caption" color="text.secondary" mb={1.5} sx={{ display: 'block' }}>
-                {searchQuery || statusFilter !== 'all' || severityFilter !== 'all' || showDemoOnly
-                  ? 'No agents match your filters. Try adjusting your search criteria.'
-                  : 'No agents yet. Create your first agent to get started!'}
-              </Typography>
-              {!searchQuery && statusFilter === 'all' && severityFilter === 'all' && !showDemoOnly && (
-                <Button variant="outlined" size="small" startIcon={<AddIcon sx={{ fontSize: 16 }} />} onClick={onCreateAgent}>
-                  New Agent
-                </Button>
-              )}
-            </Box>
-          ) : (
-            <>
-              {/* Render agents grouped by category */}
-              {Object.entries(groupedAgents).map(([category, categoryAgents]) => {
-                const CategoryIcon = categoryInfo[category]?.icon || SettingsIcon;
-                const categoryColor = categoryInfo[category]?.color || '#616161';
-
-                return (
-                  <Box key={category} mb={3}>
-                    {/* Category Header */}
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1,
-                        mb: 1.5,
-                        py: 1,
-                        px: 1.5,
-                        borderRadius: 1,
-                        background: 'linear-gradient(135deg, rgba(10, 110, 209, 0.08) 0%, rgba(53, 74, 95, 0.04) 100%)',
-                        borderLeft: '4px solid #0a6ed1',
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          width: 28,
-                          height: 28,
-                          borderRadius: '6px',
-                          bgcolor: 'rgba(10, 110, 209, 0.12)',
-                        }}
-                      >
-                        <CategoryIcon sx={{ fontSize: 16, color: '#0a6ed1' }} />
-                      </Box>
-                      <Box sx={{ flex: 1 }}>
-                        <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#354a5f', letterSpacing: '0.5px' }}>
-                          {categoryInfo[category]?.name || category}
-                        </Typography>
-                        <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#64748b' }}>
-                          {categoryInfo[category]?.description || ''}
-                        </Typography>
-                      </Box>
-                      <Chip
-                        label={`${categoryAgents.length} ${categoryAgents.length === 1 ? 'Monitor' : 'Monitors'}`}
-                        size="small"
-                        sx={{
-                          height: 22,
-                          fontSize: '0.7rem',
-                          fontWeight: 600,
-                          bgcolor: 'rgba(10, 110, 209, 0.1)',
-                          color: '#0854a0',
-                          border: '1px solid rgba(10, 110, 209, 0.2)',
-                        }}
-                      />
-                    </Box>
-
-                  <Grid container spacing={1.5}>
-                    {categoryAgents.map((agent) => {
-                      const healthScore = getHealthScore(agent);
-                      const isDemo = agent.name && agent.name.includes('[DEMO]');
-                      const notificationConfig = agent.notification_config || {};
-                      const hasNotifications = Object.values(notificationConfig).some(v => v);
-
-                      return (
-                        <Grid item xs={12} md={viewMode === 'grid' ? 6 : 12} key={agent.id}>
-                          <Paper
-                            variant="outlined"
-                            sx={{
-                              p: 1.5,
-                              ...(isDemo && {
-                                bgcolor: 'rgba(33, 150, 243, 0.03)',
-                                borderColor: 'info.light',
-                                borderWidth: 1.5
-                              })
-                            }}
-                          >
-                            <Box display="flex" justifyContent="space-between" alignItems="start" mb={0.5}>
-                              <Box flex={1}>
-                                <Box display="flex" alignItems="center" gap={0.5} mb={0.5} flexWrap="wrap">
-                                  {agent.scope === 'global' && (
-                                    <Chip
-                                      label="GLOBAL"
-                                      size="small"
-                                      variant="outlined"
-                                      sx={{ height: 18, fontSize: '0.65rem', fontWeight: 600 }}
-                                    />
-                                  )}
-                                  {isDemo && (
-                                    <Chip
-                                      label="DEMO"
-                                      size="small"
-                                      color="info"
-                                      variant="outlined"
-                                      sx={{ height: 18, fontSize: '0.65rem', fontWeight: 600 }}
-                                    />
-                                  )}
-                                  <Typography variant="body2" fontWeight={600}>
-                                    {agent.name}
-                                  </Typography>
-                                  <Chip
-                                    size="small"
-                                    variant="outlined"
-                                    label={agent.enabled ? 'Active' : 'Paused'}
-                                    color={agent.enabled ? 'success' : 'default'}
-                                    sx={{ height: 18, fontSize: '0.65rem' }}
-                                  />
-                                  {hasNotifications && (
-                                    <Tooltip title={`Notifications: ${Object.keys(notificationConfig).filter(k => notificationConfig[k]).join(', ')}`}>
-                                      <NotificationsIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                                    </Tooltip>
-                                  )}
-                                </Box>
-                                <Typography variant="caption" color="text.secondary" mb={0.5} sx={{ display: 'block' }}>
-                                  {agent.natural_language_query}
-                                </Typography>
-                                <Box display="flex" gap={0.5} flexWrap="wrap">
-                                  <Chip
-                                    label={agent.frequency}
-                                    size="small"
-                                    variant="outlined"
-                                    sx={{ height: 20, fontSize: '0.7rem' }}
-                                  />
-                                  <Chip
-                                    label={agent.severity}
-                                    size="small"
-                                    variant="outlined"
-                                    color={getSeverityColor(agent.severity)}
-                                    sx={{ height: 20, fontSize: '0.7rem' }}
-                                  />
-                                  {healthScore !== null && (
-                                    <Chip
-                                      label={`${healthScore}%`}
-                                      size="small"
-                                      variant="outlined"
-                                      sx={{ height: 20, fontSize: '0.7rem' }}
-                                    />
-                                  )}
-                                </Box>
-                              </Box>
-                              <IconButton
-                                size="small"
-                                onClick={(e) => handleMenuOpen(e, agent)}
-                              >
-                                <MoreVertIcon />
-                              </IconButton>
-                            </Box>
-
-                            {agent.last_run && (
-                              <Box mt={1} pt={1} borderTop={1} borderColor="divider">
-                                <Typography variant="caption" color="text.disabled">
-                                  Last run: {new Date(agent.last_run).toLocaleString()}
-                                </Typography>
-                              </Box>
-                            )}
-                          </Paper>
-                        </Grid>
-                      );
-                    })}
-                  </Grid>
-                </Box>
-                );
-              })}
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <Box display="flex" justifyContent="center" mt={3}>
-                  <Pagination
-                    count={totalPages}
-                    page={page}
-                    onChange={(e, value) => setPage(value)}
-                    color="primary"
-                    showFirstButton
-                    showLastButton
-                  />
-                </Box>
-              )}
-            </>
-          )}
+          <Paper sx={{ width: '100%' }}>
+            <DataGrid
+              rows={filteredAndSortedAgents}
+              columns={columns}
+              density="compact"
+              checkboxSelection
+              disableRowSelectionOnClick
+              autoHeight
+              slots={{ toolbar: GridToolbar }}
+              slotProps={{ toolbar: { showQuickFilter: true, quickFilterProps: { debounceMs: 500 } } }}
+              initialState={{ pagination: { paginationModel: { pageSize: 12 } } }}
+              pageSizeOptions={[12, 25, 50]}
+              onRowClick={(params) => {
+                setSelectedAgent(params.row);
+                setConfigDialog(true);
+              }}
+              sx={stoxTheme.getDataGridSx({ clickable: true })}
+              localeText={{
+                noRowsLabel: 'No agents yet. Create your first agent to get started!',
+              }}
+            />
+          </Paper>
         </CardContent>
       </Card>
 

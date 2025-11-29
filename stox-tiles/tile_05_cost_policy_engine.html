@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STOX.AI | Tile 5 - Inventory Cost & Policy Engine</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0f172a; --bg-secondary: #1e293b; --border-color: #475569;
+            --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
+            --wharton-blue: #004785; --wharton-maroon: #990000;
+            --cyan-400: #22d3ee; --cyan-500: #06b6d4;
+            --emerald-400: #34d399; --emerald-500: #10b981;
+            --amber-400: #fbbf24; --amber-500: #f59e0b;
+            --red-400: #f87171; --red-500: #ef4444;
+        }
+        body { font-family: 'JetBrains Mono', monospace; background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); color: var(--text-primary); min-height: 100vh; padding: 24px; }
+        .container { max-width: 1600px; margin: 0 auto; }
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+        .logo-section { display: flex; align-items: center; gap: 16px; }
+        .logo { width: 48px; height: 48px; background: linear-gradient(135deg, var(--wharton-blue), var(--wharton-maroon)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .brand h1 { font-size: 24px; font-weight: 700; color: var(--cyan-400); }
+        .brand p { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
+        .tile-badge { background: linear-gradient(135deg, var(--wharton-blue), var(--wharton-maroon)); padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+        .summary-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 32px; }
+        .summary-card { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 12px; padding: 20px; backdrop-filter: blur(10px); }
+        .summary-card .label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .summary-card .value { font-size: 28px; font-weight: 700; color: var(--text-primary); }
+        .summary-card .sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .summary-card.good { border-left: 3px solid var(--emerald-500); }
+        .summary-card.warning { border-left: 3px solid var(--amber-500); }
+        .summary-card.critical { border-left: 3px solid var(--red-500); }
+        .summary-card.neutral { border-left: 3px solid var(--cyan-500); }
+        .table-section { background: rgba(30, 41, 59, 0.3); border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 16px; overflow: hidden; backdrop-filter: blur(10px); }
+        .table-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid rgba(71, 85, 105, 0.3); background: linear-gradient(90deg, rgba(0, 71, 133, 0.2), rgba(153, 0, 0, 0.2)); }
+        .table-header h2 { font-size: 14px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+        .table-header h2 span { color: var(--cyan-400); }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th { padding: 16px 12px; text-align: left; font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; background: rgba(15, 23, 42, 0.5); border-bottom: 1px solid rgba(71, 85, 105, 0.3); }
+        .data-table td { padding: 16px 12px; border-bottom: 1px solid rgba(71, 85, 105, 0.2); font-size: 13px; }
+        .data-table tr { cursor: pointer; transition: all 0.2s; }
+        .data-table tr:hover { background: rgba(6, 182, 212, 0.05); }
+        .data-table tr:hover td:first-child { color: var(--cyan-400); }
+        .policy-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; background: rgba(6, 182, 212, 0.15); color: var(--cyan-400); border: 1px solid rgba(6, 182, 212, 0.3); }
+        .strategy-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+        .strategy-badge.mts { background: rgba(16, 185, 129, 0.15); color: var(--emerald-400); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .strategy-badge.mto { background: rgba(251, 191, 36, 0.15); color: var(--amber-400); border: 1px solid rgba(251, 191, 36, 0.3); }
+        .strategy-badge.kanban { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+        .metric-value { font-weight: 600; }
+        .metric-value.good { color: var(--emerald-400); }
+        .metric-value.warning { color: var(--amber-400); }
+        .metric-value.critical { color: var(--red-400); }
+        .drill-icon { opacity: 0; transition: all 0.2s; color: var(--cyan-400); }
+        .data-table tr:hover .drill-icon { opacity: 1; transform: translateX(4px); }
+        .detail-view { display: none; }
+        .detail-view.active { display: block; }
+        .list-view { display: block; }
+        .list-view.hidden { display: none; }
+        .back-btn { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 8px; color: var(--text-secondary); cursor: pointer; font-family: inherit; font-size: 12px; margin-bottom: 24px; transition: all 0.2s; }
+        .back-btn:hover { background: rgba(6, 182, 212, 0.1); color: var(--cyan-400); border-color: rgba(6, 182, 212, 0.3); }
+        .detail-header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+        .detail-logo { width: 56px; height: 56px; background: linear-gradient(135deg, var(--wharton-blue), var(--wharton-maroon)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .detail-title h1 { font-size: 24px; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+        .detail-title h1 .material-id { color: var(--cyan-400); }
+        .detail-title h1 .plant-id { color: var(--text-secondary); }
+        .detail-title p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+        .detail-card { background: rgba(30, 41, 59, 0.3); border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 16px; padding: 24px; backdrop-filter: blur(10px); }
+        .detail-card h3 { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+        .detail-card h3 .icon { color: var(--cyan-400); }
+        .detail-card h3 .sap-badge { margin-left: auto; font-size: 9px; font-weight: 500; color: rgba(6, 182, 212, 0.6); background: rgba(6, 182, 212, 0.1); padding: 2px 8px; border-radius: 4px; }
+        .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(71, 85, 105, 0.2); }
+        .info-row:last-child { border-bottom: none; }
+        .info-row .label { font-size: 12px; color: var(--text-muted); }
+        .info-row .value { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .chart-container { height: 200px; margin: 16px 0; }
+        .cost-breakdown { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+        .cost-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(15, 23, 42, 0.3); border-radius: 6px; }
+        .cost-item .label { font-size: 11px; color: var(--text-muted); }
+        .cost-item .value { font-size: 12px; font-weight: 600; }
+        .footer { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(71, 85, 105, 0.2); font-size: 11px; color: var(--text-muted); }
+        .footer .info { display: flex; gap: 16px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo">💰</div>
+                <div class="brand">
+                    <h1>STOX.AI</h1>
+                    <p>Inventory Cost & Policy Engine</p>
+                </div>
+            </div>
+            <div class="tile-badge">TILE 5 — FINANCE & POLICY</div>
+        </div>
+
+        <div class="list-view" id="listView">
+            <div class="summary-grid">
+                <div class="summary-card neutral">
+                    <div class="label">Total Holding Cost</div>
+                    <div class="value">$4.2M</div>
+                    <div class="sub">Annual</div>
+                </div>
+                <div class="summary-card warning">
+                    <div class="label">Cost of Overstock</div>
+                    <div class="value">$1.8M</div>
+                    <div class="sub">Opportunity cost</div>
+                </div>
+                <div class="summary-card critical">
+                    <div class="label">Cost of Understock</div>
+                    <div class="value">$2.1M</div>
+                    <div class="sub">Lost sales + expedite</div>
+                </div>
+                <div class="summary-card good">
+                    <div class="label">Optimal SL Avg</div>
+                    <div class="value">94.5%</div>
+                    <div class="sub">Cost-optimized</div>
+                </div>
+                <div class="summary-card neutral">
+                    <div class="label">WACC Applied</div>
+                    <div class="value">8.5%</div>
+                    <div class="sub">Capital cost</div>
+                </div>
+            </div>
+
+            <div class="table-section">
+                <div class="table-header">
+                    <h2><span>💰</span> Cost & Policy Analysis by SKU / Plant</h2>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Material</th>
+                            <th>Plant</th>
+                            <th>ABC/XYZ</th>
+                            <th>Holding $/yr</th>
+                            <th>Stockout $/event</th>
+                            <th>Optimal SL</th>
+                            <th>Current SL</th>
+                            <th>Policy</th>
+                            <th>Strategy</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr onclick="showDetail('MAT-001')">
+                            <td><strong>MAT-001</strong><br><span style="font-size:10px;color:var(--text-muted)">Hydraulic Pump</span></td>
+                            <td>P1000</td>
+                            <td><span class="policy-badge">A/X</span></td>
+                            <td>$36,750</td>
+                            <td>$8,500</td>
+                            <td><span class="metric-value good">97%</span></td>
+                            <td><span class="metric-value good">98.5%</span></td>
+                            <td><span class="policy-badge">High SL / Low SS</span></td>
+                            <td><span class="strategy-badge mts">MTS</span></td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                        <tr onclick="showDetail('MAT-002')">
+                            <td><strong>MAT-002</strong><br><span style="font-size:10px;color:var(--text-muted)">Bearing Assembly</span></td>
+                            <td>P1000</td>
+                            <td><span class="policy-badge">A/Y</span></td>
+                            <td>$28,400</td>
+                            <td>$5,200</td>
+                            <td><span class="metric-value warning">94%</span></td>
+                            <td><span class="metric-value good">96.2%</span></td>
+                            <td><span class="policy-badge">Med SL / Med SS</span></td>
+                            <td><span class="strategy-badge mts">MTS</span></td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                        <tr onclick="showDetail('MAT-003')">
+                            <td><strong>MAT-003</strong><br><span style="font-size:10px;color:var(--text-muted)">Control Module</span></td>
+                            <td>P2000</td>
+                            <td><span class="policy-badge">B/Z</span></td>
+                            <td>$85,200</td>
+                            <td>$2,100</td>
+                            <td><span class="metric-value warning">88%</span></td>
+                            <td><span class="metric-value critical">92.1%</span></td>
+                            <td><span class="policy-badge">Low SL / High Cover</span></td>
+                            <td><span class="strategy-badge mto">MTO</span></td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                        <tr onclick="showDetail('MAT-004')">
+                            <td><strong>MAT-004</strong><br><span style="font-size:10px;color:var(--text-muted)">Valve Kit</span></td>
+                            <td>P2000</td>
+                            <td><span class="policy-badge">A/Z</span></td>
+                            <td>$12,600</td>
+                            <td>$12,000</td>
+                            <td><span class="metric-value good">96%</span></td>
+                            <td><span class="metric-value critical">88.5%</span></td>
+                            <td><span class="policy-badge">High SL / Med SS</span></td>
+                            <td><span class="strategy-badge kanban">Kanban</span></td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                        <tr onclick="showDetail('MAT-005')">
+                            <td><strong>MAT-005</strong><br><span style="font-size:10px;color:var(--text-muted)">Gasket Set</span></td>
+                            <td>P3000</td>
+                            <td><span class="policy-badge">C/Z</span></td>
+                            <td>$4,200</td>
+                            <td>$450</td>
+                            <td><span class="metric-value">85%</span></td>
+                            <td><span class="metric-value good">100%</span></td>
+                            <td><span class="policy-badge">Low SL / Cheap Replen</span></td>
+                            <td><span class="strategy-badge mto">MTO</span></td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="detail-view" id="detailView">
+            <button class="back-btn" onclick="showList()">← Back to List</button>
+            
+            <div class="detail-header">
+                <div class="detail-logo">💰</div>
+                <div class="detail-title">
+                    <h1>
+                        <span class="material-id" id="detailMaterial">MAT-001</span>
+                        <span style="color: var(--text-muted)">|</span>
+                        <span class="plant-id" id="detailPlant">P1000</span>
+                    </h1>
+                    <p id="detailDesc">Hydraulic Pump Assembly - Cost & Policy Analysis</p>
+                </div>
+            </div>
+
+            <div class="detail-grid">
+                <div class="detail-card">
+                    <h3><span class="icon">💵</span> Cost Inputs<span class="sap-badge">MBEW</span></h3>
+                    <div class="cost-breakdown">
+                        <div class="cost-item">
+                            <span class="label">Capital Cost (WACC 8.5%)</span>
+                            <span class="value">$20,825</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="label">Storage & Space</span>
+                            <span class="value">$8,400</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="label">Insurance</span>
+                            <span class="value">$2,450</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="label">Shrinkage</span>
+                            <span class="value">$1,225</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="label">Obsolescence Risk</span>
+                            <span class="value">$3,850</span>
+                        </div>
+                    </div>
+                    <div class="info-row" style="margin-top: 16px; border-top: 1px solid rgba(71,85,105,0.3); padding-top: 16px;">
+                        <span class="label"><strong>Total Holding Cost</strong></span>
+                        <span class="value" style="color: var(--cyan-400);"><strong>$36,750/yr</strong></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Holding Cost %</span>
+                        <span class="value">15%</span>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📈</span> Cost vs Service Curve</h3>
+                    <div class="chart-container">
+                        <canvas id="costCurveChart"></canvas>
+                    </div>
+                    <div class="info-row" style="margin-top: 16px;">
+                        <span class="label">Optimal Service Level</span>
+                        <span class="value" style="color: var(--emerald-400);">97%</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Current Service Level</span>
+                        <span class="value">98.5%</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Financially Optimal Inv $</span>
+                        <span class="value" style="color: var(--cyan-400);">$232,000</span>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📊</span> Stockout Economics</h3>
+                    <div class="info-row">
+                        <span class="label">Stockout Cost / Event</span>
+                        <span class="value" style="color: var(--red-400);">$8,500</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Ordering Cost / Order</span>
+                        <span class="value">$125</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Shipping Cost / Ship</span>
+                        <span class="value">$450</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Cost of Overstock</span>
+                        <span class="value">$2,400/yr</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Cost of Understock</span>
+                        <span class="value" style="color: var(--amber-400);">$5,100/yr</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-grid" style="margin-top: 24px; grid-template-columns: 1fr 1fr;">
+                <div class="detail-card">
+                    <h3><span class="icon">🎯</span> Policy Segmentation</h3>
+                    <div class="info-row">
+                        <span class="label">ABC/XYZ Cell</span>
+                        <span class="value"><span class="policy-badge">A/X</span></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Target Service Level</span>
+                        <span class="value">97%</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Replenishment Strategy</span>
+                        <span class="value"><span class="strategy-badge mts">MTS</span></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Policy Template</span>
+                        <span class="value">High Value / Stable</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Review Frequency</span>
+                        <span class="value">Weekly</span>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">⚖️</span> Trade-off Summary</h3>
+                    <div class="info-row">
+                        <span class="label">Current vs Optimal SL</span>
+                        <span class="value" style="color: var(--amber-400);">+1.5% over</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Excess Holding Cost</span>
+                        <span class="value" style="color: var(--amber-400);">$2,400/yr</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Stockout Risk Saved</span>
+                        <span class="value" style="color: var(--emerald-400);">$850/yr</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Net Cost Impact</span>
+                        <span class="value" style="color: var(--amber-400);">+$1,550/yr</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Recommendation</span>
+                        <span class="value" style="color: var(--cyan-400);">Reduce SS by 8%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="info">
+                <span>STOX.AI Cost Engine</span>
+                <span>•</span>
+                <span>Tile 5 of 10</span>
+                <span>•</span>
+                <span>Layer: Finance & Policy</span>
+            </div>
+            <div>© 2025 Cloud Mantra LLC</div>
+        </div>
+    </div>
+
+    <script>
+        function showDetail(material) {
+            document.getElementById('listView').classList.add('hidden');
+            document.getElementById('detailView').classList.add('active');
+            
+            const matData = {
+                'MAT-001': { material: 'MAT-001', plant: 'P1000', desc: 'Hydraulic Pump Assembly - Cost & Policy Analysis' },
+                'MAT-002': { material: 'MAT-002', plant: 'P1000', desc: 'Bearing Assembly - Cost & Policy Analysis' },
+                'MAT-003': { material: 'MAT-003', plant: 'P2000', desc: 'Electronic Control Module - Cost & Policy Analysis' },
+                'MAT-004': { material: 'MAT-004', plant: 'P2000', desc: 'Valve Kit - Cost & Policy Analysis' },
+                'MAT-005': { material: 'MAT-005', plant: 'P3000', desc: 'Gasket Set - Cost & Policy Analysis' }
+            };
+            
+            const data = matData[material] || matData['MAT-001'];
+            document.getElementById('detailMaterial').textContent = data.material;
+            document.getElementById('detailPlant').textContent = data.plant;
+            document.getElementById('detailDesc').textContent = data.desc;
+            
+            setTimeout(initCharts, 100);
+        }
+        
+        function showList() {
+            document.getElementById('listView').classList.remove('hidden');
+            document.getElementById('detailView').classList.remove('active');
+        }
+        
+        function initCharts() {
+            const ctx = document.getElementById('costCurveChart');
+            if (ctx && !ctx.chart) {
+                ctx.chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['85%', '88%', '90%', '92%', '94%', '96%', '97%', '98%', '99%'],
+                        datasets: [
+                            { label: 'Total Cost', data: [52, 48, 45, 42, 40, 39, 38.5, 40, 48], borderColor: '#06b6d4', backgroundColor: 'rgba(6, 182, 212, 0.1)', fill: true, tension: 0.4, pointRadius: 4 },
+                            { label: 'Holding Cost', data: [25, 28, 30, 33, 36, 40, 43, 48, 58], borderColor: '#f59e0b', backgroundColor: 'transparent', borderDash: [5, 5], tension: 0.4, pointRadius: 0 },
+                            { label: 'Stockout Cost', data: [27, 20, 15, 9, 4, 2, 1, 0.5, 0.2], borderColor: '#ef4444', backgroundColor: 'transparent', borderDash: [5, 5], tension: 0.4, pointRadius: 0 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { color: 'rgba(71, 85, 105, 0.2)' }, ticks: { color: '#64748b', font: { size: 9 } }, title: { display: true, text: 'Service Level', color: '#64748b', font: { size: 9 } } },
+                            y: { grid: { color: 'rgba(71, 85, 105, 0.2)' }, ticks: { color: '#64748b', font: { size: 9 } }, title: { display: true, text: 'Cost ($K)', color: '#64748b', font: { size: 9 } } }
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

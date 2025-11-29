@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STOX.AI | Tile 8 - Recommendations Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0f172a; --bg-secondary: #1e293b; --border-color: #475569;
+            --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
+            --wharton-blue: #004785; --wharton-maroon: #990000;
+            --cyan-400: #22d3ee; --cyan-500: #06b6d4;
+            --emerald-400: #34d399; --emerald-500: #10b981;
+            --amber-400: #fbbf24; --amber-500: #f59e0b;
+            --red-400: #f87171; --red-500: #ef4444;
+        }
+        body { font-family: 'JetBrains Mono', monospace; background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); color: var(--text-primary); min-height: 100vh; padding: 24px; }
+        .container { max-width: 1600px; margin: 0 auto; }
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+        .logo-section { display: flex; align-items: center; gap: 16px; }
+        .logo { width: 48px; height: 48px; background: linear-gradient(135deg, var(--wharton-blue), var(--wharton-maroon)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .brand h1 { font-size: 24px; font-weight: 700; color: var(--cyan-400); }
+        .brand p { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
+        .tile-badge { background: linear-gradient(135deg, var(--wharton-blue), var(--wharton-maroon)); padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+        .summary-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 32px; }
+        .summary-card { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 12px; padding: 20px; backdrop-filter: blur(10px); }
+        .summary-card .label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .summary-card .value { font-size: 28px; font-weight: 700; color: var(--text-primary); }
+        .summary-card .sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .summary-card.good { border-left: 3px solid var(--emerald-500); }
+        .summary-card.warning { border-left: 3px solid var(--amber-500); }
+        .summary-card.critical { border-left: 3px solid var(--red-500); }
+        .summary-card.neutral { border-left: 3px solid var(--cyan-500); }
+        .table-section { background: rgba(30, 41, 59, 0.3); border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 16px; overflow: hidden; backdrop-filter: blur(10px); }
+        .table-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid rgba(71, 85, 105, 0.3); background: linear-gradient(90deg, rgba(0, 71, 133, 0.2), rgba(153, 0, 0, 0.2)); }
+        .table-header h2 { font-size: 14px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+        .table-header h2 span { color: var(--cyan-400); }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th { padding: 16px 12px; text-align: left; font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; background: rgba(15, 23, 42, 0.5); border-bottom: 1px solid rgba(71, 85, 105, 0.3); }
+        .data-table td { padding: 16px 12px; border-bottom: 1px solid rgba(71, 85, 105, 0.2); font-size: 12px; }
+        .data-table tr { cursor: pointer; transition: all 0.2s; }
+        .data-table tr:hover { background: rgba(6, 182, 212, 0.05); }
+        .data-table tr:hover td:first-child { color: var(--cyan-400); }
+        .roi-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; }
+        .roi-badge.high { background: rgba(16, 185, 129, 0.15); color: var(--emerald-400); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .roi-badge.medium { background: rgba(6, 182, 212, 0.15); color: var(--cyan-400); border: 1px solid rgba(6, 182, 212, 0.3); }
+        .roi-badge.low { background: rgba(251, 191, 36, 0.15); color: var(--amber-400); border: 1px solid rgba(251, 191, 36, 0.3); }
+        .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .status-badge.pending { background: rgba(251, 191, 36, 0.15); color: var(--amber-400); border: 1px solid rgba(251, 191, 36, 0.3); }
+        .status-badge.approved { background: rgba(16, 185, 129, 0.15); color: var(--emerald-400); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .status-badge.rejected { background: rgba(239, 68, 68, 0.15); color: var(--red-400); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .risk-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+        .risk-badge.low { background: rgba(16, 185, 129, 0.15); color: var(--emerald-400); }
+        .risk-badge.medium { background: rgba(251, 191, 36, 0.15); color: var(--amber-400); }
+        .risk-badge.high { background: rgba(239, 68, 68, 0.15); color: var(--red-400); }
+        .metric-value { font-weight: 600; }
+        .metric-value.good { color: var(--emerald-400); }
+        .metric-value.warning { color: var(--amber-400); }
+        .metric-value.critical { color: var(--red-400); }
+        .param-change { display: flex; align-items: center; gap: 4px; font-size: 11px; }
+        .param-change .current { color: var(--text-muted); text-decoration: line-through; }
+        .param-change .arrow { color: var(--text-muted); }
+        .param-change .optimal { color: var(--emerald-400); font-weight: 600; }
+        .drill-icon { opacity: 0; transition: all 0.2s; color: var(--cyan-400); }
+        .data-table tr:hover .drill-icon { opacity: 1; transform: translateX(4px); }
+        .detail-view { display: none; }
+        .detail-view.active { display: block; }
+        .list-view { display: block; }
+        .list-view.hidden { display: none; }
+        .back-btn { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 8px; color: var(--text-secondary); cursor: pointer; font-family: inherit; font-size: 12px; margin-bottom: 24px; transition: all 0.2s; }
+        .back-btn:hover { background: rgba(6, 182, 212, 0.1); color: var(--cyan-400); border-color: rgba(6, 182, 212, 0.3); }
+        .detail-header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+        .detail-logo { width: 56px; height: 56px; background: linear-gradient(135deg, var(--wharton-blue), var(--wharton-maroon)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .detail-title h1 { font-size: 24px; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+        .detail-title h1 .material-id { color: var(--cyan-400); }
+        .detail-title p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .detail-card { background: rgba(30, 41, 59, 0.3); border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 16px; padding: 24px; backdrop-filter: blur(10px); }
+        .detail-card h3 { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+        .detail-card h3 .icon { color: var(--cyan-400); }
+        .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(71, 85, 105, 0.2); }
+        .info-row:last-child { border-bottom: none; }
+        .info-row .label { font-size: 12px; color: var(--text-muted); }
+        .info-row .value { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .ai-rationale { background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 10px; padding: 16px; margin-top: 16px; }
+        .ai-rationale .title { font-size: 10px; color: var(--cyan-400); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .ai-rationale .text { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+        .action-buttons { display: flex; gap: 12px; margin-top: 24px; }
+        .action-btn { padding: 12px 24px; border-radius: 8px; font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; }
+        .action-btn.approve { background: var(--emerald-500); color: white; }
+        .action-btn.approve:hover { background: var(--emerald-400); }
+        .action-btn.reject { background: rgba(239, 68, 68, 0.2); color: var(--red-400); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .action-btn.reject:hover { background: rgba(239, 68, 68, 0.3); }
+        .footer { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(71, 85, 105, 0.2); font-size: 11px; color: var(--text-muted); }
+        .footer .info { display: flex; gap: 16px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo">💡</div>
+                <div class="brand">
+                    <h1>STOX.AI</h1>
+                    <p>Recommendations Hub</p>
+                </div>
+            </div>
+            <div class="tile-badge">TILE 8 — ACTION</div>
+        </div>
+
+        <div class="list-view" id="listView">
+            <div class="summary-grid">
+                <div class="summary-card good">
+                    <div class="label">High ROI</div>
+                    <div class="value">48</div>
+                    <div class="sub">Recommendations</div>
+                </div>
+                <div class="summary-card neutral">
+                    <div class="label">Medium ROI</div>
+                    <div class="value">124</div>
+                    <div class="sub">Recommendations</div>
+                </div>
+                <div class="summary-card warning">
+                    <div class="label">Pending Approval</div>
+                    <div class="value">86</div>
+                    <div class="sub">Awaiting review</div>
+                </div>
+                <div class="summary-card good">
+                    <div class="label">Total $ Impact</div>
+                    <div class="value">$3.4M</div>
+                    <div class="sub">If all approved</div>
+                </div>
+                <div class="summary-card good">
+                    <div class="label">Avg Confidence</div>
+                    <div class="value">87%</div>
+                    <div class="sub">Across all recs</div>
+                </div>
+            </div>
+
+            <div class="table-section">
+                <div class="table-header">
+                    <h2><span>💡</span> AI Recommendations — Ranked by ROI</h2>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Rec ID</th>
+                            <th>Material</th>
+                            <th>Plant</th>
+                            <th>Parameter</th>
+                            <th>Change</th>
+                            <th>$ Savings</th>
+                            <th>SL Impact</th>
+                            <th>ROI</th>
+                            <th>Confidence</th>
+                            <th>Risk</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr onclick="showDetail('REC-001')">
+                            <td><strong>REC-001</strong></td>
+                            <td>MAT-003</td>
+                            <td>P2000</td>
+                            <td>EISBE</td>
+                            <td><span class="param-change"><span class="current">1200</span><span class="arrow">→</span><span class="optimal">450</span></span></td>
+                            <td><span class="metric-value good">$125K</span></td>
+                            <td><span class="metric-value warning">-4.1%</span></td>
+                            <td><span class="roi-badge high">High</span></td>
+                            <td><span class="metric-value warning">78%</span></td>
+                            <td><span class="risk-badge medium">Med</span></td>
+                            <td><span class="status-badge pending">⏳ Pending</span></td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                        <tr onclick="showDetail('REC-002')">
+                            <td><strong>REC-002</strong></td>
+                            <td>MAT-005</td>
+                            <td>P3000</td>
+                            <td>DISMM</td>
+                            <td><span class="param-change"><span class="current">PD</span><span class="arrow">→</span><span class="optimal">ND</span></span></td>
+                            <td><span class="metric-value good">$89K</span></td>
+                            <td><span class="metric-value critical">-15%</span></td>
+                            <td><span class="roi-badge high">High</span></td>
+                            <td><span class="metric-value warning">72%</span></td>
+                            <td><span class="risk-badge high">High</span></td>
+                            <td><span class="status-badge pending">⏳ Pending</span></td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                        <tr onclick="showDetail('REC-003')">
+                            <td><strong>REC-003</strong></td>
+                            <td>MAT-002</td>
+                            <td>P1000</td>
+                            <td>DISLS</td>
+                            <td><span class="param-change"><span class="current">FX 500</span><span class="arrow">→</span><span class="optimal">EQ 320</span></span></td>
+                            <td><span class="metric-value good">$76.2K</span></td>
+                            <td><span class="metric-value warning">-2.2%</span></td>
+                            <td><span class="roi-badge high">High</span></td>
+                            <td><span class="metric-value good">91%</span></td>
+                            <td><span class="risk-badge low">Low</span></td>
+                            <td><span class="status-badge approved">✓ Approved</span></td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                        <tr onclick="showDetail('REC-004')">
+                            <td><strong>REC-004</strong></td>
+                            <td>MAT-004</td>
+                            <td>P2000</td>
+                            <td>EISBE</td>
+                            <td><span class="param-change"><span class="current">180</span><span class="arrow">→</span><span class="optimal">320</span></span></td>
+                            <td><span class="metric-value good">$32.4K</span></td>
+                            <td><span class="metric-value good">+7.5%</span></td>
+                            <td><span class="roi-badge medium">Med</span></td>
+                            <td><span class="metric-value good">89%</span></td>
+                            <td><span class="risk-badge low">Low</span></td>
+                            <td><span class="status-badge pending">⏳ Pending</span></td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                        <tr onclick="showDetail('REC-005')">
+                            <td><strong>REC-005</strong></td>
+                            <td>MAT-001</td>
+                            <td>P1000</td>
+                            <td>MINBE</td>
+                            <td><span class="param-change"><span class="current">800</span><span class="arrow">→</span><span class="optimal">720</span></span></td>
+                            <td><span class="metric-value good">$23.8K</span></td>
+                            <td><span class="metric-value warning">-1.5%</span></td>
+                            <td><span class="roi-badge medium">Med</span></td>
+                            <td><span class="metric-value good">94%</span></td>
+                            <td><span class="risk-badge low">Low</span></td>
+                            <td><span class="status-badge approved">✓ Approved</span></td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="detail-view" id="detailView">
+            <button class="back-btn" onclick="showList()">← Back to List</button>
+            
+            <div class="detail-header">
+                <div class="detail-logo">💡</div>
+                <div class="detail-title">
+                    <h1>
+                        <span class="material-id" id="detailRecId">REC-001</span>
+                    </h1>
+                    <p id="detailDesc">MAT-003 | P2000 | Safety Stock Optimization</p>
+                </div>
+            </div>
+
+            <div class="detail-grid">
+                <div class="detail-card">
+                    <h3><span class="icon">🔄</span> Recommended Change</h3>
+                    <div class="info-row">
+                        <span class="label">Material</span>
+                        <span class="value">MAT-003</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Plant</span>
+                        <span class="value">P2000</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Parameter</span>
+                        <span class="value">EISBE (Safety Stock)</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Current Value</span>
+                        <span class="value">1,200 EA</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Recommended Value</span>
+                        <span class="value" style="color: var(--emerald-400);">450 EA</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Δ Value</span>
+                        <span class="value" style="color: var(--emerald-400);">-750 EA (-62.5%)</span>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">💰</span> Impact Analysis</h3>
+                    <div class="info-row">
+                        <span class="label">$ Savings</span>
+                        <span class="value" style="color: var(--emerald-400);">$125,000 / year</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Service Level Impact</span>
+                        <span class="value" style="color: var(--amber-400);">-4.1% (96.0% → 91.9%)</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">ROI Rank</span>
+                        <span class="value"><span class="roi-badge high">High</span></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Confidence Score</span>
+                        <span class="value" style="color: var(--amber-400);">78%</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Risk Level</span>
+                        <span class="value"><span class="risk-badge medium">Medium</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card" style="margin-top: 24px;">
+                <h3><span class="icon">🤖</span> AI Explainability</h3>
+                <div class="ai-rationale">
+                    <div class="title">🧠 Why This Recommendation</div>
+                    <div class="text">
+                        <strong>Demand Analysis:</strong> MAT-003 exhibits erratic demand (CV=0.85) with declining trend (-8.5%/month). Current safety stock of 1,200 EA provides 156 days of coverage — significantly higher than the 45-day target for B/Z items.<br><br>
+                        <strong>Supply Analysis:</strong> Vendor VENDOR-C has poor reliability (62.1%) with actual lead times averaging 45 days vs. planned 30 days. However, the recommended reduction accounts for this supply variability with a 45% SS adjustment factor.<br><br>
+                        <strong>Financial Rationale:</strong> Holding cost of $85,200/year on excess inventory far exceeds the projected stockout cost of $2,100/event. The cost-service optimization curve shows optimal service level at 88% for this SKU segment, not the current 96%.<br><br>
+                        <strong>Risk Mitigation:</strong> Recommend phased implementation — reduce SS by 375 EA initially, monitor for 30 days, then complete remaining reduction. MRP Type change from PD to VB also recommended to better handle erratic demand.
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-grid" style="margin-top: 24px;">
+                <div class="detail-card">
+                    <h3><span class="icon">📋</span> Approval Status</h3>
+                    <div class="info-row">
+                        <span class="label">Status</span>
+                        <span class="value"><span class="status-badge pending">⏳ Pending</span></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Created</span>
+                        <span class="value">Nov 28, 2025 09:15</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Approver</span>
+                        <span class="value">—</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Approved Date</span>
+                        <span class="value">—</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="action-btn approve">✓ Approve</button>
+                        <button class="action-btn reject">✕ Reject</button>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <h3><span class="icon">📊</span> Related Recommendations</h3>
+                    <div class="info-row">
+                        <span class="label">DISMM Change</span>
+                        <span class="value">PD → VB (REC-006)</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">PLIFZ Update</span>
+                        <span class="value">30 → 45 days (REC-007)</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">MINBE Reduction</span>
+                        <span class="value">2500 → 1200 (REC-008)</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Combined $ Impact</span>
+                        <span class="value" style="color: var(--emerald-400);">$218K</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="info">
+                <span>STOX.AI Recommendations Hub</span>
+                <span>•</span>
+                <span>Tile 8 of 10</span>
+                <span>•</span>
+                <span>Layer: Action</span>
+            </div>
+            <div>© 2025 Cloud Mantra LLC</div>
+        </div>
+    </div>
+
+    <script>
+        function showDetail(recId) {
+            document.getElementById('listView').classList.add('hidden');
+            document.getElementById('detailView').classList.add('active');
+            
+            const recData = {
+                'REC-001': { recId: 'REC-001', desc: 'MAT-003 | P2000 | Safety Stock Optimization' },
+                'REC-002': { recId: 'REC-002', desc: 'MAT-005 | P3000 | MRP Type Change' },
+                'REC-003': { recId: 'REC-003', desc: 'MAT-002 | P1000 | Lot Size Optimization' },
+                'REC-004': { recId: 'REC-004', desc: 'MAT-004 | P2000 | Safety Stock Increase' },
+                'REC-005': { recId: 'REC-005', desc: 'MAT-001 | P1000 | Reorder Point Optimization' }
+            };
+            
+            const data = recData[recId] || recData['REC-001'];
+            document.getElementById('detailRecId').textContent = data.recId;
+            document.getElementById('detailDesc').textContent = data.desc;
+        }
+        
+        function showList() {
+            document.getElementById('listView').classList.remove('hidden');
+            document.getElementById('detailView').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
