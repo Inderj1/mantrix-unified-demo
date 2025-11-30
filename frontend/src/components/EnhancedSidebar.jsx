@@ -70,13 +70,6 @@ const EnhancedSidebar = ({
           secondary: 'Business Process Analytics',
           color: '#FF6B35',
         },
-        {
-          id: 6,
-          icon: <DescriptionIcon />,
-          primary: 'DOCUMENT HUB',
-          secondary: 'Upload & Analyze Documents',
-          color: '#9C27B0',
-        },
       ],
     },
     {
@@ -109,6 +102,13 @@ const EnhancedSidebar = ({
     {
       section: 'Processing Hub',
       items: [
+        {
+          id: 6,
+          icon: <DescriptionIcon />,
+          primary: 'DOCUMENT HUB',
+          secondary: 'Upload & Analyze Documents',
+          color: '#9C27B0',
+        },
         {
           id: 9,
           icon: <VisionIcon />,
@@ -288,7 +288,7 @@ const EnhancedSidebar = ({
                       '&.Mui-selected': {
                         bgcolor: useSapTheme
                           ? 'primary.main'
-                          : `${item.color}20`,
+                          : '#1e3a5f',
                         color: useSapTheme ? 'white' : 'white',
                         '&::before': {
                           opacity: 1,
@@ -296,7 +296,7 @@ const EnhancedSidebar = ({
                         '&:hover': {
                           bgcolor: useSapTheme
                             ? 'primary.dark'
-                            : `${item.color}30`,
+                            : '#264a73',
                         },
                         '& .MuiListItemIcon-root': {
                           color: useSapTheme ? 'white' : item.color,
