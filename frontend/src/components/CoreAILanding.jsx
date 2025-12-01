@@ -19,6 +19,7 @@ import {
   LocalShipping as FleetIcon,
   Engineering as EquipmentIcon,
   Lightbulb as LightbulbIcon,
+  AccountTree as ProcessMiningIcon,
 } from '@mui/icons-material';
 
 const aiModules = [
@@ -70,6 +71,18 @@ const aiModules = [
     status: 'active',
     gradient: 'linear-gradient(135deg, #0854a0 0%, #1d4ed8 100%)',
   },
+  {
+    id: 'process-mining',
+    title: 'PROCESS.AI',
+    subtitle: 'Process Mining & Analytics',
+    description: 'Discover, analyze, and optimize business processes with AI-powered insights',
+    icon: ProcessMiningIcon,
+    color: '#354a5f',
+    bgColor: '#f1f5f9',
+    stats: { label: 'Processes', value: '8' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #354a5f 0%, #1e3a5f 100%)',
+  },
 ];
 
 const CoreAILanding = ({ onTileClick }) => {
@@ -106,7 +119,7 @@ const CoreAILanding = ({ onTileClick }) => {
                 CORE.AI
               </Typography>
               <Chip
-                label="4 Modules"
+                label="5 Modules"
                 size="small"
                 sx={{
                   bgcolor: alpha('#0a6ed1', 0.1),

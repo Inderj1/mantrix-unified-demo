@@ -187,18 +187,15 @@ const ReveqAILanding = ({ onTileClick, onBack }) => {
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                  <img
-                    src="/reveq.png"
-                    alt="REVEQ.AI"
-                    style={{
-                      width: 80,
-                      height: 80,
-                      objectFit: 'contain'
+                  <Avatar
+                    sx={{
+                      width: 48,
+                      height: 48,
+                      bgcolor: '#0854a0',
                     }}
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                    }}
-                  />
+                  >
+                    <EquipmentIcon sx={{ fontSize: 28 }} />
+                  </Avatar>
                   <Box>
                     <Typography variant="h5" fontWeight={700}>
                       REVEQ.AI

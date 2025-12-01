@@ -600,6 +600,8 @@ function App() {
                     } else if (moduleId === 'reveq') {
                       setCoreAIView('reveq');
                       setReveqView('landing');
+                    } else if (moduleId === 'process-mining') {
+                      setCoreAIView('process-mining');
                     }
                   }} />
                 </Box>
@@ -955,6 +957,11 @@ function App() {
                   {reveqView === 'financial-workbench' && (
                     <FinancialWorkbench onBack={() => setReveqView('landing')} />
                   )}
+                </Box>
+              </Fade>
+              <Fade in={coreAIView === 'process-mining'} timeout={300}>
+                <Box sx={{ display: coreAIView === 'process-mining' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
+                  <ProcessMiningPage onBack={() => setCoreAIView('landing')} />
                 </Box>
               </Fade>
             </Box>

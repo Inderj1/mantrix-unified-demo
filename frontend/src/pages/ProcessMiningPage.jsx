@@ -27,6 +27,7 @@ import {
   Analytics as AnalyticsIcon,
   AccountTree as ProcessIcon,
   Download as DownloadIcon,
+  ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import ProcessExplorer from '../components/process/ProcessExplorer';
 import ProcessMetrics from '../components/process/ProcessMetrics';
@@ -39,7 +40,7 @@ import { Tabs, Tab } from '@mui/material';
 
 const STEPS = ['Select Process', 'Configure Analysis', 'View Results'];
 
-const ProcessMiningPage = () => {
+const ProcessMiningPage = ({ onBack }) => {
   // Wizard state
   const [activeStep, setActiveStep] = useState(0);
 
@@ -158,10 +159,19 @@ const ProcessMiningPage = () => {
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Stack direction="row" alignItems="center" spacing={2}>
-          <ProcessIcon sx={{ fontSize: 40, color: 'primary.main' }} />
+          {onBack && (
+            <Button
+              startIcon={<ArrowBackIcon />}
+              onClick={onBack}
+              sx={{ mr: 1 }}
+            >
+              Back to CORE.AI
+            </Button>
+          )}
+          <ProcessIcon sx={{ fontSize: 40, color: '#354a5f' }} />
           <Box>
-            <Typography variant="h4" fontWeight="bold">
-              Process Mining
+            <Typography variant="h4" fontWeight="bold" sx={{ color: '#354a5f' }}>
+              PROCESS.AI
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Discover, analyze, and optimize your business processes from event logs
