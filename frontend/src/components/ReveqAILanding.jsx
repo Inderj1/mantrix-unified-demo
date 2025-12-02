@@ -214,23 +214,29 @@ const ReveqAILanding = ({ onTileClick, onBack }) => {
         </Paper>
 
         {/* Main Content */}
-        <Box sx={{ flexGrow: 1, overflow: 'auto', p: 4 }}>
+        <Box sx={{ flexGrow: 1, overflow: 'auto', p: 2 }}>
           <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
-            <Grid container spacing={4}>
+            <Grid container spacing={2}>
               {categories.map((category, index) => (
-                <Grid item xs={12} md={6} key={category.id}>
+                <Grid item xs={12} md={4} key={category.id}>
                   <Zoom in timeout={400 + index * 100}>
                     <Card
+                      variant="outlined"
                       sx={{
-                        height: 280,
                         cursor: 'pointer',
                         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        border: '1px solid',
-                        borderColor: alpha(category.color, 0.2),
-                        borderRadius: 2,
-                        overflow: 'hidden',
-                        background: `linear-gradient(135deg, ${alpha(category.color, 0.02)} 0%, rgba(255, 255, 255, 1) 100%)`,
+                        background: 'white',
+                        border: `1px solid ${alpha(category.color, 0.15)}`,
                         position: 'relative',
+                        overflow: 'hidden',
+                        '&:hover': {
+                          transform: 'translateY(-4px)',
+                          boxShadow: `0 8px 16px ${alpha(category.color, 0.15)}`,
+                          borderColor: alpha(category.color, 0.3),
+                          '& .action-icon': {
+                            transform: 'translateX(4px)',
+                          },
+                        },
                         '&::before': {
                           content: '""',
                           position: 'absolute',
@@ -240,48 +246,23 @@ const ReveqAILanding = ({ onTileClick, onBack }) => {
                           height: '3px',
                           background: category.gradient,
                         },
-                        '&:hover': {
-                          transform: 'translateY(-6px)',
-                          boxShadow: `0 12px 32px ${alpha(category.color, 0.2)}`,
-                          borderColor: category.color,
-                          '& .category-icon': {
-                            transform: 'scale(1.1)',
-                            bgcolor: category.color,
-                            color: 'white',
-                          },
-                          '& .access-button': {
-                            background: category.gradient,
-                            color: 'white',
-                            transform: 'translateX(4px)',
-                          },
-                        },
                       }}
                       onClick={() => handleCategoryClick(category.id)}
                     >
-                      <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                      <CardContent sx={{ p: 2 }}>
                         {/* Icon and Badge */}
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2.5 }}>
-                          <Avatar
-                            className="category-icon"
-                            sx={{
-                              width: 64,
-                              height: 64,
-                              bgcolor: alpha(category.color, 0.1),
-                              color: category.color,
-                              transition: 'all 0.3s ease',
-                            }}
-                          >
-                            <category.icon sx={{ fontSize: 36 }} />
-                          </Avatar>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
+                          <category.icon sx={{ fontSize: 40, color: category.color }} />
                           <Chip
                             label={`${category.stats.value} ${category.stats.label}`}
                             size="small"
+                            variant="outlined"
                             sx={{
-                              bgcolor: alpha(category.color, 0.1),
+                              borderColor: alpha(category.color, 0.3),
                               color: category.color,
                               fontWeight: 600,
-                              fontSize: '0.75rem',
-                              height: 26,
+                              fontSize: '0.65rem',
+                              height: 20,
                             }}
                           />
                         </Box>
@@ -290,27 +271,13 @@ const ReveqAILanding = ({ onTileClick, onBack }) => {
                         <Typography
                           variant="h6"
                           sx={{
-                            fontWeight: 700,
+                            fontWeight: 600,
                             color: category.color,
-                            mb: 1.5,
-                            fontSize: '1.15rem',
-                            letterSpacing: '-0.3px'
+                            mb: 1,
+                            fontSize: '0.938rem',
                           }}
                         >
                           {category.title}
-                        </Typography>
-
-                        {/* Subtitle */}
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            color: 'text.secondary',
-                            fontWeight: 600,
-                            mb: 1,
-                            fontSize: '0.85rem'
-                          }}
-                        >
-                          {category.subtitle}
                         </Typography>
 
                         {/* Description */}
@@ -319,8 +286,8 @@ const ReveqAILanding = ({ onTileClick, onBack }) => {
                           sx={{
                             color: 'text.secondary',
                             mb: 'auto',
-                            lineHeight: 1.6,
-                            fontSize: '0.9rem'
+                            lineHeight: 1.5,
+                            fontSize: '0.813rem'
                           }}
                         >
                           {category.description}
@@ -332,8 +299,8 @@ const ReveqAILanding = ({ onTileClick, onBack }) => {
                             display: 'flex',
                             justifyContent: 'flex-end',
                             alignItems: 'center',
-                            mt: 2.5,
-                            pt: 2.5,
+                            mt: 1.5,
+                            pt: 1.5,
                             borderTop: '1px solid',
                             borderColor: alpha(category.color, 0.1)
                           }}
@@ -346,16 +313,16 @@ const ReveqAILanding = ({ onTileClick, onBack }) => {
                               gap: 0.5,
                               bgcolor: alpha(category.color, 0.1),
                               color: category.color,
-                              px: 2,
-                              py: 0.75,
-                              borderRadius: 1.5,
+                              px: 1.5,
+                              py: 0.5,
+                              borderRadius: 1,
                               fontWeight: 600,
-                              fontSize: '0.8rem',
+                              fontSize: '0.7rem',
                               transition: 'all 0.3s ease'
                             }}
                           >
                             ENTER
-                            <ArrowForwardIcon sx={{ fontSize: 16 }} />
+                            <ArrowForwardIcon sx={{ fontSize: 14 }} />
                           </Box>
                         </Box>
                       </CardContent>

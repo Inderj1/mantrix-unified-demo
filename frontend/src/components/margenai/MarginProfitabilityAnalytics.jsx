@@ -28,7 +28,6 @@ import {
   Star as StarIcon,
   AttachMoney as MoneyIcon,
   BusinessCenter as BusinessIcon,
-  LocalHospital as HospitalIcon,
   Inventory as ProductIcon,
 } from '@mui/icons-material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
@@ -47,7 +46,7 @@ import {
 } from 'recharts';
 import stoxTheme from '../stox/stoxTheme';
 
-const API_BASE = 'http://localhost:8000/api/v1/margen/csg';
+const API_BASE = `${import.meta.env.VITE_API_URL || ''}/api/v1/margen/csg`;
 
 const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'];
 
@@ -61,7 +60,6 @@ const MarginProfitabilityAnalytics = ({ onBack }) => {
   const [summary, setSummary] = useState(null);
   const [systemMargins, setSystemMargins] = useState([]);
   const [distributorMargins, setDistributorMargins] = useState([]);
-  const [surgeonMargins, setSurgeonMargins] = useState([]);
   const [topPerformers, setTopPerformers] = useState(null);
 
   const fetchData = async () => {
@@ -69,18 +67,16 @@ const MarginProfitabilityAnalytics = ({ onBack }) => {
     setError(null);
     try {
       // Fetch all data in parallel
-      const [summaryRes, systemRes, distRes, surgeonRes, performersRes] = await Promise.all([
+      const [summaryRes, systemRes, distRes, performersRes] = await Promise.all([
         fetch(`${API_BASE}/revenue/summary`).then(r => r.json()),
         fetch(`${API_BASE}/margin/by-system?sort_by=gm_percent`).then(r => r.json()),
         fetch(`${API_BASE}/margin/by-distributor?sort_by=gm_percent`).then(r => r.json()),
-        fetch(`${API_BASE}/margin/by-surgeon?min_procedures=5`).then(r => r.json()),
         fetch(`${API_BASE}/margin/top-performers`).then(r => r.json()),
       ]);
 
       setSummary(summaryRes.summary);
       setSystemMargins(systemRes.systems || []);
       setDistributorMargins(distRes.distributors || []);
-      setSurgeonMargins(surgeonRes.surgeons || []);
       setTopPerformers(performersRes);
     } catch (err) {
       setError(err.message);
@@ -160,11 +156,9 @@ const MarginProfitabilityAnalytics = ({ onBack }) => {
 
   // Unified DataGrid columns - used for all tabs
   const getColumns = (viewType) => {
-    const nameField = viewType === 'system' ? 'system' :
-                      viewType === 'distributor' ? 'distributor' : 'surgeon';
+    const nameField = viewType === 'system' ? 'system' : 'distributor';
 
-    const nameHeader = viewType === 'system' ? 'Product System' :
-                       viewType === 'distributor' ? 'Distributor' : 'Surgeon';
+    const nameHeader = viewType === 'system' ? 'Product System' : 'Distributor';
 
     return [
       {
@@ -235,7 +229,7 @@ const MarginProfitabilityAnalytics = ({ onBack }) => {
       },
       {
         field: 'transaction_count',
-        headerName: viewType === 'surgeon' ? 'Procedures' : 'Transactions',
+        headerName: 'Transactions',
         width: 110,
         type: 'number',
       },
@@ -353,7 +347,7 @@ const MarginProfitabilityAnalytics = ({ onBack }) => {
       {/* Top Performers */}
       {topPerformers && (
         <Grid container spacing={2} sx={{ mb: 3 }}>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={6}>
             <Card sx={{ height: '100%', border: `2px solid ${alpha('#10b981', 0.3)}`, bgcolor: alpha('#10b981', 0.02) }}>
               <CardContent>
                 <Stack direction="row" spacing={2} alignItems="center">
@@ -373,7 +367,7 @@ const MarginProfitabilityAnalytics = ({ onBack }) => {
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={6}>
             <Card sx={{ height: '100%', border: `2px solid ${alpha('#3b82f6', 0.3)}`, bgcolor: alpha('#3b82f6', 0.02) }}>
               <CardContent>
                 <Stack direction="row" spacing={2} alignItems="center">
@@ -393,26 +387,6 @@ const MarginProfitabilityAnalytics = ({ onBack }) => {
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} md={4}>
-            <Card sx={{ height: '100%', border: `2px solid ${alpha('#8b5cf6', 0.3)}`, bgcolor: alpha('#8b5cf6', 0.02) }}>
-              <CardContent>
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <StarIcon sx={{ fontSize: 40, color: '#8b5cf6' }} />
-                  <Box>
-                    <Typography variant="caption" color="text.secondary">
-                      Top Surgeon by GM%
-                    </Typography>
-                    <Typography variant="h6" fontWeight={700} noWrap>
-                      {topPerformers.top_surgeon?.surgeon || 'N/A'}
-                    </Typography>
-                    <Typography variant="body2" color="primary">
-                      {formatPercent(topPerformers.top_surgeon?.gm_percent)} • {formatCurrency(topPerformers.top_surgeon?.total_revenue)}
-                    </Typography>
-                  </Box>
-                </Stack>
-              </CardContent>
-            </Card>
-          </Grid>
         </Grid>
       )}
 
@@ -421,21 +395,17 @@ const MarginProfitabilityAnalytics = ({ onBack }) => {
         <Tabs value={activeTab} onChange={(e, v) => setActiveTab(v)} sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tab label="By Product System" icon={<ProductIcon />} iconPosition="start" />
           <Tab label="By Distributor" icon={<BusinessIcon />} iconPosition="start" />
-          <Tab label="By Surgeon" icon={<HospitalIcon />} iconPosition="start" />
         </Tabs>
 
         {/* Unified DataGrid - structure stays consistent across tabs */}
         <Box sx={{ p: 2, height: 600 }}>
           <DataGrid
             rows={
-              activeTab === 0 ? systemMargins.map((row, idx) => ({ id: idx + 1, rank: idx + 1, ...row })) :
-              activeTab === 1 ? distributorMargins.map((row, idx) => ({ id: idx + 1, rank: idx + 1, ...row })) :
-              surgeonMargins.map((row, idx) => ({ id: idx + 1, rank: idx + 1, ...row }))
+              activeTab === 0
+                ? systemMargins.map((row, idx) => ({ id: idx + 1, rank: idx + 1, ...row }))
+                : distributorMargins.map((row, idx) => ({ id: idx + 1, rank: idx + 1, ...row }))
             }
-            columns={getColumns(
-              activeTab === 0 ? 'system' :
-              activeTab === 1 ? 'distributor' : 'surgeon'
-            )}
+            columns={getColumns(activeTab === 0 ? 'system' : 'distributor')}
             loading={loading}
             density="compact"
             slots={{ toolbar: GridToolbar }}

@@ -22,12 +22,10 @@ import {
   TableChart as TableChartIcon,
   PictureAsPdf as PictureAsPdfIcon,
   Hub as HubIcon,
-  Email as EmailIcon,
 } from '@mui/icons-material';
 import DocumentIntelligence from './DocumentIntelligence';
 import ExcelAIProcessor from './ExcelAIProcessor';
 import PDFParserStudio from './PDFParserStudio';
-import EmailIntelligence from './EmailIntelligence';
 import { apiService } from '../services/api';
 
 const DocumentIntelligenceLanding = ({ onBack }) => {
@@ -63,11 +61,7 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
     return <PDFParserStudio onBack={() => setSelectedView(null)} />;
   }
 
-  if (selectedView === 'email-intel') {
-    return <EmailIntelligence onBack={() => setSelectedView(null)} />;
-  }
-
-  // Landing page with 4 tiles
+  // Landing page with 3 tiles
   return (
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#fafafa' }}>
       {/* Header */}
@@ -422,121 +416,6 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
                           gap: 0.5,
                           bgcolor: alpha('#64748b', 0.1),
                           color: '#64748b',
-                          px: 1.5,
-                          py: 0.5,
-                          borderRadius: 1,
-                          fontWeight: 600,
-                          fontSize: '0.75rem',
-                          transition: 'all 0.3s ease'
-                        }}
-                      >
-                        ENTER
-                        <ArrowForwardIcon sx={{ fontSize: 14 }} />
-                      </Box>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Zoom>
-            </Grid>
-
-            {/* Tile 4: Email Intelligence */}
-            <Grid item xs={12} md={4}>
-              <Zoom in timeout={700}>
-                <Card
-                  variant="outlined"
-                  sx={{
-                    cursor: 'pointer',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    background: 'white',
-                    border: `1px solid ${alpha('#0a6ed1', 0.15)}`,
-                    position: 'relative',
-                    overflow: 'hidden',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: `0 8px 16px ${alpha('#0a6ed1', 0.15)}`,
-                      borderColor: alpha('#0a6ed1', 0.3),
-                      '& .action-icon': {
-                        transform: 'translateX(4px)',
-                      },
-                    },
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      height: '3px',
-                      background: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
-                    },
-                  }}
-                  onClick={() => setSelectedView('email-intel')}
-                >
-                  <CardContent sx={{ p: 2 }}>
-                    {/* Icon and Badge */}
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                      <EmailIcon sx={{ fontSize: 40, color: '#0a6ed1' }} />
-                      <Chip
-                        label="AI Powered"
-                        size="small"
-                        variant="outlined"
-                        sx={{
-                          borderColor: alpha('#0a6ed1', 0.3),
-                          color: '#0a6ed1',
-                          fontWeight: 600,
-                          fontSize: '0.65rem',
-                          height: 20,
-                        }}
-                      />
-                    </Box>
-
-                    {/* Title */}
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 700,
-                        color: '#0a6ed1',
-                        mb: 1,
-                        fontSize: '0.938rem',
-                        letterSpacing: '-0.3px'
-                      }}
-                    >
-                      Email Intelligence
-                    </Typography>
-
-                    {/* Description */}
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'text.secondary',
-                        mb: 'auto',
-                        lineHeight: 1.6,
-                        fontSize: '0.813rem'
-                      }}
-                    >
-                      AI-powered email and communication analysis. Extract insights, detect patterns,
-                      and automate email processing with intelligent classification.
-                    </Typography>
-
-                    {/* Footer */}
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                        alignItems: 'center',
-                        mt: 1.5,
-                        pt: 1.5,
-                        borderTop: '1px solid',
-                        borderColor: alpha('#0a6ed1', 0.1)
-                      }}
-                    >
-                      <Box
-                        className="access-button"
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.5,
-                          bgcolor: alpha('#0a6ed1', 0.1),
-                          color: '#0a6ed1',
                           px: 1.5,
                           py: 0.5,
                           borderRadius: 1,

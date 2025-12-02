@@ -25,7 +25,6 @@ import {
   FileDownload as DownloadIcon,
   NavigateNext as NavigateNextIcon,
   ArrowBack as ArrowBackIcon,
-  LocalHospital as HospitalIcon,
   Business as BusinessIcon,
   LocationOn as LocationIcon,
   Inventory as ProductIcon,
@@ -45,7 +44,7 @@ import {
 } from 'recharts';
 import stoxTheme from '../stox/stoxTheme';
 
-const API_BASE = 'http://localhost:8000/api/v1/margen/csg';
+const API_BASE = `${import.meta.env.VITE_API_URL || ''}/api/v1/margen/csg`;
 
 const RevenueGrowthAnalytics = ({ onBack }) => {
   const theme = useTheme();
@@ -57,7 +56,6 @@ const RevenueGrowthAnalytics = ({ onBack }) => {
   const [summary, setSummary] = useState(null);
   const [systemData, setSystemData] = useState([]);
   const [distributorData, setDistributorData] = useState([]);
-  const [surgeonData, setSurgeonData] = useState([]);
   const [regionData, setRegionData] = useState([]);
   const [monthlyTrends, setMonthlyTrends] = useState([]);
 
@@ -66,11 +64,10 @@ const RevenueGrowthAnalytics = ({ onBack }) => {
     setError(null);
     try {
       // Fetch all data in parallel
-      const [summaryRes, systemRes, distRes, surgeonRes, regionRes, trendsRes] = await Promise.all([
+      const [summaryRes, systemRes, distRes, regionRes, trendsRes] = await Promise.all([
         fetch(`${API_BASE}/revenue/summary`).then(r => r.json()),
         fetch(`${API_BASE}/revenue/by-system`).then(r => r.json()),
         fetch(`${API_BASE}/revenue/by-distributor`).then(r => r.json()),
-        fetch(`${API_BASE}/revenue/by-surgeon`).then(r => r.json()),
         fetch(`${API_BASE}/revenue/by-region`).then(r => r.json()),
         fetch(`${API_BASE}/revenue/trends/monthly`).then(r => r.json()),
       ]);
@@ -78,7 +75,6 @@ const RevenueGrowthAnalytics = ({ onBack }) => {
       setSummary(summaryRes.summary);
       setSystemData(systemRes.systems || []);
       setDistributorData(distRes.distributors || []);
-      setSurgeonData(surgeonRes.surgeons || []);
       setRegionData(regionRes.regions || []);
       setMonthlyTrends(trendsRes.trends || []);
     } catch (err) {
@@ -146,12 +142,10 @@ const RevenueGrowthAnalytics = ({ onBack }) => {
   // Unified DataGrid columns - used for all tabs
   const getColumns = (viewType) => {
     const nameField = viewType === 'system' ? 'system' :
-                      viewType === 'distributor' ? 'distributor' :
-                      viewType === 'surgeon' ? 'surgeon' : 'region';
+                      viewType === 'distributor' ? 'distributor' : 'region';
 
     const nameHeader = viewType === 'system' ? 'Product System' :
-                       viewType === 'distributor' ? 'Distributor' :
-                       viewType === 'surgeon' ? 'Surgeon' : 'Region';
+                       viewType === 'distributor' ? 'Distributor' : 'Region';
 
     return [
       {
@@ -202,7 +196,7 @@ const RevenueGrowthAnalytics = ({ onBack }) => {
       },
       {
         field: 'transaction_count',
-        headerName: viewType === 'surgeon' ? 'Procedures' : 'Transactions',
+        headerName: 'Transactions',
         width: 120,
         type: 'number',
       },
@@ -276,7 +270,7 @@ const RevenueGrowthAnalytics = ({ onBack }) => {
           Revenue & Growth Analytics
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          Top-line revenue performance, growth trends, and sales analysis by product, surgeon, channel, and region
+          Top-line revenue performance, growth trends, and sales analysis by product, channel, and region
         </Typography>
       </Box>
 
@@ -328,7 +322,6 @@ const RevenueGrowthAnalytics = ({ onBack }) => {
         <Tabs value={activeTab} onChange={(e, v) => setActiveTab(v)} sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tab label="By Product System" icon={<ProductIcon />} iconPosition="start" />
           <Tab label="By Distributor" icon={<BusinessIcon />} iconPosition="start" />
-          <Tab label="By Surgeon" icon={<HospitalIcon />} iconPosition="start" />
           <Tab label="By Region" icon={<LocationIcon />} iconPosition="start" />
         </Tabs>
 
@@ -338,13 +331,11 @@ const RevenueGrowthAnalytics = ({ onBack }) => {
             rows={
               activeTab === 0 ? systemData.map((row, idx) => ({ id: idx + 1, ...row })) :
               activeTab === 1 ? distributorData.map((row, idx) => ({ id: idx + 1, ...row })) :
-              activeTab === 2 ? surgeonData.map((row, idx) => ({ id: idx + 1, ...row })) :
               regionData.map((row, idx) => ({ id: idx + 1, ...row }))
             }
             columns={getColumns(
               activeTab === 0 ? 'system' :
-              activeTab === 1 ? 'distributor' :
-              activeTab === 2 ? 'surgeon' : 'region'
+              activeTab === 1 ? 'distributor' : 'region'
             )}
             loading={loading}
             density="compact"

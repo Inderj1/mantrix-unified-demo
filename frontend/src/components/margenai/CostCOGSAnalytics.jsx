@@ -34,7 +34,7 @@ import {
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import stoxTheme from '../stox/stoxTheme';
 
-const API_BASE = 'http://localhost:8000/api/v1/margen/csg';
+const API_BASE = `${import.meta.env.VITE_API_URL || ''}/api/v1/margen/csg`;
 
 const CostCOGSAnalytics = ({ onBack }) => {
   const theme = useTheme();

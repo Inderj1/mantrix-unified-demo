@@ -41,6 +41,7 @@ import {
   AccountCircle as PersonaIcon,
   Settings as SettingsIcon,
   RocketLaunch as ExecutionIcon,
+  Email as EmailIcon,
 } from '@mui/icons-material';
 
 const EnhancedSidebar = ({
@@ -100,6 +101,13 @@ const EnhancedSidebar = ({
           primary: 'DOCUMENT HUB',
           secondary: 'Upload & Analyze Documents',
           color: '#9C27B0',
+        },
+        {
+          id: 13,
+          icon: <EmailIcon />,
+          primary: 'EMAIL INTEL',
+          secondary: 'Email & Communication Analysis',
+          color: '#E91E63',
         },
         {
           id: 9,
