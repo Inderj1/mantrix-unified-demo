@@ -9,8 +9,8 @@ import { mockRoutes } from './mockData';
 const createClusterIcon = (cluster, type) => {
   const count = cluster.getChildCount();
   const colors = {
-    trucks: { bg: '#3b82f6', border: '#2563eb' },
-    stores: { bg: '#8b5cf6', border: '#7c3aed' },
+    trucks: { bg: '#2b88d8', border: '#0078d4' },
+    stores: { bg: '#0078d4', border: '#005a9e' },
     alerts: { bg: '#f97316', border: '#ea580c' },
   };
   const { bg, border } = colors[type] || colors.trucks;
@@ -52,13 +52,13 @@ const MAP_STYLES = {
 // Custom marker icons
 const createTruckIcon = (status) => {
   const colors = {
-    'in-transit': '#3b82f6',
+    'in-transit': '#2b88d8',
     'delayed': '#f97316',
     'idle': '#ef4444',
     'maintenance': '#ef4444',
     'delivered': '#10b981',
   };
-  const color = colors[status] || '#3b82f6';
+  const color = colors[status] || '#2b88d8';
   const shouldPulse = status === 'delayed' || status === 'idle' || status === 'maintenance';
 
   return L.divIcon({
@@ -88,7 +88,7 @@ const createTruckIcon = (status) => {
 };
 
 const createStoreIcon = (stockLevel, facilityType) => {
-  const color = stockLevel < 30 ? '#ef4444' : stockLevel < 50 ? '#f97316' : '#3b82f6';
+  const color = stockLevel < 30 ? '#ef4444' : stockLevel < 50 ? '#f97316' : '#2b88d8';
   const shouldPulse = stockLevel < 50;
   const warningColor = stockLevel < 30 ? '#dc2626' : '#fbbf24';
   const hasWarning = stockLevel < 50;
@@ -339,7 +339,7 @@ export default function MapView({
                 <div style={{ padding: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                     <h3 style={{ fontSize: '0.875rem', fontWeight: 700, margin: 0, color: '#1e293b' }}>{store.name}</h3>
-                    <div style={{ width: '24px', height: '24px', background: '#8b5cf6', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: '24px', height: '24px', background: '#0078d4', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
                         {store.facility_type === 'distribution-center'
                           ? <path d="M18,15H16V17H18M18,11H16V13H18M20,19H12V17H14V15H12V13H14V11H12V9H20M10,7H8V5H10M10,11H8V9H10M10,15H8V13H10M10,19H8V17H10M6,7H4V5H6M6,11H4V9H6M6,15H4V13H6M6,19H4V17H6M12,7V3H2V21H22V7H12Z"/>
@@ -369,7 +369,7 @@ export default function MapView({
                   )}
                   <button
                     onClick={(e) => { e.stopPropagation(); onStoreClick?.(store); }}
-                    style={{ width: '100%', padding: '6px', background: '#2563eb', color: 'white', border: 'none', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                    style={{ width: '100%', padding: '6px', background: '#0078d4', color: 'white', border: 'none', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
                   >
                     View Details
                   </button>
@@ -386,7 +386,7 @@ export default function MapView({
         if (route.length === 0) return null;
 
         const routeColor = truck.status === 'delayed' ? '#f97316' :
-                          truck.status === 'in-transit' ? '#3b82f6' : '#64748b';
+                          truck.status === 'in-transit' ? '#2b88d8' : '#64748b';
 
         return (
           <Polyline
@@ -417,7 +417,7 @@ export default function MapView({
                 <div style={{ padding: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                     <h3 style={{ fontSize: '0.875rem', fontWeight: 700, margin: 0, color: '#1e293b' }}>{truck.truck_id}</h3>
-                    <div style={{ width: '24px', height: '24px', background: truck.status === 'delayed' ? '#f97316' : '#3b82f6', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: '24px', height: '24px', background: truck.status === 'delayed' ? '#f97316' : '#2b88d8', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
                         <path d="M18,18.5a1.5,1.5 0 0,1 -1.5,-1.5a1.5,1.5 0 0,1 1.5,-1.5a1.5,1.5 0 0,1 1.5,1.5a1.5,1.5 0 0,1 -1.5,1.5m1.5,-9l1.96,2.5H17V9.5M6,18.5a1.5,1.5 0 0,1 -1.5,-1.5a1.5,1.5 0 0,1 1.5,-1.5a1.5,1.5 0 0,1 1.5,1.5a1.5,1.5 0 0,1 -1.5,1.5M20,8h-3V4H3a1,1 0 0,0 -1,1v11h2a3,3 0 0,0 3,3a3,3 0 0,0 3,-3h6a3,3 0 0,0 3,3a3,3 0 0,0 3,-3h2v-5z"/>
                       </svg>
@@ -428,8 +428,8 @@ export default function MapView({
                       <span style={{ color: '#64748b' }}>Status:</span>
                       <span style={{
                         padding: '2px 8px', borderRadius: '4px', fontSize: '0.625rem', fontWeight: 700,
-                        background: truck.status === 'delayed' ? '#ffedd5' : truck.status === 'in-transit' ? '#dbeafe' : truck.status === 'delivered' ? '#dcfce7' : '#f1f5f9',
-                        color: truck.status === 'delayed' ? '#c2410c' : truck.status === 'in-transit' ? '#1d4ed8' : truck.status === 'delivered' ? '#15803d' : '#475569',
+                        background: truck.status === 'delayed' ? '#ffedd5' : truck.status === 'in-transit' ? '#deecf9' : truck.status === 'delivered' ? '#dcfce7' : '#f1f5f9',
+                        color: truck.status === 'delayed' ? '#c2410c' : truck.status === 'in-transit' ? '#106ebe' : truck.status === 'delivered' ? '#15803d' : '#0078d4',
                       }}>
                         {truck.status.toUpperCase()}
                       </span>
@@ -452,7 +452,7 @@ export default function MapView({
                   )}
                   <button
                     onClick={(e) => { e.stopPropagation(); onTruckClick?.(truck); }}
-                    style={{ width: '100%', padding: '6px', background: '#2563eb', color: 'white', border: 'none', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                    style={{ width: '100%', padding: '6px', background: '#0078d4', color: 'white', border: 'none', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
                   >
                     View Details
                   </button>
@@ -491,13 +491,13 @@ export default function MapView({
                         <span style={{
                           padding: '2px 8px', borderRadius: '4px', fontSize: '0.625rem', fontWeight: 700, textTransform: 'uppercase',
                           background: severity === 'critical' ? '#fef2f2' : severity === 'high' ? '#fff7ed' : severity === 'medium' ? '#fefce8' : '#eff6ff',
-                          color: severity === 'critical' ? '#b91c1c' : severity === 'high' ? '#c2410c' : severity === 'medium' ? '#a16207' : '#1d4ed8',
+                          color: severity === 'critical' ? '#b91c1c' : severity === 'high' ? '#c2410c' : severity === 'medium' ? '#a16207' : '#106ebe',
                         }}>
                           {severity}
                         </span>
                       </div>
                     </div>
-                    <p style={{ fontSize: '0.75rem', color: '#475569', margin: '0 0 12px 0', lineHeight: 1.4 }}>{alert.message}</p>
+                    <p style={{ fontSize: '0.75rem', color: '#0078d4', margin: '0 0 12px 0', lineHeight: 1.4 }}>{alert.message}</p>
                     <button
                       onClick={(e) => { e.stopPropagation(); onAlertClick?.(alert); }}
                       style={{ width: '100%', padding: '6px', background: '#ea580c', color: 'white', border: 'none', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}

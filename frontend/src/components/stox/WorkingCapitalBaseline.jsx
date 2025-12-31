@@ -74,7 +74,7 @@ const WorkingCapitalBaseline = ({ onBack }) => {
   const getHealthColor = (status) => {
     switch (status) {
       case 'Excellent': return '#10b981';
-      case 'Good': return '#3b82f6';
+      case 'Good': return '#2b88d8';
       case 'At Risk': return '#f59e0b';
       case 'Critical': return '#ef4444';
       default: return '#64748b';
@@ -101,8 +101,8 @@ const WorkingCapitalBaseline = ({ onBack }) => {
           size="small"
           sx={{
             fontWeight: 700,
-            bgcolor: alpha('#0854a0', 0.12),
-            color: '#0854a0',
+            bgcolor: alpha('#106ebe', 0.12),
+            color: '#106ebe',
           }}
         />
       ),
@@ -172,8 +172,8 @@ const WorkingCapitalBaseline = ({ onBack }) => {
           size="small"
           sx={{
             fontWeight: 700,
-            bgcolor: params.value >= 4 ? alpha('#10b981', 0.12) : params.value >= 2 ? alpha('#3b82f6', 0.12) : alpha('#f59e0b', 0.12),
-            color: params.value >= 4 ? '#059669' : params.value >= 2 ? '#1d4ed8' : '#d97706',
+            bgcolor: params.value >= 4 ? alpha('#10b981', 0.12) : params.value >= 2 ? alpha('#2b88d8', 0.12) : alpha('#f59e0b', 0.12),
+            color: params.value >= 4 ? '#059669' : params.value >= 2 ? '#0078d4' : '#d97706',
           }}
         />
       ),
@@ -238,8 +238,8 @@ const WorkingCapitalBaseline = ({ onBack }) => {
   const WCDecompositionBar = ({ row }) => {
     const total = row.total_wc_value;
     const segments = [
-      { label: 'Cycle', value: row.cycle_stock_value, pct: row.cycle_pct, color: '#3b82f6' },
-      { label: 'Safety', value: row.safety_stock_value, pct: row.safety_pct, color: '#8b5cf6' },
+      { label: 'Cycle', value: row.cycle_stock_value, pct: row.cycle_pct, color: '#2b88d8' },
+      { label: 'Safety', value: row.safety_stock_value, pct: row.safety_pct, color: '#0078d4' },
       { label: 'Pipeline', value: row.pipeline_stock_value, pct: row.pipeline_pct, color: '#06b6d4' },
       { label: 'Excess', value: row.excess_stock_value, pct: row.excess_pct, color: '#ef4444' },
     ];
@@ -280,6 +280,7 @@ const WorkingCapitalBaseline = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 2: Diagnostics</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>Working Capital Baseline</Typography>
@@ -289,9 +290,9 @@ const WorkingCapitalBaseline = ({ onBack }) => {
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-              <AccountBalance sx={{ fontSize: 32, color: '#0854a0' }} />
+              <AccountBalance sx={{ fontSize: 32, color: '#106ebe' }} />
               <Typography variant="h4" fontWeight={700}>Working Capital Baseline</Typography>
-              <Chip label="Tile 2.5" size="small" sx={{ bgcolor: alpha('#0854a0', 0.1), color: '#0854a0', fontWeight: 600 }} />
+              <Chip label="Tile 2.5" size="small" sx={{ bgcolor: alpha('#106ebe', 0.1), color: '#106ebe', fontWeight: 600 }} />
             </Stack>
             <Typography variant="body2" color="text.secondary">
               Establish today's cash position by SKU × Plant with inventory decomposition (Cycle, Safety, Pipeline, Excess)
@@ -308,15 +309,15 @@ const WorkingCapitalBaseline = ({ onBack }) => {
       {metrics && (
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#0854a0', 0.1)} 0%, ${alpha('#0854a0', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#106ebe', 0.1)} 0%, ${alpha('#106ebe', 0.05)} 100%)` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <AttachMoney sx={{ color: '#0854a0' }} />
+                  <AttachMoney sx={{ color: '#106ebe' }} />
                   <Typography variant="body2" color="text.secondary">Total WC Tied Up</Typography>
                 </Stack>
-                <Typography variant="h5" fontWeight={700} color="#0854a0">${(metrics.totalWC / 1000000).toFixed(2)}M</Typography>
+                <Typography variant="h5" fontWeight={700} color="#106ebe">${(metrics.totalWC / 1000000).toFixed(2)}M</Typography>
                 <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                  <Chip label={`${metrics.skuCount} SKUs`} size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha('#0854a0', 0.08), color: '#0854a0' }} />
+                  <Chip label={`${metrics.skuCount} SKUs`} size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha('#106ebe', 0.08), color: '#106ebe' }} />
                 </Stack>
               </CardContent>
             </Card>
@@ -336,13 +337,13 @@ const WorkingCapitalBaseline = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#8b5cf6', 0.1)} 0%, ${alpha('#8b5cf6', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#0078d4', 0.1)} 0%, ${alpha('#0078d4', 0.05)} 100%)` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <Speed sx={{ color: '#8b5cf6' }} />
+                  <Speed sx={{ color: '#0078d4' }} />
                   <Typography variant="body2" color="text.secondary">Avg WCP (Productivity)</Typography>
                 </Stack>
-                <Typography variant="h5" fontWeight={700} color="#8b5cf6">{metrics.avgWCP}x</Typography>
+                <Typography variant="h5" fontWeight={700} color="#0078d4">{metrics.avgWCP}x</Typography>
                 <Typography variant="caption" color="text.secondary">
                   Gross Margin $ / Avg WC
                 </Typography>
@@ -383,10 +384,10 @@ const WorkingCapitalBaseline = ({ onBack }) => {
           </Stack>
           <Box sx={{ display: 'flex', height: 32, borderRadius: 1, overflow: 'hidden', mb: 2 }}>
             <Tooltip title={`Cycle Stock: $${(metrics.totalCycleStock / 1000).toFixed(0)}K (${Math.round(metrics.totalCycleStock / metrics.totalWC * 100)}%)`}>
-              <Box sx={{ width: `${(metrics.totalCycleStock / metrics.totalWC * 100)}%`, bgcolor: '#3b82f6', '&:hover': { opacity: 0.8 } }} />
+              <Box sx={{ width: `${(metrics.totalCycleStock / metrics.totalWC * 100)}%`, bgcolor: '#2b88d8', '&:hover': { opacity: 0.8 } }} />
             </Tooltip>
             <Tooltip title={`Safety Stock: $${(metrics.totalSafetyStock / 1000).toFixed(0)}K (${Math.round(metrics.totalSafetyStock / metrics.totalWC * 100)}%)`}>
-              <Box sx={{ width: `${(metrics.totalSafetyStock / metrics.totalWC * 100)}%`, bgcolor: '#8b5cf6', '&:hover': { opacity: 0.8 } }} />
+              <Box sx={{ width: `${(metrics.totalSafetyStock / metrics.totalWC * 100)}%`, bgcolor: '#0078d4', '&:hover': { opacity: 0.8 } }} />
             </Tooltip>
             <Tooltip title={`Pipeline Stock: $${(metrics.totalPipelineStock / 1000).toFixed(0)}K (${Math.round(metrics.totalPipelineStock / metrics.totalWC * 100)}%)`}>
               <Box sx={{ width: `${(metrics.totalPipelineStock / metrics.totalWC * 100)}%`, bgcolor: '#06b6d4', '&:hover': { opacity: 0.8 } }} />
@@ -397,11 +398,11 @@ const WorkingCapitalBaseline = ({ onBack }) => {
           </Box>
           <Stack direction="row" spacing={4} justifyContent="center">
             <Stack direction="row" spacing={1} alignItems="center">
-              <Box sx={{ width: 14, height: 14, borderRadius: '50%', bgcolor: '#3b82f6' }} />
+              <Box sx={{ width: 14, height: 14, borderRadius: '50%', bgcolor: '#2b88d8' }} />
               <Typography variant="body2">Cycle Stock: <strong>${(metrics.totalCycleStock / 1000).toFixed(0)}K</strong></Typography>
             </Stack>
             <Stack direction="row" spacing={1} alignItems="center">
-              <Box sx={{ width: 14, height: 14, borderRadius: '50%', bgcolor: '#8b5cf6' }} />
+              <Box sx={{ width: 14, height: 14, borderRadius: '50%', bgcolor: '#0078d4' }} />
               <Typography variant="body2">Safety Stock: <strong>${(metrics.totalSafetyStock / 1000).toFixed(0)}K</strong></Typography>
             </Stack>
             <Stack direction="row" spacing={1} alignItems="center">
@@ -462,7 +463,7 @@ const WorkingCapitalBaseline = ({ onBack }) => {
         <DialogTitle>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Stack direction="row" spacing={2} alignItems="center">
-              <AccountBalance sx={{ color: '#0854a0' }} />
+              <AccountBalance sx={{ color: '#106ebe' }} />
               <Box>
                 <Typography variant="h6" fontWeight={700}>{selectedRow?.sku_name}</Typography>
                 <Typography variant="body2" color="text.secondary">{selectedRow?.sku_id} • {selectedRow?.plant_name}</Typography>
@@ -482,7 +483,7 @@ const WorkingCapitalBaseline = ({ onBack }) => {
 
               {/* Key Metrics */}
               <Grid item xs={12} md={6}>
-                <Paper sx={{ p: 2, bgcolor: alpha('#0854a0', 0.05) }}>
+                <Paper sx={{ p: 2, bgcolor: alpha('#106ebe', 0.05) }}>
                   <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2 }}>Current State</Typography>
                   <Stack spacing={1.5}>
                     <Stack direction="row" justifyContent="space-between">

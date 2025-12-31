@@ -331,7 +331,7 @@ const RecommendationsHub = ({ onBack }) => {
           color = '#10b981';
         } else if (risk < 0.5) {
           label = `Low (+${risk}%)`;
-          color = '#3b82f6';
+          color = '#2b88d8';
         } else if (risk < 1) {
           label = `Med (+${risk}%)`;
           color = '#f59e0b';
@@ -370,8 +370,8 @@ const RecommendationsHub = ({ onBack }) => {
           sx={{
             fontWeight: 700,
             fontSize: '0.7rem',
-            bgcolor: params.value > 50000 ? alpha('#10b981', 0.12) : params.value > 20000 ? alpha('#3b82f6', 0.12) : alpha('#64748b', 0.12),
-            color: params.value > 50000 ? '#059669' : params.value > 20000 ? '#1d4ed8' : '#64748b',
+            bgcolor: params.value > 50000 ? alpha('#10b981', 0.12) : params.value > 20000 ? alpha('#2b88d8', 0.12) : alpha('#64748b', 0.12),
+            color: params.value > 50000 ? '#059669' : params.value > 20000 ? '#0078d4' : '#64748b',
           }}
         />
       ),
@@ -392,9 +392,9 @@ const RecommendationsHub = ({ onBack }) => {
           sx={{
             fontWeight: 600,
             fontSize: '0.65rem',
-            bgcolor: params.value === 'Month 1' ? alpha('#10b981', 0.12) : params.value === 'Month 2' ? alpha('#3b82f6', 0.12) : alpha('#f59e0b', 0.12),
-            color: params.value === 'Month 1' ? '#059669' : params.value === 'Month 2' ? '#1d4ed8' : '#d97706',
-            '& .MuiChip-icon': { color: params.value === 'Month 1' ? '#059669' : params.value === 'Month 2' ? '#1d4ed8' : '#d97706' },
+            bgcolor: params.value === 'Month 1' ? alpha('#10b981', 0.12) : params.value === 'Month 2' ? alpha('#2b88d8', 0.12) : alpha('#f59e0b', 0.12),
+            color: params.value === 'Month 1' ? '#059669' : params.value === 'Month 2' ? '#0078d4' : '#d97706',
+            '& .MuiChip-icon': { color: params.value === 'Month 1' ? '#059669' : params.value === 'Month 2' ? '#0078d4' : '#d97706' },
           }}
         />
       ),
@@ -439,7 +439,7 @@ const RecommendationsHub = ({ onBack }) => {
       labels: ['Inventory', 'Supply', 'Cost', 'MRP', 'Analytics', 'Service'],
       datasets: [{
         data: [30, 25, 15, 15, 10, 5],
-        backgroundColor: ['#0891b2', '#f59e0b', '#10b981', '#8b5cf6', '#06b6d4', '#ec4899'],
+        backgroundColor: ['#0891b2', '#f59e0b', '#10b981', '#0078d4', '#06b6d4', '#ec4899'],
       }],
     };
 
@@ -453,7 +453,7 @@ const RecommendationsHub = ({ onBack }) => {
           selectedRec.impactScore * 0.2,
           selectedRec.impactScore * 0.15,
         ],
-        backgroundColor: ['#10b981', '#0891b2', '#8b5cf6', '#f59e0b'],
+        backgroundColor: ['#10b981', '#0891b2', '#0078d4', '#f59e0b'],
       }],
     };
 
@@ -497,10 +497,10 @@ const RecommendationsHub = ({ onBack }) => {
         <Grid container spacing={2}>
           {/* Working Capital Impact Cards */}
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: '4px solid #0854a0' }}>
+            <Card sx={{ borderLeft: '4px solid #106ebe' }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.5 }}>
-                  <AccountBalance sx={{ fontSize: 16, color: '#0854a0' }} />
+                  <AccountBalance sx={{ fontSize: 16, color: '#106ebe' }} />
                   <Typography variant="caption" color="text.secondary">Δ Working Capital</Typography>
                 </Stack>
                 <Typography variant="h5" fontWeight={700} color={selectedRec.deltaWC > 0 ? '#10b981' : selectedRec.deltaWC < 0 ? '#ef4444' : '#64748b'}>
@@ -525,13 +525,13 @@ const RecommendationsHub = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: '4px solid #8b5cf6' }}>
+            <Card sx={{ borderLeft: '4px solid #0078d4' }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.5 }}>
-                  <TrendingUp sx={{ fontSize: 16, color: '#8b5cf6' }} />
+                  <TrendingUp sx={{ fontSize: 16, color: '#0078d4' }} />
                   <Typography variant="caption" color="text.secondary">Risk-Adjusted Savings</Typography>
                 </Stack>
-                <Typography variant="h5" fontWeight={700} color="#8b5cf6">{formatCurrency(selectedRec.riskAdjustedSavings)}</Typography>
+                <Typography variant="h5" fontWeight={700} color="#0078d4">{formatCurrency(selectedRec.riskAdjustedSavings)}</Typography>
                 <Typography variant="caption" color="text.secondary">Confidence {selectedRec.confidence}%</Typography>
               </CardContent>
             </Card>
@@ -694,13 +694,13 @@ const RecommendationsHub = ({ onBack }) => {
           {metrics && (
             <Grid container spacing={2} sx={{ mb: 3 }}>
               <Grid item xs={12} sm={6} md={3}>
-                <Card sx={{ borderLeft: '4px solid #0854a0' }}>
+                <Card sx={{ borderLeft: '4px solid #106ebe' }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Stack direction="row" alignItems="center" spacing={1}>
-                      <AccountBalance sx={{ fontSize: 18, color: '#0854a0' }} />
+                      <AccountBalance sx={{ fontSize: 18, color: '#106ebe' }} />
                       <Typography variant="caption" color="text.secondary">Total WC Freed</Typography>
                     </Stack>
-                    <Typography variant="h5" fontWeight={700} color="#0854a0">{formatCurrency(metrics.totalWCFreed)}</Typography>
+                    <Typography variant="h5" fontWeight={700} color="#106ebe">{formatCurrency(metrics.totalWCFreed)}</Typography>
                     <Typography variant="caption" color="text.secondary">{metrics.totalRecs} recommendations</Typography>
                   </CardContent>
                 </Card>
@@ -718,13 +718,13 @@ const RecommendationsHub = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-                <Card sx={{ borderLeft: '4px solid #8b5cf6' }}>
+                <Card sx={{ borderLeft: '4px solid #0078d4' }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Stack direction="row" alignItems="center" spacing={1}>
-                      <TrendingUp sx={{ fontSize: 18, color: '#8b5cf6' }} />
+                      <TrendingUp sx={{ fontSize: 18, color: '#0078d4' }} />
                       <Typography variant="caption" color="text.secondary">Risk-Adjusted Savings</Typography>
                     </Stack>
-                    <Typography variant="h5" fontWeight={700} color="#8b5cf6">{formatCurrency(metrics.totalRiskAdjustedSavings)}</Typography>
+                    <Typography variant="h5" fontWeight={700} color="#0078d4">{formatCurrency(metrics.totalRiskAdjustedSavings)}</Typography>
                     <Typography variant="caption" color="text.secondary">WC × Confidence × (1-Risk)</Typography>
                   </CardContent>
                 </Card>

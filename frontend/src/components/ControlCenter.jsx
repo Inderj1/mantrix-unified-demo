@@ -43,7 +43,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
       component: <DataSourcesConnections />,
       status: 'healthy',
       badge: '9 Active',
-      color: '#0a6ed1',
+      color: '#0078d4',
     },
     {
       label: 'System Health',
@@ -52,7 +52,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
       component: <SystemHealthMonitoring />,
       status: 'healthy',
       badge: '99.9%',
-      color: '#0854a0',
+      color: '#106ebe',
     },
     {
       label: 'Settings',
@@ -105,8 +105,8 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
   // Summary stats
   const summaryStats = [
     { label: 'Services Online', value: '12', icon: <CloudIcon />, color: '#10b981' },
-    { label: 'API Latency', value: '45ms', icon: <SpeedIcon />, color: '#0a6ed1' },
-    { label: 'Uptime', value: '99.9%', icon: <MonitorIcon />, color: '#0854a0' },
+    { label: 'API Latency', value: '45ms', icon: <SpeedIcon />, color: '#0078d4' },
+    { label: 'Uptime', value: '99.9%', icon: <MonitorIcon />, color: '#106ebe' },
     { label: 'Security', value: 'Secure', icon: <SecurityIcon />, color: '#354a5f' },
   ];
 
@@ -121,7 +121,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
                 width: 56,
                 height: 56,
                 borderRadius: 2,
-                background: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
+                background: 'linear-gradient(135deg, #0078d4 0%, #106ebe 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -168,9 +168,9 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
               onClick={onRefreshStatus}
               size="small"
               sx={{
-                bgcolor: alpha('#0a6ed1', 0.1),
-                color: '#0a6ed1',
-                '&:hover': { bgcolor: alpha('#0a6ed1', 0.2) },
+                bgcolor: alpha('#0078d4', 0.1),
+                color: '#0078d4',
+                '&:hover': { bgcolor: alpha('#0078d4', 0.2) },
               }}
             >
               <RefreshIcon fontSize="small" />
@@ -189,7 +189,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
                 p: 2,
                 borderRadius: 2,
                 border: '1px solid',
-                borderColor: alpha('#0a6ed1', 0.1),
+                borderColor: alpha('#0078d4', 0.1),
                 background: '#fff',
                 position: 'relative',
                 overflow: 'hidden',
@@ -245,7 +245,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
                 borderRadius: 2,
                 cursor: tab.disabled ? 'not-allowed' : 'pointer',
                 border: '2px solid',
-                borderColor: activeTab === index ? '#0a6ed1' : alpha('#0a6ed1', 0.1),
+                borderColor: activeTab === index ? '#0078d4' : alpha('#0078d4', 0.1),
                 background: activeTab === index
                   ? 'linear-gradient(135deg, rgba(10, 110, 209, 0.08) 0%, rgba(8, 84, 160, 0.04) 100%)'
                   : '#fff',
@@ -254,7 +254,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
                 position: 'relative',
                 overflow: 'hidden',
                 '&:hover': !tab.disabled && {
-                  borderColor: '#0a6ed1',
+                  borderColor: '#0078d4',
                   transform: 'translateY(-2px)',
                   boxShadow: '0 4px 12px rgba(10, 110, 209, 0.15)',
                 },
@@ -345,7 +345,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
           p: 3,
           borderRadius: 2,
           border: '1px solid',
-          borderColor: alpha('#0a6ed1', 0.1),
+          borderColor: alpha('#0078d4', 0.1),
           background: '#fff',
           minHeight: 400,
         }}

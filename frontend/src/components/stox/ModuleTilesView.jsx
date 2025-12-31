@@ -113,8 +113,8 @@ const moduleDefinitions = {
   'outbound-replenishment': {
     title: 'Store Replenishment Cockpit',
     subtitle: 'Module 2: Outbound Planning',
-    color: '#3b82f6',
-    bgColor: '#dbeafe',
+    color: '#2b88d8',
+    bgColor: '#deecf9',
     tiles: [
       {
         id: 'store-replenishment',
@@ -185,7 +185,7 @@ const moduleDefinitions = {
   'supply-planning': {
     title: 'Supply Requirements Dashboard',
     subtitle: 'Module 4: Inbound Planning',
-    color: '#8b5cf6',
+    color: '#0078d4',
     bgColor: '#ede9fe',
     tiles: [
       {

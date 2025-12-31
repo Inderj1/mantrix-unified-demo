@@ -182,10 +182,10 @@ const FinancialWorkbench = ({ onBack }) => {
           size="small"
           sx={{
             fontWeight: 700,
-            bgcolor: alpha('#2563eb', 0.12),
-            color: '#2563eb',
+            bgcolor: alpha('#0078d4', 0.12),
+            color: '#0078d4',
             border: '1px solid',
-            borderColor: alpha('#2563eb', 0.2),
+            borderColor: alpha('#0078d4', 0.2),
           }}
         />
       ),
@@ -315,13 +315,13 @@ const FinancialWorkbench = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2563eb', 0.1)} 0%, ${alpha('#2563eb', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#0078d4', 0.1)} 0%, ${alpha('#0078d4', 0.05)} 100%)` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <TrendingUp sx={{ color: '#2563eb' }} />
+                  <TrendingUp sx={{ color: '#0078d4' }} />
                   <Typography variant="body2" color="text.secondary">Net Profit</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#2563eb">${(metrics.totalProfit / 1000).toFixed(1)}K</Typography>
+                <Typography variant="h4" fontWeight={700} color="#0078d4">${(metrics.totalProfit / 1000).toFixed(1)}K</Typography>
               </CardContent>
             </Card>
           </Grid>

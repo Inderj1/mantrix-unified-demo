@@ -550,12 +550,10 @@ const MRPParameterTuner = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline' } }}>
-              STOX.AI
-            </Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
-              MRP Parameter Tuner
-            </Typography>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 5: Sandbox</Link>
+            <Typography color="primary" variant="body1" fontWeight={600}>MRP Parameter Tuner</Typography>
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ borderColor: 'divider' }}>
             Back
@@ -599,7 +597,7 @@ const MRPParameterTuner = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #0ea5e9' }}>
+                <Card sx={{ borderLeft: '4px solid #2b88d8' }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">Modified</Typography>
                     <Typography variant="h5" fontWeight={700} color="info.main">{metrics.modifiedCount}</Typography>
@@ -615,7 +613,7 @@ const MRPParameterTuner = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #8b5cf6' }}>
+                <Card sx={{ borderLeft: '4px solid #0078d4' }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">Avg Service Level</Typography>
                     <Typography variant="h5" fontWeight={700}>{metrics.avgServiceLevel}%</Typography>

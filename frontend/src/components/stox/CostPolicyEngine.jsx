@@ -269,7 +269,7 @@ const CostPolicyEngine = ({ onBack }) => {
           selectedItem.safetyStockDays,
           selectedItem.leadTimeDays,
         ],
-        backgroundColor: ['#0891b2', '#10b981', '#8b5cf6', '#f59e0b'],
+        backgroundColor: ['#0891b2', '#10b981', '#0078d4', '#f59e0b'],
       }],
     };
 
@@ -509,7 +509,7 @@ const CostPolicyEngine = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #8b5cf6' }}>
+                <Card sx={{ borderLeft: '4px solid #0078d4' }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">Avg Variance</Typography>
                     <Typography variant="h5" fontWeight={700}>{metrics.avgVariance}%</Typography>

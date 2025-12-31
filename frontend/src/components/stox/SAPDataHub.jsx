@@ -245,7 +245,7 @@ const SAPDataHub = ({ onBack }) => {
         <Chip
           label={params.value}
           size="small"
-          sx={{ fontWeight: 700, bgcolor: alpha('#3b82f6', 0.12), color: '#2563eb' }}
+          sx={{ fontWeight: 700, bgcolor: alpha('#2b88d8', 0.12), color: '#106ebe' }}
         />
       ),
     },
@@ -714,7 +714,7 @@ const SAPDataHub = ({ onBack }) => {
         <Paper elevation={0} variant="outlined" sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: alpha('#64748b', 0.2), background: `linear-gradient(90deg, ${alpha('#0284c7', 0.05)}, ${alpha('#64748b', 0.02)})` }}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569' }}>
+              <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: '#0078d4' }}>
                 SAP System Connections — <Typography component="span" sx={{ color: '#0891b2' }}>Click to View Details</Typography>
               </Typography>
               <Chip label="RFC · OData · BTP · CDS · ODP" size="small" sx={{ fontSize: '0.6rem', bgcolor: alpha('#06b6d4', 0.1), color: '#0891b2' }} />

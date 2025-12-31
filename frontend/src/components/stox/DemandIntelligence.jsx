@@ -530,7 +530,7 @@ const DemandIntelligence = ({ onBack }) => {
                   </Stack>
                 )}
                 <Box sx={{ borderTop: '1px solid', borderColor: alpha('#64748b', 0.15), pt: 2, flex: 1 }}>
-                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#8b5cf6', textTransform: 'uppercase', letterSpacing: 1, mb: 1.5 }}>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#0078d4', textTransform: 'uppercase', letterSpacing: 1, mb: 1.5 }}>
                     Reclassification
                   </Typography>
                   {selectedSku.reclassRecommendation ? (
@@ -542,9 +542,9 @@ const DemandIntelligence = ({ onBack }) => {
                           </Typography>
                           <Typography sx={{ fontSize: '0.55rem', color: '#64748b' }}>Current</Typography>
                         </Box>
-                        <Typography sx={{ fontSize: '1.2rem', color: '#8b5cf6' }}>→</Typography>
-                        <Box sx={{ textAlign: 'center', p: 1, bgcolor: alpha('#8b5cf6', 0.1), borderRadius: 1 }}>
-                          <Typography sx={{ fontSize: '1.2rem', fontWeight: 700, color: '#8b5cf6' }}>
+                        <Typography sx={{ fontSize: '1.2rem', color: '#0078d4' }}>→</Typography>
+                        <Box sx={{ textAlign: 'center', p: 1, bgcolor: alpha('#0078d4', 0.1), borderRadius: 1 }}>
+                          <Typography sx={{ fontSize: '1.2rem', fontWeight: 700, color: '#0078d4' }}>
                             {selectedSku.reclassRecommendation.recommendedAbc}/{selectedSku.reclassRecommendation.recommendedXyz}
                           </Typography>
                           <Typography sx={{ fontSize: '0.55rem', color: '#64748b' }}>Recommended</Typography>
@@ -553,7 +553,7 @@ const DemandIntelligence = ({ onBack }) => {
                       <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textAlign: 'center', mb: 1.5 }}>
                         {selectedSku.reclassRecommendation.reason}
                       </Typography>
-                      <Button fullWidth variant="outlined" size="small" sx={{ borderColor: '#8b5cf6', color: '#8b5cf6' }}>
+                      <Button fullWidth variant="outlined" size="small" sx={{ borderColor: '#0078d4', color: '#0078d4' }}>
                         Apply Reclassification
                       </Button>
                     </>
@@ -638,7 +638,9 @@ const DemandIntelligence = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 2: Diagnostics</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>
               {selectedSku ? `${selectedSku.material} Detail` : 'Demand Intelligence'}
             </Typography>
@@ -696,10 +698,10 @@ const DemandIntelligence = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card variant="outlined" sx={{ borderLeft: `3px solid #8b5cf6` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #0078d4` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                     <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Intermittent</Typography>
-                    <Typography variant="h4" fontWeight={700} color="#7c3aed">{metrics.intermittent}</Typography>
+                    <Typography variant="h4" fontWeight={700} color="#005a9e">{metrics.intermittent}</Typography>
                   </CardContent>
                 </Card>
               </Grid>
@@ -712,7 +714,7 @@ const DemandIntelligence = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card variant="outlined" sx={{ borderLeft: `3px solid #0ea5e9` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #2b88d8` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                     <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Reclass Needed</Typography>
                     <Typography variant="h4" fontWeight={700} color="#0284c7">{metrics.reclassNeeded}</Typography>

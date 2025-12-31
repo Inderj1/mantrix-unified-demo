@@ -95,10 +95,10 @@ export default function RightPanel({
 
   const getImpactColors = (impact) => {
     switch (impact) {
-      case 'High': return { bg: alpha('#7c3aed', 0.08), border: alpha('#7c3aed', 0.25), text: '#7c3aed', btn: '#7c3aed', iconBg: alpha('#7c3aed', 0.12) };
+      case 'High': return { bg: alpha('#005a9e', 0.08), border: alpha('#005a9e', 0.25), text: '#005a9e', btn: '#005a9e', iconBg: alpha('#005a9e', 0.12) };
       case 'Medium': return { bg: alpha('#0ea5e9', 0.08), border: alpha('#0ea5e9', 0.25), text: '#0284c7', btn: '#0ea5e9', iconBg: alpha('#0ea5e9', 0.12) };
       case 'Low': return { bg: alpha('#10b981', 0.08), border: alpha('#10b981', 0.25), text: '#059669', btn: '#10b981', iconBg: alpha('#10b981', 0.12) };
-      default: return { bg: alpha('#64748b', 0.08), border: alpha('#64748b', 0.25), text: '#475569', btn: '#64748b', iconBg: alpha('#64748b', 0.12) };
+      default: return { bg: alpha('#64748b', 0.08), border: alpha('#64748b', 0.25), text: '#0078d4', btn: '#64748b', iconBg: alpha('#64748b', 0.12) };
     }
   };
 
@@ -107,7 +107,7 @@ export default function RightPanel({
       case 'emerald': return { main: '#059669', bg: alpha('#10b981', 0.1), border: alpha('#10b981', 0.2) };
       case 'blue': return { main: '#0284c7', bg: alpha('#0ea5e9', 0.1), border: alpha('#0ea5e9', 0.2) };
       case 'cyan': return { main: '#0891b2', bg: alpha('#06b6d4', 0.1), border: alpha('#06b6d4', 0.2) };
-      default: return { main: '#475569', bg: alpha('#64748b', 0.1), border: alpha('#64748b', 0.2) };
+      default: return { main: '#0078d4', bg: alpha('#64748b', 0.1), border: alpha('#64748b', 0.2) };
     }
   };
 
@@ -140,7 +140,7 @@ export default function RightPanel({
           <Box sx={{
             p: 0.75,
             borderRadius: 1,
-            background: 'linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%)',
+            background: 'linear-gradient(135deg, #005a9e 0%, #a78bfa 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -170,8 +170,8 @@ export default function RightPanel({
         {/* AI Proposed Actions */}
         <Box sx={{ mb: 3 }}>
           <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
-            <SmartToyIcon sx={{ fontSize: 14, color: '#7c3aed' }} />
-            <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            <SmartToyIcon sx={{ fontSize: 14, color: '#005a9e' }} />
+            <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: '#0078d4', textTransform: 'uppercase', letterSpacing: 0.5 }}>
               AI Proposed Actions
             </Typography>
           </Stack>
@@ -244,7 +244,7 @@ export default function RightPanel({
         <Box>
           <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
             <BoltIcon sx={{ fontSize: 14, color: '#0284c7' }} />
-            <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: '#0078d4', textTransform: 'uppercase', letterSpacing: 0.5 }}>
               AI Recommendations
             </Typography>
           </Stack>
@@ -274,7 +274,7 @@ export default function RightPanel({
                       <IconComponent sx={{ fontSize: 14, color: colors.main }} />
                     </Box>
                     <Box sx={{ flex: 1 }}>
-                      <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: '#475569', mb: 0.25 }}>
+                      <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: '#0078d4', mb: 0.25 }}>
                         {rec.category}
                       </Typography>
                       <Typography sx={{ fontSize: '0.7rem', color: '#64748b', lineHeight: 1.3, mb: 0.5 }}>
@@ -331,7 +331,7 @@ function StatItem({ icon, label, value, color = 'primary' }) {
   const colors = {
     primary: { main: '#0284c7', bg: alpha('#0ea5e9', 0.1) },
     success: { main: '#059669', bg: alpha('#10b981', 0.1) },
-    info: { main: '#7c3aed', bg: alpha('#8b5cf6', 0.1) },
+    info: { main: '#005a9e', bg: alpha('#0078d4', 0.1) },
   };
   const c = colors[color];
 

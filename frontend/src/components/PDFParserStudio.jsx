@@ -320,7 +320,7 @@ const PDFParserStudio = ({ onBack }) => {
       { icon: CloudUpload, color: '#10b981' },
       { icon: Schema, color: '#06b6d4' },
       { icon: CheckCircle, color: '#8b5cf6' },
-      { icon: Download, color: '#3b82f6' },
+      { icon: Download, color: '#2b88d8' },
     ];
 
     const { icon: IconComponent, color } = icons[Number(icon) - 1] || icons[0];
@@ -1709,11 +1709,11 @@ const PDFParserStudio = ({ onBack }) => {
                   p: 3,
                   mb: 3,
                   border: '1px solid',
-                  borderColor: alpha('#3b82f6', 0.2),
+                  borderColor: alpha('#2b88d8', 0.2),
                   borderRadius: 2,
-                  bgcolor: alpha('#3b82f6', 0.02),
+                  bgcolor: alpha('#2b88d8', 0.02),
                 }}>
-                  <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, color: '#3b82f6' }}>
+                  <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, color: '#2b88d8' }}>
                     Processing Complete
                   </Typography>
                   <Grid container spacing={2}>
@@ -1748,7 +1748,7 @@ const PDFParserStudio = ({ onBack }) => {
                   </Grid>
                 </Paper>
 
-                <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, color: '#3b82f6' }}>
+                <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, color: '#2b88d8' }}>
                   Final Data Preview
                 </Typography>
 
@@ -1787,8 +1787,8 @@ const PDFParserStudio = ({ onBack }) => {
                         borderColor: alpha('#64748b', 0.08),
                       },
                       '& .MuiDataGrid-columnHeaders': {
-                        bgcolor: alpha('#3b82f6', 0.05),
-                        color: '#3b82f6',
+                        bgcolor: alpha('#2b88d8', 0.05),
+                        color: '#2b88d8',
                         fontWeight: 700,
                         fontSize: '0.7rem',
                       },
@@ -1796,7 +1796,7 @@ const PDFParserStudio = ({ onBack }) => {
                   />
                 </Box>
 
-                <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, color: '#3b82f6' }}>
+                <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, color: '#2b88d8' }}>
                   Export Options
                 </Typography>
 
@@ -1865,9 +1865,9 @@ const PDFParserStudio = ({ onBack }) => {
                       setValidatedData([]);
                     }}
                     sx={{
-                      background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                      background: 'linear-gradient(135deg, #2b88d8 0%, #106ebe 100%)',
                       '&:hover': {
-                        background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                        background: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
                       }
                     }}
                   >

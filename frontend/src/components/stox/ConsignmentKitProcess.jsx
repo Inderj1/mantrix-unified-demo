@@ -69,7 +69,7 @@ const ConsignmentKitProcess = ({ onBack }) => {
       duration: '2-4 hrs',
       status: 'Active',
       icon: <HospitalIcon />,
-      color: '#3b82f6',
+      color: '#2b88d8',
     },
     {
       step: 2,
@@ -166,7 +166,7 @@ const ConsignmentKitProcess = ({ onBack }) => {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'Active':
-        return <Schedule fontSize="small" sx={{ color: '#3b82f6' }} />;
+        return <Schedule fontSize="small" sx={{ color: '#2b88d8' }} />;
       case 'Transit':
         return <ShippingIcon fontSize="small" sx={{ color: '#f59e0b' }} />;
       case 'Complete':
@@ -219,12 +219,12 @@ const ConsignmentKitProcess = ({ onBack }) => {
       {/* Stats Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: alpha('#3b82f6', 0.05), borderLeft: `4px solid #3b82f6` }}>
+          <Card sx={{ bgcolor: alpha('#2b88d8', 0.05), borderLeft: `4px solid #2b88d8` }}>
             <CardContent sx={{ py: 1.5, px: 2 }}>
               <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
                 Total Kits
               </Typography>
-              <Typography variant="h5" fontWeight={700} sx={{ color: '#3b82f6' }}>
+              <Typography variant="h5" fontWeight={700} sx={{ color: '#2b88d8' }}>
                 {stats.totalKits}
               </Typography>
             </CardContent>
@@ -255,12 +255,12 @@ const ConsignmentKitProcess = ({ onBack }) => {
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: alpha('#8b5cf6', 0.05), borderLeft: `4px solid #8b5cf6` }}>
+          <Card sx={{ bgcolor: alpha('#0078d4', 0.05), borderLeft: `4px solid #0078d4` }}>
             <CardContent sx={{ py: 1.5, px: 2 }}>
               <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
                 Completed Today
               </Typography>
-              <Typography variant="h5" fontWeight={700} sx={{ color: '#8b5cf6' }}>
+              <Typography variant="h5" fontWeight={700} sx={{ color: '#0078d4' }}>
                 {stats.completedToday}
               </Typography>
             </CardContent>

@@ -115,7 +115,7 @@ import { apiService } from '../services/api';
 
 // Theme colors
 const COLORS = {
-  primary: '#1976d2',
+  primary: '#2b88d8',
   secondary: '#dc004e',
   success: '#4caf50',
   warning: '#ff9800',
@@ -123,7 +123,7 @@ const COLORS = {
   info: '#2196f3',
   revenue: '#4caf50',
   segmentColors: {
-    'Champions': '#1976d2',
+    'Champions': '#2b88d8',
     'Loyal Customers': '#2e7d32',
     'Potential Loyalists': '#0288d1',
     'New Customers': '#7b1fa2',
@@ -1484,7 +1484,7 @@ const CoreAIDashboard = () => {
             scrollButtons="auto"
             sx={{
               '& .MuiTabs-indicator': {
-                backgroundColor: '#3b82f6',
+                backgroundColor: '#2b88d8',
                 height: 3
               },
               '& .MuiTab-root': {

@@ -208,7 +208,7 @@ const InventoryHealthCheck = ({ onBack }) => {
         <Chip
           label={params.value}
           size="small"
-          sx={{ fontWeight: 700, bgcolor: alpha('#8b5cf6', 0.12), color: '#7c3aed' }}
+          sx={{ fontWeight: 700, bgcolor: alpha('#0078d4', 0.12), color: '#005a9e' }}
         />
       ),
     },
@@ -481,7 +481,9 @@ const InventoryHealthCheck = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 2: Diagnostics</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>
               {selectedSku ? `${selectedSku.id} Detail` : 'Inventory Health Check'}
             </Typography>

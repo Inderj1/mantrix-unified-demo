@@ -266,7 +266,7 @@ export default function FacilityDetailsPanel({ store, alerts = [], trucks = [], 
                 {stockPercentage < 30 && (
                   <Stack direction="row" spacing={1} alignItems="flex-start">
                     <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: '#ef4444', mt: 0.75 }} />
-                    <Typography sx={{ fontSize: '0.7rem', color: '#475569' }}>
+                    <Typography sx={{ fontSize: '0.7rem', color: '#0078d4' }}>
                       Critical stock level - Schedule emergency replenishment from nearest DC
                     </Typography>
                   </Stack>
@@ -274,7 +274,7 @@ export default function FacilityDetailsPanel({ store, alerts = [], trucks = [], 
                 {capacityUsed > 90 && (
                   <Stack direction="row" spacing={1} alignItems="flex-start">
                     <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: '#f59e0b', mt: 0.75 }} />
-                    <Typography sx={{ fontSize: '0.7rem', color: '#475569' }}>
+                    <Typography sx={{ fontSize: '0.7rem', color: '#0078d4' }}>
                       Capacity near limit - Consider redistributing inventory
                     </Typography>
                   </Stack>
@@ -282,7 +282,7 @@ export default function FacilityDetailsPanel({ store, alerts = [], trucks = [], 
                 {nearbyTrucks.length === 0 && stockPercentage < 50 && (
                   <Stack direction="row" spacing={1} alignItems="flex-start">
                     <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: '#f97316', mt: 0.75 }} />
-                    <Typography sx={{ fontSize: '0.7rem', color: '#475569' }}>
+                    <Typography sx={{ fontSize: '0.7rem', color: '#0078d4' }}>
                       No inbound shipments - Allocate truck from central hub
                     </Typography>
                   </Stack>
@@ -290,7 +290,7 @@ export default function FacilityDetailsPanel({ store, alerts = [], trucks = [], 
                 {stockPercentage >= 50 && nearbyTrucks.length > 0 && (
                   <Stack direction="row" spacing={1} alignItems="flex-start">
                     <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: '#10b981', mt: 0.75 }} />
-                    <Typography sx={{ fontSize: '0.7rem', color: '#475569' }}>
+                    <Typography sx={{ fontSize: '0.7rem', color: '#0078d4' }}>
                       Inventory levels healthy - Continue monitoring demand patterns
                     </Typography>
                   </Stack>
@@ -351,7 +351,7 @@ export default function FacilityDetailsPanel({ store, alerts = [], trucks = [], 
                 </Box>
                 <Box sx={{ bgcolor: 'white', borderRadius: 1, p: 1.5, textAlign: 'center' }}>
                   <Typography sx={{ fontSize: '0.55rem', color: '#64748b', textTransform: 'uppercase', mb: 0.5 }}>30-Day</Typography>
-                  <Typography sx={{ fontSize: '1.2rem', fontWeight: 700, color: '#7c3aed' }}>+25%</Typography>
+                  <Typography sx={{ fontSize: '1.2rem', fontWeight: 700, color: '#005a9e' }}>+25%</Typography>
                 </Box>
               </Box>
             </Box>
@@ -360,13 +360,13 @@ export default function FacilityDetailsPanel({ store, alerts = [], trucks = [], 
               <Stack spacing={1}>
                 <Stack direction="row" spacing={1} alignItems="flex-start">
                   <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: '#0284c7', mt: 0.75 }} />
-                  <Typography sx={{ fontSize: '0.7rem', color: '#475569' }}>
+                  <Typography sx={{ fontSize: '0.7rem', color: '#0078d4' }}>
                     Seasonal demand increase expected due to summer heat wave
                   </Typography>
                 </Stack>
                 <Stack direction="row" spacing={1} alignItems="flex-start">
                   <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: '#10b981', mt: 0.75 }} />
-                  <Typography sx={{ fontSize: '0.7rem', color: '#475569' }}>
+                  <Typography sx={{ fontSize: '0.7rem', color: '#0078d4' }}>
                     Recommend increasing safety stock by 15% for next 2 weeks
                   </Typography>
                 </Stack>

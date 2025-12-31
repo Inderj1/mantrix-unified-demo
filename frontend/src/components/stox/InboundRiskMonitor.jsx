@@ -570,7 +570,7 @@ const InboundRiskMonitor = ({ onBack }) => {
                       {totalItems}
                     </Typography>
                   </Box>
-                  <Avatar sx={{ bgcolor: '#E3F2FD', color: '#1976d2' }}>
+                  <Avatar sx={{ bgcolor: '#E3F2FD', color: '#2b88d8' }}>
                     <SupplierIcon />
                   </Avatar>
                 </Stack>

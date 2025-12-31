@@ -103,12 +103,12 @@ const TicketingSystem = ({ onBack }) => {
           sx={{
             fontFamily: 'monospace',
             fontWeight: 700,
-            color: '#3b82f6',
+            color: '#2b88d8',
             fontSize: '0.85rem',
             cursor: 'pointer',
             textDecoration: 'underline',
             '&:hover': {
-              color: '#1e40af',
+              color: '#005a9e',
             }
           }}
           onClick={() => handleViewDetails(params.row)}
@@ -124,7 +124,7 @@ const TicketingSystem = ({ onBack }) => {
       flex: 0.8,
       renderCell: (params) => {
         const moduleColors = {
-          'MARGEN.AI': '#1976d2',
+          'MARGEN.AI': '#2b88d8',
           'REVEQ.AI': '#9c27b0',
           'Enterprise Pulse': '#ef4444',
           'STOX.AI': '#10b981',
@@ -150,11 +150,11 @@ const TicketingSystem = ({ onBack }) => {
       flex: 1.2,
       renderCell: (params) => {
         const typeColors = {
-          'STO_CREATION': '#3b82f6',
-          'FORECAST_OVERRIDE': '#8b5cf6',
+          'STO_CREATION': '#2b88d8',
+          'FORECAST_OVERRIDE': '#0078d4',
           'FINANCIAL_APPROVAL': '#f59e0b',
           'SUPPLIER_ORDER': '#10b981',
-          'MARGEN_ANALYSIS': '#1976d2',
+          'MARGEN_ANALYSIS': '#2b88d8',
           'MARGEN_REPORT': '#0d47a1',
           'REVEQ_MAINTENANCE': '#9c27b0',
           'REVEQ_UTILIZATION': '#7b1fa2',
@@ -261,7 +261,7 @@ const TicketingSystem = ({ onBack }) => {
       renderCell: (params) => {
         const priorityColors = {
           'High': '#ef4444',
-          'Normal': '#3b82f6',
+          'Normal': '#2b88d8',
           'Low': '#64748b',
         };
         return (
@@ -306,7 +306,7 @@ const TicketingSystem = ({ onBack }) => {
             <IconButton
               size="small"
               onClick={() => handleViewDetails(params.row)}
-              sx={{ color: '#3b82f6' }}
+              sx={{ color: '#2b88d8' }}
             >
               <VisibilityIcon fontSize="small" />
             </IconButton>
@@ -350,18 +350,18 @@ const TicketingSystem = ({ onBack }) => {
       {/* Metrics Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ bgcolor: alpha('#3b82f6', 0.05), borderLeft: `4px solid #3b82f6` }}>
+          <Card sx={{ bgcolor: alpha('#2b88d8', 0.05), borderLeft: `4px solid #2b88d8` }}>
             <CardContent sx={{ py: 1.5, px: 2 }}>
               <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>Total Tickets</Typography>
-              <Typography variant="h5" fontWeight={700} sx={{ color: '#3b82f6' }}>{metrics.total}</Typography>
+              <Typography variant="h5" fontWeight={700} sx={{ color: '#2b88d8' }}>{metrics.total}</Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ bgcolor: alpha('#3b82f6', 0.05), borderLeft: `4px solid #3b82f6` }}>
+          <Card sx={{ bgcolor: alpha('#2b88d8', 0.05), borderLeft: `4px solid #2b88d8` }}>
             <CardContent sx={{ py: 1.5, px: 2 }}>
               <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>Open</Typography>
-              <Typography variant="h5" fontWeight={700} sx={{ color: '#3b82f6' }}>{metrics.open}</Typography>
+              <Typography variant="h5" fontWeight={700} sx={{ color: '#2b88d8' }}>{metrics.open}</Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -502,7 +502,7 @@ const TicketingSystem = ({ onBack }) => {
       <Dialog open={detailsOpen} onClose={() => setDetailsOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>
           <Stack direction="row" alignItems="center" spacing={2}>
-            <TicketIcon sx={{ color: '#3b82f6' }} />
+            <TicketIcon sx={{ color: '#2b88d8' }} />
             <Box>
               <Typography variant="h6" fontWeight={700}>
                 Operation Details
@@ -527,7 +527,7 @@ const TicketingSystem = ({ onBack }) => {
                 <Box>
                   <Typography variant="caption" color="text.secondary">Priority</Typography>
                   <Box sx={{ mt: 0.5 }}>
-                    <Chip label={selectedTicket.priority} size="small" sx={{ bgcolor: alpha(selectedTicket.priority === 'High' ? '#ef4444' : '#3b82f6', 0.1), color: selectedTicket.priority === 'High' ? '#ef4444' : '#3b82f6' }} />
+                    <Chip label={selectedTicket.priority} size="small" sx={{ bgcolor: alpha(selectedTicket.priority === 'High' ? '#ef4444' : '#2b88d8', 0.1), color: selectedTicket.priority === 'High' ? '#ef4444' : '#2b88d8' }} />
                   </Box>
                 </Box>
                 <Box>
@@ -586,7 +586,7 @@ const TicketingSystem = ({ onBack }) => {
               <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>
                 Operational Details
               </Typography>
-              <Box sx={{ bgcolor: alpha('#3b82f6', 0.05), p: 2, borderRadius: 1, border: '1px solid', borderColor: alpha('#3b82f6', 0.2) }}>
+              <Box sx={{ bgcolor: alpha('#2b88d8', 0.05), p: 2, borderRadius: 1, border: '1px solid', borderColor: alpha('#2b88d8', 0.2) }}>
                 {selectedTicket.metadata && Object.keys(selectedTicket.metadata).length > 0 ? (
                   <Table size="small">
                     <TableBody>

@@ -35,11 +35,11 @@ const ordlyModules = [
     subtitle: 'MTS Tile 0',
     description: 'AI-powered demand capture with volatility fingerprinting, hidden constraint detection, and service risk preview',
     icon: SensorsIcon,
-    color: '#1976d2',
-    bgColor: '#e3f2fd',
+    color: '#2b88d8',
+    bgColor: '#deecf9',
     stats: { label: 'Signals', value: '47' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #1565c0 0%, #1976d2 100%)',
+    gradient: 'linear-gradient(135deg, #106ebe 0%, #2b88d8 100%)',
   },
   {
     id: 'network-optimizer',
@@ -47,11 +47,11 @@ const ordlyModules = [
     subtitle: 'MTS Tile 1',
     description: 'Multi-node fulfillment optimization with AI explainability, cost breakdown, and risk matrix',
     icon: HubIcon,
-    color: '#1976d2',
-    bgColor: '#e3f2fd',
+    color: '#2b88d8',
+    bgColor: '#deecf9',
     stats: { label: 'Options', value: '5' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #1565c0 0%, #1976d2 100%)',
+    gradient: 'linear-gradient(135deg, #106ebe 0%, #2b88d8 100%)',
   },
   {
     id: 'arbitration',
@@ -59,11 +59,11 @@ const ordlyModules = [
     subtitle: 'MTS Tile 2',
     description: 'Policy guardrails, inventory protection, exception proposals, and approval workflows',
     icon: BalanceIcon,
-    color: '#1976d2',
-    bgColor: '#e3f2fd',
+    color: '#2b88d8',
+    bgColor: '#deecf9',
     stats: { label: 'Policies', value: '5/6' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #1565c0 0%, #1976d2 100%)',
+    gradient: 'linear-gradient(135deg, #106ebe 0%, #2b88d8 100%)',
   },
   {
     id: 'sap-commit',
@@ -71,11 +71,11 @@ const ordlyModules = [
     subtitle: 'MTS Tile 3',
     description: 'Pre-commit validation, SAP document preview, decision timeline, and BAPI execution log',
     icon: StorageIcon,
-    color: '#1976d2',
-    bgColor: '#e3f2fd',
+    color: '#2b88d8',
+    bgColor: '#deecf9',
     stats: { label: 'Commits', value: '4/5' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #1565c0 0%, #1976d2 100%)',
+    gradient: 'linear-gradient(135deg, #106ebe 0%, #2b88d8 100%)',
   },
   // Learning Loop Tile
   {
@@ -84,11 +84,11 @@ const ordlyModules = [
     subtitle: 'MTS Tile 4',
     description: 'Order outcome analysis, ML model confidence updates, and continuous improvement tracking',
     icon: SchoolIcon,
-    color: '#1976d2',
-    bgColor: '#e3f2fd',
+    color: '#2b88d8',
+    bgColor: '#deecf9',
     stats: { label: 'Model Gain', value: '+2.1%' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #1565c0 0%, #1976d2 100%)',
+    gradient: 'linear-gradient(135deg, #106ebe 0%, #2b88d8 100%)',
   },
 ];
 
@@ -145,23 +145,23 @@ const OrdlyAILanding = ({ onTileClick, onBack }) => {
           <Box sx={{
             width: 4,
             height: 60,
-            background: 'linear-gradient(180deg, #0854a0 0%, #1976d2 100%)',
+            background: 'linear-gradient(180deg, #106ebe 0%, #2b88d8 100%)',
             borderRadius: 2
           }} />
           <Box>
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
-              <Avatar sx={{ width: 32, height: 32, bgcolor: '#0854a0' }}>
+              <Avatar sx={{ width: 32, height: 32, bgcolor: '#106ebe' }}>
                 <TimelineIcon sx={{ fontSize: 18 }} />
               </Avatar>
-              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: '#0854a0' }}>
+              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: '#106ebe' }}>
                 ORDLY.AI
               </Typography>
               <Chip
                 label="5 Modules"
                 size="small"
                 sx={{
-                  bgcolor: alpha('#0854a0', 0.1),
-                  color: '#0854a0',
+                  bgcolor: alpha('#106ebe', 0.1),
+                  color: '#106ebe',
                   fontWeight: 600,
                   fontSize: '0.7rem'
                 }}

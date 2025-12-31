@@ -34,11 +34,11 @@ const margenModules = [
     subtitle: 'Tile 1',
     description: 'Product SKU profitability, customer segments, channel performance with gross margin and contribution analysis',
     icon: TrendingUpIcon,
-    color: '#1e40af',
-    bgColor: '#dbeafe',
+    color: '#005a9e',
+    bgColor: '#deecf9',
     stats: { label: 'Products', value: '8' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)',
+    gradient: 'linear-gradient(135deg, #005a9e 0%, #0078d4 100%)',
   },
   {
     id: 'cost-cogs',
@@ -46,11 +46,11 @@ const margenModules = [
     subtitle: 'Tile 2',
     description: 'Distributor AR/AP analysis, DSO/DPO/DIO metrics, cash conversion cycle, and working capital optimization',
     icon: AccountBalanceIcon,
-    color: '#0a6ed1',
-    bgColor: '#dbeafe',
+    color: '#0078d4',
+    bgColor: '#deecf9',
     stats: { label: 'Distributors', value: '12' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
+    gradient: 'linear-gradient(135deg, #0078d4 0%, #106ebe 100%)',
   },
   {
     id: 'margin-profitability',
@@ -58,11 +58,11 @@ const margenModules = [
     subtitle: 'Tile 3',
     description: 'Brand market share, regional performance, competitor analysis, and growth trajectory insights',
     icon: MoneyIcon,
-    color: '#0854a0',
-    bgColor: '#dbeafe',
+    color: '#106ebe',
+    bgColor: '#deecf9',
     stats: { label: 'Brands', value: '8' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #0854a0 0%, #1d4ed8 100%)',
+    gradient: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
   },
   {
     id: 'pl-gl-explorer',
@@ -70,11 +70,11 @@ const margenModules = [
     subtitle: 'Tile 4',
     description: 'COPA margin alerts, GL account summary, financial KPIs, and executive-level profitability overview',
     icon: AssessmentIcon,
-    color: '#2563eb',
-    bgColor: '#dbeafe',
+    color: '#106ebe',
+    bgColor: '#deecf9',
     stats: { label: 'Alerts', value: '6' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+    gradient: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
   },
   {
     id: 'drivers-whatif',
@@ -82,11 +82,11 @@ const margenModules = [
     subtitle: 'Tile 5',
     description: 'Initiative tracking, owner accountability, impact realization, milestones, and risk mitigation plans',
     icon: AnalyticsIcon,
-    color: '#0ea5e9',
+    color: '#2b88d8',
     bgColor: '#e0f2fe',
     stats: { label: 'Initiatives', value: '8' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+    gradient: 'linear-gradient(135deg, #2b88d8 0%, #106ebe 100%)',
   },
   {
     id: 'ask-margen',
@@ -155,23 +155,23 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
           <Box sx={{
             width: 4,
             height: 60,
-            background: 'linear-gradient(180deg, #0a6ed1 0%, #0854a0 100%)',
+            background: 'linear-gradient(180deg, #0078d4 0%, #106ebe 100%)',
             borderRadius: 2
           }} />
           <Box>
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
-              <Avatar sx={{ width: 32, height: 32, bgcolor: '#0a6ed1' }}>
+              <Avatar sx={{ width: 32, height: 32, bgcolor: '#0078d4' }}>
                 <AssessmentIcon sx={{ fontSize: 18 }} />
               </Avatar>
-              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: '#0a6ed1' }}>
+              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: '#0078d4' }}>
                 MARGEN.AI
               </Typography>
               <Chip
                 label="6 Modules"
                 size="small"
                 sx={{
-                  bgcolor: alpha('#0a6ed1', 0.1),
-                  color: '#0a6ed1',
+                  bgcolor: alpha('#0078d4', 0.1),
+                  color: '#0078d4',
                   fontWeight: 600,
                   fontSize: '0.7rem'
                 }}

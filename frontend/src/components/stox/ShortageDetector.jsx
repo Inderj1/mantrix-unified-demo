@@ -366,7 +366,7 @@ const ShortageDetector = ({ onBack }) => {
                 setSelectedItem(params.row);
                 setDetailsOpen(true);
               }}
-              sx={{ color: '#1976d2' }}
+              sx={{ color: '#2b88d8' }}
             >
               <VisibilityIcon fontSize="small" />
             </IconButton>
@@ -558,7 +558,7 @@ const ShortageDetector = ({ onBack }) => {
                       {data.length}
                     </Typography>
                   </Box>
-                  <Avatar sx={{ bgcolor: '#E3F2FD', color: '#1976d2' }}>
+                  <Avatar sx={{ bgcolor: '#E3F2FD', color: '#2b88d8' }}>
                     <InventoryIcon />
                   </Avatar>
                 </Stack>

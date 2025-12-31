@@ -341,7 +341,7 @@ const MRPParameterOptimizer = ({ onBack }) => {
         {
           label: 'Total Cost',
           data: eoquCurveData.totalCosts,
-          borderColor: '#0854a0',
+          borderColor: '#106ebe',
           backgroundColor: 'rgba(8, 84, 160, 0.1)',
           borderWidth: 3,
           fill: true,
@@ -502,7 +502,7 @@ const MRPParameterOptimizer = ({ onBack }) => {
 
           {/* EOQ Cost Curve - Full Width */}
           <Grid item xs={12}>
-            <Card sx={{ borderTop: '3px solid #0854a0' }}>
+            <Card sx={{ borderTop: '3px solid #106ebe' }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
                   <Box>
@@ -515,7 +515,7 @@ const MRPParameterOptimizer = ({ onBack }) => {
                     <Chip
                       label={`EOQ: ${eoquCurveData.eoq} units`}
                       size="small"
-                      sx={{ bgcolor: alpha('#0854a0', 0.1), color: '#0854a0', fontWeight: 700 }}
+                      sx={{ bgcolor: alpha('#106ebe', 0.1), color: '#106ebe', fontWeight: 700 }}
                     />
                     <Chip
                       label={`Current: ${selectedItem.currentOrderQty} units`}
@@ -668,12 +668,10 @@ const MRPParameterOptimizer = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline' } }}>
-              STOX.AI
-            </Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
-              MRP Parameter Optimizer
-            </Typography>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 4: Optimization</Link>
+            <Typography color="primary" variant="body1" fontWeight={600}>MRP Parameter Optimizer</Typography>
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ borderColor: 'divider' }}>
             Back
@@ -681,9 +679,9 @@ const MRPParameterOptimizer = ({ onBack }) => {
         </Stack>
 
         <Stack direction="row" alignItems="center" spacing={2}>
-          <TuneIcon sx={{ fontSize: 32, color: '#7c3aed' }} />
+          <TuneIcon sx={{ fontSize: 32, color: '#005a9e' }} />
           <Box>
-            <Typography variant="h5" fontWeight={700} color="#7c3aed">
+            <Typography variant="h5" fontWeight={700} color="#005a9e">
               MRP Parameter Optimizer
             </Typography>
             <Typography variant="body2" color="text.secondary">
@@ -701,7 +699,7 @@ const MRPParameterOptimizer = ({ onBack }) => {
           {metrics && (
             <Grid container spacing={2} sx={{ mb: 3 }}>
               <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #7c3aed' }}>
+                <Card sx={{ borderLeft: '4px solid #005a9e' }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">Total Items</Typography>
                     <Typography variant="h5" fontWeight={700}>{metrics.totalItems}</Typography>

@@ -37,7 +37,7 @@ export const margenTheme = {
     blue: {
       50: '#eff6ff',
       500: '#3b82f6',
-      600: '#2563eb',
+      600: '#1d4ed8',
     },
     purple: {
       50: '#faf5ff',
@@ -125,9 +125,9 @@ export const margenTheme = {
       },
       completed: {
         bgcolor: alpha('#3b82f6', 0.12),
-        color: '#2563eb',
+        color: '#1d4ed8',
         border: '1px solid',
-        borderColor: alpha('#2563eb', 0.2),
+        borderColor: alpha('#1d4ed8', 0.2),
       },
     },
     // Alert severity
@@ -152,9 +152,9 @@ export const margenTheme = {
       },
       low: {
         bgcolor: alpha('#3b82f6', 0.12),
-        color: '#2563eb',
+        color: '#1d4ed8',
         border: '1px solid',
-        borderColor: alpha('#2563eb', 0.2),
+        borderColor: alpha('#1d4ed8', 0.2),
       },
     },
     // Type chips (risk/opportunity)
@@ -180,7 +180,7 @@ export const margenTheme = {
       },
       loyal: {
         bgcolor: alpha('#3b82f6', 0.12),
-        color: '#2563eb',
+        color: '#1d4ed8',
       },
       potential: {
         bgcolor: alpha('#06b6d4', 0.12),

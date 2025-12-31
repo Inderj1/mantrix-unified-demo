@@ -236,7 +236,7 @@ const CashReleaseTimeline = ({ onBack }) => {
       {
         label: 'Monthly Cash Release',
         data: data.monthlyTotals,
-        backgroundColor: '#0854a0',
+        backgroundColor: '#106ebe',
         borderRadius: 4,
       },
     ] : [
@@ -256,7 +256,7 @@ const CashReleaseTimeline = ({ onBack }) => {
       {
         label: 'Total Release',
         data: data.categoryBreakdown.map(c => c.totalRelease),
-        backgroundColor: '#0854a0',
+        backgroundColor: '#106ebe',
       },
       {
         label: 'Risk-Adjusted',
@@ -269,7 +269,7 @@ const CashReleaseTimeline = ({ onBack }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'In Progress': return '#10b981';
-      case 'Planned': return '#3b82f6';
+      case 'Planned': return '#2b88d8';
       case 'Completed': return '#64748b';
       default: return '#64748b';
     }
@@ -290,7 +290,9 @@ const CashReleaseTimeline = ({ onBack }) => {
       <Box sx={{ mb: 2 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 6: Execution</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>Cash Release Timeline</Typography>
           </Breadcrumbs>
           <Stack direction="row" spacing={1}>
@@ -304,9 +306,9 @@ const CashReleaseTimeline = ({ onBack }) => {
           </Stack>
         </Stack>
         <Stack direction="row" alignItems="center" spacing={1.5}>
-          <TimelineIcon sx={{ fontSize: 28, color: '#0854a0' }} />
+          <TimelineIcon sx={{ fontSize: 28, color: '#106ebe' }} />
           <Box>
-            <Typography variant="h5" fontWeight={700} color="#0854a0">Cash Release Timeline</Typography>
+            <Typography variant="h5" fontWeight={700} color="#106ebe">Cash Release Timeline</Typography>
             <Typography variant="body2" color="text.secondary">Track cash release by initiative over time</Typography>
           </Box>
         </Stack>
@@ -317,10 +319,10 @@ const CashReleaseTimeline = ({ onBack }) => {
         {/* Summary Cards */}
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={6} sm={3}>
-            <Card sx={{ borderLeft: '4px solid #0854a0' }}>
+            <Card sx={{ borderLeft: '4px solid #106ebe' }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Typography variant="caption" color="text.secondary">Total Cash Release</Typography>
-                <Typography variant="h5" fontWeight={700} color="#0854a0">{formatCurrency(data.totals.totalRelease)}</Typography>
+                <Typography variant="h5" fontWeight={700} color="#106ebe">{formatCurrency(data.totals.totalRelease)}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -333,7 +335,7 @@ const CashReleaseTimeline = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={6} sm={3}>
-            <Card sx={{ borderLeft: '4px solid #3b82f6' }}>
+            <Card sx={{ borderLeft: '4px solid #2b88d8' }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Typography variant="caption" color="text.secondary">Avg Confidence</Typography>
                 <Typography variant="h5" fontWeight={700}>{data.totals.avgConfidence}%</Typography>
@@ -433,9 +435,9 @@ const CashReleaseTimeline = ({ onBack }) => {
         <Grid container spacing={2} sx={{ mb: 2 }}>
           {data.quarterlyData.map((q) => (
             <Grid item xs={6} sm={3} key={q.quarter}>
-              <Card sx={{ bgcolor: alpha('#0854a0', 0.03) }}>
+              <Card sx={{ bgcolor: alpha('#106ebe', 0.03) }}>
                 <CardContent sx={{ py: 1.5 }}>
-                  <Typography variant="subtitle2" fontWeight={700} color="#0854a0">{q.quarter} 2025</Typography>
+                  <Typography variant="subtitle2" fontWeight={700} color="#106ebe">{q.quarter} 2025</Typography>
                   <Typography variant="h6" fontWeight={700}>{formatCurrency(q.totalRelease)}</Typography>
                   <Stack direction="row" spacing={1}>
                     <Chip label={`${q.initiatives} initiatives`} size="small" sx={{ height: 18, fontSize: '0.6rem' }} />

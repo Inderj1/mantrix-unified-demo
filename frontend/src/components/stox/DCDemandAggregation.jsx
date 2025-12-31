@@ -69,8 +69,8 @@ const DCDemandAggregation = ({ onBack }) => {
           label={params.value}
           size="small"
           sx={{
-            bgcolor: alpha('#475569', 0.12),
-            color: '#475569',
+            bgcolor: alpha('#0078d4', 0.12),
+            color: '#0078d4',
             fontWeight: 700,
             fontSize: '0.75rem',
           }}
@@ -133,7 +133,7 @@ const DCDemandAggregation = ({ onBack }) => {
         <Chip
           label={params.value?.toLocaleString()}
           size="small"
-          sx={{ fontWeight: 700, bgcolor: alpha('#0ea5e9', 0.12), color: '#0284c7', border: '1px solid', borderColor: alpha('#0284c7', 0.2) }}
+          sx={{ fontWeight: 700, bgcolor: alpha('#2b88d8', 0.12), color: '#0284c7', border: '1px solid', borderColor: alpha('#0284c7', 0.2) }}
         />
       ),
     },
@@ -195,6 +195,7 @@ const DCDemandAggregation = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>DC System</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>Forecast Layer</Typography>
@@ -204,7 +205,7 @@ const DCDemandAggregation = ({ onBack }) => {
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-              <TrendingUp sx={{ fontSize: 32, color: '#3b82f6' }} />
+              <TrendingUp sx={{ fontSize: 32, color: '#2b88d8' }} />
               <Typography variant="h4" fontWeight={700}>DC Forecast Layer</Typography>
             </Stack>
             <Typography variant="body2" color="text.secondary">
@@ -221,24 +222,24 @@ const DCDemandAggregation = ({ onBack }) => {
       {metrics && (
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#3b82f6', 0.1)} 0%, ${alpha('#3b82f6', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2b88d8', 0.1)} 0%, ${alpha('#2b88d8', 0.05)} 100%)` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <Warehouse sx={{ color: '#3b82f6' }} />
+                  <Warehouse sx={{ color: '#2b88d8' }} />
                   <Typography variant="body2" color="text.secondary">Total DCs</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#3b82f6">{metrics.totalDCs}</Typography>
+                <Typography variant="h4" fontWeight={700} color="#2b88d8">{metrics.totalDCs}</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2563eb', 0.1)} 0%, ${alpha('#2563eb', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#106ebe', 0.1)} 0%, ${alpha('#106ebe', 0.05)} 100%)` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <TrendingUp sx={{ color: '#2563eb' }} />
+                  <TrendingUp sx={{ color: '#106ebe' }} />
                   <Typography variant="body2" color="text.secondary">Total Demand</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#2563eb">{(metrics.totalDemand / 1000).toFixed(1)}K</Typography>
+                <Typography variant="h4" fontWeight={700} color="#106ebe">{(metrics.totalDemand / 1000).toFixed(1)}K</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -369,7 +370,7 @@ const DCDemandAggregation = ({ onBack }) => {
               <Divider sx={{ my: 2 }} />
 
               <Typography variant="subtitle1" fontWeight={600} gutterBottom>Aggregation Formula (DC Level)</Typography>
-              <Paper sx={{ p: 2, bgcolor: alpha('#3b82f6', 0.05), mb: 2 }}>
+              <Paper sx={{ p: 2, bgcolor: alpha('#2b88d8', 0.05), mb: 2 }}>
                 <Typography variant="body2" fontFamily="monospace" gutterBottom>
                   <strong>μ_DC(t) = Σ μ_c(t)</strong>
                 </Typography>

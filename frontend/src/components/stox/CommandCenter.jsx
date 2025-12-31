@@ -191,7 +191,7 @@ const CommandCenter = ({ onBack, onTileClick }) => {
     switch (type) {
       case 'critical': return <ErrorIcon sx={{ color: '#ef4444' }} />;
       case 'warning': return <Warning sx={{ color: '#f59e0b' }} />;
-      case 'info': return <InfoIcon sx={{ color: '#3b82f6' }} />;
+      case 'info': return <InfoIcon sx={{ color: '#0078d4' }} />;
       default: return <InfoIcon sx={{ color: '#64748b' }} />;
     }
   };
@@ -200,69 +200,100 @@ const CommandCenter = ({ onBack, onTileClick }) => {
     switch (type) {
       case 'critical': return '#ef4444';
       case 'warning': return '#f59e0b';
-      case 'info': return '#3b82f6';
+      case 'info': return '#0078d4';
       default: return '#64748b';
     }
   };
 
   return (
-    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      {/* Header */}
-      <Box sx={{ mb: 2 }}>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>Command Center</Typography>
-          </Breadcrumbs>
+    <Box sx={{ p: 2, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      {/* Header with Breadcrumbs */}
+      <Box sx={{ mb: 1.5, flexShrink: 0 }}>
+        {/* Breadcrumbs */}
+        <Breadcrumbs separator={<NavigateNextIcon sx={{ fontSize: 16 }} />} sx={{ mb: 1 }}>
+          <Link
+            component="button"
+            variant="caption"
+            underline="hover"
+            onClick={onBack}
+            sx={{ color: 'text.secondary', fontWeight: 500, '&:hover': { color: '#0078d4' } }}
+          >
+            CORE.AI
+          </Link>
+          <Link
+            component="button"
+            variant="caption"
+            underline="hover"
+            onClick={onBack}
+            sx={{ color: 'text.secondary', fontWeight: 500, '&:hover': { color: '#0078d4' } }}
+          >
+            STOX.AI
+          </Link>
+          <Typography variant="caption" fontWeight={600} color="#0078d4">Command Center</Typography>
+        </Breadcrumbs>
+
+        <Stack direction="row" alignItems="center" justifyContent="space-between">
+          <Stack direction="row" alignItems="center" spacing={1.5}>
+            <Box sx={{
+              width: 36,
+              height: 36,
+              borderRadius: 1,
+              bgcolor: alpha('#0078d4', 0.1),
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+              <DashboardIcon sx={{ fontSize: 20, color: '#0078d4' }} />
+            </Box>
+            <Box>
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <Typography variant="h6" fontWeight={700} color="#0078d4">Command Center</Typography>
+                <Chip label="Tile 0" size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha('#0078d4', 0.1), color: '#0078d4', fontWeight: 600 }} />
+              </Stack>
+              <Typography variant="caption" color="text.secondary">Planner's Front Door - KPIs, Exceptions & AI Assistant</Typography>
+            </Box>
+          </Stack>
           <Stack direction="row" spacing={1}>
-            <Tooltip title="Refresh"><IconButton onClick={fetchData} color="primary"><Refresh /></IconButton></Tooltip>
+            <IconButton onClick={fetchData} color="primary" size="small"><Refresh fontSize="small" /></IconButton>
             <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>
           </Stack>
-        </Stack>
-        <Stack direction="row" alignItems="center" spacing={1.5}>
-          <DashboardIcon sx={{ fontSize: 32, color: '#0854a0' }} />
-          <Box>
-            <Typography variant="h5" fontWeight={700} color="#0854a0">Command Center</Typography>
-            <Typography variant="body2" color="text.secondary">Planner's Front Door - KPIs, Exceptions & AI Assistant</Typography>
-          </Box>
-          <Chip label="Tile 0" size="small" sx={{ bgcolor: alpha('#0854a0', 0.1), color: '#0854a0', fontWeight: 600 }} />
         </Stack>
       </Box>
 
       {/* Main Content */}
-      <Box sx={{ flex: 1, display: 'flex', gap: 2, overflow: 'hidden' }}>
+      <Box sx={{ flex: 1, display: 'flex', gap: 1.5, overflow: 'hidden', minHeight: 0 }}>
         {/* Left Panel - AI Chat */}
-        <Paper sx={{ width: 380, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', bgcolor: alpha('#0854a0', 0.05) }}>
+        <Paper sx={{ width: 420, maxHeight: 420, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <Box sx={{ p: 1, borderBottom: '1px solid', borderColor: 'divider', bgcolor: alpha('#0078d4', 0.05), flexShrink: 0 }}>
             <Stack direction="row" alignItems="center" spacing={1}>
-              <Avatar sx={{ width: 32, height: 32, bgcolor: '#0854a0' }}>
-                <SmartToy sx={{ fontSize: 18 }} />
+              <Avatar sx={{ width: 28, height: 28, bgcolor: '#0078d4' }}>
+                <SmartToy sx={{ fontSize: 16 }} />
               </Avatar>
-              <Typography variant="subtitle1" fontWeight={700}>STOX AI Assistant</Typography>
+              <Typography variant="subtitle2" fontWeight={700}>STOX AI Assistant</Typography>
             </Stack>
           </Box>
 
           {/* Chat Messages */}
-          <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+          <Box sx={{ flex: 1, overflow: 'auto', p: 1, minHeight: 0 }}>
             {chatMessages.map((msg) => (
               <Box
                 key={msg.id}
                 sx={{
                   display: 'flex',
                   justifyContent: msg.type === 'user' ? 'flex-end' : 'flex-start',
-                  mb: 1.5,
+                  mb: 0.75,
                 }}
               >
                 <Box
                   sx={{
-                    maxWidth: '85%',
-                    p: 1.5,
-                    borderRadius: 2,
-                    bgcolor: msg.type === 'user' ? '#0854a0' : alpha('#64748b', 0.1),
+                    maxWidth: '90%',
+                    p: 1,
+                    borderRadius: 1.5,
+                    bgcolor: msg.type === 'user' ? '#0078d4' : alpha('#0078d4', 0.08),
                     color: msg.type === 'user' ? 'white' : 'text.primary',
                   }}
                 >
-                  <Typography variant="body2" sx={{ fontSize: '0.85rem', lineHeight: 1.5 }}>
+                  <Typography variant="caption" sx={{ fontSize: '0.75rem', lineHeight: 1.4 }}>
                     {msg.text}
                   </Typography>
                 </Box>
@@ -271,19 +302,20 @@ const CommandCenter = ({ onBack, onTileClick }) => {
           </Box>
 
           {/* Chat Input */}
-          <Box sx={{ p: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+          <Box sx={{ p: 1, borderTop: '1px solid', borderColor: 'divider', flexShrink: 0 }}>
             <TextField
               fullWidth
               size="small"
-              placeholder="Ask about WC, savings, service levels..."
+              placeholder="Ask about WC, savings..."
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleChatSubmit()}
+              sx={{ '& .MuiInputBase-input': { fontSize: '0.8rem', py: 0.75 } }}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton onClick={handleChatSubmit} color="primary" size="small">
-                      <Send />
+                      <Send fontSize="small" />
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -293,162 +325,141 @@ const CommandCenter = ({ onBack, onTileClick }) => {
         </Paper>
 
         {/* Right Panel - KPIs & Exceptions */}
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2, overflow: 'hidden' }}>
-          {/* KPI Cards */}
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1, overflow: 'hidden', minHeight: 0 }}>
+          {/* Compact KPI Cards */}
           {kpis && (
-            <Grid container spacing={2}>
-              <Grid item xs={6} md={3}>
-                <Card sx={{ borderLeft: '4px solid #0854a0' }}>
-                  <CardContent sx={{ py: 1.5 }}>
-                    <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.5 }}>
-                      <AccountBalance sx={{ fontSize: 16, color: '#0854a0' }} />
-                      <Typography variant="caption" color="text.secondary">Total WC Tied Up</Typography>
-                    </Stack>
-                    <Typography variant="h5" fontWeight={700} color="#0854a0">${(kpis.totalWCTied / 1000000).toFixed(2)}M</Typography>
+            <Grid container spacing={1} sx={{ flexShrink: 0 }}>
+              <Grid item xs={3}>
+                <Card sx={{ borderLeft: '3px solid #0078d4' }}>
+                  <CardContent sx={{ py: 1, px: 1.5, '&:last-child': { pb: 1 } }}>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>WC Tied Up</Typography>
+                    <Typography variant="h6" fontWeight={700} color="#0078d4">${(kpis.totalWCTied / 1000000).toFixed(2)}M</Typography>
                   </CardContent>
                 </Card>
               </Grid>
-              <Grid item xs={6} md={3}>
-                <Card sx={{ borderLeft: '4px solid #10b981' }}>
-                  <CardContent sx={{ py: 1.5 }}>
-                    <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.5 }}>
-                      <Savings sx={{ fontSize: 16, color: '#10b981' }} />
-                      <Typography variant="caption" color="text.secondary">Potential WC Savings</Typography>
-                    </Stack>
-                    <Typography variant="h5" fontWeight={700} color="#10b981">${(kpis.potentialSavings / 1000).toFixed(0)}K</Typography>
+              <Grid item xs={3}>
+                <Card sx={{ borderLeft: '3px solid #10b981' }}>
+                  <CardContent sx={{ py: 1, px: 1.5, '&:last-child': { pb: 1 } }}>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>Potential Savings</Typography>
+                    <Typography variant="h6" fontWeight={700} color="#10b981">${(kpis.potentialSavings / 1000).toFixed(0)}K</Typography>
                   </CardContent>
                 </Card>
               </Grid>
-              <Grid item xs={6} md={3}>
-                <Card sx={{ borderLeft: kpis.serviceLevel < kpis.serviceLevelTarget ? '4px solid #f59e0b' : '4px solid #10b981' }}>
-                  <CardContent sx={{ py: 1.5 }}>
-                    <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.5 }}>
-                      <Speed sx={{ fontSize: 16, color: kpis.serviceLevel < kpis.serviceLevelTarget ? '#f59e0b' : '#10b981' }} />
-                      <Typography variant="caption" color="text.secondary">Service Level</Typography>
-                    </Stack>
-                    <Typography variant="h5" fontWeight={700} color={kpis.serviceLevel < kpis.serviceLevelTarget ? '#f59e0b' : '#10b981'}>
+              <Grid item xs={3}>
+                <Card sx={{ borderLeft: `3px solid ${kpis.serviceLevel < kpis.serviceLevelTarget ? '#f59e0b' : '#10b981'}` }}>
+                  <CardContent sx={{ py: 1, px: 1.5, '&:last-child': { pb: 1 } }}>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>Service Level</Typography>
+                    <Typography variant="h6" fontWeight={700} color={kpis.serviceLevel < kpis.serviceLevelTarget ? '#f59e0b' : '#10b981'}>
                       {kpis.serviceLevel}%
                     </Typography>
-                    <Typography variant="caption" color="text.secondary">Target: {kpis.serviceLevelTarget}%</Typography>
                   </CardContent>
                 </Card>
               </Grid>
-              <Grid item xs={6} md={3}>
-                <Card sx={{ borderLeft: '4px solid #8b5cf6' }}>
-                  <CardContent sx={{ py: 1.5 }}>
-                    <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.5 }}>
-                      <TrendingUp sx={{ fontSize: 16, color: '#8b5cf6' }} />
-                      <Typography variant="caption" color="text.secondary">Inventory Turns</Typography>
-                    </Stack>
-                    <Typography variant="h5" fontWeight={700} color="#8b5cf6">{kpis.inventoryTurns}x</Typography>
-                    <Typography variant="caption" color="text.secondary">Target: {kpis.inventoryTurnsTarget}x</Typography>
+              <Grid item xs={3}>
+                <Card sx={{ borderLeft: '3px solid #005a9e' }}>
+                  <CardContent sx={{ py: 1, px: 1.5, '&:last-child': { pb: 1 } }}>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>Inv. Turns</Typography>
+                    <Typography variant="h6" fontWeight={700} color="#005a9e">{kpis.inventoryTurns}x</Typography>
                   </CardContent>
                 </Card>
               </Grid>
             </Grid>
           )}
 
+          {/* Quick Navigation - Compact inline */}
+          <Paper sx={{ p: 1, flexShrink: 0 }}>
+            <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap alignItems="center">
+              <Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ mr: 0.5 }}>Quick:</Typography>
+              {[
+                { label: 'WC Baseline', tile: 'working-capital-baseline' },
+                { label: 'Recommendations', tile: 'recommendations-hub' },
+                { label: 'MRP Optimizer', tile: 'mrp-parameter-optimizer' },
+                { label: 'Inventory Health', tile: 'inventory-health-check' },
+                { label: 'Supply Lead Time', tile: 'supply-lead-time' },
+                { label: 'What-If', tile: 'what-if-simulator' },
+              ].map((item) => (
+                <Chip
+                  key={item.tile}
+                  label={item.label}
+                  size="small"
+                  onClick={() => onTileClick && onTileClick(item.tile)}
+                  sx={{
+                    height: 22,
+                    fontSize: '0.7rem',
+                    cursor: 'pointer',
+                    bgcolor: alpha('#0078d4', 0.08),
+                    color: '#0078d4',
+                    fontWeight: 600,
+                    '&:hover': { bgcolor: alpha('#0078d4', 0.15) },
+                  }}
+                />
+              ))}
+            </Stack>
+          </Paper>
+
           {/* Exceptions Panel */}
-          <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', bgcolor: alpha('#ef4444', 0.05) }}>
+          <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
+            <Box sx={{ p: 1, borderBottom: '1px solid', borderColor: 'divider', bgcolor: alpha('#0078d4', 0.03), flexShrink: 0 }}>
               <Stack direction="row" alignItems="center" justifyContent="space-between">
                 <Stack direction="row" alignItems="center" spacing={1}>
-                  <Badge badgeContent={exceptions.filter(e => e.type === 'critical').length} color="error">
-                    <Warning sx={{ color: '#ef4444' }} />
-                  </Badge>
-                  <Typography variant="subtitle1" fontWeight={700}>Exceptions Requiring Attention</Typography>
+                  <Warning sx={{ color: '#ef4444', fontSize: 18 }} />
+                  <Typography variant="subtitle2" fontWeight={700}>Exceptions</Typography>
+                  <Chip
+                    label={`${exceptions.filter(e => e.type === 'critical').length} Critical`}
+                    size="small"
+                    sx={{ height: 20, bgcolor: alpha('#ef4444', 0.1), color: '#ef4444', fontWeight: 600, fontSize: '0.65rem' }}
+                  />
                 </Stack>
-                <Chip label={`${exceptions.length} Total`} size="small" sx={{ bgcolor: alpha('#64748b', 0.1), color: '#64748b' }} />
+                <Chip label={`${exceptions.length} Total`} size="small" sx={{ height: 20, bgcolor: alpha('#0078d4', 0.1), color: '#0078d4', fontWeight: 600, fontSize: '0.65rem' }} />
               </Stack>
             </Box>
 
-            <List sx={{ flex: 1, overflow: 'auto', py: 0 }}>
+            <List sx={{ flex: 1, overflow: 'auto', py: 0, minHeight: 0 }} dense>
               {exceptions.map((exception, idx) => (
                 <React.Fragment key={exception.id}>
                   <ListItem
                     sx={{
-                      py: 1.5,
+                      py: 0.5,
                       cursor: 'pointer',
                       '&:hover': { bgcolor: alpha(getExceptionColor(exception.type), 0.05) },
                     }}
                     onClick={() => handleExceptionClick(exception)}
                   >
-                    <ListItemIcon sx={{ minWidth: 40 }}>
+                    <ListItemIcon sx={{ minWidth: 28 }}>
                       {getExceptionIcon(exception.type)}
                     </ListItemIcon>
                     <ListItemText
                       primary={
-                        <Stack direction="row" alignItems="center" spacing={1}>
-                          <Typography variant="body2" fontWeight={600}>{exception.title}</Typography>
+                        <Stack direction="row" alignItems="center" spacing={0.5}>
+                          <Typography variant="caption" fontWeight={600} sx={{ fontSize: '0.75rem' }}>{exception.title}</Typography>
                           <Chip
                             label={exception.type}
                             size="small"
-                            sx={{
-                              height: 18,
-                              fontSize: '0.65rem',
-                              bgcolor: alpha(getExceptionColor(exception.type), 0.1),
-                              color: getExceptionColor(exception.type),
-                              fontWeight: 600,
-                            }}
+                            sx={{ height: 16, fontSize: '0.6rem', bgcolor: alpha(getExceptionColor(exception.type), 0.1), color: getExceptionColor(exception.type), fontWeight: 600 }}
+                          />
+                          <Chip
+                            label={exception.impact}
+                            size="small"
+                            sx={{ height: 16, fontSize: '0.6rem', bgcolor: alpha('#64748b', 0.08), color: '#64748b' }}
                           />
                         </Stack>
                       }
                       secondary={
-                        <Box>
-                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                            {exception.description}
-                          </Typography>
-                          <Chip
-                            label={exception.impact}
-                            size="small"
-                            sx={{ height: 18, fontSize: '0.6rem', mt: 0.5, bgcolor: alpha('#64748b', 0.08), color: '#64748b' }}
-                          />
-                        </Box>
+                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                          {exception.description}
+                        </Typography>
                       }
                     />
                     <ListItemSecondaryAction>
-                      <Tooltip title={exception.action}>
-                        <IconButton size="small" onClick={() => handleExceptionClick(exception)}>
-                          <ArrowForward sx={{ fontSize: 18, color: getExceptionColor(exception.type) }} />
-                        </IconButton>
-                      </Tooltip>
+                      <IconButton size="small" onClick={() => handleExceptionClick(exception)}>
+                        <ArrowForward sx={{ fontSize: 16, color: getExceptionColor(exception.type) }} />
+                      </IconButton>
                     </ListItemSecondaryAction>
                   </ListItem>
                   {idx < exceptions.length - 1 && <Divider />}
                 </React.Fragment>
               ))}
             </List>
-          </Paper>
-
-          {/* Quick Navigation */}
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5 }}>Quick Navigation</Typography>
-            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-              {[
-                { label: 'WC Baseline', tile: 'working-capital-baseline', icon: <AccountBalance sx={{ fontSize: 14 }} /> },
-                { label: 'Recommendations', tile: 'recommendations-hub', icon: <Assessment sx={{ fontSize: 14 }} /> },
-                { label: 'MRP Optimizer', tile: 'mrp-parameter-optimizer', icon: <Speed sx={{ fontSize: 14 }} /> },
-                { label: 'Inventory Health', tile: 'inventory-health-check', icon: <Inventory sx={{ fontSize: 14 }} /> },
-                { label: 'Supply Lead Time', tile: 'supply-lead-time', icon: <LocalShipping sx={{ fontSize: 14 }} /> },
-                { label: 'What-If Simulator', tile: 'what-if-simulator', icon: <Schedule sx={{ fontSize: 14 }} /> },
-              ].map((item) => (
-                <Chip
-                  key={item.tile}
-                  icon={item.icon}
-                  label={item.label}
-                  size="small"
-                  onClick={() => onTileClick && onTileClick(item.tile)}
-                  sx={{
-                    cursor: 'pointer',
-                    bgcolor: alpha('#0854a0', 0.08),
-                    color: '#0854a0',
-                    fontWeight: 600,
-                    '&:hover': { bgcolor: alpha('#0854a0', 0.15) },
-                    '& .MuiChip-icon': { color: '#0854a0' },
-                  }}
-                />
-              ))}
-            </Stack>
           </Paper>
         </Box>
       </Box>

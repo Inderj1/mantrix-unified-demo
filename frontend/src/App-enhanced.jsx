@@ -899,7 +899,7 @@ function App() {
                         const moduleColors = {
                           'demand-flow': '#06b6d4',
                           'demand-forecasting': '#10b981',
-                          'outbound-replenishment': '#3b82f6',
+                          'outbound-replenishment': '#2b88d8',
                           'dc-inventory': '#f59e0b',
                           'supply-planning': '#8b5cf6',
                           'bom-explosion': '#ec4899',
@@ -909,7 +909,7 @@ function App() {
                         setCurrentFioriTile({
                           tileId,
                           moduleId: stoxView,
-                          moduleColor: moduleColors[stoxView] || '#3b82f6',
+                          moduleColor: moduleColors[stoxView] || '#2b88d8',
                         });
                       }}
                     />

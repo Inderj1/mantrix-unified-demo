@@ -149,23 +149,23 @@ const MarketsAIDashboard = () => {
           <Box sx={{
             width: 4,
             height: 60,
-            background: 'linear-gradient(180deg, #0a6ed1 0%, #1e40af 100%)',
+            background: 'linear-gradient(180deg, #0078d4 0%, #005a9e 100%)',
             borderRadius: 2
           }} />
           <Box sx={{ flex: 1 }}>
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
-              <Avatar sx={{ width: 32, height: 32, bgcolor: '#0a6ed1' }}>
+              <Avatar sx={{ width: 32, height: 32, bgcolor: '#0078d4' }}>
                 <RadarIcon sx={{ fontSize: 18 }} />
               </Avatar>
-              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: '#0a6ed1' }}>
+              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: '#0078d4' }}>
                 MARKETS.AI
               </Typography>
               <Chip
                 label="15 Categories"
                 size="small"
                 sx={{
-                  bgcolor: alpha('#0a6ed1', 0.1),
-                  color: '#0a6ed1',
+                  bgcolor: alpha('#0078d4', 0.1),
+                  color: '#0078d4',
                   fontWeight: 600,
                   fontSize: '0.7rem'
                 }}
@@ -176,11 +176,11 @@ const MarketsAIDashboard = () => {
                   size="small"
                   icon={<RefreshIcon sx={{ fontSize: 14 }} />}
                   sx={{
-                    bgcolor: alpha('#1976d2', 0.1),
-                    color: '#1976d2',
+                    bgcolor: alpha('#2b88d8', 0.1),
+                    color: '#2b88d8',
                     fontWeight: 500,
                     fontSize: '0.7rem',
-                    '& .MuiChip-icon': { color: '#1976d2' }
+                    '& .MuiChip-icon': { color: '#2b88d8' }
                   }}
                 />
               )}
@@ -194,11 +194,11 @@ const MarketsAIDashboard = () => {
               onClick={() => setConfigPanelOpen(true)}
               size="small"
               sx={{
-                bgcolor: alpha('#0a6ed1', 0.1),
-                '&:hover': { bgcolor: alpha('#0a6ed1', 0.2) }
+                bgcolor: alpha('#0078d4', 0.1),
+                '&:hover': { bgcolor: alpha('#0078d4', 0.2) }
               }}
             >
-              <SettingsIcon sx={{ color: '#0a6ed1' }} />
+              <SettingsIcon sx={{ color: '#0078d4' }} />
             </IconButton>
           </Tooltip>
         </Box>
@@ -212,7 +212,7 @@ const MarketsAIDashboard = () => {
             sx={{
               height: '100%',
               border: '1px solid',
-              borderColor: alpha('#0a6ed1', 0.15),
+              borderColor: alpha('#0078d4', 0.15),
               '&::before': {
                 content: '""',
                 position: 'absolute',
@@ -220,7 +220,7 @@ const MarketsAIDashboard = () => {
                 left: 0,
                 right: 0,
                 height: 3,
-                background: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
+                background: 'linear-gradient(135deg, #0078d4 0%, #106ebe 100%)',
               },
               position: 'relative',
               overflow: 'hidden',
@@ -230,7 +230,7 @@ const MarketsAIDashboard = () => {
               <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
                 Active Categories
               </Typography>
-              <Typography variant="h5" fontWeight={700} sx={{ color: '#0a6ed1' }}>
+              <Typography variant="h5" fontWeight={700} sx={{ color: '#0078d4' }}>
                 {enabledCategories.length} / {categories.length}
               </Typography>
               <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
@@ -246,7 +246,7 @@ const MarketsAIDashboard = () => {
             sx={{
               height: '100%',
               border: '1px solid',
-              borderColor: alpha('#1e40af', 0.15),
+              borderColor: alpha('#005a9e', 0.15),
               '&::before': {
                 content: '""',
                 position: 'absolute',
@@ -254,7 +254,7 @@ const MarketsAIDashboard = () => {
                 left: 0,
                 right: 0,
                 height: 3,
-                background: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)',
+                background: 'linear-gradient(135deg, #005a9e 0%, #0078d4 100%)',
               },
               position: 'relative',
               overflow: 'hidden',
@@ -280,7 +280,7 @@ const MarketsAIDashboard = () => {
             sx={{
               height: '100%',
               border: '1px solid',
-              borderColor: alpha('#2563eb', 0.15),
+              borderColor: alpha('#106ebe', 0.15),
               '&::before': {
                 content: '""',
                 position: 'absolute',
@@ -288,7 +288,7 @@ const MarketsAIDashboard = () => {
                 left: 0,
                 right: 0,
                 height: 3,
-                background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                background: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
               },
               position: 'relative',
               overflow: 'hidden',
@@ -318,7 +318,7 @@ const MarketsAIDashboard = () => {
             sx={{
               height: '100%',
               border: '1px solid',
-              borderColor: alpha('#0854a0', 0.15),
+              borderColor: alpha('#106ebe', 0.15),
               '&::before': {
                 content: '""',
                 position: 'absolute',
@@ -326,7 +326,7 @@ const MarketsAIDashboard = () => {
                 left: 0,
                 right: 0,
                 height: 3,
-                background: 'linear-gradient(135deg, #0854a0 0%, #1d4ed8 100%)',
+                background: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
               },
               position: 'relative',
               overflow: 'hidden',
@@ -336,7 +336,7 @@ const MarketsAIDashboard = () => {
               <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
                 Active Signals
               </Typography>
-              <Typography variant="h5" fontWeight={700} sx={{ color: '#0854a0' }}>
+              <Typography variant="h5" fontWeight={700} sx={{ color: '#106ebe' }}>
                 {totalActiveSignals}
               </Typography>
               <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
@@ -349,7 +349,7 @@ const MarketsAIDashboard = () => {
 
       {/* Category Tiles Grid */}
       <Box>
-        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, color: '#0854a0' }}>
+        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, color: '#106ebe' }}>
           Market Signal Categories
         </Typography>
 

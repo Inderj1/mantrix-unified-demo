@@ -123,7 +123,7 @@ const CostCOGSAnalytics = ({ onBack }) => {
       title: 'Avg COGS per Unit',
       value: formatCurrency(avgCogsPerUnit),
       subtitle: `${totalCogsUnits.toLocaleString()} total units`,
-      color: '#3b82f6',
+      color: '#2b88d8',
       icon: CategoryIcon,
     },
   ] : [];

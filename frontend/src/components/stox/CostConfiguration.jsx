@@ -101,7 +101,7 @@ const CostConfiguration = ({ onBack, onSave }) => {
         <Chip
           label={`${config[field]}${unit}`}
           size="small"
-          sx={{ bgcolor: alpha('#0854a0', 0.1), color: '#0854a0', fontWeight: 700 }}
+          sx={{ bgcolor: alpha('#106ebe', 0.1), color: '#106ebe', fontWeight: 700 }}
         />
       </Stack>
       <Slider
@@ -114,7 +114,7 @@ const CostConfiguration = ({ onBack, onSave }) => {
           { value: min, label: `${min}${unit}` },
           { value: max, label: `${max}${unit}` },
         ]}
-        sx={{ color: '#0854a0' }}
+        sx={{ color: '#106ebe' }}
       />
       {description && (
         <Typography variant="caption" color="text.secondary">{description}</Typography>
@@ -128,7 +128,9 @@ const CostConfiguration = ({ onBack, onSave }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 4: Optimization</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>Cost Configuration</Typography>
           </Breadcrumbs>
           <Stack direction="row" spacing={1}>
@@ -142,9 +144,9 @@ const CostConfiguration = ({ onBack, onSave }) => {
           </Stack>
         </Stack>
         <Stack direction="row" alignItems="center" spacing={1.5}>
-          <SettingsIcon sx={{ fontSize: 32, color: '#0854a0' }} />
+          <SettingsIcon sx={{ fontSize: 32, color: '#106ebe' }} />
           <Box>
-            <Typography variant="h5" fontWeight={700} color="#0854a0">Cost Configuration</Typography>
+            <Typography variant="h5" fontWeight={700} color="#106ebe">Cost Configuration</Typography>
             <Typography variant="body2" color="text.secondary">Configure customer-specific cost economics for WC optimization</Typography>
           </Box>
         </Stack>
@@ -159,13 +161,13 @@ const CostConfiguration = ({ onBack, onSave }) => {
       {/* Summary Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} md={4}>
-          <Card sx={{ borderLeft: '4px solid #0854a0' }}>
+          <Card sx={{ borderLeft: '4px solid #106ebe' }}>
             <CardContent>
               <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                <AccountBalance sx={{ color: '#0854a0' }} />
+                <AccountBalance sx={{ color: '#106ebe' }} />
                 <Typography variant="body2" color="text.secondary">Total Holding Rate</Typography>
               </Stack>
-              <Typography variant="h4" fontWeight={700} color="#0854a0">{totalHoldingRate.toFixed(1)}%</Typography>
+              <Typography variant="h4" fontWeight={700} color="#106ebe">{totalHoldingRate.toFixed(1)}%</Typography>
               <Typography variant="caption" color="text.secondary">Annual carrying cost % of inventory value</Typography>
             </CardContent>
           </Card>
@@ -200,16 +202,16 @@ const CostConfiguration = ({ onBack, onSave }) => {
       <Box sx={{ flex: 1, overflow: 'auto' }}>
         {/* Holding Cost */}
         <Accordion expanded={expanded.includes('holding')} onChange={handleAccordionChange('holding')} sx={{ mb: 1 }}>
-          <AccordionSummary expandIcon={<ExpandMore />} sx={{ bgcolor: alpha('#0854a0', 0.05) }}>
+          <AccordionSummary expandIcon={<ExpandMore />} sx={{ bgcolor: alpha('#106ebe', 0.05) }}>
             <Stack direction="row" alignItems="center" spacing={2}>
-              <AccountBalance sx={{ color: '#0854a0' }} />
+              <AccountBalance sx={{ color: '#106ebe' }} />
               <Box>
                 <Typography fontWeight={700}>Holding Cost (Carrying Cost)</Typography>
                 <Typography variant="caption" color="text.secondary">
                   Annual cost of holding inventory as % of inventory value
                 </Typography>
               </Box>
-              <Chip label={`${totalHoldingRate.toFixed(1)}%`} sx={{ bgcolor: '#0854a0', color: 'white', fontWeight: 700 }} />
+              <Chip label={`${totalHoldingRate.toFixed(1)}%`} sx={{ bgcolor: '#106ebe', color: 'white', fontWeight: 700 }} />
             </Stack>
           </AccordionSummary>
           <AccordionDetails>

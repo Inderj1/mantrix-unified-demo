@@ -30,11 +30,11 @@ const aiModules = [
     subtitle: 'Margin Analytics & Revenue Intelligence',
     description: 'Advanced financial analytics, customer segmentation, and revenue optimization',
     icon: TrendingUpIcon,
-    color: '#0a6ed1',
-    bgColor: '#dbeafe',
+    color: '#0078d4',
+    bgColor: '#deecf9',
     stats: { label: 'Models', value: '12' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
+    gradient: 'linear-gradient(135deg, #0078d4 0%, #106ebe 100%)',
   },
   {
     id: 'stox',
@@ -42,11 +42,11 @@ const aiModules = [
     subtitle: 'Smart Inventory Optimization',
     description: 'Inventory management, demand forecasting, and supply chain optimization',
     icon: InventoryIcon,
-    color: '#0854a0',
-    bgColor: '#dbeafe',
+    color: '#106ebe',
+    bgColor: '#deecf9',
     stats: { label: 'SKUs', value: '2.5K' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #0854a0 0%, #1976d2 100%)',
+    gradient: 'linear-gradient(135deg, #106ebe 0%, #2b88d8 100%)',
   },
   {
     id: 'route',
@@ -54,11 +54,11 @@ const aiModules = [
     subtitle: 'Fleet & Route Optimization',
     description: 'AI-powered fleet management, route optimization, and logistics intelligence',
     icon: FleetIcon,
-    color: '#2563eb',
-    bgColor: '#dbeafe',
+    color: '#106ebe',
+    bgColor: '#deecf9',
     stats: { label: 'Vehicles', value: '45' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+    gradient: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
   },
   {
     id: 'process-mining',
@@ -66,11 +66,11 @@ const aiModules = [
     subtitle: 'Process Mining & Analytics',
     description: 'Discover, analyze, and optimize business processes with AI-powered insights',
     icon: ProcessMiningIcon,
-    color: '#1e40af',
-    bgColor: '#dbeafe',
+    color: '#005a9e',
+    bgColor: '#deecf9',
     stats: { label: 'Processes', value: '3' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)',
+    gradient: 'linear-gradient(135deg, #005a9e 0%, #0078d4 100%)',
   },
   {
     id: 'ordly',
@@ -78,11 +78,11 @@ const aiModules = [
     subtitle: 'Order Management Intelligence',
     description: 'AI-powered sales order management from customer intent to SAP commitment',
     icon: OrderlyIcon,
-    color: '#1976d2',
-    bgColor: '#dbeafe',
+    color: '#2b88d8',
+    bgColor: '#deecf9',
     stats: { label: 'Orders', value: '156' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #1976d2 0%, #0854a0 100%)',
+    gradient: 'linear-gradient(135deg, #2b88d8 0%, #106ebe 100%)',
   },
 ];
 
@@ -108,23 +108,23 @@ const CoreAILanding = ({ onTileClick }) => {
           <Box sx={{
             width: 4,
             height: 60,
-            background: 'linear-gradient(180deg, #0a6ed1 0%, #1e40af 100%)',
+            background: 'linear-gradient(180deg, #0078d4 0%, #005a9e 100%)',
             borderRadius: 2
           }} />
           <Box>
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
-              <Avatar sx={{ width: 32, height: 32, bgcolor: '#0a6ed1' }}>
+              <Avatar sx={{ width: 32, height: 32, bgcolor: '#0078d4' }}>
                 <SpeedIcon sx={{ fontSize: 18 }} />
               </Avatar>
-              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: '#0a6ed1' }}>
+              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: '#0078d4' }}>
                 CORE.AI
               </Typography>
               <Chip
                 label="4 Modules"
                 size="small"
                 sx={{
-                  bgcolor: alpha('#0a6ed1', 0.1),
-                  color: '#0a6ed1',
+                  bgcolor: alpha('#0078d4', 0.1),
+                  color: '#0078d4',
                   fontWeight: 600,
                   fontSize: '0.7rem'
                 }}

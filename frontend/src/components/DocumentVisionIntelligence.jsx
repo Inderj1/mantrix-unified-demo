@@ -187,7 +187,7 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
       display_name: 'Invoices',
       description: 'AI-extracted invoice data with automatic PO matching',
       icon: InvoiceIcon,
-      color: '#0a6ed1',
+      color: '#0078d4',
     },
     {
       id: 2,
@@ -195,7 +195,7 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
       display_name: 'Receipts',
       description: 'Expense receipt scanning and categorization',
       icon: ReceiptIcon,
-      color: '#0854a0',
+      color: '#106ebe',
     },
     {
       id: 3,
@@ -203,7 +203,7 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
       display_name: 'Shipping Documents',
       description: 'Shipping label and tracking document extraction',
       icon: ShippingIcon,
-      color: '#1976d2',
+      color: '#2b88d8',
     },
     {
       id: 4,
@@ -211,7 +211,7 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
       display_name: 'Inventory Labels',
       description: 'Barcode, QR code, and label data extraction',
       icon: InventoryIcon,
-      color: '#1e40af',
+      color: '#005a9e',
     },
   ];
 
@@ -419,7 +419,7 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
         <Box sx={{ mb: 4 }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <DocumentIcon sx={{ fontSize: 40, color: '#0a6ed1' }} />
+              <DocumentIcon sx={{ fontSize: 40, color: '#0078d4' }} />
               <Box>
                 <Typography variant="h5" fontWeight={600}>
                   VISION STUDIO

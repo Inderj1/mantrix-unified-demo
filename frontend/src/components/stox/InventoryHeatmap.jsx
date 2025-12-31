@@ -423,7 +423,7 @@ const InventoryHeatmap = ({ onBack }) => {
                       {avgStockLevel}%
                     </Typography>
                   </Box>
-                  <Avatar sx={{ bgcolor: '#E3F2FD', color: '#1976d2' }}>
+                  <Avatar sx={{ bgcolor: '#E3F2FD', color: '#2b88d8' }}>
                     <InventoryIcon />
                   </Avatar>
                 </Stack>
@@ -662,7 +662,7 @@ const InventoryHeatmap = ({ onBack }) => {
                           borderRadius: 2,
                           backgroundColor: '#E1E4E8',
                           '& .MuiLinearProgress-bar': {
-                            backgroundColor: params.value >= 15 ? '#2E7D32' : params.value >= 10 ? '#E65100' : '#1976d2',
+                            backgroundColor: params.value >= 15 ? '#2E7D32' : params.value >= 10 ? '#E65100' : '#2b88d8',
                           },
                         }}
                       />

@@ -13,7 +13,7 @@ export const stoxTheme = {
       50: '#f8fafc',
       400: '#94a3b8',
       500: '#64748b',
-      600: '#475569',
+      600: '#0078d4',
       700: '#334155',
       900: '#1e293b',
     },
@@ -29,7 +29,7 @@ export const stoxTheme = {
     },
     purple: {
       500: '#a855f7',
-      600: '#9333ea',
+      600: '#0078d4',
     },
     cyan: {
       500: '#06b6d4',
@@ -73,10 +73,10 @@ export const stoxTheme = {
   chips: {
     // ID/Primary chips
     primary: {
-      bgcolor: alpha('#475569', 0.12),
-      color: '#475569',
+      bgcolor: alpha('#0078d4', 0.12),
+      color: '#0078d4',
       border: '1px solid',
-      borderColor: alpha('#475569', 0.2),
+      borderColor: alpha('#0078d4', 0.2),
       fontWeight: 700,
     },
     // Forecast/Metric chips
@@ -105,9 +105,9 @@ export const stoxTheme = {
       },
       wholesale: {
         bgcolor: alpha('#a855f7', 0.12),
-        color: '#9333ea',
+        color: '#0078d4',
         border: '1px solid',
-        borderColor: alpha('#9333ea', 0.2),
+        borderColor: alpha('#0078d4', 0.2),
         fontWeight: 600,
       },
       d2c: {
@@ -171,7 +171,7 @@ export const stoxTheme = {
     },
     info: {
       bgcolor: alpha('#64748b', 0.05),
-      border: `1px solid ${alpha('#475569', 0.15)}`,
+      border: `1px solid ${alpha('#0078d4', 0.15)}`,
     },
   },
 

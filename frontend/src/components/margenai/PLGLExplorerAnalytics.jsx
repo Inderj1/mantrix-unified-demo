@@ -128,7 +128,7 @@ const PLGLExplorerAnalytics = ({ onBack }) => {
       title: 'Avg GM% Trend',
       value: formatPercent(avgGrossMargin),
       subtitle: 'Monthly average margin',
-      color: '#3b82f6',
+      color: '#2b88d8',
       icon: CalendarIcon,
     },
   ] : [];
@@ -210,8 +210,8 @@ const PLGLExplorerAnalytics = ({ onBack }) => {
           label={params.value}
           size="small"
           sx={{
-            bgcolor: alpha('#3b82f6', 0.1),
-            color: '#3b82f6',
+            bgcolor: alpha('#2b88d8', 0.1),
+            color: '#2b88d8',
             fontWeight: 600,
           }}
         />

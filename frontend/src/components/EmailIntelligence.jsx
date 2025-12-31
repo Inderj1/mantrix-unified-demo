@@ -451,7 +451,7 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
         display_name: 'Vendor Communications',
         description: 'Track communications with suppliers and vendors including POs, invoices, and shipments',
         icon: 'Business',
-        color: '#0a6ed1',
+        color: '#0078d4',
         tab_order: 1,
         is_active: true
       },
@@ -461,7 +461,7 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
         display_name: 'Customer Inquiries',
         description: 'Monitor and respond to customer support requests and inquiries',
         icon: 'Person',
-        color: '#0854a0',
+        color: '#106ebe',
         tab_order: 2,
         is_active: true
       },
@@ -481,7 +481,7 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
         display_name: 'Inventory Alerts',
         description: 'Monitor stock levels, reorder points, and inventory health alerts',
         icon: 'Inventory',
-        color: '#1e40af',
+        color: '#005a9e',
         tab_order: 4,
         is_active: true
       },
@@ -491,7 +491,7 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
         display_name: 'Email Campaigns',
         description: 'Track email marketing performance, open rates, and conversions',
         icon: 'Email',
-        color: '#0ea5e9',
+        color: '#2b88d8',
         tab_order: 5,
         is_active: true
       }
@@ -949,7 +949,7 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
         <Box sx={{ mb: 4 }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <EmailIcon sx={{ fontSize: 40, color: '#0a6ed1' }} />
+              <EmailIcon sx={{ fontSize: 40, color: '#0078d4' }} />
               <Box>
                 <Typography variant="h5" fontWeight={600}>
                   EMAIL INTEL
@@ -1001,7 +1001,7 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
         <Grid container spacing={1.5}>
           {filteredTypes.map((type, index) => {
             const IconComponent = getIconComponent(type.icon);
-            const colors = ['#0a6ed1', '#0854a0', '#1976d2', '#1e40af'];
+            const colors = ['#0078d4', '#106ebe', '#2b88d8', '#005a9e'];
             const color = type.color || colors[index % colors.length];
 
             return (

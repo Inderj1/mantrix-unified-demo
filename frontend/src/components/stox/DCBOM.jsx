@@ -307,6 +307,7 @@ const DCBOM = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>DC System</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>Bill of Materials</Typography>
@@ -316,7 +317,7 @@ const DCBOM = ({ onBack }) => {
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-              <AccountTree sx={{ fontSize: 32, color: '#1e40af' }} />
+              <AccountTree sx={{ fontSize: 32, color: '#005a9e' }} />
               <Typography variant="h4" fontWeight={700}>Bill of Materials</Typography>
             </Stack>
             <Typography variant="body2" color="text.secondary">Multi-level BOM management and component tracking for finished goods assembly</Typography>
@@ -331,24 +332,24 @@ const DCBOM = ({ onBack }) => {
       {metrics && (
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={4}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#1e40af', 0.1)} 0%, ${alpha('#1e40af', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#005a9e', 0.1)} 0%, ${alpha('#005a9e', 0.05)} 100%)` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <Layers sx={{ color: '#1e40af' }} />
+                  <Layers sx={{ color: '#005a9e' }} />
                   <Typography variant="body2" color="text.secondary">Total BOMs</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#1e40af">{metrics.totalBOMs}</Typography>
+                <Typography variant="h4" fontWeight={700} color="#005a9e">{metrics.totalBOMs}</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={4}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#3b82f6', 0.1)} 0%, ${alpha('#3b82f6', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2b88d8', 0.1)} 0%, ${alpha('#2b88d8', 0.05)} 100%)` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <AccountTree sx={{ color: '#3b82f6' }} />
+                  <AccountTree sx={{ color: '#2b88d8' }} />
                   <Typography variant="body2" color="text.secondary">Components</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#3b82f6">{metrics.totalComponents}</Typography>
+                <Typography variant="h4" fontWeight={700} color="#2b88d8">{metrics.totalComponents}</Typography>
               </CardContent>
             </Card>
           </Grid>

@@ -326,7 +326,7 @@ const SAPWriteback = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: '4px solid #8b5cf6' }}>
+            <Card sx={{ borderLeft: '4px solid #0078d4' }}>
               <CardContent>
                 <Typography variant="caption" color="text.secondary">Success Rate</Typography>
                 <Typography variant="h5" fontWeight={700}>{selectedJob.successRate}%</Typography>
@@ -492,7 +492,7 @@ const SAPWriteback = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #0ea5e9' }}>
+                <Card sx={{ borderLeft: '4px solid #2b88d8' }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">In Progress</Typography>
                     <Typography variant="h5" fontWeight={700} color="info.main">{metrics.inProgressCount}</Typography>
@@ -516,7 +516,7 @@ const SAPWriteback = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #8b5cf6' }}>
+                <Card sx={{ borderLeft: '4px solid #0078d4' }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">Avg Success</Typography>
                     <Typography variant="h5" fontWeight={700}>{metrics.avgSuccessRate}%</Typography>

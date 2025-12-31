@@ -353,7 +353,7 @@ const ExcelAIProcessor = ({ onBack }) => {
     const { active, completed, icon } = props;
 
     const icons = [
-      { icon: CloudUpload, color: '#3b82f6' },
+      { icon: CloudUpload, color: '#2b88d8' },
       { icon: Settings, color: '#06b6d4' },
       { icon: Code, color: '#8b5cf6' },
       { icon: AutoAwesome, color: '#f97316' },
@@ -406,10 +406,10 @@ const ExcelAIProcessor = ({ onBack }) => {
           variant="contained"
           onClick={handleCreateTemplate}
           sx={{
-            background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+            background: 'linear-gradient(135deg, #2b88d8 0%, #106ebe 100%)',
             boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
             '&:hover': {
-              background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+              background: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
               transform: 'scale(1.02)',
               boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
             }
@@ -431,7 +431,7 @@ const ExcelAIProcessor = ({ onBack }) => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Search sx={{ color: '#3b82f6' }} />
+                    <Search sx={{ color: '#2b88d8' }} />
                   </InputAdornment>
                 ),
                 endAdornment: searchQuery && (
@@ -451,14 +451,14 @@ const ExcelAIProcessor = ({ onBack }) => {
                   bgcolor: 'white',
                   borderRadius: 2,
                   '& fieldset': {
-                    borderColor: alpha('#3b82f6', 0.2),
+                    borderColor: alpha('#2b88d8', 0.2),
                     borderWidth: 2,
                   },
                   '&:hover fieldset': {
-                    borderColor: alpha('#3b82f6', 0.4),
+                    borderColor: alpha('#2b88d8', 0.4),
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: '#3b82f6',
+                    borderColor: '#2b88d8',
                   },
                 },
               }}
@@ -476,14 +476,14 @@ const ExcelAIProcessor = ({ onBack }) => {
                 textAlign: 'center',
                 bgcolor: 'linear-gradient(135deg, rgba(59, 130, 246, 0.02) 0%, rgba(255, 255, 255, 1) 100%)',
                 border: '2px dashed',
-                borderColor: alpha('#3b82f6', 0.3),
+                borderColor: alpha('#2b88d8', 0.3),
                 borderRadius: 2,
                 '&:hover': {
-                  borderColor: '#3b82f6',
+                  borderColor: '#2b88d8',
                   bgcolor: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(255, 255, 255, 1) 100%)',
                 }
               }}>
-                <Layers sx={{ fontSize: 64, color: alpha('#3b82f6', 0.4), mb: 2 }} />
+                <Layers sx={{ fontSize: 64, color: alpha('#2b88d8', 0.4), mb: 2 }} />
                 <Typography variant="h6" fontWeight={600} color="text.secondary" sx={{ mb: 1 }}>
                   No Templates Created Yet
                 </Typography>
@@ -495,9 +495,9 @@ const ExcelAIProcessor = ({ onBack }) => {
                   variant="contained"
                   onClick={handleCreateTemplate}
                   sx={{
-                    background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                    background: 'linear-gradient(135deg, #2b88d8 0%, #106ebe 100%)',
                     '&:hover': {
-                      background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                      background: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
                       transform: 'scale(1.02)',
                     }
                   }}
@@ -549,7 +549,7 @@ const ExcelAIProcessor = ({ onBack }) => {
         {filteredTemplates.map((template, index) => {
           // Corporate color palette - blue primary, slate secondary
           const colors = [
-            { main: '#3b82f6', gradient: 'linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)', bg: 'linear-gradient(135deg, rgba(248, 250, 252, 1) 0%, rgba(255, 255, 255, 1) 100%)', alpha: alpha('#3b82f6', 0.1) },
+            { main: '#2b88d8', gradient: 'linear-gradient(90deg, #2b88d8 0%, #106ebe 100%)', bg: 'linear-gradient(135deg, rgba(248, 250, 252, 1) 0%, rgba(255, 255, 255, 1) 100%)', alpha: alpha('#2b88d8', 0.1) },
             { main: '#64748b', gradient: 'linear-gradient(90deg, #64748b 0%, #475569 100%)', bg: 'linear-gradient(135deg, rgba(248, 250, 252, 1) 0%, rgba(255, 255, 255, 1) 100%)', alpha: alpha('#64748b', 0.1) },
           ];
           const colorScheme = colors[index % colors.length];
@@ -690,7 +690,7 @@ const ExcelAIProcessor = ({ onBack }) => {
               borderColor: '#10b981',
             },
             '& .MuiStepConnector-root.Mui-active .MuiStepConnector-line': {
-              borderColor: '#3b82f6',
+              borderColor: '#2b88d8',
             },
           }}
         >
@@ -1067,7 +1067,7 @@ const ExcelAIProcessor = ({ onBack }) => {
               variant="contained"
               onClick={() => setTemplateBuilder(prev => ({ ...prev, step: prev.step + 1 }))}
               disabled={templateBuilder.step === 0 && templateBuilder.files.length === 0}
-              sx={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}
+              sx={{ background: 'linear-gradient(135deg, #2b88d8 0%, #106ebe 100%)' }}
             >
               Next
             </Button>
@@ -1179,19 +1179,19 @@ const ExcelAIProcessor = ({ onBack }) => {
                 <Card sx={{
                   height: 80,
                   border: '1px solid',
-                  borderColor: alpha('#3b82f6', 0.15),
+                  borderColor: alpha('#2b88d8', 0.15),
                   borderRadius: 2,
                   overflow: 'hidden',
                   transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                   '&:hover': {
                     transform: 'translateY(-2px)',
-                    boxShadow: `0 8px 16px ${alpha('#3b82f6', 0.1)}`,
-                    borderColor: '#3b82f6',
+                    boxShadow: `0 8px 16px ${alpha('#2b88d8', 0.1)}`,
+                    borderColor: '#2b88d8',
                   }
                 }}>
                   <CardContent sx={{ p: 1.5, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                    <TableChart sx={{ fontSize: 24, color: '#3b82f6', mb: 0.25 }} />
-                    <Typography variant="h6" fontWeight={700} color="#3b82f6" sx={{ fontSize: '1.2rem' }}>
+                    <TableChart sx={{ fontSize: 24, color: '#2b88d8', mb: 0.25 }} />
+                    <Typography variant="h6" fontWeight={700} color="#2b88d8" sx={{ fontSize: '1.2rem' }}>
                       {fileData.columns.length}
                     </Typography>
                     <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
@@ -1305,16 +1305,16 @@ const ExcelAIProcessor = ({ onBack }) => {
                 <Paper sx={{
                   p: 1.5,
                   mt: 2,
-                  bgcolor: alpha('#3b82f6', 0.05),
+                  bgcolor: alpha('#2b88d8', 0.05),
                   border: '1px solid',
-                  borderColor: alpha('#3b82f6', 0.1),
+                  borderColor: alpha('#2b88d8', 0.1),
                   borderRadius: 1,
-                  borderLeft: '3px solid #3b82f6'
+                  borderLeft: '3px solid #2b88d8'
                 }}>
                   <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
-                    <AutoAwesome sx={{ fontSize: 16, color: '#3b82f6', mt: 0.1 }} />
+                    <AutoAwesome sx={{ fontSize: 16, color: '#2b88d8', mt: 0.1 }} />
                     <Box>
-                      <Typography variant="caption" fontWeight={600} color="#3b82f6" sx={{ display: 'block', mb: 0.3, fontSize: '0.7rem' }}>
+                      <Typography variant="caption" fontWeight={600} color="#2b88d8" sx={{ display: 'block', mb: 0.3, fontSize: '0.7rem' }}>
                         Processing Context
                       </Typography>
                       <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', lineHeight: 1.4 }}>
@@ -1430,7 +1430,7 @@ const ExcelAIProcessor = ({ onBack }) => {
                 <Grid container spacing={2}>
                   {/* Date Filter Section */}
                   <Grid item xs={12}>
-                    <Typography variant="subtitle2" fontWeight={600} color="#3b82f6" sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="subtitle2" fontWeight={600} color="#2b88d8" sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
                       <TableChart sx={{ fontSize: 18 }} />
                       Date Filter
                     </Typography>
@@ -1526,7 +1526,7 @@ const ExcelAIProcessor = ({ onBack }) => {
 
                   {/* Invoice Range Section */}
                   <Grid item xs={12}>
-                    <Typography variant="subtitle2" fontWeight={600} color="#3b82f6" sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="subtitle2" fontWeight={600} color="#2b88d8" sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Description sx={{ fontSize: 18 }} />
                       Invoice Range (Optional)
                     </Typography>
@@ -1572,16 +1572,16 @@ const ExcelAIProcessor = ({ onBack }) => {
                     <Paper sx={{
                       p: 1.5,
                       mt: 1,
-                      bgcolor: alpha('#3b82f6', 0.05),
+                      bgcolor: alpha('#2b88d8', 0.05),
                       border: '1px solid',
-                      borderColor: alpha('#3b82f6', 0.1),
+                      borderColor: alpha('#2b88d8', 0.1),
                       borderRadius: 1,
-                      borderLeft: '3px solid #3b82f6'
+                      borderLeft: '3px solid #2b88d8'
                     }}>
                       <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
-                        <AutoAwesome sx={{ fontSize: 16, color: '#3b82f6', mt: 0.1 }} />
+                        <AutoAwesome sx={{ fontSize: 16, color: '#2b88d8', mt: 0.1 }} />
                         <Box sx={{ flex: 1 }}>
-                          <Typography variant="caption" fontWeight={600} color="#3b82f6" sx={{ display: 'block', mb: 0.5, fontSize: '0.7rem' }}>
+                          <Typography variant="caption" fontWeight={600} color="#2b88d8" sx={{ display: 'block', mb: 0.5, fontSize: '0.7rem' }}>
                             Active Filters
                           </Typography>
                           <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', lineHeight: 1.6 }}>
@@ -1610,7 +1610,7 @@ const ExcelAIProcessor = ({ onBack }) => {
               mb: 3,
               background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.02) 0%, rgba(255, 255, 255, 1) 100%)',
               border: '1px solid',
-              borderColor: alpha('#3b82f6', 0.1),
+              borderColor: alpha('#2b88d8', 0.1),
               borderRadius: 2,
             }}>
               {/* Header with gradient background */}
@@ -1621,13 +1621,13 @@ const ExcelAIProcessor = ({ onBack }) => {
                 mb: 3,
                 pb: 2,
                 borderBottom: '2px solid',
-                borderColor: alpha('#3b82f6', 0.1)
+                borderColor: alpha('#2b88d8', 0.1)
               }}>
-                <Avatar sx={{ bgcolor: alpha('#3b82f6', 0.1), width: 40, height: 40 }}>
-                  <CloudUpload sx={{ color: '#3b82f6', fontSize: 24 }} />
+                <Avatar sx={{ bgcolor: alpha('#2b88d8', 0.1), width: 40, height: 40 }}>
+                  <CloudUpload sx={{ color: '#2b88d8', fontSize: 24 }} />
                 </Avatar>
                 <Box>
-                  <Typography variant="h6" fontWeight={700} color="#3b82f6">
+                  <Typography variant="h6" fontWeight={700} color="#2b88d8">
                     Upload Files to Process
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
@@ -1641,18 +1641,18 @@ const ExcelAIProcessor = ({ onBack }) => {
                   onClick={() => fileInputRef.current?.click()}
                   sx={{
                     border: '2px dashed',
-                    borderColor: alpha('#3b82f6', 0.3),
+                    borderColor: alpha('#2b88d8', 0.3),
                     borderRadius: 2,
                     p: 6,
                     textAlign: 'center',
                     cursor: 'pointer',
-                    bgcolor: alpha('#3b82f6', 0.02),
+                    bgcolor: alpha('#2b88d8', 0.02),
                     position: 'relative',
                     overflow: 'hidden',
                     transition: 'all 0.3s ease',
                     '&:hover': {
-                      bgcolor: alpha('#3b82f6', 0.05),
-                      borderColor: '#3b82f6',
+                      bgcolor: alpha('#2b88d8', 0.05),
+                      borderColor: '#2b88d8',
                       transform: 'scale(1.01)',
                       '& .upload-icon': {
                         transform: 'scale(1.1) translateY(-4px)',
@@ -1664,12 +1664,12 @@ const ExcelAIProcessor = ({ onBack }) => {
                     className="upload-icon"
                     sx={{
                       fontSize: 64,
-                      color: alpha('#3b82f6', 0.4),
+                      color: alpha('#2b88d8', 0.4),
                       mb: 2,
                       transition: 'all 0.3s ease'
                     }}
                   />
-                  <Typography variant="body1" fontWeight={600} color="#3b82f6" sx={{ mb: 0.5 }}>
+                  <Typography variant="body1" fontWeight={600} color="#2b88d8" sx={{ mb: 0.5 }}>
                     Drop Excel files here or click to browse
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
@@ -1729,19 +1729,19 @@ const ExcelAIProcessor = ({ onBack }) => {
                           p: 2,
                           bgcolor: 'white',
                           border: '1px solid',
-                          borderColor: alpha('#3b82f6', 0.1),
+                          borderColor: alpha('#2b88d8', 0.1),
                           borderRadius: 1.5,
                           transition: 'all 0.2s ease',
                           '&:hover': {
-                            borderColor: '#3b82f6',
-                            boxShadow: `0 4px 12px ${alpha('#3b82f6', 0.1)}`,
+                            borderColor: '#2b88d8',
+                            boxShadow: `0 4px 12px ${alpha('#2b88d8', 0.1)}`,
                             transform: 'translateX(4px)'
                           }
                         }}
                       >
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                          <Avatar sx={{ bgcolor: alpha('#3b82f6', 0.1), width: 36, height: 36 }}>
-                            <Description sx={{ color: '#3b82f6', fontSize: 20 }} />
+                          <Avatar sx={{ bgcolor: alpha('#2b88d8', 0.1), width: 36, height: 36 }}>
+                            <Description sx={{ color: '#2b88d8', fontSize: 20 }} />
                           </Avatar>
                           <Box>
                             <Typography variant="body2" fontWeight={600}>{file.name}</Typography>
@@ -1805,8 +1805,8 @@ const ExcelAIProcessor = ({ onBack }) => {
                 {/* Sheets Section */}
                 <Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                    <TableChart sx={{ fontSize: 18, color: '#3b82f6' }} />
-                    <Typography variant="subtitle2" fontWeight={600} color="#3b82f6">
+                    <TableChart sx={{ fontSize: 18, color: '#2b88d8' }} />
+                    <Typography variant="subtitle2" fontWeight={600} color="#2b88d8">
                       Sheets to Process
                     </Typography>
                   </Box>
@@ -1817,13 +1817,13 @@ const ExcelAIProcessor = ({ onBack }) => {
                           label={sheet.name}
                           size="small"
                           sx={{
-                            bgcolor: alpha('#3b82f6', 0.1),
-                            color: '#3b82f6',
+                            bgcolor: alpha('#2b88d8', 0.1),
+                            color: '#2b88d8',
                             fontWeight: 600,
                             border: '1px solid',
-                            borderColor: alpha('#3b82f6', 0.2),
+                            borderColor: alpha('#2b88d8', 0.2),
                             '&:hover': {
-                              bgcolor: alpha('#3b82f6', 0.2),
+                              bgcolor: alpha('#2b88d8', 0.2),
                               transform: 'scale(1.05)',
                             }
                           }}
@@ -1935,7 +1935,7 @@ const ExcelAIProcessor = ({ onBack }) => {
                       '&:before': { display: 'none' },
                       boxShadow: 'none',
                       border: '1px solid',
-                      borderColor: alpha('#3b82f6', 0.1),
+                      borderColor: alpha('#2b88d8', 0.1),
                       borderRadius: '8px !important',
                       '&.Mui-expanded': {
                         margin: '0 !important',
@@ -1951,8 +1951,8 @@ const ExcelAIProcessor = ({ onBack }) => {
                       }}
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Avatar sx={{ bgcolor: alpha('#3b82f6', 0.1), width: 32, height: 32 }}>
-                          <Description sx={{ color: '#3b82f6', fontSize: 18 }} />
+                        <Avatar sx={{ bgcolor: alpha('#2b88d8', 0.1), width: 32, height: 32 }}>
+                          <Description sx={{ color: '#2b88d8', fontSize: 18 }} />
                         </Avatar>
                         <Typography variant="subtitle1" fontWeight={600}>
                           Analysis Methodology
@@ -1960,7 +1960,7 @@ const ExcelAIProcessor = ({ onBack }) => {
                       </Box>
                     </AccordionSummary>
                     <AccordionDetails sx={{ pt: 0 }}>
-                      <Paper sx={{ p: 2, bgcolor: alpha('#3b82f6', 0.03), border: '1px solid', borderColor: alpha('#3b82f6', 0.1) }}>
+                      <Paper sx={{ p: 2, bgcolor: alpha('#2b88d8', 0.03), border: '1px solid', borderColor: alpha('#2b88d8', 0.1) }}>
                         <Typography variant="body2" sx={{ mb: 2, lineHeight: 1.8 }}>
                           This template processes financial data using a <strong>hybrid approach</strong> that combines multiple data sources:
                         </Typography>
@@ -2211,10 +2211,10 @@ const ExcelAIProcessor = ({ onBack }) => {
             sx={{
               py: 2,
               fontSize: '1.1rem',
-              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+              background: 'linear-gradient(135deg, #2b88d8 0%, #106ebe 100%)',
               boxShadow: '0 4px 14px rgba(59, 130, 246, 0.4)',
               '&:hover': {
-                background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                background: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
                 transform: 'scale(1.02)',
                 boxShadow: '0 6px 20px rgba(59, 130, 246, 0.5)',
               },
@@ -2280,12 +2280,12 @@ const ExcelAIProcessor = ({ onBack }) => {
                         textAlign: 'center',
                         background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(255, 255, 255, 1) 100%)',
                         border: '1px solid',
-                        borderColor: alpha('#3b82f6', 0.2),
+                        borderColor: alpha('#2b88d8', 0.2),
                         transition: 'all 0.3s ease',
                         '&:hover': { transform: 'translateY(-4px)', boxShadow: 3 }
                       }}>
-                        <Description sx={{ fontSize: 32, color: '#3b82f6', mb: 1 }} />
-                        <Typography variant="h4" fontWeight={700} color="#3b82f6">{processedResults.filesProcessed}</Typography>
+                        <Description sx={{ fontSize: 32, color: '#2b88d8', mb: 1 }} />
+                        <Typography variant="h4" fontWeight={700} color="#2b88d8">{processedResults.filesProcessed}</Typography>
                         <Typography variant="caption" color="text.secondary">Files Processed</Typography>
                       </Paper>
                     </Zoom>
@@ -2420,7 +2420,7 @@ const ExcelAIProcessor = ({ onBack }) => {
                       key={msg.id}
                       sx={{
                         p: 1.5,
-                        bgcolor: msg.role === 'user' ? '#3b82f6' : '#f3f4f6',
+                        bgcolor: msg.role === 'user' ? '#2b88d8' : '#f3f4f6',
                         color: msg.role === 'user' ? 'white' : 'text.primary'
                       }}
                     >

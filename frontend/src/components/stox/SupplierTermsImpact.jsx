@@ -170,7 +170,7 @@ const SupplierTermsImpact = ({ onBack }) => {
     labels: Object.keys(data.termsCounts),
     datasets: [{
       data: Object.values(data.termsSpend),
-      backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'],
+      backgroundColor: ['#2b88d8', '#10b981', '#f59e0b'],
       borderWidth: 0,
     }],
   };
@@ -182,7 +182,7 @@ const SupplierTermsImpact = ({ onBack }) => {
       {
         label: 'WC Tied',
         data: data.categoryData.map(c => c.wcTied),
-        backgroundColor: '#0854a0',
+        backgroundColor: '#106ebe',
       },
     ],
   };
@@ -193,7 +193,7 @@ const SupplierTermsImpact = ({ onBack }) => {
     datasets: [{
       label: 'Potential Value',
       data: [data.summary.totalConsignmentPotential, data.summary.totalTermsExtension, data.summary.totalDiscountAvailable],
-      backgroundColor: ['#10b981', '#3b82f6', '#f59e0b'],
+      backgroundColor: ['#10b981', '#2b88d8', '#f59e0b'],
     }],
   };
 
@@ -292,7 +292,9 @@ const SupplierTermsImpact = ({ onBack }) => {
       <Box sx={{ mb: 2 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 4: Optimization</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>Supplier Terms Impact</Typography>
           </Breadcrumbs>
           <Stack direction="row" spacing={1}>
@@ -306,9 +308,9 @@ const SupplierTermsImpact = ({ onBack }) => {
           </Stack>
         </Stack>
         <Stack direction="row" alignItems="center" spacing={1.5}>
-          <HandshakeIcon sx={{ fontSize: 28, color: '#0854a0' }} />
+          <HandshakeIcon sx={{ fontSize: 28, color: '#106ebe' }} />
           <Box>
-            <Typography variant="h5" fontWeight={700} color="#0854a0">Supplier Terms Impact</Typography>
+            <Typography variant="h5" fontWeight={700} color="#106ebe">Supplier Terms Impact</Typography>
             <Typography variant="body2" color="text.secondary">Analyze payment terms impact on Working Capital</Typography>
           </Box>
         </Stack>
@@ -319,7 +321,7 @@ const SupplierTermsImpact = ({ onBack }) => {
         {/* Summary Cards */}
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={6} sm={4} md={2}>
-            <Card sx={{ borderLeft: '4px solid #0854a0' }}>
+            <Card sx={{ borderLeft: '4px solid #106ebe' }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Typography variant="caption" color="text.secondary">Total Spend</Typography>
                 <Typography variant="h5" fontWeight={700}>{formatCurrency(data.summary.totalSpend)}</Typography>
@@ -343,10 +345,10 @@ const SupplierTermsImpact = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={6} sm={4} md={2}>
-            <Card sx={{ borderLeft: '4px solid #3b82f6' }}>
+            <Card sx={{ borderLeft: '4px solid #2b88d8' }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Typography variant="caption" color="text.secondary">Terms Extension</Typography>
-                <Typography variant="h5" fontWeight={700} color="#3b82f6">{formatCurrency(data.summary.totalTermsExtension)}</Typography>
+                <Typography variant="h5" fontWeight={700} color="#2b88d8">{formatCurrency(data.summary.totalTermsExtension)}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -359,7 +361,7 @@ const SupplierTermsImpact = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={6} sm={4} md={2}>
-            <Card sx={{ borderLeft: '4px solid #8b5cf6' }}>
+            <Card sx={{ borderLeft: '4px solid #0078d4' }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Typography variant="caption" color="text.secondary">Avg DPO</Typography>
                 <Typography variant="h5" fontWeight={700}>{data.summary.avgDPO} days</Typography>
@@ -488,10 +490,10 @@ const SupplierTermsImpact = ({ onBack }) => {
         </Paper>
 
         {/* Insights Card */}
-        <Card sx={{ bgcolor: alpha('#0854a0', 0.03) }}>
+        <Card sx={{ bgcolor: alpha('#106ebe', 0.03) }}>
           <CardContent sx={{ py: 1.5 }}>
             <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-              <InfoIcon sx={{ color: '#0854a0', fontSize: 18 }} />
+              <InfoIcon sx={{ color: '#106ebe', fontSize: 18 }} />
               <Typography variant="subtitle2" fontWeight={700}>Key Insights</Typography>
             </Stack>
             <Grid container spacing={2}>

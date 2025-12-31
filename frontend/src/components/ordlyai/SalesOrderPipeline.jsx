@@ -254,7 +254,7 @@ const ExpandableRow = ({ row, isOpen, onToggle, darkMode, onTileClick, onLineCli
     const styles = {
       rush: { bgcolor: alpha('#ef4444', 0.12), color: '#dc2626' },
       new: { bgcolor: alpha('#1976d2', 0.12), color: '#1565c0' },
-      processing: { bgcolor: alpha('#3b82f6', 0.12), color: '#2563eb' },
+      processing: { bgcolor: alpha('#2b88d8', 0.12), color: '#0078d4' },
       escalated: { bgcolor: alpha('#ef4444', 0.12), color: '#dc2626' },
       review: { bgcolor: alpha('#f59e0b', 0.12), color: '#d97706' },
       approved: { bgcolor: alpha('#10b981', 0.12), color: '#059669' },
@@ -770,7 +770,7 @@ const SalesOrderPipeline = ({ onBack, darkMode = false, onNavigate }) => {
           { label: 'In Progress', value: stats.inProgress, color: '#f59e0b' },
           { label: 'Pipeline Value', value: stats.pipelineValue >= 1000000 ? `$${(stats.pipelineValue / 1000000).toFixed(1)}M` : `$${(stats.pipelineValue / 1000).toFixed(1)}K`, color: '#10b981' },
           { label: 'Avg Margin', value: `${stats.avgMargin}%`, color: '#10b981' },
-          { label: 'Committed', value: stats.committed, color: '#3b82f6' },
+          { label: 'Committed', value: stats.committed, color: '#2b88d8' },
           { label: 'Escalated', value: stats.escalated, color: '#ef4444' },
         ].map((card) => (
           <Grid item xs={6} sm={4} md={2} key={card.label}>

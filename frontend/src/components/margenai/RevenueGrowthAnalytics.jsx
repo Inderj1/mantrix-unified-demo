@@ -120,7 +120,7 @@ const RevenueGrowthAnalytics = ({ onBack }) => {
       title: 'Avg Transaction Value',
       value: formatCurrency(avgTransactionValue),
       subtitle: 'Average per transaction',
-      color: '#3b82f6',
+      color: '#2b88d8',
       icon: BusinessIcon,
     },
     {

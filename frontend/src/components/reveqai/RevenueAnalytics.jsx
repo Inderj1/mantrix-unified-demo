@@ -159,10 +159,10 @@ const RevenueAnalytics = ({ onBack }) => {
           size="small"
           sx={{
             fontWeight: 700,
-            bgcolor: alpha('#2563eb', 0.12),
-            color: '#2563eb',
+            bgcolor: alpha('#0078d4', 0.12),
+            color: '#0078d4',
             border: '1px solid',
-            borderColor: alpha('#2563eb', 0.2),
+            borderColor: alpha('#0078d4', 0.2),
           }}
         />
       ),

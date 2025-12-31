@@ -654,7 +654,7 @@ const DemandSignal = ({ onBack }) => {
           { label: 'Active Signals', value: stats.totalSignals, color: ACCENT_BLUE },
           { label: 'Avg. Confidence', value: `${stats.avgConfidence}%`, color: CYAN },
           { label: 'High Priority', value: stats.highPriority, color: PRIMARY_BLUE },
-          { label: 'Total Value', value: `$${(stats.totalValue / 1000).toFixed(0)}K`, color: '#3b82f6' },
+          { label: 'Total Value', value: `$${(stats.totalValue / 1000).toFixed(0)}K`, color: '#2b88d8' },
         ].map((card) => (
           <Grid item xs={6} sm={4} md={3} key={card.label}>
             <Card variant="outlined" sx={{ borderLeft: `3px solid ${card.color}` }}>

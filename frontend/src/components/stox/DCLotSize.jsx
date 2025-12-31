@@ -156,8 +156,8 @@ const DCLotSize = ({ onBack }) => {
           size="small"
           sx={{
             fontWeight: 700,
-            bgcolor: alpha('#3b82f6', 0.12),
-            color: '#2563eb',
+            bgcolor: alpha('#2b88d8', 0.12),
+            color: '#106ebe',
           }}
         />
       ),
@@ -199,6 +199,7 @@ const DCLotSize = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>DC System</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>Lot Size Optimization</Typography>
@@ -245,24 +246,24 @@ const DCLotSize = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#3b82f6', 0.1)} 0%, ${alpha('#3b82f6', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2b88d8', 0.1)} 0%, ${alpha('#2b88d8', 0.05)} 100%)` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <AttachMoney sx={{ color: '#3b82f6' }} />
+                  <AttachMoney sx={{ color: '#2b88d8' }} />
                   <Typography variant="body2" color="text.secondary">Total Savings</Typography>
                 </Stack>
-                <Typography variant="h5" fontWeight={700} color="#3b82f6">${(metrics.totalSavings / 1000).toFixed(1)}K</Typography>
+                <Typography variant="h5" fontWeight={700} color="#2b88d8">${(metrics.totalSavings / 1000).toFixed(1)}K</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2563eb', 0.1)} 0%, ${alpha('#2563eb', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#106ebe', 0.1)} 0%, ${alpha('#106ebe', 0.05)} 100%)` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <LocalShipping sx={{ color: '#2563eb' }} />
+                  <LocalShipping sx={{ color: '#106ebe' }} />
                   <Typography variant="body2" color="text.secondary">Avg EOQ</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#2563eb">{metrics.avgEOQ.toLocaleString()}</Typography>
+                <Typography variant="h4" fontWeight={700} color="#106ebe">{metrics.avgEOQ.toLocaleString()}</Typography>
               </CardContent>
             </Card>
           </Grid>

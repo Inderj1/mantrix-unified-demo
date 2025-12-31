@@ -316,8 +316,8 @@ const StoreHealthMonitor = ({ onBack }) => {
           size="small"
           sx={{
             fontWeight: 700,
-            bgcolor: alpha('#8b5cf6', 0.12),
-            color: '#7c3aed',
+            bgcolor: alpha('#0078d4', 0.12),
+            color: '#005a9e',
           }}
         />
       ),
@@ -367,6 +367,7 @@ const StoreHealthMonitor = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Store System</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>Tile 2: Inventory Health</Typography>
@@ -426,13 +427,13 @@ const StoreHealthMonitor = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#3b82f6', 0.1)} 0%, ${alpha('#3b82f6', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2b88d8', 0.1)} 0%, ${alpha('#2b88d8', 0.05)} 100%)` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <Inventory sx={{ color: '#3b82f6' }} />
+                  <Inventory sx={{ color: '#2b88d8' }} />
                   <Typography variant="body2" color="text.secondary">Avg Health</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#3b82f6">{metrics.avgHealthScore}%</Typography>
+                <Typography variant="h4" fontWeight={700} color="#2b88d8">{metrics.avgHealthScore}%</Typography>
               </CardContent>
             </Card>
           </Grid>

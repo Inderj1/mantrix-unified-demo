@@ -175,8 +175,8 @@ const StoreReplenishment = ({ onBack }) => {
           size="small"
           sx={{
             fontWeight: 700,
-            bgcolor: params.value > 0 ? alpha('#3b82f6', 0.12) : alpha('#94a3b8', 0.12),
-            color: params.value > 0 ? '#2563eb' : '#64748b',
+            bgcolor: params.value > 0 ? alpha('#2b88d8', 0.12) : alpha('#94a3b8', 0.12),
+            color: params.value > 0 ? '#106ebe' : '#64748b',
           }}
         />
       ),
@@ -211,8 +211,8 @@ const StoreReplenishment = ({ onBack }) => {
           size="small"
           sx={{
             fontWeight: 600,
-            bgcolor: params.value === 'DC-East' ? alpha('#3b82f6', 0.12) : alpha('#8b5cf6', 0.12),
-            color: params.value === 'DC-East' ? '#2563eb' : '#7c3aed',
+            bgcolor: params.value === 'DC-East' ? alpha('#2b88d8', 0.12) : alpha('#0078d4', 0.12),
+            color: params.value === 'DC-East' ? '#106ebe' : '#005a9e',
           }}
         />
       ),
@@ -377,6 +377,7 @@ const StoreReplenishment = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Store System</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>Tile 4: Stock Transfer Execution</Typography>
@@ -386,7 +387,7 @@ const StoreReplenishment = ({ onBack }) => {
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-              <LocalShipping sx={{ fontSize: 32, color: '#3b82f6' }} />
+              <LocalShipping sx={{ fontSize: 32, color: '#2b88d8' }} />
               <Typography variant="h4" fontWeight={700}>Tile 4: Stock Transfer Execution (DC → Store)</Typography>
             </Stack>
             <Typography variant="body2" color="text.secondary">
@@ -403,13 +404,13 @@ const StoreReplenishment = ({ onBack }) => {
       {metrics && (
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#3b82f6', 0.1)} 0%, ${alpha('#3b82f6', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2b88d8', 0.1)} 0%, ${alpha('#2b88d8', 0.05)} 100%)` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <LocalShipping sx={{ color: '#3b82f6' }} />
+                  <LocalShipping sx={{ color: '#2b88d8' }} />
                   <Typography variant="body2" color="text.secondary">Total Orders</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#3b82f6">{metrics.totalOrders}</Typography>
+                <Typography variant="h4" fontWeight={700} color="#2b88d8">{metrics.totalOrders}</Typography>
               </CardContent>
             </Card>
           </Grid>

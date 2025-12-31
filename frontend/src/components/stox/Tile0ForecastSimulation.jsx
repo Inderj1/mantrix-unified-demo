@@ -268,10 +268,10 @@ const generateDetailData = (skuId, mainData) => {
             : sku.status === 'Moderate'
             ? [420, 385, 460, 445, 478, 502, null, null, null]
             : [410, 425, 418, 432, 445, 438, null, null, null],
-          borderColor: '#0ea5e9',
+          borderColor: '#2b88d8',
           backgroundColor: 'transparent',
           borderWidth: 2,
-          pointBackgroundColor: '#0ea5e9',
+          pointBackgroundColor: '#2b88d8',
           pointRadius: 4,
           tension: 0.3,
         },
@@ -328,7 +328,7 @@ const generateDetailData = (skuId, mainData) => {
             : sku.status === 'Moderate'
             ? [780, 650, 520, 850, 720, 645]
             : [1250, 1180, 1050, 1320, 1200, 1150],
-          borderColor: '#0ea5e9',
+          borderColor: '#2b88d8',
           backgroundColor: 'rgba(14, 165, 233, 0.1)',
           borderWidth: 2,
           fill: true,
@@ -578,7 +578,7 @@ const Tile0ForecastSimulation = ({ onBack }) => {
         <Button
           startIcon={<ArrowBackIcon />}
           onClick={handleBackToList}
-          sx={{ mb: 3, color: '#64748b', '&:hover': { bgcolor: alpha('#0ea5e9', 0.1), color: '#0ea5e9' } }}
+          sx={{ mb: 3, color: '#64748b', '&:hover': { bgcolor: alpha('#2b88d8', 0.1), color: '#2b88d8' } }}
         >
           Back to Overview
         </Button>
@@ -587,7 +587,7 @@ const Tile0ForecastSimulation = ({ onBack }) => {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
           <Box sx={{
             width: 56, height: 56, borderRadius: 2,
-            background: 'linear-gradient(135deg, #0ea5e9 0%, #10b981 100%)',
+            background: 'linear-gradient(135deg, #2b88d8 0%, #10b981 100%)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: '1.75rem'
           }}>
@@ -595,13 +595,13 @@ const Tile0ForecastSimulation = ({ onBack }) => {
           </Box>
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5}>
-              <Typography variant="h5" sx={{ fontWeight: 700, color: '#0ea5e9' }}>{selectedSku.material}</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 700, color: '#2b88d8' }}>{selectedSku.material}</Typography>
               <Typography sx={{ color: '#64748b' }}>|</Typography>
               <Typography variant="h6" sx={{ color: '#64748b' }}>{selectedSku.plant}</Typography>
               <Chip
                 label={selectedSku.abcXyz}
                 size="small"
-                sx={{ bgcolor: alpha('#0ea5e9', 0.12), color: '#0284c7', fontWeight: 600 }}
+                sx={{ bgcolor: alpha('#2b88d8', 0.12), color: '#0284c7', fontWeight: 600 }}
               />
             </Stack>
             <Typography sx={{ color: '#64748b', fontSize: '0.9rem', mt: 0.5 }}>{selectedSku.description}</Typography>
@@ -616,11 +616,11 @@ const Tile0ForecastSimulation = ({ onBack }) => {
             <Card sx={{ mb: 3, border: '1px solid', borderColor: alpha('#64748b', 0.15) }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-                  <AssessmentIcon sx={{ color: '#0ea5e9', fontSize: 20 }} />
+                  <AssessmentIcon sx={{ color: '#2b88d8', fontSize: 20 }} />
                   <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
                     Inventory Health Score
                   </Typography>
-                  <Chip label="AI-COMPUTED" size="small" sx={{ ml: 'auto', height: 18, fontSize: '0.6rem', bgcolor: alpha('#0ea5e9', 0.1), color: '#0284c7' }} />
+                  <Chip label="AI-COMPUTED" size="small" sx={{ ml: 'auto', height: 18, fontSize: '0.6rem', bgcolor: alpha('#2b88d8', 0.1), color: '#0284c7' }} />
                 </Stack>
 
                 {/* Circular Gauge */}
@@ -682,11 +682,11 @@ const Tile0ForecastSimulation = ({ onBack }) => {
             <Card sx={{ border: '1px solid', borderColor: alpha('#64748b', 0.15) }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-                  <InventoryIcon sx={{ color: '#0ea5e9', fontSize: 20 }} />
+                  <InventoryIcon sx={{ color: '#2b88d8', fontSize: 20 }} />
                   <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
                     Inventory Position
                   </Typography>
-                  <Chip label="MARD • MARC" size="small" sx={{ ml: 'auto', height: 18, fontSize: '0.55rem', bgcolor: alpha('#0ea5e9', 0.1), color: '#0284c7' }} />
+                  <Chip label="MARD • MARC" size="small" sx={{ ml: 'auto', height: 18, fontSize: '0.55rem', bgcolor: alpha('#2b88d8', 0.1), color: '#0284c7' }} />
                 </Stack>
 
                 <Stack spacing={1.5}>
@@ -703,7 +703,7 @@ const Tile0ForecastSimulation = ({ onBack }) => {
                   ))}
                   <Divider />
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569' }}>Total Available</Typography>
+                    <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: '#0078d4' }}>Total Available</Typography>
                     <Typography sx={{ fontSize: '1.1rem', fontWeight: 700 }}>{selectedSku.totalAvailable} CS</Typography>
                   </Box>
                 </Stack>
@@ -733,11 +733,11 @@ const Tile0ForecastSimulation = ({ onBack }) => {
             <Card sx={{ mb: 3, border: '1px solid', borderColor: alpha('#64748b', 0.15) }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-                  <TrendingUpIcon sx={{ color: '#0ea5e9', fontSize: 20 }} />
+                  <TrendingUpIcon sx={{ color: '#2b88d8', fontSize: 20 }} />
                   <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
                     Demand & AI Forecast
                   </Typography>
-                  <Chip label="MVER • VBAP" size="small" sx={{ ml: 'auto', height: 18, fontSize: '0.55rem', bgcolor: alpha('#0ea5e9', 0.1), color: '#0284c7' }} />
+                  <Chip label="MVER • VBAP" size="small" sx={{ ml: 'auto', height: 18, fontSize: '0.55rem', bgcolor: alpha('#2b88d8', 0.1), color: '#0284c7' }} />
                 </Stack>
                 <Box sx={{ height: 180 }}>
                   <Line data={selectedSku.demandChartData} options={chartOptions} />
@@ -763,11 +763,11 @@ const Tile0ForecastSimulation = ({ onBack }) => {
             <Card sx={{ mb: 3, border: '1px solid', borderColor: alpha('#64748b', 0.15) }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-                  <TrendingDownIcon sx={{ color: '#0ea5e9', fontSize: 20 }} />
+                  <TrendingDownIcon sx={{ color: '#2b88d8', fontSize: 20 }} />
                   <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
                     Stock Position Trend
                   </Typography>
-                  <Chip label="MSEG/MKPF" size="small" sx={{ ml: 'auto', height: 18, fontSize: '0.55rem', bgcolor: alpha('#0ea5e9', 0.1), color: '#0284c7' }} />
+                  <Chip label="MSEG/MKPF" size="small" sx={{ ml: 'auto', height: 18, fontSize: '0.55rem', bgcolor: alpha('#2b88d8', 0.1), color: '#0284c7' }} />
                 </Stack>
                 <Box sx={{ height: 150 }}>
                   <Line data={selectedSku.stockChartData} options={chartOptions} />
@@ -792,7 +792,7 @@ const Tile0ForecastSimulation = ({ onBack }) => {
                     <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                         <Typography sx={{ fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase' }}>{metric.label}</Typography>
-                        {metric.sap && <Chip label={metric.sap} size="small" sx={{ height: 14, fontSize: '0.5rem', bgcolor: alpha('#0ea5e9', 0.1), color: '#0284c7' }} />}
+                        {metric.sap && <Chip label={metric.sap} size="small" sx={{ height: 14, fontSize: '0.5rem', bgcolor: alpha('#2b88d8', 0.1), color: '#0284c7' }} />}
                       </Box>
                       <Typography sx={{ fontSize: '1.3rem', fontWeight: 700 }}>
                         {metric.value}{metric.unit && <Typography component="span" sx={{ fontSize: '0.8rem', fontWeight: 400, color: '#64748b', ml: 0.5 }}>{metric.unit}</Typography>}
@@ -842,7 +842,7 @@ const Tile0ForecastSimulation = ({ onBack }) => {
                           <Typography sx={{ fontSize: '0.75rem', color: '#64748b' }}>{alert.probability}%</Typography>
                         </Box>
                         <Typography sx={{ fontSize: '0.75rem', color: '#64748b', mb: 1 }}>{alert.impact}</Typography>
-                        <Typography sx={{ fontSize: '0.75rem', color: '#0ea5e9', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Typography sx={{ fontSize: '0.75rem', color: '#2b88d8', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 0.5 }}>
                           ⚡ {alert.action}
                         </Typography>
                       </Box>
@@ -856,7 +856,7 @@ const Tile0ForecastSimulation = ({ onBack }) => {
             <Card sx={{ mb: 3, border: '1px solid', borderColor: alpha('#64748b', 0.15) }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-                  <LightbulbIcon sx={{ color: '#0ea5e9', fontSize: 20 }} />
+                  <LightbulbIcon sx={{ color: '#2b88d8', fontSize: 20 }} />
                   <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
                     AI Recommendations
                   </Typography>
@@ -864,7 +864,7 @@ const Tile0ForecastSimulation = ({ onBack }) => {
                 </Stack>
                 <Stack spacing={1.5}>
                   {selectedSku.recommendations.map((rec) => {
-                    const priorityColor = rec.priority === 'critical' ? '#ef4444' : rec.priority === 'high' ? '#f59e0b' : '#0ea5e9';
+                    const priorityColor = rec.priority === 'critical' ? '#ef4444' : rec.priority === 'high' ? '#f59e0b' : '#2b88d8';
                     return (
                       <Box
                         key={rec.id}
@@ -913,11 +913,11 @@ const Tile0ForecastSimulation = ({ onBack }) => {
             <Card sx={{ border: '1px solid', borderColor: alpha('#64748b', 0.15) }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-                  <LocalShippingIcon sx={{ color: '#0ea5e9', fontSize: 20 }} />
+                  <LocalShippingIcon sx={{ color: '#2b88d8', fontSize: 20 }} />
                   <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
                     Vendor Lead Times
                   </Typography>
-                  <Chip label="EKBE • EINE" size="small" sx={{ ml: 'auto', height: 18, fontSize: '0.55rem', bgcolor: alpha('#0ea5e9', 0.1), color: '#0284c7' }} />
+                  <Chip label="EKBE • EINE" size="small" sx={{ ml: 'auto', height: 18, fontSize: '0.55rem', bgcolor: alpha('#2b88d8', 0.1), color: '#0284c7' }} />
                 </Stack>
                 <Stack spacing={1.5}>
                   {selectedSku.vendors.map((vendor) => (
@@ -955,15 +955,15 @@ const Tile0ForecastSimulation = ({ onBack }) => {
         <Card sx={{ mt: 3, border: '1px solid', borderColor: alpha('#64748b', 0.15) }}>
           <CardContent>
             <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
-              <SettingsIcon sx={{ color: '#0ea5e9', fontSize: 20 }} />
+              <SettingsIcon sx={{ color: '#2b88d8', fontSize: 20 }} />
               <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
                 MRP Parameters: Current vs AI-Optimized
               </Typography>
-              <Chip label="MARC Fields" size="small" sx={{ height: 18, fontSize: '0.55rem', bgcolor: alpha('#0ea5e9', 0.1), color: '#0284c7' }} />
+              <Chip label="MARC Fields" size="small" sx={{ height: 18, fontSize: '0.55rem', bgcolor: alpha('#2b88d8', 0.1), color: '#0284c7' }} />
               <Button
                 size="small"
                 variant="contained"
-                sx={{ ml: 'auto', bgcolor: alpha('#0ea5e9', 0.15), color: '#0284c7', '&:hover': { bgcolor: alpha('#0ea5e9', 0.25) } }}
+                sx={{ ml: 'auto', bgcolor: alpha('#2b88d8', 0.15), color: '#0284c7', '&:hover': { bgcolor: alpha('#2b88d8', 0.25) } }}
               >
                 ⚡ Apply to SAP
               </Button>
@@ -974,12 +974,12 @@ const Tile0ForecastSimulation = ({ onBack }) => {
                   <Box sx={{
                     p: 2, borderRadius: 1,
                     border: '1px solid',
-                    borderColor: param.changed ? alpha('#0ea5e9', 0.3) : alpha('#64748b', 0.15),
-                    bgcolor: param.changed ? alpha('#0ea5e9', 0.03) : 'transparent'
+                    borderColor: param.changed ? alpha('#2b88d8', 0.3) : alpha('#64748b', 0.15),
+                    bgcolor: param.changed ? alpha('#2b88d8', 0.03) : 'transparent'
                   }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                      <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: '#0ea5e9' }}>{param.field}</Typography>
-                      {param.changed && <Typography sx={{ fontSize: '0.7rem', color: '#0ea5e9' }}>⚡</Typography>}
+                      <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: '#2b88d8' }}>{param.field}</Typography>
+                      {param.changed && <Typography sx={{ fontSize: '0.7rem', color: '#2b88d8' }}>⚡</Typography>}
                     </Box>
                     <Typography sx={{ fontSize: '0.65rem', color: '#64748b', mb: 0.5 }}>{param.label}</Typography>
                     {param.changed ? (
@@ -1008,7 +1008,9 @@ const Tile0ForecastSimulation = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 2: Diagnostics</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>
               {selectedSku ? `${selectedSku.material} Detail` : 'Inventory Health Dashboard'}
             </Typography>
@@ -1024,7 +1026,7 @@ const Tile0ForecastSimulation = ({ onBack }) => {
         {!selectedSku && (
           <>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-              <InventoryIcon sx={{ fontSize: 40, color: '#0ea5e9' }} />
+              <InventoryIcon sx={{ fontSize: 40, color: '#2b88d8' }} />
               <Typography variant="h5" fontWeight={600}>Inventory Health Dashboard</Typography>
             </Stack>
             <Typography variant="body2" color="text.secondary">
@@ -1069,7 +1071,7 @@ const Tile0ForecastSimulation = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2.4}>
-                <Card variant="outlined" sx={{ borderLeft: `3px solid #0ea5e9` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #2b88d8` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                     <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Total Lost Sales</Typography>
                     <Typography variant="h4" fontWeight={700} color="#0284c7">{formatCurrency(metrics.totalLostSales)}</Typography>
@@ -1078,7 +1080,7 @@ const Tile0ForecastSimulation = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2.4}>
-                <Card variant="outlined" sx={{ borderLeft: `3px solid #0ea5e9` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #2b88d8` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                     <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Excess Inventory</Typography>
                     <Typography variant="h4" fontWeight={700} color="#0284c7">{formatCurrency(metrics.totalExcess)}</Typography>
@@ -1131,9 +1133,9 @@ const Tile0ForecastSimulation = ({ onBack }) => {
           {/* Legend */}
           <Box sx={{ mt: 2, p: 2, bgcolor: alpha('#64748b', 0.05), borderRadius: 1, border: '1px solid', borderColor: alpha('#64748b', 0.15) }}>
             <Typography sx={{ fontSize: '0.75rem', color: '#64748b', lineHeight: 1.8 }}>
-              <strong style={{ color: '#475569' }}>Legend:</strong> (S) = Snapshot (point-in-time) • (R) = Rolling (trailing period) • (F) = Forward-Looking (forecast/at-risk)
+              <strong style={{ color: '#0078d4' }}>Legend:</strong> (S) = Snapshot (point-in-time) • (R) = Rolling (trailing period) • (F) = Forward-Looking (forecast/at-risk)
               <br />
-              <strong style={{ color: '#475569' }}>Thresholds:</strong>{' '}
+              <strong style={{ color: '#0078d4' }}>Thresholds:</strong>{' '}
               <span style={{ color: '#10b981' }}>●</span> Green = Good |{' '}
               <span style={{ color: '#f59e0b' }}>●</span> Yellow = Caution |{' '}
               <span style={{ color: '#ef4444' }}>●</span> Red = Urgent

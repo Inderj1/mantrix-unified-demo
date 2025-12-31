@@ -237,7 +237,7 @@ const PlantInventoryIntelligence = ({ onBack }) => {
         <Chip
           label={formatCurrency(params.value)}
           size="small"
-          sx={{ fontWeight: 700, bgcolor: alpha('#3b82f6', 0.12), color: '#2563eb' }}
+          sx={{ fontWeight: 700, bgcolor: alpha('#2b88d8', 0.12), color: '#106ebe' }}
         />
       ),
     },
@@ -682,7 +682,13 @@ const PlantInventoryIntelligence = ({ onBack }) => {
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>
+              CORE.AI
+            </Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>
               STOX.AI
+            </Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>
+              Layer 1: Foundation
             </Link>
             <Typography color="primary" variant="body1" fontWeight={600}>
               {selectedPlant ? `${selectedPlant.name}` : 'Plant Inventory Intelligence'}
@@ -735,7 +741,7 @@ const PlantInventoryIntelligence = ({ onBack }) => {
         <Paper elevation={0} variant="outlined" sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: alpha('#64748b', 0.2), background: `linear-gradient(90deg, ${alpha('#0284c7', 0.05)}, ${alpha('#64748b', 0.02)})` }}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569' }}>
+              <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: '#0078d4' }}>
                 Plant Inventory Summary — <Typography component="span" sx={{ color: '#0891b2' }}>Click to Drill Down</Typography>
               </Typography>
               <Chip label="MARC / MARD / MBEW / MSEG / EKBE / MVER" size="small" sx={{ fontSize: '0.6rem', bgcolor: alpha('#06b6d4', 0.1), color: '#0891b2' }} />

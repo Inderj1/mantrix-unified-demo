@@ -86,7 +86,7 @@ const FinancialDriversAnalytics = ({ onBack }) => {
       renderCell: (params) => {
         const colorMap = {
           'Revenue': '#10b981',
-          'Cost': '#3b82f6',
+          'Cost': '#2b88d8',
           'Volume': '#f97316',
           'Pricing': '#8b5cf6',
         };

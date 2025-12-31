@@ -677,7 +677,7 @@ const Arbitration = ({ onBack }) => {
           { label: 'Pending Review', value: listStats.pendingReview, color: ACCENT_BLUE },
           { label: 'Auto-Approved', value: listStats.autoApproved, color: CYAN },
           { label: 'Avg. Margin', value: `${listStats.avgMargin}%`, color: PRIMARY_BLUE },
-          { label: 'Policy Pass Rate', value: `${listStats.policiesPass}%`, color: '#3b82f6' },
+          { label: 'Policy Pass Rate', value: `${listStats.policiesPass}%`, color: '#2b88d8' },
         ].map((card) => (
           <Grid item xs={6} sm={4} md={3} key={card.label}>
             <Card variant="outlined" sx={{ borderLeft: `3px solid ${card.color}` }}>

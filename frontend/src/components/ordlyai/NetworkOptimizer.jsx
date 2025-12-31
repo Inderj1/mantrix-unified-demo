@@ -532,7 +532,7 @@ const NetworkOptimizer = ({ onBack }) => {
           { label: 'Pending Optimization', value: listStats.totalOrders, color: ACCENT_BLUE },
           { label: 'Avg. P(On-Time)', value: `${listStats.avgPOnTime}%`, color: CYAN },
           { label: 'Split Shipments', value: listStats.splitShip, color: PRIMARY_BLUE },
-          { label: 'Avg. Margin', value: `${listStats.avgMargin}%`, color: '#3b82f6' },
+          { label: 'Avg. Margin', value: `${listStats.avgMargin}%`, color: '#2b88d8' },
         ].map((card) => (
           <Grid item xs={6} sm={4} md={3} key={card.label}>
             <Card variant="outlined" sx={{ borderLeft: `3px solid ${card.color}` }}>

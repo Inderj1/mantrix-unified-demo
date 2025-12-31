@@ -510,7 +510,7 @@ export const mockAgents = [
     name: 'Stox.AI',
     icon: '📦',
     type: 'inventory-manager',
-    color: '#8b5cf6',
+    color: '#0078d4',
     status: 'alert',
     activity: '3 critical stock alerts',
     quick_questions: ['Check stock levels', 'Predict stockouts', 'Recommend transfers'],

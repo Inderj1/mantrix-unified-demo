@@ -42,8 +42,8 @@ const DCSupplierExecution = ({ onBack }) => {
           label={params.value}
           size="small"
           sx={{
-            bgcolor: alpha('#475569', 0.12),
-            color: '#475569',
+            bgcolor: alpha('#0078d4', 0.12),
+            color: '#0078d4',
             fontWeight: 700,
             fontSize: '0.75rem',
           }}
@@ -170,6 +170,7 @@ const DCSupplierExecution = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>DC System</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>Supplier Execution</Typography>
@@ -216,24 +217,24 @@ const DCSupplierExecution = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#3b82f6', 0.1)} 0%, ${alpha('#3b82f6', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2b88d8', 0.1)} 0%, ${alpha('#2b88d8', 0.05)} 100%)` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <Build sx={{ color: '#3b82f6' }} />
+                  <Build sx={{ color: '#2b88d8' }} />
                   <Typography variant="body2" color="text.secondary">Make Orders</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#3b82f6">{metrics.makeOrders}</Typography>
+                <Typography variant="h4" fontWeight={700} color="#2b88d8">{metrics.makeOrders}</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2563eb', 0.1)} 0%, ${alpha('#2563eb', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#106ebe', 0.1)} 0%, ${alpha('#106ebe', 0.05)} 100%)` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <SwapHoriz sx={{ color: '#2563eb' }} />
+                  <SwapHoriz sx={{ color: '#106ebe' }} />
                   <Typography variant="body2" color="text.secondary">Transfer Orders</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#2563eb">{metrics.transferOrders}</Typography>
+                <Typography variant="h4" fontWeight={700} color="#106ebe">{metrics.transferOrders}</Typography>
               </CardContent>
             </Card>
           </Grid>

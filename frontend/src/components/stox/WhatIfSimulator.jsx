@@ -370,7 +370,7 @@ const WhatIfSimulator = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: '4px solid #8b5cf6' }}>
+            <Card sx={{ borderLeft: '4px solid #0078d4' }}>
               <CardContent>
                 <Typography variant="caption" color="text.secondary">Simulated SL</Typography>
                 <Typography variant="h5" fontWeight={700}>{selectedScenario.simulatedServiceLevel}%</Typography>
@@ -518,12 +518,10 @@ const WhatIfSimulator = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline' } }}>
-              STOX.AI
-            </Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
-              What-If Simulator
-            </Typography>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 5: Sandbox</Link>
+            <Typography color="primary" variant="body1" fontWeight={600}>What-If Simulator</Typography>
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ borderColor: 'divider' }}>
             Back
@@ -531,9 +529,9 @@ const WhatIfSimulator = ({ onBack }) => {
         </Stack>
 
         <Stack direction="row" alignItems="center" spacing={2}>
-          <PlayCircleIcon sx={{ fontSize: 32, color: '#8b5cf6' }} />
+          <PlayCircleIcon sx={{ fontSize: 32, color: '#0078d4' }} />
           <Box>
-            <Typography variant="h5" fontWeight={700} color="#8b5cf6">
+            <Typography variant="h5" fontWeight={700} color="#0078d4">
               What-If Simulator
             </Typography>
             <Typography variant="body2" color="text.secondary">
@@ -551,7 +549,7 @@ const WhatIfSimulator = ({ onBack }) => {
           {metrics && (
             <Grid container spacing={2} sx={{ mb: 3 }}>
               <Grid item xs={12} sm={6} md={2.4}>
-                <Card sx={{ borderLeft: '4px solid #8b5cf6' }}>
+                <Card sx={{ borderLeft: '4px solid #0078d4' }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">Total Scenarios</Typography>
                     <Typography variant="h5" fontWeight={700}>{metrics.totalScenarios}</Typography>

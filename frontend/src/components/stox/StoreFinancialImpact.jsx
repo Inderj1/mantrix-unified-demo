@@ -165,8 +165,8 @@ const StoreFinancialImpact = ({ onBack }) => {
           size="small"
           sx={{
             fontWeight: 700,
-            bgcolor: alpha('#2563eb', 0.12),
-            color: '#2563eb',
+            bgcolor: alpha('#106ebe', 0.12),
+            color: '#106ebe',
           }}
         />
       ),
@@ -292,6 +292,7 @@ const StoreFinancialImpact = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Store System</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>Tile 3: Financial Impact</Typography>
@@ -301,7 +302,7 @@ const StoreFinancialImpact = ({ onBack }) => {
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-              <Analytics sx={{ fontSize: 32, color: '#8b5cf6' }} />
+              <Analytics sx={{ fontSize: 32, color: '#0078d4' }} />
               <Typography variant="h4" fontWeight={700}>Tile 3: Financial Impact & Recommendation Engine</Typography>
             </Stack>
             <Typography variant="body2" color="text.secondary">
@@ -318,13 +319,13 @@ const StoreFinancialImpact = ({ onBack }) => {
       {metrics && (
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#8b5cf6', 0.1)} 0%, ${alpha('#8b5cf6', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#0078d4', 0.1)} 0%, ${alpha('#0078d4', 0.05)} 100%)` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <Analytics sx={{ color: '#8b5cf6' }} />
+                  <Analytics sx={{ color: '#0078d4' }} />
                   <Typography variant="body2" color="text.secondary">Total Orders</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#8b5cf6">{metrics.totalOrders}</Typography>
+                <Typography variant="h4" fontWeight={700} color="#0078d4">{metrics.totalOrders}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -340,13 +341,13 @@ const StoreFinancialImpact = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2563eb', 0.1)} 0%, ${alpha('#2563eb', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#106ebe', 0.1)} 0%, ${alpha('#106ebe', 0.05)} 100%)` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <AttachMoney sx={{ color: '#2563eb' }} />
+                  <AttachMoney sx={{ color: '#106ebe' }} />
                   <Typography variant="body2" color="text.secondary">Total Net Value</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#2563eb">${metrics.totalNetValue.toLocaleString()}</Typography>
+                <Typography variant="h4" fontWeight={700} color="#106ebe">${metrics.totalNetValue.toLocaleString()}</Typography>
               </CardContent>
             </Card>
           </Grid>

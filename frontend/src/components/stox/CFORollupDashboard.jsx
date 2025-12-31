@@ -128,7 +128,7 @@ const CFORollupDashboard = ({ onBack }) => {
     labels: ['Cycle Stock', 'Safety Stock', 'Pipeline Stock', 'Excess/Obsolete'],
     datasets: [{
       data: [data.summary.cycleStock, data.summary.safetyStock, data.summary.pipelineStock, data.summary.excessStock],
-      backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'],
+      backgroundColor: ['#2b88d8', '#10b981', '#f59e0b', '#ef4444'],
       borderWidth: 0,
     }],
   };
@@ -150,7 +150,7 @@ const CFORollupDashboard = ({ onBack }) => {
       {
         label: 'Actual WC',
         data: data.wcTrend.map(d => d.wc),
-        borderColor: '#0854a0',
+        borderColor: '#106ebe',
         backgroundColor: 'rgba(8, 84, 160, 0.1)',
         fill: true,
         tension: 0.4,
@@ -173,7 +173,7 @@ const CFORollupDashboard = ({ onBack }) => {
       {
         label: 'Working Capital ($M)',
         data: data.plants.map(p => p.wc / 1000000),
-        backgroundColor: '#0854a0',
+        backgroundColor: '#106ebe',
         yAxisID: 'y',
       },
       {
@@ -191,7 +191,9 @@ const CFORollupDashboard = ({ onBack }) => {
       <Box sx={{ mb: 2 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 6: Execution</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>CFO Rollup Dashboard</Typography>
           </Breadcrumbs>
           <Stack direction="row" spacing={1}>
@@ -205,9 +207,9 @@ const CFORollupDashboard = ({ onBack }) => {
           </Stack>
         </Stack>
         <Stack direction="row" alignItems="center" spacing={1.5}>
-          <AccountBalanceIcon sx={{ fontSize: 28, color: '#0854a0' }} />
+          <AccountBalanceIcon sx={{ fontSize: 28, color: '#106ebe' }} />
           <Box>
-            <Typography variant="h5" fontWeight={700} color="#0854a0">CFO Rollup Dashboard</Typography>
+            <Typography variant="h5" fontWeight={700} color="#106ebe">CFO Rollup Dashboard</Typography>
             <Typography variant="body2" color="text.secondary">Executive Working Capital Summary</Typography>
           </Box>
         </Stack>
@@ -218,16 +220,16 @@ const CFORollupDashboard = ({ onBack }) => {
         {/* Top KPI Cards */}
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ borderLeft: '4px solid #0854a0', height: '100%' }}>
+            <Card sx={{ borderLeft: '4px solid #106ebe', height: '100%' }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
                   <Box>
                     <Typography variant="caption" color="text.secondary">Total Working Capital</Typography>
-                    <Typography variant="h4" fontWeight={700} color="#0854a0">
+                    <Typography variant="h4" fontWeight={700} color="#106ebe">
                       {formatCurrency(data.summary.totalWorkingCapital)}
                     </Typography>
                   </Box>
-                  <AccountBalanceIcon sx={{ fontSize: 40, color: alpha('#0854a0', 0.2) }} />
+                  <AccountBalanceIcon sx={{ fontSize: 40, color: alpha('#106ebe', 0.2) }} />
                 </Stack>
               </CardContent>
             </Card>
@@ -272,7 +274,7 @@ const CFORollupDashboard = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ borderLeft: '4px solid #8b5cf6', height: '100%' }}>
+            <Card sx={{ borderLeft: '4px solid #0078d4', height: '100%' }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
                   <Box>
@@ -282,7 +284,7 @@ const CFORollupDashboard = ({ onBack }) => {
                       SL: {data.summary.serviceLevel}%
                     </Typography>
                   </Box>
-                  <Speed sx={{ fontSize: 40, color: alpha('#8b5cf6', 0.2) }} />
+                  <Speed sx={{ fontSize: 40, color: alpha('#0078d4', 0.2) }} />
                 </Stack>
               </CardContent>
             </Card>
@@ -486,7 +488,7 @@ const CFORollupDashboard = ({ onBack }) => {
                                   width: 40,
                                   height: 4,
                                   borderRadius: 2,
-                                  bgcolor: alpha('#0854a0', 0.1),
+                                  bgcolor: alpha('#106ebe', 0.1),
                                   '& .MuiLinearProgress-bar': {
                                     bgcolor: rec.confidence >= 80 ? '#10b981' : rec.confidence >= 60 ? '#f59e0b' : '#ef4444',
                                   },
@@ -499,7 +501,7 @@ const CFORollupDashboard = ({ onBack }) => {
                             <Chip
                               label={rec.timeline}
                               size="small"
-                              sx={{ height: 18, fontSize: '0.6rem', bgcolor: alpha('#0854a0', 0.1), color: '#0854a0' }}
+                              sx={{ height: 18, fontSize: '0.6rem', bgcolor: alpha('#106ebe', 0.1), color: '#106ebe' }}
                             />
                           </TableCell>
                         </TableRow>

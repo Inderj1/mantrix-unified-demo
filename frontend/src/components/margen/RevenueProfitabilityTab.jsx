@@ -133,8 +133,8 @@ export default function RevenueProfitabilityTab() {
           size="small"
           sx={{
             fontWeight: 600,
-            bgcolor: params.value === 'Tea' ? alpha('#10b981', 0.12) : params.value === 'Energy' ? alpha('#f97316', 0.12) : alpha('#3b82f6', 0.12),
-            color: params.value === 'Tea' ? '#059669' : params.value === 'Energy' ? '#ea580c' : '#2563eb',
+            bgcolor: params.value === 'Tea' ? alpha('#10b981', 0.12) : params.value === 'Energy' ? alpha('#f97316', 0.12) : alpha('#2b88d8', 0.12),
+            color: params.value === 'Tea' ? '#059669' : params.value === 'Energy' ? '#ea580c' : '#106ebe',
           }}
         />
       ),
@@ -282,7 +282,7 @@ export default function RevenueProfitabilityTab() {
         const labels = { champion: 'Champion', loyal: 'Loyal', potential: 'Potential', atRisk: 'At Risk' };
         const colors = {
           champion: { bg: alpha('#10b981', 0.12), color: '#059669' },
-          loyal: { bg: alpha('#3b82f6', 0.12), color: '#2563eb' },
+          loyal: { bg: alpha('#2b88d8', 0.12), color: '#106ebe' },
           potential: { bg: alpha('#06b6d4', 0.12), color: '#0891b2' },
           atRisk: { bg: alpha('#f97316', 0.12), color: '#ea580c' },
         };
@@ -427,7 +427,7 @@ export default function RevenueProfitabilityTab() {
         {/* Key Metrics */}
         <Grid container spacing={2} sx={{ mb: 3 }}>
           {[
-            { label: 'Revenue', value: `$${selectedRow.revenue?.toFixed(1)}M`, color: '#3b82f6', icon: <MoneyIcon /> },
+            { label: 'Revenue', value: `$${selectedRow.revenue?.toFixed(1)}M`, color: '#2b88d8', icon: <MoneyIcon /> },
             { label: 'Gross Margin', value: `${selectedRow.grossMargin?.toFixed(0)}%`, color: selectedRow.grossMargin >= 35 ? '#10b981' : '#f59e0b', icon: <ProductIcon /> },
             { label: viewMode === 'products' ? 'Contrib. Margin' : 'Net Margin', value: `${(selectedRow.contributionMargin || selectedRow.netMargin)?.toFixed(0)}%`, color: '#8b5cf6', icon: <ChannelIcon /> },
             { label: 'YoY Growth', value: `${selectedRow.yoyGrowth >= 0 ? '+' : ''}${selectedRow.yoyGrowth?.toFixed(1)}%`, color: selectedRow.yoyGrowth >= 0 ? '#10b981' : '#ef4444', icon: <TrendingUpIcon /> },
@@ -462,7 +462,7 @@ export default function RevenueProfitabilityTab() {
                         datasets: [{
                           label: 'Revenue ($M)',
                           data: selectedRow.monthlyTrend.map(t => t.revenue),
-                          backgroundColor: alpha('#3b82f6', 0.7),
+                          backgroundColor: alpha('#2b88d8', 0.7),
                           borderRadius: 4,
                         }],
                       }}
@@ -490,7 +490,7 @@ export default function RevenueProfitabilityTab() {
                         labels: selectedRow.channelMix.map(c => c.channel),
                         datasets: [{
                           data: selectedRow.channelMix.map(c => c.share),
-                          backgroundColor: [alpha('#3b82f6', 0.8), alpha('#10b981', 0.8), alpha('#f59e0b', 0.8), alpha('#8b5cf6', 0.8)],
+                          backgroundColor: [alpha('#2b88d8', 0.8), alpha('#10b981', 0.8), alpha('#f59e0b', 0.8), alpha('#8b5cf6', 0.8)],
                         }],
                       }}
                       options={{
@@ -518,7 +518,7 @@ export default function RevenueProfitabilityTab() {
                           <Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>${item.amount.toFixed(1)}M ({item.pct}%)</Typography>
                         </Stack>
                         <Box sx={{ height: 6, bgcolor: alpha('#64748b', 0.1), borderRadius: 3 }}>
-                          <Box sx={{ height: '100%', width: `${item.pct}%`, bgcolor: '#3b82f6', borderRadius: 3 }} />
+                          <Box sx={{ height: '100%', width: `${item.pct}%`, bgcolor: '#2b88d8', borderRadius: 3 }} />
                         </Box>
                       </Box>
                     ))}

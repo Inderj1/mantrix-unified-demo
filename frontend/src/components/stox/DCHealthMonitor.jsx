@@ -93,8 +93,8 @@ const DCHealthMonitor = ({ onBack }) => {
           size="small"
           sx={{
             fontWeight: 700,
-            bgcolor: alpha('#3b82f6', 0.12),
-            color: '#2563eb',
+            bgcolor: alpha('#2b88d8', 0.12),
+            color: '#106ebe',
           }}
         />
       ),
@@ -140,6 +140,7 @@ const DCHealthMonitor = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>DC System</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>Health Monitor</Typography>
@@ -149,7 +150,7 @@ const DCHealthMonitor = ({ onBack }) => {
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-              <ShowChart sx={{ fontSize: 32, color: '#2563eb' }} />
+              <ShowChart sx={{ fontSize: 32, color: '#106ebe' }} />
               <Typography variant="h4" fontWeight={700}>DC Health Monitor</Typography>
             </Stack>
             <Typography variant="body2" color="text.secondary">Real-time visibility into DC inventory health, stock levels, and availability across network</Typography>
@@ -265,13 +266,13 @@ const DCHealthMonitor = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2563eb', 0.1)} 0%, ${alpha('#2563eb', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#106ebe', 0.1)} 0%, ${alpha('#106ebe', 0.05)} 100%)` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <ShowChart sx={{ color: '#2563eb' }} />
+                  <ShowChart sx={{ color: '#106ebe' }} />
                   <Typography variant="body2" color="text.secondary">Avg Health Score</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#2563eb">{metrics.avgHealthScore}</Typography>
+                <Typography variant="h4" fontWeight={700} color="#106ebe">{metrics.avgHealthScore}</Typography>
               </CardContent>
             </Card>
           </Grid>

@@ -48,7 +48,7 @@ import stoxTheme from '../stox/stoxTheme';
 
 const API_BASE = `${import.meta.env.VITE_API_URL || ''}/api/v1/margen/csg`;
 
-const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'];
+const COLORS = ['#10b981', '#2b88d8', '#f59e0b', '#ef4444', '#8b5cf6'];
 
 const MarginProfitabilityAnalytics = ({ onBack }) => {
   const theme = useTheme();
@@ -106,7 +106,7 @@ const MarginProfitabilityAnalytics = ({ onBack }) => {
 
   const getMarginColor = (gmPercent) => {
     if (gmPercent >= 90) return '#10b981';
-    if (gmPercent >= 85) return '#3b82f6';
+    if (gmPercent >= 85) return '#2b88d8';
     if (gmPercent >= 80) return '#f59e0b';
     return '#ef4444';
   };
@@ -368,10 +368,10 @@ const MarginProfitabilityAnalytics = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} md={6}>
-            <Card sx={{ height: '100%', border: `2px solid ${alpha('#3b82f6', 0.3)}`, bgcolor: alpha('#3b82f6', 0.02) }}>
+            <Card sx={{ height: '100%', border: `2px solid ${alpha('#2b88d8', 0.3)}`, bgcolor: alpha('#2b88d8', 0.02) }}>
               <CardContent>
                 <Stack direction="row" spacing={2} alignItems="center">
-                  <StarIcon sx={{ fontSize: 40, color: '#3b82f6' }} />
+                  <StarIcon sx={{ fontSize: 40, color: '#2b88d8' }} />
                   <Box>
                     <Typography variant="caption" color="text.secondary">
                       Top Distributor by GM%
