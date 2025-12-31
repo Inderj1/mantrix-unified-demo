@@ -522,7 +522,7 @@ const StoxAILanding = ({ onTileClick, onBack }) => {
         {/* Sub-tiles Grid */}
         <Grid container spacing={1.5}>
           {currentSubTiles.map((module, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={4} key={module.id}>
+            <Grid item xs={12} sm={6} md={3} lg={3} key={module.id}>
               <Zoom in timeout={200 + index * 50}>
                 <Card
                   sx={{
@@ -692,7 +692,7 @@ const StoxAILanding = ({ onTileClick, onBack }) => {
       {/* 6 Layer Tiles */}
       <Grid container spacing={1.5}>
         {layerTiles.map((layer, index) => (
-          <Grid item xs={12} sm={6} md={4} key={layer.id}>
+          <Grid item xs={12} sm={6} md={3} lg={3} key={layer.id}>
             <Zoom in timeout={200 + index * 50}>
               <Card
                 sx={{

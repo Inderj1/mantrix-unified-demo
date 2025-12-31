@@ -7,8 +7,11 @@ import {
   Inventory, Refresh, NavigateNext as NavigateNextIcon, ArrowBack as ArrowBackIcon, Download, TrendingUp, LocalShipping, AttachMoney,
 } from '@mui/icons-material';
 import stoxTheme from './stoxTheme';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 const DCLotSize = ({ onBack }) => {
+  const tileConfig = getTileDataConfig('dc-lot-size');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -211,6 +214,7 @@ const DCLotSize = ({ onBack }) => {
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
               <Inventory sx={{ fontSize: 32, color: '#1e3a8a' }} />
               <Typography variant="h4" fontWeight={700}>Lot Size Optimization</Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
             <Typography variant="body2" color="text.secondary">Economic order quantity and lot size optimization for procurement efficiency</Typography>
           </Box>

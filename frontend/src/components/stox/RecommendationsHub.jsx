@@ -52,6 +52,8 @@ import {
   Legend,
 } from 'chart.js';
 import stoxTheme from './stoxTheme';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, ChartTooltip, Legend);
 
@@ -178,6 +180,9 @@ const RecommendationsHub = ({ onBack }) => {
     priority: 'all',
     status: 'all',
   });
+
+  // Get tile data config for data source indicator
+  const tileConfig = getTileDataConfig('recommendations-hub');
 
   useEffect(() => {
     fetchData();
@@ -676,9 +681,12 @@ const RecommendationsHub = ({ onBack }) => {
         <Stack direction="row" alignItems="center" spacing={2}>
           <RecommendIcon sx={{ fontSize: 32, color: '#ec4899' }} />
           <Box>
-            <Typography variant="h5" fontWeight={700} color="#ec4899">
-              Recommendations Hub
-            </Typography>
+            <Stack direction="row" alignItems="center" spacing={1.5}>
+              <Typography variant="h5" fontWeight={700} color="#ec4899">
+                Recommendations Hub
+              </Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
+            </Stack>
             <Typography variant="body2" color="text.secondary">
               AI-powered recommendations for inventory optimization and cost savings
             </Typography>

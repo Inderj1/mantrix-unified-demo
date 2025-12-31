@@ -49,8 +49,11 @@ import {
   Settings,
   Add,
 } from '@mui/icons-material';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 const StoreDeployment = ({ onBack }) => {
+  const tileConfig = getTileDataConfig('store-deployment');
   const [sopData, setSOPData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -498,9 +501,12 @@ const StoreDeployment = ({ onBack }) => {
         </Stack>
 
         <Box>
-          <Typography variant="h4" fontWeight={700}>
-            Store Deployment Optimizer
-          </Typography>
+          <Stack direction="row" alignItems="center" spacing={1.5}>
+            <Typography variant="h4" fontWeight={700}>
+              Store Deployment Optimizer
+            </Typography>
+            <DataSourceChip dataType={tileConfig.dataType} />
+          </Stack>
           <Typography variant="subtitle1" color="text.secondary">
             DRP Execution
           </Typography>

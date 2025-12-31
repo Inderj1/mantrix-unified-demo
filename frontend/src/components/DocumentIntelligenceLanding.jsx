@@ -91,112 +91,70 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
         <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
           <Grid container spacing={2}>
             {/* Tile 1: Document Analysis & Q&A */}
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} sm={6} md={3} lg={3}>
               <Zoom in timeout={400}>
                 <Card
                   variant="outlined"
                   sx={{
+                    height: 200,
                     cursor: 'pointer',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    background: 'white',
-                    border: `1px solid ${alpha('#106ebe', 0.15)}`,
-                    position: 'relative',
+                    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                    border: '1px solid',
+                    borderColor: alpha('#106ebe', 0.15),
+                    borderRadius: 2,
                     overflow: 'hidden',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: `0 8px 16px ${alpha('#106ebe', 0.15)}`,
-                      borderColor: alpha('#106ebe', 0.3),
-                      '& .action-icon': {
-                        transform: 'translateX(4px)',
-                      },
-                    },
+                    position: 'relative',
                     '&::before': {
                       content: '""',
                       position: 'absolute',
                       top: 0,
                       left: 0,
                       right: 0,
-                      height: '3px',
+                      height: 3,
                       background: 'linear-gradient(135deg, #106ebe 0%, #2b88d8 100%)',
+                      opacity: 0.8,
+                    },
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: `0 12px 24px ${alpha('#106ebe', 0.15)}`,
+                      borderColor: '#106ebe',
+                      '& .module-icon': {
+                        transform: 'scale(1.15)',
+                        bgcolor: '#106ebe',
+                        color: 'white',
+                      },
+                      '& .module-arrow': {
+                        opacity: 1,
+                        transform: 'translateX(4px)',
+                      },
                     },
                   }}
                   onClick={() => setSelectedView('document-analysis')}
                 >
-                  <CardContent sx={{ p: 2 }}>
-                    {/* Icon and Badge */}
+                  <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
                       <DescriptionIcon sx={{ fontSize: 40, color: '#106ebe' }} />
                       <Chip
                         label={loading ? '...' : `${documentCount} Docs`}
                         size="small"
-                        variant="outlined"
                         sx={{
-                          borderColor: alpha('#106ebe', 0.3),
+                          height: 22,
+                          fontSize: '0.65rem',
+                          bgcolor: alpha('#106ebe', 0.08),
                           color: '#106ebe',
                           fontWeight: 600,
-                          fontSize: '0.65rem',
-                          height: 20,
                         }}
                       />
                     </Box>
-
-                    {/* Title */}
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 600,
-                        color: '#106ebe',
-                        mb: 1,
-                        fontSize: '0.938rem',
-                      }}
-                    >
+                    <Typography variant="body1" sx={{ fontWeight: 700, color: '#106ebe', mb: 0.5, fontSize: '0.9rem', lineHeight: 1.3 }}>
                       Document Analysis & Q&A
                     </Typography>
-
-                    {/* Description */}
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'text.secondary',
-                        mb: 'auto',
-                        lineHeight: 1.5,
-                        fontSize: '0.813rem'
-                      }}
-                    >
+                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       AI-powered document understanding and Q&A across PDFs, Word, Excel, images, and more.
                     </Typography>
-
-                    {/* Footer */}
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                        alignItems: 'center',
-                        mt: 1.5,
-                        pt: 1.5,
-                        borderTop: '1px solid',
-                        borderColor: alpha('#106ebe', 0.1)
-                      }}
-                    >
-                      <Box
-                        className="access-button"
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.5,
-                          bgcolor: alpha('#106ebe', 0.1),
-                          color: '#106ebe',
-                          px: 1.5,
-                          py: 0.5,
-                          borderRadius: 1,
-                          fontWeight: 600,
-                          fontSize: '0.7rem',
-                          transition: 'all 0.3s ease'
-                        }}
-                      >
-                        ENTER
-                        <ArrowForwardIcon sx={{ fontSize: 14 }} />
-                      </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha('#106ebe', 0.1) }}>
+                      <Chip label="AI Q&A" size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha('#106ebe', 0.08), color: '#106ebe', fontWeight: 600 }} />
+                      <ArrowForwardIcon className="module-arrow" sx={{ color: '#106ebe', fontSize: 18, opacity: 0.5, transition: 'all 0.3s ease' }} />
                     </Box>
                   </CardContent>
                 </Card>
@@ -204,114 +162,70 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
             </Grid>
 
             {/* Tile 2: Excel AI Processor */}
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} sm={6} md={3} lg={3}>
               <Zoom in timeout={500}>
                 <Card
                   variant="outlined"
                   sx={{
+                    height: 200,
                     cursor: 'pointer',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    background: 'white',
-                    border: `1px solid ${alpha('#2b88d8', 0.15)}`,
-                    position: 'relative',
+                    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                    border: '1px solid',
+                    borderColor: alpha('#2b88d8', 0.15),
+                    borderRadius: 2,
                     overflow: 'hidden',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: `0 8px 16px ${alpha('#2b88d8', 0.15)}`,
-                      borderColor: alpha('#2b88d8', 0.3),
-                      '& .action-icon': {
-                        transform: 'translateX(4px)',
-                      },
-                    },
+                    position: 'relative',
                     '&::before': {
                       content: '""',
                       position: 'absolute',
                       top: 0,
                       left: 0,
                       right: 0,
-                      height: '3px',
+                      height: 3,
                       background: 'linear-gradient(135deg, #2b88d8 0%, #106ebe 100%)',
+                      opacity: 0.8,
+                    },
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: `0 12px 24px ${alpha('#2b88d8', 0.15)}`,
+                      borderColor: '#2b88d8',
+                      '& .module-icon': {
+                        transform: 'scale(1.15)',
+                        bgcolor: '#2b88d8',
+                        color: 'white',
+                      },
+                      '& .module-arrow': {
+                        opacity: 1,
+                        transform: 'translateX(4px)',
+                      },
                     },
                   }}
                   onClick={() => setSelectedView('excel-processor')}
                 >
-                  <CardContent sx={{ p: 2 }}>
-                    {/* Icon and Badge */}
+                  <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
                       <TableChartIcon sx={{ fontSize: 40, color: '#2b88d8' }} />
                       <Chip
                         label="3 Templates"
                         size="small"
-                        variant="outlined"
                         sx={{
-                          borderColor: alpha('#2b88d8', 0.3),
+                          height: 22,
+                          fontSize: '0.65rem',
+                          bgcolor: alpha('#2b88d8', 0.08),
                           color: '#2b88d8',
                           fontWeight: 600,
-                          fontSize: '0.65rem',
-                          height: 20,
                         }}
                       />
                     </Box>
-
-                    {/* Title */}
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 700,
-                        color: '#2b88d8',
-                        mb: 1,
-                        fontSize: '0.938rem',
-                        letterSpacing: '-0.3px'
-                      }}
-                    >
+                    <Typography variant="body1" sx={{ fontWeight: 700, color: '#2b88d8', mb: 0.5, fontSize: '0.9rem', lineHeight: 1.3 }}>
                       Excel AI Processor
                     </Typography>
-
-                    {/* Description */}
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'text.secondary',
-                        mb: 'auto',
-                        lineHeight: 1.6,
-                        fontSize: '0.813rem'
-                      }}
-                    >
-                      Intelligent Excel processing with multi-agent AI workflows. Upload spreadsheets, apply
-                      AI-powered templates, validate data quality, and generate comprehensive analytics with Claude AI.
+                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      Intelligent Excel processing with multi-agent AI workflows, templates, and analytics.
                     </Typography>
-
-                    {/* Footer */}
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                        alignItems: 'center',
-                        mt: 1.5,
-                        pt: 1.5,
-                        borderTop: '1px solid',
-                        borderColor: alpha('#2b88d8', 0.1)
-                      }}
-                    >
-                      <Box
-                        className="access-button"
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.5,
-                          bgcolor: alpha('#2b88d8', 0.1),
-                          color: '#2b88d8',
-                          px: 1.5,
-                          py: 0.5,
-                          borderRadius: 1,
-                          fontWeight: 600,
-                          fontSize: '0.75rem',
-                          transition: 'all 0.3s ease'
-                        }}
-                      >
-                        ENTER
-                        <ArrowForwardIcon sx={{ fontSize: 14 }} />
-                      </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha('#2b88d8', 0.1) }}>
+                      <Chip label="AI Workflows" size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha('#2b88d8', 0.08), color: '#2b88d8', fontWeight: 600 }} />
+                      <ArrowForwardIcon className="module-arrow" sx={{ color: '#2b88d8', fontSize: 18, opacity: 0.5, transition: 'all 0.3s ease' }} />
                     </Box>
                   </CardContent>
                 </Card>
@@ -319,114 +233,70 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
             </Grid>
 
             {/* Tile 3: PDF Parser Studio */}
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} sm={6} md={3} lg={3}>
               <Zoom in timeout={600}>
                 <Card
                   variant="outlined"
                   sx={{
+                    height: 200,
                     cursor: 'pointer',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    background: 'white',
-                    border: `1px solid ${alpha('#2b88d8', 0.15)}`,
-                    position: 'relative',
+                    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                    border: '1px solid',
+                    borderColor: alpha('#0078d4', 0.15),
+                    borderRadius: 2,
                     overflow: 'hidden',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: `0 8px 16px ${alpha('#2b88d8', 0.15)}`,
-                      borderColor: alpha('#2b88d8', 0.3),
-                      '& .action-icon': {
-                        transform: 'translateX(4px)',
-                      },
-                    },
+                    position: 'relative',
                     '&::before': {
                       content: '""',
                       position: 'absolute',
                       top: 0,
                       left: 0,
                       right: 0,
-                      height: '3px',
-                      background: 'linear-gradient(135deg, #2b88d8 0%, #0078d4 100%)',
+                      height: 3,
+                      background: 'linear-gradient(135deg, #0078d4 0%, #2b88d8 100%)',
+                      opacity: 0.8,
+                    },
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: `0 12px 24px ${alpha('#0078d4', 0.15)}`,
+                      borderColor: '#0078d4',
+                      '& .module-icon': {
+                        transform: 'scale(1.15)',
+                        bgcolor: '#0078d4',
+                        color: 'white',
+                      },
+                      '& .module-arrow': {
+                        opacity: 1,
+                        transform: 'translateX(4px)',
+                      },
                     },
                   }}
                   onClick={() => setSelectedView('pdf-parser')}
                 >
-                  <CardContent sx={{ p: 2 }}>
-                    {/* Icon and Badge */}
+                  <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                      <PictureAsPdfIcon sx={{ fontSize: 40, color: '#2b88d8' }} />
+                      <PictureAsPdfIcon sx={{ fontSize: 40, color: '#0078d4' }} />
                       <Chip
                         label="3 Templates"
                         size="small"
-                        variant="outlined"
                         sx={{
-                          borderColor: alpha('#2b88d8', 0.3),
-                          color: '#2b88d8',
-                          fontWeight: 600,
+                          height: 22,
                           fontSize: '0.65rem',
-                          height: 20,
+                          bgcolor: alpha('#0078d4', 0.08),
+                          color: '#0078d4',
+                          fontWeight: 600,
                         }}
                       />
                     </Box>
-
-                    {/* Title */}
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 700,
-                        color: '#2b88d8',
-                        mb: 1,
-                        fontSize: '0.938rem',
-                        letterSpacing: '-0.3px'
-                      }}
-                    >
+                    <Typography variant="body1" sx={{ fontWeight: 700, color: '#0078d4', mb: 0.5, fontSize: '0.9rem', lineHeight: 1.3 }}>
                       PDF Parser Studio
                     </Typography>
-
-                    {/* Description */}
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'text.secondary',
-                        mb: 'auto',
-                        lineHeight: 1.6,
-                        fontSize: '0.813rem'
-                      }}
-                    >
-                      Enterprise-grade PDF data extraction pipeline with customizable templates, AI-powered field
-                      recognition, schema validation, and automated CSV transformation workflows.
+                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      Enterprise-grade PDF extraction with AI-powered field recognition and CSV workflows.
                     </Typography>
-
-                    {/* Footer */}
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                        alignItems: 'center',
-                        mt: 1.5,
-                        pt: 1.5,
-                        borderTop: '1px solid',
-                        borderColor: alpha('#2b88d8', 0.1)
-                      }}
-                    >
-                      <Box
-                        className="access-button"
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.5,
-                          bgcolor: alpha('#2b88d8', 0.1),
-                          color: '#2b88d8',
-                          px: 1.5,
-                          py: 0.5,
-                          borderRadius: 1,
-                          fontWeight: 600,
-                          fontSize: '0.75rem',
-                          transition: 'all 0.3s ease'
-                        }}
-                      >
-                        ENTER
-                        <ArrowForwardIcon sx={{ fontSize: 14 }} />
-                      </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha('#0078d4', 0.1) }}>
+                      <Chip label="Extraction" size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha('#0078d4', 0.08), color: '#0078d4', fontWeight: 600 }} />
+                      <ArrowForwardIcon className="module-arrow" sx={{ color: '#0078d4', fontSize: 18, opacity: 0.5, transition: 'all 0.3s ease' }} />
                     </Box>
                   </CardContent>
                 </Card>

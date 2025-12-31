@@ -22,6 +22,8 @@ import {
   Legend,
 } from 'chart.js';
 import stoxTheme from './stoxTheme';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, ChartTooltip, Legend);
 
@@ -140,6 +142,9 @@ const SupplierTermsImpact = ({ onBack }) => {
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState(0);
   const [categoryFilter, setCategoryFilter] = useState('all');
+
+  // Get tile data config for data source indicator
+  const tileConfig = getTileDataConfig('supplier-terms-impact');
 
   useEffect(() => {
     loadData();
@@ -289,30 +294,32 @@ const SupplierTermsImpact = ({ onBack }) => {
   return (
     <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       {/* Header */}
-      <Box sx={{ mb: 2 }}>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+      <Box sx={{ mb: 3 }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 4: Optimization</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>Supplier Terms Impact</Typography>
           </Breadcrumbs>
-          <Stack direction="row" spacing={1}>
-            <Tooltip title="Refresh">
-              <IconButton onClick={loadData} size="small"><Refresh /></IconButton>
-            </Tooltip>
-            <Tooltip title="Export">
-              <IconButton size="small"><Download /></IconButton>
-            </Tooltip>
-            <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>
-          </Stack>
+          <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>
         </Stack>
-        <Stack direction="row" alignItems="center" spacing={1.5}>
-          <HandshakeIcon sx={{ fontSize: 28, color: '#106ebe' }} />
+        <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
-            <Typography variant="h5" fontWeight={700} color="#106ebe">Supplier Terms Impact</Typography>
-            <Typography variant="body2" color="text.secondary">Analyze payment terms impact on Working Capital</Typography>
+            <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
+              <HandshakeIcon sx={{ fontSize: 32, color: '#106ebe' }} />
+              <Typography variant="h4" fontWeight={700}>Supplier Terms Impact</Typography>
+              <Chip label="Tile 4.4" size="small" sx={{ bgcolor: alpha('#106ebe', 0.1), color: '#106ebe', fontWeight: 600 }} />
+              <DataSourceChip dataType={tileConfig.dataType} />
+            </Stack>
+            <Typography variant="body2" color="text.secondary">
+              Analyze payment terms impact on Working Capital
+            </Typography>
           </Box>
+          <Stack direction="row" spacing={1}>
+            <Tooltip title="Refresh"><IconButton onClick={loadData} color="primary"><Refresh /></IconButton></Tooltip>
+            <Tooltip title="Export"><IconButton color="primary"><Download /></IconButton></Tooltip>
+          </Stack>
         </Stack>
       </Box>
 

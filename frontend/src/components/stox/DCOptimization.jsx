@@ -7,8 +7,11 @@ import {
   Analytics, Refresh, NavigateNext as NavigateNextIcon, ArrowBack as ArrowBackIcon, Download, TrendingUp, Inventory,
 } from '@mui/icons-material';
 import stoxTheme from './stoxTheme';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 const DCOptimization = ({ onBack }) => {
+  const tileConfig = getTileDataConfig('dc-optimization');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -161,6 +164,7 @@ const DCOptimization = ({ onBack }) => {
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
               <Analytics sx={{ fontSize: 32, color: '#0078d4' }} />
               <Typography variant="h4" fontWeight={700}>DC Safety Stox Layer</Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
             <Typography variant="body2" color="text.secondary">Optimize inventory positioning and allocation across distribution center network</Typography>
           </Box>

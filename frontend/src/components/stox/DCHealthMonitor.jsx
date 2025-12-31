@@ -8,8 +8,11 @@ import {
 } from '@mui/icons-material';
 import stoxTheme from './stoxTheme';
 import { useDCHealthData } from '../../hooks/useStoxData';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 const DCHealthMonitor = ({ onBack }) => {
+  const tileConfig = getTileDataConfig('dc-health-monitor');
   // Use persistent data hook
   const { data, loading, refetch } = useDCHealthData();
 
@@ -152,6 +155,7 @@ const DCHealthMonitor = ({ onBack }) => {
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
               <ShowChart sx={{ fontSize: 32, color: '#106ebe' }} />
               <Typography variant="h4" fontWeight={700}>DC Health Monitor</Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
             <Typography variant="body2" color="text.secondary">Real-time visibility into DC inventory health, stock levels, and availability across network</Typography>
           </Box>

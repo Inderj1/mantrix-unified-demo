@@ -10,8 +10,11 @@ import {
 } from '@mui/icons-material';
 import { useDCDemandData } from '../../hooks/useStoxData';
 import TreeDataGrid from './TreeDataGrid';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 const DCDemandAggregation = ({ onBack }) => {
+  const tileConfig = getTileDataConfig('dc-demand-aggregation');
   // Use persistent data hook
   const { data, loading, refetch } = useDCDemandData();
 
@@ -207,6 +210,7 @@ const DCDemandAggregation = ({ onBack }) => {
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
               <TrendingUp sx={{ fontSize: 32, color: '#2b88d8' }} />
               <Typography variant="h4" fontWeight={700}>DC Forecast Layer</Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
             <Typography variant="body2" color="text.secondary">
               Aggregate demand forecasts from all store locations and channels for centralized planning

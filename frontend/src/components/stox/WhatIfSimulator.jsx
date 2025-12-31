@@ -53,6 +53,8 @@ import {
   Filler,
 } from 'chart.js';
 import stoxTheme from './stoxTheme';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, ChartTooltip, Legend, Filler);
 
@@ -105,6 +107,7 @@ const generateScenarioData = () => {
 };
 
 const WhatIfSimulator = ({ onBack }) => {
+  const tileConfig = getTileDataConfig('what-if-simulator');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -531,9 +534,12 @@ const WhatIfSimulator = ({ onBack }) => {
         <Stack direction="row" alignItems="center" spacing={2}>
           <PlayCircleIcon sx={{ fontSize: 32, color: '#0078d4' }} />
           <Box>
-            <Typography variant="h5" fontWeight={700} color="#0078d4">
-              What-If Simulator
-            </Typography>
+            <Stack direction="row" alignItems="center" spacing={1.5}>
+              <Typography variant="h5" fontWeight={700} color="#0078d4">
+                What-If Simulator
+              </Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
+            </Stack>
             <Typography variant="body2" color="text.secondary">
               Run scenario simulations to analyze impact on service levels, costs, and inventory
             </Typography>

@@ -7,8 +7,11 @@ import {
   Analytics, Refresh, NavigateNext as NavigateNextIcon, ArrowBack as ArrowBackIcon, Download, AttachMoney, TrendingUp, CheckCircle,
 } from '@mui/icons-material';
 import stoxTheme from './stoxTheme';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 const StoreFinancialImpact = ({ onBack }) => {
+  const tileConfig = getTileDataConfig('store-financial-impact');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -304,6 +307,7 @@ const StoreFinancialImpact = ({ onBack }) => {
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
               <Analytics sx={{ fontSize: 32, color: '#0078d4' }} />
               <Typography variant="h4" fontWeight={700}>Tile 3: Financial Impact & Recommendation Engine</Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
             <Typography variant="body2" color="text.secondary">
               Quantify financial value of replenishment actions with GMROI, avoided margin, and net value calculations

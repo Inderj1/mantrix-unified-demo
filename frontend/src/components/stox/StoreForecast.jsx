@@ -33,8 +33,11 @@ import {
 } from '@mui/icons-material';
 import TimeGranularitySelector from '../common/TimeGranularitySelector';
 import stoxTheme from './stoxTheme';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 const StoreForecast = ({ onBack }) => {
+  const tileConfig = getTileDataConfig('store-forecast');
   const [forecastData, setForecastData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -375,6 +378,7 @@ const StoreForecast = ({ onBack }) => {
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
               <TrendingUp sx={{ fontSize: 32, color: '#106ebe' }} />
               <Typography variant="h4" fontWeight={700}>Tile 1: Demand Forecasting (Baseline)</Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
             <Typography variant="body2" color="text.secondary">
               {granularity === 'daily'

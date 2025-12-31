@@ -48,6 +48,8 @@ import {
   Add,
 } from '@mui/icons-material';
 import TimeGranularitySelector from '../common/TimeGranularitySelector';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 const SellThroughAnalytics = ({ onBack }) => {
   const [sopData, setSOPData] = useState([]);
@@ -57,6 +59,9 @@ const SellThroughAnalytics = ({ onBack }) => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [consensusDialogOpen, setConsensusDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+
+  // Get tile data config for data source indicator
+  const tileConfig = getTileDataConfig('sell-through-analytics');
 
   useEffect(() => {
     fetchSOPData();
@@ -475,9 +480,12 @@ const SellThroughAnalytics = ({ onBack }) => {
         </Stack>
 
         <Box>
-          <Typography variant="h4" fontWeight={700}>
-            Sell-Through Analytics Dashboard
-          </Typography>
+          <Stack direction="row" alignItems="center" spacing={1.5}>
+            <Typography variant="h4" fontWeight={700}>
+              Sell-Through Analytics Dashboard
+            </Typography>
+            <DataSourceChip dataType={tileConfig.dataType} />
+          </Stack>
           <Typography variant="subtitle1" color="text.secondary">
             POS Data Visualization
           </Typography>

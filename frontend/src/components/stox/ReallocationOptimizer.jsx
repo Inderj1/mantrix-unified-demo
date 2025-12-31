@@ -36,6 +36,8 @@ import {
   Inventory as InventoryIcon,
 } from '@mui/icons-material';
 import stoxService from '../../services/stoxService';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 // Utility Functions
 const formatNumber = (value) => {
@@ -75,6 +77,7 @@ function TabPanel({ children, value, index, ...other }) {
 }
 
 const ReallocationOptimizer = ({ onBack }) => {
+  const tileConfig = getTileDataConfig('reallocation-optimizer');
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
   const [error, setError] = useState(null);
@@ -535,9 +538,12 @@ const ReallocationOptimizer = ({ onBack }) => {
             Back
           </Button>
           <Box sx={{ flex: 1 }}>
-            <Typography variant="h4" fontWeight={700} sx={{ letterSpacing: '-0.5px' }}>
-              Reallocation Optimizer
-            </Typography>
+            <Stack direction="row" alignItems="center" spacing={1.5}>
+              <Typography variant="h4" fontWeight={700} sx={{ letterSpacing: '-0.5px' }}>
+                Reallocation Optimizer
+              </Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
+            </Stack>
             <Typography variant="subtitle1" color="text.secondary">
               Smart stock balancing and strategic transfer recommendations
             </Typography>

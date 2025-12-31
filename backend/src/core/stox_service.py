@@ -5,6 +5,7 @@ Provides inventory optimization analytics and recommendations
 from typing import List, Dict, Any, Optional
 import structlog
 from ..db.postgresql_client import PostgreSQLClient
+from ..db.bigquery import BigQueryClient
 
 logger = structlog.get_logger()
 
@@ -14,7 +15,9 @@ class StoxService:
 
     def __init__(self):
         self.db = PostgreSQLClient(database="mantrix_nexxt")
-        logger.info("StoxService initialized")
+        self.bq = BigQueryClient()
+        self.bq_dataset = "copa_export_copa_data_000000000000"
+        logger.info("StoxService initialized with PostgreSQL and BigQuery")
 
     # ========== SHORTAGE DETECTOR METHODS ==========
 
@@ -512,3 +515,632 @@ class StoxService:
                 },
                 "processes": []
             }
+
+    # ========== BIGQUERY WORKING CAPITAL METHODS ==========
+
+    def get_working_capital_baseline(
+        self,
+        plant: Optional[str] = None,
+        category: Optional[str] = None,
+        abc_class: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0
+    ) -> Dict[str, Any]:
+        """Get working capital baseline data from BigQuery stox_demo_inventory_wc_baseline"""
+        try:
+            query = f"""
+            SELECT
+                record_id,
+                sku_id,
+                sku_name,
+                plant_id,
+                plant_name,
+                category,
+                on_hand_qty,
+                cycle_stock_qty,
+                safety_stock_qty,
+                pipeline_stock_qty,
+                excess_stock_qty,
+                unit_cost,
+                total_wc_value,
+                cycle_stock_value,
+                safety_stock_value,
+                pipeline_stock_value,
+                excess_stock_value,
+                daily_demand,
+                lead_time_days,
+                service_level,
+                wcp,
+                dio,
+                inventory_turns,
+                gross_margin_pct,
+                wc_savings_opportunity,
+                carrying_cost_savings,
+                health_status,
+                abc_class,
+                xyz_class,
+                snapshot_date
+            FROM `arizona-poc.{self.bq_dataset}.stox_demo_inventory_wc_baseline`
+            WHERE 1=1
+            """
+
+            if plant:
+                query += f" AND plant_id = '{plant}'"
+            if category:
+                query += f" AND category = '{category}'"
+            if abc_class:
+                query += f" AND abc_class = '{abc_class}'"
+
+            query += f" ORDER BY total_wc_value DESC LIMIT {limit} OFFSET {offset}"
+
+            rows = self.bq.execute_query(query)
+
+            # Get summary stats
+            summary_query = f"""
+            SELECT
+                COUNT(*) as total_skus,
+                SUM(total_wc_value) as total_working_capital,
+                SUM(wc_savings_opportunity) as total_savings_opportunity,
+                AVG(dio) as avg_dio,
+                AVG(inventory_turns) as avg_turns
+            FROM `arizona-poc.{self.bq_dataset}.stox_demo_inventory_wc_baseline`
+            """
+            summary = self.bq.execute_query(summary_query)
+
+            return {
+                "data": rows,
+                "summary": summary[0] if summary else {},
+                "data_source": "demo",
+                "table": "stox_demo_inventory_wc_baseline"
+            }
+        except Exception as e:
+            logger.error(f"Failed to get working capital baseline: {e}")
+            raise
+
+    def get_inventory_health(
+        self,
+        plant: Optional[str] = None,
+        risk_level: Optional[str] = None,
+        limit: int = 100
+    ) -> Dict[str, Any]:
+        """Get inventory health data from BigQuery stox_demo_inventory_health"""
+        try:
+            query = f"""
+            SELECT
+                material_id,
+                material_name,
+                plant_id,
+                category,
+                stock_qty,
+                stock_value,
+                age_days,
+                days_on_hand,
+                coverage_months,
+                health_score,
+                excess_qty,
+                excess_value,
+                risk_level,
+                writeoff_risk_pct,
+                abc_class,
+                xyz_class,
+                recommended_action,
+                snapshot_date
+            FROM `arizona-poc.{self.bq_dataset}.stox_demo_inventory_health`
+            WHERE 1=1
+            """
+
+            if plant:
+                query += f" AND plant_id = '{plant}'"
+            if risk_level:
+                query += f" AND risk_level = '{risk_level}'"
+
+            query += f" ORDER BY health_score ASC LIMIT {limit}"
+
+            rows = self.bq.execute_query(query)
+
+            # Get distribution by health score
+            dist_query = f"""
+            SELECT
+                CASE
+                    WHEN health_score >= 80 THEN 'Healthy'
+                    WHEN health_score >= 60 THEN 'At Risk'
+                    WHEN health_score >= 40 THEN 'Critical'
+                    ELSE 'Severe'
+                END as health_category,
+                COUNT(*) as count,
+                SUM(stock_value) as value
+            FROM `arizona-poc.{self.bq_dataset}.stox_demo_inventory_health`
+            GROUP BY 1
+            ORDER BY health_score DESC
+            """
+            distribution = self.bq.execute_query(dist_query)
+
+            return {
+                "data": rows,
+                "distribution": distribution,
+                "data_source": "demo",
+                "table": "stox_demo_inventory_health"
+            }
+        except Exception as e:
+            logger.error(f"Failed to get inventory health: {e}")
+            raise
+
+    def get_mrp_parameters(
+        self,
+        plant: Optional[str] = None,
+        abc_class: Optional[str] = None,
+        limit: int = 100
+    ) -> Dict[str, Any]:
+        """Get MRP parameters from BigQuery stox_demo_mrp_parameters"""
+        try:
+            query = f"""
+            SELECT
+                material_id,
+                plant_id,
+                mrp_type,
+                abc_class,
+                current_safety_stock,
+                current_reorder_point,
+                current_lot_size,
+                optimal_safety_stock,
+                optimal_reorder_point,
+                optimal_lot_size,
+                lead_time_days,
+                demand_variability,
+                supply_variability,
+                service_level_target,
+                stockout_risk_pct,
+                savings_potential,
+                ordering_cost,
+                holding_cost_pct,
+                eoq,
+                snapshot_date
+            FROM `arizona-poc.{self.bq_dataset}.stox_demo_mrp_parameters`
+            WHERE 1=1
+            """
+
+            if plant:
+                query += f" AND plant_id = '{plant}'"
+            if abc_class:
+                query += f" AND abc_class = '{abc_class}'"
+
+            query += f" ORDER BY savings_potential DESC LIMIT {limit}"
+
+            rows = self.bq.execute_query(query)
+
+            # Get total savings potential
+            summary_query = f"""
+            SELECT
+                SUM(savings_potential) as total_savings,
+                AVG(stockout_risk_pct) as avg_stockout_risk,
+                COUNT(*) as total_materials
+            FROM `arizona-poc.{self.bq_dataset}.stox_demo_mrp_parameters`
+            """
+            summary = self.bq.execute_query(summary_query)
+
+            return {
+                "data": rows,
+                "summary": summary[0] if summary else {},
+                "data_source": "demo",
+                "table": "stox_demo_mrp_parameters"
+            }
+        except Exception as e:
+            logger.error(f"Failed to get MRP parameters: {e}")
+            raise
+
+    def get_supplier_lead_times(
+        self,
+        vendor: Optional[str] = None,
+        risk_level: Optional[str] = None,
+        limit: int = 100
+    ) -> Dict[str, Any]:
+        """Get supplier lead times from BigQuery stox_demo_supplier_lead_times"""
+        try:
+            query = f"""
+            SELECT
+                material_id,
+                plant_id,
+                vendor_id,
+                vendor_name,
+                planned_lead_time,
+                actual_lead_time_avg,
+                lead_time_stddev,
+                lead_time_p50,
+                lead_time_p90,
+                on_time_delivery_pct,
+                reliability_score,
+                risk_level,
+                orders_analyzed,
+                early_count,
+                on_time_count,
+                late_count,
+                safety_stock_adjustment,
+                predicted_lead_time,
+                trend,
+                snapshot_date
+            FROM `arizona-poc.{self.bq_dataset}.stox_demo_supplier_lead_times`
+            WHERE 1=1
+            """
+
+            if vendor:
+                query += f" AND vendor_name = '{vendor}'"
+            if risk_level:
+                query += f" AND risk_level = '{risk_level}'"
+
+            query += f" ORDER BY reliability_score ASC LIMIT {limit}"
+
+            rows = self.bq.execute_query(query)
+
+            return {
+                "data": rows,
+                "data_source": "demo",
+                "table": "stox_demo_supplier_lead_times"
+            }
+        except Exception as e:
+            logger.error(f"Failed to get supplier lead times: {e}")
+            raise
+
+    def get_recommendations(
+        self,
+        category: Optional[str] = None,
+        status: Optional[str] = None,
+        priority: Optional[str] = None,
+        limit: int = 50
+    ) -> Dict[str, Any]:
+        """Get recommendations from BigQuery stox_demo_recommendations"""
+        try:
+            query = f"""
+            SELECT
+                recommendation_id,
+                title,
+                category,
+                priority,
+                change_type,
+                material_id,
+                plant_id,
+                current_value,
+                recommended_value,
+                confidence_score,
+                impact_score,
+                delta_wc,
+                carrying_cost_savings,
+                cash_release_months,
+                service_risk_pct,
+                status,
+                created_date,
+                approved_date,
+                implemented_date,
+                approved_by
+            FROM `arizona-poc.{self.bq_dataset}.stox_demo_recommendations`
+            WHERE 1=1
+            """
+
+            if category:
+                query += f" AND category = '{category}'"
+            if status:
+                query += f" AND status = '{status}'"
+            if priority:
+                query += f" AND priority = '{priority}'"
+
+            query += f" ORDER BY impact_score DESC LIMIT {limit}"
+
+            rows = self.bq.execute_query(query)
+
+            # Get summary by status
+            summary_query = f"""
+            SELECT
+                status,
+                COUNT(*) as count,
+                SUM(delta_wc) as total_delta_wc
+            FROM `arizona-poc.{self.bq_dataset}.stox_demo_recommendations`
+            GROUP BY status
+            """
+            summary = self.bq.execute_query(summary_query)
+
+            return {
+                "data": rows,
+                "summary": summary,
+                "data_source": "demo",
+                "table": "stox_demo_recommendations"
+            }
+        except Exception as e:
+            logger.error(f"Failed to get recommendations: {e}")
+            raise
+
+    def get_demand_patterns(
+        self,
+        plant: Optional[str] = None,
+        pattern: Optional[str] = None,
+        limit: int = 100
+    ) -> Dict[str, Any]:
+        """Get demand patterns from BigQuery stox_demo_demand_patterns"""
+        try:
+            query = f"""
+            SELECT
+                material_id,
+                material_name,
+                plant_id,
+                avg_daily_demand,
+                peak_demand,
+                min_demand,
+                demand_stddev,
+                coefficient_of_variation,
+                adi,
+                pattern,
+                abc_class,
+                xyz_class,
+                trend_direction,
+                seasonality_index,
+                anomaly_count,
+                risk_score,
+                supply_risk,
+                demand_risk,
+                snapshot_date
+            FROM `arizona-poc.{self.bq_dataset}.stox_demo_demand_patterns`
+            WHERE 1=1
+            """
+
+            if plant:
+                query += f" AND plant_id = '{plant}'"
+            if pattern:
+                query += f" AND pattern = '{pattern}'"
+
+            query += f" ORDER BY risk_score DESC LIMIT {limit}"
+
+            rows = self.bq.execute_query(query)
+
+            return {
+                "data": rows,
+                "data_source": "demo",
+                "table": "stox_demo_demand_patterns"
+            }
+        except Exception as e:
+            logger.error(f"Failed to get demand patterns: {e}")
+            raise
+
+    def get_cash_release(self, limit: int = 20) -> Dict[str, Any]:
+        """Get cash release initiatives from BigQuery stox_demo_cash_release"""
+        try:
+            query = f"""
+            SELECT
+                initiative_id,
+                name,
+                category,
+                total_release,
+                risk_adjusted,
+                confidence_pct,
+                start_month,
+                duration_months,
+                status,
+                risk_level,
+                owner,
+                monthly_release_json,
+                snapshot_date
+            FROM `arizona-poc.{self.bq_dataset}.stox_demo_cash_release`
+            ORDER BY total_release DESC
+            LIMIT {limit}
+            """
+
+            rows = self.bq.execute_query(query)
+
+            # Get totals
+            summary_query = f"""
+            SELECT
+                SUM(total_release) as total_release,
+                SUM(risk_adjusted) as total_risk_adjusted,
+                COUNT(*) as initiative_count
+            FROM `arizona-poc.{self.bq_dataset}.stox_demo_cash_release`
+            """
+            summary = self.bq.execute_query(summary_query)
+
+            return {
+                "data": rows,
+                "summary": summary[0] if summary else {},
+                "data_source": "demo",
+                "table": "stox_demo_cash_release"
+            }
+        except Exception as e:
+            logger.error(f"Failed to get cash release: {e}")
+            raise
+
+    def get_forecasts(
+        self,
+        plant: Optional[str] = None,
+        pattern: Optional[str] = None,
+        limit: int = 100
+    ) -> Dict[str, Any]:
+        """Get forecasts from BigQuery stox_demo_forecasts"""
+        try:
+            query = f"""
+            SELECT
+                material_id,
+                material_name,
+                plant_id,
+                pattern,
+                selected_model,
+                forecast_1m,
+                forecast_3m,
+                forecast_6m,
+                p10,
+                p90,
+                mape,
+                mae,
+                rmse,
+                bias,
+                accuracy_rating,
+                confidence_level,
+                snapshot_date
+            FROM `arizona-poc.{self.bq_dataset}.stox_demo_forecasts`
+            WHERE 1=1
+            """
+
+            if plant:
+                query += f" AND plant_id = '{plant}'"
+            if pattern:
+                query += f" AND pattern = '{pattern}'"
+
+            query += f" ORDER BY confidence_level DESC LIMIT {limit}"
+
+            rows = self.bq.execute_query(query)
+
+            return {
+                "data": rows,
+                "data_source": "demo",
+                "table": "stox_demo_forecasts"
+            }
+        except Exception as e:
+            logger.error(f"Failed to get forecasts: {e}")
+            raise
+
+    def get_exceptions(
+        self,
+        tile: Optional[str] = None,
+        priority: Optional[int] = None,
+        limit: int = 20
+    ) -> Dict[str, Any]:
+        """Get exceptions from BigQuery stox_demo_exceptions"""
+        try:
+            query = f"""
+            SELECT
+                exception_id,
+                type,
+                title,
+                description,
+                impact,
+                action,
+                tile,
+                priority,
+                created_date
+            FROM `arizona-poc.{self.bq_dataset}.stox_demo_exceptions`
+            WHERE 1=1
+            """
+
+            if tile:
+                query += f" AND tile = '{tile}'"
+            if priority:
+                query += f" AND priority <= {priority}"
+
+            query += f" ORDER BY priority, created_date DESC LIMIT {limit}"
+
+            rows = self.bq.execute_query(query)
+
+            return {
+                "data": rows,
+                "data_source": "demo",
+                "table": "stox_demo_exceptions"
+            }
+        except Exception as e:
+            logger.error(f"Failed to get exceptions: {e}")
+            raise
+
+    # ========== BIGQUERY REAL DATA (VIEWS) METHODS ==========
+
+    def get_performance_kpis(self) -> Dict[str, Any]:
+        """Get performance KPIs from BigQuery view (real data)"""
+        try:
+            query = f"""
+            SELECT
+                month,
+                fill_rate,
+                otif_pct,
+                cycle_time,
+                order_count
+            FROM `arizona-poc.{self.bq_dataset}.stox_vw_performance_kpis`
+            ORDER BY month DESC
+            LIMIT 12
+            """
+
+            rows = self.bq.execute_query(query)
+
+            return {
+                "data": rows,
+                "data_source": "real",
+                "table": "stox_vw_performance_kpis"
+            }
+        except Exception as e:
+            logger.error(f"Failed to get performance KPIs: {e}")
+            raise
+
+    def get_margin_analysis(
+        self,
+        plant: Optional[str] = None,
+        limit: int = 100
+    ) -> Dict[str, Any]:
+        """Get margin analysis from BigQuery view (real data)"""
+        try:
+            query = f"""
+            SELECT
+                Plant,
+                Material_Number,
+                total_sales,
+                total_margin,
+                avg_margin_pct
+            FROM `arizona-poc.{self.bq_dataset}.stox_vw_margin_analysis`
+            WHERE 1=1
+            """
+
+            if plant:
+                query += f" AND Plant = '{plant}'"
+
+            query += f" ORDER BY total_margin DESC LIMIT {limit}"
+
+            rows = self.bq.execute_query(query)
+
+            return {
+                "data": rows,
+                "data_source": "real",
+                "table": "stox_vw_margin_analysis"
+            }
+        except Exception as e:
+            logger.error(f"Failed to get margin analysis: {e}")
+            raise
+
+    def get_cfo_rollup(self) -> Dict[str, Any]:
+        """Get CFO rollup dashboard data (real data from transaction_data)"""
+        try:
+            query = f"""
+            SELECT
+                DATE_TRUNC(Posting_Date, MONTH) as month,
+                SUM(CAST(Net_Sales AS FLOAT64)) as net_sales,
+                SUM(CAST(Gross_Margin AS FLOAT64)) as gross_margin,
+                SUM(CAST(Quantity AS FLOAT64)) as quantity,
+                COUNT(DISTINCT Material_Number) as unique_materials,
+                COUNT(DISTINCT Plant) as plants
+            FROM `arizona-poc.{self.bq_dataset}.transaction_data`
+            WHERE Posting_Date IS NOT NULL
+            GROUP BY 1
+            ORDER BY month DESC
+            LIMIT 12
+            """
+
+            rows = self.bq.execute_query(query)
+
+            return {
+                "data": rows,
+                "data_source": "real",
+                "table": "transaction_data"
+            }
+        except Exception as e:
+            logger.error(f"Failed to get CFO rollup: {e}")
+            raise
+
+    def get_sell_through_analytics(self) -> Dict[str, Any]:
+        """Get sell-through analytics (real data from time_series_performance)"""
+        try:
+            query = f"""
+            SELECT *
+            FROM `arizona-poc.{self.bq_dataset}.time_series_performance`
+            ORDER BY period DESC
+            LIMIT 100
+            """
+
+            rows = self.bq.execute_query(query)
+
+            return {
+                "data": rows,
+                "data_source": "real",
+                "table": "time_series_performance"
+            }
+        except Exception as e:
+            logger.error(f"Failed to get sell-through analytics: {e}")
+            raise

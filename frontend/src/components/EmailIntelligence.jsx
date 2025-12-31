@@ -1005,7 +1005,7 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
             const color = type.color || colors[index % colors.length];
 
             return (
-              <Grid item xs={12} sm={6} md={4} key={type.id}>
+              <Grid item xs={12} sm={6} md={3} lg={3} key={type.id}>
                 <Card
                   variant="outlined"
                   sx={{
@@ -1088,7 +1088,7 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
 
           {/* Add Custom Type Tile */}
           {!searchQuery && (
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid item xs={12} sm={6} md={3} lg={3}>
               <Card
                 variant="outlined"
                 sx={{

@@ -178,6 +178,154 @@ class StoxService {
     const response = await this.client.get('/health');
     return response.data;
   }
+
+  // ========== BIGQUERY ENDPOINTS (Demo Data) ==========
+
+  /**
+   * Get working capital baseline data
+   * @param {Object} params - Query parameters
+   * @param {string} params.plant - Filter by plant ID
+   * @param {string} params.category - Filter by category
+   * @param {string} params.abc_class - Filter by ABC class (A, B, C)
+   * @param {number} params.limit - Number of results
+   * @param {number} params.offset - Pagination offset
+   */
+  async getWorkingCapital(params = {}) {
+    const response = await this.client.get('/working-capital', { params });
+    return response.data;
+  }
+
+  /**
+   * Get inventory health data
+   * @param {Object} params - Query parameters
+   * @param {string} params.plant - Filter by plant ID
+   * @param {string} params.risk_level - Filter by risk level
+   * @param {number} params.limit - Number of results
+   */
+  async getInventoryHealth(params = {}) {
+    const response = await this.client.get('/inventory-health', { params });
+    return response.data;
+  }
+
+  /**
+   * Get MRP parameter optimization data
+   * @param {Object} params - Query parameters
+   * @param {string} params.plant - Filter by plant ID
+   * @param {string} params.abc_class - Filter by ABC class
+   * @param {number} params.limit - Number of results
+   */
+  async getMRPParameters(params = {}) {
+    const response = await this.client.get('/mrp-parameters', { params });
+    return response.data;
+  }
+
+  /**
+   * Get supplier lead time analytics
+   * @param {Object} params - Query parameters
+   * @param {string} params.vendor - Filter by vendor name
+   * @param {string} params.risk_level - Filter by risk level
+   * @param {number} params.limit - Number of results
+   */
+  async getLeadTimes(params = {}) {
+    const response = await this.client.get('/lead-times', { params });
+    return response.data;
+  }
+
+  /**
+   * Get optimization recommendations
+   * @param {Object} params - Query parameters
+   * @param {string} params.category - Filter by category
+   * @param {string} params.status - Filter by status
+   * @param {string} params.priority - Filter by priority
+   * @param {number} params.limit - Number of results
+   */
+  async getRecommendations(params = {}) {
+    const response = await this.client.get('/recommendations', { params });
+    return response.data;
+  }
+
+  /**
+   * Get demand pattern intelligence
+   * @param {Object} params - Query parameters
+   * @param {string} params.plant - Filter by plant ID
+   * @param {string} params.pattern - Filter by pattern type
+   * @param {number} params.limit - Number of results
+   */
+  async getDemandPatterns(params = {}) {
+    const response = await this.client.get('/demand-patterns', { params });
+    return response.data;
+  }
+
+  /**
+   * Get cash release timeline initiatives
+   * @param {Object} params - Query parameters
+   * @param {number} params.limit - Number of results
+   */
+  async getCashRelease(params = {}) {
+    const response = await this.client.get('/cash-release', { params });
+    return response.data;
+  }
+
+  /**
+   * Get forecast data
+   * @param {Object} params - Query parameters
+   * @param {string} params.plant - Filter by plant ID
+   * @param {string} params.pattern - Filter by pattern type
+   * @param {number} params.limit - Number of results
+   */
+  async getForecasts(params = {}) {
+    const response = await this.client.get('/forecasts', { params });
+    return response.data;
+  }
+
+  /**
+   * Get exceptions for Command Center
+   * @param {Object} params - Query parameters
+   * @param {string} params.tile - Filter by tile name
+   * @param {number} params.priority - Filter by priority level
+   * @param {number} params.limit - Number of results
+   */
+  async getExceptions(params = {}) {
+    const response = await this.client.get('/exceptions', { params });
+    return response.data;
+  }
+
+  // ========== BIGQUERY ENDPOINTS (Real Data) ==========
+
+  /**
+   * Get performance KPIs (fill rate, OTIF, cycle time) - REAL DATA
+   */
+  async getPerformanceKPIs() {
+    const response = await this.client.get('/kpis/performance');
+    return response.data;
+  }
+
+  /**
+   * Get margin analysis by plant/material - REAL DATA
+   * @param {Object} params - Query parameters
+   * @param {string} params.plant - Filter by plant
+   * @param {number} params.limit - Number of results
+   */
+  async getMarginAnalysis(params = {}) {
+    const response = await this.client.get('/kpis/margins', { params });
+    return response.data;
+  }
+
+  /**
+   * Get CFO rollup dashboard data - REAL DATA
+   */
+  async getCFORollup() {
+    const response = await this.client.get('/cfo-rollup');
+    return response.data;
+  }
+
+  /**
+   * Get sell-through analytics - REAL DATA
+   */
+  async getSellThrough() {
+    const response = await this.client.get('/sell-through');
+    return response.data;
+  }
 }
 
 // Export singleton instance

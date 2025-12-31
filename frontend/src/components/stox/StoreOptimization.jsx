@@ -7,8 +7,11 @@ import {
   Analytics, Refresh, NavigateNext as NavigateNextIcon, ArrowBack as ArrowBackIcon, Download, TrendingUp, Inventory,
 } from '@mui/icons-material';
 import stoxTheme from './stoxTheme';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 const StoreOptimization = ({ onBack }) => {
+  const tileConfig = getTileDataConfig('store-optimization');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -501,6 +504,7 @@ const StoreOptimization = ({ onBack }) => {
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
               <Analytics sx={{ fontSize: 32, color: '#0078d4' }} />
               <Typography variant="h4" fontWeight={700}>Inventory Optimization</Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
             <Typography variant="body2" color="text.secondary">
               Calculate optimal inventory policies: ROP, EOQ, Safety Stock, and ABC classification

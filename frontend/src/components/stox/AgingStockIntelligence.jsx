@@ -36,6 +36,8 @@ import {
   LocationOn as LocationIcon,
 } from '@mui/icons-material';
 import stoxService from '../../services/stoxService';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 // Utility Functions
 const formatNumber = (value) => {
@@ -85,6 +87,9 @@ const AgingStockIntelligence = ({ onBack }) => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
   const [error, setError] = useState(null);
+
+  // Get tile data config for data source indicator
+  const tileConfig = getTileDataConfig('aging-stock-intelligence');
 
   // Tab 1: Aging Analysis
   const [agingInventory, setAgingInventory] = useState([]);
@@ -523,9 +528,12 @@ const AgingStockIntelligence = ({ onBack }) => {
             Back
           </Button>
           <Box sx={{ flex: 1 }}>
-            <Typography variant="h4" fontWeight={700} sx={{ letterSpacing: '-0.5px' }}>
-              Aging Stock Intelligence
-            </Typography>
+            <Stack direction="row" alignItems="center" spacing={1.5}>
+              <Typography variant="h4" fontWeight={700} sx={{ letterSpacing: '-0.5px' }}>
+                Aging Stock Intelligence
+              </Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
+            </Stack>
             <Typography variant="subtitle1" color="text.secondary">
               Smart obsolescence prevention and clearance strategies
             </Typography>

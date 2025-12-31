@@ -9,8 +9,11 @@ import {
 import stoxTheme from './stoxTheme';
 import { useDCSupplierData } from '../../hooks/useStoxData';
 import TreeDataGrid from './TreeDataGrid';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 const DCSupplierExecution = ({ onBack }) => {
+  const tileConfig = getTileDataConfig('dc-supplier-execution');
   // Use persistent data hook
   const { data, loading, refetch } = useDCSupplierData();
 
@@ -182,6 +185,7 @@ const DCSupplierExecution = ({ onBack }) => {
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
               <LocalShipping sx={{ fontSize: 32, color: '#172554' }} />
               <Typography variant="h4" fontWeight={700}>Supplier Execution</Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
             <Typography variant="body2" color="text.secondary">Supplier collaboration portal with order tracking, delivery management, and performance metrics</Typography>
           </Box>

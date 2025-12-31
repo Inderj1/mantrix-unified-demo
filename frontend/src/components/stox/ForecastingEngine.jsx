@@ -46,6 +46,8 @@ import {
   Filler,
 } from 'chart.js';
 import stoxTheme from './stoxTheme';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, ChartTooltip, Legend, Filler);
@@ -185,6 +187,9 @@ const ForecastingEngine = ({ onBack }) => {
     bias: 'all',
     plant: 'all',
   });
+
+  // Get tile data config for data source indicator
+  const tileConfig = getTileDataConfig('forecasting-engine');
 
   useEffect(() => {
     fetchData();
@@ -612,6 +617,7 @@ const ForecastingEngine = ({ onBack }) => {
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
               <PsychologyIcon sx={{ fontSize: 40, color: '#0078d4' }} />
               <Typography variant="h5" fontWeight={600}>Forecasting Engine</Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
             <Typography variant="body2" color="text.secondary">
               AI-powered demand forecasting with model selection, accuracy tracking, and confidence intervals

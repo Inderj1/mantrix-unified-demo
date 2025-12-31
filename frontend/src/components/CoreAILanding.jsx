@@ -61,18 +61,6 @@ const aiModules = [
     gradient: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
   },
   {
-    id: 'process-mining',
-    title: 'PROCESS.AI',
-    subtitle: 'Process Mining & Analytics',
-    description: 'Discover, analyze, and optimize business processes with AI-powered insights',
-    icon: ProcessMiningIcon,
-    color: '#005a9e',
-    bgColor: '#deecf9',
-    stats: { label: 'Processes', value: '3' },
-    status: 'active',
-    gradient: 'linear-gradient(135deg, #005a9e 0%, #0078d4 100%)',
-  },
-  {
     id: 'ordly',
     title: 'ORDLY.AI',
     subtitle: 'Order Management Intelligence',
@@ -83,6 +71,18 @@ const aiModules = [
     stats: { label: 'Orders', value: '156' },
     status: 'active',
     gradient: 'linear-gradient(135deg, #2b88d8 0%, #106ebe 100%)',
+  },
+  {
+    id: 'process-mining',
+    title: 'PROCESS.AI',
+    subtitle: 'Process Mining & Analytics',
+    description: 'Discover, analyze, and optimize business processes with AI-powered insights',
+    icon: ProcessMiningIcon,
+    color: '#005a9e',
+    bgColor: '#deecf9',
+    stats: { label: 'Processes', value: '3' },
+    status: 'active',
+    gradient: 'linear-gradient(135deg, #005a9e 0%, #0078d4 100%)',
   },
 ];
 
@@ -142,7 +142,7 @@ const CoreAILanding = ({ onTileClick }) => {
         {aiModules
           .filter((module) => module.id !== 'route')
           .map((module, index) => (
-          <Grid item xs={12} sm={6} md={4} lg={4} key={module.id}>
+          <Grid item xs={12} sm={6} md={3} lg={3} key={module.id}>
             <Zoom in timeout={200 + index * 50}>
               <Card
                 sx={{

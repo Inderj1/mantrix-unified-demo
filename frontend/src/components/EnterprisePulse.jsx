@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import {
   Box,
@@ -6,44 +6,80 @@ import {
   DialogContent,
 } from '@mui/material';
 import AgentCreationWizard from './pulse/AgentCreationWizard';
-import AgentDashboard from './pulse/AgentDashboard';
+import EnterprisePulseLanding from './pulse/EnterprisePulseLanding';
+import KitAlertsView from './pulse/KitAlertsView';
+import AgentsManagementView from './pulse/AgentsManagementView';
 
 const EnterprisePulse = () => {
   const { user } = useUser();
   // Use fixed 'persona' ID for persona-based insights
   const userId = 'persona';
   const [showWizard, setShowWizard] = useState(false);
+  const [selectedView, setSelectedView] = useState(null);
+  const [alertCount, setAlertCount] = useState(12);
+  const [agentCount, setAgentCount] = useState(8);
 
+  const handleTileClick = (tileId) => {
+    setSelectedView(tileId);
+  };
+
+  const handleBack = () => {
+    setSelectedView(null);
+  };
+
+  // Render ML Insights view (KitAlertsView)
+  if (selectedView === 'alerts') {
+    return (
+      <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: '#f5f5f5' }}>
+        <KitAlertsView onBack={handleBack} />
+      </Box>
+    );
+  }
+
+  // Render AI Agents view (AgentsManagementView)
+  if (selectedView === 'agents') {
+    return (
+      <Box sx={{
+        p: 3,
+        height: '100%',
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        bgcolor: '#f5f5f5'
+      }}>
+        {/* Agent Creation Wizard Dialog */}
+        <Dialog
+          open={showWizard}
+          onClose={() => setShowWizard(false)}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogContent sx={{ p: 3 }}>
+            <AgentCreationWizard
+              userId={userId}
+              onClose={() => setShowWizard(false)}
+              onSave={() => {
+                setShowWizard(false);
+              }}
+            />
+          </DialogContent>
+        </Dialog>
+
+        <AgentsManagementView
+          userId={userId}
+          onBack={handleBack}
+          onCreateAgent={() => setShowWizard(true)}
+        />
+      </Box>
+    );
+  }
+
+  // Render landing page with tiles
   return (
-    <Box sx={{
-      p: 3,
-      height: '100%',
-      overflowY: 'auto',
-      overflowX: 'hidden',
-      bgcolor: '#f5f5f5'
-    }}>
-      {/* Agent Creation Wizard Dialog */}
-      <Dialog
-        open={showWizard}
-        onClose={() => setShowWizard(false)}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogContent sx={{ p: 3 }}>
-          <AgentCreationWizard
-            userId={userId}
-            onClose={() => setShowWizard(false)}
-            onSave={() => {
-              setShowWizard(false);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
-
-      {/* Main Dashboard */}
-      <AgentDashboard
-        userId={userId}
-        onCreateAgent={() => setShowWizard(true)}
+    <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: '#f5f5f5' }}>
+      <EnterprisePulseLanding
+        onTileClick={handleTileClick}
+        alertCount={alertCount}
+        agentCount={agentCount}
       />
     </Box>
   );

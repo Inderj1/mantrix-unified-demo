@@ -48,6 +48,8 @@ import {
   Filler,
 } from 'chart.js';
 import stoxTheme from './stoxTheme';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, ArcElement, Title, ChartTooltip, Legend, Filler);
 
@@ -140,6 +142,9 @@ const PerformanceMonitor = ({ onBack }) => {
     category: 'all',
     status: 'all',
   });
+
+  // Get tile data config for data source indicator
+  const tileConfig = getTileDataConfig('performance-monitor');
 
   useEffect(() => {
     fetchData();
@@ -493,9 +498,12 @@ const PerformanceMonitor = ({ onBack }) => {
         <Stack direction="row" alignItems="center" spacing={2}>
           <SpeedIcon sx={{ fontSize: 32, color: '#f59e0b' }} />
           <Box>
-            <Typography variant="h5" fontWeight={700} color="#f59e0b">
-              Performance Monitor
-            </Typography>
+            <Stack direction="row" alignItems="center" spacing={1.5}>
+              <Typography variant="h5" fontWeight={700} color="#f59e0b">
+                Performance Monitor
+              </Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
+            </Stack>
             <Typography variant="body2" color="text.secondary">
               Track KPIs, service levels, inventory turns, and optimization performance
             </Typography>

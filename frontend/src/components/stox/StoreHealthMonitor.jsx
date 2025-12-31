@@ -32,8 +32,11 @@ import {
   Inventory,
 } from '@mui/icons-material';
 import stoxTheme from './stoxTheme';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 const StoreHealthMonitor = ({ onBack }) => {
+  const tileConfig = getTileDataConfig('store-health-monitor');
   const [healthData, setHealthData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -379,6 +382,7 @@ const StoreHealthMonitor = ({ onBack }) => {
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
               <ShowChart sx={{ fontSize: 32, color: '#10b981' }} />
               <Typography variant="h4" fontWeight={700}>Tile 2: Inventory Health Monitoring</Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
             <Typography variant="body2" color="text.secondary">
               Measure inventory adequacy vs. forecast, compute safety stock, ROP, and stockout risk

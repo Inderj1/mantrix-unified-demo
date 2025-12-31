@@ -1,5 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import AgentConfigForm from './AgentConfigForm';
+import KitAlertDetail from './KitAlertDetail';
+import {
+  generateKitAlerts,
+  generateAlertDetail,
+  calculateAlertStats,
+  ALERT_TYPE_LABELS,
+  SEVERITY,
+  STATUS,
+} from './kitAlertMockData';
 import {
   Box,
   Grid,
@@ -55,10 +64,12 @@ import {
   Inventory as InventoryIcon,
   ShowChart as ShowChartIcon,
   Radar as RadarIcon,
-  ArrowBack as ArrowBackIcon,
+  Error as ErrorIcon,
+  AttachMoney as AttachMoneyIcon,
+  AccessTime as AccessTimeIcon,
 } from '@mui/icons-material';
 
-const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
+const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, darkMode = false }) => {
   const [agents, setAgents] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const [stats, setStats] = useState(null);
@@ -75,8 +86,18 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
   const [severityFilter, setSeverityFilter] = useState('all');
   const [showDemoOnly, setShowDemoOnly] = useState(false);
 
+  // Kit Alerts state
+  const [kitAlerts, setKitAlerts] = useState([]);
+  const [selectedKitAlert, setSelectedKitAlert] = useState(null);
+  const [kitAlertSeverityFilter, setKitAlertSeverityFilter] = useState('all');
+  const [kitAlertTypeFilter, setKitAlertTypeFilter] = useState('all');
+  const [kitAlertStatusFilter, setKitAlertStatusFilter] = useState('all');
+  const [kitAlertProcessFilter, setKitAlertProcessFilter] = useState('all');
+
   useEffect(() => {
     loadData();
+    // Load kit alerts (mock data)
+    setKitAlerts(generateKitAlerts(20));
     const interval = setInterval(loadData, 30000); // Refresh every 30s
     return () => clearInterval(interval);
   }, [userId]);
@@ -214,12 +235,108 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
 
   const getSeverityColor = (severity) => {
     switch (severity) {
-      case 'high': return 'error';
+      case 'critical': return 'error';
+      case 'high': return 'warning';
       case 'medium': return 'warning';
+      case 'warning': return 'info';
       case 'low': return 'info';
+      case 'info': return 'default';
       default: return 'default';
     }
   };
+
+  // Kit Alert action handler
+  const handleKitAlertAction = (action, data) => {
+    console.log('Kit Alert Action:', action, data);
+    // Update the alert in state based on action
+    setKitAlerts(prev => prev.map(alert => {
+      if (alert.id !== data.alertId) return alert;
+
+      const now = new Date().toISOString();
+      const newHistoryItem = {
+        action,
+        by: 'Current User',
+        at: now,
+        notes: '',
+      };
+
+      switch (action) {
+        case 'approve':
+          newHistoryItem.notes = `Approved AI suggestion: ${data.aiSuggestion?.action}`;
+          return {
+            ...alert,
+            status: 'resolved',
+            action_history: [newHistoryItem, ...(alert.action_history || [])],
+          };
+        case 'escalate':
+          newHistoryItem.notes = `Escalated to ${data.escalateTo}`;
+          return {
+            ...alert,
+            severity: alert.severity === 'high' ? 'critical' : 'high',
+            action_history: [newHistoryItem, ...(alert.action_history || [])],
+          };
+        case 'assign':
+          newHistoryItem.notes = `Assigned to ${data.assignee}`;
+          return {
+            ...alert,
+            status: 'in_progress',
+            assigned_to: { name: data.assignee, role: 'Team Member' },
+            action_history: [newHistoryItem, ...(alert.action_history || [])],
+          };
+        case 'snooze':
+          newHistoryItem.notes = `Snoozed for ${data.duration}`;
+          return {
+            ...alert,
+            status: 'snoozed',
+            action_history: [newHistoryItem, ...(alert.action_history || [])],
+          };
+        case 'note':
+          newHistoryItem.action = 'note_added';
+          newHistoryItem.notes = data.note;
+          return {
+            ...alert,
+            action_history: [newHistoryItem, ...(alert.action_history || [])],
+          };
+        case 'resolve':
+          newHistoryItem.notes = `Resolved as ${data.resolution}`;
+          return {
+            ...alert,
+            status: 'resolved',
+            action_history: [newHistoryItem, ...(alert.action_history || [])],
+          };
+        default:
+          return alert;
+      }
+    }));
+
+    // If we're viewing the detail, update selectedKitAlert too
+    if (selectedKitAlert?.id === data.alertId) {
+      setSelectedKitAlert(null); // Go back to list after action
+    }
+  };
+
+  // Filtered kit alerts
+  const filteredKitAlerts = useMemo(() => {
+    let filtered = [...kitAlerts];
+
+    if (kitAlertSeverityFilter !== 'all') {
+      filtered = filtered.filter(a => a.severity === kitAlertSeverityFilter);
+    }
+    if (kitAlertTypeFilter !== 'all') {
+      filtered = filtered.filter(a => a.type === kitAlertTypeFilter);
+    }
+    if (kitAlertStatusFilter !== 'all') {
+      filtered = filtered.filter(a => a.status === kitAlertStatusFilter);
+    }
+    if (kitAlertProcessFilter !== 'all') {
+      filtered = filtered.filter(a => a.process_type === kitAlertProcessFilter);
+    }
+
+    return filtered;
+  }, [kitAlerts, kitAlertSeverityFilter, kitAlertTypeFilter, kitAlertStatusFilter, kitAlertProcessFilter]);
+
+  // Kit alert stats
+  const kitAlertStats = useMemo(() => calculateAlertStats(kitAlerts), [kitAlerts]);
 
   // Category display names and icons for grouping agents
   const categoryInfo = {
@@ -486,17 +603,6 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
       {/* Header with Stats */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Box display="flex" alignItems="center" gap={2}>
-          {onBack && (
-            <Button
-              startIcon={<ArrowBackIcon />}
-              onClick={onBack}
-              variant="outlined"
-              size="small"
-              sx={{ borderColor: 'divider', mr: 1 }}
-            >
-              Back
-            </Button>
-          )}
           <Box
             sx={{
               width: 56,
@@ -513,7 +619,7 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
           </Box>
           <Box>
             <Typography variant="h4" fontWeight={700} sx={{ color: colors.text }}>
-              AI Agents
+              Enterprise Pulse
             </Typography>
             <Typography variant="body2" sx={{ color: colors.grey }}>
               Proactive agents that monitor and protect business operations
@@ -544,7 +650,8 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
               p: 2,
               borderRadius: 2,
               border: '1px solid',
-              borderColor: alpha(colors.primary, 0.1),
+              borderColor: darkMode ? alpha(colors.primary, 0.2) : alpha(colors.primary, 0.1),
+              bgcolor: darkMode ? '#161b22' : undefined,
               position: 'relative',
               overflow: 'hidden',
               '&::before': {
@@ -592,7 +699,8 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
               p: 2,
               borderRadius: 2,
               border: '1px solid',
-              borderColor: alpha(colors.primary, 0.1),
+              borderColor: darkMode ? alpha(colors.warning, 0.2) : alpha(colors.primary, 0.1),
+              bgcolor: darkMode ? '#161b22' : undefined,
               position: 'relative',
               overflow: 'hidden',
               '&::before': {
@@ -640,7 +748,8 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
               p: 2,
               borderRadius: 2,
               border: '1px solid',
-              borderColor: alpha(colors.primary, 0.1),
+              borderColor: darkMode ? alpha(colors.success, 0.2) : alpha(colors.primary, 0.1),
+              bgcolor: darkMode ? '#161b22' : undefined,
               position: 'relative',
               overflow: 'hidden',
               '&::before': {
@@ -688,7 +797,8 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
               p: 2,
               borderRadius: 2,
               border: '1px solid',
-              borderColor: alpha(colors.primary, 0.1),
+              borderColor: darkMode ? alpha(colors.secondary, 0.2) : alpha(colors.primary, 0.1),
+              bgcolor: darkMode ? '#161b22' : undefined,
               position: 'relative',
               overflow: 'hidden',
               '&::before': {
@@ -730,106 +840,282 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
         </Grid>
       </Grid>
 
-      {/* Active Alerts */}
-      {activeAlerts.length > 0 && (
-        <Card variant="outlined" sx={{ mb: 2 }}>
-          <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
-            <Box display="flex" alignItems="center" justifyContent="space-between" mb={1.5}>
-              <Box display="flex" alignItems="center" gap={1}>
-                <WarningIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
-                <Typography variant="subtitle2" fontWeight={600}>
-                  Active Alerts
-                </Typography>
+      {/* Kit Management Alerts - Show detail view or list */}
+      {selectedKitAlert ? (
+        <KitAlertDetail
+          alert={generateAlertDetail(selectedKitAlert)}
+          onBack={() => setSelectedKitAlert(null)}
+          onAction={handleKitAlertAction}
+        />
+      ) : (
+        <>
+          {/* Kit Alerts KPI Cards */}
+          <Grid container spacing={2} mb={2}>
+            <Grid item xs={6} sm={3}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 1.5,
+                  borderRadius: 2,
+                  border: '1px solid',
+                  borderColor: alpha(colors.error, 0.2),
+                  bgcolor: darkMode ? '#161b22' : alpha(colors.error, 0.03),
+                }}
+              >
+                <Box display="flex" alignItems="center" justifyContent="space-between">
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">Active Alerts</Typography>
+                    <Typography variant="h5" fontWeight={700} color="error.main">
+                      {kitAlertStats.activeAlerts}
+                    </Typography>
+                  </Box>
+                  <WarningIcon sx={{ color: colors.error, fontSize: 28 }} />
+                </Box>
+              </Paper>
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 1.5,
+                  borderRadius: 2,
+                  border: '1px solid',
+                  borderColor: alpha(colors.error, 0.3),
+                  bgcolor: darkMode ? '#161b22' : alpha(colors.error, 0.05),
+                }}
+              >
+                <Box display="flex" alignItems="center" justifyContent="space-between">
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">Critical</Typography>
+                    <Typography variant="h5" fontWeight={700} color="error.dark">
+                      {kitAlertStats.criticalAlerts}
+                    </Typography>
+                  </Box>
+                  <ErrorIcon sx={{ color: colors.error, fontSize: 28 }} />
+                </Box>
+              </Paper>
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 1.5,
+                  borderRadius: 2,
+                  border: '1px solid',
+                  borderColor: alpha(colors.warning, 0.2),
+                  bgcolor: darkMode ? '#161b22' : alpha(colors.warning, 0.03),
+                }}
+              >
+                <Box display="flex" alignItems="center" justifyContent="space-between">
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">At Risk Value</Typography>
+                    <Typography variant="h5" fontWeight={700} color="warning.dark">
+                      ${(kitAlertStats.atRiskValue / 1000).toFixed(0)}K
+                    </Typography>
+                  </Box>
+                  <AttachMoneyIcon sx={{ color: colors.warning, fontSize: 28 }} />
+                </Box>
+              </Paper>
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 1.5,
+                  borderRadius: 2,
+                  border: '1px solid',
+                  borderColor: alpha(colors.primary, 0.2),
+                  bgcolor: darkMode ? '#161b22' : alpha(colors.primary, 0.03),
+                }}
+              >
+                <Box display="flex" alignItems="center" justifyContent="space-between">
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">Avg Response</Typography>
+                    <Typography variant="h5" fontWeight={700} color="primary.main">
+                      {kitAlertStats.avgResponseTime}
+                    </Typography>
+                  </Box>
+                  <AccessTimeIcon sx={{ color: colors.primary, fontSize: 28 }} />
+                </Box>
+              </Paper>
+            </Grid>
+          </Grid>
+
+          {/* Kit Alerts Section */}
+          <Card variant="outlined" sx={{ mb: 2, bgcolor: darkMode ? '#161b22' : undefined }}>
+            <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
+              <Box display="flex" alignItems="center" justifyContent="space-between" mb={1.5}>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <LocalShippingIcon sx={{ fontSize: 18, color: colors.primary }} />
+                  <Typography variant="subtitle2" fontWeight={600}>
+                    Kit Management Alerts
+                  </Typography>
+                  <Chip label={filteredKitAlerts.length} size="small" color="error" />
+                </Box>
+                <IconButton onClick={() => setKitAlerts(generateKitAlerts(20))} size="small">
+                  <RefreshIcon fontSize="small" />
+                </IconButton>
               </Box>
-              <Chip label={activeAlerts.length} size="small" color="error" />
-            </Box>
-            <Divider sx={{ mb: 2 }} />
-            <Box sx={{ maxHeight: 250, overflow: 'auto' }}>
-              {activeAlerts.map((alert) => {
-                const isDemo = alert.monitor_name && alert.monitor_name.includes('[DEMO]');
-                return (
-                  <Paper
-                    key={alert.id}
-                    variant="outlined"
-                    sx={{
-                      p: 1.5,
-                      mb: 1,
-                      ...(isDemo && {
-                        bgcolor: 'rgba(33, 150, 243, 0.03)',
-                        borderColor: 'info.light',
-                        borderWidth: 1.5
-                      })
-                    }}
+
+              {/* Kit Alert Filters */}
+              <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+                <FormControl size="small" sx={{ minWidth: 100 }}>
+                  <InputLabel>Severity</InputLabel>
+                  <Select
+                    value={kitAlertSeverityFilter}
+                    label="Severity"
+                    onChange={(e) => setKitAlertSeverityFilter(e.target.value)}
                   >
-                    <Box display="flex" justifyContent="space-between" alignItems="start">
-                      <Box flex={1}>
-                        <Box display="flex" alignItems="center" gap={0.5} mb={0.5} flexWrap="wrap">
-                          {isDemo && (
+                    <MenuItem value="all">All</MenuItem>
+                    <MenuItem value="critical">Critical</MenuItem>
+                    <MenuItem value="high">High</MenuItem>
+                    <MenuItem value="warning">Warning</MenuItem>
+                    <MenuItem value="info">Info</MenuItem>
+                  </Select>
+                </FormControl>
+                <FormControl size="small" sx={{ minWidth: 140 }}>
+                  <InputLabel>Alert Type</InputLabel>
+                  <Select
+                    value={kitAlertTypeFilter}
+                    label="Alert Type"
+                    onChange={(e) => setKitAlertTypeFilter(e.target.value)}
+                  >
+                    <MenuItem value="all">All Types</MenuItem>
+                    <MenuItem value="shipment_delay">Shipment Delay</MenuItem>
+                    <MenuItem value="dwell_time_exceeded">Dwell Time</MenuItem>
+                    <MenuItem value="return_overdue">Return Overdue</MenuItem>
+                    <MenuItem value="temperature_excursion">Temp Excursion</MenuItem>
+                    <MenuItem value="geofence_violation">Geofence</MenuItem>
+                    <MenuItem value="low_stock">Low Stock</MenuItem>
+                    <MenuItem value="payment_overdue">Payment Overdue</MenuItem>
+                    <MenuItem value="automation_failure">Automation Failure</MenuItem>
+                  </Select>
+                </FormControl>
+                <FormControl size="small" sx={{ minWidth: 110 }}>
+                  <InputLabel>Status</InputLabel>
+                  <Select
+                    value={kitAlertStatusFilter}
+                    label="Status"
+                    onChange={(e) => setKitAlertStatusFilter(e.target.value)}
+                  >
+                    <MenuItem value="all">All</MenuItem>
+                    <MenuItem value="new">New</MenuItem>
+                    <MenuItem value="acknowledged">Acknowledged</MenuItem>
+                    <MenuItem value="in_progress">In Progress</MenuItem>
+                    <MenuItem value="snoozed">Snoozed</MenuItem>
+                  </Select>
+                </FormControl>
+                <FormControl size="small" sx={{ minWidth: 110 }}>
+                  <InputLabel>Process</InputLabel>
+                  <Select
+                    value={kitAlertProcessFilter}
+                    label="Process"
+                    onChange={(e) => setKitAlertProcessFilter(e.target.value)}
+                  >
+                    <MenuItem value="all">All</MenuItem>
+                    <MenuItem value="loaner">Loaner</MenuItem>
+                    <MenuItem value="consignment">Consignment</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+
+              <Divider sx={{ mb: 2 }} />
+
+              {/* Kit Alerts List */}
+              <Box sx={{ maxHeight: 400, overflow: 'auto' }}>
+                {filteredKitAlerts.length === 0 ? (
+                  <Box textAlign="center" py={4}>
+                    <CheckCircleIcon sx={{ fontSize: 48, color: colors.success, mb: 1 }} />
+                    <Typography variant="body2" color="text.secondary">
+                      No alerts matching current filters
+                    </Typography>
+                  </Box>
+                ) : (
+                  filteredKitAlerts.map((alert) => (
+                    <Paper
+                      key={alert.id}
+                      variant="outlined"
+                      onClick={() => setSelectedKitAlert(alert)}
+                      sx={{
+                        p: 2,
+                        mb: 1,
+                        cursor: 'pointer',
+                        bgcolor: darkMode ? '#161b22' : undefined,
+                        borderLeft: 4,
+                        borderLeftColor: alert.severity === 'critical' ? 'error.main' :
+                          alert.severity === 'high' ? 'warning.main' :
+                          alert.severity === 'warning' ? 'info.main' : 'grey.400',
+                        '&:hover': {
+                          bgcolor: darkMode ? '#21262d' : alpha(colors.primary, 0.03),
+                          borderColor: alpha(colors.primary, 0.3),
+                        },
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      <Box display="flex" justifyContent="space-between" alignItems="start">
+                        <Box flex={1}>
+                          <Box display="flex" alignItems="center" gap={0.5} mb={0.5} flexWrap="wrap">
                             <Chip
-                              label="DEMO"
+                              label={alert.severity}
                               size="small"
-                              color="info"
-                              variant="outlined"
-                              sx={{ height: 18, fontSize: '0.65rem', fontWeight: 600 }}
+                              color={getSeverityColor(alert.severity)}
+                              sx={{ height: 20, fontSize: '0.65rem', fontWeight: 600 }}
                             />
-                          )}
-                          <Chip
-                            label={alert.severity}
-                            size="small"
-                            variant="outlined"
-                            color={getSeverityColor(alert.severity)}
-                            sx={{ height: 18, fontSize: '0.65rem' }}
-                          />
-                          <Typography variant="body2" fontWeight={600}>
+                            <Chip
+                              label={ALERT_TYPE_LABELS[alert.type] || alert.type}
+                              size="small"
+                              variant="outlined"
+                              sx={{ height: 20, fontSize: '0.65rem' }}
+                            />
+                            <Chip
+                              label={alert.process_type}
+                              size="small"
+                              color={alert.process_type === 'loaner' ? 'primary' : 'secondary'}
+                              variant="outlined"
+                              sx={{ height: 20, fontSize: '0.65rem' }}
+                            />
+                            {alert.status !== 'new' && (
+                              <Chip
+                                label={alert.status.replace('_', ' ')}
+                                size="small"
+                                variant="outlined"
+                                sx={{ height: 20, fontSize: '0.65rem' }}
+                              />
+                            )}
+                          </Box>
+                          <Typography variant="body2" fontWeight={600} sx={{ mb: 0.5 }}>
                             {alert.title}
                           </Typography>
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                            {alert.message}
+                          </Typography>
+                          <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.7rem' }}>
+                            {alert.kit_id} • {alert.hospital} • {new Date(alert.triggered_at).toLocaleString()}
+                          </Typography>
                         </Box>
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-                          {alert.message}
-                        </Typography>
-                        <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.7rem' }}>
-                          {alert.monitor_name} • {new Date(alert.triggered_at).toLocaleString()}
-                        </Typography>
+                        <Box textAlign="right" sx={{ ml: 2 }}>
+                          <Typography variant="h6" fontWeight={700} color="error.main" sx={{ lineHeight: 1.2 }}>
+                            ${alert.estimated_value?.toLocaleString()}
+                          </Typography>
+                          {alert.days_overdue > 0 && (
+                            <Typography variant="caption" color="warning.main" fontWeight={600}>
+                              {alert.days_overdue} days
+                            </Typography>
+                          )}
+                        </Box>
                       </Box>
-                    <Box display="flex" gap={0.5} alignItems="center">
-                      <Tooltip title="True Positive">
-                        <IconButton
-                          size="small"
-                          onClick={() => handleAlertFeedback(alert.id, 'true_positive')}
-                          sx={{ p: 0.5 }}
-                        >
-                          <ThumbUpIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="False Positive">
-                        <IconButton
-                          size="small"
-                          onClick={() => handleAlertFeedback(alert.id, 'false_positive')}
-                          sx={{ p: 0.5 }}
-                        >
-                          <ThumbDownIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                        </IconButton>
-                      </Tooltip>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={() => handleAcknowledgeAlert(alert.id)}
-                        sx={{ fontSize: '0.7rem', py: 0.25, px: 1, minWidth: 0 }}
-                      >
-                        Ack
-                      </Button>
-                    </Box>
-                  </Box>
-                </Paper>
-                );
-              })}
-            </Box>
-          </CardContent>
-        </Card>
+                    </Paper>
+                  ))
+                )}
+              </Box>
+            </CardContent>
+          </Card>
+        </>
       )}
 
-      {/* Agents List */}
-      <Card variant="outlined">
+      {/* Agents List - Hide when viewing alert detail */}
+      {!selectedKitAlert && (
+      <Card variant="outlined" sx={{ bgcolor: darkMode ? '#161b22' : undefined }}>
         <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
           <Box display="flex" alignItems="center" justifyContent="space-between" mb={1.5}>
             <Box display="flex" alignItems="center" gap={1}>
@@ -910,7 +1196,7 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
 
           <Divider sx={{ mb: 1.5 }} />
 
-          <Paper sx={{ width: '100%' }}>
+          <Paper sx={{ width: '100%', bgcolor: darkMode ? '#161b22' : undefined }}>
             <DataGrid
               rows={filteredAndSortedAgents}
               columns={columns}
@@ -926,7 +1212,7 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
                 setSelectedAgent(params.row);
                 setConfigDialog(true);
               }}
-              sx={stoxTheme.getDataGridSx({ clickable: true })}
+              sx={stoxTheme.getDataGridSx({ clickable: true, darkMode })}
               localeText={{
                 noRowsLabel: 'No agents yet. Create your first agent to get started!',
               }}
@@ -934,6 +1220,7 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
           </Paper>
         </CardContent>
       </Card>
+      )}
 
       {/* Context Menu */}
       <Menu

@@ -11,6 +11,9 @@ import {
 } from '@mui/icons-material';
 import stoxTheme from './stoxTheme';
 import { generateWorkingCapitalData, generateSummaryMetrics, generateWCTrendData } from './mockData/workingCapitalMocks';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
+import stoxService from '../../services/stoxService';
 
 /**
  * Working Capital Baseline - Tile 2.5
@@ -38,13 +41,69 @@ const WorkingCapitalBaseline = ({ onBack }) => {
   const [detailOpen, setDetailOpen] = useState(false);
   const [filterPlant, setFilterPlant] = useState('all');
   const [filterCategory, setFilterCategory] = useState('all');
+  const [useApi, setUseApi] = useState(true);
+
+  // Get tile data config for data source indicator
+  const tileConfig = getTileDataConfig('working-capital-baseline');
 
   useEffect(() => {
     fetchData();
   }, []);
 
-  const fetchData = () => {
+  const fetchData = async () => {
     setLoading(true);
+    try {
+      if (useApi) {
+        // Try to fetch from BigQuery API
+        const response = await stoxService.getWorkingCapital({ limit: 500 });
+        if (response && response.data && response.data.length > 0) {
+          // Transform API response to match expected format
+          const wcData = response.data.map((row, idx) => ({
+            id: row.record_id || idx + 1,
+            plant_id: row.plant_id,
+            plant_name: row.plant_name,
+            sku_id: row.sku_id,
+            sku_name: row.sku_name,
+            category: row.category,
+            total_wc_value: Number(row.total_wc_value) || 0,
+            cycle_stock_value: Number(row.cycle_stock_value) || 0,
+            safety_stock_value: Number(row.safety_stock_value) || 0,
+            pipeline_stock_value: Number(row.pipeline_stock_value) || 0,
+            excess_stock_value: Number(row.excess_stock_value) || 0,
+            cycle_pct: Math.round((Number(row.cycle_stock_value) / Number(row.total_wc_value)) * 100) || 0,
+            safety_pct: Math.round((Number(row.safety_stock_value) / Number(row.total_wc_value)) * 100) || 0,
+            pipeline_pct: Math.round((Number(row.pipeline_stock_value) / Number(row.total_wc_value)) * 100) || 0,
+            excess_pct: Math.round((Number(row.excess_stock_value) / Number(row.total_wc_value)) * 100) || 0,
+            wcp: Number(row.wcp) || 0,
+            dio: Number(row.dio) || 0,
+            wc_savings_opportunity: Number(row.wc_savings_opportunity) || 0,
+            potential_carrying_savings: Number(row.carrying_cost_savings) || 0,
+            health_status: row.health_status || 'Good',
+            lead_time_days: Number(row.lead_time_days) || 0,
+            lot_size: Number(row.on_hand_qty) || 0,
+            daily_demand: Number(row.daily_demand) || 0,
+            service_level: Number(row.service_level) || 95,
+            optimal_safety_stock: Number(row.safety_stock_value) * 0.8,
+            optimal_cycle_stock: Number(row.cycle_stock_value) * 0.9,
+            optimal_total_wc: Number(row.total_wc_value) - Number(row.wc_savings_opportunity),
+          }));
+          const summaryMetrics = generateSummaryMetrics(wcData);
+          setData(wcData);
+          setMetrics(response.summary ? {
+            ...summaryMetrics,
+            totalWC: Number(response.summary.total_working_capital) || summaryMetrics.totalWC,
+            totalSavingsOpportunity: Number(response.summary.total_savings_opportunity) || summaryMetrics.totalSavingsOpportunity,
+            avgDIO: Math.round(Number(response.summary.avg_dio)) || summaryMetrics.avgDIO,
+          } : summaryMetrics);
+          setLoading(false);
+          return;
+        }
+      }
+    } catch (error) {
+      console.warn('API fetch failed, falling back to mock data:', error);
+    }
+
+    // Fallback to mock data
     setTimeout(() => {
       const wcData = generateWorkingCapitalData();
       const summaryMetrics = generateSummaryMetrics(wcData);
@@ -293,6 +352,7 @@ const WorkingCapitalBaseline = ({ onBack }) => {
               <AccountBalance sx={{ fontSize: 32, color: '#106ebe' }} />
               <Typography variant="h4" fontWeight={700}>Working Capital Baseline</Typography>
               <Chip label="Tile 2.5" size="small" sx={{ bgcolor: alpha('#106ebe', 0.1), color: '#106ebe', fontWeight: 600 }} />
+              <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
             <Typography variant="body2" color="text.secondary">
               Establish today's cash position by SKU × Plant with inventory decomposition (Cycle, Safety, Pipeline, Excess)

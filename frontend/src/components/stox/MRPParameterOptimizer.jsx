@@ -45,6 +45,8 @@ import {
   Legend,
 } from 'chart.js';
 import stoxTheme from './stoxTheme';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, ChartTooltip, Legend);
 
@@ -191,6 +193,9 @@ const MRPParameterOptimizer = ({ onBack }) => {
     stockoutRisk: 'all',
     mrpType: 'all',
   });
+
+  // Get tile data config for data source indicator
+  const tileConfig = getTileDataConfig('mrp-parameter-optimizer');
 
   useEffect(() => {
     fetchData();
@@ -681,9 +686,12 @@ const MRPParameterOptimizer = ({ onBack }) => {
         <Stack direction="row" alignItems="center" spacing={2}>
           <TuneIcon sx={{ fontSize: 32, color: '#005a9e' }} />
           <Box>
-            <Typography variant="h5" fontWeight={700} color="#005a9e">
-              MRP Parameter Optimizer
-            </Typography>
+            <Stack direction="row" alignItems="center" spacing={1.5}>
+              <Typography variant="h5" fontWeight={700} color="#005a9e">
+                MRP Parameter Optimizer
+              </Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
+            </Stack>
             <Typography variant="body2" color="text.secondary">
               Optimize safety stock, reorder points, and lot sizes using AI recommendations
             </Typography>

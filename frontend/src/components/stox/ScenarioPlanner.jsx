@@ -64,8 +64,11 @@ import {
   madisonReedBOMs,
   suppliers as madisonReedSuppliers,
 } from '../../data/madisonReedMasterData';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 const ScenarioPlanner = ({ onBack }) => {
+  const tileConfig = getTileDataConfig('scenario-planner');
   // Scenario State
   const [scenarioName, setScenarioName] = useState('New Scenario');
   const [activeScenario, setActiveScenario] = useState('custom');
@@ -344,9 +347,12 @@ const ScenarioPlanner = ({ onBack }) => {
 
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Box sx={{ flex: 1 }}>
-            <Typography variant="h4" fontWeight={700} sx={{ letterSpacing: '-0.5px', mb: 0.5 }}>
-              What-If Scenario Planner
-            </Typography>
+            <Stack direction="row" alignItems="center" spacing={1.5}>
+              <Typography variant="h4" fontWeight={700} sx={{ letterSpacing: '-0.5px', mb: 0.5 }}>
+                What-If Scenario Planner
+              </Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
+            </Stack>
             <Typography variant="body2" color="text.secondary">
               Model demand scenarios and analyze end-to-end supply chain impact
             </Typography>

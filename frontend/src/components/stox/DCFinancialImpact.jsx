@@ -7,8 +7,11 @@ import {
   Analytics, Refresh, NavigateNext as NavigateNextIcon, ArrowBack as ArrowBackIcon, Download, AttachMoney, TrendingUp, TrendingDown,
 } from '@mui/icons-material';
 import stoxTheme from './stoxTheme';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 const DCFinancialImpact = ({ onBack }) => {
+  const tileConfig = getTileDataConfig('dc-financial-impact');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -181,6 +184,7 @@ const DCFinancialImpact = ({ onBack }) => {
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
               <Analytics sx={{ fontSize: 32, color: '#64748b' }} />
               <Typography variant="h4" fontWeight={700}>DC Financial Impact</Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
             <Typography variant="body2" color="text.secondary">Distribution center financial impact analysis with inventory carrying costs and network optimization opportunities</Typography>
           </Box>

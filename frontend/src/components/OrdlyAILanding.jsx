@@ -177,7 +177,7 @@ const OrdlyAILanding = ({ onTileClick, onBack }) => {
       {/* Module Tiles */}
       <Grid container spacing={1.5}>
         {ordlyModules.map((module, index) => (
-          <Grid item xs={12} sm={6} md={4} lg={4} key={module.id}>
+          <Grid item xs={12} sm={6} md={3} lg={3} key={module.id}>
             <Zoom in timeout={200 + index * 50}>
               <Card
                 sx={{

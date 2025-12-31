@@ -42,6 +42,8 @@ import {
   Filler,
 } from 'chart.js';
 import stoxTheme from './stoxTheme';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, ChartTooltip, Legend, Filler);
 
@@ -138,6 +140,9 @@ const InventoryHealthCheck = ({ onBack }) => {
     xyz: 'all',
     plant: 'all',
   });
+
+  // Get tile data config for data source indicator
+  const tileConfig = getTileDataConfig('inventory-health-check');
 
   useEffect(() => {
     fetchData();
@@ -501,6 +506,7 @@ const InventoryHealthCheck = ({ onBack }) => {
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
               <HealthIcon sx={{ fontSize: 40, color: '#06b6d4' }} />
               <Typography variant="h5" fontWeight={600}>Inventory Health Check</Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
             <Typography variant="body2" color="text.secondary">
               Monitor inventory health scores, excess stock, coverage metrics, and service levels

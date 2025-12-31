@@ -218,7 +218,7 @@ const ReveqAILanding = ({ onTileClick, onBack }) => {
           <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
             <Grid container spacing={2}>
               {categories.map((category, index) => (
-                <Grid item xs={12} md={4} key={category.id}>
+                <Grid item xs={12} sm={6} md={3} lg={3} key={category.id}>
                   <Zoom in timeout={400 + index * 100}>
                     <Card
                       variant="outlined"
@@ -404,7 +404,7 @@ const ReveqAILanding = ({ onTileClick, onBack }) => {
       {/* Module Tiles */}
       <Grid container spacing={1.5}>
         {currentModules.map((module, index) => (
-          <Grid item xs={12} sm={6} md={4} lg={4} key={module.id}>
+          <Grid item xs={12} sm={6} md={3} lg={3} key={module.id}>
             <Zoom in timeout={200 + index * 50}>
               <Card
                 sx={{

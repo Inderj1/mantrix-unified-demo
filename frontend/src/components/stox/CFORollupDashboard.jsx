@@ -8,6 +8,8 @@ import {
   Refresh, NavigateNext as NavigateNextIcon, ArrowBack as ArrowBackIcon, Download, TrendingUp, TrendingDown,
   AttachMoney, Savings, Warning, CheckCircle, Schedule, ShowChart, PieChart as PieChartIcon, Speed,
 } from '@mui/icons-material';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 import { Line, Doughnut, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -103,6 +105,9 @@ const CFORollupDashboard = ({ onBack }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Get tile data config for data source indicator
+  const tileConfig = getTileDataConfig('cfo-rollup-dashboard');
+
   useEffect(() => {
     loadData();
   }, []);
@@ -188,30 +193,32 @@ const CFORollupDashboard = ({ onBack }) => {
   return (
     <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       {/* Header */}
-      <Box sx={{ mb: 2 }}>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+      <Box sx={{ mb: 3 }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 6: Execution</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>CFO Rollup Dashboard</Typography>
           </Breadcrumbs>
-          <Stack direction="row" spacing={1}>
-            <Tooltip title="Refresh Data">
-              <IconButton onClick={loadData} size="small"><Refresh /></IconButton>
-            </Tooltip>
-            <Tooltip title="Export Report">
-              <IconButton size="small"><Download /></IconButton>
-            </Tooltip>
-            <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>
-          </Stack>
+          <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>
         </Stack>
-        <Stack direction="row" alignItems="center" spacing={1.5}>
-          <AccountBalanceIcon sx={{ fontSize: 28, color: '#106ebe' }} />
+        <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
-            <Typography variant="h5" fontWeight={700} color="#106ebe">CFO Rollup Dashboard</Typography>
-            <Typography variant="body2" color="text.secondary">Executive Working Capital Summary</Typography>
+            <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
+              <AccountBalanceIcon sx={{ fontSize: 32, color: '#106ebe' }} />
+              <Typography variant="h4" fontWeight={700}>CFO Rollup Dashboard</Typography>
+              <Chip label="Tile 6.3" size="small" sx={{ bgcolor: alpha('#106ebe', 0.1), color: '#106ebe', fontWeight: 600 }} />
+              <DataSourceChip dataType={tileConfig.dataType} />
+            </Stack>
+            <Typography variant="body2" color="text.secondary">
+              Executive Working Capital Summary
+            </Typography>
           </Box>
+          <Stack direction="row" spacing={1}>
+            <Tooltip title="Refresh"><IconButton onClick={loadData} color="primary"><Refresh /></IconButton></Tooltip>
+            <Tooltip title="Export"><IconButton color="primary"><Download /></IconButton></Tooltip>
+          </Stack>
         </Stack>
       </Box>
 

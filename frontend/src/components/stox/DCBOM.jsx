@@ -4,8 +4,11 @@ import { GridToolbar } from '@mui/x-data-grid';
 import { AccountTree, Refresh, NavigateNext as NavigateNextIcon, ArrowBack as ArrowBackIcon, Download, Layers } from '@mui/icons-material';
 import stoxTheme from './stoxTheme';
 import TreeDataGrid from './TreeDataGrid';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 const DCBOM = ({ onBack }) => {
+  const tileConfig = getTileDataConfig('dc-bom');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -319,6 +322,7 @@ const DCBOM = ({ onBack }) => {
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
               <AccountTree sx={{ fontSize: 32, color: '#005a9e' }} />
               <Typography variant="h4" fontWeight={700}>Bill of Materials</Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
             <Typography variant="body2" color="text.secondary">Multi-level BOM management and component tracking for finished goods assembly</Typography>
           </Box>

@@ -8,8 +8,11 @@ import {
 } from '@mui/icons-material';
 import stoxTheme from './stoxTheme';
 import { createTicket, updateTicketStatus } from '../../hooks/useTickets';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 const StoreReplenishment = ({ onBack }) => {
+  const tileConfig = getTileDataConfig('store-replenishment');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -389,6 +392,7 @@ const StoreReplenishment = ({ onBack }) => {
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
               <LocalShipping sx={{ fontSize: 32, color: '#2b88d8' }} />
               <Typography variant="h4" fontWeight={700}>Tile 4: Stock Transfer Execution (DC → Store)</Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
             <Typography variant="body2" color="text.secondary">
               Match store demand to best DC based on availability, freight cost, and ETA - create executable STO/PR in SAP

@@ -50,6 +50,8 @@ import {
   Filler,
 } from 'chart.js';
 import stoxTheme from './stoxTheme';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, ChartTooltip, Legend, Filler);
@@ -169,6 +171,7 @@ const generatePlantData = () => {
 };
 
 const PlantInventoryIntelligence = ({ onBack }) => {
+  const tileConfig = getTileDataConfig('plant-inventory-intelligence');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPlant, setSelectedPlant] = useState(null);
@@ -690,9 +693,12 @@ const PlantInventoryIntelligence = ({ onBack }) => {
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>
               Layer 1: Foundation
             </Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
-              {selectedPlant ? `${selectedPlant.name}` : 'Plant Inventory Intelligence'}
-            </Typography>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Typography color="primary" variant="body1" fontWeight={600}>
+                {selectedPlant ? `${selectedPlant.name}` : 'Plant Inventory Intelligence'}
+              </Typography>
+              <DataSourceChip dataType={tileConfig.dataType} size="small" />
+            </Stack>
           </Breadcrumbs>
           {!selectedPlant && (
             <Stack direction="row" spacing={1}>

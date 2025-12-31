@@ -8,6 +8,8 @@ import {
   Refresh, NavigateNext as NavigateNextIcon, ArrowBack as ArrowBackIcon, Download,
   AttachMoney, TrendingUp, CalendarMonth, CheckCircle, Schedule, Warning,
 } from '@mui/icons-material';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -209,6 +211,9 @@ const CashReleaseTimeline = ({ onBack }) => {
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState('monthly');
 
+  // Get tile data config for data source indicator
+  const tileConfig = getTileDataConfig('cash-release-timeline');
+
   useEffect(() => {
     loadData();
   }, []);
@@ -287,30 +292,32 @@ const CashReleaseTimeline = ({ onBack }) => {
   return (
     <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       {/* Header */}
-      <Box sx={{ mb: 2 }}>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+      <Box sx={{ mb: 3 }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 6: Execution</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>Cash Release Timeline</Typography>
           </Breadcrumbs>
-          <Stack direction="row" spacing={1}>
-            <Tooltip title="Refresh">
-              <IconButton onClick={loadData} size="small"><Refresh /></IconButton>
-            </Tooltip>
-            <Tooltip title="Export">
-              <IconButton size="small"><Download /></IconButton>
-            </Tooltip>
-            <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>
-          </Stack>
+          <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>
         </Stack>
-        <Stack direction="row" alignItems="center" spacing={1.5}>
-          <TimelineIcon sx={{ fontSize: 28, color: '#106ebe' }} />
+        <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
-            <Typography variant="h5" fontWeight={700} color="#106ebe">Cash Release Timeline</Typography>
-            <Typography variant="body2" color="text.secondary">Track cash release by initiative over time</Typography>
+            <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
+              <TimelineIcon sx={{ fontSize: 32, color: '#106ebe' }} />
+              <Typography variant="h4" fontWeight={700}>Cash Release Timeline</Typography>
+              <Chip label="Tile 6.2" size="small" sx={{ bgcolor: alpha('#106ebe', 0.1), color: '#106ebe', fontWeight: 600 }} />
+              <DataSourceChip dataType={tileConfig.dataType} />
+            </Stack>
+            <Typography variant="body2" color="text.secondary">
+              Track cash release by initiative over time
+            </Typography>
           </Box>
+          <Stack direction="row" spacing={1}>
+            <Tooltip title="Refresh"><IconButton onClick={loadData} color="primary"><Refresh /></IconButton></Tooltip>
+            <Tooltip title="Export"><IconButton color="primary"><Download /></IconButton></Tooltip>
+          </Stack>
         </Stack>
       </Box>
 

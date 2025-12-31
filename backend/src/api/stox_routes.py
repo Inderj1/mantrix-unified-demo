@@ -219,3 +219,194 @@ async def get_consignment_kit_process():
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "service": "STOX.AI"}
+
+
+# ========== BIGQUERY ENDPOINTS (Demo Data) ==========
+
+@router.get("/working-capital")
+async def get_working_capital(
+    plant: Optional[str] = Query(None, description="Filter by plant ID"),
+    category: Optional[str] = Query(None, description="Filter by category"),
+    abc_class: Optional[str] = Query(None, description="Filter by ABC class (A, B, C)"),
+    limit: int = Query(100, description="Number of results"),
+    offset: int = Query(0, description="Pagination offset")
+):
+    """Get working capital baseline data from BigQuery"""
+    try:
+        return stox_service.get_working_capital_baseline(
+            plant=plant, category=category, abc_class=abc_class,
+            limit=limit, offset=offset
+        )
+    except Exception as e:
+        logger.error(f"Failed to get working capital: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/inventory-health")
+async def get_inventory_health(
+    plant: Optional[str] = Query(None, description="Filter by plant ID"),
+    risk_level: Optional[str] = Query(None, description="Filter by risk level"),
+    limit: int = Query(100, description="Number of results")
+):
+    """Get inventory health data from BigQuery"""
+    try:
+        return stox_service.get_inventory_health(
+            plant=plant, risk_level=risk_level, limit=limit
+        )
+    except Exception as e:
+        logger.error(f"Failed to get inventory health: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/mrp-parameters")
+async def get_mrp_parameters(
+    plant: Optional[str] = Query(None, description="Filter by plant ID"),
+    abc_class: Optional[str] = Query(None, description="Filter by ABC class"),
+    limit: int = Query(100, description="Number of results")
+):
+    """Get MRP parameter optimization data from BigQuery"""
+    try:
+        return stox_service.get_mrp_parameters(
+            plant=plant, abc_class=abc_class, limit=limit
+        )
+    except Exception as e:
+        logger.error(f"Failed to get MRP parameters: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/lead-times")
+async def get_lead_times(
+    vendor: Optional[str] = Query(None, description="Filter by vendor name"),
+    risk_level: Optional[str] = Query(None, description="Filter by risk level"),
+    limit: int = Query(100, description="Number of results")
+):
+    """Get supplier lead time analytics from BigQuery"""
+    try:
+        return stox_service.get_supplier_lead_times(
+            vendor=vendor, risk_level=risk_level, limit=limit
+        )
+    except Exception as e:
+        logger.error(f"Failed to get lead times: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/recommendations")
+async def get_recommendations(
+    category: Optional[str] = Query(None, description="Filter by category"),
+    status: Optional[str] = Query(None, description="Filter by status"),
+    priority: Optional[str] = Query(None, description="Filter by priority"),
+    limit: int = Query(50, description="Number of results")
+):
+    """Get optimization recommendations from BigQuery"""
+    try:
+        return stox_service.get_recommendations(
+            category=category, status=status, priority=priority, limit=limit
+        )
+    except Exception as e:
+        logger.error(f"Failed to get recommendations: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/demand-patterns")
+async def get_demand_patterns(
+    plant: Optional[str] = Query(None, description="Filter by plant ID"),
+    pattern: Optional[str] = Query(None, description="Filter by pattern type"),
+    limit: int = Query(100, description="Number of results")
+):
+    """Get demand pattern intelligence from BigQuery"""
+    try:
+        return stox_service.get_demand_patterns(
+            plant=plant, pattern=pattern, limit=limit
+        )
+    except Exception as e:
+        logger.error(f"Failed to get demand patterns: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/cash-release")
+async def get_cash_release(
+    limit: int = Query(20, description="Number of results")
+):
+    """Get cash release timeline initiatives from BigQuery"""
+    try:
+        return stox_service.get_cash_release(limit=limit)
+    except Exception as e:
+        logger.error(f"Failed to get cash release: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/forecasts")
+async def get_forecasts(
+    plant: Optional[str] = Query(None, description="Filter by plant ID"),
+    pattern: Optional[str] = Query(None, description="Filter by pattern type"),
+    limit: int = Query(100, description="Number of results")
+):
+    """Get forecast data from BigQuery"""
+    try:
+        return stox_service.get_forecasts(
+            plant=plant, pattern=pattern, limit=limit
+        )
+    except Exception as e:
+        logger.error(f"Failed to get forecasts: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/exceptions")
+async def get_exceptions(
+    tile: Optional[str] = Query(None, description="Filter by tile name"),
+    priority: Optional[int] = Query(None, description="Filter by priority level"),
+    limit: int = Query(20, description="Number of results")
+):
+    """Get exceptions for Command Center from BigQuery"""
+    try:
+        return stox_service.get_exceptions(
+            tile=tile, priority=priority, limit=limit
+        )
+    except Exception as e:
+        logger.error(f"Failed to get exceptions: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ========== BIGQUERY ENDPOINTS (Real Data) ==========
+
+@router.get("/kpis/performance")
+async def get_performance_kpis():
+    """Get performance KPIs (fill rate, OTIF, cycle time) - REAL DATA"""
+    try:
+        return stox_service.get_performance_kpis()
+    except Exception as e:
+        logger.error(f"Failed to get performance KPIs: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/kpis/margins")
+async def get_margin_analysis(
+    plant: Optional[str] = Query(None, description="Filter by plant"),
+    limit: int = Query(100, description="Number of results")
+):
+    """Get margin analysis by plant/material - REAL DATA"""
+    try:
+        return stox_service.get_margin_analysis(plant=plant, limit=limit)
+    except Exception as e:
+        logger.error(f"Failed to get margin analysis: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/cfo-rollup")
+async def get_cfo_rollup():
+    """Get CFO rollup dashboard data - REAL DATA"""
+    try:
+        return stox_service.get_cfo_rollup()
+    except Exception as e:
+        logger.error(f"Failed to get CFO rollup: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/sell-through")
+async def get_sell_through():
+    """Get sell-through analytics - REAL DATA"""
+    try:
+        return stox_service.get_sell_through_analytics()
+    except Exception as e:
+        logger.error(f"Failed to get sell-through analytics: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

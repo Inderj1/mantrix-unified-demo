@@ -29,6 +29,8 @@ import {
   Tab,
 } from '@mui/material';
 import stoxService from '../../services/stoxService';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 import {
   DataGrid,
   GridToolbar,
@@ -129,6 +131,9 @@ const ShortageDetector = ({ onBack }) => {
   const [viewMode, setViewMode] = useState('table');
   const [activeTab, setActiveTab] = useState(0);
   const [error, setError] = useState(null);
+
+  // Get tile data config for data source indicator
+  const tileConfig = getTileDataConfig('shortage-detector');
 
   // Load data on mount
   useEffect(() => {
@@ -459,9 +464,12 @@ const ShortageDetector = ({ onBack }) => {
             Back
           </Button>
           <Box sx={{ flex: 1 }}>
-            <Typography variant="h4" fontWeight={700} sx={{ letterSpacing: '-0.5px' }}>
-              Shortage Detector
-            </Typography>
+            <Stack direction="row" alignItems="center" spacing={1.5}>
+              <Typography variant="h4" fontWeight={700} sx={{ letterSpacing: '-0.5px' }}>
+                Shortage Detector
+              </Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
+            </Stack>
             <Typography variant="subtitle1" color="text.secondary">
               Real-time stockout prevention and inventory monitoring
             </Typography>

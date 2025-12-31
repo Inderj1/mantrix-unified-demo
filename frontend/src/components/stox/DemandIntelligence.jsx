@@ -43,6 +43,8 @@ import {
   Legend,
 } from 'chart.js';
 import stoxTheme from './stoxTheme';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, ChartTooltip, Legend);
@@ -151,6 +153,9 @@ const DemandIntelligence = ({ onBack }) => {
     xyz: 'all',
     plant: 'all',
   });
+
+  // Get tile data config for data source indicator
+  const tileConfig = getTileDataConfig('demand-intelligence');
 
   useEffect(() => {
     fetchData();
@@ -658,6 +663,7 @@ const DemandIntelligence = ({ onBack }) => {
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
               <AnalyticsIcon sx={{ fontSize: 40, color: '#06b6d4' }} />
               <Typography variant="h5" fontWeight={600}>Demand Intelligence</Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
             <Typography variant="body2" color="text.secondary">
               Analyze demand patterns, detect anomalies, and manage ABC/XYZ classification

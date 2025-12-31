@@ -19,6 +19,8 @@ import {
   Tab,
 } from '@mui/material';
 import stoxService from '../../services/stoxService';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 import {
   DataGrid,
   GridToolbar,
@@ -89,6 +91,9 @@ const InventoryHeatmap = ({ onBack }) => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
   const [error, setError] = useState(null);
+
+  // Get tile data config for data source indicator
+  const tileConfig = getTileDataConfig('inventory-heatmap');
 
   // Load data on mount
   useEffect(() => {
@@ -362,9 +367,12 @@ const InventoryHeatmap = ({ onBack }) => {
             Back
           </Button>
           <Box sx={{ flex: 1 }}>
-            <Typography variant="h4" fontWeight={700} sx={{ letterSpacing: '-0.5px' }}>
-              Inventory Heatmap
-            </Typography>
+            <Stack direction="row" alignItems="center" spacing={1.5}>
+              <Typography variant="h4" fontWeight={700} sx={{ letterSpacing: '-0.5px' }}>
+                Inventory Heatmap
+              </Typography>
+              <DataSourceChip dataType={tileConfig.dataType} />
+            </Stack>
             <Typography variant="subtitle1" color="text.secondary">
               Visual stock distribution across warehouses and stores
             </Typography>

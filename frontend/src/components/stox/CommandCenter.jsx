@@ -11,6 +11,8 @@ import {
   Savings, AccountBalance, LocalShipping, Schedule, Assessment,
 } from '@mui/icons-material';
 import stoxTheme from './stoxTheme';
+import DataSourceChip from './DataSourceChip';
+import { getTileDataConfig } from './stoxDataConfig';
 
 /**
  * Command Center - Tile 0
@@ -118,6 +120,9 @@ const CommandCenter = ({ onBack, onTileClick }) => {
   const [chatMessages, setChatMessages] = useState(initialMessages);
   const [chatInput, setChatInput] = useState('');
 
+  // Get tile data config for data source indicator
+  const tileConfig = getTileDataConfig('command-center');
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -206,64 +211,40 @@ const CommandCenter = ({ onBack, onTileClick }) => {
   };
 
   return (
-    <Box sx={{ p: 2, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       {/* Header with Breadcrumbs */}
-      <Box sx={{ mb: 1.5, flexShrink: 0 }}>
-        {/* Breadcrumbs */}
-        <Breadcrumbs separator={<NavigateNextIcon sx={{ fontSize: 16 }} />} sx={{ mb: 1 }}>
-          <Link
-            component="button"
-            variant="caption"
-            underline="hover"
-            onClick={onBack}
-            sx={{ color: 'text.secondary', fontWeight: 500, '&:hover': { color: '#0078d4' } }}
-          >
-            CORE.AI
-          </Link>
-          <Link
-            component="button"
-            variant="caption"
-            underline="hover"
-            onClick={onBack}
-            sx={{ color: 'text.secondary', fontWeight: 500, '&:hover': { color: '#0078d4' } }}
-          >
-            STOX.AI
-          </Link>
-          <Typography variant="caption" fontWeight={600} color="#0078d4">Command Center</Typography>
-        </Breadcrumbs>
-
+      <Box sx={{ mb: 3, flexShrink: 0 }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 0: Command Center</Link>
+            <Typography color="primary" variant="body1" fontWeight={600}>Command Center</Typography>
+          </Breadcrumbs>
+          <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>
+        </Stack>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Stack direction="row" alignItems="center" spacing={1.5}>
-            <Box sx={{
-              width: 36,
-              height: 36,
-              borderRadius: 1,
-              bgcolor: alpha('#0078d4', 0.1),
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-              <DashboardIcon sx={{ fontSize: 20, color: '#0078d4' }} />
-            </Box>
-            <Box>
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <Typography variant="h6" fontWeight={700} color="#0078d4">Command Center</Typography>
-                <Chip label="Tile 0" size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha('#0078d4', 0.1), color: '#0078d4', fontWeight: 600 }} />
-              </Stack>
-              <Typography variant="caption" color="text.secondary">Planner's Front Door - KPIs, Exceptions & AI Assistant</Typography>
-            </Box>
-          </Stack>
+          <Box>
+            <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
+              <DashboardIcon sx={{ fontSize: 32, color: '#0078d4' }} />
+              <Typography variant="h4" fontWeight={700}>Command Center</Typography>
+              <Chip label="Tile 0" size="small" sx={{ bgcolor: alpha('#0078d4', 0.1), color: '#0078d4', fontWeight: 600 }} />
+              <DataSourceChip dataType={tileConfig.dataType} />
+            </Stack>
+            <Typography variant="body2" color="text.secondary">
+              Planner's Front Door - KPIs, Exceptions & AI Assistant
+            </Typography>
+          </Box>
           <Stack direction="row" spacing={1}>
-            <IconButton onClick={fetchData} color="primary" size="small"><Refresh fontSize="small" /></IconButton>
-            <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>
+            <IconButton onClick={fetchData} color="primary"><Refresh /></IconButton>
           </Stack>
         </Stack>
       </Box>
 
       {/* Main Content */}
-      <Box sx={{ flex: 1, display: 'flex', gap: 1.5, overflow: 'hidden', minHeight: 0 }}>
+      <Box sx={{ flex: 1, display: 'flex', gap: 2, overflow: 'hidden', minHeight: 0 }}>
         {/* Left Panel - AI Chat */}
-        <Paper sx={{ width: 420, maxHeight: 420, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <Paper sx={{ width: 420, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <Box sx={{ p: 1, borderBottom: '1px solid', borderColor: 'divider', bgcolor: alpha('#0078d4', 0.05), flexShrink: 0 }}>
             <Stack direction="row" alignItems="center" spacing={1}>
               <Avatar sx={{ width: 28, height: 28, bgcolor: '#0078d4' }}>
@@ -325,10 +306,10 @@ const CommandCenter = ({ onBack, onTileClick }) => {
         </Paper>
 
         {/* Right Panel - KPIs & Exceptions */}
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1, overflow: 'hidden', minHeight: 0 }}>
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'auto', minHeight: 0 }}>
           {/* Compact KPI Cards */}
           {kpis && (
-            <Grid container spacing={1} sx={{ flexShrink: 0 }}>
+            <Grid container spacing={1} sx={{ mb: 2, flexShrink: 0 }}>
               <Grid item xs={3}>
                 <Card sx={{ borderLeft: '3px solid #0078d4' }}>
                   <CardContent sx={{ py: 1, px: 1.5, '&:last-child': { pb: 1 } }}>
@@ -367,7 +348,7 @@ const CommandCenter = ({ onBack, onTileClick }) => {
           )}
 
           {/* Quick Navigation - Compact inline */}
-          <Paper sx={{ p: 1, flexShrink: 0 }}>
+          <Paper sx={{ p: 1, mb: 2, flexShrink: 0 }}>
             <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap alignItems="center">
               <Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ mr: 0.5 }}>Quick:</Typography>
               {[
@@ -398,7 +379,7 @@ const CommandCenter = ({ onBack, onTileClick }) => {
           </Paper>
 
           {/* Exceptions Panel */}
-          <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
+          <Paper sx={{ flexShrink: 0 }}>
             <Box sx={{ p: 1, borderBottom: '1px solid', borderColor: 'divider', bgcolor: alpha('#0078d4', 0.03), flexShrink: 0 }}>
               <Stack direction="row" alignItems="center" justifyContent="space-between">
                 <Stack direction="row" alignItems="center" spacing={1}>
@@ -414,7 +395,7 @@ const CommandCenter = ({ onBack, onTileClick }) => {
               </Stack>
             </Box>
 
-            <List sx={{ flex: 1, overflow: 'auto', py: 0, minHeight: 0 }} dense>
+            <List sx={{ py: 0 }} dense>
               {exceptions.map((exception, idx) => (
                 <React.Fragment key={exception.id}>
                   <ListItem
