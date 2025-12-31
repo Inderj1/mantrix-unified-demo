@@ -149,7 +149,7 @@ const MarketsAIDashboard = () => {
           <Box sx={{
             width: 4,
             height: 60,
-            background: 'linear-gradient(180deg, #0a6ed1 0%, #354a5f 100%)',
+            background: 'linear-gradient(180deg, #0a6ed1 0%, #1e40af 100%)',
             borderRadius: 2
           }} />
           <Box sx={{ flex: 1 }}>
@@ -176,11 +176,11 @@ const MarketsAIDashboard = () => {
                   size="small"
                   icon={<RefreshIcon sx={{ fontSize: 14 }} />}
                   sx={{
-                    bgcolor: alpha('#64748b', 0.1),
-                    color: '#64748b',
+                    bgcolor: alpha('#1976d2', 0.1),
+                    color: '#1976d2',
                     fontWeight: 500,
                     fontSize: '0.7rem',
-                    '& .MuiChip-icon': { color: '#64748b' }
+                    '& .MuiChip-icon': { color: '#1976d2' }
                   }}
                 />
               )}
@@ -246,7 +246,7 @@ const MarketsAIDashboard = () => {
             sx={{
               height: '100%',
               border: '1px solid',
-              borderColor: alpha('#354a5f', 0.15),
+              borderColor: alpha('#1e40af', 0.15),
               '&::before': {
                 content: '""',
                 position: 'absolute',
@@ -254,7 +254,7 @@ const MarketsAIDashboard = () => {
                 left: 0,
                 right: 0,
                 height: 3,
-                background: 'linear-gradient(135deg, #354a5f 0%, #32363a 100%)',
+                background: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)',
               },
               position: 'relative',
               overflow: 'hidden',
@@ -280,7 +280,7 @@ const MarketsAIDashboard = () => {
             sx={{
               height: '100%',
               border: '1px solid',
-              borderColor: alpha('#64748b', 0.15),
+              borderColor: alpha('#2563eb', 0.15),
               '&::before': {
                 content: '""',
                 position: 'absolute',
@@ -288,7 +288,7 @@ const MarketsAIDashboard = () => {
                 left: 0,
                 right: 0,
                 height: 3,
-                background: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
+                background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
               },
               position: 'relative',
               overflow: 'hidden',
@@ -349,7 +349,7 @@ const MarketsAIDashboard = () => {
 
       {/* Category Tiles Grid */}
       <Box>
-        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, color: '#354a5f' }}>
+        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, color: '#0854a0' }}>
           Market Signal Categories
         </Typography>
 

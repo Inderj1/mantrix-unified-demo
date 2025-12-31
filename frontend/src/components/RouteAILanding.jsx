@@ -35,11 +35,11 @@ const routeModules = [
     subtitle: 'Vehicle Operations',
     description: 'Real-time vehicle tracking, driver management, and fleet utilization analytics',
     icon: FleetIcon,
-    color: '#354a5f',
-    bgColor: '#fff3e0',
+    color: '#0854a0',
+    bgColor: '#dbeafe',
     stats: { label: 'Active Vehicles', value: '45' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #354a5f 0%, #32363a 100%)',
+    gradient: 'linear-gradient(135deg, #0854a0 0%, #1976d2 100%)',
   },
   {
     id: 'route-optimization',
@@ -47,11 +47,11 @@ const routeModules = [
     subtitle: 'Smart Routing',
     description: 'AI-powered route planning, traffic-aware optimization, and dynamic re-routing',
     icon: RouteIcon,
-    color: '#6a6d70',
-    bgColor: '#e8f5e9',
+    color: '#1976d2',
+    bgColor: '#dbeafe',
     stats: { label: 'Routes Optimized', value: '1,245' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #6a6d70 0%, #6a6d70 100%)',
+    gradient: 'linear-gradient(135deg, #1976d2 0%, #1d4ed8 100%)',
   },
   {
     id: 'delivery-tracking',
@@ -83,11 +83,11 @@ const routeModules = [
     subtitle: 'Cost Optimization',
     description: 'Fuel consumption tracking, cost analysis, and efficiency recommendations',
     icon: FuelIcon,
-    color: '#89919a',
-    bgColor: '#ffebee',
+    color: '#2563eb',
+    bgColor: '#dbeafe',
     stats: { label: 'Cost Saved', value: '$12.5K' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #89919a 0%, #6a6d70 100%)',
+    gradient: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
   },
   {
     id: 'maintenance-scheduler',
@@ -95,11 +95,11 @@ const routeModules = [
     subtitle: 'Predictive Maintenance',
     description: 'Preventive maintenance scheduling, service alerts, and vehicle health monitoring',
     icon: MaintenanceIcon,
-    color: '#607D8B',
-    bgColor: '#eceff1',
+    color: '#1e40af',
+    bgColor: '#dbeafe',
     stats: { label: 'Upcoming Services', value: '8' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #607D8B 0%, #455A64 100%)',
+    gradient: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)',
   },
 ];
 
@@ -145,10 +145,10 @@ const RouteAILanding = ({ onTileClick, onBack }) => {
             sx={{
               width: 64,
               height: 64,
-              bgcolor: alpha('#354a5f', 0.1),
+              bgcolor: alpha('#0854a0', 0.1),
             }}
           >
-            <FleetIcon sx={{ fontSize: 36, color: '#354a5f' }} />
+            <FleetIcon sx={{ fontSize: 36, color: '#0854a0' }} />
           </Avatar>
           <Box>
             <Typography variant="h4" fontWeight={700}>

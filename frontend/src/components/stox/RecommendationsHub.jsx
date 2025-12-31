@@ -35,6 +35,10 @@ import {
   TrendingUp,
   Lightbulb,
   AutoAwesome,
+  AccountBalance,
+  Savings,
+  Warning,
+  CalendarMonth,
 } from '@mui/icons-material';
 import { Doughnut, Bar } from 'react-chartjs-2';
 import {
@@ -57,30 +61,81 @@ const formatCurrency = (value) => {
   return `$${value}`;
 };
 
-// Generate mock recommendations data
+// Generate mock recommendations data with Working Capital metrics
 const generateRecommendationsData = () => {
   const recommendations = [
-    { id: 'REC-001', title: 'Reduce Safety Stock for MAT-001', category: 'Inventory', priority: 'High' },
-    { id: 'REC-002', title: 'Increase Reorder Point for MAT-005', category: 'Inventory', priority: 'Medium' },
-    { id: 'REC-003', title: 'Switch to Moving Average Costing', category: 'Cost', priority: 'Low' },
-    { id: 'REC-004', title: 'Consolidate Suppliers for Bearings', category: 'Supply', priority: 'High' },
-    { id: 'REC-005', title: 'Implement VMI for Electronics', category: 'Supply', priority: 'Medium' },
-    { id: 'REC-006', title: 'Adjust Lot Size for MAT-008', category: 'MRP', priority: 'Medium' },
-    { id: 'REC-007', title: 'Update Lead Time Parameters', category: 'MRP', priority: 'High' },
-    { id: 'REC-008', title: 'Review ABC Classification', category: 'Analytics', priority: 'Low' },
-    { id: 'REC-009', title: 'Optimize Service Level Targets', category: 'Service', priority: 'High' },
-    { id: 'REC-010', title: 'Reduce Excess Stock in P2000', category: 'Inventory', priority: 'High' },
-    { id: 'REC-011', title: 'Improve Demand Forecast Accuracy', category: 'Analytics', priority: 'Medium' },
-    { id: 'REC-012', title: 'Negotiate Better Terms with VND-003', category: 'Supply', priority: 'Medium' },
+    { id: 'REC-001', title: 'Reduce Safety Stock for MAT-001', category: 'Inventory', priority: 'High', changeType: 'Safety Stock', currentValue: 500, recommendedValue: 420 },
+    { id: 'REC-002', title: 'Increase Reorder Point for MAT-005', category: 'Inventory', priority: 'Medium', changeType: 'Reorder Point', currentValue: 720, recommendedValue: 800 },
+    { id: 'REC-003', title: 'Switch to Moving Average Costing', category: 'Cost', priority: 'Low', changeType: 'Cost Method', currentValue: 0, recommendedValue: 0 },
+    { id: 'REC-004', title: 'Consolidate Suppliers for Bearings', category: 'Supply', priority: 'High', changeType: 'Supplier', currentValue: 0, recommendedValue: 0 },
+    { id: 'REC-005', title: 'Implement VMI for Electronics', category: 'Supply', priority: 'Medium', changeType: 'VMI', currentValue: 0, recommendedValue: 0 },
+    { id: 'REC-006', title: 'Adjust Lot Size for MAT-008', category: 'MRP', priority: 'Medium', changeType: 'Lot Size', currentValue: 500, recommendedValue: 340 },
+    { id: 'REC-007', title: 'Update Lead Time Parameters', category: 'MRP', priority: 'High', changeType: 'Lead Time', currentValue: 14, recommendedValue: 10 },
+    { id: 'REC-008', title: 'Review ABC Classification', category: 'Analytics', priority: 'Low', changeType: 'Classification', currentValue: 0, recommendedValue: 0 },
+    { id: 'REC-009', title: 'Optimize Service Level Targets', category: 'Service', priority: 'High', changeType: 'Service Level', currentValue: 99, recommendedValue: 97 },
+    { id: 'REC-010', title: 'Reduce Excess Stock in P2000', category: 'Inventory', priority: 'High', changeType: 'Excess Stock', currentValue: 1200, recommendedValue: 0 },
+    { id: 'REC-011', title: 'Improve Demand Forecast Accuracy', category: 'Analytics', priority: 'Medium', changeType: 'Forecast', currentValue: 0, recommendedValue: 0 },
+    { id: 'REC-012', title: 'Negotiate Better Terms with VND-003', category: 'Supply', priority: 'Medium', changeType: 'Payment Terms', currentValue: 30, recommendedValue: 60 },
   ];
 
   const statuses = ['Pending', 'Approved', 'Rejected', 'Implemented'];
+  const cashReleaseMonths = ['Month 1', 'Month 2', 'Month 3', 'Month 4+'];
+  const carryingRate = 0.22; // 22% annual carrying cost
 
   return recommendations.map((rec, idx) => {
     const confidence = Math.floor(70 + Math.random() * 29);
-    const estimatedSavings = Math.floor(5000 + Math.random() * 95000);
     const impactScore = Math.floor(60 + Math.random() * 40);
     const status = statuses[idx % 4];
+    const unitCost = 150 + Math.floor(Math.random() * 100); // $150-250 per unit
+
+    // Calculate Working Capital metrics
+    let deltaUnits = 0;
+    let deltaWC = 0;
+    let serviceRisk = 0;
+
+    if (rec.changeType === 'Safety Stock' || rec.changeType === 'Excess Stock') {
+      deltaUnits = rec.currentValue - rec.recommendedValue;
+      deltaWC = deltaUnits * unitCost;
+      serviceRisk = rec.changeType === 'Safety Stock' ? (0.2 + Math.random() * 0.8) : 0; // 0.2-1.0% for SS reduction
+    } else if (rec.changeType === 'Lot Size') {
+      deltaUnits = (rec.currentValue - rec.recommendedValue) / 2; // Cycle stock = lot/2
+      deltaWC = deltaUnits * unitCost;
+      serviceRisk = 0; // Lot size doesn't affect service
+    } else if (rec.changeType === 'Reorder Point') {
+      deltaUnits = rec.recommendedValue - rec.currentValue; // Increase = more WC
+      deltaWC = -deltaUnits * unitCost; // Negative WC freed (increase)
+      serviceRisk = -0.5; // Negative = service improvement
+    } else if (rec.changeType === 'Service Level') {
+      deltaWC = (rec.currentValue - rec.recommendedValue) * 5000; // $5K per service % reduction
+      serviceRisk = (rec.currentValue - rec.recommendedValue) * 0.3; // 0.3% per % reduction
+    } else if (rec.changeType === 'Payment Terms') {
+      // Payment terms improvement frees WC without inventory change
+      deltaWC = Math.floor(50000 + Math.random() * 100000);
+      serviceRisk = 0;
+    } else {
+      // Other categories - estimate WC impact
+      deltaWC = Math.floor(10000 + Math.random() * 40000);
+      serviceRisk = Math.random() * 0.5;
+    }
+
+    // Calculate annual carrying cost savings
+    const deltaAnnualCost = deltaWC > 0 ? Math.round(deltaWC * carryingRate) : 0;
+
+    // Calculate risk-adjusted savings
+    const riskMultiplier = Math.max(0, 1 - Math.abs(serviceRisk) / 10);
+    const riskAdjustedSavings = Math.round(deltaWC * (confidence / 100) * riskMultiplier);
+
+    // Determine cash release month based on change type
+    let cashReleaseMonth;
+    if (rec.changeType === 'Safety Stock' || rec.changeType === 'Excess Stock') {
+      cashReleaseMonth = 'Month 1';
+    } else if (rec.changeType === 'Lot Size') {
+      cashReleaseMonth = 'Month 2';
+    } else if (rec.changeType === 'Lead Time') {
+      cashReleaseMonth = 'Month 3';
+    } else {
+      cashReleaseMonth = cashReleaseMonths[idx % 4];
+    }
 
     return {
       id: rec.id,
@@ -89,7 +144,6 @@ const generateRecommendationsData = () => {
       priority: rec.priority,
       status,
       confidence,
-      estimatedSavings,
       impactScore,
       affectedItems: Math.floor(1 + Math.random() * 20),
       generatedDate: new Date(Date.now() - Math.floor(Math.random() * 14) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -97,6 +151,19 @@ const generateRecommendationsData = () => {
       implementationEffort: ['Low', 'Medium', 'High'][idx % 3],
       aiModel: 'STOX-AI v2.1',
       rationale: 'Based on historical demand patterns and current inventory levels.',
+      // Working Capital metrics
+      changeType: rec.changeType,
+      currentValue: rec.currentValue,
+      recommendedValue: rec.recommendedValue,
+      deltaUnits,
+      unitCost,
+      deltaWC: Math.round(deltaWC),
+      deltaAnnualCost,
+      serviceRisk: parseFloat(serviceRisk.toFixed(2)),
+      riskAdjustedSavings,
+      cashReleaseMonth,
+      // Legacy field for compatibility
+      estimatedSavings: Math.abs(deltaWC) || Math.floor(5000 + Math.random() * 95000),
     };
   });
 };
@@ -130,6 +197,11 @@ const RecommendationsHub = ({ onBack }) => {
       const totalSavings = recData.filter(d => d.status === 'Approved' || d.status === 'Implemented').reduce((sum, d) => sum + d.estimatedSavings, 0);
       const avgConfidence = recData.reduce((sum, d) => sum + d.confidence, 0) / totalRecs;
 
+      // Working Capital metrics
+      const totalWCFreed = recData.filter(d => d.deltaWC > 0).reduce((sum, d) => sum + d.deltaWC, 0);
+      const totalAnnualCarrySavings = recData.filter(d => d.deltaAnnualCost > 0).reduce((sum, d) => sum + d.deltaAnnualCost, 0);
+      const totalRiskAdjustedSavings = recData.filter(d => d.riskAdjustedSavings > 0).reduce((sum, d) => sum + d.riskAdjustedSavings, 0);
+
       setMetrics({
         totalRecs,
         pendingCount,
@@ -138,6 +210,10 @@ const RecommendationsHub = ({ onBack }) => {
         highPriorityCount,
         totalSavings,
         avgConfidence: avgConfidence.toFixed(0),
+        // WC metrics
+        totalWCFreed,
+        totalAnnualCarrySavings,
+        totalRiskAdjustedSavings,
       });
       setLoading(false);
     }, 500);
@@ -152,26 +228,10 @@ const RecommendationsHub = ({ onBack }) => {
 
   const columns = [
     { field: 'id', headerName: 'Rec ID', minWidth: 90, flex: 0.6 },
-    { field: 'title', headerName: 'Recommendation', minWidth: 250, flex: 2 },
+    { field: 'title', headerName: 'Recommendation', minWidth: 200, flex: 1.5 },
     {
       field: 'category',
       headerName: 'Category',
-      minWidth: 100,
-      flex: 0.7,
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params) => (
-        <Chip
-          label={params.value}
-          size="small"
-          color={params.value === 'Inventory' ? 'info' : params.value === 'Supply' ? 'warning' : params.value === 'Cost' ? 'success' : 'secondary'}
-          sx={{ fontWeight: 600 }}
-        />
-      ),
-    },
-    {
-      field: 'priority',
-      headerName: 'Priority',
       minWidth: 90,
       flex: 0.6,
       align: 'center',
@@ -180,16 +240,32 @@ const RecommendationsHub = ({ onBack }) => {
         <Chip
           label={params.value}
           size="small"
+          color={params.value === 'Inventory' ? 'info' : params.value === 'Supply' ? 'warning' : params.value === 'Cost' ? 'success' : 'secondary'}
+          sx={{ fontWeight: 600, fontSize: '0.7rem' }}
+        />
+      ),
+    },
+    {
+      field: 'priority',
+      headerName: 'Priority',
+      minWidth: 80,
+      flex: 0.5,
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <Chip
+          label={params.value}
+          size="small"
           color={params.value === 'High' ? 'error' : params.value === 'Medium' ? 'warning' : 'default'}
-          sx={{ fontWeight: 600 }}
+          sx={{ fontWeight: 600, fontSize: '0.7rem' }}
         />
       ),
     },
     {
       field: 'status',
       headerName: 'Status',
-      minWidth: 110,
-      flex: 0.7,
+      minWidth: 100,
+      flex: 0.6,
       align: 'center',
       headerAlign: 'center',
       renderCell: (params) => (
@@ -197,51 +273,158 @@ const RecommendationsHub = ({ onBack }) => {
           label={params.value}
           size="small"
           color={params.value === 'Implemented' ? 'success' : params.value === 'Approved' ? 'info' : params.value === 'Rejected' ? 'error' : 'default'}
-          sx={{ fontWeight: 600 }}
+          sx={{ fontWeight: 600, fontSize: '0.7rem' }}
+        />
+      ),
+    },
+    // Working Capital Columns
+    {
+      field: 'deltaWC',
+      headerName: 'Δ WC ($)',
+      minWidth: 110,
+      flex: 0.7,
+      align: 'right',
+      headerAlign: 'right',
+      description: 'Working Capital freed (Inventory reduction × unit cost)',
+      renderCell: (params) => (
+        <Chip
+          icon={params.value > 0 ? <Savings sx={{ fontSize: 14 }} /> : undefined}
+          label={params.value >= 0 ? `+${formatCurrency(params.value)}` : formatCurrency(params.value)}
+          size="small"
+          sx={{
+            fontWeight: 700,
+            fontSize: '0.7rem',
+            bgcolor: params.value > 0 ? alpha('#10b981', 0.12) : params.value < 0 ? alpha('#ef4444', 0.12) : alpha('#64748b', 0.12),
+            color: params.value > 0 ? '#059669' : params.value < 0 ? '#dc2626' : '#64748b',
+            '& .MuiChip-icon': { color: params.value > 0 ? '#059669' : '#64748b' },
+          }}
+        />
+      ),
+    },
+    {
+      field: 'deltaAnnualCost',
+      headerName: 'Δ Annual Cost',
+      minWidth: 120,
+      flex: 0.7,
+      align: 'right',
+      headerAlign: 'right',
+      description: 'Annual carrying cost savings (WC freed × 22% carrying rate)',
+      renderCell: (params) => (
+        <Typography variant="body2" fontWeight={600} sx={{ color: params.value > 0 ? '#059669' : '#64748b' }}>
+          {params.value > 0 ? `-${formatCurrency(params.value)}/yr` : '-'}
+        </Typography>
+      ),
+    },
+    {
+      field: 'serviceRisk',
+      headerName: 'Service Risk',
+      minWidth: 100,
+      flex: 0.6,
+      align: 'center',
+      headerAlign: 'center',
+      description: 'Increase in stockout probability (%)',
+      renderCell: (params) => {
+        const risk = params.value;
+        let label, color;
+        if (risk <= 0) {
+          label = risk < 0 ? 'Improved' : 'None';
+          color = '#10b981';
+        } else if (risk < 0.5) {
+          label = `Low (+${risk}%)`;
+          color = '#3b82f6';
+        } else if (risk < 1) {
+          label = `Med (+${risk}%)`;
+          color = '#f59e0b';
+        } else {
+          label = `High (+${risk}%)`;
+          color = '#ef4444';
+        }
+        return (
+          <Chip
+            icon={risk > 0.5 ? <Warning sx={{ fontSize: 12 }} /> : undefined}
+            label={label}
+            size="small"
+            sx={{
+              fontWeight: 600,
+              fontSize: '0.65rem',
+              bgcolor: alpha(color, 0.12),
+              color: color,
+              '& .MuiChip-icon': { color: color },
+            }}
+          />
+        );
+      },
+    },
+    {
+      field: 'riskAdjustedSavings',
+      headerName: 'Risk-Adj Savings',
+      minWidth: 130,
+      flex: 0.8,
+      align: 'right',
+      headerAlign: 'right',
+      description: 'WC × Confidence × (1 - Risk Factor)',
+      renderCell: (params) => (
+        <Chip
+          label={formatCurrency(params.value)}
+          size="small"
+          sx={{
+            fontWeight: 700,
+            fontSize: '0.7rem',
+            bgcolor: params.value > 50000 ? alpha('#10b981', 0.12) : params.value > 20000 ? alpha('#3b82f6', 0.12) : alpha('#64748b', 0.12),
+            color: params.value > 50000 ? '#059669' : params.value > 20000 ? '#1d4ed8' : '#64748b',
+          }}
+        />
+      ),
+    },
+    {
+      field: 'cashReleaseMonth',
+      headerName: 'Cash Release',
+      minWidth: 100,
+      flex: 0.6,
+      align: 'center',
+      headerAlign: 'center',
+      description: 'When CFO sees balance sheet impact',
+      renderCell: (params) => (
+        <Chip
+          icon={<CalendarMonth sx={{ fontSize: 12 }} />}
+          label={params.value}
+          size="small"
+          sx={{
+            fontWeight: 600,
+            fontSize: '0.65rem',
+            bgcolor: params.value === 'Month 1' ? alpha('#10b981', 0.12) : params.value === 'Month 2' ? alpha('#3b82f6', 0.12) : alpha('#f59e0b', 0.12),
+            color: params.value === 'Month 1' ? '#059669' : params.value === 'Month 2' ? '#1d4ed8' : '#d97706',
+            '& .MuiChip-icon': { color: params.value === 'Month 1' ? '#059669' : params.value === 'Month 2' ? '#1d4ed8' : '#d97706' },
+          }}
         />
       ),
     },
     {
       field: 'confidence',
       headerName: 'Confidence',
-      minWidth: 110,
-      flex: 0.7,
+      minWidth: 100,
+      flex: 0.6,
       align: 'center',
       headerAlign: 'center',
       renderCell: (params) => (
-        <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', gap: 0.5 }}>
           <LinearProgress
             variant="determinate"
             value={params.value}
-            sx={{ flex: 1, height: 6, borderRadius: 3 }}
+            sx={{ flex: 1, height: 5, borderRadius: 3 }}
             color={params.value >= 90 ? 'success' : params.value >= 75 ? 'info' : 'warning'}
           />
-          <Typography variant="caption" fontWeight={600}>{params.value}%</Typography>
+          <Typography variant="caption" fontWeight={600} sx={{ fontSize: '0.7rem' }}>{params.value}%</Typography>
         </Box>
       ),
     },
     {
-      field: 'estimatedSavings',
-      headerName: 'Est. Savings',
-      minWidth: 110,
-      flex: 0.7,
-      align: 'right',
-      headerAlign: 'right',
-      renderCell: (params) => formatCurrency(params.value),
-    },
-    {
       field: 'affectedItems',
       headerName: 'Items',
-      minWidth: 70,
-      flex: 0.5,
+      minWidth: 60,
+      flex: 0.4,
       align: 'center',
       headerAlign: 'center',
-    },
-    {
-      field: 'generatedDate',
-      headerName: 'Generated',
-      minWidth: 100,
-      flex: 0.7,
     },
   ];
 
@@ -312,36 +495,58 @@ const RecommendationsHub = ({ onBack }) => {
         </Box>
 
         <Grid container spacing={2}>
-          {/* Summary Cards */}
+          {/* Working Capital Impact Cards */}
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: '4px solid #10b981' }}>
+            <Card sx={{ borderLeft: '4px solid #0854a0' }}>
               <CardContent>
-                <Typography variant="caption" color="text.secondary">Estimated Savings</Typography>
-                <Typography variant="h5" fontWeight={700} color="success.main">{formatCurrency(selectedRec.estimatedSavings)}</Typography>
+                <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.5 }}>
+                  <AccountBalance sx={{ fontSize: 16, color: '#0854a0' }} />
+                  <Typography variant="caption" color="text.secondary">Δ Working Capital</Typography>
+                </Stack>
+                <Typography variant="h5" fontWeight={700} color={selectedRec.deltaWC > 0 ? '#10b981' : selectedRec.deltaWC < 0 ? '#ef4444' : '#64748b'}>
+                  {selectedRec.deltaWC >= 0 ? '+' : ''}{formatCurrency(selectedRec.deltaWC)}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">Cash freed from inventory</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: '4px solid #0891b2' }}>
+            <Card sx={{ borderLeft: '4px solid #10b981' }}>
               <CardContent>
-                <Typography variant="caption" color="text.secondary">Confidence Score</Typography>
-                <Typography variant="h5" fontWeight={700}>{selectedRec.confidence}%</Typography>
+                <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.5 }}>
+                  <Savings sx={{ fontSize: 16, color: '#10b981' }} />
+                  <Typography variant="caption" color="text.secondary">Δ Annual Cost</Typography>
+                </Stack>
+                <Typography variant="h5" fontWeight={700} color="success.main">
+                  {selectedRec.deltaAnnualCost > 0 ? `-${formatCurrency(selectedRec.deltaAnnualCost)}/yr` : '-'}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">Recurring P&L benefit</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
             <Card sx={{ borderLeft: '4px solid #8b5cf6' }}>
               <CardContent>
-                <Typography variant="caption" color="text.secondary">Impact Score</Typography>
-                <Typography variant="h5" fontWeight={700}>{selectedRec.impactScore}/100</Typography>
+                <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.5 }}>
+                  <TrendingUp sx={{ fontSize: 16, color: '#8b5cf6' }} />
+                  <Typography variant="caption" color="text.secondary">Risk-Adjusted Savings</Typography>
+                </Stack>
+                <Typography variant="h5" fontWeight={700} color="#8b5cf6">{formatCurrency(selectedRec.riskAdjustedSavings)}</Typography>
+                <Typography variant="caption" color="text.secondary">Confidence {selectedRec.confidence}%</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: '4px solid #f59e0b' }}>
+            <Card sx={{ borderLeft: selectedRec.serviceRisk > 0.5 ? '4px solid #f59e0b' : '4px solid #10b981' }}>
               <CardContent>
-                <Typography variant="caption" color="text.secondary">Affected Items</Typography>
-                <Typography variant="h5" fontWeight={700}>{selectedRec.affectedItems}</Typography>
+                <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.5 }}>
+                  {selectedRec.serviceRisk > 0.5 ? <Warning sx={{ fontSize: 16, color: '#f59e0b' }} /> : <CheckCircle sx={{ fontSize: 16, color: '#10b981' }} />}
+                  <Typography variant="caption" color="text.secondary">Service Risk</Typography>
+                </Stack>
+                <Typography variant="h5" fontWeight={700} color={selectedRec.serviceRisk > 0.5 ? '#f59e0b' : '#10b981'}>
+                  {selectedRec.serviceRisk <= 0 ? (selectedRec.serviceRisk < 0 ? 'Improved' : 'None') : `+${selectedRec.serviceRisk}%`}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">Cash release: {selectedRec.cashReleaseMonth}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -485,54 +690,54 @@ const RecommendationsHub = ({ onBack }) => {
         renderDetailView()
       ) : (
         <>
-          {/* Summary Cards */}
+          {/* Summary Cards - Working Capital Focused */}
           {metrics && (
             <Grid container spacing={2} sx={{ mb: 3 }}>
-              <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #ec4899' }}>
+              <Grid item xs={12} sm={6} md={3}>
+                <Card sx={{ borderLeft: '4px solid #0854a0' }}>
                   <CardContent sx={{ py: 1.5 }}>
-                    <Typography variant="caption" color="text.secondary">Total Recommendations</Typography>
-                    <Typography variant="h5" fontWeight={700}>{metrics.totalRecs}</Typography>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <AccountBalance sx={{ fontSize: 18, color: '#0854a0' }} />
+                      <Typography variant="caption" color="text.secondary">Total WC Freed</Typography>
+                    </Stack>
+                    <Typography variant="h5" fontWeight={700} color="#0854a0">{formatCurrency(metrics.totalWCFreed)}</Typography>
+                    <Typography variant="caption" color="text.secondary">{metrics.totalRecs} recommendations</Typography>
                   </CardContent>
                 </Card>
               </Grid>
-              <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #64748b' }}>
-                  <CardContent sx={{ py: 1.5 }}>
-                    <Typography variant="caption" color="text.secondary">Pending Review</Typography>
-                    <Typography variant="h5" fontWeight={700}>{metrics.pendingCount}</Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #0891b2' }}>
-                  <CardContent sx={{ py: 1.5 }}>
-                    <Typography variant="caption" color="text.secondary">Approved</Typography>
-                    <Typography variant="h5" fontWeight={700} color="info.main">{metrics.approvedCount}</Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={12} sm={6} md={2}>
+              <Grid item xs={12} sm={6} md={3}>
                 <Card sx={{ borderLeft: '4px solid #10b981' }}>
                   <CardContent sx={{ py: 1.5 }}>
-                    <Typography variant="caption" color="text.secondary">Implemented</Typography>
-                    <Typography variant="h5" fontWeight={700} color="success.main">{metrics.implementedCount}</Typography>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <Savings sx={{ fontSize: 18, color: '#10b981' }} />
+                      <Typography variant="caption" color="text.secondary">Annual Carry Savings</Typography>
+                    </Stack>
+                    <Typography variant="h5" fontWeight={700} color="#10b981">{formatCurrency(metrics.totalAnnualCarrySavings)}/yr</Typography>
+                    <Typography variant="caption" color="text.secondary">22% carrying rate applied</Typography>
                   </CardContent>
                 </Card>
               </Grid>
-              <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #ef4444' }}>
+              <Grid item xs={12} sm={6} md={3}>
+                <Card sx={{ borderLeft: '4px solid #8b5cf6' }}>
                   <CardContent sx={{ py: 1.5 }}>
-                    <Typography variant="caption" color="text.secondary">High Priority</Typography>
-                    <Typography variant="h5" fontWeight={700} color="error.main">{metrics.highPriorityCount}</Typography>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <TrendingUp sx={{ fontSize: 18, color: '#8b5cf6' }} />
+                      <Typography variant="caption" color="text.secondary">Risk-Adjusted Savings</Typography>
+                    </Stack>
+                    <Typography variant="h5" fontWeight={700} color="#8b5cf6">{formatCurrency(metrics.totalRiskAdjustedSavings)}</Typography>
+                    <Typography variant="caption" color="text.secondary">WC × Confidence × (1-Risk)</Typography>
                   </CardContent>
                 </Card>
               </Grid>
-              <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #16a34a' }}>
+              <Grid item xs={12} sm={6} md={3}>
+                <Card sx={{ borderLeft: '4px solid #f59e0b' }}>
                   <CardContent sx={{ py: 1.5 }}>
-                    <Typography variant="caption" color="text.secondary">Total Savings</Typography>
-                    <Typography variant="h5" fontWeight={700} color="success.main">{formatCurrency(metrics.totalSavings)}</Typography>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <Schedule sx={{ fontSize: 18, color: '#f59e0b' }} />
+                      <Typography variant="caption" color="text.secondary">Pending / High Priority</Typography>
+                    </Stack>
+                    <Typography variant="h5" fontWeight={700} color="#f59e0b">{metrics.pendingCount} / {metrics.highPriorityCount}</Typography>
+                    <Typography variant="caption" color="text.secondary">{metrics.implementedCount} implemented</Typography>
                   </CardContent>
                 </Card>
               </Grid>

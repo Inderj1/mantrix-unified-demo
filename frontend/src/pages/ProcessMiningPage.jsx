@@ -168,9 +168,9 @@ const ProcessMiningPage = ({ onBack }) => {
               Back to CORE.AI
             </Button>
           )}
-          <ProcessIcon sx={{ fontSize: 40, color: '#354a5f' }} />
+          <ProcessIcon sx={{ fontSize: 40, color: '#1e40af' }} />
           <Box>
-            <Typography variant="h4" fontWeight="bold" sx={{ color: '#354a5f' }}>
+            <Typography variant="h4" fontWeight="bold" sx={{ color: '#1e40af' }}>
               PROCESS.AI
             </Typography>
             <Typography variant="body2" color="text.secondary">

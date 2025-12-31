@@ -431,46 +431,6 @@ class EventExtractor:
                 'supported': True
             },
             {
-                'id': 'consignment-kit',
-                'name': 'Consignment Kit Management',
-                'description': 'Hospital-distributor consignment kit lifecycle tracking',
-                'activities': [
-                    'Kit Request',
-                    'Transfer Order',
-                    'Pick & Ship DC',
-                    'Kit in Transit',
-                    'Receipt',
-                    'Surgery',
-                    'Usage Record',
-                    'Ship Replacements',
-                    'Replace Transit',
-                    'Restock Kit',
-                    'Kit Available'
-                ],
-                'data_source': 'consignment_kit_tracking',
-                'supported': True
-            },
-            {
-                'id': 'loaner-process',
-                'name': 'Loaner Process',
-                'description': 'Hospital-distributor loaner equipment lifecycle tracking',
-                'activities': [
-                    'Kit Request',
-                    'Transfer Order',
-                    'Pick & Ship DC',
-                    'Kit in Transit',
-                    'Receipt',
-                    'Surgery',
-                    'Usage Report',
-                    'Return Arrange',
-                    'Return Transit',
-                    'DC Receipt & QC',
-                    'Invoice Process'
-                ],
-                'data_source': 'loaner_process_tracking',
-                'supported': True
-            },
-            {
                 'id': 'quote-to-cash',
                 'name': 'Quote-to-Cash (Q2C)',
                 'description': 'Sales process from quote to revenue',

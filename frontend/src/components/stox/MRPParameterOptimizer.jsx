@@ -54,6 +54,53 @@ const formatCurrency = (value) => {
   return `$${value}`;
 };
 
+// Generate EOQ Cost Curve data
+const generateEOQCurveData = (annualDemand, orderingCost, unitCost, holdingRate) => {
+  const holdingCostPerUnit = unitCost * holdingRate;
+  const eoq = Math.sqrt((2 * annualDemand * orderingCost) / holdingCostPerUnit);
+
+  // Generate points from 0.2x EOQ to 3x EOQ
+  const minQ = Math.max(10, Math.floor(eoq * 0.2));
+  const maxQ = Math.ceil(eoq * 3);
+  const step = Math.max(1, Math.floor((maxQ - minQ) / 20));
+
+  const quantities = [];
+  const orderingCosts = [];
+  const holdingCosts = [];
+  const totalCosts = [];
+
+  for (let q = minQ; q <= maxQ; q += step) {
+    quantities.push(q);
+    const ordCost = (annualDemand / q) * orderingCost;
+    const holdCost = (q / 2) * holdingCostPerUnit;
+    orderingCosts.push(ordCost);
+    holdingCosts.push(holdCost);
+    totalCosts.push(ordCost + holdCost);
+  }
+
+  // Add the EOQ point if not already included
+  if (!quantities.includes(Math.round(eoq))) {
+    const eoqOrdCost = (annualDemand / eoq) * orderingCost;
+    const eoqHoldCost = (eoq / 2) * holdingCostPerUnit;
+    quantities.push(Math.round(eoq));
+    orderingCosts.push(eoqOrdCost);
+    holdingCosts.push(eoqHoldCost);
+    totalCosts.push(eoqOrdCost + eoqHoldCost);
+  }
+
+  // Sort by quantity
+  const sortedIndices = quantities.map((_, i) => i).sort((a, b) => quantities[a] - quantities[b]);
+
+  return {
+    eoq: Math.round(eoq),
+    minTotalCost: Math.round((annualDemand / eoq) * orderingCost + (eoq / 2) * holdingCostPerUnit),
+    quantities: sortedIndices.map(i => quantities[i]),
+    orderingCosts: sortedIndices.map(i => Math.round(orderingCosts[i])),
+    holdingCosts: sortedIndices.map(i => Math.round(holdingCosts[i])),
+    totalCosts: sortedIndices.map(i => Math.round(totalCosts[i])),
+  };
+};
+
 // Generate mock MRP parameter data
 const generateMRPData = () => {
   const materials = [
@@ -93,6 +140,13 @@ const generateMRPData = () => {
 
     const savingsPotential = Math.abs(ssDiff) * (5 + Math.random() * 15);
 
+    // EOQ-related fields for cost curve analysis
+    const annualDemand = Math.floor(5000 + Math.random() * 45000); // 5K-50K units/year
+    const unitCost = Math.floor(20 + Math.random() * 180); // $20-$200 per unit
+    const orderingCostPerPO = Math.floor(75 + Math.random() * 75); // $75-$150 per PO
+    const holdingRate = 0.18 + Math.random() * 0.08; // 18-26% carrying rate
+    const currentOrderQty = Math.floor(300 + Math.random() * 700); // Current order quantity
+
     return {
       id: mat.id,
       material: mat.name,
@@ -117,6 +171,12 @@ const generateMRPData = () => {
       supplyVariability: (5 + Math.random() * 25).toFixed(1),
       reviewCycle: Math.floor(7 + Math.random() * 21),
       lastOptimized: new Date(Date.now() - Math.floor(Math.random() * 60) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      // EOQ fields
+      annualDemand,
+      unitCost,
+      orderingCostPerPO,
+      holdingRate,
+      currentOrderQty,
     };
   });
 };
@@ -266,6 +326,48 @@ const MRPParameterOptimizer = ({ onBack }) => {
   const renderDetailView = () => {
     if (!selectedItem) return null;
 
+    // Generate EOQ curve data
+    const eoquCurveData = generateEOQCurveData(
+      selectedItem.annualDemand,
+      selectedItem.orderingCostPerPO,
+      selectedItem.unitCost,
+      selectedItem.holdingRate
+    );
+
+    // EOQ Chart data for visualization
+    const eoqChartData = {
+      labels: eoquCurveData.quantities,
+      datasets: [
+        {
+          label: 'Total Cost',
+          data: eoquCurveData.totalCosts,
+          borderColor: '#0854a0',
+          backgroundColor: 'rgba(8, 84, 160, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+        },
+        {
+          label: 'Ordering Cost',
+          data: eoquCurveData.orderingCosts,
+          borderColor: '#ef4444',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          borderDash: [5, 5],
+          tension: 0.4,
+        },
+        {
+          label: 'Holding Cost',
+          data: eoquCurveData.holdingCosts,
+          borderColor: '#10b981',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          borderDash: [5, 5],
+          tension: 0.4,
+        },
+      ],
+    };
+
     const comparisonData = {
       labels: ['Safety Stock', 'Reorder Point'],
       datasets: [
@@ -394,6 +496,91 @@ const MRPParameterOptimizer = ({ onBack }) => {
                     }}
                   />
                 </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* EOQ Cost Curve - Full Width */}
+          <Grid item xs={12}>
+            <Card sx={{ borderTop: '3px solid #0854a0' }}>
+              <CardContent>
+                <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+                  <Box>
+                    <Typography variant="subtitle1" fontWeight={700}>EOQ Cost Curve Analysis</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Total Cost = Ordering Cost + Holding Cost | EOQ = √(2DK/H)
+                    </Typography>
+                  </Box>
+                  <Stack direction="row" spacing={2}>
+                    <Chip
+                      label={`EOQ: ${eoquCurveData.eoq} units`}
+                      size="small"
+                      sx={{ bgcolor: alpha('#0854a0', 0.1), color: '#0854a0', fontWeight: 700 }}
+                    />
+                    <Chip
+                      label={`Current: ${selectedItem.currentOrderQty} units`}
+                      size="small"
+                      sx={{ bgcolor: alpha('#ef4444', 0.1), color: '#ef4444', fontWeight: 700 }}
+                    />
+                    <Chip
+                      label={`Min Cost: ${formatCurrency(eoquCurveData.minTotalCost)}/yr`}
+                      size="small"
+                      sx={{ bgcolor: alpha('#10b981', 0.1), color: '#10b981', fontWeight: 700 }}
+                    />
+                  </Stack>
+                </Stack>
+                <Box sx={{ height: 300 }}>
+                  <Line
+                    data={eoqChartData}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      interaction: {
+                        mode: 'index',
+                        intersect: false,
+                      },
+                      plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                          callbacks: {
+                            label: (context) => `${context.dataset.label}: ${formatCurrency(context.raw)}`,
+                          },
+                        },
+                      },
+                      scales: {
+                        x: {
+                          title: { display: true, text: 'Order Quantity (units)' },
+                        },
+                        y: {
+                          beginAtZero: true,
+                          title: { display: true, text: 'Annual Cost ($)' },
+                          ticks: {
+                            callback: (value) => formatCurrency(value),
+                          },
+                        },
+                      },
+                    }}
+                  />
+                </Box>
+                {/* EOQ Parameters Summary */}
+                <Grid container spacing={2} sx={{ mt: 1, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+                  <Grid item xs={6} sm={3}>
+                    <Typography variant="caption" color="text.secondary">Annual Demand (D)</Typography>
+                    <Typography variant="body2" fontWeight={600}>{selectedItem.annualDemand.toLocaleString()} units</Typography>
+                  </Grid>
+                  <Grid item xs={6} sm={3}>
+                    <Typography variant="caption" color="text.secondary">Ordering Cost (K)</Typography>
+                    <Typography variant="body2" fontWeight={600}>${selectedItem.orderingCostPerPO}/order</Typography>
+                  </Grid>
+                  <Grid item xs={6} sm={3}>
+                    <Typography variant="caption" color="text.secondary">Unit Cost</Typography>
+                    <Typography variant="body2" fontWeight={600}>${selectedItem.unitCost}/unit</Typography>
+                  </Grid>
+                  <Grid item xs={6} sm={3}>
+                    <Typography variant="caption" color="text.secondary">Holding Rate (H)</Typography>
+                    <Typography variant="body2" fontWeight={600}>{(selectedItem.holdingRate * 100).toFixed(1)}%</Typography>
+                  </Grid>
+                </Grid>
               </CardContent>
             </Card>
           </Grid>

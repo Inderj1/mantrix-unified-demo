@@ -118,8 +118,14 @@ import ForecastingEngine from './components/stox/ForecastingEngine.jsx';
 import SAPDataHub from './components/stox/SAPDataHub.jsx';
 import PlantInventoryIntelligence from './components/stox/PlantInventoryIntelligence.jsx';
 import InventoryHealthCheck from './components/stox/InventoryHealthCheck.jsx';
+import WorkingCapitalBaseline from './components/stox/WorkingCapitalBaseline.jsx';
+import CommandCenter from './components/stox/CommandCenter.jsx';
 import SupplyLeadTime from './components/stox/SupplyLeadTime.jsx';
 import CostPolicyEngine from './components/stox/CostPolicyEngine.jsx';
+import CostConfiguration from './components/stox/CostConfiguration.jsx';
+import CFORollupDashboard from './components/stox/CFORollupDashboard.jsx';
+import CashReleaseTimeline from './components/stox/CashReleaseTimeline.jsx';
+import SupplierTermsImpact from './components/stox/SupplierTermsImpact.jsx';
 import MRPParameterOptimizer from './components/stox/MRPParameterOptimizer.jsx';
 import MRPParameterTuner from './components/stox/MRPParameterTuner.jsx';
 import WhatIfSimulator from './components/stox/WhatIfSimulator.jsx';
@@ -722,7 +728,7 @@ function App() {
                         } else if (moduleId === 'executive-command') {
                           console.log('Setting stoxView to: executive-command');
                           setStoxView('executive-command');
-                        } else if (['demand-flow', 'demand-forecasting', 'outbound-replenishment', 'dc-inventory', 'supply-planning', 'bom-explosion', 'component-consolidation', 'analytics-whatif', 'tile0-forecast-simulation', 'store-forecasting', 'store-health-monitor', 'store-optimization', 'store-replenishment', 'store-financial-impact', 'supply-chain-map', 'dc-demand-aggregation', 'dc-health-monitor', 'dc-optimization', 'dc-bom', 'dc-lot-size', 'dc-supplier-exec', 'dc-financial-impact', 'demand-intelligence', 'forecasting-engine', 'sap-data-hub', 'plant-inventory-intelligence', 'inventory-health-check', 'supply-lead-time', 'cost-policy-engine', 'mrp-parameter-optimizer', 'mrp-parameter-tuner', 'what-if-simulator', 'recommendations-hub', 'sap-writeback', 'performance-monitor'].includes(moduleId)) {
+                        } else if (['demand-flow', 'demand-forecasting', 'outbound-replenishment', 'dc-inventory', 'supply-planning', 'bom-explosion', 'component-consolidation', 'analytics-whatif', 'tile0-forecast-simulation', 'store-forecasting', 'store-health-monitor', 'store-optimization', 'store-replenishment', 'store-financial-impact', 'supply-chain-map', 'dc-demand-aggregation', 'dc-health-monitor', 'dc-optimization', 'dc-bom', 'dc-lot-size', 'dc-supplier-exec', 'dc-financial-impact', 'demand-intelligence', 'forecasting-engine', 'sap-data-hub', 'plant-inventory-intelligence', 'inventory-health-check', 'working-capital-baseline', 'command-center', 'supply-lead-time', 'cost-policy-engine', 'cost-configuration', 'mrp-parameter-optimizer', 'mrp-parameter-tuner', 'what-if-simulator', 'recommendations-hub', 'sap-writeback', 'performance-monitor', 'cfo-rollup-dashboard', 'cash-release-timeline', 'supplier-terms-impact'].includes(moduleId)) {
                           console.log('Setting stoxView to module tiles:', moduleId);
                           setStoxView(moduleId);
                         }
@@ -809,11 +815,26 @@ function App() {
                   {stoxView === 'inventory-health-check' && (
                     <InventoryHealthCheck onBack={() => setStoxView('landing')} />
                   )}
+                  {stoxView === 'working-capital-baseline' && (
+                    <WorkingCapitalBaseline onBack={() => setStoxView('landing')} />
+                  )}
+                  {stoxView === 'command-center' && (
+                    <CommandCenter
+                      onBack={() => setStoxView('landing')}
+                      onTileClick={(tileId) => setStoxView(tileId)}
+                    />
+                  )}
                   {stoxView === 'supply-lead-time' && (
                     <SupplyLeadTime onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'cost-policy-engine' && (
                     <CostPolicyEngine onBack={() => setStoxView('landing')} />
+                  )}
+                  {stoxView === 'cost-configuration' && (
+                    <CostConfiguration onBack={() => setStoxView('landing')} />
+                  )}
+                  {stoxView === 'supplier-terms-impact' && (
+                    <SupplierTermsImpact onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'mrp-parameter-optimizer' && (
                     <MRPParameterOptimizer onBack={() => setStoxView('landing')} />
@@ -832,6 +853,12 @@ function App() {
                   )}
                   {stoxView === 'performance-monitor' && (
                     <PerformanceMonitor onBack={() => setStoxView('landing')} />
+                  )}
+                  {stoxView === 'cfo-rollup-dashboard' && (
+                    <CFORollupDashboard onBack={() => setStoxView('landing')} />
+                  )}
+                  {stoxView === 'cash-release-timeline' && (
+                    <CashReleaseTimeline onBack={() => setStoxView('landing')} />
                   )}
                   {/* DC System Modules */}
                   {stoxView === 'dc-demand-aggregation' && (

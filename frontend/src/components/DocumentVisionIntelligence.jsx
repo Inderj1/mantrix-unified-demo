@@ -203,7 +203,7 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
       display_name: 'Shipping Documents',
       description: 'Shipping label and tracking document extraction',
       icon: ShippingIcon,
-      color: '#64748b',
+      color: '#1976d2',
     },
     {
       id: 4,
@@ -211,7 +211,7 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
       display_name: 'Inventory Labels',
       description: 'Barcode, QR code, and label data extraction',
       icon: InventoryIcon,
-      color: '#354a5f',
+      color: '#1e40af',
     },
   ];
 

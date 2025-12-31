@@ -22,6 +22,7 @@ import {
   Timeline as OrderlyIcon,
 } from '@mui/icons-material';
 
+// All modules use blue color palette for consistency
 const aiModules = [
   {
     id: 'margen',
@@ -41,11 +42,11 @@ const aiModules = [
     subtitle: 'Smart Inventory Optimization',
     description: 'Inventory management, demand forecasting, and supply chain optimization',
     icon: InventoryIcon,
-    color: '#354a5f',
-    bgColor: '#f1f5f9',
+    color: '#0854a0',
+    bgColor: '#dbeafe',
     stats: { label: 'SKUs', value: '2.5K' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #354a5f 0%, #32363a 100%)',
+    gradient: 'linear-gradient(135deg, #0854a0 0%, #1976d2 100%)',
   },
   {
     id: 'route',
@@ -53,11 +54,11 @@ const aiModules = [
     subtitle: 'Fleet & Route Optimization',
     description: 'AI-powered fleet management, route optimization, and logistics intelligence',
     icon: FleetIcon,
-    color: '#64748b',
-    bgColor: '#f1f5f9',
+    color: '#2563eb',
+    bgColor: '#dbeafe',
     stats: { label: 'Vehicles', value: '45' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
+    gradient: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
   },
   {
     id: 'process-mining',
@@ -65,11 +66,11 @@ const aiModules = [
     subtitle: 'Process Mining & Analytics',
     description: 'Discover, analyze, and optimize business processes with AI-powered insights',
     icon: ProcessMiningIcon,
-    color: '#354a5f',
-    bgColor: '#f1f5f9',
-    stats: { label: 'Processes', value: '8' },
+    color: '#1e40af',
+    bgColor: '#dbeafe',
+    stats: { label: 'Processes', value: '3' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #354a5f 0%, #1e3a5f 100%)',
+    gradient: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)',
   },
   {
     id: 'ordly',
@@ -77,11 +78,11 @@ const aiModules = [
     subtitle: 'Order Management Intelligence',
     description: 'AI-powered sales order management from customer intent to SAP commitment',
     icon: OrderlyIcon,
-    color: '#0854a0',
+    color: '#1976d2',
     bgColor: '#dbeafe',
     stats: { label: 'Orders', value: '156' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #0854a0 0%, #1976d2 100%)',
+    gradient: 'linear-gradient(135deg, #1976d2 0%, #0854a0 100%)',
   },
 ];
 
@@ -107,7 +108,7 @@ const CoreAILanding = ({ onTileClick }) => {
           <Box sx={{
             width: 4,
             height: 60,
-            background: 'linear-gradient(180deg, #0a6ed1 0%, #354a5f 100%)',
+            background: 'linear-gradient(180deg, #0a6ed1 0%, #1e40af 100%)',
             borderRadius: 2
           }} />
           <Box>

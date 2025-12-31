@@ -99,13 +99,13 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
                     cursor: 'pointer',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     background: 'white',
-                    border: `1px solid ${alpha('#354a5f', 0.15)}`,
+                    border: `1px solid ${alpha('#0854a0', 0.15)}`,
                     position: 'relative',
                     overflow: 'hidden',
                     '&:hover': {
                       transform: 'translateY(-4px)',
-                      boxShadow: `0 8px 16px ${alpha('#354a5f', 0.15)}`,
-                      borderColor: alpha('#354a5f', 0.3),
+                      boxShadow: `0 8px 16px ${alpha('#0854a0', 0.15)}`,
+                      borderColor: alpha('#0854a0', 0.3),
                       '& .action-icon': {
                         transform: 'translateX(4px)',
                       },
@@ -117,7 +117,7 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
                       left: 0,
                       right: 0,
                       height: '3px',
-                      background: 'linear-gradient(135deg, #354a5f 0%, #32363a 100%)',
+                      background: 'linear-gradient(135deg, #0854a0 0%, #1976d2 100%)',
                     },
                   }}
                   onClick={() => setSelectedView('document-analysis')}
@@ -125,14 +125,14 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
                   <CardContent sx={{ p: 2 }}>
                     {/* Icon and Badge */}
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                      <DescriptionIcon sx={{ fontSize: 40, color: '#354a5f' }} />
+                      <DescriptionIcon sx={{ fontSize: 40, color: '#0854a0' }} />
                       <Chip
                         label={loading ? '...' : `${documentCount} Docs`}
                         size="small"
                         variant="outlined"
                         sx={{
-                          borderColor: alpha('#354a5f', 0.3),
-                          color: '#354a5f',
+                          borderColor: alpha('#0854a0', 0.3),
+                          color: '#0854a0',
                           fontWeight: 600,
                           fontSize: '0.65rem',
                           height: 20,
@@ -145,7 +145,7 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
                       variant="h6"
                       sx={{
                         fontWeight: 600,
-                        color: '#354a5f',
+                        color: '#0854a0',
                         mb: 1,
                         fontSize: '0.938rem',
                       }}
@@ -175,7 +175,7 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
                         mt: 1.5,
                         pt: 1.5,
                         borderTop: '1px solid',
-                        borderColor: alpha('#354a5f', 0.1)
+                        borderColor: alpha('#0854a0', 0.1)
                       }}
                     >
                       <Box
@@ -184,8 +184,8 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
                           display: 'flex',
                           alignItems: 'center',
                           gap: 0.5,
-                          bgcolor: alpha('#354a5f', 0.1),
-                          color: '#354a5f',
+                          bgcolor: alpha('#0854a0', 0.1),
+                          color: '#0854a0',
                           px: 1.5,
                           py: 0.5,
                           borderRadius: 1,
@@ -327,13 +327,13 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
                     cursor: 'pointer',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     background: 'white',
-                    border: `1px solid ${alpha('#64748b', 0.15)}`,
+                    border: `1px solid ${alpha('#1976d2', 0.15)}`,
                     position: 'relative',
                     overflow: 'hidden',
                     '&:hover': {
                       transform: 'translateY(-4px)',
-                      boxShadow: `0 8px 16px ${alpha('#64748b', 0.15)}`,
-                      borderColor: alpha('#64748b', 0.3),
+                      boxShadow: `0 8px 16px ${alpha('#1976d2', 0.15)}`,
+                      borderColor: alpha('#1976d2', 0.3),
                       '& .action-icon': {
                         transform: 'translateX(4px)',
                       },
@@ -345,7 +345,7 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
                       left: 0,
                       right: 0,
                       height: '3px',
-                      background: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
+                      background: 'linear-gradient(135deg, #1976d2 0%, #1d4ed8 100%)',
                     },
                   }}
                   onClick={() => setSelectedView('pdf-parser')}
@@ -353,14 +353,14 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
                   <CardContent sx={{ p: 2 }}>
                     {/* Icon and Badge */}
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                      <PictureAsPdfIcon sx={{ fontSize: 40, color: '#64748b' }} />
+                      <PictureAsPdfIcon sx={{ fontSize: 40, color: '#1976d2' }} />
                       <Chip
                         label="3 Templates"
                         size="small"
                         variant="outlined"
                         sx={{
-                          borderColor: alpha('#64748b', 0.3),
-                          color: '#64748b',
+                          borderColor: alpha('#1976d2', 0.3),
+                          color: '#1976d2',
                           fontWeight: 600,
                           fontSize: '0.65rem',
                           height: 20,
@@ -373,7 +373,7 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
                       variant="h6"
                       sx={{
                         fontWeight: 700,
-                        color: '#64748b',
+                        color: '#1976d2',
                         mb: 1,
                         fontSize: '0.938rem',
                         letterSpacing: '-0.3px'
@@ -405,7 +405,7 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
                         mt: 1.5,
                         pt: 1.5,
                         borderTop: '1px solid',
-                        borderColor: alpha('#64748b', 0.1)
+                        borderColor: alpha('#1976d2', 0.1)
                       }}
                     >
                       <Box
@@ -414,8 +414,8 @@ const DocumentIntelligenceLanding = ({ onBack }) => {
                           display: 'flex',
                           alignItems: 'center',
                           gap: 0.5,
-                          bgcolor: alpha('#64748b', 0.1),
-                          color: '#64748b',
+                          bgcolor: alpha('#1976d2', 0.1),
+                          color: '#1976d2',
                           px: 1.5,
                           py: 0.5,
                           borderRadius: 1,

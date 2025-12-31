@@ -40,10 +40,26 @@ import {
   Psychology as PsychologyIcon,
   RocketLaunch as RocketLaunchIcon,
   Layers as LayersIcon,
+  AccountBalance as AccountBalanceIcon,
+  Dashboard as DashboardIcon,
 } from '@mui/icons-material';
 
-// 6 Layer Tiles for the main landing page
+// 7 Layer Tiles for the main landing page (Layer 0 = Command Center)
+// All tiles use blue color palette for consistency
 const layerTiles = [
+  {
+    id: 'layer-0',
+    layer: 0,
+    title: 'Command Center',
+    subtitle: 'Planner Front Door',
+    description: 'AI-powered command center with KPIs, exceptions, and quick navigation',
+    icon: DashboardIcon,
+    color: '#0854a0',
+    bgColor: '#dbeafe',
+    gradient: 'linear-gradient(135deg, #0854a0 0%, #1976d2 100%)',
+    tileCount: 1,
+    isSpecial: true, // Mark as special tile that opens directly
+  },
   {
     id: 'layer-1',
     layer: 1,
@@ -63,10 +79,10 @@ const layerTiles = [
     subtitle: 'Health & Patterns',
     description: 'Analyze inventory health, detect anomalies, and classify demand patterns with AI insights',
     icon: HealthAndSafetyIcon,
-    color: '#354a5f',
-    bgColor: '#f1f5f9',
-    gradient: 'linear-gradient(135deg, #354a5f 0%, #32363a 100%)',
-    tileCount: 3,
+    color: '#1d4ed8',
+    bgColor: '#dbeafe',
+    gradient: 'linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)',
+    tileCount: 4,
   },
   {
     id: 'layer-3',
@@ -87,10 +103,10 @@ const layerTiles = [
     subtitle: 'Parameters & Costs',
     description: 'AI-driven safety stock, reorder point optimization, and cost policy management',
     icon: TuneIcon,
-    color: '#64748b',
-    bgColor: '#f1f5f9',
-    gradient: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
-    tileCount: 2,
+    color: '#2563eb',
+    bgColor: '#dbeafe',
+    gradient: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+    tileCount: 4,
   },
   {
     id: 'layer-5',
@@ -111,15 +127,29 @@ const layerTiles = [
     subtitle: 'Actions & Monitoring',
     description: 'AI recommendations, SAP writeback, and performance monitoring with feedback loop',
     icon: RocketLaunchIcon,
-    color: '#354a5f',
-    bgColor: '#f1f5f9',
-    gradient: 'linear-gradient(135deg, #354a5f 0%, #32363a 100%)',
-    tileCount: 3,
+    color: '#1e40af',
+    bgColor: '#dbeafe',
+    gradient: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)',
+    tileCount: 5,
   },
 ];
 
-// Sub-tiles organized by layer
+// Sub-tiles organized by layer - all using blue color palette
 const subTilesByLayer = {
+  'layer-0': [
+    {
+      id: 'command-center',
+      title: 'Command Center',
+      subtitle: 'Tile 0 - Planner Front Door',
+      description: 'AI-powered command center with KPIs, exceptions, chat assistant, and quick navigation',
+      icon: DashboardIcon,
+      color: '#0854a0',
+      bgColor: '#dbeafe',
+      stats: { label: 'Alerts', value: '8' },
+      status: 'active',
+      gradient: 'linear-gradient(135deg, #0854a0 0%, #1976d2 100%)',
+    },
+  ],
   'layer-1': [
     {
       id: 'sap-data-hub',
@@ -127,11 +157,11 @@ const subTilesByLayer = {
       subtitle: 'Layer 1 - Infrastructure',
       description: 'Monitor SAP system connections, data quality scores, extraction jobs, and ODQ delta queues',
       icon: HubIcon,
-      color: '#354a5f',
-      bgColor: '#f1f5f9',
+      color: '#1e40af',
+      bgColor: '#dbeafe',
       stats: { label: 'Systems', value: '4' },
       status: 'active',
-      gradient: 'linear-gradient(135deg, #354a5f 0%, #32363a 100%)',
+      gradient: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)',
     },
     {
       id: 'plant-inventory-intelligence',
@@ -151,11 +181,11 @@ const subTilesByLayer = {
       subtitle: 'Layer 1 - Procurement',
       description: 'Vendor lead time analysis, OTD tracking, variability metrics, and safety stock recommendations',
       icon: ScheduleIcon,
-      color: '#64748b',
-      bgColor: '#f1f5f9',
+      color: '#2563eb',
+      bgColor: '#dbeafe',
       stats: { label: 'Vendors', value: '8' },
       status: 'active',
-      gradient: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
+      gradient: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
     },
     {
       id: 'supply-chain-map',
@@ -184,16 +214,28 @@ const subTilesByLayer = {
       gradient: 'linear-gradient(135deg, #0854a0 0%, #1d4ed8 100%)',
     },
     {
+      id: 'working-capital-baseline',
+      title: 'Working Capital Baseline',
+      subtitle: 'Layer 2.5 - Cash Position',
+      description: 'Establish cash position by SKU × Plant with WC decomposition (Cycle, Safety, Pipeline, Excess)',
+      icon: AccountBalanceIcon,
+      color: '#1976d2',
+      bgColor: '#dbeafe',
+      stats: { label: 'WC Tied', value: '$2.8M' },
+      status: 'active',
+      gradient: 'linear-gradient(135deg, #1976d2 0%, #0854a0 100%)',
+    },
+    {
       id: 'tile0-forecast-simulation',
       title: 'Inventory Health Dashboard',
       subtitle: 'Layer 2 - Analytics',
       description: 'Compare AI models (ARIMA, ETS, ML), override forecasts, and confirm baseline for optimization',
       icon: ScienceIcon,
-      color: '#354a5f',
-      bgColor: '#f1f5f9',
+      color: '#1e40af',
+      bgColor: '#dbeafe',
       stats: { label: 'Models', value: '3' },
       status: 'active',
-      gradient: 'linear-gradient(135deg, #354a5f 0%, #32363a 100%)',
+      gradient: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)',
     },
     {
       id: 'demand-intelligence',
@@ -229,11 +271,23 @@ const subTilesByLayer = {
       subtitle: 'Layer 4 - Costing',
       description: 'Manage cost methods, inventory policies, EOQ parameters, and holding costs',
       icon: AttachMoneyIcon,
-      color: '#354a5f',
-      bgColor: '#f1f5f9',
+      color: '#1e40af',
+      bgColor: '#dbeafe',
       stats: { label: 'Policies', value: '12' },
       status: 'active',
-      gradient: 'linear-gradient(135deg, #354a5f 0%, #32363a 100%)',
+      gradient: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)',
+    },
+    {
+      id: 'cost-configuration',
+      title: 'Cost Configuration',
+      subtitle: 'Layer 4 - Economics',
+      description: 'Configure customer-specific cost economics: holding costs, ordering costs, and stockout costs',
+      icon: SettingsIcon,
+      color: '#0854a0',
+      bgColor: '#dbeafe',
+      stats: { label: 'Parameters', value: '15' },
+      status: 'active',
+      gradient: 'linear-gradient(135deg, #0854a0 0%, #1976d2 100%)',
     },
     {
       id: 'mrp-parameter-optimizer',
@@ -247,6 +301,18 @@ const subTilesByLayer = {
       status: 'active',
       gradient: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
     },
+    {
+      id: 'supplier-terms-impact',
+      title: 'Supplier Terms Impact',
+      subtitle: 'Layer 4.5 - Terms Analysis',
+      description: 'Analyze payment terms impact on WC: consignment, Net 30/60/90, early pay discounts',
+      icon: ScheduleIcon,
+      color: '#2563eb',
+      bgColor: '#dbeafe',
+      stats: { label: 'Suppliers', value: '10' },
+      status: 'active',
+      gradient: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+    },
   ],
   'layer-5': [
     {
@@ -255,11 +321,11 @@ const subTilesByLayer = {
       subtitle: 'Layer 5 - Fine-Tuning',
       description: 'Interactive parameter tuning with sliders, real-time simulation, and impact preview',
       icon: SettingsIcon,
-      color: '#354a5f',
-      bgColor: '#f1f5f9',
+      color: '#1e40af',
+      bgColor: '#dbeafe',
       stats: { label: 'Parameters', value: '48' },
       status: 'active',
-      gradient: 'linear-gradient(135deg, #354a5f 0%, #32363a 100%)',
+      gradient: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)',
     },
     {
       id: 'what-if-simulator',
@@ -276,16 +342,40 @@ const subTilesByLayer = {
   ],
   'layer-6': [
     {
+      id: 'cfo-rollup-dashboard',
+      title: 'CFO Rollup Dashboard',
+      subtitle: 'Layer 6 - Executive View',
+      description: 'Executive summary of Working Capital, cash release potential, and risk-adjusted savings',
+      icon: AccountBalanceIcon,
+      color: '#0854a0',
+      bgColor: '#dbeafe',
+      stats: { label: 'WC Tied', value: '$12.8M' },
+      status: 'active',
+      gradient: 'linear-gradient(135deg, #0854a0 0%, #1976d2 100%)',
+    },
+    {
+      id: 'cash-release-timeline',
+      title: 'Cash Release Timeline',
+      subtitle: 'Layer 6 - Project Tracking',
+      description: 'Track cash release initiatives over time with Gantt-style timeline and confidence metrics',
+      icon: ScheduleIcon,
+      color: '#2563eb',
+      bgColor: '#dbeafe',
+      stats: { label: 'Initiatives', value: '8' },
+      status: 'active',
+      gradient: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+    },
+    {
       id: 'recommendations-hub',
       title: 'Recommendations Hub',
       subtitle: 'Layer 6 - AI Insights',
       description: 'AI-powered recommendations for inventory optimization with approval workflow',
       icon: RecommendIcon,
-      color: '#0854a0',
+      color: '#0a6ed1',
       bgColor: '#dbeafe',
       stats: { label: 'Recommendations', value: '15' },
       status: 'active',
-      gradient: 'linear-gradient(135deg, #0854a0 0%, #1d4ed8 100%)',
+      gradient: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
     },
     {
       id: 'sap-writeback',
@@ -293,11 +383,11 @@ const subTilesByLayer = {
       subtitle: 'Layer 6 - Integration',
       description: 'Monitor and manage parameter updates pushed to SAP systems',
       icon: CloudSyncIcon,
-      color: '#64748b',
-      bgColor: '#f1f5f9',
+      color: '#1976d2',
+      bgColor: '#dbeafe',
       stats: { label: 'Jobs', value: '12' },
       status: 'active',
-      gradient: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
+      gradient: 'linear-gradient(135deg, #1976d2 0%, #1d4ed8 100%)',
     },
     {
       id: 'performance-monitor',
@@ -305,11 +395,11 @@ const subTilesByLayer = {
       subtitle: 'Layer 6 - Feedback Loop',
       description: 'Track KPIs, service levels, inventory turns, and optimization performance',
       icon: SpeedIcon,
-      color: '#354a5f',
-      bgColor: '#f1f5f9',
+      color: '#1e40af',
+      bgColor: '#dbeafe',
       stats: { label: 'KPIs', value: '20' },
       status: 'active',
-      gradient: 'linear-gradient(135deg, #354a5f 0%, #32363a 100%)',
+      gradient: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)',
     },
   ],
 };
@@ -318,6 +408,13 @@ const StoxAILanding = ({ onTileClick, onBack }) => {
   const [selectedLayer, setSelectedLayer] = useState(null);
 
   const handleLayerClick = (layerId) => {
+    // Special handling for Command Center (Layer 0) - opens directly
+    const layer = layerTiles.find(l => l.id === layerId);
+    if (layer?.isSpecial && onTileClick) {
+      // Open command-center directly
+      onTileClick('command-center');
+      return;
+    }
     setSelectedLayer(layerId);
   };
 
@@ -575,7 +672,7 @@ const StoxAILanding = ({ onTileClick, onBack }) => {
                 STOX.AI
               </Typography>
               <Chip
-                label="6-Layer Architecture"
+                label="7-Layer Architecture"
                 size="small"
                 sx={{
                   bgcolor: alpha('#0a6ed1', 0.1),

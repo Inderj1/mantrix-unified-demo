@@ -481,7 +481,7 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
         display_name: 'Inventory Alerts',
         description: 'Monitor stock levels, reorder points, and inventory health alerts',
         icon: 'Inventory',
-        color: '#354a5f',
+        color: '#1e40af',
         tab_order: 4,
         is_active: true
       },
@@ -1001,7 +1001,7 @@ const EmailIntelligence = ({ onNavigateToConfig }) => {
         <Grid container spacing={1.5}>
           {filteredTypes.map((type, index) => {
             const IconComponent = getIconComponent(type.icon);
-            const colors = ['#0a6ed1', '#0854a0', '#64748b', '#354a5f'];
+            const colors = ['#0a6ed1', '#0854a0', '#1976d2', '#1e40af'];
             const color = type.color || colors[index % colors.length];
 
             return (

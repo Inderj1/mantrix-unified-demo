@@ -159,7 +159,7 @@ const InventoryPieChart = withTooltip(({ data, width, height, tooltipData, toolt
 
   const colorScale = scaleOrdinal({
     domain: data.map(d => d.category),
-    range: ['#0a6ed1', '#0854a0', '#64748b', '#354a5f', '#0ea5e9', '#1e3a5f'],
+    range: ['#0a6ed1', '#0854a0', '#1976d2', '#1e40af', '#0ea5e9', '#2563eb'],
   });
 
   return (
