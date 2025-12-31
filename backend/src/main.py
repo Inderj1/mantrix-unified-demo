@@ -23,6 +23,7 @@ from src.api.excel_processor_routes import router as excel_processor_router
 from src.api.pdf_extraction_routes import router as pdf_extraction_router
 from src.api.command_tower_routes import router as command_tower_router
 from src.api.ordlyai_routes import router as ordlyai_router
+from src.api.bigquery_routes import router as bigquery_router
 
 # Configure structured logging
 structlog.configure(
@@ -143,6 +144,7 @@ app.include_router(excel_processor_router)
 app.include_router(pdf_extraction_router, prefix="/api/v1/pdf")
 app.include_router(command_tower_router)
 app.include_router(ordlyai_router)
+app.include_router(bigquery_router)  # AXIS.AI BigQuery routes
 
 # Mount static files for generated outputs
 # Output directory is at project root, not backend

@@ -10,6 +10,16 @@ from src.core.schema_aware_generator import SchemaAwareGenerator
 from src.core.gross_margin_examples import GROSS_MARGIN_EXAMPLES, COPA_GROSS_MARGIN_RULES
 from src.core.financial_analysis_queries import FINANCIAL_ANALYSIS_QUERIES
 
+# Import knowledge service for semantic search (optional)
+try:
+    from src.core.knowledge_graph.weaviate_knowledge_service import (
+        get_knowledge_service,
+        WeaviateKnowledgeService
+    )
+    KNOWLEDGE_SERVICE_AVAILABLE = True
+except ImportError:
+    KNOWLEDGE_SERVICE_AVAILABLE = False
+
 logger = structlog.get_logger()
 
 
@@ -21,8 +31,18 @@ class LLMClient:
         self.max_retries = 3
         self.retry_delay = 1.0  # Base delay in seconds
         self.schema_aware = SchemaAwareGenerator()
-        
-        # Few-shot examples for better SQL generation
+
+        # Initialize knowledge service for semantic search (optional)
+        self.knowledge_service = None
+        if KNOWLEDGE_SERVICE_AVAILABLE:
+            try:
+                self.knowledge_service = get_knowledge_service()
+                logger.info("Knowledge service initialized for LLMClient")
+            except Exception as e:
+                logger.warning(f"Failed to initialize knowledge service: {e}")
+                self.knowledge_service = None
+
+        # Few-shot examples for better SQL generation (fallback when knowledge service unavailable)
         self.few_shot_examples = [
             {
                 "question": "Show me total sales by month for last year",
@@ -756,7 +776,12 @@ Financial Query Rules:
             if financial_context.get("formulas"):
                 financial_rules += "\n\nAvailable Financial Formulas:"
                 for metric, formula in financial_context["formulas"].items():
-                    financial_rules += f"\n- {metric}: {list(formula.values())[0] if formula else 'N/A'}"
+                    # Handle both dict and string formula formats
+                    if isinstance(formula, dict):
+                        formula_str = list(formula.values())[0] if formula else 'N/A'
+                    else:
+                        formula_str = str(formula) if formula else 'N/A'
+                    financial_rules += f"\n- {metric}: {formula_str}"
             
             base_prompt += financial_rules
         
@@ -1131,12 +1156,69 @@ Return a JSON object with:
         from src.core.embeddings import EmbeddingService
         embedding_service = EmbeddingService()
         return embedding_service.generate_embedding(text)
-    
+
+    def get_metric_context(self, query: str) -> Optional[Dict[str, Any]]:
+        """Get relevant financial metric definitions from knowledge service.
+
+        Args:
+            query: Natural language query
+
+        Returns:
+            Dict with metric definitions or None if not found
+        """
+        if not self.knowledge_service:
+            return None
+
+        try:
+            metrics = self.knowledge_service.find_metrics(query, limit=3)
+            if not metrics:
+                return None
+
+            return {
+                "metrics": [
+                    {
+                        "code": m.metric_code,
+                        "name": m.metric_name,
+                        "description": m.description,
+                        "formula": m.formula,
+                        "formula_sql": m.formula_sql,
+                        "is_percentage": m.is_percentage,
+                        "is_currency": m.is_currency
+                    }
+                    for m in metrics
+                ]
+            }
+        except Exception as e:
+            logger.warning(f"Error getting metric context: {e}")
+            return None
+
     def _get_relevant_examples(self, user_query: str, financial_context: Optional[Dict[str, Any]] = None) -> List[Dict[str, str]]:
-        """Get relevant few-shot examples based on the user query."""
+        """Get relevant few-shot examples based on the user query.
+
+        First tries to get semantically similar examples from the knowledge service.
+        Falls back to keyword-based matching if knowledge service is unavailable.
+        """
+        # Try knowledge service first for semantic similarity matching
+        if self.knowledge_service:
+            try:
+                dynamic_examples = self.knowledge_service.get_similar_sql_examples(
+                    query=user_query,
+                    limit=3,
+                    dialect="postgresql"  # LLMClient is used for PostgreSQL queries
+                )
+                if dynamic_examples:
+                    logger.info(f"Using {len(dynamic_examples)} dynamic examples from knowledge service")
+                    return [
+                        {"question": ex["question"], "sql": ex["sql"]}
+                        for ex in dynamic_examples
+                    ]
+            except Exception as e:
+                logger.warning(f"Knowledge service example lookup failed: {e}")
+
+        # Fallback to keyword-based matching
         query_lower = user_query.lower()
         relevant_examples = []
-        
+
         # PRIORITY 1: Check for revenue queries FIRST - this is most critical
         if any(term in query_lower for term in ['revenue', 'sales', 'income', 'turnover']):
             # ALWAYS add revenue examples from GROSS_MARGIN_EXAMPLES that use Gross_Revenue correctly

@@ -190,7 +190,7 @@ const SimpleChatInterface = () => {
   const [messages, setMessages] = useState([{
     id: Date.now(),
     type: 'assistant',
-    content: 'Hello! I can help you query your data. Try asking something like "Show me top 5 GL accounts by total amount". I\'ll maintain context throughout our conversation, so you can ask follow-up questions like "filter by amount > 1000".',
+    content: 'Hello! I\'m AXIS.AI, your BigQuery analytics assistant. I can query your BigQuery datasets to answer business questions. Try asking something like "Show me revenue by product" or "What are the top 10 customers by sales?". I\'ll maintain context throughout our conversation for follow-up questions.',
     timestamp: new Date(),
   }]);
   const [inputMessage, setInputMessage] = useState('');
@@ -351,7 +351,7 @@ const SimpleChatInterface = () => {
       const welcomeMessage = {
         id: Date.now().toString(),
         type: 'assistant',
-        content: 'Hello! I can help you query your data. Try asking something like "Show me top 5 GL accounts by total amount". I\'ll maintain context throughout our conversation, so you can ask follow-up questions like "filter by amount > 1000".',
+        content: 'Hello! I\'m AXIS.AI, your BigQuery analytics assistant. I can query your BigQuery datasets to answer business questions. Try asking something like "Show me revenue by product" or "What are the top 10 customers by sales?". I\'ll maintain context throughout our conversation for follow-up questions.',
         timestamp: new Date(),
       };
       
@@ -402,7 +402,7 @@ const SimpleChatInterface = () => {
         formattedMessages.push({
           id: Date.now(),
           type: 'assistant',
-          content: 'Hello! I can help you query your data. Try asking something like "Show me top 5 GL accounts by total amount". I\'ll maintain context throughout our conversation, so you can ask follow-up questions like "filter by amount > 1000".',
+          content: 'Hello! I\'m AXIS.AI, your BigQuery analytics assistant. I can query your BigQuery datasets to answer business questions. Try asking something like "Show me revenue by product" or "What are the top 10 customers by sales?". I\'ll maintain context throughout our conversation for follow-up questions.',
           timestamp: new Date(),
         });
       }
@@ -449,9 +449,9 @@ const SimpleChatInterface = () => {
     // Don't save user message here - the backend will save it when processing the query
 
     try {
-      // Call API with conversation ID
-      console.log('Sending query:', inputMessage, 'with conversation ID:', conversationId);
-      const response = await apiService.executeQuery(inputMessage, { conversationId });
+      // Call BigQuery API with conversation ID (AXIS.AI uses BigQuery)
+      console.log('Sending BigQuery query:', inputMessage, 'with conversation ID:', conversationId);
+      const response = await apiService.executeBigQuery(inputMessage, { conversationId });
       const { data } = response;
       
       console.log('API Response:', data);
@@ -552,7 +552,7 @@ const SimpleChatInterface = () => {
   const handleRunModifiedSql = async (messageId, sql) => {
     setLoading(true);
     try {
-      const response = await apiService.executeQuery(sql, { conversationId, isModifiedSql: true });
+      const response = await apiService.executeBigQuery(sql, { conversationId, isModifiedSql: true });
       const { data } = response;
       
       if (data.error) {
@@ -713,7 +713,7 @@ const SimpleChatInterface = () => {
     setMessages([{
       id: Date.now(),
       type: 'assistant',
-      content: 'Hello! I can help you query your data. Try asking something like "Show me top 5 GL accounts by total amount". I\'ll maintain context throughout our conversation, so you can ask follow-up questions like "filter by amount > 1000".',
+      content: 'Hello! I\'m AXIS.AI, your BigQuery analytics assistant. I can query your BigQuery datasets to answer business questions. Try asking something like "Show me revenue by product" or "What are the top 10 customers by sales?". I\'ll maintain context throughout our conversation for follow-up questions.',
       timestamp: new Date(),
     }]);
     await createNewConversation();
@@ -762,7 +762,7 @@ const SimpleChatInterface = () => {
       setMessages([{
         id: Date.now(),
         type: 'assistant',
-        content: 'Hello! I can help you query your data. Try asking something like "Show me top 5 GL accounts by total amount". I\'ll maintain context throughout our conversation, so you can ask follow-up questions like "filter by amount > 1000".',
+        content: 'Hello! I\'m AXIS.AI, your BigQuery analytics assistant. I can query your BigQuery datasets to answer business questions. Try asking something like "Show me revenue by product" or "What are the top 10 customers by sales?". I\'ll maintain context throughout our conversation for follow-up questions.',
         timestamp: new Date(),
       }]);
 
@@ -1704,7 +1704,28 @@ const SimpleChatInterface = () => {
                           sampleValue = message.results[i][key];
                         }
 
-                        const isNumeric = typeof sampleValue === 'number';
+                        // Check if this looks like an ID column (should NOT be formatted as numeric)
+                        const lowerKey = key.toLowerCase();
+                        const isIdColumn = lowerKey === 'customer' ||
+                                          lowerKey.includes('customer_id') ||
+                                          lowerKey.includes('customerid') ||
+                                          lowerKey.includes('_id') ||
+                                          lowerKey.endsWith('id') ||
+                                          lowerKey.includes('number') ||
+                                          lowerKey.includes('_no') ||
+                                          lowerKey.includes('_code') ||
+                                          lowerKey === 'sku' ||
+                                          lowerKey === 'material' ||
+                                          lowerKey.includes('sold_to') ||
+                                          lowerKey.includes('bill_to') ||
+                                          lowerKey.includes('ship_to') ||
+                                          lowerKey.includes('payer');
+
+                        // Check if numeric - could be number type or a numeric string from BigQuery
+                        // But exclude ID columns even if they contain only digits
+                        const isNumeric = !isIdColumn && (
+                                         typeof sampleValue === 'number' ||
+                                         (typeof sampleValue === 'string' && !isNaN(parseFloat(sampleValue)) && isFinite(sampleValue)));
 
                         // Check if this is a quantity/count column (should NOT be formatted as currency)
                         const isQuantity = key.toLowerCase().includes('quantity') ||
@@ -1713,11 +1734,34 @@ const SimpleChatInterface = () => {
                                          key.toLowerCase().includes('units');
 
                         // Check if this is a currency amount column (exclude quantities)
-                        const isAmount = !isQuantity && (key.toLowerCase().includes('amount') ||
-                                       key.toLowerCase().includes('total') ||
-                                       key.toLowerCase().includes('revenue') ||
-                                       key.toLowerCase().includes('cost') ||
-                                       key.toLowerCase().includes('cogs'));
+                        // Keywords that indicate currency columns
+                        const currencyKeywords = [
+                          'amount', 'total', 'revenue', 'cost', 'cogs', 'sales', 'margin',
+                          'profit', 'price', 'value', 'fee', 'discount', 'freight', 'allowance',
+                          'variance', 'budget', 'spend', 'payment', 'clv', 'monetary',
+                          'gm', 'gross', 'net', 'earnings', 'income', 'expense', 'balance',
+                          'credit', 'debit', 'tax', 'surcharge', 'commission', 'rebate'
+                        ];
+
+                        const hasCurrencyKeyword = currencyKeywords.some(kw => lowerKey.includes(kw));
+
+                        // Also detect currency by looking at the data: large numbers with decimals
+                        // Sample multiple values to check if they look like currency
+                        let looksLikeCurrency = false;
+                        if (isNumeric && !hasCurrencyKeyword) {
+                          const sampleValues = message.results.slice(0, 10).map(r => r[key]).filter(v => v != null);
+                          const numericSamples = sampleValues.map(v => typeof v === 'number' ? v : parseFloat(v)).filter(n => !isNaN(n));
+                          if (numericSamples.length > 0) {
+                            // Check if values are large (> 100) and have decimal places - likely currency
+                            const hasLargeValues = numericSamples.some(n => Math.abs(n) > 100);
+                            const hasDecimals = numericSamples.some(n => n % 1 !== 0);
+                            // Avoid treating percentages (0-100 range) or IDs as currency
+                            const notPercentage = numericSamples.some(n => Math.abs(n) > 100 || n < 0);
+                            looksLikeCurrency = hasLargeValues && hasDecimals && notPercentage;
+                          }
+                        }
+
+                        const isAmount = !isQuantity && (hasCurrencyKeyword || looksLikeCurrency);
                         const isFirstColumn = index === 0;
                         
                         return {
@@ -1738,14 +1782,18 @@ const SimpleChatInterface = () => {
                                 return <span style={{ color: '#999', fontStyle: 'italic' }}>null</span>;
                               }
                               
-                              if (isNumeric && isAmount && typeof params.value === 'number') {
-                                return `$${params.value.toLocaleString('en-US', { 
-                                  minimumFractionDigits: 2, 
-                                  maximumFractionDigits: 2 
+                              // Convert to number if it's a numeric string
+                              const numValue = typeof params.value === 'number' ? params.value : parseFloat(params.value);
+                              const isValidNumber = !isNaN(numValue) && isFinite(numValue);
+
+                              if (isNumeric && isAmount && isValidNumber) {
+                                return `$${numValue.toLocaleString('en-US', {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2
                                 })}`;
                               }
-                              if (isNumeric && typeof params.value === 'number') {
-                                return params.value.toLocaleString('en-US');
+                              if (isNumeric && isValidNumber) {
+                                return numValue.toLocaleString('en-US');
                               }
                               return String(params.value);
                             } catch (err) {

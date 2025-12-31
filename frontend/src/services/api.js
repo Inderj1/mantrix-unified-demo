@@ -61,6 +61,31 @@ export const apiService = {
     });
   },
   
+  // BigQuery endpoints (for AXIS.AI)
+  executeBigQuery: (question, options = {}) => {
+    const { conversationId, dataset, ...otherOptions } = options;
+    return api.post('/api/v1/bigquery/query', {
+      question,
+      conversationId,
+      dataset,
+      options: otherOptions
+    });
+  },
+
+  getBigQueryDatasets: () => api.get('/api/v1/bigquery/datasets'),
+
+  getBigQueryTables: (dataset = null) =>
+    api.get(`/api/v1/bigquery/tables${dataset ? `?dataset=${dataset}` : ''}`),
+
+  getBigQuerySchema: (dataset = null, tables = null) => {
+    const params = new URLSearchParams();
+    if (dataset) params.append('dataset', dataset);
+    if (tables) params.append('tables', tables);
+    return api.get(`/api/v1/bigquery/schema?${params.toString()}`);
+  },
+
+  getBigQueryHealth: () => api.get('/api/v1/bigquery/health'),
+
   // Schema endpoints
   getSchemas: () => api.get('/api/v1/schemas'),
   

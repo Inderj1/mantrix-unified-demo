@@ -24,7 +24,8 @@ from src.api.models import (
     ResearchReportResponse, ResearchInsightResponse, ResearchRecommendationResponse
 )
 from src.core.postgresql_sql_generator import PostgreSQLGenerator as SQLGenerator
-from src.db.database_client import DatabaseClient as BigQueryClient  # Legacy - no longer used
+from src.db.database_client import DatabaseClient as PostgreSQLClient  # PostgreSQL database client
+from src.db.bigquery import BigQueryClient  # Actual BigQuery client for health checks
 from src.db.weaviate_client import WeaviateClient
 from src.core.optimization import (
     MaterializedViewManager, MaterializedViewConfig, MaterializedViewOptimizer,

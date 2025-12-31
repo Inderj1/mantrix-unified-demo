@@ -1,150 +1,293 @@
 #!/bin/bash
+#
+# Mantrix Unified Development Environment Starter
+# ================================================
+# Starts all development services: Docker (databases), Backend (FastAPI), Frontend (Vite)
+#
+# Usage:
+#   ./start_dev.sh              # Start all services
+#   ./start_dev.sh --no-docker  # Skip Docker services (if already running)
+#   ./start_dev.sh --backend    # Start backend only
+#   ./start_dev.sh --frontend   # Start frontend only
+#   ./start_dev.sh --docker     # Start Docker services only
+#
+# Services:
+#   - Docker: Redis, MongoDB, Weaviate, Neo4j, PostgreSQL, Fuseki
+#   - Backend: FastAPI (uvicorn) on port 8000
+#   - Frontend: Vite dev server on port 5173
+#
+
+set -e
 
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-echo -e "${GREEN}========================================${NC}"
-echo -e "${GREEN}  Starting Mantrix Development Environment${NC}"
-echo -e "${GREEN}========================================${NC}"
+# Project root directory
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BACKEND_DIR="${PROJECT_ROOT}/backend"
+FRONTEND_DIR="${PROJECT_ROOT}/frontend"
+LOG_DIR="${PROJECT_ROOT}/logs"
 
-# Function to cleanup on exit
-cleanup() {
-    echo -e "\n${YELLOW}Shutting down services...${NC}"
-    pkill -f "npm start"
-    pkill -f "uvicorn src.main:app"
-    docker-compose stop redis 2>/dev/null
-    echo -e "${GREEN}All services stopped.${NC}"
-    exit 0
+# PID files for tracking processes
+PID_DIR="${PROJECT_ROOT}/.dev_pids"
+BACKEND_PID_FILE="${PID_DIR}/backend.pid"
+FRONTEND_PID_FILE="${PID_DIR}/frontend.pid"
+
+# Log files
+mkdir -p "${LOG_DIR}"
+BACKEND_LOG="${LOG_DIR}/backend.log"
+FRONTEND_LOG="${LOG_DIR}/frontend.log"
+
+# Default options
+START_DOCKER=true
+START_BACKEND=true
+START_FRONTEND=true
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --no-docker)
+            START_DOCKER=false
+            shift
+            ;;
+        --backend)
+            START_DOCKER=false
+            START_FRONTEND=false
+            shift
+            ;;
+        --frontend)
+            START_DOCKER=false
+            START_BACKEND=false
+            shift
+            ;;
+        --docker)
+            START_BACKEND=false
+            START_FRONTEND=false
+            shift
+            ;;
+        -h|--help)
+            echo "Usage: $0 [OPTIONS]"
+            echo ""
+            echo "Options:"
+            echo "  --no-docker    Skip Docker services (if already running)"
+            echo "  --backend      Start backend only"
+            echo "  --frontend     Start frontend only"
+            echo "  --docker       Start Docker services only"
+            echo "  -h, --help     Show this help message"
+            exit 0
+            ;;
+        *)
+            echo -e "${RED}Unknown option: $1${NC}"
+            exit 1
+            ;;
+    esac
+done
+
+# Create PID directory
+mkdir -p "${PID_DIR}"
+
+echo -e "${CYAN}"
+echo "============================================================="
+echo "         MANTRIX UNIFIED DEVELOPMENT ENVIRONMENT             "
+echo "============================================================="
+echo "  Backend:  http://localhost:8000                            "
+echo "  Frontend: http://localhost:5173                            "
+echo "  API Docs: http://localhost:8000/docs                       "
+echo "============================================================="
+echo -e "${NC}"
+
+# Function to check if a port is in use
+check_port() {
+    local port=$1
+    if lsof -Pi ":${port}" -sTCP:LISTEN -t >/dev/null 2>&1; then
+        return 0  # Port is in use
+    else
+        return 1  # Port is free
+    fi
 }
 
-trap cleanup SIGINT SIGTERM
+# Function to wait for a service to be ready
+wait_for_service() {
+    local name=$1
+    local url=$2
+    local max_attempts=${3:-30}
+    local attempt=1
 
-# Check if virtual environment exists
-if [ ! -d "backend/venv" ]; then
-    echo -e "${RED}Virtual environment not found. Creating one...${NC}"
-    cd backend
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install -r requirements.txt
-    cd ..
+    echo -n "  Waiting for ${name}..."
+    while [ $attempt -le $max_attempts ]; do
+        if curl -s "$url" >/dev/null 2>&1; then
+            echo -e " ${GREEN}ready${NC}"
+            return 0
+        fi
+        sleep 1
+        attempt=$((attempt + 1))
+        echo -n "."
+    done
+    echo -e " ${RED}timeout${NC}"
+    return 1
+}
+
+# ============================================================
+# Start Docker Services
+# ============================================================
+if [ "$START_DOCKER" = true ]; then
+    echo -e "\n${BLUE}[1/3] Starting Docker Services...${NC}"
+
+    # Check if Docker is running
+    if ! docker info >/dev/null 2>&1; then
+        echo -e "${YELLOW}  Docker is not running. Starting Docker...${NC}"
+        open -a Docker
+
+        # Wait for Docker to start
+        echo -n "  Waiting for Docker..."
+        for i in {1..60}; do
+            if docker info >/dev/null 2>&1; then
+                echo -e " ${GREEN}ready${NC}"
+                break
+            fi
+            sleep 2
+            echo -n "."
+        done
+
+        if ! docker info >/dev/null 2>&1; then
+            echo -e "\n${RED}  Docker failed to start. Please start Docker manually.${NC}"
+            exit 1
+        fi
+    else
+        echo -e "  Docker is already running ${GREEN}OK${NC}"
+    fi
+
+    # Start docker-compose services (excluding api and nginx)
+    echo -e "  Starting database services..."
+    cd "${PROJECT_ROOT}"
+
+    # Start specific services needed for development
+    docker-compose up -d redis mongodb weaviate neo4j postgres fuseki 2>&1 | while read line; do
+        echo "    $line"
+    done
+
+    echo -e "  ${GREEN}Docker services started${NC}"
+
+    # Wait for key services
+    echo -e "\n  Checking service health..."
+    wait_for_service "Redis" "http://localhost:6379" 10 2>/dev/null || true
+    wait_for_service "MongoDB" "http://localhost:27017" 10 2>/dev/null || true
+    wait_for_service "Weaviate" "http://localhost:8082/v1/.well-known/ready" 30 || true
 else
-    echo -e "${GREEN}✓ Virtual environment found${NC}"
+    echo -e "\n${YELLOW}[1/3] Skipping Docker Services${NC}"
 fi
 
-# Start Core Docker Services (Redis, PostgreSQL, MongoDB, Weaviate)
-echo -e "\n${YELLOW}Starting Core Docker Services...${NC}"
-docker-compose up -d redis postgres mongodb weaviate 2>&1 | grep -v "variable is not set"
-sleep 3
+# ============================================================
+# Start Backend (FastAPI with Uvicorn)
+# ============================================================
+if [ "$START_BACKEND" = true ]; then
+    echo -e "\n${BLUE}[2/3] Starting Backend (FastAPI)...${NC}"
 
-# Check Redis
-if docker ps --format '{{.Names}}' | grep -q "mantrix.*redis"; then
-    echo -e "${GREEN}✓ Redis started on localhost:6379${NC}"
+    # Check if backend is already running
+    if check_port 8000; then
+        echo -e "  ${YELLOW}Backend already running on port 8000${NC}"
+    else
+        cd "${BACKEND_DIR}"
+
+        # Check for virtual environment
+        if [ ! -d "venv" ]; then
+            echo -e "  ${YELLOW}Creating virtual environment...${NC}"
+            python3 -m venv venv
+        fi
+
+        # Activate venv and start uvicorn
+        echo -e "  Starting uvicorn server..."
+        source venv/bin/activate
+
+        # Start uvicorn in background
+        nohup uvicorn src.main:app \
+            --host 0.0.0.0 \
+            --port 8000 \
+            --reload \
+            > "${BACKEND_LOG}" 2>&1 &
+
+        BACKEND_PID=$!
+        echo $BACKEND_PID > "${BACKEND_PID_FILE}"
+
+        echo -e "  Backend PID: ${BACKEND_PID}"
+        echo -e "  Log file: ${BACKEND_LOG}"
+
+        # Wait for backend to be ready
+        wait_for_service "Backend API" "http://localhost:8000/api/v1/health" 60 || true
+    fi
 else
-    echo -e "${RED}✗ Failed to start Redis${NC}"
-    exit 1
+    echo -e "\n${YELLOW}[2/3] Skipping Backend${NC}"
 fi
 
-# Check PostgreSQL
-if docker ps --format '{{.Names}}' | grep -q "mantrix.*postgres"; then
-    echo -e "${GREEN}✓ PostgreSQL started on localhost:5433${NC}"
+# ============================================================
+# Start Frontend (Vite)
+# ============================================================
+if [ "$START_FRONTEND" = true ]; then
+    echo -e "\n${BLUE}[3/3] Starting Frontend (Vite)...${NC}"
+
+    # Check if frontend is already running
+    if check_port 5173; then
+        echo -e "  ${YELLOW}Frontend already running on port 5173${NC}"
+    else
+        cd "${FRONTEND_DIR}"
+
+        # Check for node_modules
+        if [ ! -d "node_modules" ]; then
+            echo -e "  ${YELLOW}Installing dependencies...${NC}"
+            npm install
+        fi
+
+        # Start Vite dev server in background
+        echo -e "  Starting Vite dev server..."
+        nohup npm run start > "${FRONTEND_LOG}" 2>&1 &
+
+        FRONTEND_PID=$!
+        echo $FRONTEND_PID > "${FRONTEND_PID_FILE}"
+
+        echo -e "  Frontend PID: ${FRONTEND_PID}"
+        echo -e "  Log file: ${FRONTEND_LOG}"
+
+        # Wait for frontend to be ready
+        wait_for_service "Frontend" "http://localhost:5173" 30 || true
+    fi
 else
-    echo -e "${RED}✗ Failed to start PostgreSQL${NC}"
-    exit 1
+    echo -e "\n${YELLOW}[3/3] Skipping Frontend${NC}"
 fi
 
-# Check MongoDB
-if docker ps --format '{{.Names}}' | grep -q "mantrix.*mongodb"; then
-    echo -e "${GREEN}✓ MongoDB started on localhost:27017${NC}"
-else
-    echo -e "${YELLOW}⚠ MongoDB failed to start (optional)${NC}"
-fi
-
-# Check Weaviate
-if docker ps --format '{{.Names}}' | grep -q "mantrix.*weaviate"; then
-    echo -e "${GREEN}✓ Weaviate started on localhost:8082${NC}"
-else
-    echo -e "${YELLOW}⚠ Weaviate failed to start (optional)${NC}"
-fi
-
-# Start Backend
-echo -e "\n${YELLOW}Starting Backend (FastAPI)...${NC}"
-
-# Kill any existing backend processes on port 8000
-if lsof -Pi :8000 -sTCP:LISTEN -t >/dev/null 2>&1; then
-    echo -e "${YELLOW}  Stopping existing backend processes...${NC}"
-    lsof -Pi :8000 -sTCP:LISTEN -t | xargs kill -9 2>/dev/null || true
-    sleep 1
-fi
-
-cd "$(dirname "$0")/backend"
-./venv/bin/python -m uvicorn src.main:app --reload > ../logs/backend.log 2>&1 &
-BACKEND_PID=$!
-cd ..
-sleep 3
-
-if ps -p $BACKEND_PID > /dev/null; then
-    echo -e "${GREEN}✓ Backend started on http://localhost:8000${NC}"
-    echo -e "  PID: $BACKEND_PID"
-    echo -e "  Logs: logs/backend.log"
-else
-    echo -e "${RED}✗ Failed to start backend${NC}"
-    exit 1
-fi
-
-# Start Frontend
-echo -e "\n${YELLOW}Starting Frontend (React + Vite)...${NC}"
-
-# Kill any existing frontend processes on port 3001
-if lsof -Pi :3001 -sTCP:LISTEN -t >/dev/null 2>&1; then
-    echo -e "${YELLOW}  Stopping existing frontend processes...${NC}"
-    lsof -Pi :3001 -sTCP:LISTEN -t | xargs kill -9 2>/dev/null || true
-    sleep 1
-fi
-
-cd frontend
-npm start > ../logs/frontend.log 2>&1 &
-FRONTEND_PID=$!
-cd ..
-sleep 3
-
-if ps -p $FRONTEND_PID > /dev/null; then
-    echo -e "${GREEN}✓ Frontend started on http://localhost:3001${NC}"
-    echo -e "  PID: $FRONTEND_PID"
-    echo -e "  Logs: logs/frontend.log"
-else
-    echo -e "${RED}✗ Failed to start frontend${NC}"
-    exit 1
-fi
-
-# Optional: Start Neo4j and Fuseki (less commonly used)
-if [ "$1" == "--full" ]; then
-    echo -e "\n${YELLOW}Starting additional services (Neo4j, Fuseki)...${NC}"
-    docker-compose up -d neo4j fuseki 2>&1 | grep -v "variable is not set"
-    sleep 3
-    echo -e "${GREEN}✓ Additional services started${NC}"
-    echo -e "  Neo4j: localhost:7474 (browser), localhost:7687 (bolt)"
-    echo -e "  Fuseki: localhost:3030"
-fi
-
+# ============================================================
 # Summary
-echo -e "\n${GREEN}========================================${NC}"
-echo -e "${GREEN}  All services running!${NC}"
-echo -e "${GREEN}========================================${NC}"
-echo -e "${GREEN}Frontend:  ${NC} http://localhost:3001"
-echo -e "${GREEN}Backend:   ${NC} http://localhost:8000"
-echo -e "${GREEN}API Docs:  ${NC} http://localhost:8000/docs"
-echo -e "\n${GREEN}Databases:${NC}"
-echo -e "${GREEN}  PostgreSQL:${NC} localhost:5433"
-echo -e "${GREEN}  MongoDB:   ${NC} localhost:27017"
-echo -e "${GREEN}  Redis:     ${NC} localhost:6379"
-echo -e "${GREEN}  Weaviate:  ${NC} localhost:8082"
-echo -e "\n${YELLOW}Logs:${NC}"
-echo -e "  Backend:  tail -f logs/backend.log"
-echo -e "  Frontend: tail -f logs/frontend.log"
-echo -e "\n${YELLOW}Press Ctrl+C to stop all services${NC}"
+# ============================================================
+echo -e "\n${GREEN}"
+echo "============================================================="
+echo "              DEVELOPMENT ENVIRONMENT READY                  "
+echo "============================================================="
+if [ "$START_BACKEND" = true ]; then
+    echo "  Backend API:  http://localhost:8000                        "
+    echo "  API Docs:     http://localhost:8000/docs                   "
+fi
+if [ "$START_FRONTEND" = true ]; then
+    echo "  Frontend:     http://localhost:5173                        "
+fi
+if [ "$START_DOCKER" = true ]; then
+    echo "-------------------------------------------------------------"
+    echo "  Redis:        localhost:6379                               "
+    echo "  MongoDB:      localhost:27017                              "
+    echo "  Weaviate:     localhost:8082                               "
+    echo "  Neo4j:        localhost:7474 (HTTP) / 7687 (Bolt)          "
+    echo "  PostgreSQL:   localhost:5433                               "
+    echo "  Fuseki:       localhost:3030                               "
+fi
+echo "-------------------------------------------------------------"
+echo "  To stop all services: ./stop_dev.sh                        "
+echo "  View backend logs:  tail -f logs/backend.log               "
+echo "  View frontend logs: tail -f logs/frontend.log              "
+echo "============================================================="
+echo -e "${NC}"
 
-# Keep script running and tail logs
-tail -f logs/backend.log logs/frontend.log
+# Return to project root
+cd "${PROJECT_ROOT}"

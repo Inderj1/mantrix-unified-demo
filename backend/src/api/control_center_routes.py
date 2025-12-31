@@ -8,7 +8,18 @@ import structlog
 
 from ..core.system_monitor import get_system_monitor
 from ..core.sql_generator import SQLGenerator
+from ..db.bigquery import BigQueryClient
 from .routes import get_sql_generator, get_weaviate_client
+
+# BigQuery client singleton for control center
+_bq_client = None
+
+def get_bigquery_client() -> BigQueryClient:
+    """Get or create BigQuery client for control center health checks"""
+    global _bq_client
+    if _bq_client is None:
+        _bq_client = BigQueryClient()
+    return _bq_client
 
 logger = structlog.get_logger()
 router = APIRouter(prefix="/api/v1/control-center", tags=["control-center"])
@@ -35,7 +46,7 @@ async def get_system_health(
 
         # Check service health
         services = {
-            'bigquery': generator.bq_client,
+            'bigquery': get_bigquery_client(),
             'redis': generator.cache_manager.redis if generator.cache_manager else None,
             'weaviate': get_weaviate_client(),
         }
@@ -119,7 +130,7 @@ async def get_services_detail(
 
         # BigQuery
         try:
-            bq = generator.bq_client
+            bq = get_bigquery_client()
             tables = bq.list_tables()
             services_info.append({
                 "id": "bigquery",
@@ -372,7 +383,7 @@ async def get_data_sources(
 
         # BigQuery
         try:
-            bq = generator.bq_client
+            bq = get_bigquery_client()
             tables = bq.list_tables()
 
             # Get total size (simplified - would need actual query for real size)
