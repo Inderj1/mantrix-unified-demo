@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORDLY.AI MTS - Tile 1: Network Fulfillment Optimizer</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+            background: linear-gradient(135deg, #0a0f1a 0%, #0d1520 50%, #0a0f1a 100%);
+            min-height: 100vh;
+            color: #e2e8f0;
+        }
+
+        .order-context-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 24px;
+            background: linear-gradient(90deg, rgba(52, 211, 153, 0.1) 0%, rgba(15, 23, 42, 0.9) 100%);
+            border-bottom: 1px solid rgba(52, 211, 153, 0.3);
+        }
+        .order-context-left { display: flex; align-items: center; gap: 24px; }
+        .btn-back {
+            display: flex; align-items: center; gap: 6px; padding: 6px 12px;
+            background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px; color: #94a3b8; font-family: inherit; font-size: 11px;
+            cursor: pointer; text-decoration: none;
+        }
+        .btn-back:hover { border-color: rgba(255, 255, 255, 0.3); color: #e2e8f0; }
+        .order-info { display: flex; align-items: center; gap: 16px; }
+        .order-po { font-size: 16px; font-weight: 700; color: #22d3ee; }
+        .order-customer { font-size: 14px; color: #e2e8f0; }
+        .order-material { font-size: 12px; color: #94a3b8; }
+        .order-context-right { display: flex; align-items: center; gap: 16px; }
+        .order-value { text-align: right; }
+        .order-value-amount { font-size: 18px; font-weight: 700; color: #34d399; }
+        .order-value-label { font-size: 10px; color: #64748b; }
+        .status-badge { padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: 600; background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+
+        .flow-indicator {
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+            padding: 12px 24px; background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .flow-step {
+            display: flex; align-items: center; gap: 8px; padding: 6px 14px;
+            border-radius: 6px; font-size: 11px; color: #64748b; background: rgba(255, 255, 255, 0.03);
+        }
+        .flow-step.active { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+        .flow-step.complete { background: rgba(52, 211, 153, 0.1); color: #34d399; }
+        .flow-arrow { color: #475569; font-size: 12px; }
+
+        .summary-strip {
+            display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px;
+            padding: 16px 24px; background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .summary-card {
+            background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px; padding: 12px; text-align: center;
+        }
+        .summary-value { font-size: 18px; font-weight: 700; }
+        .summary-value.emerald { color: #34d399; }
+        .summary-value.amber { color: #fbbf24; }
+        .summary-value.cyan { color: #22d3ee; }
+        .summary-value.red { color: #f87171; }
+        .summary-label { font-size: 9px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+        .main-content {
+            display: grid; grid-template-columns: 1fr 380px; gap: 20px;
+            padding: 20px 24px; height: calc(100vh - 240px);
+        }
+
+        .panel {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.7) 100%);
+            border: 1px solid rgba(52, 211, 153, 0.2); border-radius: 12px;
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        .panel-header {
+            padding: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+        }
+        .panel-title { font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 4px; }
+        .panel-subtitle { font-size: 10px; color: #64748b; }
+        .panel-content { flex: 1; overflow-y: auto; padding: 16px; }
+
+        .fulfillment-option {
+            background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px; padding: 16px; margin-bottom: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+        }
+        .fulfillment-option:hover { border-color: rgba(52, 211, 153, 0.3); }
+        .fulfillment-option.recommended { border-color: rgba(52, 211, 153, 0.5); background: rgba(52, 211, 153, 0.05); }
+        .fulfillment-option.selected { border-color: #34d399; box-shadow: 0 0 20px rgba(52, 211, 153, 0.2); }
+        .fulfillment-option.split { border-color: rgba(168, 85, 247, 0.4); background: rgba(168, 85, 247, 0.03); }
+
+        .option-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .option-rank { display: flex; align-items: center; gap: 10px; }
+        .rank-number {
+            width: 28px; height: 28px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-size: 12px; font-weight: 700;
+            background: rgba(255, 255, 255, 0.1); color: #94a3b8;
+        }
+        .fulfillment-option.recommended .rank-number { background: rgba(52, 211, 153, 0.2); color: #34d399; }
+        .option-title { font-size: 14px; font-weight: 600; color: #e2e8f0; }
+        .option-subtitle { font-size: 11px; color: #94a3b8; }
+        .option-badges { display: flex; gap: 6px; }
+        .badge { padding: 3px 8px; border-radius: 4px; font-size: 9px; font-weight: 600; }
+        .badge.recommended { background: rgba(52, 211, 153, 0.2); color: #34d399; }
+        .badge.split { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
+        .badge.risky { background: rgba(248, 113, 113, 0.2); color: #f87171; }
+
+        .option-metrics { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 12px; }
+        .metric-item { text-align: center; padding: 8px; background: rgba(0, 0, 0, 0.2); border-radius: 6px; }
+        .metric-value { font-size: 14px; font-weight: 700; color: #e2e8f0; }
+        .metric-value.emerald { color: #34d399; }
+        .metric-value.amber { color: #fbbf24; }
+        .metric-value.cyan { color: #22d3ee; }
+        .metric-value.red { color: #f87171; }
+        .metric-label { font-size: 8px; color: #64748b; text-transform: uppercase; margin-top: 2px; }
+
+        .node-breakdown {
+            background: rgba(0, 0, 0, 0.2); border-radius: 6px; padding: 10px;
+            display: flex; gap: 8px; flex-wrap: wrap;
+        }
+        .node-chip {
+            display: flex; align-items: center; gap: 6px;
+            padding: 6px 10px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px; font-size: 10px;
+        }
+        .node-icon { font-size: 12px; }
+        .node-name { color: #e2e8f0; font-weight: 500; }
+        .node-qty { color: #94a3b8; }
+
+        .explainer-section { margin-bottom: 20px; }
+        .explainer-title { font-size: 12px; font-weight: 600; color: #e2e8f0; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .explainer-icon { font-size: 14px; }
+
+        .reason-list { list-style: none; }
+        .reason-item {
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 6px;
+            margin-bottom: 8px; font-size: 11px; line-height: 1.5;
+        }
+        .reason-icon { font-size: 12px; }
+        .reason-text { color: #cbd5e1; }
+        .reason-text strong { color: #34d399; }
+
+        .cost-breakdown { background: rgba(0, 0, 0, 0.2); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+        .cost-title { font-size: 11px; font-weight: 600; color: #94a3b8; margin-bottom: 12px; }
+        .cost-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 11px; }
+        .cost-row:last-child { border-bottom: none; }
+        .cost-label { color: #94a3b8; }
+        .cost-value { color: #e2e8f0; font-weight: 500; }
+        .cost-value.negative { color: #f87171; }
+        .cost-value.positive { color: #34d399; }
+        .cost-row.total { border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 8px; padding-top: 12px; }
+        .cost-row.total .cost-label { color: #e2e8f0; font-weight: 600; }
+        .cost-row.total .cost-value { font-size: 14px; font-weight: 700; }
+
+        .risk-matrix { background: rgba(0, 0, 0, 0.2); border-radius: 8px; padding: 16px; }
+        .risk-matrix-title { font-size: 11px; font-weight: 600; color: #94a3b8; margin-bottom: 12px; }
+        .risk-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; }
+        .risk-label { flex: 1; font-size: 10px; color: #94a3b8; }
+        .risk-bar { width: 120px; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden; }
+        .risk-fill { height: 100%; border-radius: 3px; }
+        .risk-fill.low { background: #34d399; }
+        .risk-fill.medium { background: #fbbf24; }
+        .risk-fill.high { background: #f87171; }
+        .risk-pct { font-size: 10px; font-weight: 600; min-width: 40px; text-align: right; }
+
+        .comparison-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+        .comparison-table th { text-align: left; padding: 8px; color: #64748b; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .comparison-table td { padding: 8px; color: #cbd5e1; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .comparison-table tr.selected { background: rgba(52, 211, 153, 0.1); }
+        .comparison-table tr.selected td { color: #e2e8f0; }
+
+        .action-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 24px;
+            border-top: 1px solid rgba(52, 211, 153, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+        }
+        .footer-info { display: flex; gap: 16px; font-size: 11px; color: #64748b; }
+        .footer-actions { display: flex; gap: 10px; }
+        .btn { padding: 10px 18px; border-radius: 6px; font-family: inherit; font-size: 12px; font-weight: 500; cursor: pointer; }
+        .btn-secondary { background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); color: #94a3b8; }
+        .btn-primary { background: linear-gradient(135deg, #34d399 0%, #10b981 100%); border: none; color: #0a0f1a; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="order-context-bar">
+        <div class="order-context-left">
+            <a href="#" class="btn-back">← Back to Demand Signal</a>
+            <div class="order-info">
+                <span class="order-po">EDI-850-78432</span>
+                <span class="order-customer">Walmart Distribution</span>
+                <span class="order-material">SKU-7742 Energy Drink 12-Pack • 15,000 cases</span>
+            </div>
+        </div>
+        <div class="order-context-right">
+            <div class="order-value">
+                <div class="order-value-amount">$247,500</div>
+                <div class="order-value-label">Order Value</div>
+            </div>
+            <div class="status-badge">🧠 OPTIMIZING</div>
+        </div>
+    </div>
+
+    <div class="flow-indicator">
+        <div class="flow-step complete"><span>✓</span><span>Demand Signal</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step active"><span>1</span><span>Network Optimizer</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><span>2</span><span>Arbitration</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><span>3</span><span>SAP Commit</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><span>4</span><span>Learning Loop</span></div>
+    </div>
+
+    <div class="summary-strip">
+        <div class="summary-card"><div class="summary-value cyan">5</div><div class="summary-label">Nodes Evaluated</div></div>
+        <div class="summary-card"><div class="summary-value emerald">94%</div><div class="summary-label">Best P(On-Time)</div></div>
+        <div class="summary-card"><div class="summary-value emerald">28.4%</div><div class="summary-label">Best Margin</div></div>
+        <div class="summary-card"><div class="summary-value amber">$4,200</div><div class="summary-label">Shadow Cost Δ</div></div>
+        <div class="summary-card"><div class="summary-value cyan">$18,450</div><div class="summary-label">Freight Cost</div></div>
+        <div class="summary-card"><div class="summary-value emerald">LOW</div><div class="summary-label">Perfect Order Risk</div></div>
+    </div>
+
+    <div class="main-content">
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">Network Fulfillment Options</div>
+                <div class="panel-subtitle">Multi-objective optimization across margin, service, inventory, and carbon</div>
+            </div>
+            <div class="panel-content">
+                <div class="fulfillment-option recommended selected">
+                    <div class="option-header">
+                        <div class="option-rank">
+                            <div class="rank-number">1</div>
+                            <div>
+                                <div class="option-title">Memphis DC + Dallas DC Split</div>
+                                <div class="option-subtitle">Multi-node fulfillment with optimal service</div>
+                            </div>
+                        </div>
+                        <div class="option-badges">
+                            <span class="badge recommended">✓ RECOMMENDED</span>
+                            <span class="badge split">SPLIT SHIP</span>
+                        </div>
+                    </div>
+                    <div class="option-metrics">
+                        <div class="metric-item"><div class="metric-value emerald">28.4%</div><div class="metric-label">Margin</div></div>
+                        <div class="metric-item"><div class="metric-value emerald">94%</div><div class="metric-label">P(On-Time)</div></div>
+                        <div class="metric-item"><div class="metric-value cyan">$18,450</div><div class="metric-label">Freight</div></div>
+                        <div class="metric-item"><div class="metric-value amber">$4,200</div><div class="metric-label">Shadow Cost</div></div>
+                        <div class="metric-item"><div class="metric-value emerald">2.1 kg</div><div class="metric-label">CO₂/Case</div></div>
+                    </div>
+                    <div class="node-breakdown">
+                        <div class="node-chip"><span class="node-icon">🏭</span><span class="node-name">Memphis DC</span><span class="node-qty">9,000 CS</span></div>
+                        <div class="node-chip"><span class="node-icon">🏭</span><span class="node-name">Dallas DC</span><span class="node-qty">6,000 CS</span></div>
+                    </div>
+                </div>
+
+                <div class="fulfillment-option">
+                    <div class="option-header">
+                        <div class="option-rank">
+                            <div class="rank-number">2</div>
+                            <div>
+                                <div class="option-title">Memphis DC Single Node</div>
+                                <div class="option-subtitle">Full order from regional hub</div>
+                            </div>
+                        </div>
+                        <div class="option-badges">
+                            <span class="badge risky">SERVICE RISK</span>
+                        </div>
+                    </div>
+                    <div class="option-metrics">
+                        <div class="metric-item"><div class="metric-value emerald">29.1%</div><div class="metric-label">Margin</div></div>
+                        <div class="metric-item"><div class="metric-value amber">78%</div><div class="metric-label">P(On-Time)</div></div>
+                        <div class="metric-item"><div class="metric-value cyan">$14,200</div><div class="metric-label">Freight</div></div>
+                        <div class="metric-item"><div class="metric-value red">$8,900</div><div class="metric-label">Shadow Cost</div></div>
+                        <div class="metric-item"><div class="metric-value amber">2.8 kg</div><div class="metric-label">CO₂/Case</div></div>
+                    </div>
+                    <div class="node-breakdown">
+                        <div class="node-chip"><span class="node-icon">🏭</span><span class="node-name">Memphis DC</span><span class="node-qty">15,000 CS</span></div>
+                    </div>
+                </div>
+
+                <div class="fulfillment-option">
+                    <div class="option-header">
+                        <div class="option-rank">
+                            <div class="rank-number">3</div>
+                            <div>
+                                <div class="option-title">Chicago Plant Direct</div>
+                                <div class="option-subtitle">Direct ship from manufacturing</div>
+                            </div>
+                        </div>
+                        <div class="option-badges">
+                            <span class="badge" style="background: rgba(34, 211, 238, 0.2); color: #22d3ee;">HIGHEST MARGIN</span>
+                        </div>
+                    </div>
+                    <div class="option-metrics">
+                        <div class="metric-item"><div class="metric-value emerald">31.2%</div><div class="metric-label">Margin</div></div>
+                        <div class="metric-item"><div class="metric-value red">62%</div><div class="metric-label">P(On-Time)</div></div>
+                        <div class="metric-item"><div class="metric-value cyan">$21,800</div><div class="metric-label">Freight</div></div>
+                        <div class="metric-item"><div class="metric-value emerald">$1,200</div><div class="metric-label">Shadow Cost</div></div>
+                        <div class="metric-item"><div class="metric-value red">3.4 kg</div><div class="metric-label">CO₂/Case</div></div>
+                    </div>
+                    <div class="node-breakdown">
+                        <div class="node-chip"><span class="node-icon">🏭</span><span class="node-name">Chicago Plant</span><span class="node-qty">15,000 CS</span></div>
+                    </div>
+                </div>
+
+                <div class="fulfillment-option" style="opacity: 0.6;">
+                    <div class="option-header">
+                        <div class="option-rank">
+                            <div class="rank-number">4</div>
+                            <div>
+                                <div class="option-title">Phoenix DC Single Node</div>
+                                <div class="option-subtitle">West region fulfillment</div>
+                            </div>
+                        </div>
+                        <div class="option-badges">
+                            <span class="badge risky">NOT RECOMMENDED</span>
+                        </div>
+                    </div>
+                    <div class="option-metrics">
+                        <div class="metric-item"><div class="metric-value amber">25.8%</div><div class="metric-label">Margin</div></div>
+                        <div class="metric-item"><div class="metric-value red">54%</div><div class="metric-label">P(On-Time)</div></div>
+                        <div class="metric-item"><div class="metric-value red">$28,400</div><div class="metric-label">Freight</div></div>
+                        <div class="metric-item"><div class="metric-value amber">$5,600</div><div class="metric-label">Shadow Cost</div></div>
+                        <div class="metric-item"><div class="metric-value red">4.1 kg</div><div class="metric-label">CO₂/Case</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">AI Decision Explainability</div>
+                <div class="panel-subtitle">Why Memphis + Dallas split is optimal</div>
+            </div>
+            <div class="panel-content">
+                <div class="explainer-section">
+                    <div class="explainer-title"><span class="explainer-icon">💡</span> Optimization Rationale</div>
+                    <ul class="reason-list">
+                        <li class="reason-item">
+                            <span class="reason-icon">🎯</span>
+                            <span class="reason-text"><strong>+16% service probability</strong> vs single-node Memphis (94% vs 78%)</span>
+                        </li>
+                        <li class="reason-item">
+                            <span class="reason-icon">💰</span>
+                            <span class="reason-text"><strong>Penalty-adjusted margin wins</strong> — 28.4% realized vs 29.1% nominal with 22% miss risk</span>
+                        </li>
+                        <li class="reason-item">
+                            <span class="reason-icon">📦</span>
+                            <span class="reason-text"><strong>Inventory protection</strong> — Avoids draining Memphis below safety stock during promo</span>
+                        </li>
+                        <li class="reason-item">
+                            <span class="reason-icon">🚚</span>
+                            <span class="reason-text"><strong>Carrier capacity secured</strong> — Dallas has confirmed trailer availability</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="explainer-section">
+                    <div class="explainer-title"><span class="explainer-icon">💵</span> True Landed Cost</div>
+                    <div class="cost-breakdown">
+                        <div class="cost-row">
+                            <span class="cost-label">Product Cost (Blended)</span>
+                            <span class="cost-value">$148,500</span>
+                        </div>
+                        <div class="cost-row">
+                            <span class="cost-label">Freight (Memphis 9K + Dallas 6K)</span>
+                            <span class="cost-value">$18,450</span>
+                        </div>
+                        <div class="cost-row">
+                            <span class="cost-label">Accessorial Probability</span>
+                            <span class="cost-value">$820</span>
+                        </div>
+                        <div class="cost-row">
+                            <span class="cost-label">Shadow Inventory Cost</span>
+                            <span class="cost-value negative">$4,200</span>
+                        </div>
+                        <div class="cost-row">
+                            <span class="cost-label">Expected Chargeback</span>
+                            <span class="cost-value positive">$1,350</span>
+                        </div>
+                        <div class="cost-row total">
+                            <span class="cost-label">Net Landed Margin</span>
+                            <span class="cost-value positive">$70,230 (28.4%)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="explainer-section">
+                    <div class="explainer-title"><span class="explainer-icon">⚠️</span> Risk Matrix</div>
+                    <div class="risk-matrix">
+                        <div class="risk-item">
+                            <span class="risk-label">Chargeback Probability</span>
+                            <div class="risk-bar"><div class="risk-fill low" style="width: 6%;"></div></div>
+                            <span class="risk-pct" style="color: #34d399;">6%</span>
+                        </div>
+                        <div class="risk-item">
+                            <span class="risk-label">Deduction Likelihood</span>
+                            <div class="risk-bar"><div class="risk-fill low" style="width: 4%;"></div></div>
+                            <span class="risk-pct" style="color: #34d399;">4%</span>
+                        </div>
+                        <div class="risk-item">
+                            <span class="risk-label">Damage/Claim Risk</span>
+                            <div class="risk-bar"><div class="risk-fill low" style="width: 2%;"></div></div>
+                            <span class="risk-pct" style="color: #34d399;">2%</span>
+                        </div>
+                        <div class="risk-item">
+                            <span class="risk-label">Future Stockout Impact</span>
+                            <div class="risk-bar"><div class="risk-fill medium" style="width: 18%;"></div></div>
+                            <span class="risk-pct" style="color: #fbbf24;">18%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="explainer-section">
+                    <div class="explainer-title"><span class="explainer-icon">⚖️</span> Option Comparison</div>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr><th>Option</th><th>Margin</th><th>P(OT)</th><th>Shadow</th><th>CO₂</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr class="selected"><td>MEM+DAL Split</td><td style="color:#34d399">28.4%</td><td style="color:#34d399">94%</td><td>$4.2K</td><td>2.1kg</td></tr>
+                            <tr><td>Memphis Single</td><td style="color:#34d399">29.1%</td><td style="color:#fbbf24">78%</td><td style="color:#f87171">$8.9K</td><td>2.8kg</td></tr>
+                            <tr><td>Chicago Direct</td><td style="color:#34d399">31.2%</td><td style="color:#f87171">62%</td><td style="color:#34d399">$1.2K</td><td style="color:#f87171">3.4kg</td></tr>
+                            <tr><td>Phoenix Single</td><td style="color:#fbbf24">25.8%</td><td style="color:#f87171">54%</td><td>$5.6K</td><td style="color:#f87171">4.1kg</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-footer">
+        <div class="footer-info">
+            <span>Selected: <span style="color: #34d399;">Memphis + Dallas Split</span></span>
+            <span>Service Uplift: <span style="color: #34d399;">+16%</span></span>
+            <span>Expected Margin: <span style="color: #34d399;">$70,230</span></span>
+        </div>
+        <div class="footer-actions">
+            <button class="btn btn-secondary">← Back to Demand</button>
+            <button class="btn btn-secondary">Override Selection</button>
+            <button class="btn btn-primary">Accept & Send to Arbitration →</button>
+        </div>
+    </div>
+</body>
+</html>

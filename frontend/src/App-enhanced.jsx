@@ -142,6 +142,19 @@ import EmailIntelligence from './components/EmailIntelligence';
 import CommsConfig from './components/CommsConfig';
 import RouteAI from './components/RouteAI';
 import RouteAILanding from './components/RouteAILanding';
+import OrdlyAILanding from './components/OrdlyAILanding';
+import CustomerIntentCockpit from './components/ordlyai/CustomerIntentCockpit';
+import SkuDecisioning from './components/ordlyai/SkuDecisioning';
+import LeadTimeRecommendation from './components/ordlyai/LeadTimeRecommendation';
+import OrderValueControlTower from './components/ordlyai/OrderValueControlTower';
+import SalesOrderPipeline from './components/ordlyai/SalesOrderPipeline';
+import SkuBomOptimizer from './components/ordlyai/SkuBomOptimizer';
+import SapCommitTrace from './components/ordlyai/SapCommitTrace';
+import LearningLoop from './components/ordlyai/LearningLoop';
+import DemandSignal from './components/ordlyai/DemandSignal';
+import NetworkOptimizer from './components/ordlyai/NetworkOptimizer';
+import Arbitration from './components/ordlyai/Arbitration';
+import SapCommit from './components/ordlyai/SapCommit';
 import FleetManagement from './components/routeai/FleetManagement';
 import RouteOptimization from './components/routeai/RouteOptimization';
 import DeliveryTracking from './components/routeai/DeliveryTracking';
@@ -227,6 +240,7 @@ function App() {
   const [margenView, setMargenView] = usePersistedState('mantrix-margenView', 'landing'); // 'landing', 'revenue-sales', 'cost-operations', etc.
   const [routeView, setRouteView] = usePersistedState('mantrix-routeView', 'landing'); // 'landing', module IDs
   const [reveqView, setReveqView] = usePersistedState('mantrix-reveqView', 'landing'); // 'landing', module IDs
+  const [ordlyView, setOrdlyView] = usePersistedState('mantrix-ordlyView', 'landing'); // 'landing', module IDs
   const [currentFioriTile, setCurrentFioriTile] = useState(null); // { tileId, title, moduleId, moduleColor }
   const [axisAIView, setAxisAIView] = useState('landing'); // 'landing', 'forecast', 'budget', 'driver', 'scenario', 'insights'
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
@@ -602,6 +616,9 @@ function App() {
                       setReveqView('landing');
                     } else if (moduleId === 'process-mining') {
                       setCoreAIView('process-mining');
+                    } else if (moduleId === 'ordly') {
+                      setCoreAIView('ordly');
+                      setOrdlyView('landing');
                     }
                   }} />
                 </Box>
@@ -962,6 +979,85 @@ function App() {
               <Fade in={coreAIView === 'process-mining'} timeout={300}>
                 <Box sx={{ display: coreAIView === 'process-mining' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
                   <ProcessMiningPage onBack={() => setCoreAIView('landing')} />
+                </Box>
+              </Fade>
+              <Fade in={coreAIView === 'ordly'} timeout={300}>
+                <Box sx={{ display: coreAIView === 'ordly' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
+                  {ordlyView === 'landing' && (
+                    <OrdlyAILanding
+                      onBack={() => setCoreAIView('landing')}
+                      onTileClick={(moduleId) => {
+                        console.log('OrdlyAI tile clicked:', moduleId);
+                        setOrdlyView(moduleId);
+                      }}
+                    />
+                  )}
+                  {ordlyView === 'sales-order-pipeline' && (
+                    <SalesOrderPipeline
+                      onBack={() => setOrdlyView('landing')}
+                      onNavigate={(view) => {
+                        if (view === 'customer-intent-cockpit') {
+                          setOrdlyView('customer-intent-cockpit');
+                        } else if (view === 'sku-decisioning') {
+                          setOrdlyView('sku-decisioning');
+                        }
+                      }}
+                    />
+                  )}
+                  {ordlyView === 'customer-intent-cockpit' && (
+                    <CustomerIntentCockpit
+                      onBack={() => setOrdlyView('landing')}
+                      onNavigate={(view) => {
+                        if (view === 'sku-decisioning') {
+                          setOrdlyView('sku-decisioning');
+                        }
+                      }}
+                    />
+                  )}
+                  {ordlyView === 'sku-decisioning' && (
+                    <SkuDecisioning
+                      onBack={() => setOrdlyView('landing')}
+                      onNavigate={(view) => {
+                        if (view === 'lead-time-recommendation') {
+                          setOrdlyView('lead-time-recommendation');
+                        }
+                      }}
+                    />
+                  )}
+                  {ordlyView === 'lead-time-recommendation' && (
+                    <LeadTimeRecommendation
+                      onBack={() => setOrdlyView('landing')}
+                      onNavigate={(view) => {
+                        if (view === 'sap-commit-trace') {
+                          setOrdlyView('sap-commit-trace');
+                        }
+                      }}
+                    />
+                  )}
+                  {ordlyView === 'order-value-control-tower' && (
+                    <OrderValueControlTower onBack={() => setOrdlyView('landing')} />
+                  )}
+                  {ordlyView === 'sku-bom-optimizer' && (
+                    <SkuBomOptimizer onBack={() => setOrdlyView('landing')} />
+                  )}
+                  {ordlyView === 'sap-commit-trace' && (
+                    <SapCommitTrace onBack={() => setOrdlyView('landing')} />
+                  )}
+                  {ordlyView === 'learning-loop' && (
+                    <LearningLoop onBack={() => setOrdlyView('landing')} />
+                  )}
+                  {ordlyView === 'demand-signal' && (
+                    <DemandSignal onBack={() => setOrdlyView('landing')} />
+                  )}
+                  {ordlyView === 'network-optimizer' && (
+                    <NetworkOptimizer onBack={() => setOrdlyView('landing')} />
+                  )}
+                  {ordlyView === 'arbitration' && (
+                    <Arbitration onBack={() => setOrdlyView('landing')} />
+                  )}
+                  {ordlyView === 'sap-commit' && (
+                    <SapCommit onBack={() => setOrdlyView('landing')} />
+                  )}
                 </Box>
               </Fade>
             </Box>

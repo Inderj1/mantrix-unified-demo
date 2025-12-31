@@ -22,6 +22,7 @@ from src.api.comms_config_routes import router as comms_config_router
 from src.api.excel_processor_routes import router as excel_processor_router
 from src.api.pdf_extraction_routes import router as pdf_extraction_router
 from src.api.command_tower_routes import router as command_tower_router
+from src.api.ordlyai_routes import router as ordlyai_router
 
 # Configure structured logging
 structlog.configure(
@@ -141,6 +142,7 @@ app.include_router(comms_config_router)
 app.include_router(excel_processor_router)
 app.include_router(pdf_extraction_router, prefix="/api/v1/pdf")
 app.include_router(command_tower_router)
+app.include_router(ordlyai_router)
 
 # Mount static files for generated outputs
 # Output directory is at project root, not backend

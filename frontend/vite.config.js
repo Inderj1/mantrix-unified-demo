@@ -9,7 +9,11 @@ export default defineConfig({
     allowedHosts: [
       'localhost',
       '127.0.0.1',
-      'nexxt-mantrix.cloudmantra.ai'
+      'nexxt-mantrix.cloudmantra.ai',
+      'madisonreed.cloudmantra.ai',
+      'drinkaz-mantrix.cloudmantra.ai',
+      'drinkaz-axis.cloudmantra.ai',
+      'demo-axis.cloudmantra.ai'
     ],
     proxy: {
       '/api': {

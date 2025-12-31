@@ -6,89 +6,97 @@ import {
   CardContent,
   Typography,
   Chip,
-  alpha,
   Avatar,
   Stack,
+  Button,
+  Breadcrumbs,
+  Link,
+  alpha,
   Zoom,
 } from '@mui/material';
 import {
-  TrendingUp as TrendingUpIcon,
-  Inventory as InventoryIcon,
-  Speed as SpeedIcon,
   ArrowForward as ArrowForwardIcon,
-  LocalShipping as FleetIcon,
+  NavigateNext as NavigateNextIcon,
+  ArrowBack as ArrowBackIcon,
   Lightbulb as LightbulbIcon,
-  AccountTree as ProcessMiningIcon,
-  Timeline as OrderlyIcon,
+  Timeline as TimelineIcon,
+  Sensors as SensorsIcon,
+  Hub as HubIcon,
+  Balance as BalanceIcon,
+  Storage as StorageIcon,
+  School as SchoolIcon,
 } from '@mui/icons-material';
 
-const aiModules = [
+const ordlyModules = [
+  // MTS Flow Tiles (Make-to-Stock Pipeline)
   {
-    id: 'margen',
-    title: 'MARGEN.AI',
-    subtitle: 'Margin Analytics & Revenue Intelligence',
-    description: 'Advanced financial analytics, customer segmentation, and revenue optimization',
-    icon: TrendingUpIcon,
-    color: '#0a6ed1',
-    bgColor: '#dbeafe',
-    stats: { label: 'Models', value: '12' },
+    id: 'demand-signal',
+    title: 'Demand Signal',
+    subtitle: 'MTS Tile 0',
+    description: 'AI-powered demand capture with volatility fingerprinting, hidden constraint detection, and service risk preview',
+    icon: SensorsIcon,
+    color: '#1976d2',
+    bgColor: '#e3f2fd',
+    stats: { label: 'Signals', value: '47' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
+    gradient: 'linear-gradient(135deg, #1565c0 0%, #1976d2 100%)',
   },
   {
-    id: 'stox',
-    title: 'STOX.AI',
-    subtitle: 'Smart Inventory Optimization',
-    description: 'Inventory management, demand forecasting, and supply chain optimization',
-    icon: InventoryIcon,
-    color: '#354a5f',
-    bgColor: '#f1f5f9',
-    stats: { label: 'SKUs', value: '2.5K' },
+    id: 'network-optimizer',
+    title: 'Network Optimizer',
+    subtitle: 'MTS Tile 1',
+    description: 'Multi-node fulfillment optimization with AI explainability, cost breakdown, and risk matrix',
+    icon: HubIcon,
+    color: '#1976d2',
+    bgColor: '#e3f2fd',
+    stats: { label: 'Options', value: '5' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #354a5f 0%, #32363a 100%)',
+    gradient: 'linear-gradient(135deg, #1565c0 0%, #1976d2 100%)',
   },
   {
-    id: 'route',
-    title: 'ROUTE.AI',
-    subtitle: 'Fleet & Route Optimization',
-    description: 'AI-powered fleet management, route optimization, and logistics intelligence',
-    icon: FleetIcon,
-    color: '#64748b',
-    bgColor: '#f1f5f9',
-    stats: { label: 'Vehicles', value: '45' },
+    id: 'arbitration',
+    title: 'Economic Arbitration',
+    subtitle: 'MTS Tile 2',
+    description: 'Policy guardrails, inventory protection, exception proposals, and approval workflows',
+    icon: BalanceIcon,
+    color: '#1976d2',
+    bgColor: '#e3f2fd',
+    stats: { label: 'Policies', value: '5/6' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
+    gradient: 'linear-gradient(135deg, #1565c0 0%, #1976d2 100%)',
   },
   {
-    id: 'process-mining',
-    title: 'PROCESS.AI',
-    subtitle: 'Process Mining & Analytics',
-    description: 'Discover, analyze, and optimize business processes with AI-powered insights',
-    icon: ProcessMiningIcon,
-    color: '#354a5f',
-    bgColor: '#f1f5f9',
-    stats: { label: 'Processes', value: '8' },
+    id: 'sap-commit',
+    title: 'SAP Commit & Trace',
+    subtitle: 'MTS Tile 3',
+    description: 'Pre-commit validation, SAP document preview, decision timeline, and BAPI execution log',
+    icon: StorageIcon,
+    color: '#1976d2',
+    bgColor: '#e3f2fd',
+    stats: { label: 'Commits', value: '4/5' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #354a5f 0%, #1e3a5f 100%)',
+    gradient: 'linear-gradient(135deg, #1565c0 0%, #1976d2 100%)',
   },
+  // Learning Loop Tile
   {
-    id: 'ordly',
-    title: 'ORDLY.AI',
-    subtitle: 'Order Management Intelligence',
-    description: 'AI-powered sales order management from customer intent to SAP commitment',
-    icon: OrderlyIcon,
-    color: '#0854a0',
-    bgColor: '#dbeafe',
-    stats: { label: 'Orders', value: '156' },
+    id: 'learning-loop',
+    title: 'Learning Loop',
+    subtitle: 'MTS Tile 4',
+    description: 'Order outcome analysis, ML model confidence updates, and continuous improvement tracking',
+    icon: SchoolIcon,
+    color: '#1976d2',
+    bgColor: '#e3f2fd',
+    stats: { label: 'Model Gain', value: '+2.1%' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #0854a0 0%, #1976d2 100%)',
+    gradient: 'linear-gradient(135deg, #1565c0 0%, #1976d2 100%)',
   },
 ];
 
-const CoreAILanding = ({ onTileClick }) => {
-  const handleTileClick = (module) => {
-    if (module.status === 'active' && onTileClick) {
-      onTileClick(module.id);
+const OrdlyAILanding = ({ onTileClick, onBack }) => {
+  const handleTileClick = (moduleId) => {
+    console.log('OrdlyAI tile clicked:', moduleId);
+    if (onTileClick) {
+      onTileClick(moduleId);
     }
   };
 
@@ -98,49 +106,77 @@ const CoreAILanding = ({ onTileClick }) => {
       height: '100%',
       overflowY: 'auto',
       overflowX: 'hidden',
-      background: 'linear-gradient(180deg, rgba(10, 110, 209, 0.05) 0%, rgba(255, 255, 255, 1) 50%)',
+      background: 'linear-gradient(180deg, rgba(8, 84, 160, 0.05) 0%, rgba(255, 255, 255, 1) 50%)',
     }}>
-      {/* Header */}
+      {/* Header with Breadcrumbs */}
       <Box sx={{ mb: 3 }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link
+              component="button"
+              variant="body1"
+              onClick={onBack}
+              sx={{
+                textDecoration: 'none',
+                color: 'text.primary',
+                '&:hover': { textDecoration: 'underline' }
+              }}
+            >
+              CORE.AI
+            </Link>
+            <Typography color="primary" variant="body1" fontWeight={600}>
+              ORDLY.AI
+            </Typography>
+          </Breadcrumbs>
+
+          <Button
+            startIcon={<ArrowBackIcon />}
+            onClick={onBack}
+            variant="outlined"
+            size="small"
+            sx={{ borderColor: 'divider' }}
+          >
+            Back
+          </Button>
+        </Stack>
+
         {/* System Identity Badge */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
           <Box sx={{
             width: 4,
             height: 60,
-            background: 'linear-gradient(180deg, #0a6ed1 0%, #354a5f 100%)',
+            background: 'linear-gradient(180deg, #0854a0 0%, #1976d2 100%)',
             borderRadius: 2
           }} />
           <Box>
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
-              <Avatar sx={{ width: 32, height: 32, bgcolor: '#0a6ed1' }}>
-                <SpeedIcon sx={{ fontSize: 18 }} />
+              <Avatar sx={{ width: 32, height: 32, bgcolor: '#0854a0' }}>
+                <TimelineIcon sx={{ fontSize: 18 }} />
               </Avatar>
-              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: '#0a6ed1' }}>
-                CORE.AI
+              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: '#0854a0' }}>
+                ORDLY.AI
               </Typography>
               <Chip
-                label="4 Modules"
+                label="5 Modules"
                 size="small"
                 sx={{
-                  bgcolor: alpha('#0a6ed1', 0.1),
-                  color: '#0a6ed1',
+                  bgcolor: alpha('#0854a0', 0.1),
+                  color: '#0854a0',
                   fontWeight: 600,
                   fontSize: '0.7rem'
                 }}
               />
             </Stack>
             <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
-              Operational Intelligence Suite - AI-powered analytics and optimization platform
+              Intelligent Sales Order Management - From Customer Intent to SAP Commitment
             </Typography>
           </Box>
         </Box>
       </Box>
 
-      {/* Module Tiles - Matching Stox.AI/Margen.AI styling */}
+      {/* Module Tiles */}
       <Grid container spacing={1.5}>
-        {aiModules
-          .filter((module) => module.id !== 'route')
-          .map((module, index) => (
+        {ordlyModules.map((module, index) => (
           <Grid item xs={12} sm={6} md={4} lg={4} key={module.id}>
             <Zoom in timeout={200 + index * 50}>
               <Card
@@ -179,7 +215,7 @@ const CoreAILanding = ({ onTileClick }) => {
                     },
                   } : {},
                 }}
-                onClick={() => handleTileClick(module)}
+                onClick={() => module.status === 'active' && handleTileClick(module.id)}
               >
                 <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
                   {/* Icon and Status */}
@@ -230,12 +266,12 @@ const CoreAILanding = ({ onTileClick }) => {
         ))}
       </Grid>
 
-      {/* Footer Info */}
+      {/* Info Section */}
       <Box sx={{ mt: 6, textAlign: 'center' }}>
         <Stack direction="row" spacing={2} justifyContent="center" alignItems="center">
           <LightbulbIcon sx={{ color: 'warning.main' }} />
           <Typography variant="body2" color="text.secondary">
-            Powered by advanced machine learning and real-time data analytics
+            ORDLY.AI provides intelligent order management from customer intent capture to SAP commitment
           </Typography>
         </Stack>
       </Box>
@@ -243,4 +279,4 @@ const CoreAILanding = ({ onTileClick }) => {
   );
 };
 
-export default CoreAILanding;
+export default OrdlyAILanding;
