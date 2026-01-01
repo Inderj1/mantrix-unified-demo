@@ -308,10 +308,10 @@ const KitAlertsView = ({ onBack, darkMode = false }) => {
         </Box>
         <Box flex={1}>
           <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
-            ML Insights & Alerts
+            Proactive Alerts
           </Typography>
           <Typography variant="body2" sx={{ color: colors.grey }}>
-            Proactive business intelligence from ML models
+            AI-driven alerts from intelligent monitoring agents
           </Typography>
         </Box>
         <IconButton onClick={() => setKitAlerts(generateKitAlerts(25))}>

@@ -1012,6 +1012,16 @@ class BigQuerySQLGenerator:
             - Example WRONG: SELECT LOWER(Sold_to_Name) AS customer_name
             - Only use LOWER() in WHERE clauses for case-insensitive filtering, NOT in SELECT
 
+            CRITICAL - NULL VALUE FILTERING FOR IDENTIFIER COLUMNS:
+            - ALWAYS filter out NULL values for key identifier columns when listing or aggregating by them
+            - When showing customers: WHERE Sold_to_Number IS NOT NULL AND Sold_to_Name IS NOT NULL
+            - When showing products: WHERE Material IS NOT NULL AND Material_Description IS NOT NULL
+            - When showing distributors: WHERE Distributor IS NOT NULL
+            - When grouping by any column: Add WHERE column IS NOT NULL to exclude null groups
+            - Example CORRECT: SELECT DISTINCT Sold_to_Number, Sold_to_Name FROM table WHERE Sold_to_Number IS NOT NULL
+            - Example WRONG: SELECT DISTINCT Sold_to_Number, Sold_to_Name FROM table (returns null rows)
+            - This prevents confusing "null | null" rows in query results
+
             AVAILABLE TABLES - YOU MUST ONLY USE THESE TABLES:
             {', '.join([f"`{self.project_id}.{self.dataset_id}.{s['table_name']}`" for s in schemas])}
 
@@ -1248,6 +1258,9 @@ class BigQuerySQLGenerator:
 
                 # Remove LOWER() from SELECT columns - preserves original text case
                 sql = self._remove_lower_from_select(sql)
+
+                # Add null filters for identifier columns (safety net)
+                sql = self._add_null_filters_for_identifiers(sql)
 
                 # VALIDATION: Check for invented/placeholder table names
                 logger.info(f"Validating SQL for placeholder tables. SQL preview: {sql[:200]}...")
@@ -1522,5 +1535,88 @@ Return ONLY the corrected SQL, no explanation."""
 
         if sql != original_sql:
             logger.info("Removed LOWER() from SELECT columns to preserve text case")
+
+        return sql
+
+    def _add_null_filters_for_identifiers(self, sql: str) -> str:
+        """Add IS NOT NULL filters for identifier columns when missing.
+
+        This is a safety net to prevent null rows from appearing in results
+        when querying for customers, products, distributors, etc.
+        """
+        import re
+
+        original_sql = sql
+
+        # Key identifier columns that should always filter nulls when selected
+        identifier_columns = {
+            'Sold_to_Number': 'Sold_to_Number',
+            'Sold_to_Name': 'Sold_to_Name',
+            'customer_id': 'Sold_to_Number',
+            'customer_name': 'Sold_to_Name',
+            'Material': 'Material',
+            'Material_Description': 'Material_Description',
+            'Distributor': 'Distributor',
+            'Payer_Name': 'Payer_Name',
+            'Bill_to_Party_Name': 'Bill_to_Party_Name',
+        }
+
+        # Check if this is a DISTINCT query or GROUP BY query on identifier columns
+        is_distinct = bool(re.search(r'SELECT\s+DISTINCT', sql, re.IGNORECASE))
+        has_group_by = bool(re.search(r'GROUP\s+BY', sql, re.IGNORECASE))
+
+        if not (is_distinct or has_group_by):
+            return sql  # Only apply to listing/aggregation queries
+
+        # Find which identifier columns are in the SELECT
+        columns_to_filter = []
+        for col_alias, actual_col in identifier_columns.items():
+            # Check if column is in SELECT clause
+            select_pattern = rf'SELECT\s+.*?\b{re.escape(col_alias)}\b.*?FROM'
+            if re.search(select_pattern, sql, re.IGNORECASE | re.DOTALL):
+                # Check if NOT NULL filter already exists
+                null_pattern = rf'\b{re.escape(actual_col)}\s+IS\s+NOT\s+NULL'
+                if not re.search(null_pattern, sql, re.IGNORECASE):
+                    columns_to_filter.append(actual_col)
+
+        if not columns_to_filter:
+            return sql
+
+        # Remove duplicates while preserving order
+        columns_to_filter = list(dict.fromkeys(columns_to_filter))
+
+        # Build the null filter clause
+        null_filters = ' AND '.join([f'{col} IS NOT NULL' for col in columns_to_filter])
+
+        # Add to WHERE clause
+        if re.search(r'\bWHERE\b', sql, re.IGNORECASE):
+            # WHERE exists - add to it
+            # Find WHERE and add after it
+            sql = re.sub(
+                r'(\bWHERE\s+)',
+                rf'\1{null_filters} AND ',
+                sql,
+                count=1,
+                flags=re.IGNORECASE
+            )
+        else:
+            # No WHERE - add one before GROUP BY, ORDER BY, or LIMIT
+            for clause in ['GROUP BY', 'ORDER BY', 'LIMIT']:
+                pattern = rf'(\s+{clause}\b)'
+                if re.search(pattern, sql, re.IGNORECASE):
+                    sql = re.sub(
+                        pattern,
+                        rf' WHERE {null_filters}\1',
+                        sql,
+                        count=1,
+                        flags=re.IGNORECASE
+                    )
+                    break
+            else:
+                # No GROUP BY, ORDER BY, or LIMIT - add before trailing semicolon or at end
+                sql = sql.rstrip(';').rstrip() + f' WHERE {null_filters};'
+
+        if sql != original_sql:
+            logger.info(f"Added null filters for identifier columns: {columns_to_filter}")
 
         return sql

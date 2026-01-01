@@ -32,9 +32,9 @@ const EnterprisePulseLanding = ({ onTileClick, alertCount = 0, agentCount = 0, d
   const tiles = [
     {
       id: 'alerts',
-      title: 'ML Insights',
-      subtitle: 'Proactive Intelligence',
-      description: 'Business insights from ML models - pricing optimization, margin protection, customer retention',
+      title: 'Proactive Alerts',
+      subtitle: 'AI-Driven Intelligence',
+      description: 'Real-time alerts from AI agents monitoring pricing, margins, customers, and operations',
       icon: AlertsIcon,
       color: colors.primary,
       gradient: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
@@ -43,8 +43,8 @@ const EnterprisePulseLanding = ({ onTileClick, alertCount = 0, agentCount = 0, d
     {
       id: 'agents',
       title: 'AI Agents',
-      subtitle: 'ML Model Monitoring',
-      description: 'Configure proactive agents that monitor pricing, customers, and operations to surface opportunities',
+      subtitle: 'Autonomous Monitoring',
+      description: 'Configure intelligent agents that continuously monitor business operations and surface opportunities',
       icon: AgentsIcon,
       color: colors.primary,
       gradient: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,

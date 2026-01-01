@@ -302,7 +302,7 @@ const DemandSignal = ({ onBack }) => {
     const signal = selectedSignal;
 
     return (
-      <Box sx={{ height: '100%', overflow: 'auto', bgcolor: darkMode ? '#0d1117' : '#f8fafc' }}>
+      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: darkMode ? '#0d1117' : '#f8fafc' }}>
         {/* Order Context Bar */}
         <Box sx={{
           display: 'flex',
@@ -312,6 +312,7 @@ const DemandSignal = ({ onBack }) => {
           py: 1.5,
           bgcolor: alpha(CYAN, 0.05),
           borderBottom: `1px solid ${alpha(CYAN, 0.2)}`,
+          flexShrink: 0,
         }}>
           <Stack direction="row" alignItems="center" spacing={3}>
             <Button
@@ -359,6 +360,7 @@ const DemandSignal = ({ onBack }) => {
           bgcolor: alpha('#f1f5f9', 0.8),
           borderBottom: '1px solid',
           borderColor: 'divider',
+          flexShrink: 0,
         }}>
           {flowSteps.map((step, idx) => (
             <React.Fragment key={step.id}>
@@ -382,9 +384,9 @@ const DemandSignal = ({ onBack }) => {
         </Box>
 
         {/* 3-Column Layout */}
-        <Grid container sx={{ height: 'calc(100% - 140px)' }}>
+        <Grid container sx={{ flex: 1, minHeight: 500, overflow: 'visible' }}>
           {/* Left Panel - Demand Inbox */}
-          <Grid item xs={12} md={3} sx={{ borderRight: '1px solid', borderColor: 'divider', overflow: 'auto' }}>
+          <Grid item xs={12} md={3} sx={{ borderRight: '1px solid', borderColor: 'divider' }}>
             <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', bgcolor: alpha('#000', 0.02) }}>
               <Typography sx={{ fontSize: '0.85rem', fontWeight: 600 }}>Demand Inbox</Typography>
               <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary' }}>Multi-source order ingestion</Typography>
@@ -418,10 +420,31 @@ const DemandSignal = ({ onBack }) => {
                 </Paper>
               ))}
             </Box>
+            {/* Signal Metadata */}
+            <Box sx={{ p: 1.5, borderTop: '1px solid', borderColor: 'divider', bgcolor: alpha('#f1f5f9', 0.5) }}>
+              <Stack spacing={0.5}>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography sx={{ fontSize: '0.6rem', color: 'text.secondary' }}>Source:</Typography>
+                  <Typography sx={{ fontSize: '0.6rem', fontWeight: 600 }}>EDI 850</Typography>
+                </Stack>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography sx={{ fontSize: '0.6rem', color: 'text.secondary' }}>Received:</Typography>
+                  <Typography sx={{ fontSize: '0.6rem', fontWeight: 600 }}>{signal.receivedAgo}</Typography>
+                </Stack>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography sx={{ fontSize: '0.6rem', color: 'text.secondary' }}>SLA:</Typography>
+                  <Typography sx={{ fontSize: '0.6rem', fontWeight: 600, color: WARNING_AMBER }}>{signal.slaRemaining}</Typography>
+                </Stack>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography sx={{ fontSize: '0.6rem', color: 'text.secondary' }}>Penalty:</Typography>
+                  <Typography sx={{ fontSize: '0.6rem', fontWeight: 600, color: '#dc2626' }}>${signal.penaltyExposure?.toLocaleString()}</Typography>
+                </Stack>
+              </Stack>
+            </Box>
           </Grid>
 
           {/* Center Panel - Demand Intent Object */}
-          <Grid item xs={12} md={5} sx={{ borderRight: '1px solid', borderColor: 'divider', overflow: 'auto' }}>
+          <Grid item xs={12} md={5} sx={{ borderRight: '1px solid', borderColor: 'divider' }}>
             <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', bgcolor: alpha('#000', 0.02) }}>
               <Typography sx={{ fontSize: '0.85rem', fontWeight: 600 }}>Demand Intent Object</Typography>
               <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary' }}>Probabilistic demand signal with risk fingerprint</Typography>
@@ -517,7 +540,7 @@ const DemandSignal = ({ onBack }) => {
           </Grid>
 
           {/* Right Panel - Axis AI Chat */}
-          <Grid item xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <Grid item xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', bgcolor: alpha('#000', 0.02) }}>
               <Typography sx={{ fontSize: '0.85rem', fontWeight: 600 }}>Axis AI - Demand Intelligence</Typography>
               <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary' }}>Query demand patterns, history, constraints</Typography>
@@ -574,35 +597,6 @@ const DemandSignal = ({ onBack }) => {
           </Grid>
         </Grid>
 
-        {/* Action Footer */}
-        <Box sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          px: 3,
-          py: 2,
-          borderTop: '1px solid',
-          borderColor: 'divider',
-          bgcolor: alpha('#f1f5f9', 0.8),
-        }}>
-          <Stack direction="row" spacing={3}>
-            <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>Source: <Typography component="span" sx={{ fontWeight: 500 }}>EDI 850</Typography></Typography>
-            <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>Received: <Typography component="span" sx={{ fontWeight: 500 }}>{signal.receivedAgo}</Typography></Typography>
-            <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>SLA: <Typography component="span" sx={{ fontWeight: 600, color: WARNING_AMBER }}>{signal.slaRemaining} remaining</Typography></Typography>
-            <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>Penalty Exposure: <Typography component="span" sx={{ fontWeight: 600, color: '#dc2626' }}>${signal.penaltyExposure?.toLocaleString()}</Typography></Typography>
-          </Stack>
-          <Stack direction="row" spacing={1.5}>
-            <Button variant="outlined" size="small" sx={{ fontSize: '0.75rem', borderColor: 'divider' }}>Re-Extract</Button>
-            <Button variant="outlined" size="small" sx={{ fontSize: '0.75rem', borderColor: 'divider' }}>Request Clarification</Button>
-            <Button
-              variant="contained"
-              size="small"
-              sx={{ bgcolor: CYAN, '&:hover': { bgcolor: alpha(CYAN, 0.8) }, fontWeight: 600, fontSize: '0.75rem' }}
-            >
-              Promote to Network Optimizer →
-            </Button>
-          </Stack>
-        </Box>
       </Box>
     );
   };
@@ -617,7 +611,7 @@ const DemandSignal = ({ onBack }) => {
 
   // List View
   const renderListView = () => (
-    <Box sx={{ p: 3, minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#f8fafc' }}>
+    <Box sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', bgcolor: '#f8fafc', overflow: 'auto' }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>

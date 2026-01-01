@@ -362,6 +362,103 @@ async def update_ticket(ticket_id: int, request: UpdateTicketRequest):
         raise HTTPException(status_code=500, detail=f"Error updating ticket: {str(e)}")
 
 
+@router.post("/seed-demo-data")
+async def seed_demo_data():
+    """
+    Seed the command tower with sample demo data for all AI modules
+    """
+    import random
+    from datetime import timedelta
+
+    sample_tickets = [
+        # STOX.AI - Inventory Actions
+        {"source_module": "STOX.AI", "ticket_type": "REORDER_TRIGGERED", "title": "Reorder Triggered: SKU-4521", "description": "Safety stock threshold reached for DC Atlanta. Auto-generated reorder for 500 units.", "priority": "High", "status": "Completed"},
+        {"source_module": "STOX.AI", "ticket_type": "SAFETY_STOCK_ADJUSTED", "title": "Safety Stock Adjusted: Chicago DC", "description": "Increased safety stock by 15% for seasonal demand pattern detected.", "priority": "Medium", "status": "Completed"},
+        {"source_module": "STOX.AI", "ticket_type": "REALLOCATION_EXECUTED", "title": "Reallocation: Dallas → Houston", "description": "Transferred 500 units to prevent stockout in Houston region.", "priority": "High", "status": "Completed"},
+        {"source_module": "STOX.AI", "ticket_type": "SHORTAGE_ALERT", "title": "Shortage Alert: West Region", "description": "Projected stockout in 5 days for high-velocity SKU-1156.", "priority": "Critical", "status": "Open"},
+        {"source_module": "STOX.AI", "ticket_type": "WORKING_CAPITAL_OPT", "title": "Working Capital Optimized", "description": "Released $125K through inventory optimization across 3 DCs.", "priority": "Medium", "status": "Completed"},
+        {"source_module": "STOX.AI", "ticket_type": "MRP_PARAMETER_CHANGE", "title": "MRP Lead Time Updated", "description": "Adjusted supplier lead time from 14 to 21 days for RM-445.", "priority": "Low", "status": "Completed"},
+        {"source_module": "STOX.AI", "ticket_type": "STORE_REPLENISHMENT", "title": "Store Replenishment: Store #1842", "description": "Auto-generated replenishment order for 12 SKUs based on sell-through.", "priority": "Medium", "status": "In Progress"},
+
+        # MARGEN.AI - Financial Actions
+        {"source_module": "MARGEN.AI", "ticket_type": "MARGIN_ALERT", "title": "Margin Alert: Premium Segment", "description": "Gross margin dropped 3.2% vs last month for premium customer segment.", "priority": "High", "status": "Open"},
+        {"source_module": "MARGEN.AI", "ticket_type": "CLV_UPDATED", "title": "CLV Recalculated: Enterprise Accounts", "description": "Updated CLV for 45 enterprise customers based on Q4 transactions.", "priority": "Medium", "status": "Completed"},
+        {"source_module": "MARGEN.AI", "ticket_type": "SEGMENT_CHANGE", "title": "Segment Migration: 12 Accounts", "description": "Moved 12 accounts from Growth to At Risk based on RFM analysis.", "priority": "High", "status": "Completed"},
+        {"source_module": "MARGEN.AI", "ticket_type": "CHURN_RISK", "title": "Churn Risk: Acme Corp", "description": "High churn probability (78%) detected for Acme Corp. Last order 45 days ago.", "priority": "Critical", "status": "In Progress"},
+        {"source_module": "MARGEN.AI", "ticket_type": "REVENUE_FORECAST", "title": "Q2 Revenue Forecast Updated", "description": "Revised forecast: $2.4M (+8% YoY) based on current pipeline.", "priority": "Medium", "status": "Completed"},
+
+        # ORDLY.AI - Order Actions
+        {"source_module": "ORDLY.AI", "ticket_type": "ORDER_COMMITTED", "title": "SAP Commit: PO-2025-4521", "description": "Order committed to SAP with 98% match confidence. 45 line items processed.", "priority": "Medium", "status": "Completed"},
+        {"source_module": "ORDLY.AI", "ticket_type": "DEMAND_SIGNAL", "title": "EDI 850 Processed: Walmart", "description": "Processed 45 line items from EDI 850 demand signal.", "priority": "High", "status": "Completed"},
+        {"source_module": "ORDLY.AI", "ticket_type": "NETWORK_OPTIMIZED", "title": "Network Optimization Complete", "description": "Optimized fulfillment across 8 DCs. Estimated savings: $23K.", "priority": "Medium", "status": "Completed"},
+        {"source_module": "ORDLY.AI", "ticket_type": "ARBITRATION", "title": "Arbitration: Multi-DC Conflict", "description": "Resolved allocation conflict for SKU-7789 across 3 DCs.", "priority": "High", "status": "In Progress"},
+        {"source_module": "ORDLY.AI", "ticket_type": "PROMISE_UPDATE", "title": "Promise Date Updated: Order #8842", "description": "Revised delivery from Jan 15 to Jan 12 based on inventory availability.", "priority": "Low", "status": "Completed"},
+
+        # AXIS.AI - Forecast Actions
+        {"source_module": "AXIS.AI", "ticket_type": "FORECAST_UPDATED", "title": "Demand Forecast: Q1 2025", "description": "ML model updated forecast with 94% accuracy. Demand up 12% vs prior.", "priority": "Medium", "status": "Completed"},
+        {"source_module": "AXIS.AI", "ticket_type": "SCENARIO_CREATED", "title": "Scenario: 10% Demand Surge", "description": "Created what-if scenario for supply planning with 10% demand increase.", "priority": "Low", "status": "Completed"},
+        {"source_module": "AXIS.AI", "ticket_type": "BUDGET_ALERT", "title": "Budget Variance Alert", "description": "COGS exceeding budget by 4.2% in West region.", "priority": "High", "status": "Open"},
+
+        # Enterprise Pulse - Agent Actions
+        {"source_module": "Enterprise Pulse", "ticket_type": "PULSE_AGENT_EXEC", "title": "Agent: Customer Follow-up", "description": "Automated follow-up email sent to 23 customers with pending quotes.", "priority": "Medium", "status": "Completed"},
+        {"source_module": "Enterprise Pulse", "ticket_type": "PULSE_ALERT", "title": "Alert: Quote Expiring", "description": "5 quotes expiring in next 48 hours. Total value: $145K.", "priority": "High", "status": "Open"},
+        {"source_module": "Enterprise Pulse", "ticket_type": "PULSE_CONFIG", "title": "Config: New Alert Rule", "description": "Created new alert rule for margin below threshold notifications.", "priority": "Low", "status": "Completed"},
+    ]
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+
+        # Clear existing demo data (optional - comment out if you want to append)
+        cursor.execute("DELETE FROM command_tower_tickets WHERE ticket_id > 0")
+
+        created_count = 0
+        for ticket_data in sample_tickets:
+            # Randomize created_at within last 72 hours
+            hours_ago = random.randint(1, 72)
+            created_at = datetime.now() - timedelta(hours=hours_ago)
+
+            # Set completed_at for completed tickets
+            completed_at = None
+            if ticket_data["status"] == "Completed":
+                completed_at = created_at + timedelta(hours=random.randint(1, 24))
+
+            cursor.execute(
+                """
+                INSERT INTO command_tower_tickets
+                (ticket_type, status, priority, source_module, source_tile, title, description, user_name, metadata, created_at, completed_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s::jsonb, %s, %s)
+                """,
+                (
+                    ticket_data["ticket_type"],
+                    ticket_data["status"],
+                    ticket_data.get("priority", "Medium"),
+                    ticket_data["source_module"],
+                    ticket_data.get("source_tile", "Command Center"),
+                    ticket_data["title"],
+                    ticket_data["description"],
+                    random.choice(["System", "AI Agent", "John Mitchell", "Sarah Chen", "David Kim"]),
+                    json.dumps({"demo": True, "seeded_at": datetime.now().isoformat()}),
+                    created_at,
+                    completed_at
+                )
+            )
+            created_count += 1
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return {
+            "success": True,
+            "message": f"Seeded {created_count} demo tickets successfully",
+            "count": created_count
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error seeding demo data: {str(e)}")
+
+
 @router.get("/stats")
 async def get_stats():
     """

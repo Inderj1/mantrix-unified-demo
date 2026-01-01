@@ -33,12 +33,47 @@ const TicketingSystem = ({ onBack }) => {
   const [cancelReason, setCancelReason] = useState('');
 
   // Filter tickets by module on frontend
-  const { tickets: allTickets, loading, refresh } = useTickets({
+  const { tickets: apiTickets, loading, refresh } = useTickets({
     status: statusFilter,
     type: typeFilter,
     priority: priorityFilter,
     searchTerm: searchTerm,
   });
+
+  // Generate demo data when API returns empty
+  const generateDemoTickets = () => {
+    const demoData = [
+      // STOX.AI - Inventory Actions
+      { ticket_id: 1001, source_module: "STOX.AI", ticket_type: "REORDER_TRIGGERED", title: "Reorder Triggered: SKU-4521", description: "Safety stock threshold reached for DC Atlanta. Auto-generated reorder for 500 units.", priority: "High", status: "Completed", user_name: "System", created_at: new Date(Date.now() - 2*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      { ticket_id: 1002, source_module: "STOX.AI", ticket_type: "SAFETY_STOCK_ADJUSTED", title: "Safety Stock Adjusted: Chicago DC", description: "Increased safety stock by 15% for seasonal demand pattern detected.", priority: "Medium", status: "Completed", user_name: "AI Agent", created_at: new Date(Date.now() - 5*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      { ticket_id: 1003, source_module: "STOX.AI", ticket_type: "REALLOCATION_EXECUTED", title: "Reallocation: Dallas → Houston", description: "Transferred 500 units to prevent stockout in Houston region.", priority: "High", status: "Completed", user_name: "System", created_at: new Date(Date.now() - 8*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      { ticket_id: 1004, source_module: "STOX.AI", ticket_type: "SHORTAGE_ALERT", title: "Shortage Alert: West Region", description: "Projected stockout in 5 days for high-velocity SKU-1156.", priority: "Critical", status: "Open", user_name: "AI Agent", created_at: new Date(Date.now() - 1*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      { ticket_id: 1005, source_module: "STOX.AI", ticket_type: "STORE_REPLENISHMENT", title: "Store Replenishment: Store #1842", description: "Auto-generated replenishment order for 12 SKUs based on sell-through.", priority: "Medium", status: "In Progress", user_name: "System", created_at: new Date(Date.now() - 3*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+
+      // MARGEN.AI - Financial Actions
+      { ticket_id: 1006, source_module: "MARGEN.AI", ticket_type: "MARGIN_ALERT", title: "Margin Alert: Premium Segment", description: "Gross margin dropped 3.2% vs last month for premium customer segment.", priority: "High", status: "Open", user_name: "AI Agent", created_at: new Date(Date.now() - 4*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      { ticket_id: 1007, source_module: "MARGEN.AI", ticket_type: "CLV_UPDATED", title: "CLV Recalculated: Enterprise Accounts", description: "Updated CLV for 45 enterprise customers based on Q4 transactions.", priority: "Medium", status: "Completed", user_name: "System", created_at: new Date(Date.now() - 12*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      { ticket_id: 1008, source_module: "MARGEN.AI", ticket_type: "CHURN_RISK", title: "Churn Risk: Acme Corp", description: "High churn probability (78%) detected for Acme Corp. Last order 45 days ago.", priority: "Critical", status: "In Progress", user_name: "Sarah Chen", created_at: new Date(Date.now() - 6*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+
+      // ORDLY.AI - Order Actions
+      { ticket_id: 1009, source_module: "ORDLY.AI", ticket_type: "ORDER_COMMITTED", title: "SAP Commit: PO-2025-4521", description: "Order committed to SAP with 98% match confidence. 45 line items processed.", priority: "Medium", status: "Completed", user_name: "System", created_at: new Date(Date.now() - 2*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      { ticket_id: 1010, source_module: "ORDLY.AI", ticket_type: "DEMAND_SIGNAL", title: "EDI 850 Processed: Walmart", description: "Processed 45 line items from EDI 850 demand signal.", priority: "High", status: "Completed", user_name: "AI Agent", created_at: new Date(Date.now() - 3*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      { ticket_id: 1011, source_module: "ORDLY.AI", ticket_type: "ARBITRATION", title: "Arbitration: Multi-DC Conflict", description: "Resolved allocation conflict for SKU-7789 across 3 DCs.", priority: "High", status: "In Progress", user_name: "System", created_at: new Date(Date.now() - 1*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      { ticket_id: 1012, source_module: "ORDLY.AI", ticket_type: "NETWORK_OPTIMIZED", title: "Network Optimization Complete", description: "Optimized fulfillment across 8 DCs. Estimated savings: $23K.", priority: "Medium", status: "Completed", user_name: "AI Agent", created_at: new Date(Date.now() - 10*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+
+      // AXIS.AI - Forecast Actions
+      { ticket_id: 1013, source_module: "AXIS.AI", ticket_type: "FORECAST_UPDATED", title: "Demand Forecast: Q1 2025", description: "ML model updated forecast with 94% accuracy. Demand up 12% vs prior.", priority: "Medium", status: "Completed", user_name: "System", created_at: new Date(Date.now() - 24*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      { ticket_id: 1014, source_module: "AXIS.AI", ticket_type: "BUDGET_ALERT", title: "Budget Variance Alert", description: "COGS exceeding budget by 4.2% in West region.", priority: "High", status: "Open", user_name: "AI Agent", created_at: new Date(Date.now() - 5*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+
+      // Enterprise Pulse - Agent Actions
+      { ticket_id: 1015, source_module: "Enterprise Pulse", ticket_type: "PULSE_AGENT_EXEC", title: "Agent: Customer Follow-up", description: "Automated follow-up email sent to 23 customers with pending quotes.", priority: "Medium", status: "Completed", user_name: "AI Agent", created_at: new Date(Date.now() - 7*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      { ticket_id: 1016, source_module: "Enterprise Pulse", ticket_type: "PULSE_ALERT", title: "Alert: Quote Expiring", description: "5 quotes expiring in next 48 hours. Total value: $145K.", priority: "High", status: "Open", user_name: "System", created_at: new Date(Date.now() - 2*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+    ];
+    return demoData;
+  };
+
+  // Use API data if available, otherwise use demo data
+  const allTickets = apiTickets.length > 0 ? apiTickets : generateDemoTickets();
 
   const tickets = moduleFilter === 'All'
     ? allTickets
@@ -101,14 +136,13 @@ const TicketingSystem = ({ onBack }) => {
         <Typography
           variant="body2"
           sx={{
-            fontFamily: 'monospace',
-            fontWeight: 700,
+            fontWeight: 600,
             color: '#2b88d8',
-            fontSize: '0.85rem',
+            fontSize: '0.8rem',
             cursor: 'pointer',
-            textDecoration: 'underline',
             '&:hover': {
               color: '#005a9e',
+              textDecoration: 'underline',
             }
           }}
           onClick={() => handleViewDetails(params.row)}
@@ -124,10 +158,11 @@ const TicketingSystem = ({ onBack }) => {
       flex: 0.8,
       renderCell: (params) => {
         const moduleColors = {
-          'MARGEN.AI': '#2b88d8',
-          'REVEQ.AI': '#9c27b0',
-          'Enterprise Pulse': '#ef4444',
           'STOX.AI': '#10b981',
+          'ORDLY.AI': '#0ea5e9',
+          'MARGEN.AI': '#8b5cf6',
+          'AXIS.AI': '#f59e0b',
+          'Enterprise Pulse': '#ef4444',
         };
         return (
           <Chip
@@ -150,34 +185,68 @@ const TicketingSystem = ({ onBack }) => {
       flex: 1.2,
       renderCell: (params) => {
         const typeColors = {
-          'STO_CREATION': '#2b88d8',
-          'FORECAST_OVERRIDE': '#0078d4',
-          'FINANCIAL_APPROVAL': '#f59e0b',
-          'SUPPLIER_ORDER': '#10b981',
-          'MARGEN_ANALYSIS': '#2b88d8',
-          'MARGEN_REPORT': '#0d47a1',
-          'REVEQ_MAINTENANCE': '#9c27b0',
-          'REVEQ_UTILIZATION': '#7b1fa2',
+          // STOX.AI
+          'REORDER_TRIGGERED': '#10b981',
+          'SAFETY_STOCK_ADJUSTED': '#059669',
+          'REALLOCATION_EXECUTED': '#10b981',
+          'SHORTAGE_ALERT': '#ef4444',
+          'WORKING_CAPITAL_OPT': '#10b981',
+          'MRP_PARAMETER_CHANGE': '#059669',
+          'STORE_REPLENISHMENT': '#10b981',
+          // ORDLY.AI
+          'ORDER_COMMITTED': '#0ea5e9',
+          'DEMAND_SIGNAL': '#0ea5e9',
+          'NETWORK_OPTIMIZED': '#0ea5e9',
+          'ARBITRATION': '#0891b2',
+          'PROMISE_UPDATE': '#0ea5e9',
+          // MARGEN.AI
+          'MARGIN_ALERT': '#ef4444',
+          'CLV_UPDATED': '#8b5cf6',
+          'SEGMENT_CHANGE': '#8b5cf6',
+          'CHURN_RISK': '#ef4444',
+          'REVENUE_FORECAST': '#8b5cf6',
+          // AXIS.AI
+          'FORECAST_UPDATED': '#f59e0b',
+          'SCENARIO_CREATED': '#f59e0b',
+          'BUDGET_ALERT': '#ef4444',
+          // Enterprise Pulse
           'PULSE_AGENT_EXEC': '#ef4444',
           'PULSE_ALERT': '#f97316',
           'PULSE_CONFIG': '#64748b',
         };
         const typeLabels = {
-          'STO_CREATION': 'STO/PR Creation',
-          'FORECAST_OVERRIDE': 'Forecast Override',
-          'FINANCIAL_APPROVAL': 'Financial Approval',
-          'SUPPLIER_ORDER': 'Supplier Order',
-          'MARGEN_ANALYSIS': 'MARGEN Analysis',
-          'MARGEN_REPORT': 'MARGEN Report',
-          'REVEQ_MAINTENANCE': 'REVEQ Maintenance',
-          'REVEQ_UTILIZATION': 'REVEQ Utilization',
-          'PULSE_AGENT_EXEC': 'Pulse Agent Execution',
+          // STOX.AI
+          'REORDER_TRIGGERED': 'Reorder Triggered',
+          'SAFETY_STOCK_ADJUSTED': 'Safety Stock Adjusted',
+          'REALLOCATION_EXECUTED': 'Reallocation',
+          'SHORTAGE_ALERT': 'Shortage Alert',
+          'WORKING_CAPITAL_OPT': 'WC Optimized',
+          'MRP_PARAMETER_CHANGE': 'MRP Changed',
+          'STORE_REPLENISHMENT': 'Store Replenishment',
+          // ORDLY.AI
+          'ORDER_COMMITTED': 'Order Committed',
+          'DEMAND_SIGNAL': 'Demand Signal',
+          'NETWORK_OPTIMIZED': 'Network Optimized',
+          'ARBITRATION': 'Arbitration',
+          'PROMISE_UPDATE': 'Promise Update',
+          // MARGEN.AI
+          'MARGIN_ALERT': 'Margin Alert',
+          'CLV_UPDATED': 'CLV Updated',
+          'SEGMENT_CHANGE': 'Segment Change',
+          'CHURN_RISK': 'Churn Risk',
+          'REVENUE_FORECAST': 'Revenue Forecast',
+          // AXIS.AI
+          'FORECAST_UPDATED': 'Forecast Updated',
+          'SCENARIO_CREATED': 'Scenario Created',
+          'BUDGET_ALERT': 'Budget Alert',
+          // Enterprise Pulse
+          'PULSE_AGENT_EXEC': 'Pulse Agent Exec',
           'PULSE_ALERT': 'Pulse Alert',
-          'PULSE_CONFIG': 'Pulse Configuration',
+          'PULSE_CONFIG': 'Pulse Config',
         };
         return (
           <Chip
-            label={typeLabels[params.value] || params.value}
+            label={typeLabels[params.value] || params.value?.replace(/_/g, ' ')}
             size="small"
             sx={{
               bgcolor: alpha(typeColors[params.value] || '#64748b', 0.1),
@@ -421,27 +490,39 @@ const TicketingSystem = ({ onBack }) => {
             <InputLabel>Module</InputLabel>
             <Select value={moduleFilter} onChange={(e) => setModuleFilter(e.target.value)} label="Module">
               <MenuItem value="All">All Modules</MenuItem>
-              <MenuItem value="MARGEN.AI">MARGEN.AI</MenuItem>
-              <MenuItem value="REVEQ.AI">REVEQ.AI</MenuItem>
-              <MenuItem value="Enterprise Pulse">Enterprise Pulse</MenuItem>
               <MenuItem value="STOX.AI">STOX.AI</MenuItem>
+              <MenuItem value="ORDLY.AI">ORDLY.AI</MenuItem>
+              <MenuItem value="MARGEN.AI">MARGEN.AI</MenuItem>
+              <MenuItem value="AXIS.AI">AXIS.AI</MenuItem>
+              <MenuItem value="Enterprise Pulse">Enterprise Pulse</MenuItem>
             </Select>
           </FormControl>
           <FormControl size="small" sx={{ minWidth: 150 }}>
             <InputLabel>Type</InputLabel>
             <Select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} label="Type">
               <MenuItem value="All">All Types</MenuItem>
-              <MenuItem value="MARGEN_ANALYSIS">MARGEN Analysis</MenuItem>
-              <MenuItem value="MARGEN_REPORT">MARGEN Report</MenuItem>
-              <MenuItem value="REVEQ_MAINTENANCE">REVEQ Maintenance</MenuItem>
-              <MenuItem value="REVEQ_UTILIZATION">REVEQ Utilization</MenuItem>
+              {/* STOX.AI */}
+              <MenuItem value="REORDER_TRIGGERED">Reorder Triggered</MenuItem>
+              <MenuItem value="SAFETY_STOCK_ADJUSTED">Safety Stock Adjusted</MenuItem>
+              <MenuItem value="REALLOCATION_EXECUTED">Reallocation</MenuItem>
+              <MenuItem value="SHORTAGE_ALERT">Shortage Alert</MenuItem>
+              <MenuItem value="STORE_REPLENISHMENT">Store Replenishment</MenuItem>
+              {/* ORDLY.AI */}
+              <MenuItem value="ORDER_COMMITTED">Order Committed</MenuItem>
+              <MenuItem value="DEMAND_SIGNAL">Demand Signal</MenuItem>
+              <MenuItem value="NETWORK_OPTIMIZED">Network Optimized</MenuItem>
+              <MenuItem value="ARBITRATION">Arbitration</MenuItem>
+              {/* MARGEN.AI */}
+              <MenuItem value="MARGIN_ALERT">Margin Alert</MenuItem>
+              <MenuItem value="CLV_UPDATED">CLV Updated</MenuItem>
+              <MenuItem value="SEGMENT_CHANGE">Segment Change</MenuItem>
+              <MenuItem value="CHURN_RISK">Churn Risk</MenuItem>
+              {/* AXIS.AI */}
+              <MenuItem value="FORECAST_UPDATED">Forecast Updated</MenuItem>
+              <MenuItem value="BUDGET_ALERT">Budget Alert</MenuItem>
+              {/* Enterprise Pulse */}
               <MenuItem value="PULSE_AGENT_EXEC">Pulse Agent Exec</MenuItem>
               <MenuItem value="PULSE_ALERT">Pulse Alert</MenuItem>
-              <MenuItem value="PULSE_CONFIG">Pulse Config</MenuItem>
-              <MenuItem value="STO_CREATION">STO Creation</MenuItem>
-              <MenuItem value="FORECAST_OVERRIDE">Forecast Override</MenuItem>
-              <MenuItem value="FINANCIAL_APPROVAL">Financial Approval</MenuItem>
-              <MenuItem value="SUPPLIER_ORDER">Supplier Order</MenuItem>
             </Select>
           </FormControl>
           <FormControl size="small" sx={{ minWidth: 130 }}>

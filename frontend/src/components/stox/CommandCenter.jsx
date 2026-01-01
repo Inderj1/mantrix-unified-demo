@@ -108,10 +108,64 @@ const initialMessages = [
   {
     id: 1,
     type: 'assistant',
-    text: "Welcome to STOX.AI Command Center. I can help you with inventory optimization, working capital analysis, and parameter tuning. What would you like to explore today?",
+    text: "Welcome to STOX.AI Command Center. I can help you with inventory optimization, working capital analysis, safety stock, MRP parameters, and supply chain management. What would you like to explore today?",
     timestamp: new Date().toISOString(),
   },
 ];
+
+// Inventory/Stock related keywords for domain validation
+const INVENTORY_KEYWORDS = [
+  // Core inventory terms
+  'inventory', 'stock', 'safety stock', 'reorder', 'warehouse', 'shortage',
+  'stockout', 'supply', 'lead time', 'vendor', 'supplier', 'lot size',
+  'working capital', 'wc', 'mrp', 'reallocation', 'inbound', 'obsolescence',
+  // Optimization terms
+  'optimization', 'optimizer', 'optimize', 'parameter', 'tuning', 'recommendation',
+  'forecast', 'demand', 'fill rate', 'service level', 'otif', 'cycle time',
+  // Financial terms in inventory context
+  'savings', 'opportunity', 'cost', 'carrying cost', 'dio', 'turns',
+  'excess', 'surplus', 'deficit', 'aging', 'clearance',
+  // Entities
+  'plant', 'sku', 'material', 'category', 'abc', 'xyz',
+  // General queries
+  'show', 'list', 'what', 'how', 'which', 'find', 'get', 'help',
+];
+
+// Non-inventory topics to reject
+const NON_INVENTORY_TOPICS = [
+  // Financial/Sales (AskMargen domain)
+  'revenue', 'sales trend', 'margin analysis', 'profit margin', 'customer segment',
+  'top customers', 'clv', 'rfm', 'champions', 'loyal customers',
+  // General off-topic
+  'weather', 'news', 'sports', 'entertainment', 'recipe', 'travel',
+  'personal', 'health', 'medical', 'politics', 'religion',
+];
+
+// Check if query is inventory/stock related
+const isInventoryQuestion = (query) => {
+  const queryLower = query.toLowerCase();
+
+  // Check for non-inventory topics
+  for (const topic of NON_INVENTORY_TOPICS) {
+    if (queryLower.includes(topic)) {
+      return {
+        valid: false,
+        message: "I'm STOX.AI, your inventory optimization assistant. I can help with stock levels, safety stock, MRP parameters, supplier lead times, and working capital analysis. For sales, revenue, and customer analytics, please use AskMargen in the AXIS.AI module."
+      };
+    }
+  }
+
+  // Check for inventory keywords
+  const hasInventoryContext = INVENTORY_KEYWORDS.some(keyword => queryLower.includes(keyword));
+
+  // Allow if has inventory context or is a short/greeting query
+  if (hasInventoryContext || query.trim().split(/\s+/).length <= 3) {
+    return { valid: true, message: '' };
+  }
+
+  // Default: be lenient but remind about scope
+  return { valid: true, message: '' };
+};
 
 const CommandCenter = ({ onBack, onTileClick }) => {
   const [exceptions, setExceptions] = useState([]);
@@ -157,22 +211,42 @@ const CommandCenter = ({ onBack, onTileClick }) => {
       timestamp: new Date().toISOString(),
     };
 
-    // Mock AI response
+    // Domain validation - check if query is inventory related
+    const domainCheck = isInventoryQuestion(chatInput);
+    if (!domainCheck.valid) {
+      const rejectionMessage = {
+        id: chatMessages.length + 2,
+        type: 'assistant',
+        text: domainCheck.message,
+        timestamp: new Date().toISOString(),
+      };
+      setChatMessages([...chatMessages, userMessage, rejectionMessage]);
+      setChatInput('');
+      return;
+    }
+
+    // Mock AI response for inventory-related queries
     const responses = {
       'wc': "Based on current analysis, you have $2.85M in working capital tied up in inventory. The largest opportunities are in excess stock ($320K) and safety stock optimization ($165K). Would you like me to show the Working Capital Baseline tile?",
       'savings': "I've identified $485K in potential WC savings across 12 recommendations. The top 3 opportunities are: 1) Excess stock liquidation ($120K), 2) Safety stock reduction ($95K), 3) Lot size optimization ($78K). Shall I take you to the Recommendations Hub?",
       'service': "Current service level is 96.2% against a 97.5% target. The gap is primarily in 3 SKUs with high demand variability. I recommend reviewing the MRP Parameter Optimizer to adjust safety stocks.",
-      'default': "I can help you with working capital analysis, inventory optimization, and exception management. Try asking about 'WC opportunities', 'savings potential', or 'service level status'.",
+      'stock': "I can help you analyze stock levels, safety stock optimization, and shortage predictions. Current alerts show 3 critical shortages and 5 materials at risk. Want to see the Shortage Detector?",
+      'supplier': "I have visibility into supplier performance and lead times. Currently tracking 12 vendors with an average OTIF of 94.2%. Would you like to review the Supply Lead Time tile?",
+      'default': "I can help you with working capital analysis, inventory optimization, safety stock, MRP parameters, and supplier performance. Try asking about 'WC opportunities', 'stock levels', 'supplier lead times', or 'service level status'.",
     };
 
     let responseText = responses.default;
     const lowerInput = chatInput.toLowerCase();
-    if (lowerInput.includes('wc') || lowerInput.includes('working capital') || lowerInput.includes('inventory')) {
+    if (lowerInput.includes('wc') || lowerInput.includes('working capital')) {
       responseText = responses.wc;
     } else if (lowerInput.includes('saving') || lowerInput.includes('opportunity') || lowerInput.includes('recommend')) {
       responseText = responses.savings;
     } else if (lowerInput.includes('service') || lowerInput.includes('stockout') || lowerInput.includes('fill')) {
       responseText = responses.service;
+    } else if (lowerInput.includes('stock') || lowerInput.includes('inventory') || lowerInput.includes('shortage')) {
+      responseText = responses.stock;
+    } else if (lowerInput.includes('supplier') || lowerInput.includes('vendor') || lowerInput.includes('lead time')) {
+      responseText = responses.supplier;
     }
 
     const assistantMessage = {

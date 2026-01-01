@@ -45,6 +45,7 @@ import {
   getStatusColor,
   getCategoryColor,
   getSourceLabel,
+  getSourceColor,
   TICKET_STATUS,
   TICKET_PRIORITY,
   TICKET_CATEGORIES,
@@ -195,14 +196,19 @@ const CommandTowerView = ({ onBack, onCreateTicket, darkMode = false }) => {
     {
       field: 'source',
       headerName: 'Source',
-      width: 100,
+      width: 110,
       renderCell: (params) => (
         <Chip
           label={getSourceLabel(params.value)}
           size="small"
-          variant="outlined"
-          color={params.value === TICKET_SOURCES.AGENT_AUTOMATED ? 'secondary' : 'default'}
-          sx={{ height: 20, fontSize: '0.65rem' }}
+          sx={{
+            height: 22,
+            fontSize: '0.65rem',
+            fontWeight: 600,
+            bgcolor: alpha(getSourceColor(params.value), 0.15),
+            color: getSourceColor(params.value),
+            border: `1px solid ${alpha(getSourceColor(params.value), 0.3)}`,
+          }}
         />
       ),
     },
@@ -359,8 +365,10 @@ const CommandTowerView = ({ onBack, onCreateTicket, darkMode = false }) => {
           <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha(colors.warning, 0.2), bgcolor: alpha(colors.warning, 0.03) }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
-                <Typography variant="caption" color="text.secondary">From Agents</Typography>
-                <Typography variant="h4" fontWeight={700} color="warning.main">{stats.bySource.agent_automated}</Typography>
+                <Typography variant="caption" color="text.secondary">From AI Modules</Typography>
+                <Typography variant="h4" fontWeight={700} color="warning.main">
+                  {(stats.bySource.stox_ai || 0) + (stats.bySource.ordly_ai || 0) + (stats.bySource.margen_ai || 0) + (stats.bySource.axis_ai || 0)}
+                </Typography>
               </Box>
               <SmartToyIcon sx={{ color: colors.warning, fontSize: 28 }} />
             </Box>
@@ -429,9 +437,14 @@ const CommandTowerView = ({ onBack, onCreateTicket, darkMode = false }) => {
                 <InputLabel>Category</InputLabel>
                 <Select value={categoryFilter} label="Category" onChange={(e) => setCategoryFilter(e.target.value)}>
                   <MenuItem value="all">All Categories</MenuItem>
+                  <MenuItem value={TICKET_CATEGORIES.INVENTORY}>Inventory</MenuItem>
+                  <MenuItem value={TICKET_CATEGORIES.ORDER}>Order</MenuItem>
+                  <MenuItem value={TICKET_CATEGORIES.FINANCIAL}>Financial</MenuItem>
+                  <MenuItem value={TICKET_CATEGORIES.FORECAST}>Forecast</MenuItem>
+                  <MenuItem value={TICKET_CATEGORIES.SUPPLY_CHAIN}>Supply Chain</MenuItem>
+                  <MenuItem value={TICKET_CATEGORIES.AI_QUERY}>AI Query</MenuItem>
                   <MenuItem value={TICKET_CATEGORIES.PRICING}>Pricing</MenuItem>
                   <MenuItem value={TICKET_CATEGORIES.CUSTOMER}>Customer</MenuItem>
-                  <MenuItem value={TICKET_CATEGORIES.ML_MODEL}>ML Model</MenuItem>
                   <MenuItem value={TICKET_CATEGORIES.OPERATIONS}>Operations</MenuItem>
                   <MenuItem value={TICKET_CATEGORIES.QUOTE}>Quote</MenuItem>
                 </Select>
@@ -442,6 +455,12 @@ const CommandTowerView = ({ onBack, onCreateTicket, darkMode = false }) => {
                 <InputLabel>Source</InputLabel>
                 <Select value={sourceFilter} label="Source" onChange={(e) => setSourceFilter(e.target.value)}>
                   <MenuItem value="all">All Sources</MenuItem>
+                  <MenuItem value={TICKET_SOURCES.STOX_AI}>STOX.AI</MenuItem>
+                  <MenuItem value={TICKET_SOURCES.ORDLY_AI}>ORDLY.AI</MenuItem>
+                  <MenuItem value={TICKET_SOURCES.MARGEN_AI}>MARGEN.AI</MenuItem>
+                  <MenuItem value={TICKET_SOURCES.AXIS_AI}>AXIS.AI</MenuItem>
+                  <MenuItem value={TICKET_SOURCES.PROCESS_AI}>PROCESS.AI</MenuItem>
+                  <MenuItem value={TICKET_SOURCES.EMAIL_INTEL}>EMAIL INTEL</MenuItem>
                   <MenuItem value={TICKET_SOURCES.ALERT_ACTION}>ML Alert</MenuItem>
                   <MenuItem value={TICKET_SOURCES.AGENT_AUTOMATED}>Agent Automated</MenuItem>
                   <MenuItem value={TICKET_SOURCES.MANUAL_ENTRY}>Manual Entry</MenuItem>

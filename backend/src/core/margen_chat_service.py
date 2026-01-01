@@ -2,19 +2,90 @@
 MargenAI Chat Service - Natural language interface for margin analytics
 """
 from typing import Dict, Any, List, Optional
+import re
 import structlog
 from .postgresql_sql_generator import PostgreSQLGenerator
 
 logger = structlog.get_logger()
 
+# Financial/CFO-related keywords for domain validation
+FINANCIAL_KEYWORDS = {
+    # Core financial terms
+    'revenue', 'sales', 'margin', 'profit', 'cost', 'price', 'pricing',
+    'gross', 'net', 'income', 'expense', 'budget', 'forecast',
+    # Analytics terms
+    'top', 'bottom', 'trend', 'growth', 'decline', 'compare', 'comparison',
+    'average', 'total', 'sum', 'count', 'percentage', 'ratio',
+    # Business entities
+    'customer', 'product', 'segment', 'region', 'category', 'brand',
+    'distributor', 'payer', 'material', 'sku',
+    # Time-based
+    'monthly', 'quarterly', 'yearly', 'annual', 'ytd', 'mtd', 'yoy',
+    # CFO specific
+    'clv', 'lifetime', 'value', 'performance', 'kpi', 'metric',
+    'rfm', 'champions', 'loyal', 'at risk',
+    # General queries
+    'show', 'list', 'what', 'how', 'which', 'who', 'find', 'get',
+}
+
+# Non-financial topics to reject
+NON_FINANCIAL_TOPICS = {
+    # Inventory/Stock (STOX.AI domain)
+    'inventory', 'stock', 'safety stock', 'reorder', 'warehouse', 'shortage',
+    'stockout', 'supply chain', 'lead time', 'vendor', 'supplier', 'lot size',
+    'working capital', 'mrp', 'reallocation', 'inbound', 'obsolescence',
+    # General off-topic
+    'weather', 'news', 'sports', 'entertainment', 'recipe', 'travel',
+    'personal', 'health', 'medical', 'politics', 'religion',
+}
+
 
 class MargenChatService:
     """Service for processing natural language queries about margin data"""
-    
+
     def __init__(self):
         # Use PostgreSQL SQL generator for MargenAI queries (using mantrix_nexxt database)
         self.sql_generator = PostgreSQLGenerator(database="mantrix_nexxt")
         self.example_queries = self._get_example_queries()
+
+    def _is_financial_question(self, query: str) -> tuple[bool, str]:
+        """
+        Check if the query is related to financial/CFO topics.
+        Returns (is_valid, rejection_message)
+        """
+        query_lower = query.lower()
+        words = set(re.findall(r'\b\w+\b', query_lower))
+
+        # Check for explicitly non-financial topics
+        for topic in NON_FINANCIAL_TOPICS:
+            if topic in query_lower:
+                # Special case: "working capital" is inventory/STOX domain
+                if 'working capital' in query_lower or 'inventory' in query_lower or 'stock' in query_lower:
+                    return False, (
+                        "I specialize in financial analytics like revenue, margins, and customer analysis. "
+                        "For inventory, stock, and working capital questions, please use the STOX.AI assistant "
+                        "in the Command Center tile."
+                    )
+                return False, (
+                    "I'm AskMargen, your CFO analytics assistant. I can help with financial questions about "
+                    "revenue, margins, customers, products, and business performance. "
+                    "Please rephrase your question to focus on financial analytics."
+                )
+
+        # Check if query contains any financial keywords
+        has_financial_context = bool(words.intersection(FINANCIAL_KEYWORDS))
+
+        # Allow queries that have financial context OR are simple data queries
+        if has_financial_context:
+            return True, ""
+
+        # For very short queries or greetings, be lenient
+        if len(words) <= 3:
+            return True, ""
+
+        # Default: assume it might be a valid financial query if we can't determine
+        # Let the SQL generator handle it - it will fail naturally if invalid
+        return True, ""
     
     def _get_example_queries(self) -> List[Dict[str, str]]:
         """Get example queries for the chat interface - now with full transaction data"""
@@ -72,15 +143,31 @@ class MargenChatService:
         ]
     
     def process_chat_query(
-        self, 
+        self,
         query: str,
         conversation_context: Optional[List[Dict]] = None
     ) -> Dict[str, Any]:
         """Process a natural language query and return results with explanation"""
-        
+
         logger.info(f"Processing MargenAI chat query: {query}")
-        
+
         try:
+            # Domain validation - ensure query is financial/CFO related
+            is_valid, rejection_message = self._is_financial_question(query)
+            if not is_valid:
+                logger.info(f"Query rejected - not financial domain: {query}")
+                return {
+                    "success": False,
+                    "domain_rejected": True,
+                    "message": rejection_message,
+                    "suggestions": [
+                        "What is the total revenue for 2024?",
+                        "Show me top 10 customers by margin",
+                        "What are the sales trends by month?",
+                        "Which products have the highest profit margin?"
+                    ]
+                }
+
             # Add context about the domain
             enhanced_query = self._enhance_query_with_context(query)
             
