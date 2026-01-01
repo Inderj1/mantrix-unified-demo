@@ -65,16 +65,19 @@ const SellInForecast = ({ onBack }) => {
 
   // Helper function to generate data based on granularity
   const generateDataByGranularity = (granularity) => {
+    // Arizona Beverages Products
     const products = [
-      { sku: 'SKU-7891', name: 'Madison Reed Premium Color Kit' },
-      { sku: 'SKU-4523', name: 'Color Reviving Gloss' },
-      { sku: 'SKU-9021', name: 'Root Retouch Kit' },
+      { sku: 'AZ-GT-001', name: 'AZ GREEN TEA $1 24PK 20OZ TALLBOY' },
+      { sku: 'AZ-AP-001', name: 'AZ ARNOLD PALMER BLACK 4PK GALLON PECO' },
+      { sku: 'AZ-LT-001', name: 'AZ LEMON TEA NP 24PK 22OZ CAN' },
     ];
 
+    // Arizona Beverages Customers (from BigQuery)
     const customers = [
-      { id: 'CUST-TARGET-001', name: 'Target Corporation' },
-      { id: 'CUST-AMAZON-001', name: 'Amazon' },
+      { id: 'CUST-COSTCO-001', name: 'COSTCO DEPOT TRACY' },
+      { id: 'CUST-AMAZON-001', name: 'AMAZON - CMH2' },
       { id: 'CUST-WALMART-001', name: 'Walmart' },
+      { id: 'CUST-PUBLIX-001', name: 'PUBLIX JACKSONVILLE WAREHOUSE' },
     ];
 
     const data = [];

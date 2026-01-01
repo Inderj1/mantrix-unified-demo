@@ -263,17 +263,18 @@ export const useTrendsInsights = (monthsBack = 12) => {
 export const useProductOverview = (limit = 100, offset = 0) => {
   return useMargenData(['product-overview', limit, offset], () => {
     const products = [];
+    // Arizona Beverages Products
     const productBases = [
-      'Premium Hair Color Kit',
-      'Root Touch-Up Spray',
-      'Intensive Hair Mask',
-      'Volumizing Shampoo',
-      'Color Protecting Conditioner',
-      'Heat Styling Spray',
-      'Hair Repair Serum',
-      'Scalp Treatment',
-      'Leave-In Conditioner',
-      'Detangling Spray',
+      'AZ GREEN TEA $1 24PK 20OZ TALLBOY',
+      'AZ ARNOLD PALMER BLACK 4PK GALLON PECO',
+      'AZ LEMON TEA NP 24PK 22OZ CAN',
+      'AZ MUCHO MANGO 4PK GALLON',
+      'AZ FRUIT PUNCH 12PK 11OZ CAN SUITCS PECO',
+      'AZ HALF & HALF NP 24PK 20OZ TALLBOY',
+      'AZ WATERMELON $1 24PK 20OZ TALLBOY',
+      'AZ SWEET TEA 4PK GALLON PECO',
+      'AZ HARD VARIETY 2-12PK 12OZ CAN',
+      'AZ GRAPEADE 99C 24PK 22OZ CAN',
     ];
 
     for (let i = 0; i < Math.min(limit, 100); i++) {
@@ -342,9 +343,10 @@ export const useMargenSummary = () => {
 export const useRevenueGrowth = () => {
   return useMargenData('revenue-growth', () => {
     const data = [];
-    const products = ['Premium Hair Color', 'Root Touch-Up', 'Hair Mask', 'Shampoo', 'Conditioner'];
-    const channels = ['Retail Stores', 'E-Commerce', 'Wholesale', 'D2C'];
-    const regions = ['East', 'West', 'Central', 'South'];
+    // Arizona Beverages Products
+    const products = ['AZ Green Tea', 'AZ Arnold Palmer', 'AZ Lemon Tea', 'AZ Mucho Mango', 'AZ Fruit Punch'];
+    const channels = ['Convenience Stores', 'Club Stores', 'Grocery Chains', 'E-commerce'];
+    const regions = ['Northeast', 'West', 'Central', 'Southeast'];
 
     // Generate 50 rows of revenue data
     for (let i = 0; i < 50; i++) {
@@ -431,15 +433,16 @@ export const useCostCOGS = () => {
 export const useMarginProfitability = () => {
   return useMargenData('margin-profitability', () => {
     const data = [];
+    // Arizona Beverages Products and Segments
     const items = [
-      { type: 'Product', name: 'Premium Hair Color Kit' },
-      { type: 'Product', name: 'Root Touch-Up Spray' },
-      { type: 'Product', name: 'Intensive Hair Mask' },
-      { type: 'Product', name: 'Volumizing Shampoo' },
-      { type: 'Segment', name: 'Champions' },
-      { type: 'Segment', name: 'Loyal Customers' },
-      { type: 'Segment', name: 'Potential Loyalists' },
-      { type: 'Segment', name: 'Recent Customers' },
+      { type: 'Product', name: 'AZ GREEN TEA $1 24PK 20OZ TALLBOY' },
+      { type: 'Product', name: 'AZ ARNOLD PALMER BLACK 4PK GALLON PECO' },
+      { type: 'Product', name: 'AZ LEMON TEA NP 24PK 22OZ CAN' },
+      { type: 'Product', name: 'AZ MUCHO MANGO 4PK GALLON' },
+      { type: 'Segment', name: 'Convenience Stores' },
+      { type: 'Segment', name: 'Club Stores' },
+      { type: 'Segment', name: 'Grocery Chains' },
+      { type: 'Segment', name: 'E-commerce' },
     ];
 
     items.forEach((item, idx) => {
@@ -482,12 +485,12 @@ export const usePLGLData = () => {
   return useMargenData('pl-gl-data', () => {
     const data = [];
 
-    // Revenue accounts (4000-4999)
+    // Revenue accounts (4000-4999) - Arizona Beverages
     const revenueAccounts = [
-      { account: '4100-01', name: 'Product Sales - Hair Color', category: 'Revenue', subcategory: 'Product Revenue', amount: 12500000 },
-      { account: '4100-02', name: 'Product Sales - Hair Care', category: 'Revenue', subcategory: 'Product Revenue', amount: 8900000 },
-      { account: '4200-01', name: 'Service Revenue', category: 'Revenue', subcategory: 'Service Revenue', amount: 2100000 },
-      { account: '4300-01', name: 'Other Income', category: 'Revenue', subcategory: 'Other', amount: 450000 },
+      { account: '4100-01', name: 'Product Sales - Ready-to-Drink Tea', category: 'Revenue', subcategory: 'Product Revenue', amount: 18500000 },
+      { account: '4100-02', name: 'Product Sales - Fruit Beverages', category: 'Revenue', subcategory: 'Product Revenue', amount: 12900000 },
+      { account: '4200-01', name: 'Co-Packing Revenue', category: 'Revenue', subcategory: 'Service Revenue', amount: 3100000 },
+      { account: '4300-01', name: 'Other Income', category: 'Revenue', subcategory: 'Other', amount: 650000 },
     ];
 
     // COGS accounts (5000-5999)

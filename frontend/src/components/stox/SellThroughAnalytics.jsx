@@ -70,16 +70,19 @@ const SellThroughAnalytics = ({ onBack }) => {
 
   // Helper function to generate data based on granularity
   const generateDataByGranularity = (granularity) => {
+    // Arizona Beverages Products
     const products = [
-      { sku: 'SKU-7891', name: 'Madison Reed Premium Color Kit' },
-      { sku: 'SKU-4523', name: 'Color Reviving Gloss' },
-      { sku: 'SKU-9021', name: 'Root Retouch Kit' },
+      { sku: 'AZ-GT-001', name: 'AZ GREEN TEA $1 24PK 20OZ TALLBOY' },
+      { sku: 'AZ-AP-001', name: 'AZ ARNOLD PALMER BLACK 4PK GALLON PECO' },
+      { sku: 'AZ-LT-001', name: 'AZ LEMON TEA NP 24PK 22OZ CAN' },
     ];
 
+    // Arizona Beverages Distribution Partners
     const partners = [
-      { name: 'Target', location: 'Target DC - Minneapolis', leadTime: 5, targetSL: 95 },
-      { name: 'Amazon', location: 'Amazon FC - Phoenix', leadTime: 3, targetSL: 98 },
+      { name: 'Costco', location: 'COSTCO DEPOT TRACY', leadTime: 5, targetSL: 95 },
+      { name: 'Amazon', location: 'AMAZON - CMH2', leadTime: 3, targetSL: 98 },
       { name: 'Walmart', location: 'Walmart DC - Bentonville', leadTime: 4, targetSL: 95 },
+      { name: 'Publix', location: 'PUBLIX JACKSONVILLE WAREHOUSE', leadTime: 4, targetSL: 96 },
     ];
 
     const data = [];

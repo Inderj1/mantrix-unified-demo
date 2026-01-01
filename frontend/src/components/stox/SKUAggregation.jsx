@@ -67,12 +67,13 @@ const SKUAggregation = ({ onBack }) => {
 
   // Helper function to generate data based on granularity (Weekly/Monthly only - Daily doesn't make sense for aggregation)
   const generateDataByGranularity = (granularity) => {
+    // Arizona Beverages Products
     const products = [
-      { sku: 'SKU-7891', name: 'Madison Reed Premium Color Kit' },
-      { sku: 'SKU-4523', name: 'Color Reviving Gloss' },
-      { sku: 'SKU-9021', name: 'Root Retouch Kit' },
-      { sku: 'SKU-3312', name: 'Shine Therapy Conditioner' },
-      { sku: 'SKU-5641', name: 'Volume Boost Shampoo' },
+      { sku: 'AZ-GT-001', name: 'AZ GREEN TEA $1 24PK 20OZ TALLBOY' },
+      { sku: 'AZ-AP-001', name: 'AZ ARNOLD PALMER BLACK 4PK GALLON PECO' },
+      { sku: 'AZ-LT-001', name: 'AZ LEMON TEA NP 24PK 22OZ CAN' },
+      { sku: 'AZ-MM-001', name: 'AZ MUCHO MANGO 4PK GALLON' },
+      { sku: 'AZ-FP-001', name: 'AZ FRUIT PUNCH 12PK 11OZ CAN SUITCS PECO' },
     ];
 
     const data = [];

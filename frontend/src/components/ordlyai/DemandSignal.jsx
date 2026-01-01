@@ -43,14 +43,14 @@ const SUCCESS_GREEN = '#059669';
 const WARNING_AMBER = '#d97706';
 const CYAN = '#22d3ee';
 
-// Mock data for demand signals
+// Mock data for demand signals - Arizona Beverages
 const mockDemandSignals = [
   {
     id: 'EDI-850-78432',
     customer: 'Walmart Distribution',
-    material: 'SKU-7742 Energy Drink 12-Pack',
+    material: 'AZ GREEN TEA $1 24PK 20OZ TALLBOY',
     quantity: 15000,
-    orderValue: 247500,
+    orderValue: 374850,
     classification: 'PROMO',
     confidence: 91,
     pOnTime: 72,
@@ -62,7 +62,7 @@ const mockDemandSignals = [
     extractedFields: {
       customer: { value: 'Walmart #4521', confidence: 98 },
       shipTo: { value: 'Bentonville DC-7', confidence: 96 },
-      material: { value: 'SKU-7742', confidence: 99 },
+      material: { value: 'AZ-GT-001', confidence: 99 },
       quantity: { value: '15,000 CS', confidence: 97 },
       requestedDate: { value: 'Jan 18, 2025', confidence: 82 },
       mabd: { value: 'Jan 20, 2025', confidence: 94 },
@@ -80,11 +80,11 @@ const mockDemandSignals = [
     ],
   },
   {
-    id: 'PO-KRG-991204',
-    customer: 'Kroger Central',
-    material: 'Sparkling Water 24-Pack',
+    id: 'PO-COSTCO-991204',
+    customer: 'COSTCO DEPOT TRACY',
+    material: 'AZ ARNOLD PALMER BLACK 4PK GALLON PECO',
     quantity: 8000,
-    orderValue: 156000,
+    orderValue: 159920,
     classification: 'PANIC BUY',
     confidence: 87,
     pOnTime: 65,
@@ -94,9 +94,9 @@ const mockDemandSignals = [
     mabd: 'Jan 17, 2025',
     penaltyExposure: 120000,
     extractedFields: {
-      customer: { value: 'Kroger #8821', confidence: 96 },
-      shipTo: { value: 'Cincinnati DC-3', confidence: 94 },
-      material: { value: 'SKU-4421', confidence: 98 },
+      customer: { value: 'COSTCO #4221', confidence: 96 },
+      shipTo: { value: 'Tracy DC-3', confidence: 94 },
+      material: { value: 'AZ-AP-001', confidence: 98 },
       quantity: { value: '8,000 CS', confidence: 95 },
       requestedDate: { value: 'Jan 16, 2025', confidence: 78 },
       mabd: { value: 'Jan 17, 2025', confidence: 92 },
@@ -113,10 +113,10 @@ const mockDemandSignals = [
   },
   {
     id: 'EDI-850-78429',
-    customer: 'Target Southwest',
-    material: 'Sports Drink Variety',
+    customer: 'PUBLIX JACKSONVILLE WAREHOUSE',
+    material: 'AZ LEMON TEA NP 24PK 22OZ CAN',
     quantity: 4200,
-    orderValue: 98000,
+    orderValue: 96558,
     classification: 'NORMAL',
     confidence: 94,
     pOnTime: 88,
@@ -126,9 +126,9 @@ const mockDemandSignals = [
     mabd: 'Jan 24, 2025',
     penaltyExposure: 63000,
     extractedFields: {
-      customer: { value: 'Target #2341', confidence: 99 },
-      shipTo: { value: 'Phoenix DC-2', confidence: 97 },
-      material: { value: 'SKU-3312', confidence: 98 },
+      customer: { value: 'PUBLIX #2341', confidence: 99 },
+      shipTo: { value: 'Jacksonville DC-2', confidence: 97 },
+      material: { value: 'AZ-LT-001', confidence: 98 },
       quantity: { value: '4,200 CS', confidence: 99 },
       requestedDate: { value: 'Jan 22, 2025', confidence: 95 },
       mabd: { value: 'Jan 24, 2025', confidence: 96 },
@@ -143,13 +143,44 @@ const mockDemandSignals = [
       { so: 'SO-765432', date: 'Nov 2024', qty: '4.5K CS', match: 92 },
     ],
   },
+  {
+    id: 'EDI-850-78435',
+    customer: 'AMAZON - CMH2',
+    material: 'AZ MUCHO MANGO 4PK GALLON',
+    quantity: 6500,
+    orderValue: 129935,
+    classification: 'NORMAL',
+    confidence: 96,
+    pOnTime: 92,
+    slaRemaining: '8h 30m',
+    receivedAgo: '15 min ago',
+    requestedDate: 'Jan 25, 2025',
+    mabd: 'Jan 28, 2025',
+    penaltyExposure: 45000,
+    extractedFields: {
+      customer: { value: 'AMAZON CMH2', confidence: 99 },
+      shipTo: { value: 'Columbus FC', confidence: 98 },
+      material: { value: 'AZ-MM-001', confidence: 99 },
+      quantity: { value: '6,500 CS', confidence: 98 },
+      requestedDate: { value: 'Jan 25, 2025', confidence: 97 },
+      mabd: { value: 'Jan 28, 2025', confidence: 98 },
+    },
+    hiddenConstraints: [
+      { icon: 'pallet', text: 'Amazon Vendor Flex Requirements' },
+    ],
+    volatilityFingerprint: { normal: 90, promo: 5, panic: 2, eoq: 3 },
+    historyInsight: 'E-commerce fulfillment order. Amazon typically has consistent demand patterns.',
+    similarOrders: [
+      { so: 'SO-780112', date: 'Dec 2024', qty: '6K CS', match: 94 },
+    ],
+  },
 ];
 
 // AI Chat messages
 const initialChatMessages = [
   {
     type: 'ai',
-    text: "I've analyzed EDI-850-78432 from Walmart. This is a **PROMO order** for 15,000 cases of SKU-7742 Energy Drink, 3.2x their normal order volume.",
+    text: "I've analyzed EDI-850-78432 from Walmart. This is a **PROMO order** for 15,000 cases of AZ Green Tea 24-Pack, 3.2x their normal order volume.",
   },
 ];
 

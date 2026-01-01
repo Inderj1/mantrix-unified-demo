@@ -65,17 +65,19 @@ const DemandWorkbench = ({ onBack }) => {
 
   // Helper function to generate data based on granularity
   const generateDataByGranularity = (granularity) => {
+    // Arizona Beverages Products
     const products = [
-      { sku: 'SKU-7891', name: 'Madison Reed Premium Color Kit', family: 'Hair Color' },
-      { sku: 'SKU-4523', name: 'Color Reviving Gloss', family: 'Hair Care' },
-      { sku: 'SKU-9021', name: 'Root Retouch Kit', family: 'Hair Color' },
+      { sku: 'AZ-GT-001', name: 'AZ GREEN TEA $1 24PK 20OZ TALLBOY', family: 'Ready-to-Drink Tea' },
+      { sku: 'AZ-AP-001', name: 'AZ ARNOLD PALMER BLACK 4PK GALLON PECO', family: 'Ready-to-Drink Tea' },
+      { sku: 'AZ-LT-001', name: 'AZ LEMON TEA NP 24PK 22OZ CAN', family: 'Ready-to-Drink Tea' },
     ];
 
+    // Arizona Beverages Distribution Locations
     const locations = [
-      { id: 'NYC-001', store_id: 'STORE_001', channel: 'STORE' },
-      { id: 'ONLINE', store_id: 'WEB_MAIN', channel: 'ONLINE' },
-      { id: 'TARGET-DC', store_id: 'B2B_TARGET', channel: 'B2B' },
-      { id: 'LA-045', store_id: 'STORE_045', channel: 'STORE' },
+      { id: 'COSTCO-TRACY', store_id: 'COSTCO_DEPOT_TRACY', channel: 'CLUB' },
+      { id: 'AMAZON-CMH2', store_id: 'AMAZON_CMH2', channel: 'ECOMMERCE' },
+      { id: 'WALMART-DC', store_id: 'B2B_WALMART', channel: 'B2B' },
+      { id: 'PUBLIX-JAX', store_id: 'PUBLIX_JACKSONVILLE', channel: 'GROCERY' },
     ];
 
     const data = [];
