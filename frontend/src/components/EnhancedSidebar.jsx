@@ -168,7 +168,7 @@ const EnhancedSidebar = ({
               <Box
                 component="img"
                 src="/mantra9.png"
-                alt="Mantra9"
+                alt="CloudMantra"
                 sx={{
                   height: 40,
                   width: 'auto',

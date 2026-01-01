@@ -1741,11 +1741,11 @@ function AuthenticatedApp() {
           animation: 'fadeInUp 0.6s ease-out',
         }}>
           {/* Logo */}
-          <Box sx={{ textAlign: 'center', mb: 3 }}>
-            <img 
-              src="/mantra9.png" 
-              alt="Cloud Mantra" 
-              style={{ height: 60, objectFit: 'contain' }}
+          <Box sx={{ textAlign: 'center', mb: 2 }}>
+            <img
+              src="/drinkaz.png"
+              alt="Drinkaz"
+              style={{ height: 140, objectFit: 'contain', margin: '-20px 0' }}
             />
           </Box>
             
@@ -1830,15 +1830,39 @@ function AuthenticatedApp() {
               By signing in, you agree to our Terms of Service and Privacy Policy
             </Typography>
             
-            <Typography sx={{ 
+            <Typography sx={{
               fontSize: '0.7rem',
               color: '#cbd5e1',
               fontFamily: 'Poppins, sans-serif',
               textAlign: 'center',
               mt: 2,
             }}>
-              © 2024 Cloud Mantra, Inc. All rights reserved.
+              © 2024 Arizona. All rights reserved.
             </Typography>
+
+            {/* Powered by CloudMantra */}
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 1,
+              mt: 3,
+              pt: 2,
+              borderTop: '1px solid rgba(0, 0, 0, 0.06)',
+            }}>
+              <Typography sx={{
+                fontSize: '0.7rem',
+                color: '#94a3b8',
+                fontFamily: 'Poppins, sans-serif',
+              }}>
+                Powered by
+              </Typography>
+              <img
+                src="/mantra9.png"
+                alt="CloudMantra"
+                style={{ height: 32, objectFit: 'contain' }}
+              />
+            </Box>
           </Box>
         </Paper>
       </Box>
