@@ -1,35 +1,38 @@
 /**
- * Working Capital Baseline Mock Data
+ * Working Capital Baseline Mock Data - Lam Research
  * Provides comprehensive mock datasets for WC decomposition analysis
+ *
+ * Uses actual Lam Research plant and material data for consistency
  */
 
-// Plants data
-export const plants = [
-  { id: 'PLANT-001', name: 'Chicago Distribution', region: 'Midwest' },
-  { id: 'PLANT-002', name: 'Dallas Hub', region: 'South' },
-  { id: 'PLANT-003', name: 'Newark Warehouse', region: 'East' },
-  { id: 'PLANT-004', name: 'Phoenix Center', region: 'West' },
-];
+import { LAM_PLANTS, LAM_MATERIALS, LAM_MATERIAL_PLANT_DATA, getMaterialById } from '../../../data/arizonaBeveragesMasterData';
 
-// SKUs with unit costs and margins
-export const skus = [
-  { id: 'SKU-10001', name: 'Premium Hair Color - Blonde', category: 'Hair Color', unitCost: 12.50, grossMargin: 18.75, dailyDemand: 45 },
-  { id: 'SKU-10002', name: 'Premium Hair Color - Brunette', category: 'Hair Color', unitCost: 12.50, grossMargin: 18.75, dailyDemand: 62 },
-  { id: 'SKU-10003', name: 'Premium Hair Color - Black', category: 'Hair Color', unitCost: 12.50, grossMargin: 18.75, dailyDemand: 38 },
-  { id: 'SKU-10004', name: 'Root Touch-Up Spray', category: 'Touch-Up', unitCost: 8.00, grossMargin: 14.00, dailyDemand: 85 },
-  { id: 'SKU-10005', name: 'Intensive Hair Mask', category: 'Treatment', unitCost: 15.00, grossMargin: 22.00, dailyDemand: 28 },
-  { id: 'SKU-10006', name: 'Color Protect Shampoo', category: 'Shampoo', unitCost: 6.50, grossMargin: 11.50, dailyDemand: 120 },
-  { id: 'SKU-10007', name: 'Color Protect Conditioner', category: 'Conditioner', unitCost: 7.00, grossMargin: 12.00, dailyDemand: 95 },
-  { id: 'SKU-10008', name: 'Styling Gel - Strong Hold', category: 'Styling', unitCost: 5.50, grossMargin: 9.50, dailyDemand: 55 },
-];
+// Re-export plants and materials for backward compatibility
+export const plants = LAM_PLANTS.map(p => ({
+  id: p.id,
+  name: p.name,
+  region: p.region,
+  grossMarginPct: p.grossMarginPct,
+  carryingCostPct: p.carryingCostPct,
+}));
+
+export const skus = LAM_MATERIALS.map(m => ({
+  id: m.id,
+  name: m.name,
+  category: m.materialGroup,
+  type: m.type,
+  unitCost: m.basePrice,
+  grossMargin: m.basePrice * 0.38, // 38% typical gross margin
+}));
 
 /**
  * Generate Working Capital Baseline data for all SKU × Plant combinations
+ * Uses actual LAM_MATERIAL_PLANT_DATA for realistic values
  *
  * Key Formulas:
  * - Cycle Stock = Lot Size / 2 (average during replenishment cycle)
  * - Safety Stock = z × σ × √LT (service level factor × demand std × sqrt lead time)
- * - Pipeline Stock = Lead Time × Daily Demand
+ * - Pipeline Stock = Lead Time × Daily Demand (in-transit inventory)
  * - Excess Stock = On-Hand - (Cycle + Safety + Pipeline) when positive
  *
  * - WCP (Working Capital Productivity) = Annual Gross Margin $ / Average WC
@@ -39,127 +42,125 @@ export const generateWorkingCapitalData = () => {
   const data = [];
   let idCounter = 1;
 
-  plants.forEach((plant) => {
-    skus.forEach((sku) => {
-      // Variability factors by plant
-      const plantFactor = {
-        'PLANT-001': 1.0,
-        'PLANT-002': 1.15,
-        'PLANT-003': 0.95,
-        'PLANT-004': 1.08,
-      }[plant.id] || 1.0;
+  LAM_MATERIAL_PLANT_DATA.forEach((mpd) => {
+    const material = getMaterialById(mpd.materialId);
+    const plant = LAM_PLANTS.find(p => p.id === mpd.plant);
 
-      // Base parameters
-      const dailyDemand = Math.round(sku.dailyDemand * plantFactor);
-      const leadTimeDays = Math.round(7 + Math.random() * 14); // 7-21 days
-      const lotSize = Math.round(dailyDemand * (14 + Math.random() * 21)); // 2-5 weeks of demand
-      const demandStdDev = Math.round(dailyDemand * (0.15 + Math.random() * 0.25)); // 15-40% CV
-      const serviceLevel = 0.95 + Math.random() * 0.04; // 95-99%
-      const zScore = serviceLevel > 0.98 ? 2.33 : serviceLevel > 0.95 ? 1.96 : 1.65;
+    if (!material || !plant) return;
 
-      // Calculate inventory components (in units)
-      const cycleStockUnits = Math.round(lotSize / 2);
-      const safetyStockUnits = Math.round(zScore * demandStdDev * Math.sqrt(leadTimeDays));
-      const pipelineStockUnits = Math.round(leadTimeDays * dailyDemand);
+    // Calculate inventory value
+    const inventoryValue = mpd.totalStock * material.basePrice;
 
-      // Some SKUs have excess (policy errors)
-      const hasExcess = Math.random() > 0.7;
-      const excessStockUnits = hasExcess ? Math.round((0.1 + Math.random() * 0.3) * (cycleStockUnits + safetyStockUnits)) : 0;
+    // Decompose inventory into components (estimated based on material type)
+    const isFG = material.type === 'FERT';
+    const isSFG = material.type === 'HALB';
 
-      // Total on-hand inventory
-      const totalUnits = cycleStockUnits + safetyStockUnits + pipelineStockUnits + excessStockUnits;
+    // Cycle stock: ~35% for FG, ~40% for SFG, ~30% for RAW
+    const cycleStockPct = isFG ? 0.35 : isSFG ? 0.40 : 0.30;
+    // Safety stock: ~25% for FG, ~30% for SFG, ~35% for RAW
+    const safetyStockPct = isFG ? 0.25 : isSFG ? 0.30 : 0.35;
+    // Pipeline stock: based on lead time ratio (~lead time / (lead time + 30))
+    const pipelineStockPct = mpd.leadTime / (mpd.leadTime + 60);
+    // Excess: from actual data excessStock field
+    const excessStockValue = mpd.excessStock || 0;
 
-      // Convert to dollar values
-      const cycleStockValue = cycleStockUnits * sku.unitCost;
-      const safetyStockValue = safetyStockUnits * sku.unitCost;
-      const pipelineStockValue = pipelineStockUnits * sku.unitCost;
-      const excessStockValue = excessStockUnits * sku.unitCost;
-      const totalWCValue = totalUnits * sku.unitCost;
+    // Calculate base inventory (excluding excess)
+    const baseInventoryValue = inventoryValue - excessStockValue;
+    const cycleStockValue = Math.round(baseInventoryValue * cycleStockPct);
+    const safetyStockValue = Math.round(baseInventoryValue * safetyStockPct);
+    const pipelineStockValue = Math.round(baseInventoryValue * pipelineStockPct);
 
-      // Calculate WCP (Working Capital Productivity)
-      // WCP = Annual Gross Margin / Average Working Capital
-      const annualGrossMargin = dailyDemand * 365 * sku.grossMargin * 0.85; // 85% sell-through
-      const wcp = totalWCValue > 0 ? (annualGrossMargin / totalWCValue) : 0;
+    // Recalculate total to ensure it matches
+    const totalWCValue = cycleStockValue + safetyStockValue + pipelineStockValue + excessStockValue;
 
-      // Calculate DIO (Days Inventory Outstanding)
-      // DIO = (Average Inventory Value / Annual COGS) × 365
-      const annualCOGS = dailyDemand * 365 * sku.unitCost;
-      const dio = annualCOGS > 0 ? Math.round((totalWCValue / annualCOGS) * 365) : 0;
+    // Calculate WCP (Working Capital Productivity)
+    // WCP = Annual Gross Margin / Average Working Capital
+    const dailyDemand = mpd.totalStock / (mpd.dos || 90); // Estimate daily demand from DOS
+    const annualGrossMargin = dailyDemand * 365 * material.basePrice * (plant.grossMarginPct || 0.38);
+    const wcp = totalWCValue > 0 ? (annualGrossMargin / totalWCValue) : 0;
 
-      // Calculate optimal values (what it should be)
-      const optimalSafetyStock = Math.round(safetyStockUnits * 0.85); // 15% reduction opportunity
-      const optimalCycleStock = Math.round(cycleStockUnits * 0.90); // 10% reduction with better EOQ
-      const optimalTotalWC = (optimalCycleStock + optimalSafetyStock + pipelineStockUnits) * sku.unitCost;
-      const wcSavingsOpportunity = totalWCValue - optimalTotalWC - excessStockValue; // Exclude excess which should be 0
+    // DIO = 365 / Turns (directly from actual data)
+    const dio = mpd.turns > 0 ? Math.round(365 / mpd.turns) : 999;
 
-      // Carrying cost (annual) - typically 20-25% of inventory value
-      const carryingRate = 0.22; // 22% annual carrying cost
-      const annualCarryingCost = totalWCValue * carryingRate;
-      const potentialCarryingSavings = wcSavingsOpportunity * carryingRate;
+    // Optimal values (what it should be) - based on target turns
+    const targetTurns = isFG ? 4 : isSFG ? 6 : 8;
+    const optimalSafetyStock = Math.round(safetyStockValue * 0.85); // 15% reduction opportunity
+    const optimalCycleStock = Math.round(cycleStockValue * 0.90); // 10% reduction with better EOQ
+    const optimalTotalWC = optimalCycleStock + optimalSafetyStock + pipelineStockValue;
+    const wcSavingsOpportunity = Math.max(0, totalWCValue - optimalTotalWC);
 
-      // Risk indicator
-      const excessRatio = excessStockValue / totalWCValue;
-      let healthStatus;
-      if (excessRatio > 0.2) {
-        healthStatus = 'Critical';
-      } else if (excessRatio > 0.1 || wcp < 2) {
-        healthStatus = 'At Risk';
-      } else if (wcp >= 4) {
-        healthStatus = 'Excellent';
-      } else {
-        healthStatus = 'Good';
-      }
+    // Carrying cost (annual) - use plant-specific rate
+    const carryingRate = plant.carryingCostPct || 0.22;
+    const annualCarryingCost = totalWCValue * carryingRate;
+    const potentialCarryingSavings = Math.round(wcSavingsOpportunity * carryingRate);
 
-      data.push({
-        id: `WC${String(idCounter++).padStart(5, '0')}`,
-        plant_id: plant.id,
-        plant_name: plant.name,
-        region: plant.region,
-        sku_id: sku.id,
-        sku_name: sku.name,
-        category: sku.category,
-        unit_cost: sku.unitCost,
-        gross_margin: sku.grossMargin,
-        daily_demand: dailyDemand,
-        lead_time_days: leadTimeDays,
-        lot_size: lotSize,
-        service_level: (serviceLevel * 100).toFixed(1),
+    // Health status based on actual KPIs
+    const excessRatio = excessStockValue / totalWCValue;
+    let healthStatus;
+    if (mpd.dos > 365) {
+      healthStatus = 'Dead Stock';
+    } else if (excessRatio > 0.2 || mpd.turns < 1) {
+      healthStatus = 'Critical';
+    } else if (excessRatio > 0.1 || mpd.turns < 2 || wcp < 2) {
+      healthStatus = 'At Risk';
+    } else if (wcp >= 4 && mpd.turns >= targetTurns) {
+      healthStatus = 'Excellent';
+    } else {
+      healthStatus = 'Good';
+    }
 
-        // Inventory decomposition (units)
-        cycle_stock_units: cycleStockUnits,
-        safety_stock_units: safetyStockUnits,
-        pipeline_stock_units: pipelineStockUnits,
-        excess_stock_units: excessStockUnits,
-        total_units: totalUnits,
+    data.push({
+      id: `WC${String(idCounter++).padStart(5, '0')}`,
+      plant_id: plant.id,
+      plant_name: plant.name,
+      region: plant.region,
+      sku_id: material.id,
+      sku_name: material.name,
+      category: material.materialGroup,
+      material_type: material.type,
+      unit_cost: material.basePrice,
+      gross_margin: material.basePrice * (plant.grossMarginPct || 0.38),
+      daily_demand: Math.round(dailyDemand * 10) / 10,
+      lead_time_days: mpd.leadTime,
+      lot_size: mpd.lotSize || Math.round(dailyDemand * 30),
+      service_level: (92 + Math.random() * 7).toFixed(1),
 
-        // Working Capital values ($)
-        cycle_stock_value: Math.round(cycleStockValue),
-        safety_stock_value: Math.round(safetyStockValue),
-        pipeline_stock_value: Math.round(pipelineStockValue),
-        excess_stock_value: Math.round(excessStockValue),
-        total_wc_value: Math.round(totalWCValue),
+      // Actual inventory data from source
+      total_stock: mpd.totalStock,
+      turns: mpd.turns,
+      dos: Math.round(mpd.dos),
+      fill_rate: mpd.fillRate,
+      abc: mpd.abc,
+      xyz: mpd.xyz,
+      stockouts: mpd.stockouts,
 
-        // Optimal values
-        optimal_safety_stock: Math.round(optimalSafetyStock * sku.unitCost),
-        optimal_cycle_stock: Math.round(optimalCycleStock * sku.unitCost),
-        optimal_total_wc: Math.round(optimalTotalWC),
-        wc_savings_opportunity: Math.round(wcSavingsOpportunity),
+      // Working Capital decomposition ($)
+      cycle_stock_value: cycleStockValue,
+      safety_stock_value: safetyStockValue,
+      pipeline_stock_value: pipelineStockValue,
+      excess_stock_value: Math.round(excessStockValue),
+      total_wc_value: Math.round(totalWCValue),
 
-        // Key metrics
-        wcp: parseFloat(wcp.toFixed(2)), // Working Capital Productivity
-        dio: dio, // Days Inventory Outstanding
-        annual_carrying_cost: Math.round(annualCarryingCost),
-        potential_carrying_savings: Math.round(potentialCarryingSavings),
+      // Optimal values
+      optimal_safety_stock: optimalSafetyStock,
+      optimal_cycle_stock: optimalCycleStock,
+      optimal_total_wc: Math.round(optimalTotalWC),
+      wc_savings_opportunity: Math.round(wcSavingsOpportunity),
 
-        // Status
-        health_status: healthStatus,
+      // Key metrics
+      wcp: parseFloat(wcp.toFixed(2)), // Working Capital Productivity
+      dio: dio, // Days Inventory Outstanding
+      annual_carrying_cost: Math.round(annualCarryingCost),
+      potential_carrying_savings: potentialCarryingSavings,
 
-        // Percentages for visualization
-        cycle_pct: Math.round((cycleStockValue / totalWCValue) * 100),
-        safety_pct: Math.round((safetyStockValue / totalWCValue) * 100),
-        pipeline_pct: Math.round((pipelineStockValue / totalWCValue) * 100),
-        excess_pct: Math.round((excessStockValue / totalWCValue) * 100),
-      });
+      // Status
+      health_status: healthStatus,
+
+      // Percentages for visualization
+      cycle_pct: totalWCValue > 0 ? Math.round((cycleStockValue / totalWCValue) * 100) : 0,
+      safety_pct: totalWCValue > 0 ? Math.round((safetyStockValue / totalWCValue) * 100) : 0,
+      pipeline_pct: totalWCValue > 0 ? Math.round((pipelineStockValue / totalWCValue) * 100) : 0,
+      excess_pct: totalWCValue > 0 ? Math.round((excessStockValue / totalWCValue) * 100) : 0,
     });
   });
 
@@ -170,6 +171,23 @@ export const generateWorkingCapitalData = () => {
  * Generate summary metrics for Working Capital Baseline
  */
 export const generateSummaryMetrics = (data) => {
+  if (!data || data.length === 0) {
+    return {
+      totalWC: 0,
+      totalCycleStock: 0,
+      totalSafetyStock: 0,
+      totalPipelineStock: 0,
+      totalExcessStock: 0,
+      totalSavingsOpportunity: 0,
+      totalPotentialCarrySavings: 0,
+      avgWCP: '0',
+      avgDIO: 0,
+      skuCount: 0,
+      criticalCount: 0,
+      atRiskCount: 0,
+    };
+  }
+
   const totalWC = data.reduce((sum, row) => sum + row.total_wc_value, 0);
   const totalCycleStock = data.reduce((sum, row) => sum + row.cycle_stock_value, 0);
   const totalSafetyStock = data.reduce((sum, row) => sum + row.safety_stock_value, 0);
@@ -191,23 +209,26 @@ export const generateSummaryMetrics = (data) => {
     avgWCP: avgWCP.toFixed(2),
     avgDIO,
     skuCount: data.length,
-    criticalCount: data.filter(d => d.health_status === 'Critical').length,
+    criticalCount: data.filter(d => d.health_status === 'Critical' || d.health_status === 'Dead Stock').length,
     atRiskCount: data.filter(d => d.health_status === 'At Risk').length,
   };
 };
 
 /**
  * Weekly trend data for WC over 12 weeks
+ * Based on actual Lam Research total inventory value
  */
 export const generateWCTrendData = () => {
   const weeks = [];
-  let baseWC = 2800000; // Starting WC
+  // Calculate base WC from actual data
+  const wcData = generateWorkingCapitalData();
+  const baseWC = wcData.reduce((sum, row) => sum + row.total_wc_value, 0);
 
   for (let i = 0; i < 12; i++) {
     const weekNum = i + 1;
     // Simulate gradual improvement with some noise
-    const improvement = i * 0.015; // 1.5% improvement per week
-    const noise = (Math.random() - 0.5) * 0.03; // ±1.5% noise
+    const improvement = i * 0.008; // 0.8% improvement per week
+    const noise = (Math.random() - 0.5) * 0.02; // ±1% noise
     const wcValue = baseWC * (1 - improvement + noise);
 
     weeks.push({
@@ -215,9 +236,9 @@ export const generateWCTrendData = () => {
       weekLabel: `Week ${weekNum}`,
       totalWC: Math.round(wcValue),
       cycleStock: Math.round(wcValue * 0.35),
-      safetyStock: Math.round(wcValue * 0.30),
-      pipelineStock: Math.round(wcValue * 0.28),
-      excessStock: Math.round(wcValue * 0.07 * (1 - i * 0.08)), // Excess decreasing
+      safetyStock: Math.round(wcValue * 0.28),
+      pipelineStock: Math.round(wcValue * 0.22),
+      excessStock: Math.round(wcValue * 0.15 * (1 - i * 0.06)), // Excess decreasing
     });
   }
 

@@ -52,36 +52,49 @@ import stoxTheme from './stoxTheme';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, ChartTooltip, Legend);
 
-// Generate mock SAP writeback data
+// Import Lam Research data
+import {
+  LAM_PLANTS,
+  LAM_MATERIALS,
+  LAM_MATERIAL_PLANT_DATA,
+  getPlantName,
+  getMaterialById,
+} from '../../data/arizonaBeveragesMasterData';
+
+// Generate SAP writeback data using Lam Research references
 const generateWritebackData = () => {
   const jobs = [
-    { id: 'WB-001', name: 'Safety Stock Update', target: 'MM02', system: 'S4P' },
-    { id: 'WB-002', name: 'Reorder Point Sync', target: 'MM02', system: 'S4P' },
-    { id: 'WB-003', name: 'MRP Parameter Update', target: 'MD02', system: 'S4P' },
-    { id: 'WB-004', name: 'Lead Time Adjustment', target: 'ME12', system: 'S4P' },
-    { id: 'WB-005', name: 'Lot Size Configuration', target: 'MM02', system: 'S4D' },
-    { id: 'WB-006', name: 'Cost Update', target: 'MR21', system: 'S4P' },
-    { id: 'WB-007', name: 'Vendor Master Update', target: 'XK02', system: 'S4P' },
-    { id: 'WB-008', name: 'Info Record Update', target: 'ME12', system: 'S4D' },
-    { id: 'WB-009', name: 'Scheduling Agreement', target: 'ME32L', system: 'S4P' },
-    { id: 'WB-010', name: 'Stock Transfer Order', target: 'MB1B', system: 'S4P' },
-    { id: 'WB-011', name: 'Purchase Requisition', target: 'ME51N', system: 'S4D' },
-    { id: 'WB-012', name: 'Forecast Update', target: 'MD61', system: 'S4P' },
+    { id: 'WB-001', name: 'Safety Stock Update - Fremont HQ', target: 'MM02', system: 'S4P', plant: '1000', materials: ['SFG0001', 'SFG0002', 'SFG0003'] },
+    { id: 'WB-002', name: 'Reorder Point Sync - Tualatin', target: 'MM02', system: 'S4P', plant: '2000', materials: ['FG0001', 'FG0002', 'SFG0001'] },
+    { id: 'WB-003', name: 'MRP Parameter Update - Korea', target: 'MD02', system: 'S4P', plant: '3000', materials: ['FG0001', 'FG0002', 'FG0003'] },
+    { id: 'WB-004', name: 'Lead Time Adjustment - Vendors', target: 'ME12', system: 'S4P', plant: 'ALL', materials: ['SFG0001', 'SFG0002'] },
+    { id: 'WB-005', name: 'Lot Size Config - Taiwan', target: 'MM02', system: 'S4D', plant: '4000', materials: ['FG0001', 'SFG0001', 'SFG0004'] },
+    { id: 'WB-006', name: 'Standard Cost Update - FY25', target: 'MR21', system: 'S4P', plant: 'ALL', materials: ['FG0001', 'FG0002', 'FG0003'] },
+    { id: 'WB-007', name: 'Vendor Info Record - Applied Materials', target: 'XK02', system: 'S4P', plant: 'ALL', vendor: 'SUPP0001' },
+    { id: 'WB-008', name: 'Info Record Update - MKS Instruments', target: 'ME12', system: 'S4D', plant: 'ALL', vendor: 'SUPP0005' },
+    { id: 'WB-009', name: 'Scheduling Agreement - Swagelok', target: 'ME32L', system: 'S4P', plant: '1000', vendor: 'SUPP0010' },
+    { id: 'WB-010', name: 'Inter-Plant Transfer - Korea to Taiwan', target: 'MB1B', system: 'S4P', plant: '3000', materials: ['FG0001', 'FG0002'] },
+    { id: 'WB-011', name: 'Purchase Req - RF Power Supply', target: 'ME51N', system: 'S4D', plant: '2000', materials: ['SFG0002'] },
+    { id: 'WB-012', name: 'Forecast Update - Q2 FY25', target: 'MD61', system: 'S4P', plant: 'ALL', materials: ['FG0001', 'FG0002', 'FG0003'] },
   ];
 
   const statuses = ['Completed', 'In Progress', 'Pending', 'Failed', 'Scheduled'];
 
   return jobs.map((job, idx) => {
     const status = statuses[idx % 5];
-    const recordsTotal = Math.floor(50 + Math.random() * 450);
+    // Records based on actual Lam data - materials * plants
+    const recordsTotal = job.plant === 'ALL' ? (job.materials?.length || 3) * 5 : (job.materials?.length || 3);
     const recordsProcessed = status === 'Completed' ? recordsTotal : status === 'In Progress' ? Math.floor(recordsTotal * (0.3 + Math.random() * 0.6)) : 0;
-    const recordsFailed = status === 'Failed' ? Math.floor(recordsTotal * 0.1) : status === 'Completed' ? Math.floor(Math.random() * 5) : 0;
+    const recordsFailed = status === 'Failed' ? Math.floor(recordsTotal * 0.1) : status === 'Completed' ? Math.floor(Math.random() * 2) : 0;
 
     return {
       id: job.id,
       name: job.name,
       target: job.target,
       system: job.system,
+      plant: job.plant,
+      materials: job.materials,
+      vendor: job.vendor,
       status,
       recordsTotal,
       recordsProcessed,
@@ -92,8 +105,8 @@ const generateWritebackData = () => {
       duration: status === 'Completed' || status === 'Failed' ? `${Math.floor(1 + Math.random() * 15)} min` : '-',
       lastRun: new Date(Date.now() - Math.floor(Math.random() * 86400000)).toISOString().split('T')[0],
       nextRun: status === 'Scheduled' ? new Date(Date.now() + Math.floor(Math.random() * 86400000)).toISOString().split('T')[0] : '-',
-      createdBy: 'System',
-      errorMessage: status === 'Failed' ? 'RFC connection timeout' : null,
+      createdBy: 'STOX.AI',
+      errorMessage: status === 'Failed' ? 'RFC connection timeout to SAP ECC - Korea plant' : null,
     };
   });
 };

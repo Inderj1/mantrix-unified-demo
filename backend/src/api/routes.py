@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Query
+from pydantic import BaseModel
 from typing import Dict, Any, List, Optional
 import structlog
 import os
@@ -23,7 +24,7 @@ from src.api.models import (
     ExecuteResearchRequest, ResearchProgressResponse,
     ResearchReportResponse, ResearchInsightResponse, ResearchRecommendationResponse
 )
-from src.core.postgresql_sql_generator import PostgreSQLGenerator as SQLGenerator
+from src.core.bigquery_sql_generator import BigQuerySQLGenerator as SQLGenerator
 from src.db.database_client import DatabaseClient as PostgreSQLClient  # PostgreSQL database client
 from src.db.bigquery import BigQueryClient  # Actual BigQuery client for health checks
 from src.db.weaviate_client import WeaviateClient
@@ -560,13 +561,75 @@ async def clear_all_caches(
     """Clear all caches (use with caution)."""
     if not generator.cache_manager:
         raise HTTPException(status_code=503, detail="Cache is not enabled")
-    
+
     try:
         deleted = generator.cache_manager.clear_all_caches()
         return {"deleted": deleted, "message": "All caches cleared"}
     except Exception as e:
         logger.error(f"Failed to clear caches: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============ Table Access Control ============
+
+@router.get("/allowed-tables")
+async def get_allowed_tables(
+    generator: SQLGenerator = Depends(get_sql_generator)
+):
+    """Get the list of allowed tables for AXIS.AI queries"""
+    all_tables = generator.list_tables()
+    return {
+        "allowed_tables": generator.allowed_tables,
+        "all_tables": all_tables,
+        "restriction_enabled": generator.allowed_tables is not None
+    }
+
+
+class AllowedTablesBody(BaseModel):
+    tables: List[str]
+
+
+@router.put("/allowed-tables")
+async def set_allowed_tables(
+    body: AllowedTablesBody,
+    generator: SQLGenerator = Depends(get_sql_generator)
+):
+    """Set the list of allowed tables (runtime override)"""
+    tables = body.tables
+    # Get all available tables
+    all_tables_raw = generator.bq_client.list_tables()
+
+    # Validate that all tables exist
+    invalid_tables = [t for t in tables if t not in all_tables_raw]
+    if invalid_tables:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid tables: {invalid_tables}"
+        )
+
+    generator.allowed_tables = tables if tables else None
+    logger.info(f"Allowed tables updated to: {generator.allowed_tables}")
+
+    return {
+        "success": True,
+        "allowed_tables": generator.allowed_tables,
+        "message": f"Table access restricted to {len(tables)} tables" if tables else "All tables accessible"
+    }
+
+
+@router.delete("/allowed-tables")
+async def clear_allowed_tables(
+    generator: SQLGenerator = Depends(get_sql_generator)
+):
+    """Clear allowed tables restriction (allow all tables)"""
+    generator.allowed_tables = None
+    logger.info("Allowed tables restriction cleared")
+
+    return {
+        "success": True,
+        "allowed_tables": None,
+        "message": "All tables are now accessible"
+    }
 
 
 @router.post("/cache/warm")

@@ -59,7 +59,7 @@ const defaultCostConfig = {
   backorderAdmin: 75,
 };
 
-const CostConfiguration = ({ onBack, onSave }) => {
+const CostConfiguration = ({ onBack, onSave, onTileClick }) => {
   const [config, setConfig] = useState(defaultCostConfig);
   const [expanded, setExpanded] = useState(['holding', 'ordering', 'stockout']);
   const [hasChanges, setHasChanges] = useState(false);
@@ -128,9 +128,8 @@ const CostConfiguration = ({ onBack, onSave }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 4: Optimization</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>Layer 4: Optimization</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>Cost Configuration</Typography>
           </Breadcrumbs>
           <Stack direction="row" spacing={1}>

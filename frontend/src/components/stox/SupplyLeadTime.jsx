@@ -45,35 +45,36 @@ import {
 import stoxTheme from './stoxTheme';
 import DataSourceChip from './DataSourceChip';
 import { getTileDataConfig } from './stoxDataConfig';
+import { LAM_PLANTS, LAM_VENDORS, LAM_MATERIALS, LAM_MATERIAL_PLANT_DATA, getMaterialById, getPlantName } from '../../data/arizonaBeveragesMasterData';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, ChartTooltip, Legend, Filler);
 
-// Generate mock lead time data
+// Generate lead time data using Lam Research data
 const generateLeadTimeData = () => {
-  const materials = [
-    { id: 'MAT-001', name: 'Hydraulic Pump', plant: 'P1000', vendor: 'VENDOR-A' },
-    { id: 'MAT-002', name: 'Bearing Assembly', plant: 'P1000', vendor: 'VENDOR-B' },
-    { id: 'MAT-003', name: 'Control Module', plant: 'P2000', vendor: 'VENDOR-C' },
-    { id: 'MAT-004', name: 'Valve Kit', plant: 'P2000', vendor: 'VENDOR-D' },
-    { id: 'MAT-005', name: 'Gasket Set', plant: 'P3000', vendor: 'VENDOR-E' },
-    { id: 'MAT-006', name: 'Sensor Array', plant: 'P1000', vendor: 'VENDOR-A' },
-    { id: 'MAT-007', name: 'Motor Drive', plant: 'P2000', vendor: 'VENDOR-F' },
-    { id: 'MAT-008', name: 'Filter Element', plant: 'P3000', vendor: 'VENDOR-B' },
-    { id: 'MAT-009', name: 'Seal Kit', plant: 'P1000', vendor: 'VENDOR-C' },
-    { id: 'MAT-010', name: 'Coupling Assembly', plant: 'P2000', vendor: 'VENDOR-D' },
-  ];
+  // Build materials from LAM_MATERIAL_PLANT_DATA with vendor assignments
+  const materials = LAM_MATERIAL_PLANT_DATA.slice(0, 12).map((plantData, idx) => {
+    const baseMaterial = getMaterialById(plantData.materialId);
+    const vendor = LAM_VENDORS[idx % LAM_VENDORS.length];
+    return {
+      id: plantData.materialId,
+      name: baseMaterial ? baseMaterial.name : plantData.materialId,
+      plant: plantData.plant,
+      vendor: vendor.id,
+      vendorName: vendor.name,
+      baseLeadTime: plantData.leadTime,
+    };
+  });
 
   const reliabilityOptions = ['Excellent', 'Good', 'Fair', 'Poor'];
 
   return materials.map((mat, idx) => {
-    const pltDays = Math.floor(10 + Math.random() * 25);
-    const gapDays = Math.floor(-5 + Math.random() * 20);
+    // Use real lead time as PLT base
+    const pltDays = mat.baseLeadTime || Math.floor(10 + Math.random() * 25);
+    const gapDays = Math.floor(-5 + Math.random() * 15); // Variance from planned
     const rltDays = pltDays + gapDays;
-    const otd = Math.floor(65 + Math.random() * 35);
-    const qtyVar = Math.floor(1 + Math.random() * 20);
+    const otd = Math.floor(70 + Math.random() * 28); // OTD % 70-98
+    const qtyVar = Math.floor(1 + Math.random() * 15);
     const reliability = reliabilityOptions[idx % 4];
-    const isExcellent = reliability === 'Excellent';
-    const isPoor = reliability === 'Poor';
 
     const ssAdj = gapDays > 5 ? `+${Math.floor(gapDays * 3)}%` : gapDays < -2 ? `${Math.floor(gapDays * 2)}%` : '0%';
 
@@ -81,7 +82,9 @@ const generateLeadTimeData = () => {
       id: mat.id,
       material: mat.name,
       plant: mat.plant,
+      plantName: getPlantName(mat.plant),
       vendor: mat.vendor,
+      vendorName: mat.vendorName,
       rlt: rltDays,
       plt: pltDays,
       gap: gapDays,
@@ -116,7 +119,7 @@ const generateDetailData = (id, data) => {
   return sku;
 };
 
-const SupplyLeadTime = ({ onBack }) => {
+const SupplyLeadTime = ({ onBack, onTileClick }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -501,12 +504,16 @@ const SupplyLeadTime = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 1: Foundation</Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
-              {selectedSku ? `${selectedSku.id} Detail` : 'Supply & Lead Time Analytics'}
-            </Typography>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={() => selectedSku ? setSelectedSku(null) : onBack()} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>Layer 1: Foundation</Link>
+            {selectedSku ? (
+              <>
+                <Link component="button" variant="body1" onClick={() => setSelectedSku(null)} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>Supply & Lead Time</Link>
+                <Typography color="primary" variant="body1" fontWeight={600}>{selectedSku.id} Detail</Typography>
+              </>
+            ) : (
+              <Typography color="primary" variant="body1" fontWeight={600}>Supply & Lead Time</Typography>
+            )}
           </Breadcrumbs>
           {!selectedSku && (
             <Stack direction="row" spacing={1}>

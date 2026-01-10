@@ -40,34 +40,16 @@ const TicketingSystem = ({ onBack }) => {
     searchTerm: searchTerm,
   });
 
-  // Generate demo data when API returns empty
+  // Generate demo data when API returns empty - Lam Research Supply Chain
   const generateDemoTickets = () => {
     const demoData = [
-      // STOX.AI - Inventory Actions
-      { ticket_id: 1001, source_module: "STOX.AI", ticket_type: "REORDER_TRIGGERED", title: "Reorder Triggered: SKU-4521", description: "Safety stock threshold reached for DC Atlanta. Auto-generated reorder for 500 units.", priority: "High", status: "Completed", user_name: "System", created_at: new Date(Date.now() - 2*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
-      { ticket_id: 1002, source_module: "STOX.AI", ticket_type: "SAFETY_STOCK_ADJUSTED", title: "Safety Stock Adjusted: Chicago DC", description: "Increased safety stock by 15% for seasonal demand pattern detected.", priority: "Medium", status: "Completed", user_name: "AI Agent", created_at: new Date(Date.now() - 5*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
-      { ticket_id: 1003, source_module: "STOX.AI", ticket_type: "REALLOCATION_EXECUTED", title: "Reallocation: Dallas → Houston", description: "Transferred 500 units to prevent stockout in Houston region.", priority: "High", status: "Completed", user_name: "System", created_at: new Date(Date.now() - 8*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
-      { ticket_id: 1004, source_module: "STOX.AI", ticket_type: "SHORTAGE_ALERT", title: "Shortage Alert: West Region", description: "Projected stockout in 5 days for high-velocity SKU-1156.", priority: "Critical", status: "Open", user_name: "AI Agent", created_at: new Date(Date.now() - 1*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
-      { ticket_id: 1005, source_module: "STOX.AI", ticket_type: "STORE_REPLENISHMENT", title: "Store Replenishment: Store #1842", description: "Auto-generated replenishment order for 12 SKUs based on sell-through.", priority: "Medium", status: "In Progress", user_name: "System", created_at: new Date(Date.now() - 3*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
-
-      // MARGEN.AI - Financial Actions
-      { ticket_id: 1006, source_module: "MARGEN.AI", ticket_type: "MARGIN_ALERT", title: "Margin Alert: Premium Segment", description: "Gross margin dropped 3.2% vs last month for premium customer segment.", priority: "High", status: "Open", user_name: "AI Agent", created_at: new Date(Date.now() - 4*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
-      { ticket_id: 1007, source_module: "MARGEN.AI", ticket_type: "CLV_UPDATED", title: "CLV Recalculated: Enterprise Accounts", description: "Updated CLV for 45 enterprise customers based on Q4 transactions.", priority: "Medium", status: "Completed", user_name: "System", created_at: new Date(Date.now() - 12*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
-      { ticket_id: 1008, source_module: "MARGEN.AI", ticket_type: "CHURN_RISK", title: "Churn Risk: Acme Corp", description: "High churn probability (78%) detected for Acme Corp. Last order 45 days ago.", priority: "Critical", status: "In Progress", user_name: "Sarah Chen", created_at: new Date(Date.now() - 6*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
-
-      // ORDLY.AI - Order Actions
-      { ticket_id: 1009, source_module: "ORDLY.AI", ticket_type: "ORDER_COMMITTED", title: "SAP Commit: PO-2025-4521", description: "Order committed to SAP with 98% match confidence. 45 line items processed.", priority: "Medium", status: "Completed", user_name: "System", created_at: new Date(Date.now() - 2*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
-      { ticket_id: 1010, source_module: "ORDLY.AI", ticket_type: "DEMAND_SIGNAL", title: "EDI 850 Processed: Walmart", description: "Processed 45 line items from EDI 850 demand signal.", priority: "High", status: "Completed", user_name: "AI Agent", created_at: new Date(Date.now() - 3*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
-      { ticket_id: 1011, source_module: "ORDLY.AI", ticket_type: "ARBITRATION", title: "Arbitration: Multi-DC Conflict", description: "Resolved allocation conflict for SKU-7789 across 3 DCs.", priority: "High", status: "In Progress", user_name: "System", created_at: new Date(Date.now() - 1*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
-      { ticket_id: 1012, source_module: "ORDLY.AI", ticket_type: "NETWORK_OPTIMIZED", title: "Network Optimization Complete", description: "Optimized fulfillment across 8 DCs. Estimated savings: $23K.", priority: "Medium", status: "Completed", user_name: "AI Agent", created_at: new Date(Date.now() - 10*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
-
-      // AXIS.AI - Forecast Actions
-      { ticket_id: 1013, source_module: "AXIS.AI", ticket_type: "FORECAST_UPDATED", title: "Demand Forecast: Q1 2025", description: "ML model updated forecast with 94% accuracy. Demand up 12% vs prior.", priority: "Medium", status: "Completed", user_name: "System", created_at: new Date(Date.now() - 24*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
-      { ticket_id: 1014, source_module: "AXIS.AI", ticket_type: "BUDGET_ALERT", title: "Budget Variance Alert", description: "COGS exceeding budget by 4.2% in West region.", priority: "High", status: "Open", user_name: "AI Agent", created_at: new Date(Date.now() - 5*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
-
-      // Enterprise Pulse - Agent Actions
-      { ticket_id: 1015, source_module: "Enterprise Pulse", ticket_type: "PULSE_AGENT_EXEC", title: "Agent: Customer Follow-up", description: "Automated follow-up email sent to 23 customers with pending quotes.", priority: "Medium", status: "Completed", user_name: "AI Agent", created_at: new Date(Date.now() - 7*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
-      { ticket_id: 1016, source_module: "Enterprise Pulse", ticket_type: "PULSE_ALERT", title: "Alert: Quote Expiring", description: "5 quotes expiring in next 48 hours. Total value: $145K.", priority: "High", status: "Open", user_name: "System", created_at: new Date(Date.now() - 2*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      // Critical inventory alerts
+      { ticket_id: 1001, source_module: "STOX.AI", ticket_type: "SHORTAGE_ALERT", title: "Low Stock: Hwaseong Korea (65%)", description: "Samsung order at risk. Transfer from Taiwan initiated.", priority: "Critical", status: "In Progress", user_name: "Stox.AI", created_at: new Date(Date.now() - 1*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      { ticket_id: 1002, source_module: "STOX.AI", ticket_type: "DEMAND_SURGE", title: "TSMC N3 Expansion: +40% Demand", description: "Etch system demand surge. Taiwan plant capacity review needed.", priority: "Critical", status: "Open", user_name: "Forecast.AI", created_at: new Date(Date.now() - 2*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      { ticket_id: 1003, source_module: "STOX.AI", ticket_type: "SHIPMENT_DELAYED", title: "SHP-002 Oregon Delayed +6hrs", description: "MKS RF Power Supply delayed due to weather. Tualatin notified.", priority: "High", status: "In Progress", user_name: "Logistics.AI", created_at: new Date(Date.now() - 3*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      { ticket_id: 1004, source_module: "STOX.AI", ticket_type: "REALLOCATION_EXECUTED", title: "Transfer: Taiwan → Korea (3 units)", description: "Etch Systems transfer to prevent Samsung stockout. Savings: $850K.", priority: "High", status: "Completed", user_name: "System", created_at: new Date(Date.now() - 5*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      { ticket_id: 1005, source_module: "STOX.AI", ticket_type: "SAFETY_STOCK_ADJUSTED", title: "Fremont Safety Stock -15 units", description: "Released $675K working capital. MRP parameters updated.", priority: "Medium", status: "Completed", user_name: "WorkingCap.AI", created_at: new Date(Date.now() - 8*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      { ticket_id: 1006, source_module: "Enterprise Pulse", ticket_type: "PULSE_ALERT", title: "2 Plants Below 70% Threshold", description: "Korea (65%) and Austria (58%) require immediate attention.", priority: "Critical", status: "Open", user_name: "Stox.AI", created_at: new Date(Date.now() - 30*60*1000).toISOString(), updated_at: new Date().toISOString() },
     ];
     return demoData;
   };
@@ -185,7 +167,7 @@ const TicketingSystem = ({ onBack }) => {
       flex: 1.2,
       renderCell: (params) => {
         const typeColors = {
-          // STOX.AI
+          // STOX.AI - Inventory
           'REORDER_TRIGGERED': '#10b981',
           'SAFETY_STOCK_ADJUSTED': '#059669',
           'REALLOCATION_EXECUTED': '#10b981',
@@ -193,6 +175,17 @@ const TicketingSystem = ({ onBack }) => {
           'WORKING_CAPITAL_OPT': '#10b981',
           'MRP_PARAMETER_CHANGE': '#059669',
           'STORE_REPLENISHMENT': '#10b981',
+          // STOX.AI - Logistics
+          'SHIPMENT_DELAYED': '#f97316',
+          'SHIPMENT_EXPEDITED': '#0ea5e9',
+          // STOX.AI - Demand
+          'DEMAND_SURGE': '#ef4444',
+          'FORECAST_UPDATED': '#06b6d4',
+          // STOX.AI - Vendor
+          'VENDOR_LEAD_TIME': '#f59e0b',
+          'VENDOR_QUALITY': '#f59e0b',
+          // STOX.AI - SAP
+          'SAP_WRITEBACK': '#8b5cf6',
           // ORDLY.AI
           'ORDER_COMMITTED': '#0ea5e9',
           'DEMAND_SIGNAL': '#0ea5e9',
@@ -206,7 +199,6 @@ const TicketingSystem = ({ onBack }) => {
           'CHURN_RISK': '#ef4444',
           'REVENUE_FORECAST': '#8b5cf6',
           // AXIS.AI
-          'FORECAST_UPDATED': '#f59e0b',
           'SCENARIO_CREATED': '#f59e0b',
           'BUDGET_ALERT': '#ef4444',
           // Enterprise Pulse
@@ -215,7 +207,7 @@ const TicketingSystem = ({ onBack }) => {
           'PULSE_CONFIG': '#64748b',
         };
         const typeLabels = {
-          // STOX.AI
+          // STOX.AI - Inventory
           'REORDER_TRIGGERED': 'Reorder Triggered',
           'SAFETY_STOCK_ADJUSTED': 'Safety Stock Adjusted',
           'REALLOCATION_EXECUTED': 'Reallocation',
@@ -223,6 +215,17 @@ const TicketingSystem = ({ onBack }) => {
           'WORKING_CAPITAL_OPT': 'WC Optimized',
           'MRP_PARAMETER_CHANGE': 'MRP Changed',
           'STORE_REPLENISHMENT': 'Store Replenishment',
+          // STOX.AI - Logistics
+          'SHIPMENT_DELAYED': 'Shipment Delayed',
+          'SHIPMENT_EXPEDITED': 'Shipment Expedited',
+          // STOX.AI - Demand
+          'DEMAND_SURGE': 'Demand Surge',
+          'FORECAST_UPDATED': 'Forecast Updated',
+          // STOX.AI - Vendor
+          'VENDOR_LEAD_TIME': 'Vendor Lead Time',
+          'VENDOR_QUALITY': 'Vendor Quality',
+          // STOX.AI - SAP
+          'SAP_WRITEBACK': 'SAP Writeback',
           // ORDLY.AI
           'ORDER_COMMITTED': 'Order Committed',
           'DEMAND_SIGNAL': 'Demand Signal',
@@ -236,7 +239,6 @@ const TicketingSystem = ({ onBack }) => {
           'CHURN_RISK': 'Churn Risk',
           'REVENUE_FORECAST': 'Revenue Forecast',
           // AXIS.AI
-          'FORECAST_UPDATED': 'Forecast Updated',
           'SCENARIO_CREATED': 'Scenario Created',
           'BUDGET_ALERT': 'Budget Alert',
           // Enterprise Pulse

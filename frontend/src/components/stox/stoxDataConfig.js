@@ -70,12 +70,7 @@ export const TILE_DATA_CONFIG = {
   },
 
   // Layer 2: Diagnostics
-  'working-capital-baseline': {
-    dataType: DATA_SOURCE_TYPES.DEMO,
-    tables: ['stox_demo_inventory_wc_baseline'],
-    apiEndpoint: '/working-capital',
-    description: 'Working capital decomposition analysis',
-  },
+  // working-capital-baseline merged into inventory-dashboard
   'inventory-health-check': {
     dataType: DATA_SOURCE_TYPES.DEMO,
     tables: ['stox_demo_inventory_health'],
@@ -87,6 +82,12 @@ export const TILE_DATA_CONFIG = {
     tables: ['transaction_data', 'stox_demo_demand_patterns'],
     apiEndpoint: '/demand-patterns',
     description: 'Demand patterns and forecasting',
+  },
+  'inventory-dashboard': {
+    dataType: DATA_SOURCE_TYPES.DEMO,
+    tables: ['stox_demo_inventory_dashboard'],
+    apiEndpoint: '/inventory-dashboard',
+    description: 'Comprehensive inventory dashboard with ABC/XYZ analytics',
   },
   'supply-lead-time': {
     dataType: DATA_SOURCE_TYPES.DEMO,
@@ -184,6 +185,12 @@ export const TILE_DATA_CONFIG = {
   },
 
   // Layer 5: Sandbox
+  'mrp-optimizer': {
+    dataType: DATA_SOURCE_TYPES.DEMO,
+    tables: ['stox_demo_mrp_optimizer'],
+    apiEndpoint: '/mrp-optimizer',
+    description: 'MRP Type ↔ Parameter Optimization by SKU/Plant with AI recommendations',
+  },
   'what-if-simulator': {
     dataType: DATA_SOURCE_TYPES.DEMO,
     tables: ['stox_demo_scenarios'],

@@ -53,58 +53,58 @@ import { getTileDataConfig } from './stoxDataConfig';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, ArcElement, Title, ChartTooltip, Legend, Filler);
 
+// Import Lam Research data
+import {
+  LAM_PLANTS,
+  LAM_MATERIAL_PLANT_DATA,
+  LAM_MATERIALS,
+  calculatePlantSummary,
+  formatCurrency as lamFormatCurrency,
+} from '../../data/arizonaBeveragesMasterData';
+
 const formatCurrency = (value) => {
   if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
   if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
   return `$${value}`;
 };
 
-// Generate mock performance KPI data
+// Generate performance KPI data using Lam Research metrics
 const generateKPIData = () => {
+  // Calculate actual metrics from Lam Research data
+  const avgTurns = LAM_MATERIAL_PLANT_DATA.reduce((sum, d) => sum + d.turns, 0) / LAM_MATERIAL_PLANT_DATA.length;
+  const avgDOS = LAM_MATERIAL_PLANT_DATA.reduce((sum, d) => sum + d.dos, 0) / LAM_MATERIAL_PLANT_DATA.length;
+  const avgFillRate = LAM_MATERIAL_PLANT_DATA.reduce((sum, d) => sum + d.fillRate, 0) / LAM_MATERIAL_PLANT_DATA.length;
+  const totalExcess = LAM_MATERIAL_PLANT_DATA.reduce((sum, d) => sum + (d.excessStock || 0), 0);
+  const avgStockouts = LAM_MATERIAL_PLANT_DATA.reduce((sum, d) => sum + d.stockouts, 0) / LAM_MATERIAL_PLANT_DATA.length;
+
+  // Calculate plant-level summaries
+  const plantSummaries = LAM_PLANTS.map(p => calculatePlantSummary(p.id));
+  const avgLeadTime = LAM_MATERIAL_PLANT_DATA.reduce((sum, d) => sum + d.leadTime, 0) / LAM_MATERIAL_PLANT_DATA.length;
+
   const kpis = [
-    { id: 'KPI-001', name: 'Service Level', category: 'Service', unit: '%', target: 95 },
-    { id: 'KPI-002', name: 'Fill Rate', category: 'Service', unit: '%', target: 98 },
-    { id: 'KPI-003', name: 'Inventory Turns', category: 'Efficiency', unit: 'x', target: 8 },
-    { id: 'KPI-004', name: 'GMROI', category: 'Financial', unit: '$', target: 3.5 },
-    { id: 'KPI-005', name: 'Stockout Rate', category: 'Service', unit: '%', target: 2 },
-    { id: 'KPI-006', name: 'Excess Inventory', category: 'Financial', unit: '$', target: 100000 },
-    { id: 'KPI-007', name: 'Days of Supply', category: 'Efficiency', unit: 'days', target: 30 },
-    { id: 'KPI-008', name: 'Forecast Accuracy', category: 'Planning', unit: '%', target: 85 },
-    { id: 'KPI-009', name: 'On-Time Delivery', category: 'Service', unit: '%', target: 95 },
-    { id: 'KPI-010', name: 'Perfect Order Rate', category: 'Service', unit: '%', target: 90 },
-    { id: 'KPI-011', name: 'Carrying Cost %', category: 'Financial', unit: '%', target: 20 },
-    { id: 'KPI-012', name: 'Order Cycle Time', category: 'Efficiency', unit: 'days', target: 5 },
-    { id: 'KPI-013', name: 'Supplier OTD', category: 'Supply', unit: '%', target: 92 },
-    { id: 'KPI-014', name: 'Lead Time Variance', category: 'Supply', unit: 'days', target: 2 },
-    { id: 'KPI-015', name: 'MRP Accuracy', category: 'Planning', unit: '%', target: 90 },
+    { id: 'KPI-001', name: 'Service Level - Global', category: 'Service', unit: '%', target: 95, actual: 95 - avgStockouts * 0.8 },
+    { id: 'KPI-002', name: 'Fill Rate - All Plants', category: 'Service', unit: '%', target: 98, actual: avgFillRate },
+    { id: 'KPI-003', name: 'Inventory Turns', category: 'Efficiency', unit: 'x', target: 6.0, actual: avgTurns },
+    { id: 'KPI-004', name: 'GMROI', category: 'Financial', unit: '$', target: 2.8, actual: 2.5 + (avgTurns / 10) },
+    { id: 'KPI-005', name: 'Stockout Rate', category: 'Service', unit: '%', target: 3, actual: avgStockouts * 0.5 },
+    { id: 'KPI-006', name: 'Excess Inventory', category: 'Financial', unit: '$', target: 80000000, actual: totalExcess },
+    { id: 'KPI-007', name: 'Days of Supply', category: 'Efficiency', unit: 'days', target: 90, actual: avgDOS },
+    { id: 'KPI-008', name: 'Forecast Accuracy', category: 'Planning', unit: '%', target: 85, actual: 82 + Math.random() * 6 },
+    { id: 'KPI-009', name: 'On-Time Delivery', category: 'Service', unit: '%', target: 95, actual: 93 + Math.random() * 5 },
+    { id: 'KPI-010', name: 'Perfect Order Rate', category: 'Service', unit: '%', target: 90, actual: 88 + Math.random() * 6 },
+    { id: 'KPI-011', name: 'Carrying Cost %', category: 'Financial', unit: '%', target: 18, actual: 15 + totalExcess / 100000000 * 5 },
+    { id: 'KPI-012', name: 'Order Cycle Time', category: 'Efficiency', unit: 'days', target: avgLeadTime * 0.8, actual: avgLeadTime },
+    { id: 'KPI-013', name: 'Supplier OTD', category: 'Supply', unit: '%', target: 92, actual: 89 + Math.random() * 6 },
+    { id: 'KPI-014', name: 'Lead Time Variance', category: 'Supply', unit: 'days', target: 5, actual: 3 + Math.random() * 4 },
+    { id: 'KPI-015', name: 'MRP Accuracy', category: 'Planning', unit: '%', target: 90, actual: 87 + Math.random() * 6 },
   ];
 
   return kpis.map((kpi, idx) => {
-    let actual, previousPeriod;
-
-    if (kpi.unit === '%') {
-      if (kpi.name.includes('Stockout') || kpi.name.includes('Carrying')) {
-        // Lower is better
-        actual = kpi.target * (0.7 + Math.random() * 0.6);
-        previousPeriod = actual * (0.9 + Math.random() * 0.2);
-      } else {
-        // Higher is better
-        actual = kpi.target * (0.9 + Math.random() * 0.15);
-        previousPeriod = actual * (0.9 + Math.random() * 0.15);
-      }
-    } else if (kpi.unit === 'days') {
-      actual = kpi.target * (0.8 + Math.random() * 0.5);
-      previousPeriod = actual * (0.9 + Math.random() * 0.3);
-    } else if (kpi.unit === '$') {
-      actual = kpi.target * (0.8 + Math.random() * 0.5);
-      previousPeriod = actual * (0.85 + Math.random() * 0.3);
-    } else {
-      actual = kpi.target * (0.85 + Math.random() * 0.3);
-      previousPeriod = actual * (0.9 + Math.random() * 0.2);
-    }
+    let actual = kpi.actual;
+    let previousPeriod = actual * (0.95 + Math.random() * 0.1); // Previous period slightly different
 
     const change = ((actual - previousPeriod) / previousPeriod * 100);
-    const isLowerBetter = kpi.name.includes('Stockout') || kpi.name.includes('Carrying') || kpi.name.includes('Excess') || kpi.name.includes('Variance') || kpi.name.includes('Cycle Time');
+    const isLowerBetter = kpi.name.includes('Stockout') || kpi.name.includes('Carrying') || kpi.name.includes('Excess') || kpi.name.includes('Variance') || kpi.name.includes('Cycle Time') || kpi.name.includes('Days of Supply');
     const achievement = isLowerBetter
       ? actual <= kpi.target ? 100 : Math.max(0, 100 - ((actual - kpi.target) / kpi.target * 100))
       : actual >= kpi.target ? 100 : (actual / kpi.target * 100);
@@ -126,8 +126,8 @@ const generateKPIData = () => {
       status,
       isLowerBetter,
       trend: Array.from({ length: 6 }, () => kpi.unit === '%'
-        ? (kpi.target * (0.85 + Math.random() * 0.2)).toFixed(1)
-        : (kpi.target * (0.7 + Math.random() * 0.5)).toFixed(1)
+        ? (actual * (0.95 + Math.random() * 0.1)).toFixed(1)
+        : (actual * (0.9 + Math.random() * 0.2)).toFixed(1)
       ),
     };
   });

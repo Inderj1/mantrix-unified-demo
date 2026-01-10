@@ -41,25 +41,11 @@ import {
   RocketLaunch as RocketLaunchIcon,
   Layers as LayersIcon,
   AccountBalance as AccountBalanceIcon,
-  Dashboard as DashboardIcon,
 } from '@mui/icons-material';
 
-// 7 Layer Tiles for the main landing page (Layer 0 = Command Center)
+// 6 Layer Tiles for the main landing page (removed Command Center/Layer 0)
 // All tiles use blue color palette for consistency
 const layerTiles = [
-  {
-    id: 'layer-0',
-    layer: 0,
-    title: 'Command Center',
-    subtitle: 'Planner Front Door',
-    description: 'AI-powered command center with KPIs, exceptions, and quick navigation',
-    icon: DashboardIcon,
-    color: '#106ebe',
-    bgColor: '#deecf9',
-    gradient: 'linear-gradient(135deg, #106ebe 0%, #2b88d8 100%)',
-    tileCount: 1,
-    isSpecial: true, // Mark as special tile that opens directly
-  },
   {
     id: 'layer-1',
     layer: 1,
@@ -136,20 +122,6 @@ const layerTiles = [
 
 // Sub-tiles organized by layer - all using blue color palette
 const subTilesByLayer = {
-  'layer-0': [
-    {
-      id: 'command-center',
-      title: 'Command Center',
-      subtitle: 'Tile 0 - Planner Front Door',
-      description: 'AI-powered command center with KPIs, exceptions, chat assistant, and quick navigation',
-      icon: DashboardIcon,
-      color: '#106ebe',
-      bgColor: '#deecf9',
-      stats: { label: 'Alerts', value: '8' },
-      status: 'active',
-      gradient: 'linear-gradient(135deg, #106ebe 0%, #2b88d8 100%)',
-    },
-  ],
   'layer-1': [
     {
       id: 'sap-data-hub',
@@ -408,13 +380,6 @@ const StoxAILanding = ({ onTileClick, onBack }) => {
   const [selectedLayer, setSelectedLayer] = useState(null);
 
   const handleLayerClick = (layerId) => {
-    // Special handling for Command Center (Layer 0) - opens directly
-    const layer = layerTiles.find(l => l.id === layerId);
-    if (layer?.isSpecial && onTileClick) {
-      // Open command-center directly
-      onTileClick('command-center');
-      return;
-    }
     setSelectedLayer(layerId);
   };
 

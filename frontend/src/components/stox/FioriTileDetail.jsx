@@ -38,6 +38,7 @@ import {
   Assignment,
 } from '@mui/icons-material';
 // import * as XLSX from 'xlsx';
+import { LAM_MATERIALS, LAM_MATERIAL_PLANT_DATA, LAM_PLANTS, getMaterialById } from '../../data/arizonaBeveragesMasterData';
 
 // Data generators for each tile based on SAP tables and Excel data
 const generateTileData = (tileId) => {
@@ -111,12 +112,34 @@ const generateTileData = (tileId) => {
       { id: 2, sku: 'SKU_HC_002', on_hand: 1200, in_transit: 0, allocated_ch01: 400, allocated_ch02: 380, safety_stock: 200, available: 220 },
       { id: 3, sku: 'SKU_HC_006', on_hand: 2400, in_transit: 800, allocated_ch01: 800, allocated_ch02: 520, safety_stock: 400, available: 1480 },
     ],
-    'working-capital': () => [
-      { id: 1, sku: 'SKU_HC_001', inventory_units: 1800, unit_cost: 35, inventory_value: 63000, turns: 10.5, dio: 35, status: 'Optimal' },
-      { id: 2, sku: 'SKU_HC_002', inventory_units: 1200, unit_cost: 40, inventory_value: 48000, turns: 9.2, dio: 40, status: 'Optimal' },
-      { id: 3, sku: 'SKU_HC_003', inventory_units: 0, unit_cost: 38, inventory_value: 0, turns: 0, dio: 0, status: 'Stockout' },
-      { id: 4, sku: 'SKU_HC_006', inventory_units: 2400, unit_cost: 35, inventory_value: 84000, turns: 8.5, dio: 43, status: 'Optimal' },
-    ],
+    'working-capital': () => {
+      // Generate from actual Lam Research material-plant data
+      return LAM_MATERIAL_PLANT_DATA.slice(0, 12).map((mpd, idx) => {
+        const material = getMaterialById(mpd.materialId);
+        const plant = LAM_PLANTS.find(p => p.id === mpd.plant);
+        const inventoryValue = mpd.totalStock * (material?.basePrice || 0);
+        // DIO = 365 / Turns
+        const dio = mpd.turns > 0 ? Math.round(365 / mpd.turns) : 0;
+        // Status based on DOS thresholds
+        const status = mpd.dos > 365 ? 'Dead Stock' : mpd.dos > 180 ? 'Slow Moving' : mpd.turns >= 4 ? 'Optimal' : 'Review';
+        return {
+          id: idx + 1,
+          sku: mpd.materialId,
+          sku_name: material?.name || mpd.materialId,
+          plant: plant?.name || mpd.plant,
+          inventory_units: mpd.totalStock,
+          unit_cost: material?.basePrice || 0,
+          inventory_value: inventoryValue,
+          turns: mpd.turns,
+          dos: Math.round(mpd.dos),
+          dio: dio,
+          fill_rate: mpd.fillRate,
+          abc: mpd.abc,
+          xyz: mpd.xyz,
+          status: status,
+        };
+      });
+    },
     'excess-obsolete': () => [
       { id: 1, sku: 'SKU_HC_003', inventory: 0, last_sale: '2024-01-15', days_no_sale: 90, category: 'End-of-Life', action: 'Discontinued', value: 0 },
       { id: 2, sku: 'SKU_HC_010', inventory: 450, last_sale: '2024-04-29', days_no_sale: 60, category: 'Slow-Moving', action: 'Markdown 30%', value: 15750 },
@@ -199,11 +222,40 @@ const generateTileData = (tileId) => {
       { id: 2, date: '2024-01-15', anomaly_type: 'Stockout', sku: 'SKU_HC_003', store: 'STORE_003', expected: 28, actual: 0, variance: '-100%', reason: 'End-of-Life' },
       { id: 3, date: '2024-03-18', anomaly_type: 'Slow Sales', sku: 'SKU_HC_002', store: 'STORE_010', expected: 40, actual: 18, variance: '-55%', reason: 'Competitor Promo' },
     ],
-    'working-capital-optimizer': () => [
-      { id: 1, sku: 'SKU_HC_001', inventory_value: 63000, target_turns: 10, current_turns: 10.5, dio: 35, target_dio: 40, cash_impact: '+$5,000', status: 'Optimal' },
-      { id: 2, sku: 'SKU_HC_002', inventory_value: 48000, target_turns: 10, current_turns: 9.2, dio: 40, target_dio: 40, cash_impact: '$0', status: 'Optimal' },
-      { id: 3, sku: 'SKU_HC_006', inventory_value: 84000, target_turns: 10, current_turns: 8.5, dio: 43, target_dio: 40, cash_impact: '-$8,400', status: 'Review' },
-    ],
+    'working-capital-optimizer': () => {
+      // Generate optimization recommendations from Lam Research data
+      return LAM_MATERIAL_PLANT_DATA.slice(0, 10).map((mpd, idx) => {
+        const material = getMaterialById(mpd.materialId);
+        const plant = LAM_PLANTS.find(p => p.id === mpd.plant);
+        const inventoryValue = mpd.totalStock * (material?.basePrice || 0);
+        const dio = mpd.turns > 0 ? Math.round(365 / mpd.turns) : 0;
+        // Target turns based on material type: FG=4x, SFG=6x, RAW=8x
+        const targetTurns = material?.type === 'FERT' ? 4 : material?.type === 'HALB' ? 6 : 8;
+        const targetDio = Math.round(365 / targetTurns);
+        // Cash impact = (current inv - optimal inv) where optimal = currentCOGS / targetTurns
+        const currentCOGS = inventoryValue * mpd.turns;
+        const optimalInv = targetTurns > 0 ? currentCOGS / targetTurns : inventoryValue;
+        const cashImpact = inventoryValue - optimalInv;
+        const status = mpd.turns >= targetTurns ? 'Optimal' : mpd.turns >= targetTurns * 0.7 ? 'Review' : 'Action Required';
+        return {
+          id: idx + 1,
+          sku: mpd.materialId,
+          sku_name: material?.name || mpd.materialId,
+          plant: plant?.name || mpd.plant,
+          material_type: material?.type || 'Unknown',
+          inventory_value: inventoryValue,
+          target_turns: targetTurns,
+          current_turns: mpd.turns,
+          dio: dio,
+          target_dio: targetDio,
+          cash_impact: cashImpact > 0 ? `+$${(cashImpact/1000).toFixed(0)}K` : cashImpact < -1000 ? `-$${(Math.abs(cashImpact)/1000).toFixed(0)}K` : '$0',
+          cash_impact_value: cashImpact,
+          excess_stock: mpd.excessStock || 0,
+          wcp: plant?.grossMarginPct ? (plant.grossMarginPct * mpd.turns * 2.2).toFixed(1) : '0',
+          status: status,
+        };
+      });
+    },
   };
 
   return dataGenerators[tileId] ? dataGenerators[tileId]() : [];
@@ -318,14 +370,18 @@ const getColumnConfig = (tileId) => {
       { field: 'available', headerName: 'Available', minWidth: 140, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center', cellClassName: 'highlight-cell' },
     ],
     'working-capital': [
-      { field: 'sku', headerName: 'SKU', minWidth: 150, flex: 1 },
-      { field: 'inventory_units', headerName: 'Inventory Units', minWidth: 170, flex: 1, type: 'number', align: 'center', headerAlign: 'center'},
-      { field: 'unit_cost', headerName: 'Unit Cost ($)', minWidth: 150, flex: 1, type: 'number', align: 'center', headerAlign: 'center'},
-      { field: 'inventory_value', headerName: 'Inventory Value ($)', minWidth: 190, flex: 1.1, type: 'number', align: 'center', headerAlign: 'center'},
-      { field: 'turns', headerName: 'Turns', minWidth: 120, flex: 0.8, type: 'number', align: 'center', headerAlign: 'center'},
-      { field: 'dio', headerName: 'DIO (days)', minWidth: 140, flex: 0.9, type: 'number', align: 'center', headerAlign: 'center'},
-      { field: 'status', headerName: 'Status', minWidth: 150, flex: 1, align: 'center', headerAlign: 'center', renderCell: (params) => (
-        <Chip label={params.value} color={params.value === 'Optimal' ? 'success' : params.value === 'Stockout' ? 'error' : 'warning'} size="small" />
+      { field: 'sku', headerName: 'Material ID', minWidth: 100, flex: 0.7 },
+      { field: 'sku_name', headerName: 'Material Name', minWidth: 200, flex: 1.3 },
+      { field: 'plant', headerName: 'Plant', minWidth: 130, flex: 0.8 },
+      { field: 'inventory_units', headerName: 'Stock', minWidth: 80, flex: 0.5, type: 'number', align: 'center', headerAlign: 'center'},
+      { field: 'inventory_value', headerName: 'Inventory $', minWidth: 120, flex: 0.8, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value >= 1000000 ? `$${(params.value/1000000).toFixed(1)}M` : `$${(params.value/1000).toFixed(0)}K` },
+      { field: 'turns', headerName: 'Turns', minWidth: 80, flex: 0.5, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toFixed(1) },
+      { field: 'dos', headerName: 'DOS', minWidth: 80, flex: 0.5, type: 'number', align: 'center', headerAlign: 'center'},
+      { field: 'dio', headerName: 'DIO', minWidth: 80, flex: 0.5, type: 'number', align: 'center', headerAlign: 'center'},
+      { field: 'fill_rate', headerName: 'Fill %', minWidth: 80, flex: 0.5, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => `${params.value?.toFixed(1)}%` },
+      { field: 'abc', headerName: 'ABC', minWidth: 60, flex: 0.4, align: 'center', headerAlign: 'center'},
+      { field: 'status', headerName: 'Status', minWidth: 110, flex: 0.7, align: 'center', headerAlign: 'center', renderCell: (params) => (
+        <Chip label={params.value} size="small" color={params.value === 'Optimal' ? 'success' : params.value === 'Dead Stock' ? 'error' : params.value === 'Slow Moving' ? 'warning' : 'info'} />
       )},
     ],
     'excess-obsolete': [
@@ -444,15 +500,21 @@ const getColumnConfig = (tileId) => {
       { field: 'reason', headerName: 'Reason', minWidth: 220, flex: 1.3 },
     ],
     'working-capital-optimizer': [
-      { field: 'sku', headerName: 'SKU', minWidth: 150, flex: 1 },
-      { field: 'inventory_value', headerName: 'Inventory Value ($)', minWidth: 190, flex: 1.1, type: 'number', align: 'center', headerAlign: 'center'},
-      { field: 'target_turns', headerName: 'Target Turns', minWidth: 160, flex: 1, type: 'number', align: 'center', headerAlign: 'center'},
-      { field: 'current_turns', headerName: 'Current Turns', minWidth: 170, flex: 1, type: 'number', align: 'center', headerAlign: 'center'},
-      { field: 'dio', headerName: 'DIO', minWidth: 120, flex: 0.8, type: 'number', align: 'center', headerAlign: 'center'},
-      { field: 'target_dio', headerName: 'Target DIO', minWidth: 150, flex: 1, type: 'number', align: 'center', headerAlign: 'center'},
-      { field: 'cash_impact', headerName: 'Cash Impact', minWidth: 160, flex: 1 },
-      { field: 'status', headerName: 'Status', minWidth: 150, flex: 1, align: 'center', headerAlign: 'center', renderCell: (params) => (
-        <Chip label={params.value} color={params.value === 'Optimal' ? 'success' : 'warning'} size="small" />
+      { field: 'sku', headerName: 'Material', minWidth: 90, flex: 0.6 },
+      { field: 'sku_name', headerName: 'Material Name', minWidth: 180, flex: 1.2 },
+      { field: 'plant', headerName: 'Plant', minWidth: 120, flex: 0.7 },
+      { field: 'material_type', headerName: 'Type', minWidth: 70, flex: 0.4 },
+      { field: 'inventory_value', headerName: 'Inv Value', minWidth: 100, flex: 0.7, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value >= 1000000 ? `$${(params.value/1000000).toFixed(1)}M` : `$${(params.value/1000).toFixed(0)}K` },
+      { field: 'current_turns', headerName: 'Curr Turns', minWidth: 90, flex: 0.5, type: 'number', align: 'center', headerAlign: 'center', valueFormatter: (params) => params.value?.toFixed(1) },
+      { field: 'target_turns', headerName: 'Target', minWidth: 70, flex: 0.4, type: 'number', align: 'center', headerAlign: 'center'},
+      { field: 'dio', headerName: 'DIO', minWidth: 60, flex: 0.4, type: 'number', align: 'center', headerAlign: 'center'},
+      { field: 'target_dio', headerName: 'Tgt DIO', minWidth: 70, flex: 0.4, type: 'number', align: 'center', headerAlign: 'center'},
+      { field: 'wcp', headerName: 'WCP', minWidth: 70, flex: 0.4, align: 'center', headerAlign: 'center'},
+      { field: 'cash_impact', headerName: 'Cash Impact', minWidth: 100, flex: 0.6, renderCell: (params) => (
+        <Chip label={params.value} size="small" sx={{ fontWeight: 600 }} color={params.value?.startsWith('+') ? 'success' : params.value?.startsWith('-') ? 'error' : 'default'} />
+      )},
+      { field: 'status', headerName: 'Status', minWidth: 120, flex: 0.7, align: 'center', headerAlign: 'center', renderCell: (params) => (
+        <Chip label={params.value} size="small" color={params.value === 'Optimal' ? 'success' : params.value === 'Action Required' ? 'error' : 'warning'} />
       )},
     ],
   };
@@ -628,20 +690,16 @@ const getTileMetrics = (tileId, data) => {
       { label: 'Avg Variance', value: '55%', icon: ShowChart, color: '#2b88d8', trend: 'High' },
     ],
     'working-capital-optimizer': [
-      { label: 'Total Inventory Value', value: '$' + data.reduce((sum, row) => sum + (row.inventory_value || 0), 0).toLocaleString(), icon: AttachMoney, color: '#06b6d4', trend: null },
+      { label: 'Total Inventory Value', value: (() => {
+        const total = data.reduce((sum, row) => sum + (row.inventory_value || 0), 0);
+        return total >= 1000000 ? `$${(total/1000000).toFixed(1)}M` : `$${(total/1000).toFixed(0)}K`;
+      })(), icon: AttachMoney, color: '#06b6d4', trend: null },
       { label: 'Optimal SKUs', value: data.filter(r => r.status === 'Optimal').length, icon: CheckCircle, color: '#10b981', trend: null },
-      { label: 'Needs Review', value: data.filter(r => r.status === 'Review').length, icon: Warning, color: '#f59e0b', trend: null },
-      { label: 'Cash Impact', value: (() => {
-        try {
-          const total = data.reduce((sum, row) => {
-            const val = parseInt((row.cash_impact || '0').replace(/[$,+]/g, ''));
-            return sum + (isNaN(val) ? 0 : val);
-          }, 0);
-          return total >= 0 ? '+$' + total.toLocaleString() : '-$' + Math.abs(total).toLocaleString();
-        } catch {
-          return '$0';
-        }
-      })(), icon: TrendingUp, color: '#2b88d8', trend: null },
+      { label: 'Action Required', value: data.filter(r => r.status === 'Action Required').length, icon: Warning, color: '#ef4444', trend: null },
+      { label: 'WC Release Potential', value: (() => {
+        const total = data.reduce((sum, row) => sum + (row.cash_impact_value || 0), 0);
+        return total >= 0 ? `+$${(total/1000000).toFixed(1)}M` : `-$${(Math.abs(total)/1000000).toFixed(1)}M`;
+      })(), icon: TrendingUp, color: '#2b88d8', trend: 'Optimization' },
     ],
   };
 

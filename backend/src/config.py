@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
 
@@ -8,11 +8,12 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
+        extra="ignore",  # Allow extra env vars not defined in Settings
     )
 
     # Anthropic
     anthropic_api_key: str = Field(..., alias="ANTHROPIC_API_KEY")
-    anthropic_model: str = Field(default="claude-3-opus-20240229", alias="ANTHROPIC_MODEL")
+    anthropic_model: str = Field(default="claude-sonnet-4-20250514", alias="ANTHROPIC_MODEL")
 
     # OpenAI (for embeddings)
     openai_api_key: Optional[str] = Field(None, alias="OPENAI_API_KEY")
@@ -20,12 +21,17 @@ class Settings(BaseSettings):
         default="text-embedding-3-small", alias="OPENAI_EMBEDDING_MODEL"
     )
 
-    # Google Cloud / BigQuery (Optional - deprecated in favor of PostgreSQL)
+    # Google Cloud / BigQuery
     google_cloud_project: Optional[str] = Field(None, alias="GOOGLE_CLOUD_PROJECT")
     google_application_credentials: Optional[str] = Field(
         None, alias="GOOGLE_APPLICATION_CREDENTIALS"
     )
     bigquery_dataset: Optional[str] = Field(None, alias="BIGQUERY_DATASET")
+
+    # BigQuery Table Access Control
+    # Comma-separated list of allowed tables. If empty, all tables are allowed.
+    # Example: "customer_master_analysis,sales_order_cockpit_export,dataset_25m_table"
+    bigquery_allowed_tables: Optional[str] = Field(None, alias="BIGQUERY_ALLOWED_TABLES")
 
     # Weaviate
     weaviate_url: str = Field(default="http://localhost:8082", alias="WEAVIATE_URL")

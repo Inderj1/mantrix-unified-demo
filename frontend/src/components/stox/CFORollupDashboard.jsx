@@ -25,6 +25,8 @@ import {
   Filler,
 } from 'chart.js';
 
+import { LAM_PLANTS, LAM_MATERIAL_PLANT_DATA, calculatePlantSummary, getMaterialById } from '../../data/arizonaBeveragesMasterData';
+
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, ArcElement, Title, ChartTooltip, Legend, Filler);
 
 const formatCurrency = (value) => {
@@ -33,17 +35,24 @@ const formatCurrency = (value) => {
   return `$${value}`;
 };
 
-// Generate executive summary data
+// Generate executive summary data using Lam Research data
 const generateCFOData = () => {
-  // Overall WC metrics
-  const totalWorkingCapital = 12800000 + Math.random() * 2000000;
-  const cycleStock = totalWorkingCapital * (0.35 + Math.random() * 0.05);
-  const safetyStock = totalWorkingCapital * (0.30 + Math.random() * 0.05);
-  const pipelineStock = totalWorkingCapital * (0.15 + Math.random() * 0.05);
-  const excessStock = totalWorkingCapital - cycleStock - safetyStock - pipelineStock;
+  // Calculate total excess from actual Lam Research data
+  const totalExcess = LAM_MATERIAL_PLANT_DATA.reduce((sum, d) => sum + (d.excessStock || 0), 0);
+  const totalValue = LAM_MATERIAL_PLANT_DATA.reduce((sum, d) => {
+    const mat = getMaterialById(d.materialId);
+    return sum + (d.totalStock * (mat?.basePrice || 0));
+  }, 0);
+
+  // Overall WC metrics - use real data scaled appropriately
+  const totalWorkingCapital = totalExcess > 0 ? totalExcess : 185000000;
+  const cycleStock = totalWorkingCapital * 0.38;
+  const safetyStock = totalWorkingCapital * 0.28;
+  const pipelineStock = totalWorkingCapital * 0.14;
+  const excessStock = totalWorkingCapital * 0.20;
 
   // Cash release potential
-  const totalCashRelease = 1800000 + Math.random() * 400000;
+  const totalCashRelease = excessStock * 0.85; // 85% of excess is recoverable
   const highConfidence = totalCashRelease * 0.45;
   const mediumConfidence = totalCashRelease * 0.35;
   const lowConfidence = totalCashRelease * 0.20;
@@ -51,13 +60,19 @@ const generateCFOData = () => {
   // Risk-adjusted savings
   const riskAdjustedSavings = totalCashRelease * 0.72;
 
-  // Plant breakdown
-  const plants = [
-    { name: 'Atlanta DC', wc: 4200000, cashRelease: 620000, confidence: 85, serviceRisk: 2.1, dioChange: -8 },
-    { name: 'Chicago Hub', wc: 3800000, cashRelease: 480000, confidence: 78, serviceRisk: 3.5, dioChange: -5 },
-    { name: 'Dallas Center', wc: 2900000, cashRelease: 390000, confidence: 82, serviceRisk: 2.8, dioChange: -6 },
-    { name: 'Phoenix Warehouse', wc: 1900000, cashRelease: 310000, confidence: 71, serviceRisk: 4.2, dioChange: -4 },
-  ];
+  // Plant breakdown using Lam Research plants
+  const plants = LAM_PLANTS.map(plant => {
+    const summary = calculatePlantSummary(plant.id);
+    return {
+      name: `${plant.name}`,
+      region: plant.region,
+      wc: summary.totalExcess > 0 ? summary.totalExcess : totalWorkingCapital / LAM_PLANTS.length * (0.8 + Math.random() * 0.4),
+      cashRelease: (summary.totalExcess || totalWorkingCapital / LAM_PLANTS.length * 0.2) * 0.15,
+      confidence: Math.floor(70 + Math.random() * 25),
+      serviceRisk: (1.5 + Math.random() * 3).toFixed(1),
+      dioChange: Math.floor(-4 - Math.random() * 8),
+    };
+  });
 
   // Monthly WC trend (last 12 months)
   const wcTrend = Array.from({ length: 12 }, (_, i) => {
@@ -101,7 +116,7 @@ const generateCFOData = () => {
   };
 };
 
-const CFORollupDashboard = ({ onBack }) => {
+const CFORollupDashboard = ({ onBack, onTileClick }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -196,9 +211,8 @@ const CFORollupDashboard = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 6: Execution</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>Layer 6: Execution</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>CFO Rollup Dashboard</Typography>
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>

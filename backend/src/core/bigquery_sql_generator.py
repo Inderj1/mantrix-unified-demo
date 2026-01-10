@@ -49,6 +49,15 @@ class BigQuerySQLGenerator:
         # Cache for schema info
         self._schema_cache = None
 
+        # Parse allowed tables from config (comma-separated list)
+        self.allowed_tables = None
+        if settings.bigquery_allowed_tables:
+            self.allowed_tables = [
+                t.strip() for t in settings.bigquery_allowed_tables.split(',')
+                if t.strip()
+            ]
+            logger.info(f"Table access restricted to: {self.allowed_tables}")
+
         # Initialize knowledge service for semantic search
         self.knowledge_service = None
         if KNOWLEDGE_SERVICE_AVAILABLE:
@@ -96,16 +105,26 @@ class BigQuerySQLGenerator:
         logger.info(f"Switched to dataset: {dataset_id}")
 
     def list_tables(self) -> List[str]:
-        """List all tables in the current dataset"""
+        """List all tables in the current dataset (filtered by allowed_tables if set)"""
         try:
-            return self.bq_client.list_tables()
+            all_tables = self.bq_client.list_tables()
+            if self.allowed_tables:
+                # Filter to only allowed tables
+                filtered = [t for t in all_tables if t in self.allowed_tables]
+                logger.debug(f"Filtered tables from {len(all_tables)} to {len(filtered)}")
+                return filtered
+            return all_tables
         except Exception as e:
             logger.error(f"Failed to list tables: {e}")
             return []
 
     def get_table_schema(self, table_name: str) -> Dict[str, Any]:
-        """Get schema for a specific table"""
+        """Get schema for a specific table (respects allowed_tables restriction)"""
         try:
+            # Check if table is allowed
+            if self.allowed_tables and table_name not in self.allowed_tables:
+                logger.warning(f"Access denied to table {table_name} - not in allowed_tables")
+                return {}
             return self.bq_client.get_table_schema(table_name)
         except Exception as e:
             logger.error(f"Failed to get schema for {table_name}: {e}")
@@ -268,17 +287,10 @@ class BigQuerySQLGenerator:
         query_lower = query.lower()
         all_tables = self.list_tables()
 
-        # Define keyword mappings
+        # Define keyword mappings - only for allowed tables
         table_keywords = {
-            "transaction_data": ["sales", "revenue", "margin", "profit", "order", "transaction", "gross", "net"],
-            "dataset_25m_table": ["customer", "client", "buyer", "sold", "name", "sales", "revenue", "margin", "product", "material", "brand"],
-            "GL_Accounts": ["gl", "account", "ledger", "chart", "bucket"],
-            "customer_master_analysis": ["customer", "client", "buyer", "segment", "rfm", "analysis"],
-            "sales_order_cockpit_export": ["sales order", "order", "delivery", "shipment"],
-            "cohort_retention_table": ["cohort", "retention", "churn"],
-            "segment_performance_summary": ["segment", "performance", "kpi"],
-            "stox_demo_inventory_health": ["inventory", "stock", "health"],
-            "stox_demo_forecasts": ["forecast", "prediction", "future"],
+            "dataset_25m_table": ["customer", "client", "buyer", "sold", "name", "sales", "revenue", "margin", "product", "material", "brand", "gross", "net", "profit", "transaction"],
+            "sales_order_cockpit_export": ["sales order", "order", "delivery", "shipment", "ship"],
         }
 
         relevant_tables = []
@@ -302,6 +314,141 @@ class BigQuerySQLGenerator:
                 relevant_tables = all_tables[:3]
 
         return relevant_tables[:5]  # Limit to 5 tables
+
+    def _fix_current_date_queries(self, sql: str) -> str:
+        """Remove CURRENT_DATE() based filtering since data has fixed date range.
+
+        Also fixes wrong date column usage (REFERENCESDDOCUMENT -> Posting_Date).
+        """
+        import re
+
+        original_sql = sql
+
+        # Fix 1: Replace wrong date column parsing with Posting_Date
+        # Pattern: PARSE_DATE('%Y%m%d', SUBSTRING(REFERENCESDDOCUMENT, ...)) -> Posting_Date
+        sql = re.sub(
+            r"PARSE_DATE\s*\(\s*'%Y%m%d'\s*,\s*SUBSTRING\s*\(\s*REFERENCESDDOCUMENT[^)]*\)\s*\)",
+            'Posting_Date',
+            sql,
+            flags=re.IGNORECASE
+        )
+        # Pattern: CAST(SUBSTRING(REFERENCESDDOCUMENT, ...) AS DATE) -> Posting_Date
+        sql = re.sub(
+            r"CAST\s*\(\s*SUBSTRING\s*\(\s*REFERENCESDDOCUMENT[^)]*\)\s*AS\s+DATE\s*\)",
+            'Posting_Date',
+            sql,
+            flags=re.IGNORECASE
+        )
+
+        # Fix 2: Remove CURRENT_DATE() based filtering entirely
+        # Remove conditions like: AND Posting_Date >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
+        sql = re.sub(
+            r"\s+AND\s+\w+\s*>=\s*DATE_SUB\s*\(\s*CURRENT_DATE\s*\(\s*\)\s*,\s*INTERVAL\s+\d+\s+\w+\s*\)",
+            '',
+            sql,
+            flags=re.IGNORECASE
+        )
+
+        # Remove standalone WHERE conditions with CURRENT_DATE (not preceded by AND)
+        sql = re.sub(
+            r"\s+AND\s+Posting_Date\s*>=\s*DATE_SUB\s*\(\s*CURRENT_DATE\s*\(\s*\)\s*,\s*INTERVAL\s+\d+\s+\w+\s*\)",
+            '',
+            sql,
+            flags=re.IGNORECASE
+        )
+
+        # Remove WHERE conditions with CURRENT_DATE when followed by GROUP/ORDER
+        sql = re.sub(
+            r"WHERE\s+\w+\s*>=\s*DATE_SUB\s*\(\s*CURRENT_DATE\s*\(\s*\)\s*,\s*INTERVAL\s+\d+\s+\w+\s*\)\s*(GROUP|ORDER)",
+            r'WHERE Posting_Date IS NOT NULL \1',
+            sql,
+            flags=re.IGNORECASE
+        )
+
+        # More general pattern - remove entire lines containing CURRENT_DATE()
+        lines = sql.split('\n')
+        filtered_lines = []
+        removed_count = 0
+        for line in lines:
+            line_upper = line.upper()
+            has_current_date = 'CURRENT_DATE' in line_upper
+            has_condition = 'AND' in line_upper or '>=' in line_upper
+            if has_current_date and has_condition:
+                # Skip lines with CURRENT_DATE in conditions
+                logger.warning(f"REMOVING CURRENT_DATE line: [{line.strip()}]")
+                removed_count += 1
+                continue
+            filtered_lines.append(line)
+        sql = '\n'.join(filtered_lines)
+        if removed_count > 0:
+            logger.warning(f"Removed {removed_count} lines containing CURRENT_DATE()")
+
+        # Remove the complex REFERENCESDDOCUMENT conditions entirely
+        sql = re.sub(
+            r"\s+AND\s+LENGTH\s*\(\s*REFERENCESDDOCUMENT\s*\)\s*>=\s*\d+",
+            '',
+            sql,
+            flags=re.IGNORECASE
+        )
+        sql = re.sub(
+            r"\s+AND\s+REGEXP_CONTAINS\s*\(\s*SUBSTRING\s*\(\s*REFERENCESDDOCUMENT[^)]*\)[^)]*\)",
+            '',
+            sql,
+            flags=re.IGNORECASE
+        )
+        sql = re.sub(
+            r"WHERE\s+REFERENCESDDOCUMENT\s+IS\s+NOT\s+NULL\s+AND",
+            'WHERE',
+            sql,
+            flags=re.IGNORECASE
+        )
+
+        # Clean up double spaces and newlines
+        sql = re.sub(r'\n\s*\n', '\n', sql)
+        sql = re.sub(r'  +', ' ', sql)
+
+        # Fix BigQuery CTE column name conflicts - when a CTE and column have same name
+        # This causes "No matching signature for aggregate function" errors
+        # Solution: rename columns that conflict with CTE names
+        cte_pattern = r'WITH\s+(\w+)\s+AS'
+        cte_matches = re.findall(cte_pattern, sql, flags=re.IGNORECASE)
+        logger.info(f"CTE conflict check - found CTEs: {cte_matches}")
+        for cte_name in cte_matches:
+            # If a column has same name as CTE, rename it with _value suffix
+            col_pattern = rf'\b{cte_name}\s+AS\s+{cte_name}\b'
+            if re.search(col_pattern, sql, flags=re.IGNORECASE):
+                sql = re.sub(col_pattern, f'{cte_name} AS {cte_name}_value', sql, flags=re.IGNORECASE)
+                # Also update references to this column in aggregates
+                sql = re.sub(rf'AVG\s*\(\s*{cte_name}\s*\)', f'AVG({cte_name}_value)', sql, flags=re.IGNORECASE)
+                sql = re.sub(rf'SUM\s*\(\s*{cte_name}\s*\)', f'SUM({cte_name}_value)', sql, flags=re.IGNORECASE)
+                logger.info(f"Fixed CTE column name conflict for: {cte_name}")
+
+            # Also fix case where column is named same as CTE in subsequent CTEs
+            # e.g., SUM(...) AS monthly_revenue in CTE monthly_revenue
+            # Use .+? to handle nested parentheses like SUM(COALESCE(...))
+            sum_pattern = rf'(SUM\s*\(.+?\))\s+AS\s+{cte_name}\b'
+            sum_match = re.search(sum_pattern, sql, flags=re.IGNORECASE)
+            logger.info(f"CTE conflict check - SUM pattern for {cte_name}: {sum_match.group(0) if sum_match else 'No match'}")
+            if sum_match:
+                # Rename the column to avoid conflict
+                sql = re.sub(sum_pattern, rf'\1 AS {cte_name}_amount', sql, flags=re.IGNORECASE)
+                # Update all references to this column throughout the SQL
+                # But be careful not to replace the CTE name itself in FROM clauses
+                # Only replace column references (preceded by comma, SELECT, or in functions)
+                sql = re.sub(rf'AVG\s*\(\s*{cte_name}\s*\)', f'AVG({cte_name}_amount)', sql, flags=re.IGNORECASE)
+                sql = re.sub(rf',\s*\n\s*{cte_name}\s*,', f',\n {cte_name}_amount,', sql, flags=re.IGNORECASE)
+                sql = re.sub(rf',\s*{cte_name}\s*,', f', {cte_name}_amount,', sql, flags=re.IGNORECASE)
+                sql = re.sub(rf'SELECT\s+\n?\s*{cte_name}\s*,', f'SELECT\n {cte_name}_amount,', sql, flags=re.IGNORECASE)
+                sql = re.sub(rf'ROUND\s*\(\s*{cte_name}\s*,', f'ROUND({cte_name}_amount,', sql, flags=re.IGNORECASE)
+                # Also handle standalone column reference after SELECT or comma
+                sql = re.sub(rf'(?<=,)\s*{cte_name}(?=\s*,|\s+AS)', f' {cte_name}_amount', sql, flags=re.IGNORECASE)
+                sql = re.sub(rf'(?<=SELECT)\s+{cte_name}(?=\s*,)', f' {cte_name}_amount', sql, flags=re.IGNORECASE)
+                logger.info(f"Fixed CTE column name conflict (SUM pattern) for: {cte_name}")
+
+        if sql != original_sql:
+            logger.info(f"Fixed CURRENT_DATE() and/or REFERENCESDDOCUMENT in SQL")
+
+        return sql
 
     def _fix_postgresql_syntax(self, sql: str) -> str:
         """Fix common PostgreSQL syntax that might slip through to BigQuery"""
@@ -972,18 +1119,33 @@ class BigQuerySQLGenerator:
             - DATE_TRUNC: Use DATE_TRUNC(date_column, MONTH) NOT DATE_TRUNC('month', date_column)
             - INTERVAL: Use DATE_SUB(CURRENT_DATE(), INTERVAL 2 YEAR) NOT CURRENT_DATE() - INTERVAL '2 years'
             - Example monthly grouping: DATE_TRUNC(Posting_Date, MONTH) AS month
-            - Example year filter: WHERE Posting_Date >= DATE_SUB(CURRENT_DATE(), INTERVAL 2 YEAR)
+            - Example year filter: WHERE EXTRACT(YEAR FROM Posting_Date) IN (2023, 2024, 2025)
             - Year-over-year: Use EXTRACT(YEAR FROM date_column) and self-join or LAG() function
 
             CRITICAL - DATA DATE RANGE (MUST FOLLOW):
             {data_date_range}
-            - NEVER use CURRENT_DATE() for date filtering - it will return no results
-            - For YoY (Year-over-Year): Compare years within the available data range
-            - For MoM (Month-over-Month): Query all available months, don't filter by "last N months"
-            - For trends: Use all available data without date restrictions
-            - When user asks for "last year" or "this year", use the most recent complete year in the data
-            - Example CORRECT: WHERE Posting_Date IS NOT NULL (gets all data)
-            - Example WRONG: WHERE Posting_Date >= DATE_SUB(CURRENT_DATE(), INTERVAL 12 MONTH)
+
+            ABSOLUTE RULES FOR DATE HANDLING:
+            1. NEVER use CURRENT_DATE(), DATE_SUB(CURRENT_DATE(), ...), or any function that references today's date
+            2. The data has a FIXED date range - queries using CURRENT_DATE() WILL RETURN EMPTY RESULTS
+            3. For "last N months" or "recent" queries: Use ORDER BY date DESC LIMIT N instead of date filtering
+            4. For YoY: Compare specific years like 2024 vs 2023, not "this year vs last year"
+            5. For MoM: Get all months with ORDER BY, not filtered by relative dates
+
+            CORRECT PATTERNS:
+            - "Last 6 months": ORDER BY month DESC LIMIT 6 (NOT: WHERE date >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH))
+            - "Recent data": ORDER BY Posting_Date DESC LIMIT 1000 (NOT: WHERE Posting_Date >= CURRENT_DATE() - 30)
+            - "This year": WHERE EXTRACT(YEAR FROM Posting_Date) = 2024 (use actual year from data range)
+
+            WRONG PATTERNS (WILL FAIL):
+            - DATE_SUB(CURRENT_DATE(), INTERVAL N MONTH)
+            - WHERE Posting_Date >= CURRENT_DATE() - INTERVAL '6 months'
+            - CURRENT_DATE() anywhere in the query
+
+            ROLLING AVERAGES AND WINDOW FUNCTIONS:
+            - For rolling averages, use Posting_Date (the primary date column), NOT Sales_Order columns
+            - Example rolling 3-month: AVG(value) OVER (ORDER BY DATE_TRUNC(Posting_Date, MONTH) ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)
+            - Always use DATE_TRUNC(Posting_Date, MONTH) for monthly grouping
 
             IMPORTANT - Number and Currency Formatting in BigQuery:
             - Return numeric values as raw numbers (FLOAT64 or INT64), NOT as formatted strings
@@ -998,12 +1160,11 @@ class BigQuerySQLGenerator:
             - || for concatenation - use CONCAT() instead
 
             IMPORTANT TABLE GUIDANCE:
-            - For customer data with names: Use `dataset_25m_table` (alias: d) which has Sold_to_Name (customer name), Sold_to_Number (customer ID), Payer_Name (parent company), Bill_to_Party_Name (billing entity)
-            - For customer analytics/segments: Use `customer_master_analysis` (alias: c) which has Customer (ID), RFM_Segment, Advanced_Segment, ABC classifications
+            - For customer data with names: Use `dataset_25m_table` which has Sold_to_Name (customer name), Sold_to_Number (customer ID), Payer_Name (parent company), Bill_to_Party_Name (billing entity)
             - When user asks for "customers" or "customer list", use dataset_25m_table and include Sold_to_Name (or Payer_Name for consolidated view), Sold_to_Number
             - For a simple customer list, use: SELECT DISTINCT Sold_to_Number, Sold_to_Name FROM dataset_25m_table
-            - When joining tables, ALWAYS use table aliases (d, c) and qualify all column references to avoid ambiguity
-            - Example JOIN: FROM dataset_25m_table d LEFT JOIN customer_master_analysis c ON d.Sold_to_Number = c.Customer
+            - For sales orders and delivery info: Use `sales_order_cockpit_export`
+            - ONLY use tables listed in AVAILABLE TABLES below - do not reference any other tables
 
             CRITICAL - TEXT CASE PRESERVATION:
             - NEVER use LOWER() on columns in SELECT statements - this converts "WALMART" to "walmart" which is wrong
@@ -1252,6 +1413,10 @@ class BigQuerySQLGenerator:
                     sql = sql.rstrip(';') + " LIMIT 1000;"
                     result["limit_added"] = True
 
+                # CRITICAL: Remove CURRENT_DATE() based filtering - data has fixed date range
+                sql = self._fix_current_date_queries(sql)
+                logger.info(f"After _fix_current_date_queries - contains CURRENT_DATE: {'CURRENT_DATE' in sql.upper()}")
+
                 # CRITICAL: Force correct project/dataset in case LLM hallucinated different ones
                 # This catches cases like `arizona-poc.project_ops.table` and fixes to correct dataset
                 sql = self._enforce_correct_dataset(sql)
@@ -1326,6 +1491,145 @@ class BigQuerySQLGenerator:
                 "dataset": self.dataset_id
             }
 
+    def _format_value(self, value: Any, column_name: str) -> str:
+        """Format a value based on column name patterns.
+
+        Applies:
+        - Currency formatting ($X,XXX.XX) for revenue, cost, margin, price columns
+        - Percentage formatting (X.XX%) for percentage/ratio columns
+        - Comma separators for large numbers (quantity, count)
+        - Preserves ID/code columns as strings
+        """
+        if value is None:
+            return None
+
+        # Convert to string if needed
+        str_value = str(value)
+
+        # Check if it's already formatted (has $ or %)
+        if str_value.startswith('$') or str_value.endswith('%'):
+            return str_value
+
+        column_lower = column_name.lower()
+
+        # ID/Code/Year columns - preserve as-is (don't format as numbers)
+        preserve_keywords = [
+            'customer', 'id', 'code', 'sku', 'material', 'product_code',
+            'order', 'document', 'reference', 'key', 'number', 'no',
+            'account', 'gl_', 'segment', 'channel', 'region', 'territory',
+            'year', 'month', 'date', 'period', 'fiscal', 'calendar',
+            'quarter', 'week', 'day', 'hour', 'time', 'timestamp',
+            'name', 'description', 'category', 'type', 'status',
+            'product', 'item', 'brand', 'vendor', 'supplier', 'distributor',
+            'employee', 'user', 'manager', 'owner', 'created', 'modified'
+        ]
+        for kw in preserve_keywords:
+            if kw in column_lower:
+                return str_value  # Return as-is, preserve original format
+
+        # Try to parse as number
+        try:
+            # Remove any existing commas
+            clean_value = str_value.replace(',', '')
+            num_value = float(clean_value)
+        except (ValueError, TypeError):
+            return str_value  # Return as-is if not a number
+
+        # Currency columns - format as $X,XXX.XX
+        currency_keywords = [
+            'revenue', 'sales', 'cost', 'margin', 'price', 'amount',
+            'total', 'gross', 'net', 'profit', 'expense', 'fee',
+            'cogs', 'cogm', 'cos', 'value', 'income', 'earning',
+            'payment', 'charge', 'discount', 'rebate', 'allowance',
+            'difference', 'delta', 'variance', 'budget', 'actual',
+            'spend', 'expenditure', 'liability', 'asset', 'balance',
+            'debit', 'credit', 'invoice', 'billing', 'freight',
+            'shipping', 'handling', 'tax', 'duty', 'tariff'
+        ]
+
+        # Percentage columns - already formatted or need % suffix
+        percentage_keywords = [
+            'percent', 'pct', 'ratio', 'rate', 'growth', 'change',
+            'margin_pct', 'margin_percent', 'percentage', 'yoy', 'mom',
+            'qoq', 'wow', 'contribution', 'share', 'proportion',
+            'utilization', 'efficiency', 'yield', 'conversion'
+        ]
+
+        # Quantity columns - just add comma separators, no decimals
+        quantity_keywords = [
+            'count', 'quantity', 'qty', 'units', 'items', 'rows',
+            'number', 'num_', '_num', 'total_count', 'sold', 'ordered',
+            'shipped', 'delivered', 'cases', 'volume'
+        ]
+
+        # Priority order: percentage -> quantity -> currency
+        # This ensures 'margin_percentage' is percentage, 'quantity_sold' is quantity
+
+        # 1. Check for percentage columns FIRST
+        is_percentage = False
+        for kw in percentage_keywords:
+            if kw in column_lower:
+                is_percentage = True
+                break
+
+        if is_percentage:
+            # If value is already a percentage (e.g., "43.5%"), return as-is
+            if '%' in str_value:
+                return str_value
+            # If value is a ratio (0-1), multiply by 100
+            if -1 <= num_value <= 1 and 'ratio' in column_lower:
+                return f"{num_value * 100:,.2f}%"
+            # Otherwise just add % suffix
+            return f"{num_value:,.2f}%"
+
+        # 2. Check for quantity columns (before currency to avoid 'total_quantity' being currency)
+        is_quantity = False
+        for kw in quantity_keywords:
+            if kw in column_lower:
+                is_quantity = True
+                break
+
+        if is_quantity:
+            # Format with commas, no decimals for whole numbers, 2 decimals otherwise
+            if num_value == int(num_value):
+                return f"{int(num_value):,}"
+            return f"{num_value:,.2f}"
+
+        # 3. Check for currency columns (only if not percentage or quantity)
+        for kw in currency_keywords:
+            if kw in column_lower:
+                # Format as currency with $ and commas
+                if num_value < 0:
+                    return f"-${abs(num_value):,.2f}"
+                return f"${num_value:,.2f}"
+
+        # Default: if it's a large number, add commas but keep decimals
+        if abs(num_value) >= 1000:
+            if num_value == int(num_value):
+                return f"{int(num_value):,}"
+            return f"{num_value:,.2f}"
+
+        # Small numbers - return with 2 decimal places if has decimals
+        if num_value != int(num_value):
+            return f"{num_value:.2f}"
+
+        return str_value
+
+    def _format_results(self, results: List[Dict[str, Any]], columns: List[str]) -> List[Dict[str, Any]]:
+        """Format all result values based on column names."""
+        if not results:
+            return results
+
+        formatted_results = []
+        for row in results:
+            formatted_row = {}
+            for col in columns:
+                value = row.get(col)
+                formatted_row[col] = self._format_value(value, col)
+            formatted_results.append(formatted_row)
+
+        return formatted_results
+
     def execute_sql(self, sql: str) -> Dict[str, Any]:
         """Execute SQL query and return results"""
         try:
@@ -1348,9 +1652,12 @@ class BigQuerySQLGenerator:
             if results:
                 columns = list(results[0].keys()) if results else []
 
+                # Apply formatting to results (currency, percentages, etc.)
+                formatted_results = self._format_results(results, columns)
+
                 return {
                     "success": True,
-                    "data": results,
+                    "data": formatted_results,
                     "columns": columns,
                     "row_count": len(results),
                     "sql": sql,
@@ -1473,6 +1780,9 @@ Return ONLY the corrected SQL, no explanation."""
 
             # Force correct project/dataset in case LLM hallucinated different ones
             fixed_sql = self._enforce_correct_dataset(fixed_sql)
+
+            # Fix CURRENT_DATE and CTE column name conflicts
+            fixed_sql = self._fix_current_date_queries(fixed_sql)
 
             logger.info("LLM provided SQL fix")
             return fixed_sql

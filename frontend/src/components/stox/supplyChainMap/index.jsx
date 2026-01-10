@@ -50,7 +50,7 @@ export default function SupplyChainMap({ onBack }) {
   const [filters, setFilters] = useState({
     trucks: true,
     stores: true,
-    routes: true,
+    routes: false,
     alerts: true,
   });
 

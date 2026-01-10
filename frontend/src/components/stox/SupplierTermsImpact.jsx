@@ -24,6 +24,7 @@ import {
 import stoxTheme from './stoxTheme';
 import DataSourceChip from './DataSourceChip';
 import { getTileDataConfig } from './stoxDataConfig';
+import { LAM_VENDORS } from '../../data/arizonaBeveragesMasterData';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, ChartTooltip, Legend);
 
@@ -33,20 +34,26 @@ const formatCurrency = (value) => {
   return `$${value}`;
 };
 
-// Generate supplier terms data
+// Generate supplier terms data using Lam Research vendors
 const generateSupplierTermsData = () => {
-  const suppliers = [
-    { name: 'Acme Components', spend: 2800000, terms: 'Net 45', consignment: false, earlyDiscount: '2/10', category: 'Electronics' },
-    { name: 'Global Metals Inc', spend: 2100000, terms: 'Net 30', consignment: true, earlyDiscount: null, category: 'Raw Materials' },
-    { name: 'Pacific Plastics', spend: 1800000, terms: 'Net 60', consignment: false, earlyDiscount: '1.5/15', category: 'Components' },
-    { name: 'Atlas Bearings', spend: 1500000, terms: 'Net 30', consignment: false, earlyDiscount: '2/10', category: 'MRO' },
-    { name: 'Premier Fasteners', spend: 1200000, terms: 'Net 45', consignment: true, earlyDiscount: null, category: 'Components' },
-    { name: 'Delta Electronics', spend: 950000, terms: 'Net 30', consignment: false, earlyDiscount: '2.5/10', category: 'Electronics' },
-    { name: 'Allied Chemicals', spend: 850000, terms: 'Net 60', consignment: false, earlyDiscount: null, category: 'Raw Materials' },
-    { name: 'Midwest Motors', spend: 720000, terms: 'Net 45', consignment: false, earlyDiscount: '1/10', category: 'Components' },
-    { name: 'Eastern Logistics', spend: 580000, terms: 'Net 30', consignment: false, earlyDiscount: null, category: 'Services' },
-    { name: 'Summit Packaging', spend: 420000, terms: 'Net 30', consignment: true, earlyDiscount: null, category: 'Packaging' },
-  ];
+  // Map Lam Research vendors to supplier terms data
+  const suppliers = LAM_VENDORS.slice(0, 10).map((vendor, idx) => {
+    const termsOptions = ['Net 30', 'Net 45', 'Net 60'];
+    const discountOptions = ['2/10', '1.5/15', '2.5/10', '1/10', null];
+    // Spend based on vendor rating and lead time
+    const baseSpend = vendor.rating >= 4.5 ? 3500000 : vendor.rating >= 4.0 ? 2500000 : 1500000;
+    return {
+      name: vendor.name,
+      vendorId: vendor.id,
+      spend: baseSpend + Math.floor(Math.random() * 1000000),
+      terms: termsOptions[idx % 3],
+      consignment: idx % 4 === 1, // Every 4th vendor on consignment
+      earlyDiscount: discountOptions[idx % 5],
+      category: vendor.category,
+      baseLeadTime: vendor.leadTime,
+      baseRating: vendor.rating,
+    };
+  });
 
   // Calculate WC impact for each supplier
   const supplierData = suppliers.map((sup, idx) => {
@@ -69,6 +76,7 @@ const generateSupplierTermsData = () => {
 
     return {
       id: idx + 1,
+      vendorId: sup.vendorId,
       supplier: sup.name,
       category: sup.category,
       annualSpend: sup.spend,
@@ -83,8 +91,9 @@ const generateSupplierTermsData = () => {
       discountValue: Math.round(discountValue),
       annualizedRate: Math.round(annualizedRate * 10) / 10,
       dpo: termsDays + Math.floor(Math.random() * 5),
-      leadTime: 7 + Math.floor(Math.random() * 21),
-      onTimeDelivery: (92 + Math.random() * 7).toFixed(1),
+      leadTime: sup.baseLeadTime || (7 + Math.floor(Math.random() * 21)),
+      onTimeDelivery: sup.baseRating ? (sup.baseRating * 20 + Math.random() * 5).toFixed(1) : (92 + Math.random() * 7).toFixed(1),
+      rating: sup.baseRating,
     };
   });
 
@@ -137,7 +146,7 @@ const generateSupplierTermsData = () => {
   };
 };
 
-const SupplierTermsImpact = ({ onBack }) => {
+const SupplierTermsImpact = ({ onBack, onTileClick }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState(0);
@@ -297,9 +306,8 @@ const SupplierTermsImpact = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 4: Optimization</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>Layer 4: Optimization</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>Supplier Terms Impact</Typography>
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>

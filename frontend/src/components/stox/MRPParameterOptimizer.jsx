@@ -103,57 +103,57 @@ const generateEOQCurveData = (annualDemand, orderingCost, unitCost, holdingRate)
   };
 };
 
-// Generate mock MRP parameter data
+// Import Lam Research data
+import {
+  LAM_MATERIALS,
+  LAM_MATERIAL_PLANT_DATA,
+  LAM_PLANTS,
+  getMaterialById,
+  getPlantName,
+} from '../../data/arizonaBeveragesMasterData';
+
+// Generate MRP parameter data from Lam Research materials
 const generateMRPData = () => {
-  const materials = [
-    { id: 'MAT-001', name: 'Hydraulic Pump', mrpType: 'PD' },
-    { id: 'MAT-002', name: 'Bearing Assembly', mrpType: 'VB' },
-    { id: 'MAT-003', name: 'Control Module', mrpType: 'PD' },
-    { id: 'MAT-004', name: 'Valve Kit', mrpType: 'V1' },
-    { id: 'MAT-005', name: 'Gasket Set', mrpType: 'VB' },
-    { id: 'MAT-006', name: 'Sensor Array', mrpType: 'PD' },
-    { id: 'MAT-007', name: 'Motor Drive', mrpType: 'PD' },
-    { id: 'MAT-008', name: 'Filter Element', mrpType: 'V1' },
-    { id: 'MAT-009', name: 'Seal Kit', mrpType: 'VB' },
-    { id: 'MAT-010', name: 'Coupling Assembly', mrpType: 'PD' },
-    { id: 'MAT-011', name: 'Shaft Bearing', mrpType: 'VB' },
-    { id: 'MAT-012', name: 'Pressure Gauge', mrpType: 'V1' },
-  ];
-
   const lotSizes = ['EX', 'FX', 'WB', 'MB', 'TB', 'HB'];
-  const abcOptions = ['A', 'B', 'C'];
 
-  return materials.map((mat, idx) => {
-    const currentSS = Math.floor(100 + Math.random() * 400);
-    const optimalSS = Math.floor(currentSS * (0.7 + Math.random() * 0.6));
+  // Use unique material-plant combinations from LAM data
+  return LAM_MATERIAL_PLANT_DATA.slice(0, 12).map((mpd, idx) => {
+    const material = getMaterialById(mpd.materialId);
+    const plantName = getPlantName(mpd.plant);
+
+    const currentSS = mpd.safetyStock || Math.floor(20 + Math.random() * 80);
+    // Calculate optimal SS based on lead time and demand variability
+    const optimalSS = Math.floor(currentSS * (mpd.dos > 150 ? 0.7 : mpd.dos < 50 ? 1.3 : 1.0));
     const ssDiff = currentSS - optimalSS;
-    const ssOptimization = ssDiff > 0 ? 'Reduce' : ssDiff < -50 ? 'Increase' : 'Optimal';
+    const ssOptimization = ssDiff > 5 ? 'Reduce' : ssDiff < -5 ? 'Increase' : 'Optimal';
 
-    const currentROP = Math.floor(200 + Math.random() * 500);
-    const optimalROP = Math.floor(currentROP * (0.8 + Math.random() * 0.4));
+    const currentROP = mpd.reorderPoint || Math.floor(currentSS * 2);
+    const optimalROP = Math.floor(currentROP * (mpd.dos > 150 ? 0.8 : mpd.dos < 50 ? 1.2 : 1.0));
     const ropDiff = currentROP - optimalROP;
 
     const currentLotSize = lotSizes[idx % 6];
-    const optimalLotSize = lotSizes[(idx + 2) % 6];
+    const optimalLotSize = mpd.lotSize ? `FX-${mpd.lotSize}` : lotSizes[(idx + 2) % 6];
 
-    const serviceLevel = (92 + Math.random() * 7).toFixed(1);
-    const fillRate = (90 + Math.random() * 9).toFixed(1);
-    const stockoutRisk = ssOptimization === 'Reduce' ? 'Low' : ssOptimization === 'Increase' ? 'High' : 'Medium';
+    const stockoutRisk = mpd.stockouts > 6 ? 'High' : mpd.stockouts > 3 ? 'Medium' : 'Low';
 
-    const savingsPotential = Math.abs(ssDiff) * (5 + Math.random() * 15);
+    // Savings potential based on excess stock
+    const savingsPotential = mpd.excessStock > 0
+      ? Math.floor(mpd.excessStock * 0.18) // 18% carrying cost savings
+      : Math.floor(Math.abs(ssDiff) * (material?.basePrice || 1000) * 0.01);
 
     // EOQ-related fields for cost curve analysis
-    const annualDemand = Math.floor(5000 + Math.random() * 45000); // 5K-50K units/year
-    const unitCost = Math.floor(20 + Math.random() * 180); // $20-$200 per unit
-    const orderingCostPerPO = Math.floor(75 + Math.random() * 75); // $75-$150 per PO
-    const holdingRate = 0.18 + Math.random() * 0.08; // 18-26% carrying rate
-    const currentOrderQty = Math.floor(300 + Math.random() * 700); // Current order quantity
+    const annualDemand = Math.floor((365 / mpd.dos) * mpd.totalStock * 12); // Annualized demand
+    const unitCost = material?.basePrice || 50000;
+    const orderingCostPerPO = unitCost > 1000000 ? 2500 : unitCost > 100000 ? 500 : 150;
+    const holdingRate = 0.15 + (mpd.abc === 'A' ? 0.03 : mpd.abc === 'B' ? 0.05 : 0.07);
+    const currentOrderQty = mpd.lotSize || Math.floor(10 + Math.random() * 20);
 
     return {
-      id: mat.id,
-      material: mat.name,
-      mrpType: mat.mrpType,
-      abc: abcOptions[idx % 3],
+      id: mpd.materialId,
+      material: material?.name || mpd.materialId,
+      plant: plantName,
+      mrpType: mpd.mrpType,
+      abc: mpd.abc,
       currentSS,
       optimalSS,
       ssDiff,
@@ -164,14 +164,14 @@ const generateMRPData = () => {
       currentLotSize,
       optimalLotSize,
       lotSizeChange: currentLotSize !== optimalLotSize,
-      serviceLevel: parseFloat(serviceLevel),
-      fillRate: parseFloat(fillRate),
+      serviceLevel: (100 - mpd.stockouts * 0.5).toFixed(1),
+      fillRate: mpd.fillRate,
       stockoutRisk,
       savingsPotential: Math.floor(savingsPotential),
-      leadTime: Math.floor(5 + Math.random() * 25),
-      demandVariability: (10 + Math.random() * 40).toFixed(1),
-      supplyVariability: (5 + Math.random() * 25).toFixed(1),
-      reviewCycle: Math.floor(7 + Math.random() * 21),
+      leadTime: mpd.leadTime,
+      demandVariability: mpd.xyz === 'Z' ? (35 + Math.random() * 15).toFixed(1) : mpd.xyz === 'Y' ? (20 + Math.random() * 15).toFixed(1) : (5 + Math.random() * 10).toFixed(1),
+      supplyVariability: (10 + Math.random() * 15).toFixed(1),
+      reviewCycle: mpd.mrpType === 'PD' ? 7 : mpd.mrpType === 'VB' ? 14 : 30,
       lastOptimized: new Date(Date.now() - Math.floor(Math.random() * 60) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       // EOQ fields
       annualDemand,
@@ -179,11 +179,15 @@ const generateMRPData = () => {
       orderingCostPerPO,
       holdingRate,
       currentOrderQty,
+      // Additional Lam data
+      turns: mpd.turns,
+      dos: mpd.dos,
+      excessStock: mpd.excessStock,
     };
   });
 };
 
-const MRPParameterOptimizer = ({ onBack }) => {
+const MRPParameterOptimizer = ({ onBack, onTileClick }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -673,9 +677,8 @@ const MRPParameterOptimizer = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 4: Optimization</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>Layer 4: Optimization</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>MRP Parameter Optimizer</Typography>
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ borderColor: 'divider' }}>

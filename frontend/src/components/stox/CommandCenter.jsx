@@ -13,6 +13,7 @@ import {
 import stoxTheme from './stoxTheme';
 import DataSourceChip from './DataSourceChip';
 import { getTileDataConfig } from './stoxDataConfig';
+import { LAM_PLANTS, LAM_MATERIALS, LAM_MATERIAL_PLANT_DATA, LAM_VENDORS, calculatePlantSummary, formatCurrency } from '../../data/arizonaBeveragesMasterData';
 
 /**
  * Command Center - Tile 0
@@ -27,81 +28,92 @@ import { getTileDataConfig } from './stoxDataConfig';
  * - Alert feed from all layers
  */
 
-// Mock exceptions data
-const generateExceptions = () => [
-  {
-    id: 'EXC-001',
-    type: 'critical',
-    title: 'Excess Stock Alert',
-    description: 'SKU-10001 at PLANT-001 has $45K excess inventory (180 days old)',
-    impact: '$45,000 WC tied',
-    action: 'Review excess stock',
-    tile: 'working-capital-baseline',
-  },
-  {
-    id: 'EXC-002',
-    type: 'warning',
-    title: 'Safety Stock Below Target',
-    description: 'SKU-10005 safety stock at 65% of recommended level',
-    impact: '2.3% stockout risk',
-    action: 'Adjust safety stock',
-    tile: 'mrp-parameter-optimizer',
-  },
-  {
-    id: 'EXC-003',
-    type: 'critical',
-    title: 'Supplier Lead Time Increase',
-    description: 'VND-003 lead time increased from 14 to 21 days',
-    impact: 'Affects 12 SKUs',
-    action: 'Update parameters',
-    tile: 'supply-lead-time',
-  },
-  {
-    id: 'EXC-004',
-    type: 'info',
-    title: 'Pending Recommendations',
-    description: '5 high-priority recommendations awaiting approval',
-    impact: '$125K potential savings',
-    action: 'Review recommendations',
-    tile: 'recommendations-hub',
-  },
-  {
-    id: 'EXC-005',
-    type: 'warning',
-    title: 'DIO Above Target',
-    description: 'PLANT-002 DIO at 52 days vs 35 day target',
-    impact: '$180K WC opportunity',
-    action: 'Review inventory',
-    tile: 'working-capital-baseline',
-  },
-  {
-    id: 'EXC-006',
-    type: 'critical',
-    title: 'Lot Size Optimization',
-    description: 'EOQ analysis shows 15% reduction opportunity',
-    impact: '$78K annual savings',
-    action: 'Optimize lot sizes',
-    tile: 'mrp-parameter-optimizer',
-  },
-  {
-    id: 'EXC-007',
-    type: 'info',
-    title: 'Forecast Accuracy Drop',
-    description: 'Hair Color category MAPE increased to 18%',
-    impact: 'Review forecast',
-    action: 'Check demand intelligence',
-    tile: 'demand-intelligence',
-  },
-  {
-    id: 'EXC-008',
-    type: 'warning',
-    title: 'Service Level Risk',
-    description: '3 SKUs projected below 95% service target',
-    impact: 'Customer impact',
-    action: 'Adjust parameters',
-    tile: 'inventory-health-check',
-  },
-];
+// Generate exceptions using Lam Research data
+const generateExceptions = () => {
+  // Calculate total excess from actual data
+  const totalExcess = LAM_MATERIAL_PLANT_DATA.reduce((sum, d) => sum + (d.excessStock || 0), 0);
+
+  // Find materials with low fill rates
+  const lowFillRateMaterials = LAM_MATERIAL_PLANT_DATA.filter(d => d.fillRate < 95);
+
+  // Find materials with high DOS (slow moving)
+  const highDOSMaterials = LAM_MATERIAL_PLANT_DATA.filter(d => d.dos > 200);
+
+  return [
+    {
+      id: 'EXC-001',
+      type: 'critical',
+      title: 'Excess Stock Alert - Fremont',
+      description: `FG0001 Etch System AKARA at ${LAM_PLANTS[0].name} has $42.5M excess inventory (>180 days)`,
+      impact: formatCurrency(42500000) + ' WC tied',
+      action: 'Review excess stock',
+      tile: 'inventory-dashboard',
+    },
+    {
+      id: 'EXC-002',
+      type: 'critical',
+      title: 'Excess Stock Alert - Hwaseong',
+      description: `FG0002 ALTUS HAMMER at ${LAM_PLANTS[2].name} has $54M excess inventory`,
+      impact: formatCurrency(54000000) + ' WC tied',
+      action: 'Review excess stock',
+      tile: 'inventory-dashboard',
+    },
+    {
+      id: 'EXC-003',
+      type: 'warning',
+      title: 'Safety Stock Review Needed',
+      description: `SFG0001 Vacuum Pump Module across 3 plants has inconsistent safety stock levels`,
+      impact: '5-8% stockout risk',
+      action: 'Adjust safety stock',
+      tile: 'mrp-optimizer',
+    },
+    {
+      id: 'EXC-004',
+      type: 'critical',
+      title: 'Supplier Lead Time Increase',
+      description: `${LAM_VENDORS[2].name} lead time increased from 45 to 65 days`,
+      impact: 'Affects 8 SKUs',
+      action: 'Update MRP parameters',
+      tile: 'supply-lead-time',
+    },
+    {
+      id: 'EXC-005',
+      type: 'info',
+      title: 'Pending MRP Recommendations',
+      description: `${highDOSMaterials.length} materials with >200 DOS need MRP type review`,
+      impact: formatCurrency(totalExcess * 0.15) + ' potential savings',
+      action: 'Review recommendations',
+      tile: 'mrp-optimizer',
+    },
+    {
+      id: 'EXC-006',
+      type: 'warning',
+      title: 'DIO Above Target - Tualatin',
+      description: `${LAM_PLANTS[1].name} DIO at 145 days vs 60 day target`,
+      impact: formatCurrency(900000) + ' WC opportunity',
+      action: 'Review inventory',
+      tile: 'inventory-dashboard',
+    },
+    {
+      id: 'EXC-007',
+      type: 'warning',
+      title: 'Service Level Risk',
+      description: `${lowFillRateMaterials.length} materials below 95% fill rate target`,
+      impact: 'Customer delivery risk',
+      action: 'Adjust parameters',
+      tile: 'inventory-dashboard',
+    },
+    {
+      id: 'EXC-008',
+      type: 'info',
+      title: 'Lot Size Optimization',
+      description: 'EOQ analysis shows 12% reduction opportunity for RAW materials',
+      impact: formatCurrency(250000) + ' annual savings',
+      action: 'Optimize lot sizes',
+      tile: 'mrp-optimizer',
+    },
+  ];
+};
 
 // Mock chat messages
 const initialMessages = [
@@ -185,17 +197,30 @@ const CommandCenter = ({ onBack, onTileClick }) => {
     setLoading(true);
     setTimeout(() => {
       setExceptions(generateExceptions());
+
+      // Calculate KPIs from Lam Research data
+      const totalExcess = LAM_MATERIAL_PLANT_DATA.reduce((sum, d) => sum + (d.excessStock || 0), 0);
+      const avgTurns = LAM_MATERIAL_PLANT_DATA.length > 0
+        ? LAM_MATERIAL_PLANT_DATA.reduce((sum, d) => sum + d.turns, 0) / LAM_MATERIAL_PLANT_DATA.length
+        : 0;
+      const avgDOS = LAM_MATERIAL_PLANT_DATA.length > 0
+        ? LAM_MATERIAL_PLANT_DATA.reduce((sum, d) => sum + d.dos, 0) / LAM_MATERIAL_PLANT_DATA.length
+        : 0;
+      const avgFillRate = LAM_MATERIAL_PLANT_DATA.length > 0
+        ? LAM_MATERIAL_PLANT_DATA.reduce((sum, d) => sum + d.fillRate, 0) / LAM_MATERIAL_PLANT_DATA.length
+        : 0;
+
       setKpis({
-        totalWCTied: 2850000,
-        potentialSavings: 485000,
-        serviceLevel: 96.2,
-        serviceLevelTarget: 97.5,
-        inventoryTurns: 5.8,
-        inventoryTurnsTarget: 6.5,
-        dioAvg: 45,
-        dioTarget: 35,
-        pendingRecs: 8,
-        criticalAlerts: 3,
+        totalWCTied: totalExcess > 0 ? totalExcess : 105000000, // Use calculated or fallback
+        potentialSavings: totalExcess * 0.18, // ~18% savings potential
+        serviceLevel: avgFillRate.toFixed(1),
+        serviceLevelTarget: 97.0,
+        inventoryTurns: avgTurns.toFixed(1),
+        inventoryTurnsTarget: 6.0,
+        dioAvg: Math.round(avgDOS),
+        dioTarget: 60,
+        pendingRecs: 12,
+        criticalAlerts: 4,
       });
       setLoading(false);
     }, 500);
@@ -290,9 +315,7 @@ const CommandCenter = ({ onBack, onTileClick }) => {
       <Box sx={{ mb: 3, flexShrink: 0 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 0: Command Center</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>STOX.AI</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>Command Center</Typography>
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>
@@ -426,12 +449,12 @@ const CommandCenter = ({ onBack, onTileClick }) => {
             <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap alignItems="center">
               <Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ mr: 0.5 }}>Quick:</Typography>
               {[
-                { label: 'WC Baseline', tile: 'working-capital-baseline' },
+                { label: 'Inventory Dashboard', tile: 'inventory-dashboard' },
+                { label: 'MRP Optimizer', tile: 'mrp-optimizer' },
                 { label: 'Recommendations', tile: 'recommendations-hub' },
-                { label: 'MRP Optimizer', tile: 'mrp-parameter-optimizer' },
-                { label: 'Inventory Health', tile: 'inventory-health-check' },
                 { label: 'Supply Lead Time', tile: 'supply-lead-time' },
-                { label: 'What-If', tile: 'what-if-simulator' },
+                { label: 'CFO Rollup', tile: 'cfo-rollup-dashboard' },
+                { label: 'Plant Intelligence', tile: 'plant-inventory-intelligence' },
               ].map((item) => (
                 <Chip
                   key={item.tile}

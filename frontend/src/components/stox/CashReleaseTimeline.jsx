@@ -20,6 +20,7 @@ import {
   Tooltip as ChartTooltip,
   Legend,
 } from 'chart.js';
+import { LAM_PLANTS, LAM_VENDORS, getPlantName } from '../../data/arizonaBeveragesMasterData';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, ChartTooltip, Legend);
 
@@ -29,72 +30,77 @@ const formatCurrency = (value) => {
   return `$${value}`;
 };
 
-// Generate cash release timeline data
+// Generate cash release timeline data using Lam Research context
 const generateTimelineData = () => {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
 
-  // Initiative types with different release profiles
+  // Initiative types with Lam Research context
   const initiatives = [
     {
       id: 1,
-      name: 'Safety Stock Optimization - A-Class',
+      name: `Safety Stock Optimization - ${getPlantName('1000')}`,
       category: 'Safety Stock',
-      totalRelease: 420000,
+      totalRelease: 6500000,
       confidence: 88,
       startMonth: 0,
       duration: 3,
       risk: 'Low',
       status: 'In Progress',
       owner: 'Inventory Team',
+      plant: '1000',
     },
     {
       id: 2,
-      name: 'EOQ Optimization - Slow Movers',
+      name: 'EOQ Optimization - SFG Components',
       category: 'Lot Size',
-      totalRelease: 280000,
+      totalRelease: 2800000,
       confidence: 75,
       startMonth: 1,
       duration: 4,
       risk: 'Medium',
       status: 'Planned',
       owner: 'Procurement',
+      plant: 'All',
     },
     {
       id: 3,
-      name: 'Excess Inventory Liquidation',
+      name: `Excess Stock Liquidation - ${getPlantName('3000')}`,
       category: 'Excess/Obsolete',
-      totalRelease: 520000,
+      totalRelease: 12000000,
       confidence: 92,
       startMonth: 0,
       duration: 2,
       risk: 'Low',
       status: 'In Progress',
       owner: 'Sales Ops',
+      plant: '3000',
     },
     {
       id: 4,
-      name: 'Lead Time Reduction - Top Suppliers',
+      name: `Lead Time Reduction - ${LAM_VENDORS[2]?.name || 'Edwards Vacuum'}`,
       category: 'Pipeline Stock',
-      totalRelease: 350000,
+      totalRelease: 3500000,
       confidence: 68,
       startMonth: 3,
       duration: 5,
       risk: 'High',
       status: 'Planned',
       owner: 'Procurement',
+      plant: 'All',
     },
     {
       id: 5,
-      name: 'Consignment Conversion',
+      name: `Consignment Program - ${LAM_VENDORS[0]?.name || 'Applied Materials'}`,
       category: 'Terms',
-      totalRelease: 180000,
+      totalRelease: 1800000,
       confidence: 82,
       startMonth: 2,
       duration: 3,
       risk: 'Medium',
       status: 'Planned',
       owner: 'Supply Chain',
+      plant: 'All',
     },
     {
       id: 6,
@@ -206,7 +212,7 @@ const generateTimelineData = () => {
   };
 };
 
-const CashReleaseTimeline = ({ onBack }) => {
+const CashReleaseTimeline = ({ onBack, onTileClick }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState('monthly');
@@ -295,9 +301,8 @@ const CashReleaseTimeline = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 6: Execution</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>Layer 6: Execution</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>Cash Release Timeline</Typography>
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>

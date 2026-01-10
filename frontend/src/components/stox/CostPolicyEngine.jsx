@@ -43,6 +43,7 @@ import {
   Legend,
 } from 'chart.js';
 import stoxTheme from './stoxTheme';
+import { LAM_MATERIALS, LAM_MATERIAL_PLANT_DATA, getMaterialById } from '../../data/arizonaBeveragesMasterData';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, ChartTooltip, Legend);
 
@@ -54,38 +55,37 @@ const formatCurrency = (value) => {
 
 const formatPercent = (value) => `${value.toFixed(1)}%`;
 
-// Generate mock cost policy data
+// Generate cost policy data using Lam Research materials
 const generateCostData = () => {
-  const materials = [
-    { id: 'MAT-001', name: 'Hydraulic Pump', category: 'Mechanical' },
-    { id: 'MAT-002', name: 'Bearing Assembly', category: 'Mechanical' },
-    { id: 'MAT-003', name: 'Control Module', category: 'Electronics' },
-    { id: 'MAT-004', name: 'Valve Kit', category: 'Mechanical' },
-    { id: 'MAT-005', name: 'Gasket Set', category: 'Consumables' },
-    { id: 'MAT-006', name: 'Sensor Array', category: 'Electronics' },
-    { id: 'MAT-007', name: 'Motor Drive', category: 'Electronics' },
-    { id: 'MAT-008', name: 'Filter Element', category: 'Consumables' },
-    { id: 'MAT-009', name: 'Seal Kit', category: 'Consumables' },
-    { id: 'MAT-010', name: 'Coupling Assembly', category: 'Mechanical' },
-    { id: 'MAT-011', name: 'Shaft Bearing', category: 'Mechanical' },
-    { id: 'MAT-012', name: 'Pressure Gauge', category: 'Instruments' },
-  ];
+  // Use LAM_MATERIALS to build cost policy data
+  const materials = LAM_MATERIALS.slice(0, 12).map(mat => ({
+    id: mat.id,
+    name: mat.name,
+    category: mat.materialGroup,
+    basePrice: mat.basePrice,
+    type: mat.type,
+  }));
 
   const costTypes = ['Standard', 'Moving Avg', 'FIFO', 'LIFO'];
   const policyStatus = ['Active', 'Pending Review', 'Needs Update'];
 
   return materials.map((mat, idx) => {
-    const standardCost = Math.floor(100 + Math.random() * 900);
+    // Use base price from Lam data, with fallback
+    const standardCost = mat.basePrice || Math.floor(100 + Math.random() * 900);
     const movingAvgCost = standardCost * (0.9 + Math.random() * 0.2);
     const lastPurchaseCost = standardCost * (0.85 + Math.random() * 0.3);
     const variance = ((movingAvgCost - standardCost) / standardCost * 100);
     const costType = costTypes[idx % 4];
     const status = Math.abs(variance) > 10 ? policyStatus[2] : Math.abs(variance) > 5 ? policyStatus[1] : policyStatus[0];
 
+    // Get plant data if available for lead time
+    const plantData = LAM_MATERIAL_PLANT_DATA.find(p => p.materialId === mat.id);
+
     return {
       id: mat.id,
       material: mat.name,
       category: mat.category,
+      type: mat.type,
       costType,
       standardCost,
       movingAvgCost: movingAvgCost.toFixed(2),
@@ -94,21 +94,21 @@ const generateCostData = () => {
       varianceNum: variance,
       status,
       holdingCostPct: (15 + Math.random() * 10).toFixed(1),
-      orderingCost: Math.floor(25 + Math.random() * 75),
-      leadTimeDays: Math.floor(5 + Math.random() * 25),
-      minOrderQty: Math.floor(10 + Math.random() * 90) * 10,
+      orderingCost: mat.type === 'FERT' ? Math.floor(500 + Math.random() * 500) : Math.floor(25 + Math.random() * 75),
+      leadTimeDays: plantData?.leadTime || Math.floor(5 + Math.random() * 25),
+      minOrderQty: mat.type === 'FERT' ? 1 : Math.floor(10 + Math.random() * 90) * 10,
       safetyStockDays: Math.floor(5 + Math.random() * 15),
-      reorderPoint: Math.floor(50 + Math.random() * 150),
-      economicOrderQty: Math.floor(100 + Math.random() * 400),
+      reorderPoint: plantData?.reorderPoint || Math.floor(50 + Math.random() * 150),
+      economicOrderQty: plantData?.lotSize || Math.floor(100 + Math.random() * 400),
       lastReviewDate: new Date(Date.now() - Math.floor(Math.random() * 90) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       nextReviewDate: new Date(Date.now() + Math.floor(30 + Math.random() * 60) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      annualVolume: Math.floor(1000 + Math.random() * 9000),
-      annualValue: Math.floor(50000 + Math.random() * 500000),
+      annualVolume: mat.type === 'FERT' ? Math.floor(5 + Math.random() * 20) : Math.floor(1000 + Math.random() * 9000),
+      annualValue: standardCost * (mat.type === 'FERT' ? Math.floor(5 + Math.random() * 20) : Math.floor(100 + Math.random() * 500)),
     };
   });
 };
 
-const CostPolicyEngine = ({ onBack }) => {
+const CostPolicyEngine = ({ onBack, onTileClick }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -444,8 +444,11 @@ const CostPolicyEngine = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline' } }}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
               STOX.AI
+            </Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+              Layer 4: Optimization
             </Link>
             <Typography color="primary" variant="body1" fontWeight={600}>
               Cost Policy Engine

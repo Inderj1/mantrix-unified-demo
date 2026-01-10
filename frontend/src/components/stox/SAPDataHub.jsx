@@ -46,22 +46,29 @@ import {
   Legend,
 } from 'chart.js';
 import stoxTheme from './stoxTheme';
+import { LAM_PLANTS } from '../../data/arizonaBeveragesMasterData';
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, ChartTooltip, Legend);
 
-// Generate mock SAP system data
+// Generate SAP system data for Lam Research plants
 const generateSAPData = () => {
-  const systems = [
-    { id: 'P1000', name: 'Chicago Manufacturing Hub', version: 'S/4HANA 2023', client: '100' },
-    { id: 'P2000', name: 'Detroit Assembly Center', version: 'S/4HANA 2023', client: '100' },
-    { id: 'P3000', name: 'Phoenix Distribution', version: 'ECC 6.0 EHP8', client: '200' },
-    { id: 'P4000', name: 'Atlanta Regional DC', version: 'S/4HANA 2022', client: '100' },
-  ];
+  // Map Lam Research plants to SAP system data
+  const systems = LAM_PLANTS.map(plant => ({
+    id: plant.id,
+    name: `${plant.name} (${plant.country})`,
+    version: plant.id === '1000' || plant.id === '2000' ? 'S/4HANA 2023' :
+             plant.id === '3000' ? 'S/4HANA 2022' :
+             plant.id === '4000' ? 'S/4HANA 2022' : 'S/4HANA 2021',
+    client: plant.region === 'Americas' ? '100' : plant.region === 'Asia' ? '200' : '300',
+    region: plant.region,
+    currency: plant.currency,
+  }));
 
-  const statuses = ['connected', 'connected', 'delayed', 'connected'];
-  const rfcStatuses = ['Active', 'Active', 'Active', 'Active'];
-  const odataStatuses = ['Active', 'Active', 'Slow', 'Active'];
+  // Define statuses per plant (mostly healthy with one delayed for realism)
+  const statuses = ['connected', 'connected', 'connected', 'delayed', 'connected'];
+  const rfcStatuses = ['Active', 'Active', 'Active', 'Active', 'Active'];
+  const odataStatuses = ['Active', 'Active', 'Active', 'Slow', 'Active'];
 
   return systems.map((sys, idx) => {
     const status = statuses[idx];
@@ -73,6 +80,8 @@ const generateSAPData = () => {
       name: sys.name,
       version: sys.version,
       client: sys.client,
+      region: sys.region,
+      currency: sys.currency,
       status,
       statusText: isHealthy ? 'Connected' : isDelayed ? 'Delayed' : 'Error',
       rfc: rfcStatuses[idx],
@@ -111,22 +120,22 @@ const generateSAPData = () => {
         { name: 'ODQ_CLEANUP', time: 'Tomorrow 01:00 AM', status: 'scheduled' },
       ],
       tables: [
-        { name: 'MARC', freshness: '2m', stale: false },
-        { name: 'MARD', freshness: '2m', stale: false },
-        { name: 'MBEW', freshness: '5m', stale: false },
-        { name: 'MSEG', freshness: isHealthy ? '2m' : '8m', stale: !isHealthy },
-        { name: 'MKPF', freshness: isHealthy ? '2m' : '8m', stale: !isHealthy },
-        { name: 'EKKO', freshness: '8m', stale: false },
-        { name: 'EKPO', freshness: '8m', stale: false },
-        { name: 'EKBE', freshness: '8m', stale: false },
-        { name: 'EINA', freshness: '15m', stale: false },
-        { name: 'EINE', freshness: '15m', stale: false },
-        { name: 'LFA1', freshness: '1h', stale: false },
-        { name: 'MVER', freshness: '5m', stale: false },
-        { name: 'PLAF', freshness: '10m', stale: false },
-        { name: 'MDKP', freshness: '10m', stale: false },
-        { name: 'VBAP', freshness: '5m', stale: false },
-        { name: 'LIPS', freshness: '5m', stale: false },
+        { name: 'MARC', freshness: '1h', stale: false },
+        { name: 'MARD', freshness: '1h', stale: false },
+        { name: 'MBEW', freshness: '4h', stale: false },
+        { name: 'MSEG', freshness: isHealthy ? '1h' : '6h', stale: !isHealthy },
+        { name: 'MKPF', freshness: isHealthy ? '1h' : '6h', stale: !isHealthy },
+        { name: 'EKKO', freshness: '4h', stale: false },
+        { name: 'EKPO', freshness: '4h', stale: false },
+        { name: 'EKBE', freshness: '4h', stale: false },
+        { name: 'EINA', freshness: '12h', stale: false },
+        { name: 'EINE', freshness: '12h', stale: false },
+        { name: 'LFA1', freshness: '24h', stale: false },
+        { name: 'MVER', freshness: '4h', stale: false },
+        { name: 'PLAF', freshness: '6h', stale: false },
+        { name: 'MDKP', freshness: '6h', stale: false },
+        { name: 'VBAP', freshness: '4h', stale: false },
+        { name: 'LIPS', freshness: '4h', stale: false },
       ],
       throughput: Array.from({ length: 12 }, () => Math.floor(800 + Math.random() * 1600)),
       records: `${(1.5 + Math.random() * 1.5).toFixed(1)}M`,
@@ -143,7 +152,7 @@ const generateSAPData = () => {
   });
 };
 
-const SAPDataHub = ({ onBack }) => {
+const SAPDataHub = ({ onBack, onTileClick }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedSystem, setSelectedSystem] = useState(null);
@@ -185,6 +194,29 @@ const SAPDataHub = ({ onBack }) => {
     { field: 'id', headerName: 'Plant ID', minWidth: 100, flex: 0.8 },
     { field: 'name', headerName: 'Plant Name', minWidth: 180, flex: 1.4 },
     {
+      field: 'region',
+      headerName: 'Region',
+      minWidth: 100,
+      flex: 0.7,
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <Chip
+          label={params.value}
+          size="small"
+          sx={{
+            fontWeight: 600,
+            bgcolor: params.value === 'Americas' ? alpha('#10b981', 0.12) :
+                     params.value === 'Asia' ? alpha('#f59e0b', 0.12) :
+                     alpha('#06b6d4', 0.12),
+            color: params.value === 'Americas' ? '#059669' :
+                   params.value === 'Asia' ? '#d97706' :
+                   '#0891b2',
+          }}
+        />
+      ),
+    },
+    {
       field: 'status',
       headerName: 'Status',
       minWidth: 120,
@@ -200,7 +232,6 @@ const SAPDataHub = ({ onBack }) => {
         />
       ),
     },
-    { field: 'version', headerName: 'SAP Version', minWidth: 140, flex: 1, align: 'center', headerAlign: 'center' },
     {
       field: 'rfc',
       headerName: 'RFC',
@@ -266,7 +297,6 @@ const SAPDataHub = ({ onBack }) => {
       ),
     },
     { field: 'lastSync', headerName: 'Last Sync', minWidth: 100, flex: 0.7, align: 'center', headerAlign: 'center' },
-    { field: 'latency', headerName: 'Latency', minWidth: 100, flex: 0.7, align: 'center', headerAlign: 'center' },
     {
       field: 'dataQuality',
       headerName: 'Data Quality',
@@ -660,12 +690,22 @@ const SAPDataHub = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
               STOX.AI
             </Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
-              {selectedSystem ? `${selectedSystem.name}` : 'SAP Data Hub'}
-            </Typography>
+            <Link component="button" variant="body1" onClick={() => selectedSystem ? setSelectedSystem(null) : onBack()} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+              Layer 1: Foundation
+            </Link>
+            {selectedSystem ? (
+              <>
+                <Link component="button" variant="body1" onClick={() => setSelectedSystem(null)} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+                  SAP Data Hub
+                </Link>
+                <Typography color="primary" variant="body1" fontWeight={600}>{selectedSystem.name}</Typography>
+              </>
+            ) : (
+              <Typography color="primary" variant="body1" fontWeight={600}>SAP Data Hub</Typography>
+            )}
           </Breadcrumbs>
           {!selectedSystem && (
             <Stack direction="row" spacing={1}>

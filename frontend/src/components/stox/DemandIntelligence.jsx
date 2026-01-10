@@ -45,68 +45,107 @@ import {
 import stoxTheme from './stoxTheme';
 import DataSourceChip from './DataSourceChip';
 import { getTileDataConfig } from './stoxDataConfig';
+import { LAM_MATERIALS, LAM_MATERIAL_PLANT_DATA, LAM_PLANTS, getMaterialById, getPlantName } from '../../data/arizonaBeveragesMasterData';
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, ChartTooltip, Legend);
 
-// SKU Icons mapping (beverages)
-const skuIcons = ['🍵', '🍋', '🧃', '🥭', '⚡', '🍊', '🫐', '🍇'];
+// SKU Icons mapping (semiconductor equipment)
+const skuIcons = ['⚙️', '🔧', '💻', '🔬', '⚡', '🛠️', '📡', '🔩'];
 
-// Generate mock demand intelligence data
+// Derive pattern from XYZ classification and other factors
+const getPatternFromData = (plantData) => {
+  // X = Stable demand, Y = Variable demand, Z = Erratic demand
+  const xyzPatterns = {
+    'X': 'Stable',
+    'Y': 'Seasonal',
+    'Z': 'Erratic',
+  };
+
+  // Refine based on turns and DOS
+  if (plantData.turns < 1) return 'Intermittent';
+  if (plantData.dos > 300) return 'Intermittent';
+  if (plantData.turns > 8) return 'Trending Up';
+  if (plantData.turns < 2 && plantData.dos > 200) return 'Trending Down';
+
+  return xyzPatterns[plantData.xyz] || 'Erratic';
+};
+
+// Calculate CV (Coefficient of Variation) from XYZ classification
+const getCVFromXYZ = (xyz) => {
+  // X = low variability (CV < 0.3), Y = medium (0.3-0.7), Z = high (> 0.7)
+  if (xyz === 'X') return 0.15 + Math.random() * 0.1;  // 0.15-0.25
+  if (xyz === 'Y') return 0.35 + Math.random() * 0.25; // 0.35-0.6
+  return 0.75 + Math.random() * 0.35;                   // 0.75-1.1
+};
+
+// Generate demand intelligence data using Lam Research data
 const generateDemandData = () => {
-  const materials = [
-    { id: 'AZ-GT-23OZ', name: 'Arizona Green Tea 23oz', plant: 'Woodbury, NY' },
-    { id: 'AZ-AP-20OZ', name: 'Arnold Palmer 20oz', plant: 'Woodbury, NY' },
-    { id: 'AZ-FP-128OZ', name: 'Fruit Punch Gallon', plant: 'La Vergne, TN' },
-    { id: 'AZ-MG-15.5OZ', name: 'Mucho Mango 15.5oz', plant: 'La Vergne, TN' },
-    { id: 'AZ-RX-16OZ', name: 'RX Energy 16oz', plant: 'Columbus, OH' },
-    { id: 'AZ-LM-23OZ', name: 'Lemon Tea 23oz', plant: 'Columbus, OH' },
-    { id: 'AZ-WM-20OZ', name: 'Watermelon 20oz', plant: 'Woodbury, NY' },
-    { id: 'AZ-GR-15.5OZ', name: 'Grapeade 15.5oz', plant: 'La Vergne, TN' },
-  ];
+  return LAM_MATERIAL_PLANT_DATA.map((plantData, idx) => {
+    const material = getMaterialById(plantData.materialId);
+    const plantName = getPlantName(plantData.plant);
 
-  const patterns = ['Stable', 'Trending Up', 'Trending Down', 'Intermittent', 'Seasonal', 'Erratic'];
-  const abcClasses = ['A', 'B', 'C'];
-  const xyzClasses = ['X', 'Y', 'Z'];
+    // Derive pattern from actual XYZ classification
+    const pattern = getPatternFromData(plantData);
 
-  return materials.map((mat, idx) => {
-    const pattern = patterns[idx % patterns.length];
-    const cv = pattern === 'Stable' ? 0.15 + Math.random() * 0.15
-             : pattern === 'Intermittent' ? 0.8 + Math.random() * 0.4
-             : pattern === 'Erratic' ? 1.0 + Math.random() * 0.5
-             : 0.3 + Math.random() * 0.4;
+    // Calculate CV based on XYZ classification
+    const cv = getCVFromXYZ(plantData.xyz);
+
+    // ADI (Average Demand Interval) - higher for intermittent items
     const adi = pattern === 'Intermittent' ? 3 + Math.random() * 5 : 1 + Math.random() * 1.5;
-    const trend = pattern.includes('Up') ? 'up' : pattern.includes('Down') ? 'down' : null;
-    const seasonality = pattern === 'Seasonal' ? 0.3 + Math.random() * 0.4 : Math.random() * 0.2;
-    const anomalies = pattern === 'Erratic' ? Math.floor(3 + Math.random() * 5) : Math.floor(Math.random() * 3);
-    const abc = abcClasses[idx % 3];
-    const xyz = cv < 0.3 ? 'X' : cv < 0.7 ? 'Y' : 'Z';
-    const riskScore = Math.min(100, Math.round(cv * 40 + anomalies * 10 + (xyz === 'Z' ? 20 : xyz === 'Y' ? 10 : 0)));
-    const fcstAcc = Math.max(50, Math.round(95 - cv * 30 - anomalies * 3));
+
+    // Trend based on pattern
+    const trend = pattern === 'Trending Up' ? 'up' : pattern === 'Trending Down' ? 'down' : null;
+
+    // Seasonality - Y class has seasonal patterns
+    const seasonality = plantData.xyz === 'Y' ? 0.3 + Math.random() * 0.3 : Math.random() * 0.15;
+
+    // Anomalies from stockouts in source data
+    const anomalies = Math.min(plantData.stockouts || 0, 8);
+
+    // Risk score based on actual MAPE, stockouts, and XYZ
+    const mapeRisk = (plantData.mape || 20) * 0.8;
+    const stockoutRisk = (plantData.stockouts || 0) * 8;
+    const xyzRisk = plantData.xyz === 'Z' ? 20 : plantData.xyz === 'Y' ? 10 : 0;
+    const riskScore = Math.min(100, Math.round(mapeRisk + stockoutRisk + xyzRisk) / 2);
+
+    // Forecast accuracy from actual MAPE (100 - MAPE)
+    const fcstAcc = Math.max(50, Math.round(100 - (plantData.mape || 20)));
+
+    // Daily demand based on turns and stock
+    const avgDaily = Math.round((plantData.totalStock / (plantData.dos || 90)) * 30); // Monthly equivalent
 
     return {
-      id: mat.id,
-      material: mat.name,
-      plant: mat.plant,
+      id: `${plantData.materialId}-${plantData.plant}`,
+      materialId: plantData.materialId,
+      material: material?.name || plantData.materialId,
+      plant: plantName,
+      plantId: plantData.plant,
       pattern,
       cv: parseFloat(cv.toFixed(2)),
       adi: parseFloat(adi.toFixed(1)),
       trend,
       seasonality: parseFloat(seasonality.toFixed(2)),
       anomalies,
-      abc,
-      xyz,
+      abc: plantData.abc,
+      xyz: plantData.xyz,
       riskScore,
       fcstAcc,
-      icon: skuIcons[idx],
-      // Detail data
-      avgDaily: Math.round(50 + Math.random() * 200),
-      peakDemand: Math.round(150 + Math.random() * 300),
-      minDemand: Math.round(10 + Math.random() * 50),
-      demandStdDev: Math.round(20 + Math.random() * 80),
+      icon: skuIcons[idx % skuIcons.length],
+      // Detail data from actual source
+      avgDaily,
+      peakDemand: Math.round(avgDaily * (1 + cv)),
+      minDemand: Math.round(avgDaily * Math.max(0.1, 1 - cv)),
+      demandStdDev: Math.round(avgDaily * cv),
       volatilityScore: Math.round(cv * 100),
-      supplyRisk: Math.round(20 + Math.random() * 40),
+      supplyRisk: Math.round(20 + (plantData.leadTime || 90) / 5),
       demandRisk: Math.round(riskScore * 0.6),
+      // Additional source data
+      turns: plantData.turns,
+      dos: plantData.dos,
+      fillRate: plantData.fillRate,
+      mape: plantData.mape,
+      forecastBias: plantData.forecastBias,
     };
   });
 };

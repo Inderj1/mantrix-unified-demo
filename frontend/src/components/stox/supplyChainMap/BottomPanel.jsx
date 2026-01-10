@@ -29,55 +29,55 @@ export default function BottomPanel({
   const successfulActions = completedActions.filter(a => a.status === 'completed').length;
   const successRate = completedActions.length > 0 ? Math.round((successfulActions / completedActions.length) * 100) : 100;
 
-  // Insight cards with supply chain data
+  // Insight cards with Lam Research supply chain data
   const insights = [
     {
       id: 1,
       icon: TrendingUpIcon,
       category: 'Demand',
       categoryColor: 'blue',
-      description: 'Northeast +18% next week - heat wave',
-      confidence: 87,
+      description: 'TSMC N3 expansion: +40% etch demand',
+      confidence: 91,
     },
     {
       id: 2,
       icon: WarningAmberIcon,
       category: 'Risk',
       categoryColor: 'orange',
-      description: 'I-40 delays Thu-Fri, 3 trucks affected',
-      confidence: 92,
+      description: 'Korea plant at 65% - Samsung order risk',
+      confidence: 94,
     },
     {
       id: 3,
       icon: SavingsIcon,
       category: 'Savings',
       categoryColor: 'emerald',
-      description: 'Consolidate Midwest - save $3.8K/wk',
-      confidence: 94,
+      description: 'Reduce Fremont safety stock - free $675K',
+      confidence: 92,
     },
     {
       id: 4,
       icon: InventoryIcon,
       category: 'Stock',
       categoryColor: 'purple',
-      description: 'Columbus DC - RX Energy low in 2d',
+      description: 'Austria plant at 58% - EMEA impacted',
       confidence: 89,
     },
     {
       id: 5,
       icon: LocalShippingIcon,
-      category: 'Route',
+      category: 'Shipment',
       categoryColor: 'cyan',
-      description: 'Alt route saves 45min - Nashville',
+      description: 'AIR-001 Korea: Etch systems ETA 14hrs',
       confidence: 96,
     },
     {
       id: 6,
       icon: AccessTimeIcon,
-      category: 'Capacity',
+      category: 'Transfer',
       categoryColor: 'amber',
-      description: 'Woodbury at 85% - add capacity',
-      confidence: 85,
+      description: 'Taiwan→Korea: 3 systems pending approval',
+      confidence: 88,
     },
   ];
 

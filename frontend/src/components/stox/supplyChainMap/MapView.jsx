@@ -49,17 +49,24 @@ const MAP_STYLES = {
   'stadia-dark': 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
 };
 
-// Custom marker icons
-const createTruckIcon = (status) => {
+// Custom marker icons - supports ground, air, sea shipments
+const createTruckIcon = (status, shipmentType = 'ground') => {
   const colors = {
     'in-transit': '#2b88d8',
     'delayed': '#f97316',
-    'idle': '#ef4444',
-    'maintenance': '#ef4444',
+    'idle': '#94a3b8',
     'delivered': '#10b981',
   };
   const color = colors[status] || '#2b88d8';
-  const shouldPulse = status === 'delayed' || status === 'idle' || status === 'maintenance';
+  const shouldPulse = status === 'delayed';
+
+  // Different icons for different shipment types
+  const icons = {
+    ground: '<path d="M18,18.5a1.5,1.5 0 0,1 -1.5,-1.5a1.5,1.5 0 0,1 1.5,-1.5a1.5,1.5 0 0,1 1.5,1.5a1.5,1.5 0 0,1 -1.5,1.5m1.5,-9l1.96,2.5H17V9.5M6,18.5a1.5,1.5 0 0,1 -1.5,-1.5a1.5,1.5 0 0,1 1.5,-1.5a1.5,1.5 0 0,1 1.5,1.5a1.5,1.5 0 0,1 -1.5,1.5M20,8h-3V4H3a1,1 0 0,0 -1,1v11h2a3,3 0 0,0 3,3a3,3 0 0,0 3,-3h6a3,3 0 0,0 3,3a3,3 0 0,0 3,-3h2v-5z"/>',
+    air: '<path d="M21,16V14L13,9V3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5V9L2,14V16L10,13.5V19L8,20.5V22L11.5,21L15,22V20.5L13,19V13.5L21,16Z"/>',
+    sea: '<path d="M20,21C18.61,21 17.22,20.53 16,19.67C13.56,21.38 10.44,21.38 8,19.67C6.78,20.53 5.39,21 4,21H2V23H4C5.37,23 6.74,22.65 8,22C10.5,23.3 13.5,23.3 16,22C17.26,22.65 18.62,23 20,23H22V21H20M20,17C18.61,17 17.22,16.53 16,15.67C13.56,17.38 10.44,17.38 8,15.67C6.78,16.53 5.39,17 4,17H2V19H4C5.37,19 6.74,18.65 8,18C10.5,19.3 13.5,19.3 16,18C17.26,18.65 18.62,19 20,19H22V17H20M22,13.5V12L12,7V1H10V7L0,12V13.5L10,10V14.6L8,15.6V17.5L11,16.5L14,17.5V15.6L12,14.6V10L22,13.5Z"/>',
+  };
+  const icon = icons[shipmentType] || icons.ground;
 
   return L.divIcon({
     html: `
@@ -69,12 +76,10 @@ const createTruckIcon = (status) => {
                     border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.35);
                     ${shouldPulse ? 'animation: pulse 2s infinite;' : ''}">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
-            <path d="M18,18.5a1.5,1.5 0 0,1 -1.5,-1.5a1.5,1.5 0 0,1 1.5,-1.5a1.5,1.5 0 0,1 1.5,1.5a1.5,1.5 0 0,1 -1.5,1.5m1.5,-9l1.96,2.5H17V9.5M6,18.5a1.5,1.5 0 0,1 -1.5,-1.5a1.5,1.5 0 0,1 1.5,-1.5a1.5,1.5 0 0,1 1.5,1.5a1.5,1.5 0 0,1 -1.5,1.5M20,8h-3V4H3a1,1 0 0,0 -1,1v11h2a3,3 0 0,0 3,3a3,3 0 0,0 3,-3h6a3,3 0 0,0 3,3a3,3 0 0,0 3,-3h2v-5z"/>
+            ${icon}
           </svg>
           ${shouldPulse ? `<div style="position: absolute; inset: -3px; border-radius: 50%; border: 1.5px solid ${color}; animation: ping 2s infinite;"></div>` : ''}
         </div>
-        <div style="width: 0; height: 0; border-left: 3px solid transparent; border-right: 3px solid transparent;
-                    border-top: 4px solid white; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));"></div>
       </div>
       <style>
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
@@ -82,51 +87,61 @@ const createTruckIcon = (status) => {
       </style>
     `,
     className: 'custom-marker',
-    iconSize: [28, 36],
-    iconAnchor: [14, 36],
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
   });
 };
 
 const createStoreIcon = (stockLevel, facilityType) => {
-  const color = stockLevel < 30 ? '#ef4444' : stockLevel < 50 ? '#f97316' : '#2b88d8';
-  const shouldPulse = stockLevel < 50;
-  const warningColor = stockLevel < 30 ? '#dc2626' : '#fbbf24';
-  const hasWarning = stockLevel < 50;
-  const isDC = facilityType === 'distribution-center';
+  const isPlant = facilityType === 'plant';
+  const isVendor = facilityType === 'vendor';
+
+  // Plants: blue when healthy, orange/red when low
+  // Vendors: green (suppliers)
+  let color;
+  if (isVendor) {
+    color = '#10b981'; // Green for vendors
+  } else {
+    color = stockLevel < 60 ? '#ef4444' : stockLevel < 75 ? '#f59e0b' : '#0078d4';
+  }
+
+  const shouldPulse = isPlant && stockLevel < 70;
+  const hasWarning = isPlant && stockLevel < 70;
+
+  // Different icons for plant vs vendor
+  const plantIcon = '<path d="M18,15H16V17H18M18,11H16V13H18M20,19H12V17H14V15H12V13H14V11H12V9H20M10,7H8V5H10M10,11H8V9H10M10,15H8V13H10M10,19H8V17H10M6,7H4V5H6M6,11H4V9H6M6,15H4V13H6M6,19H4V17H6M12,7V3H2V21H22V7H12Z"/>';
+  const vendorIcon = '<path d="M18.36 9L18.96 12H5.04L5.64 9H18.36M20 4H4V6H20V4M20 7H4L3 12V14H4V20H14V14H18V20H20V14H21V12L20 7M6 18V14H12V18H6Z"/>';
 
   return L.divIcon({
     html: `
       <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
-        <div style="position: relative; width: 26px; height: 26px; background: ${color};
-                    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        <div style="position: relative; width: ${isPlant ? 30 : 24}px; height: ${isPlant ? 30 : 24}px; background: ${color};
+                    border-radius: ${isPlant ? '6px' : '50%'}; display: flex; align-items: center; justify-content: center;
                     border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.35);
                     ${shouldPulse ? 'animation: pulse 2s infinite;' : ''}">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
-            ${isDC
-              ? '<path d="M18,15H16V17H18M18,11H16V13H18M20,19H12V17H14V15H12V13H14V11H12V9H20M10,7H8V5H10M10,11H8V9H10M10,15H8V13H10M10,19H8V17H10M6,7H4V5H6M6,11H4V9H6M6,15H4V13H6M6,19H4V17H6M12,7V3H2V21H22V7H12Z"/>'
-              : '<path d="M12,2L2,7V10C2,16.5 6.5,22.5 12,24C17.5,22.5 22,16.5 22,10V7L12,2M12,4.18L20,8.09V10C20,15.5 16.5,20.38 12,21.93C7.5,20.38 4,15.5 4,10V8.09L12,4.18Z"/>'
-            }
+          <svg width="${isPlant ? 16 : 12}" height="${isPlant ? 16 : 12}" viewBox="0 0 24 24" fill="white">
+            ${isPlant ? plantIcon : vendorIcon}
           </svg>
           ${hasWarning ? `
-            <div style="position: absolute; top: -5px; right: -5px; width: 12px; height: 12px;
-                        background: ${warningColor}; border-radius: 50%; border: 1.5px solid white;
+            <div style="position: absolute; top: -6px; right: -6px; width: 14px; height: 14px;
+                        background: #ef4444; border-radius: 50%; border: 2px solid white;
                         display: flex; align-items: center; justify-content: center;
-                        font-size: 8px; font-weight: bold; color: white;
+                        font-size: 9px; font-weight: bold; color: white;
                         box-shadow: 0 1px 4px rgba(0,0,0,0.3);">!</div>
           ` : ''}
         </div>
-        <div style="margin-top: 2px; background: ${color}; padding: 1px 5px; border-radius: 3px;
-                    font-size: 8px; font-weight: bold; color: white; white-space: nowrap;
-                    box-shadow: 0 1px 4px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.3);">
-          ${stockLevel}%
-        </div>
-        <div style="width: 0; height: 0; border-left: 3px solid transparent; border-right: 3px solid transparent;
-                    border-top: 4px solid white; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25)); margin-top: -1px;"></div>
+        ${isPlant ? `
+          <div style="margin-top: 2px; background: ${color}; padding: 2px 6px; border-radius: 4px;
+                      font-size: 9px; font-weight: bold; color: white; white-space: nowrap;
+                      box-shadow: 0 1px 4px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.3);">
+            ${stockLevel}%
+          </div>
+        ` : ''}
       </div>
     `,
     className: 'custom-marker',
-    iconSize: [26, 50],
-    iconAnchor: [13, 50],
+    iconSize: [isPlant ? 30 : 24, isPlant ? 52 : 30],
+    iconAnchor: [isPlant ? 15 : 12, isPlant ? 52 : 30],
   });
 };
 
@@ -315,6 +330,7 @@ export default function MapView({
         zoomControl={true}
         attributionControl={false}
         preferCanvas={true}
+        worldCopyJump={true}
       >
       <MapEventHandler onMapReady={onMapReady} isFullScreen={isFullScreen} />
       <TileLayer url={tileUrl} maxZoom={20} minZoom={2} />
@@ -335,43 +351,67 @@ export default function MapView({
               position={getOffsetPosition(store.latitude, store.longitude, 'store')}
               icon={createStoreIcon(store.stock_level, store.facility_type)}
             >
-              <Popup minWidth={220} maxWidth={220}>
+              <Popup minWidth={240} maxWidth={240}>
                 <div style={{ padding: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <h3 style={{ fontSize: '0.875rem', fontWeight: 700, margin: 0, color: '#1e293b' }}>{store.name}</h3>
-                    <div style={{ width: '24px', height: '24px', background: '#0078d4', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
-                        {store.facility_type === 'distribution-center'
-                          ? <path d="M18,15H16V17H18M18,11H16V13H18M20,19H12V17H14V15H12V13H14V11H12V9H20M10,7H8V5H10M10,11H8V9H10M10,15H8V13H10M10,19H8V17H10M6,7H4V5H6M6,11H4V9H6M6,15H4V13H6M6,19H4V17H6M12,7V3H2V21H22V7H12Z"/>
-                          : <path d="M18.36 9L18.96 12H5.04L5.64 9H18.36M20 4H4V6H20V4M20 7H4L3 12V14H4V20H14V14H18V20H20V14H21V12L20 7M6 18V14H12V18H6Z"/>
-                        }
-                      </svg>
+                    <div>
+                      <h3 style={{ fontSize: '0.875rem', fontWeight: 700, margin: 0, color: '#1e293b' }}>{store.name}</h3>
+                      <span style={{ fontSize: '0.65rem', color: '#64748b' }}>{store.country} • {store.region}</span>
                     </div>
+                    <span style={{
+                      padding: '2px 8px', borderRadius: '4px', fontSize: '0.625rem', fontWeight: 700,
+                      background: store.facility_type === 'plant' ? '#deecf9' : '#d1fae5',
+                      color: store.facility_type === 'plant' ? '#0078d4' : '#059669',
+                    }}>
+                      {store.facility_type === 'plant' ? 'PLANT' : 'VENDOR'}
+                    </span>
                   </div>
-                  <div style={{ fontSize: '0.75rem', marginBottom: '12px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                      <span style={{ color: '#64748b' }}>Stock:</span>
-                      <span style={{ fontWeight: 700, color: store.stock_level < 50 ? '#ea580c' : '#0891b2' }}>{store.stock_level}%</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                      <span style={{ color: '#64748b' }}>Available:</span>
-                      <span style={{ color: '#334155' }}>{(store.available_stock || store.current_stock).toLocaleString()} units</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#64748b' }}>Demand:</span>
-                      <span style={{ color: '#334155' }}>{store.demand_rate}/day</span>
-                    </div>
+                  <div style={{ fontSize: '0.75rem', marginBottom: '8px' }}>
+                    {store.facility_type === 'plant' ? (
+                      <>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                          <span style={{ color: '#64748b' }}>Capacity:</span>
+                          <span style={{ fontWeight: 700, color: store.stock_level < 70 ? '#ea580c' : '#0891b2' }}>{store.stock_level}%</span>
+                        </div>
+                        {store.inventory_value && (
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <span style={{ color: '#64748b' }}>Inventory:</span>
+                            <span style={{ color: '#0078d4', fontWeight: 600 }}>${(store.inventory_value / 1000000).toFixed(0)}M</span>
+                          </div>
+                        )}
+                        {store.customers && (
+                          <div style={{ marginTop: '6px', padding: '4px 8px', background: '#f1f5f9', borderRadius: '4px', fontSize: '0.65rem', color: '#334155' }}>
+                            <span style={{ color: '#64748b' }}>Customers: </span>{store.customers.join(', ')}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                          <span style={{ color: '#64748b' }}>Category:</span>
+                          <span style={{ color: '#334155', fontWeight: 500 }}>{store.category}</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                          <span style={{ color: '#64748b' }}>Lead Time:</span>
+                          <span style={{ color: '#334155' }}>{store.lead_time} days</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span style={{ color: '#64748b' }}>Rating:</span>
+                          <span style={{ color: '#f59e0b', fontWeight: 600 }}>★ {store.vendor_rating}</span>
+                        </div>
+                      </>
+                    )}
                   </div>
-                  {store.stock_level < 30 && (
+                  {store.facility_type === 'plant' && store.stock_level < 70 && (
                     <div style={{ marginBottom: '8px', padding: '4px 8px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '4px', fontSize: '0.625rem', color: '#b91c1c' }}>
-                      Critical Stock
+                      ⚠ Low Stock Alert
                     </div>
                   )}
                   <button
                     onClick={(e) => { e.stopPropagation(); onStoreClick?.(store); }}
-                    style={{ width: '100%', padding: '6px', background: '#0078d4', color: 'white', border: 'none', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                    style={{ width: '100%', padding: '6px', background: store.facility_type === 'plant' ? '#0078d4' : '#10b981', color: 'white', border: 'none', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
                   >
-                    View Details
+                    {store.facility_type === 'plant' ? 'View Plant Details' : 'View Vendor Profile'}
                   </button>
                 </div>
               </Popup>
@@ -380,24 +420,63 @@ export default function MapView({
         </MarkerClusterGroup>
       )}
 
-      {/* Route polylines - render separately so they can be toggled independently */}
+      {/* Route polylines - clean curved arcs for global routes */}
       {showRoutes && trucks.map((truck) => {
         const route = getTruckRoute(truck.truck_id);
-        if (route.length === 0) return null;
+        if (route.length < 2) return null;
 
         const routeColor = truck.status === 'delayed' ? '#f97316' :
-                          truck.status === 'in-transit' ? '#2b88d8' : '#64748b';
+                          truck.status === 'in-transit' ? '#0078d4' :
+                          truck.status === 'delivered' ? '#10b981' : '#94a3b8';
+
+        // Generate curved arc points for smoother routes
+        const generateArcPoints = (start, end, numPoints = 20) => {
+          const points = [];
+          for (let i = 0; i <= numPoints; i++) {
+            const t = i / numPoints;
+            const lat = start[0] + (end[0] - start[0]) * t;
+            const lng = start[1] + (end[1] - start[1]) * t;
+            // Add curvature for longer routes
+            const distance = Math.sqrt(Math.pow(end[0] - start[0], 2) + Math.pow(end[1] - start[1], 2));
+            const curvature = Math.min(distance * 0.15, 8);
+            const curve = Math.sin(t * Math.PI) * curvature;
+            points.push([lat + curve * 0.3, lng]);
+          }
+          return points;
+        };
+
+        // Create smooth curved route through all waypoints
+        const curvedRoute = [];
+        for (let i = 0; i < route.length - 1; i++) {
+          const arcPoints = generateArcPoints(route[i], route[i + 1], 15);
+          curvedRoute.push(...(i === 0 ? arcPoints : arcPoints.slice(1)));
+        }
 
         return (
-          <Polyline
-            key={`route-${truck.truck_id}`}
-            positions={route}
-            pathOptions={{
-              color: routeColor,
-              weight: 4,
-              opacity: 0.8,
-            }}
-          />
+          <React.Fragment key={`route-${truck.truck_id}`}>
+            {/* Glow effect */}
+            <Polyline
+              positions={curvedRoute}
+              pathOptions={{
+                color: routeColor,
+                weight: 8,
+                opacity: 0.15,
+                lineCap: 'round',
+                lineJoin: 'round',
+              }}
+            />
+            {/* Main route line */}
+            <Polyline
+              positions={curvedRoute}
+              pathOptions={{
+                color: routeColor,
+                weight: 2.5,
+                opacity: 0.85,
+                lineCap: 'round',
+                lineJoin: 'round',
+              }}
+            />
+          </React.Fragment>
         );
       })}
 
@@ -412,49 +491,55 @@ export default function MapView({
           zoomToBoundsOnClick={true}
         >
           {trucks.map((truck) => (
-            <Marker key={truck.truck_id} position={getOffsetPosition(truck.latitude, truck.longitude, 'truck')} icon={createTruckIcon(truck.status)}>
-              <Popup minWidth={200} maxWidth={200}>
+            <Marker key={truck.truck_id} position={getOffsetPosition(truck.latitude, truck.longitude, 'truck')} icon={createTruckIcon(truck.status, truck.type)}>
+              <Popup minWidth={220} maxWidth={220}>
                 <div style={{ padding: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                     <h3 style={{ fontSize: '0.875rem', fontWeight: 700, margin: 0, color: '#1e293b' }}>{truck.truck_id}</h3>
-                    <div style={{ width: '24px', height: '24px', background: truck.status === 'delayed' ? '#f97316' : '#2b88d8', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
-                        <path d="M18,18.5a1.5,1.5 0 0,1 -1.5,-1.5a1.5,1.5 0 0,1 1.5,-1.5a1.5,1.5 0 0,1 1.5,1.5a1.5,1.5 0 0,1 -1.5,1.5m1.5,-9l1.96,2.5H17V9.5M6,18.5a1.5,1.5 0 0,1 -1.5,-1.5a1.5,1.5 0 0,1 1.5,-1.5a1.5,1.5 0 0,1 1.5,1.5a1.5,1.5 0 0,1 -1.5,1.5M20,8h-3V4H3a1,1 0 0,0 -1,1v11h2a3,3 0 0,0 3,3a3,3 0 0,0 3,-3h6a3,3 0 0,0 3,3a3,3 0 0,0 3,-3h2v-5z"/>
-                      </svg>
-                    </div>
+                    <span style={{
+                      padding: '2px 8px', borderRadius: '4px', fontSize: '0.625rem', fontWeight: 700,
+                      background: truck.status === 'delayed' ? '#ffedd5' : truck.status === 'in-transit' ? '#deecf9' : truck.status === 'delivered' ? '#dcfce7' : '#f1f5f9',
+                      color: truck.status === 'delayed' ? '#c2410c' : truck.status === 'in-transit' ? '#106ebe' : truck.status === 'delivered' ? '#15803d' : '#64748b',
+                    }}>
+                      {(truck.type || 'ground').toUpperCase()} • {truck.status.toUpperCase()}
+                    </span>
                   </div>
                   <div style={{ fontSize: '0.75rem', marginBottom: '8px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                      <span style={{ color: '#64748b' }}>Status:</span>
-                      <span style={{
-                        padding: '2px 8px', borderRadius: '4px', fontSize: '0.625rem', fontWeight: 700,
-                        background: truck.status === 'delayed' ? '#ffedd5' : truck.status === 'in-transit' ? '#deecf9' : truck.status === 'delivered' ? '#dcfce7' : '#f1f5f9',
-                        color: truck.status === 'delayed' ? '#c2410c' : truck.status === 'in-transit' ? '#106ebe' : truck.status === 'delivered' ? '#15803d' : '#0078d4',
-                      }}>
-                        {truck.status.toUpperCase()}
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                      <span style={{ color: '#64748b' }}>Cargo:</span>
-                      <span style={{ color: '#334155' }}>{Math.round((truck.cargo_loaded / truck.cargo_capacity) * 100)}%</span>
-                    </div>
+                    {truck.cargo && (
+                      <div style={{ marginBottom: '6px', padding: '4px 8px', background: '#f1f5f9', borderRadius: '4px', fontSize: '0.7rem', color: '#334155' }}>
+                        {truck.cargo}
+                      </div>
+                    )}
+                    {truck.origin && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                        <span style={{ color: '#64748b' }}>From:</span>
+                        <span style={{ color: '#334155', fontWeight: 500 }}>{truck.origin}</span>
+                      </div>
+                    )}
                     {truck.destination_name && (
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                         <span style={{ color: '#64748b' }}>To:</span>
-                        <span style={{ color: '#334155', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', marginLeft: '8px' }}>{truck.destination_name}</span>
+                        <span style={{ color: '#334155', fontWeight: 500 }}>{truck.destination_name}</span>
+                      </div>
+                    )}
+                    {truck.eta && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                        <span style={{ color: '#64748b' }}>ETA:</span>
+                        <span style={{ color: truck.status === 'delayed' ? '#c2410c' : '#334155', fontWeight: 600 }}>{truck.eta}</span>
+                      </div>
+                    )}
+                    {truck.value && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ color: '#64748b' }}>Value:</span>
+                        <span style={{ color: '#0078d4', fontWeight: 600 }}>${(truck.value / 1000000).toFixed(2)}M</span>
                       </div>
                     )}
                   </div>
-                  {truck.status === 'delayed' && (
-                    <div style={{ marginBottom: '8px', padding: '4px 8px', background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '4px', fontSize: '0.625rem', color: '#c2410c' }}>
-                      Delayed
-                    </div>
-                  )}
                   <button
                     onClick={(e) => { e.stopPropagation(); onTruckClick?.(truck); }}
                     style={{ width: '100%', padding: '6px', background: '#0078d4', color: 'white', border: 'none', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
                   >
-                    View Details
+                    Track Shipment
                   </button>
                 </div>
               </Popup>

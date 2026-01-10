@@ -317,6 +317,7 @@ async def bigquery_health():
             "dataset": generator.dataset_id,
             "table_count": len(tables),
             "tables": tables[:10],  # First 10 tables
+            "allowed_tables": generator.allowed_tables,
             "message": f"Connected to {generator.project_id}.{generator.dataset_id}"
         }
     except Exception as e:
@@ -327,3 +328,60 @@ async def bigquery_health():
             "project": settings.google_cloud_project,
             "dataset": settings.bigquery_dataset
         }
+
+
+class AllowedTablesRequest(BaseModel):
+    tables: List[str]
+
+
+@router.get("/allowed-tables")
+async def get_allowed_tables(
+    generator: BigQuerySQLGenerator = Depends(get_bq_generator)
+):
+    """Get the list of allowed tables (if restriction is enabled)"""
+    all_tables = generator.bq_client.list_tables()
+    return {
+        "allowed_tables": generator.allowed_tables,
+        "all_tables": all_tables,
+        "restriction_enabled": generator.allowed_tables is not None
+    }
+
+
+@router.put("/allowed-tables")
+async def set_allowed_tables(
+    request: AllowedTablesRequest,
+    generator: BigQuerySQLGenerator = Depends(get_bq_generator)
+):
+    """Set the list of allowed tables (runtime override, does not persist to .env)"""
+    # Validate that all tables exist
+    all_tables = generator.bq_client.list_tables()
+    invalid_tables = [t for t in request.tables if t not in all_tables]
+    if invalid_tables:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid tables: {invalid_tables}. Available: {all_tables}"
+        )
+
+    generator.allowed_tables = request.tables if request.tables else None
+    logger.info(f"Allowed tables updated to: {generator.allowed_tables}")
+
+    return {
+        "success": True,
+        "allowed_tables": generator.allowed_tables,
+        "message": f"Table access restricted to {len(request.tables)} tables" if request.tables else "All tables are now accessible"
+    }
+
+
+@router.delete("/allowed-tables")
+async def clear_allowed_tables(
+    generator: BigQuerySQLGenerator = Depends(get_bq_generator)
+):
+    """Clear the allowed tables restriction (allow all tables)"""
+    generator.allowed_tables = None
+    logger.info("Allowed tables restriction cleared - all tables accessible")
+
+    return {
+        "success": True,
+        "allowed_tables": None,
+        "message": "All tables are now accessible"
+    }

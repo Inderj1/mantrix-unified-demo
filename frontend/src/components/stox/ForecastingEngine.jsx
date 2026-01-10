@@ -48,28 +48,57 @@ import {
 import stoxTheme from './stoxTheme';
 import DataSourceChip from './DataSourceChip';
 import { getTileDataConfig } from './stoxDataConfig';
+import { LAM_MATERIALS, LAM_MATERIAL_PLANT_DATA, LAM_PLANTS, getMaterialById, getPlantName } from '../../data/arizonaBeveragesMasterData';
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, ChartTooltip, Legend, Filler);
 
-// SKU Icons mapping (beverages)
-const skuIcons = ['🍵', '🍋', '🧃', '🥭', '⚡', '🍊', '🫐', '🍇'];
+// SKU Icons mapping (semiconductor equipment)
+const skuIcons = ['⚙️', '🔧', '💻', '🔬', '⚡', '🛠️', '📡', '🔩'];
 
 // Forecasting models
 const forecastModels = ['SES', 'Holt-Winters', 'Croston', 'Ensemble', 'Bootstrap', 'SARIMA'];
 
-// Generate mock forecasting data
+// Derive pattern from XYZ classification and other factors
+const getPatternFromData = (plantData, material) => {
+  // X = Stable demand, Y = Variable demand, Z = Erratic demand
+  const xyzPatterns = {
+    'X': 'Stable',      // Predictable, consistent demand
+    'Y': 'Seasonal',    // Variable but with patterns
+    'Z': 'Erratic',     // Unpredictable demand
+  };
+
+  // Refine based on turns and DOS
+  if (plantData.turns < 1) return 'Intermittent';  // Very slow moving
+  if (plantData.dos > 300) return 'Intermittent';  // Very high coverage
+  if (plantData.turns > 8) return 'Trending';      // Fast moving
+
+  return xyzPatterns[plantData.xyz] || 'Erratic';
+};
+
+// Generate forecasting data using ALL Lam Research materials
 const generateForecastData = () => {
-  const materials = [
-    { id: 'AZ-GT-23OZ', name: 'Arizona Green Tea 23oz', plant: 'Woodbury, NY', pattern: 'Stable' },
-    { id: 'AZ-AP-20OZ', name: 'Arnold Palmer 20oz', plant: 'Woodbury, NY', pattern: 'Seasonal' },
-    { id: 'AZ-FP-128OZ', name: 'Fruit Punch Gallon', plant: 'La Vergne, TN', pattern: 'Trending' },
-    { id: 'AZ-MG-15.5OZ', name: 'Mucho Mango 15.5oz', plant: 'La Vergne, TN', pattern: 'Intermittent' },
-    { id: 'AZ-RX-16OZ', name: 'RX Energy 16oz', plant: 'Columbus, OH', pattern: 'Erratic' },
-    { id: 'AZ-LM-23OZ', name: 'Lemon Tea 23oz', plant: 'Columbus, OH', pattern: 'Stable' },
-    { id: 'AZ-WM-20OZ', name: 'Watermelon 20oz', plant: 'Woodbury, NY', pattern: 'Seasonal' },
-    { id: 'AZ-GR-15.5OZ', name: 'Grapeade 15.5oz', plant: 'La Vergne, TN', pattern: 'Trending' },
-  ];
+  // Build materials from ALL Lam data with patterns derived from actual XYZ classification
+  const materials = LAM_MATERIAL_PLANT_DATA.map((plantData, idx) => {
+    const baseMaterial = getMaterialById(plantData.materialId);
+    return {
+      id: `${plantData.materialId}-${plantData.plant}`,  // Unique ID combining material + plant
+      materialId: plantData.materialId,
+      name: baseMaterial?.name || plantData.materialId,
+      plant: getPlantName(plantData.plant),
+      plantId: plantData.plant,
+      pattern: getPatternFromData(plantData, baseMaterial),  // Pattern derived from actual data
+      xyz: plantData.xyz,
+      type: baseMaterial?.type,
+      turns: plantData.turns,
+      dos: plantData.dos,
+    };
+  });
+
+  // Get actual MAPE and bias from source data
+  const getSourceData = (materialId, plantId) => {
+    return LAM_MATERIAL_PLANT_DATA.find(d => d.materialId === materialId && d.plant === plantId);
+  };
 
   return materials.map((mat, idx) => {
     // Select best model based on pattern
@@ -82,25 +111,24 @@ const generateForecastData = () => {
     };
     const model = modelByPattern[mat.pattern] || 'Ensemble';
 
-    // Generate forecasts
-    const baseFcst = 100 + Math.random() * 400;
-    const fcst1m = Math.round(baseFcst * (0.9 + Math.random() * 0.2));
-    const fcst3m = Math.round(baseFcst * 3 * (0.9 + Math.random() * 0.2));
-    const fcst6m = Math.round(baseFcst * 6 * (0.85 + Math.random() * 0.3));
+    // Get source data for actual MAPE and bias
+    const sourceData = getSourceData(mat.materialId, mat.plantId);
 
-    // Confidence intervals (P10, P90)
-    const spread = mat.pattern === 'Erratic' ? 0.4 : mat.pattern === 'Intermittent' ? 0.3 : 0.15;
+    // Generate forecasts based on actual demand patterns
+    // Use turns as a proxy for demand velocity
+    const baseMonthlyDemand = Math.round((mat.turns || 3) * 50);
+    const fcst1m = baseMonthlyDemand + Math.round(baseMonthlyDemand * 0.1 * (Math.random() - 0.5));
+    const fcst3m = fcst1m * 3;
+    const fcst6m = fcst1m * 6;
+
+    // Confidence intervals based on pattern volatility
+    const spread = mat.pattern === 'Erratic' ? 0.35 : mat.pattern === 'Intermittent' ? 0.28 : mat.pattern === 'Seasonal' ? 0.18 : 0.12;
     const p10 = Math.round(fcst1m * (1 - spread));
     const p90 = Math.round(fcst1m * (1 + spread));
 
-    // Accuracy metrics
-    const mape = mat.pattern === 'Stable' ? 5 + Math.random() * 10
-              : mat.pattern === 'Seasonal' ? 10 + Math.random() * 12
-              : mat.pattern === 'Intermittent' ? 20 + Math.random() * 15
-              : mat.pattern === 'Erratic' ? 25 + Math.random() * 20
-              : 12 + Math.random() * 15;
-
-    const bias = -15 + Math.random() * 30; // -15% to +15%
+    // Use ACTUAL MAPE and bias from source data
+    const mape = sourceData?.mape || 20;
+    const bias = sourceData?.forecastBias || 0;
 
     return {
       id: mat.id,
@@ -115,10 +143,10 @@ const generateForecastData = () => {
       p90,
       mape: parseFloat(mape.toFixed(1)),
       bias: parseFloat(bias.toFixed(1)),
-      icon: skuIcons[idx],
-      // Accuracy rating
+      icon: skuIcons[idx % skuIcons.length],  // Cycle through icons
+      // Accuracy rating based on actual MAPE
       accuracyRating: mape < 10 ? 'Excellent' : mape < 20 ? 'Good' : mape < 30 ? 'Fair' : 'Poor',
-      // Bias direction
+      // Bias direction based on actual forecast bias
       biasDirection: bias > 5 ? 'over' : bias < -5 ? 'under' : 'balanced',
     };
   });
@@ -176,7 +204,7 @@ const generateDetailData = (skuId, mainData) => {
   };
 };
 
-const ForecastingEngine = ({ onBack }) => {
+const ForecastingEngine = ({ onBack, onTileClick }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -597,12 +625,16 @@ const ForecastingEngine = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 3: Prediction</Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
-              {selectedSku ? `${selectedSku.material} Detail` : 'Forecasting Engine'}
-            </Typography>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={() => selectedSku ? setSelectedSku(null) : onBack()} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>Layer 3: Prediction</Link>
+            {selectedSku ? (
+              <>
+                <Link component="button" variant="body1" onClick={() => setSelectedSku(null)} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>Forecasting Engine</Link>
+                <Typography color="primary" variant="body1" fontWeight={600}>{selectedSku.material} Detail</Typography>
+              </>
+            ) : (
+              <Typography color="primary" variant="body1" fontWeight={600}>Forecasting Engine</Typography>
+            )}
           </Breadcrumbs>
           {!selectedSku && (
             <Stack direction="row" spacing={1}>
@@ -622,6 +654,11 @@ const ForecastingEngine = ({ onBack }) => {
             <Typography variant="body2" color="text.secondary">
               AI-powered demand forecasting with model selection, accuracy tracking, and confidence intervals
             </Typography>
+            <Chip
+              label="MAPE and Bias from XYZ classification analysis | Forecasts derived from inventory turns"
+              size="small"
+              sx={{ mt: 1, bgcolor: alpha('#10b981', 0.1), color: '#059669', fontSize: '0.65rem' }}
+            />
           </>
         )}
       </Box>

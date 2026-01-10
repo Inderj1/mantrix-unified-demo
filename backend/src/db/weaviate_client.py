@@ -131,22 +131,42 @@ class WeaviateClient:
             logger.error(f"Failed to index schema: {e}")
             raise
     
-    def search_similar_tables(self, query_embedding: List[float], limit: int = 5) -> List[Dict[str, Any]]:
-        """Search for tables similar to the query."""
+    def search_similar_tables(
+        self,
+        query_embedding: List[float],
+        limit: int = 5,
+        allowed_tables: Optional[List[str]] = None
+    ) -> List[Dict[str, Any]]:
+        """Search for tables similar to the query.
+
+        Args:
+            query_embedding: The embedding vector for the query
+            limit: Maximum number of results to return
+            allowed_tables: If provided, only return tables in this list
+        """
         try:
             collection = self.client.collections.get(self.collection_name)
-            
+
+            # Request more results if filtering, to ensure we get enough matches
+            search_limit = limit * 3 if allowed_tables else limit
+
             response = collection.query.near_vector(
                 near_vector=query_embedding,
-                limit=limit,
+                limit=search_limit,
                 return_metadata=wvc.query.MetadataQuery(distance=True)
             )
-            
+
             results = []
             for item in response.objects:
+                table_name = item.properties["table_name"]
+
+                # Filter by allowed tables if specified
+                if allowed_tables and table_name not in allowed_tables:
+                    continue
+
                 import json
                 result = {
-                    "table_name": item.properties["table_name"],
+                    "table_name": table_name,
                     "dataset": item.properties["dataset"],
                     "project": item.properties["project"],
                     "description": item.properties["description"],
@@ -155,7 +175,11 @@ class WeaviateClient:
                     "distance": item.metadata.distance if item.metadata else None
                 }
                 results.append(result)
-            
+
+                # Stop once we have enough results
+                if len(results) >= limit:
+                    break
+
             return results
         except Exception as e:
             logger.error(f"Failed to search tables: {e}")

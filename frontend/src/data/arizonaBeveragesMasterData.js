@@ -289,6 +289,80 @@ export const getProductsByCategory = (category) => products.filter(p => p.catego
 export const getPlantsByRegion = (region) => plants.filter(p => p.region === region);
 export const getCustomersByType = (type) => customers.filter(c => c.type === type);
 
+// ============================================================================
+// LAM-COMPATIBLE EXPORTS (for DemandIntelligence and other STOX tiles)
+// These maintain backward compatibility with LAM Research data structure
+// ============================================================================
+
+export const LAM_MATERIALS = products.map(p => ({
+  id: p.id,
+  name: p.name,
+  sku: p.sku,
+  category: p.category,
+}));
+
+export const LAM_PLANTS = plants.map(p => ({
+  id: p.id,
+  name: p.name,
+  region: p.region,
+}));
+
+export const LAM_MATERIAL_PLANT_DATA = products.slice(0, 12).flatMap((product, pIdx) =>
+  plants.slice(0, 4).map((plant, plIdx) => ({
+    materialId: product.id,
+    plant: plant.id,
+    abc: ['A', 'B', 'C'][pIdx % 3],
+    xyz: ['X', 'Y', 'Z'][plIdx % 3],
+    totalStock: 10000 + Math.floor(Math.random() * 50000),
+    dos: 30 + Math.floor(Math.random() * 60),
+    turns: 4 + Math.random() * 8,
+    mape: 10 + Math.random() * 25,
+    stockouts: Math.floor(Math.random() * 5),
+    safetyStock: 2000 + Math.floor(Math.random() * 5000),
+    reorderPoint: 5000 + Math.floor(Math.random() * 10000),
+  }))
+);
+
+export const getMaterialById = (id) => LAM_MATERIALS.find(m => m.id === id);
+export const getPlantName = (id) => {
+  const plant = LAM_PLANTS.find(p => p.id === id);
+  return plant?.name || id;
+};
+
+export const LAM_VENDORS = suppliers.map(s => ({
+  id: s.id,
+  name: s.name,
+  leadTime: s.leadTime,
+  otd: 85 + Math.random() * 10,
+}));
+
+export const getMaterialsByPlant = (plantId) =>
+  LAM_MATERIAL_PLANT_DATA.filter(d => d.plant === plantId);
+
+export const calculatePlantSummary = (plantId) => {
+  const materials = getMaterialsByPlant(plantId);
+  return {
+    totalSKUs: materials.length,
+    totalStock: materials.reduce((acc, m) => acc + (m.totalStock || 0), 0),
+    avgDOS: materials.length > 0 ? materials.reduce((acc, m) => acc + (m.dos || 0), 0) / materials.length : 0,
+    avgTurns: materials.length > 0 ? materials.reduce((acc, m) => acc + (m.turns || 0), 0) / materials.length : 0,
+  };
+};
+
+export const formatCurrency = (value, currency = 'USD') => {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(value);
+};
+
+export const formatCurrencyUSD = (value) => formatCurrency(value, 'USD');
+
+export const CURRENCY_RATES = {
+  USD: 1,
+  EUR: 0.92,
+  GBP: 0.79,
+};
+
+export const MRP_TYPES = ['PD', 'VB', 'V1', 'V2', 'ND'];
+
 // Default export for convenience
 export default {
   products,
@@ -310,4 +384,10 @@ export default {
   getProductsByCategory,
   getPlantsByRegion,
   getCustomersByType,
+  // LAM-compatible exports
+  LAM_MATERIALS,
+  LAM_PLANTS,
+  LAM_MATERIAL_PLANT_DATA,
+  getMaterialById,
+  getPlantName,
 };
