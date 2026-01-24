@@ -31,8 +31,20 @@ import CashWorkingCapitalTab from '../margen/CashWorkingCapitalTab';
 import GrowthMarketTab from '../margen/GrowthMarketTab';
 import ActionAccountabilityTab from '../margen/ActionAccountabilityTab';
 
-const MargenAIDashboard = ({ onBack, onTileClick }) => {
+const MargenAIDashboard = ({ onBack, onTileClick, darkMode = false }) => {
   const [activeTab, setActiveTab] = useState(0);
+
+  const getColors = (darkMode) => ({
+    primary: darkMode ? '#4da6ff' : '#0a6ed1',
+    text: darkMode ? '#e6edf3' : '#1e293b',
+    textSecondary: darkMode ? '#8b949e' : '#64748b',
+    background: darkMode ? '#0d1117' : '#f8fbfd',
+    paper: darkMode ? '#161b22' : '#ffffff',
+    cardBg: darkMode ? '#21262d' : '#ffffff',
+    border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+  });
+
+  const colors = getColors(darkMode);
 
   const tabs = [
     { label: 'Executive Summary', icon: <AssessmentIcon sx={{ fontSize: 18 }} /> },
@@ -43,16 +55,15 @@ const MargenAIDashboard = ({ onBack, onTileClick }) => {
   ];
 
   return (
-    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#f8fafc' }}>
+    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: colors.background }}>
       {/* Header */}
       <Paper
         elevation={0}
         sx={{
           px: 3,
           py: 2,
-          borderBottom: '1px solid',
-          borderColor: alpha('#64748b', 0.15),
-          bgcolor: 'white',
+          borderBottom: `1px solid ${colors.border}`,
+          bgcolor: colors.paper,
         }}
       >
         <Stack direction="row" alignItems="center" justifyContent="space-between">
@@ -62,11 +73,11 @@ const MargenAIDashboard = ({ onBack, onTileClick }) => {
                 component="button"
                 variant="body2"
                 onClick={onBack}
-                sx={{ textDecoration: 'none', color: 'text.secondary', '&:hover': { color: 'primary.main' } }}
+                sx={{ textDecoration: 'none', color: colors.textSecondary, '&:hover': { color: colors.primary } }}
               >
                 MARGEN.AI
               </Link>
-              <Typography color="text.primary" variant="body2" fontWeight={600}>
+              <Typography sx={{ color: colors.text }} variant="body2" fontWeight={600}>
                 COPA Analytics
               </Typography>
             </Breadcrumbs>
@@ -84,10 +95,10 @@ const MargenAIDashboard = ({ onBack, onTileClick }) => {
                 <AssessmentIcon sx={{ fontSize: 24, color: 'white' }} />
               </Box>
               <Box>
-                <Typography variant="h5" fontWeight={700} color="#1e293b">
+                <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
                   Arizona Beverages - COPA Analytics
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                   Profitability Analysis & Margin Intelligence
                 </Typography>
               </Box>
@@ -121,9 +132,8 @@ const MargenAIDashboard = ({ onBack, onTileClick }) => {
         elevation={0}
         sx={{
           px: 3,
-          borderBottom: '1px solid',
-          borderColor: alpha('#64748b', 0.15),
-          bgcolor: 'white',
+          borderBottom: `1px solid ${colors.border}`,
+          bgcolor: colors.paper,
         }}
       >
         <Tabs
@@ -137,7 +147,7 @@ const MargenAIDashboard = ({ onBack, onTileClick }) => {
               fontWeight: 600,
               fontSize: '0.875rem',
               minHeight: 56,
-              color: '#64748b',
+              color: colors.textSecondary,
               '&.Mui-selected': {
                 color: '#10b981',
               },

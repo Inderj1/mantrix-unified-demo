@@ -315,7 +315,7 @@ const generateMaterialData = () => {
 };
 
 // ABC/XYZ Matrix component
-const ABCXYZMatrix = ({ data, filters, onCellClick, theme }) => {
+const ABCXYZMatrix = ({ data, filters, onCellClick, theme, colors }) => {
   const matrix = [
     { abc: 'A', xyz: 'X', strategy: 'JIT + Safety Stock', color: theme.palette.success.main },
     { abc: 'A', xyz: 'Y', strategy: 'Regular Monitoring', color: theme.palette.info.main },
@@ -329,10 +329,10 @@ const ABCXYZMatrix = ({ data, filters, onCellClick, theme }) => {
   ];
 
   return (
-    <Card sx={{ p: 2 }}>
+    <Card sx={{ p: 2, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
       <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
         <GridViewIcon sx={{ color: theme.palette.primary.main }} />
-        <Typography variant="subtitle1" fontWeight={600}>ABC/XYZ Matrix</Typography>
+        <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>ABC/XYZ Matrix</Typography>
       </Stack>
 
       <Box sx={{ display: 'grid', gridTemplateColumns: '50px repeat(3, 1fr)', gap: 0.5 }}>
@@ -388,8 +388,19 @@ const ABCXYZMatrix = ({ data, filters, onCellClick, theme }) => {
   );
 };
 
-const InventoryDashboard = ({ onBack, onTileClick }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const InventoryDashboard = ({ onBack, onTileClick, darkMode = false }) => {
   const theme = useTheme();
+  const colors = getColors(darkMode);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ type: 'all', plant: 'all', status: 'all', abc: null, xyz: null, search: '' });
@@ -706,10 +717,10 @@ const InventoryDashboard = ({ onBack, onTileClick }) => {
       r: {
         beginAtZero: true,
         max: 100,
-        ticks: { color: theme.palette.text.secondary, backdropColor: 'transparent' },
-        grid: { color: theme.palette.divider },
-        angleLines: { color: theme.palette.divider },
-        pointLabels: { color: theme.palette.text.secondary, font: { size: 11 } }
+        ticks: { color: colors.textSecondary, backdropColor: 'transparent' },
+        grid: { color: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' },
+        angleLines: { color: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' },
+        pointLabels: { color: colors.textSecondary, font: { size: 11 } }
       }
     },
     plugins: { legend: { display: false } }
@@ -748,10 +759,10 @@ const InventoryDashboard = ({ onBack, onTileClick }) => {
     maintainAspectRatio: false,
     interaction: { intersect: false, mode: 'index' },
     scales: {
-      x: { grid: { color: theme.palette.divider }, ticks: { color: theme.palette.text.secondary } },
-      y: { grid: { color: theme.palette.divider }, ticks: { color: theme.palette.text.secondary }, title: { display: true, text: 'Units', color: theme.palette.text.secondary } }
+      x: { grid: { color: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }, ticks: { color: colors.textSecondary } },
+      y: { grid: { color: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }, ticks: { color: colors.textSecondary }, title: { display: true, text: 'Units', color: colors.textSecondary } }
     },
-    plugins: { legend: { position: 'top', align: 'end', labels: { color: theme.palette.text.secondary, usePointStyle: true, padding: 20 } } }
+    plugins: { legend: { position: 'top', align: 'end', labels: { color: colors.textSecondary, usePointStyle: true, padding: 20 } } }
   };
 
   // Detail View Render
@@ -766,7 +777,7 @@ const InventoryDashboard = ({ onBack, onTileClick }) => {
         </Button>
 
         {/* Header */}
-        <Paper sx={{ p: 3, mb: 3 }}>
+        <Paper sx={{ p: 3, mb: 3, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
             <Box>
               <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
@@ -806,10 +817,10 @@ const InventoryDashboard = ({ onBack, onTileClick }) => {
         {activeTab === 0 && (
           <Grid container spacing={3}>
             <Grid item xs={12} md={4}>
-              <Card sx={{ p: 2, height: '100%' }}>
+              <Card sx={{ p: 2, height: '100%', bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                 <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
                   <InventoryIcon sx={{ color: 'primary.main' }} />
-                  <Typography variant="subtitle1" fontWeight={600}>Stock Position</Typography>
+                  <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>Stock Position</Typography>
                 </Stack>
                 {[
                   { label: 'Unrestricted', value: mat.stock, color: 'text.primary' },
@@ -829,10 +840,10 @@ const InventoryDashboard = ({ onBack, onTileClick }) => {
               </Card>
             </Grid>
             <Grid item xs={12} md={4}>
-              <Card sx={{ p: 2, height: '100%' }}>
+              <Card sx={{ p: 2, height: '100%', bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                 <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
                   <CheckCircleIcon sx={{ color: 'success.main' }} />
-                  <Typography variant="subtitle1" fontWeight={600}>Health Score: {mat.healthScore}/100</Typography>
+                  <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>Health Score: {mat.healthScore}/100</Typography>
                 </Stack>
                 <Box sx={{ height: 250 }}>
                   <Radar data={getRadarChartData(mat)} options={radarOptions} />
@@ -847,13 +858,13 @@ const InventoryDashboard = ({ onBack, onTileClick }) => {
                   { icon: CheckCircleIcon, label: 'Fill Rate', value: mat.kpis.fillRate + '%', color: 'success.main' },
                   { icon: LocalShippingIcon, label: 'Lead Time', value: mat.leadTime + 'd', color: 'info.main' },
                 ].map((item, i) => (
-                  <Card key={i} sx={{ p: 2 }}>
+                  <Card key={i} sx={{ p: 2, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                       <Stack direction="row" spacing={1} alignItems="center">
                         <item.icon sx={{ fontSize: 18, color: item.color }} />
-                        <Typography variant="body2" color="text.secondary">{item.label}</Typography>
+                        <Typography variant="body2" sx={{ color: colors.textSecondary }}>{item.label}</Typography>
                       </Stack>
-                      <Typography variant="h6" fontWeight={700}>{item.value}</Typography>
+                      <Typography variant="h6" fontWeight={700} sx={{ color: colors.text }}>{item.value}</Typography>
                     </Stack>
                   </Card>
                 ))}
@@ -1448,7 +1459,7 @@ const InventoryDashboard = ({ onBack, onTileClick }) => {
   };
 
   return (
-    <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: 'background.default' }}>
+    <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -1502,15 +1513,15 @@ const InventoryDashboard = ({ onBack, onTileClick }) => {
             <Grid container spacing={2} sx={{ mb: 3 }}>
               {kpis.map((kpi, index) => (
                 <Grid item xs={12} sm={6} md={3} lg={1.5} key={index}>
-                  <Card sx={{ p: 2, height: '100%' }}>
+                  <Card sx={{ p: 2, height: '100%', bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                     <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-                      <Typography variant="caption" color="text.secondary">{kpi.label}</Typography>
+                      <Typography variant="caption" sx={{ color: colors.textSecondary }}>{kpi.label}</Typography>
                       <Box sx={{ p: 0.75, borderRadius: 1, bgcolor: alpha(kpi.color, 0.1) }}>
                         <kpi.icon sx={{ fontSize: 18, color: kpi.color }} />
                       </Box>
                     </Stack>
-                    <Typography variant="h5" fontWeight={700} sx={{ my: 0.5 }}>{kpi.value}</Typography>
-                    <Typography variant="caption" color="text.secondary">{kpi.subtext}</Typography>
+                    <Typography variant="h5" fontWeight={700} sx={{ my: 0.5, color: colors.text }}>{kpi.value}</Typography>
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>{kpi.subtext}</Typography>
                     {kpi.trend !== undefined && (
                       <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mt: 0.5 }}>
                         {kpi.trend >= 0 ? <TrendingUpIcon sx={{ fontSize: 14, color: 'success.main' }} /> : <TrendingDownIcon sx={{ fontSize: 14, color: 'error.main' }} />}
@@ -1581,15 +1592,17 @@ const InventoryDashboard = ({ onBack, onTileClick }) => {
                   </Stack>
                 ) : (
                   <Stack spacing={2}>
-                    <ABCXYZMatrix data={data} filters={filters} onCellClick={handleMatrixClick} theme={theme} />
+                    <ABCXYZMatrix data={data} filters={filters} onCellClick={handleMatrixClick} theme={theme} colors={colors} />
 
                     {/* Filters */}
-                    <Card sx={{ p: 2 }}>
+                    <Card sx={{ p: 2, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                       <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2 }}>Quick Filters</Typography>
 
                       <FormControl fullWidth size="small" sx={{ mb: 1.5 }}>
-                        <InputLabel>Material Type</InputLabel>
-                        <Select value={filters.type} label="Material Type" onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value }))}>
+                        <InputLabel sx={{ color: colors.textSecondary }}>Material Type</InputLabel>
+                        <Select value={filters.type} label="Material Type" onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value }))}
+                          sx={{ color: colors.text, '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border }, '& .MuiSvgIcon-root': { color: colors.text } }}
+                          MenuProps={{ PaperProps: { sx: { bgcolor: colors.paper, border: `1px solid ${colors.border}`, '& .MuiMenuItem-root': { color: colors.text, '&:hover': { bgcolor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)' } } } } }}>
                           <MenuItem value="all">All Types</MenuItem>
                           <MenuItem value="FERT">Finished Goods (FG)</MenuItem>
                           <MenuItem value="HALB">Semi-Finished (SFG)</MenuItem>
@@ -1599,8 +1612,10 @@ const InventoryDashboard = ({ onBack, onTileClick }) => {
                       </FormControl>
 
                       <FormControl fullWidth size="small" sx={{ mb: 1.5 }}>
-                        <InputLabel>Plant</InputLabel>
-                        <Select value={filters.plant} label="Plant" onChange={(e) => setFilters(prev => ({ ...prev, plant: e.target.value }))}>
+                        <InputLabel sx={{ color: colors.textSecondary }}>Plant</InputLabel>
+                        <Select value={filters.plant} label="Plant" onChange={(e) => setFilters(prev => ({ ...prev, plant: e.target.value }))}
+                          sx={{ color: colors.text, '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border }, '& .MuiSvgIcon-root': { color: colors.text } }}
+                          MenuProps={{ PaperProps: { sx: { bgcolor: colors.paper, border: `1px solid ${colors.border}`, '& .MuiMenuItem-root': { color: colors.text, '&:hover': { bgcolor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)' } } } } }}>
                           <MenuItem value="all">All Plants</MenuItem>
                           <MenuItem value="1000">1000 - Keasbey NJ</MenuItem>
                           <MenuItem value="2000">2000 - Santa Clarita CA</MenuItem>
@@ -1609,8 +1624,10 @@ const InventoryDashboard = ({ onBack, onTileClick }) => {
                       </FormControl>
 
                       <FormControl fullWidth size="small" sx={{ mb: 1.5 }}>
-                        <InputLabel>Status</InputLabel>
-                        <Select value={filters.status} label="Status" onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}>
+                        <InputLabel sx={{ color: colors.textSecondary }}>Status</InputLabel>
+                        <Select value={filters.status} label="Status" onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+                          sx={{ color: colors.text, '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border }, '& .MuiSvgIcon-root': { color: colors.text } }}
+                          MenuProps={{ PaperProps: { sx: { bgcolor: colors.paper, border: `1px solid ${colors.border}`, '& .MuiMenuItem-root': { color: colors.text, '&:hover': { bgcolor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)' } } } } }}>
                           <MenuItem value="all">All Status</MenuItem>
                           <MenuItem value="healthy">Healthy</MenuItem>
                           <MenuItem value="warning">Warning</MenuItem>
@@ -1627,7 +1644,7 @@ const InventoryDashboard = ({ onBack, onTileClick }) => {
 
             {/* Table Section */}
             <Grid item xs={12} md={sidebarCollapsed ? 11.5 : 9} lg={sidebarCollapsed ? 11.6 : 9.5} sx={{ transition: 'all 0.3s ease' }}>
-              <Card sx={{ p: 2 }}>
+              <Card sx={{ p: 2, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                 <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
                   <TextField
                     size="small"
@@ -1635,9 +1652,18 @@ const InventoryDashboard = ({ onBack, onTileClick }) => {
                     value={filters.search}
                     onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
                     InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment> }}
-                    sx={{ flex: 1 }}
+                    sx={{
+                      flex: 1,
+                      '& .MuiOutlinedInput-root': {
+                        color: colors.text,
+                        '& fieldset': { borderColor: colors.border },
+                        '&:hover fieldset': { borderColor: colors.primary },
+                        '&.Mui-focused fieldset': { borderColor: colors.primary },
+                      },
+                      '& .MuiInputBase-input::placeholder': { color: colors.textSecondary, opacity: 1 },
+                    }}
                   />
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                     Showing <strong>{filteredData.length}</strong> of <strong>{data.length}</strong> materials
                   </Typography>
                 </Stack>
@@ -1646,6 +1672,42 @@ const InventoryDashboard = ({ onBack, onTileClick }) => {
                   rows={filteredData}
                   columns={columns}
                   autoHeight
+                  sx={{
+                    bgcolor: colors.paper,
+                    color: colors.text,
+                    '& .MuiDataGrid-columnHeaders': {
+                      bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                      color: colors.text,
+                      borderBottom: `1px solid ${colors.border}`,
+                    },
+                    '& .MuiDataGrid-columnHeaderTitle': {
+                      color: colors.text,
+                      fontWeight: 600,
+                    },
+                    '& .MuiDataGrid-cell': {
+                      color: colors.text,
+                      borderBottom: `1px solid ${colors.border}`,
+                    },
+                    '& .MuiDataGrid-row': {
+                      '&:hover': {
+                        bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                      },
+                    },
+                    '& .MuiDataGrid-footerContainer': {
+                      bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                      borderTop: `1px solid ${colors.border}`,
+                      color: colors.text,
+                    },
+                    '& .MuiTablePagination-root': {
+                      color: colors.text,
+                    },
+                    '& .MuiDataGrid-toolbarContainer': {
+                      color: colors.text,
+                      '& .MuiButton-root': {
+                        color: colors.text,
+                      },
+                    },
+                  }}
                   initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
                   pageSizeOptions={[10, 25, 50]}
                   disableRowSelectionOnClick
@@ -1653,6 +1715,9 @@ const InventoryDashboard = ({ onBack, onTileClick }) => {
                   sx={{
                     ...stoxTheme.getDataGridSx({ clickable: true }),
                     '& .MuiDataGrid-row': { cursor: 'pointer' },
+                    '& .MuiDataGrid-columnHeaders': { bgcolor: darkMode ? '#21262d' : '#f8fafc', color: colors.text },
+                    '& .MuiDataGrid-cell': { color: colors.text, borderBottom: `1px solid ${colors.border}` },
+                    '& .MuiDataGrid-footerContainer': { bgcolor: darkMode ? '#21262d' : '#f8fafc', color: colors.text },
                   }}
                   slots={{ toolbar: GridToolbar }}
                   slotProps={{ toolbar: { showQuickFilter: false } }}

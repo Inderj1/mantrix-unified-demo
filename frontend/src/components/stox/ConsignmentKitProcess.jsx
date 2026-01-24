@@ -25,7 +25,19 @@ import {
   Error as ErrorIcon,
 } from '@mui/icons-material';
 
-const ConsignmentKitProcess = ({ onBack }) => {
+// Dark Mode Color Helper
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const ConsignmentKitProcess = ({ onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [processData, setProcessData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -194,7 +206,7 @@ const ConsignmentKitProcess = ({ onBack }) => {
   };
 
   return (
-    <Box sx={{ p: 3, height: '100%', overflowY: 'auto' }}>
+    <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -269,7 +281,7 @@ const ConsignmentKitProcess = ({ onBack }) => {
       </Grid>
 
       {/* Process Flow */}
-      <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider' }}>
+      <Paper elevation={0} sx={{ p: 3, border: `1px solid ${colors.border}`, borderColor: colors.border, bgcolor: colors.paper }}>
         <Typography variant="h6" fontWeight={700} sx={{ mb: 3 }}>
           Consignment Kit Process Flow
         </Typography>

@@ -31,6 +31,16 @@ import {
 } from '@mui/icons-material';
 import { apiService } from '../../services/api';
 
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 const ALLOWED_TOPICS = [
   'revenue', 'sales', 'profit', 'margin', 'cost', 'expense', 'cash flow',
   'working capital', 'customer', 'product', 'forecast', 'prediction',
@@ -48,7 +58,8 @@ const SAMPLE_QUERIES = [
   "Break down COGS by component"
 ];
 
-const AIAnalyticsChat = ({ dashboardData, onBack }) => {
+const AIAnalyticsChat = ({ dashboardData, onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -178,7 +189,7 @@ const AIAnalyticsChat = ({ dashboardData, onBack }) => {
   };
 
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 1 }}>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 1, bgcolor: colors.background }}>
       {/* Header with Breadcrumbs */}
       <Box sx={{ mb: 2 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -208,9 +219,9 @@ const AIAnalyticsChat = ({ dashboardData, onBack }) => {
       </Box>
 
       {/* Header */}
-      <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+      <Box sx={{ p: 2, borderBottom: 1, borderColor: colors.border, bgcolor: colors.paper }}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="h6">AI Analytics Assistant</Typography>
+          <Typography variant="h6" sx={{ color: colors.text }}>AI Analytics Assistant</Typography>
           <Box>
             <IconButton 
               onClick={() => setShowHistory(!showHistory)}
@@ -245,9 +256,10 @@ const AIAnalyticsChat = ({ dashboardData, onBack }) => {
                 }}>
                   {message.type === 'user' ? <PersonIcon /> : <BotIcon />}
                 </Avatar>
-                <Box sx={{ 
+                <Box sx={{
                   maxWidth: '70%',
-                  bgcolor: message.type === 'user' ? 'primary.light' : 'grey.100',
+                  bgcolor: message.type === 'user' ? (darkMode ? 'rgba(77, 166, 255, 0.2)' : 'primary.light') : colors.cardBg,
+                  border: `1px solid ${colors.border}`,
                   borderRadius: 2,
                   p: 2
                 }}>
@@ -277,8 +289,8 @@ const AIAnalyticsChat = ({ dashboardData, onBack }) => {
 
         {/* Side Panel */}
         {showHistory && (
-          <Paper sx={{ width: 300, p: 2, borderLeft: 1, borderColor: 'divider' }}>
-            <Typography variant="h6" gutterBottom>Query History</Typography>
+          <Paper sx={{ width: 300, p: 2, borderLeft: 1, borderColor: colors.border, bgcolor: colors.paper }}>
+            <Typography variant="h6" gutterBottom sx={{ color: colors.text }}>Query History</Typography>
             <List dense>
               {queryHistory.map((query, index) => (
                 <ListItem 
@@ -318,7 +330,7 @@ const AIAnalyticsChat = ({ dashboardData, onBack }) => {
       </Box>
 
       {/* Input Area */}
-      <Box sx={{ px: 2, py: 1.5, borderTop: 1, borderColor: 'divider' }}>
+      <Box sx={{ px: 2, py: 1.5, borderTop: 1, borderColor: colors.border, bgcolor: colors.paper }}>
         <Box display="flex" gap={1}>
           <TextField
             fullWidth

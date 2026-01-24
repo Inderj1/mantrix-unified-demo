@@ -49,7 +49,18 @@ import {
 } from '@mui/icons-material';
 import TimeGranularitySelector from '../common/TimeGranularitySelector';
 
-const DemandWorkbench = ({ onBack }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const DemandWorkbench = ({ onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [sopData, setSOPData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -420,6 +431,7 @@ const DemandWorkbench = ({ onBack }) => {
       display: 'flex',
       flexDirection: 'column',
       overflowY: 'auto',
+      bgcolor: colors.background,
     }}>
       {/* Header with Breadcrumbs */}
       <Box sx={{ mb: 3 }}>
@@ -501,16 +513,16 @@ const DemandWorkbench = ({ onBack }) => {
       {metrics && (
         <Grid container spacing={1.5} sx={{ mb: 2 }}>
           <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ boxShadow: 'none', border: '1px solid #E1E4E8' }}>
+            <Card sx={{ boxShadow: 'none', border: `1px solid ${colors.border}`, bgcolor: colors.cardBg }}>
               <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
                   <CheckCircle sx={{ fontSize: 18, color: 'primary.main' }} />
                   <Chip size="small" label="Actual" color="primary" sx={{ fontSize: '0.65rem', height: 18 }} />
                 </Box>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem', textTransform: 'uppercase' }}>
+                <Typography variant="caption" sx={{ color: colors.textSecondary, fontSize: '0.7rem', textTransform: 'uppercase' }}>
                   Total Actual Sales
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: '#0F3460', fontSize: '1.25rem' }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: colors.text, fontSize: '1.25rem' }}>
                   {metrics.total_actual_sales?.toLocaleString()}
                 </Typography>
               </CardContent>
@@ -518,16 +530,16 @@ const DemandWorkbench = ({ onBack }) => {
           </Grid>
 
           <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ boxShadow: 'none', border: '1px solid #E1E4E8' }}>
+            <Card sx={{ boxShadow: 'none', border: `1px solid ${colors.border}`, bgcolor: colors.cardBg }}>
               <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
                   <Speed sx={{ fontSize: 18, color: 'info.main' }} />
                   <Chip size="small" label="Forecast" color="info" sx={{ fontSize: '0.65rem', height: 18 }} />
                 </Box>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem', textTransform: 'uppercase' }}>
+                <Typography variant="caption" sx={{ color: colors.textSecondary, fontSize: '0.7rem', textTransform: 'uppercase' }}>
                   Total Forecast Qty
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: '#0F3460', fontSize: '1.25rem' }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: colors.text, fontSize: '1.25rem' }}>
                   {metrics.total_forecast_qty?.toLocaleString()}
                 </Typography>
               </CardContent>
@@ -535,7 +547,7 @@ const DemandWorkbench = ({ onBack }) => {
           </Grid>
 
           <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ boxShadow: 'none', border: '1px solid #E1E4E8' }}>
+            <Card sx={{ boxShadow: 'none', border: `1px solid ${colors.border}`, bgcolor: colors.cardBg }}>
               <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
                   <AttachMoney sx={{ fontSize: 18, color: 'success.main' }} />
@@ -546,10 +558,10 @@ const DemandWorkbench = ({ onBack }) => {
                     color="success"
                   />
                 </Box>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem', textTransform: 'uppercase' }}>
+                <Typography variant="caption" sx={{ color: colors.textSecondary, fontSize: '0.7rem', textTransform: 'uppercase' }}>
                   Avg Forecast Accuracy
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: '#0F3460', fontSize: '1.25rem' }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: colors.text, fontSize: '1.25rem' }}>
                   {metrics.avg_forecast_accuracy.toFixed(1)}%
                 </Typography>
               </CardContent>
@@ -557,7 +569,7 @@ const DemandWorkbench = ({ onBack }) => {
           </Grid>
 
           <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ boxShadow: 'none', border: '1px solid #E1E4E8' }}>
+            <Card sx={{ boxShadow: 'none', border: `1px solid ${colors.border}`, bgcolor: colors.cardBg }}>
               <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
                   <CompareArrows sx={{ fontSize: 18, color: metrics.forecast_bias > 0 ? 'warning.main' : 'success.main' }} />
@@ -568,10 +580,10 @@ const DemandWorkbench = ({ onBack }) => {
                     sx={{ fontSize: '0.65rem', height: 18 }}
                   />
                 </Box>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem', textTransform: 'uppercase' }}>
+                <Typography variant="caption" sx={{ color: colors.textSecondary, fontSize: '0.7rem', textTransform: 'uppercase' }}>
                   Forecast Bias
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: '#0F3460', fontSize: '1.25rem' }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: colors.text, fontSize: '1.25rem' }}>
                   {metrics.forecast_bias > 0 ? '+' : ''}{metrics.forecast_bias.toFixed(1)}%
                 </Typography>
               </CardContent>
@@ -579,16 +591,16 @@ const DemandWorkbench = ({ onBack }) => {
           </Grid>
 
           <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ boxShadow: 'none', border: '1px solid #E1E4E8' }}>
+            <Card sx={{ boxShadow: 'none', border: `1px solid ${colors.border}`, bgcolor: colors.cardBg }}>
               <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
                   <Warning sx={{ fontSize: 18, color: 'error.main' }} />
                   <Chip size="small" label="Manual" color="error" sx={{ fontSize: '0.65rem', height: 18 }} />
                 </Box>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem', textTransform: 'uppercase' }}>
+                <Typography variant="caption" sx={{ color: colors.textSecondary, fontSize: '0.7rem', textTransform: 'uppercase' }}>
                   Manual Overrides
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: '#0F3460', fontSize: '1.25rem' }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: colors.text, fontSize: '1.25rem' }}>
                   {metrics.override_count}
                 </Typography>
               </CardContent>
@@ -596,7 +608,7 @@ const DemandWorkbench = ({ onBack }) => {
           </Grid>
 
           <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ boxShadow: 'none', border: '1px solid #E1E4E8' }}>
+            <Card sx={{ boxShadow: 'none', border: `1px solid ${colors.border}`, bgcolor: colors.cardBg }}>
               <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
                   <Group sx={{ fontSize: 18, color: 'secondary.main' }} />
@@ -607,10 +619,10 @@ const DemandWorkbench = ({ onBack }) => {
                     color="secondary"
                   />
                 </Box>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem', textTransform: 'uppercase' }}>
+                <Typography variant="caption" sx={{ color: colors.textSecondary, fontSize: '0.7rem', textTransform: 'uppercase' }}>
                   Approval Progress
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: '#0F3460', fontSize: '1.25rem' }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: colors.text, fontSize: '1.25rem' }}>
                   {metrics.approval_progress.toFixed(0)}%
                 </Typography>
               </CardContent>
@@ -620,15 +632,15 @@ const DemandWorkbench = ({ onBack }) => {
       )}
 
       {/* Main Content */}
-      <Paper sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+      <Paper sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         {/* Table Toolbar */}
         <Box sx={{
           p: 2,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          borderBottom: '1px solid #E1E4E8',
-          backgroundColor: '#fafafa'
+          borderBottom: `1px solid ${colors.border}`,
+          backgroundColor: darkMode ? 'rgba(255,255,255,0.03)' : '#fafafa'
         }}>
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button
@@ -649,7 +661,7 @@ const DemandWorkbench = ({ onBack }) => {
               Delete Selected ({selectedRows.length})
             </Button>
           </Box>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          <Typography variant="body2" sx={{ color: colors.textSecondary }}>
             {sopData.length} plans total
           </Typography>
         </Box>
@@ -674,15 +686,31 @@ const DemandWorkbench = ({ onBack }) => {
               },
             }}
             sx={{
-              '& .MuiDataGrid-row:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.04)',
+              '& .MuiDataGrid-root': {
+                color: colors.text,
+                bgcolor: colors.paper,
+              },
+              '& .MuiDataGrid-row': {
+                bgcolor: colors.paper,
+                '&:hover': {
+                  bgcolor: darkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)',
+                },
               },
               '& .MuiDataGrid-cell': {
-                borderBottom: '1px solid rgba(224, 224, 224, 1)',
+                borderBottom: `1px solid ${colors.border}`,
+                color: colors.text,
               },
               '& .MuiDataGrid-columnHeaders': {
-                backgroundColor: '#f5f5f5',
-                borderBottom: '2px solid rgba(224, 224, 224, 1)',
+                bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : '#f5f5f5',
+                borderBottom: `2px solid ${colors.border}`,
+                color: colors.text,
+              },
+              '& .MuiDataGrid-footerContainer': {
+                borderTop: `1px solid ${colors.border}`,
+                bgcolor: darkMode ? 'rgba(255,255,255,0.03)' : '#fafafa',
+              },
+              '& .MuiCheckbox-root': {
+                color: darkMode ? colors.textSecondary : undefined,
               },
             }}
             initialState={{

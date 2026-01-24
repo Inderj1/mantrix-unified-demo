@@ -24,6 +24,16 @@ import { LAM_PLANTS, LAM_VENDORS, getPlantName } from '../../data/arizonaBeverag
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, ChartTooltip, Legend);
 
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 const formatCurrency = (value) => {
   if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
   if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
@@ -212,13 +222,14 @@ const generateTimelineData = () => {
   };
 };
 
-const CashReleaseTimeline = ({ onBack, onTileClick }) => {
+const CashReleaseTimeline = ({ onBack, onTileClick, darkMode = false }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState('monthly');
 
   // Get tile data config for data source indicator
   const tileConfig = getTileDataConfig('cash-release-timeline');
+  const colors = getColors(darkMode);
 
   useEffect(() => {
     loadData();
@@ -296,7 +307,7 @@ const CashReleaseTimeline = ({ onBack, onTileClick }) => {
   };
 
   return (
-    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -331,7 +342,7 @@ const CashReleaseTimeline = ({ onBack, onTileClick }) => {
         {/* Summary Cards */}
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={6} sm={3}>
-            <Card sx={{ borderLeft: '4px solid #106ebe' }}>
+            <Card sx={{ borderLeft: '4px solid #106ebe', bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Typography variant="caption" color="text.secondary">Total Cash Release</Typography>
                 <Typography variant="h5" fontWeight={700} color="#106ebe">{formatCurrency(data.totals.totalRelease)}</Typography>
@@ -339,7 +350,7 @@ const CashReleaseTimeline = ({ onBack, onTileClick }) => {
             </Card>
           </Grid>
           <Grid item xs={6} sm={3}>
-            <Card sx={{ borderLeft: '4px solid #10b981' }}>
+            <Card sx={{ borderLeft: '4px solid #10b981', bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Typography variant="caption" color="text.secondary">Risk-Adjusted</Typography>
                 <Typography variant="h5" fontWeight={700} color="#10b981">{formatCurrency(data.totals.riskAdjusted)}</Typography>
@@ -347,7 +358,7 @@ const CashReleaseTimeline = ({ onBack, onTileClick }) => {
             </Card>
           </Grid>
           <Grid item xs={6} sm={3}>
-            <Card sx={{ borderLeft: '4px solid #2b88d8' }}>
+            <Card sx={{ borderLeft: '4px solid #2b88d8', bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Typography variant="caption" color="text.secondary">Avg Confidence</Typography>
                 <Typography variant="h5" fontWeight={700}>{data.totals.avgConfidence}%</Typography>
@@ -355,7 +366,7 @@ const CashReleaseTimeline = ({ onBack, onTileClick }) => {
             </Card>
           </Grid>
           <Grid item xs={6} sm={3}>
-            <Card sx={{ borderLeft: '4px solid #f59e0b' }}>
+            <Card sx={{ borderLeft: '4px solid #f59e0b', bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Typography variant="caption" color="text.secondary">Initiatives</Typography>
                 <Stack direction="row" spacing={1} alignItems="baseline">
@@ -373,7 +384,7 @@ const CashReleaseTimeline = ({ onBack, onTileClick }) => {
         <Grid container spacing={2} sx={{ mb: 2 }}>
           {/* Timeline Chart */}
           <Grid item xs={12} md={8}>
-            <Card sx={{ height: 300 }}>
+            <Card sx={{ height: 300, bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
                   <Typography variant="subtitle2" fontWeight={700}>Cash Release Over Time</Typography>
@@ -402,7 +413,12 @@ const CashReleaseTimeline = ({ onBack, onTileClick }) => {
                       scales: {
                         y: {
                           beginAtZero: true,
-                          ticks: { callback: (v) => formatCurrency(v) },
+                          ticks: { callback: (v) => formatCurrency(v), color: colors.textSecondary },
+                          grid: { color: colors.border },
+                        },
+                        x: {
+                          ticks: { color: colors.textSecondary },
+                          grid: { color: colors.border },
                         },
                       },
                     }}
@@ -414,7 +430,7 @@ const CashReleaseTimeline = ({ onBack, onTileClick }) => {
 
           {/* Category Breakdown */}
           <Grid item xs={12} md={4}>
-            <Card sx={{ height: 300 }}>
+            <Card sx={{ height: 300, bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent>
                 <Typography variant="subtitle2" fontWeight={700} gutterBottom>By Category</Typography>
                 <Box sx={{ height: 230 }}>
@@ -425,14 +441,19 @@ const CashReleaseTimeline = ({ onBack, onTileClick }) => {
                       maintainAspectRatio: false,
                       indexAxis: 'y',
                       plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } },
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 }, color: colors.text } },
                         tooltip: {
                           callbacks: { label: (ctx) => `${ctx.dataset.label}: ${formatCurrency(ctx.raw)}` },
                         },
                       },
                       scales: {
                         x: {
-                          ticks: { callback: (v) => formatCurrency(v) },
+                          ticks: { callback: (v) => formatCurrency(v), color: colors.textSecondary },
+                          grid: { color: colors.border },
+                        },
+                        y: {
+                          ticks: { color: colors.textSecondary },
+                          grid: { color: colors.border },
                         },
                       },
                     }}
@@ -447,7 +468,7 @@ const CashReleaseTimeline = ({ onBack, onTileClick }) => {
         <Grid container spacing={2} sx={{ mb: 2 }}>
           {data.quarterlyData.map((q) => (
             <Grid item xs={6} sm={3} key={q.quarter}>
-              <Card sx={{ bgcolor: alpha('#106ebe', 0.03) }}>
+              <Card sx={{ bgcolor: alpha('#106ebe', darkMode ? 0.15 : 0.03), borderColor: colors.border }}>
                 <CardContent sx={{ py: 1.5 }}>
                   <Typography variant="subtitle2" fontWeight={700} color="#106ebe">{q.quarter} 2025</Typography>
                   <Typography variant="h6" fontWeight={700}>{formatCurrency(q.totalRelease)}</Typography>
@@ -462,7 +483,7 @@ const CashReleaseTimeline = ({ onBack, onTileClick }) => {
         </Grid>
 
         {/* Initiatives Gantt-style Table */}
-        <Card>
+        <Card sx={{ bgcolor: colors.cardBg, borderColor: colors.border }}>
           <CardContent>
             <Typography variant="subtitle2" fontWeight={700} gutterBottom>Initiative Timeline</Typography>
             <TableContainer>

@@ -46,20 +46,23 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-// Blue/grey color palette
-const colors = {
-  primary: '#0a6ed1',
-  secondary: '#0854a0',
-  dark: '#354a5f',
-  slate: '#475569',
-  grey: '#64748b',
-  light: '#94a3b8',
-  success: '#10b981',
-  warning: '#f59e0b',
-  error: '#ef4444',
-  text: '#1e293b',
-  bg: '#f8fbfd',
-};
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  secondary: darkMode ? '#5cb3ff' : '#0854a0',
+  dark: darkMode ? '#8b949e' : '#354a5f',
+  slate: darkMode ? '#8b949e' : '#475569',
+  grey: darkMode ? '#8b949e' : '#64748b',
+  light: darkMode ? '#6e7681' : '#94a3b8',
+  success: darkMode ? '#3fb950' : '#10b981',
+  warning: darkMode ? '#d29922' : '#f59e0b',
+  error: darkMode ? '#f85149' : '#ef4444',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
 
 // Service icon mapping
 const getServiceIcon = (serviceType) => {
@@ -72,7 +75,8 @@ const getServiceIcon = (serviceType) => {
   }
 };
 
-const SystemHealthMonitoring = () => {
+const SystemHealthMonitoring = ({ darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [systemHealth, setSystemHealth] = useState(null);
   const [services, setServices] = useState([]);
   const [metricsData, setMetricsData] = useState([]);
@@ -245,12 +249,13 @@ const SystemHealthMonitoring = () => {
             sx={{
               p: 2,
               borderRadius: 3,
-              bgcolor: 'white',
+              bgcolor: colors.paper,
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: `1px solid ${colors.border}`,
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
-              <Typography variant="caption" sx={{ color: colors.grey, fontWeight: 500 }}>
+              <Typography variant="caption" sx={{ color: colors.textSecondary, fontWeight: 500 }}>
                 System Status
               </Typography>
               <CheckCircleIcon sx={{ color: colors.success, fontSize: 20 }} />
@@ -281,12 +286,13 @@ const SystemHealthMonitoring = () => {
             sx={{
               p: 2,
               borderRadius: 3,
-              bgcolor: 'white',
+              bgcolor: colors.paper,
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: `1px solid ${colors.border}`,
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
-              <Typography variant="caption" sx={{ color: colors.grey, fontWeight: 500 }}>
+              <Typography variant="caption" sx={{ color: colors.textSecondary, fontWeight: 500 }}>
                 CPU Usage
               </Typography>
               <TrendingUpIcon sx={{ color: colors.primary, fontSize: 20 }} />
@@ -315,12 +321,13 @@ const SystemHealthMonitoring = () => {
             sx={{
               p: 2,
               borderRadius: 3,
-              bgcolor: 'white',
+              bgcolor: colors.paper,
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: `1px solid ${colors.border}`,
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
-              <Typography variant="caption" sx={{ color: colors.grey, fontWeight: 500 }}>
+              <Typography variant="caption" sx={{ color: colors.textSecondary, fontWeight: 500 }}>
                 Memory Usage
               </Typography>
               <SpeedIcon sx={{ color: colors.secondary, fontSize: 20 }} />
@@ -340,12 +347,13 @@ const SystemHealthMonitoring = () => {
             sx={{
               p: 2,
               borderRadius: 3,
-              bgcolor: 'white',
+              bgcolor: colors.paper,
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: `1px solid ${colors.border}`,
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
-              <Typography variant="caption" sx={{ color: colors.grey, fontWeight: 500 }}>
+              <Typography variant="caption" sx={{ color: colors.textSecondary, fontWeight: 500 }}>
                 Disk Usage
               </Typography>
               <StorageIcon sx={{ color: colors.dark, fontSize: 20 }} />
@@ -367,8 +375,9 @@ const SystemHealthMonitoring = () => {
           p: 3,
           mb: 3,
           borderRadius: 3,
-          bgcolor: 'white',
+          bgcolor: colors.paper,
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          border: `1px solid ${colors.border}`,
         }}
       >
         <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text, mb: 2 }}>
@@ -381,8 +390,9 @@ const SystemHealthMonitoring = () => {
                 elevation={0}
                 sx={{
                   borderRadius: 3,
-                  bgcolor: 'white',
+                  bgcolor: colors.cardBg,
                   boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  border: `1px solid ${colors.border}`,
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
                   '&:hover': {
@@ -413,7 +423,7 @@ const SystemHealthMonitoring = () => {
                         <Typography variant="subtitle2" fontWeight={600} sx={{ color: colors.text }}>
                           {service.name}
                         </Typography>
-                        <Typography variant="caption" sx={{ color: colors.grey, fontSize: '0.7rem' }}>
+                        <Typography variant="caption" sx={{ color: colors.textSecondary, fontSize: '0.7rem' }}>
                           {service.endpoint || 'Local Service'}
                         </Typography>
                       </Box>
@@ -518,8 +528,9 @@ const SystemHealthMonitoring = () => {
             sx={{
               p: 3,
               borderRadius: 3,
-              bgcolor: 'white',
+              bgcolor: colors.paper,
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: `1px solid ${colors.border}`,
             }}
           >
             <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text, mb: 2 }}>
@@ -566,8 +577,9 @@ const SystemHealthMonitoring = () => {
             sx={{
               p: 3,
               borderRadius: 3,
-              bgcolor: 'white',
+              bgcolor: colors.paper,
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: `1px solid ${colors.border}`,
             }}
           >
             <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text, mb: 2 }}>
@@ -616,8 +628,9 @@ const SystemHealthMonitoring = () => {
           p: 3,
           mt: 3,
           borderRadius: 3,
-          bgcolor: 'white',
+          bgcolor: colors.paper,
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          border: `1px solid ${colors.border}`,
         }}
       >
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
@@ -646,7 +659,7 @@ const SystemHealthMonitoring = () => {
             </ListItemIcon>
             <ListItemText
               primary={<Typography variant="body2" fontWeight={500} sx={{ color: colors.text }}>High latency detected on Weaviate Vector DB</Typography>}
-              secondary={<Typography variant="caption" sx={{ color: colors.grey }}>2 minutes ago - Average response time exceeded 200ms threshold</Typography>}
+              secondary={<Typography variant="caption" sx={{ color: colors.textSecondary }}>2 minutes ago - Average response time exceeded 200ms threshold</Typography>}
             />
           </ListItem>
           <Divider sx={{ my: 1 }} />
@@ -663,7 +676,7 @@ const SystemHealthMonitoring = () => {
             </ListItemIcon>
             <ListItemText
               primary={<Typography variant="body2" fontWeight={500} sx={{ color: colors.text }}>Redis cache memory usage normalized</Typography>}
-              secondary={<Typography variant="caption" sx={{ color: colors.grey }}>15 minutes ago - Memory usage dropped below 80% threshold</Typography>}
+              secondary={<Typography variant="caption" sx={{ color: colors.textSecondary }}>15 minutes ago - Memory usage dropped below 80% threshold</Typography>}
             />
           </ListItem>
           <Divider sx={{ my: 1 }} />
@@ -679,7 +692,7 @@ const SystemHealthMonitoring = () => {
             </ListItemIcon>
             <ListItemText
               primary={<Typography variant="body2" fontWeight={500} sx={{ color: colors.text }}>API endpoint /api/v1/query experienced timeout</Typography>}
-              secondary={<Typography variant="caption" sx={{ color: colors.grey }}>1 hour ago - Query execution exceeded 30 second limit</Typography>}
+              secondary={<Typography variant="caption" sx={{ color: colors.textSecondary }}>1 hour ago - Query execution exceeded 30 second limit</Typography>}
             />
           </ListItem>
         </List>

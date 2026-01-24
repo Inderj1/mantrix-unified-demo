@@ -7,7 +7,18 @@ import TreeDataGrid from './TreeDataGrid';
 import DataSourceChip from './DataSourceChip';
 import { getTileDataConfig } from './stoxDataConfig';
 
-const DCBOM = ({ onBack }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const DCBOM = ({ onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const tileConfig = getTileDataConfig('dc-bom');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -306,25 +317,25 @@ const DCBOM = ({ onBack }) => {
   ];
 
   return (
-    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: colors.background }}>
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>DC System</Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>Bill of Materials</Typography>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text }}>CORE.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text }}>DC System</Link>
+            <Typography color="primary" variant="body1" fontWeight={600} sx={{ color: colors.primary }}>Bill of Materials</Typography>
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>
         </Stack>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-              <AccountTree sx={{ fontSize: 32, color: '#005a9e' }} />
-              <Typography variant="h4" fontWeight={700}>Bill of Materials</Typography>
+              <AccountTree sx={{ fontSize: 32, color: colors.primary }} />
+              <Typography variant="h4" fontWeight={700} sx={{ color: colors.text }}>Bill of Materials</Typography>
               <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
-            <Typography variant="body2" color="text.secondary">Multi-level BOM management and component tracking for finished goods assembly</Typography>
+            <Typography variant="body2" sx={{ color: colors.textSecondary }}>Multi-level BOM management and component tracking for finished goods assembly</Typography>
           </Box>
           <Stack direction="row" spacing={1}>
             <Tooltip title="Refresh"><IconButton onClick={fetchData} color="primary"><Refresh /></IconButton></Tooltip>
@@ -336,33 +347,33 @@ const DCBOM = ({ onBack }) => {
       {metrics && (
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={4}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#005a9e', 0.1)} 0%, ${alpha('#005a9e', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#005a9e', 0.1)} 0%, ${alpha('#005a9e', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <Layers sx={{ color: '#005a9e' }} />
-                  <Typography variant="body2" color="text.secondary">Total BOMs</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Total BOMs</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#005a9e">{metrics.totalBOMs}</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={4}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2b88d8', 0.1)} 0%, ${alpha('#2b88d8', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2b88d8', 0.1)} 0%, ${alpha('#2b88d8', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <AccountTree sx={{ color: '#2b88d8' }} />
-                  <Typography variant="body2" color="text.secondary">Components</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Components</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#2b88d8">{metrics.totalComponents}</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={4}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#ef4444', 0.1)} 0%, ${alpha('#ef4444', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#ef4444', 0.1)} 0%, ${alpha('#ef4444', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <Download sx={{ color: '#ef4444' }} />
-                  <Typography variant="body2" color="text.secondary">Shortages</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Shortages</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#ef4444">{metrics.shortages}</Typography>
               </CardContent>
@@ -371,7 +382,7 @@ const DCBOM = ({ onBack }) => {
         </Grid>
       )}
 
-      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         <TreeDataGrid
           rows={data}
           columns={columns}
@@ -381,7 +392,27 @@ const DCBOM = ({ onBack }) => {
           slotProps={{ toolbar: { showQuickFilter: true, quickFilterProps: { debounceMs: 500 } } }}
           initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
           pageSizeOptions={[10, 25, 50, 100]}
-          sx={stoxTheme.getDataGridSx()}
+          sx={{
+            ...stoxTheme.getDataGridSx(),
+            '& .MuiDataGrid-cell': {
+              color: colors.text,
+              borderColor: colors.border,
+            },
+            '& .MuiDataGrid-columnHeaders': {
+              backgroundColor: darkMode ? '#21262d' : '#f8fafc',
+              color: colors.text,
+              borderBottom: `2px solid ${colors.border}`,
+            },
+            '& .MuiDataGrid-row': {
+              bgcolor: colors.paper,
+              '&:hover': {
+                bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+              },
+            },
+            bgcolor: colors.paper,
+            color: colors.text,
+            border: `1px solid ${colors.border}`,
+          }}
         />
       </Paper>
     </Box>

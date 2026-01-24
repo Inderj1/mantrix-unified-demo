@@ -11,7 +11,18 @@ import { createTicket, updateTicketStatus } from '../../hooks/useTickets';
 import DataSourceChip from './DataSourceChip';
 import { getTileDataConfig } from './stoxDataConfig';
 
-const StoreReplenishment = ({ onBack }) => {
+const StoreReplenishment = ({ onBack, darkMode = false }) => {
+  const getColors = (darkMode) => ({
+    primary: darkMode ? '#4da6ff' : '#0a6ed1',
+    text: darkMode ? '#e6edf3' : '#1e293b',
+    textSecondary: darkMode ? '#8b949e' : '#64748b',
+    background: darkMode ? '#0d1117' : '#f8fbfd',
+    paper: darkMode ? '#161b22' : '#ffffff',
+    cardBg: darkMode ? '#21262d' : '#ffffff',
+    border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+  });
+
+  const colors = getColors(darkMode);
   const tileConfig = getTileDataConfig('store-replenishment');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -376,14 +387,14 @@ const StoreReplenishment = ({ onBack }) => {
   ];
 
   return (
-    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: colors.background }}>
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Store System</Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>Tile 4: Stock Transfer Execution</Typography>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text }}>CORE.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text }}>Store System</Link>
+            <Typography sx={{ color: colors.primary }} variant="body1" fontWeight={600}>Tile 4: Stock Transfer Execution</Typography>
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>
         </Stack>
@@ -391,10 +402,10 @@ const StoreReplenishment = ({ onBack }) => {
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
               <LocalShipping sx={{ fontSize: 32, color: '#2b88d8' }} />
-              <Typography variant="h4" fontWeight={700}>Tile 4: Stock Transfer Execution (DC → Store)</Typography>
+              <Typography variant="h4" fontWeight={700} sx={{ color: colors.text }}>Tile 4: Stock Transfer Execution (DC → Store)</Typography>
               <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: colors.textSecondary }}>
               Match store demand to best DC based on availability, freight cost, and ETA - create executable STO/PR in SAP
             </Typography>
           </Box>
@@ -408,44 +419,44 @@ const StoreReplenishment = ({ onBack }) => {
       {metrics && (
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2b88d8', 0.1)} 0%, ${alpha('#2b88d8', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2b88d8', 0.1)} 0%, ${alpha('#2b88d8', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <LocalShipping sx={{ color: '#2b88d8' }} />
-                  <Typography variant="body2" color="text.secondary">Total Orders</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Total Orders</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#2b88d8">{metrics.totalOrders}</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#10b981', 0.1)} 0%, ${alpha('#10b981', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#10b981', 0.1)} 0%, ${alpha('#10b981', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <CheckCircle sx={{ color: '#10b981' }} />
-                  <Typography variant="body2" color="text.secondary">Total Value</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Total Value</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#10b981">${(metrics.totalValue / 1000).toFixed(1)}K</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#ef4444', 0.1)} 0%, ${alpha('#ef4444', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#ef4444', 0.1)} 0%, ${alpha('#ef4444', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <Send sx={{ color: '#ef4444' }} />
-                  <Typography variant="body2" color="text.secondary">Expedite</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Expedite</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#ef4444">{metrics.expediteCount}</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#f59e0b', 0.1)} 0%, ${alpha('#f59e0b', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#f59e0b', 0.1)} 0%, ${alpha('#f59e0b', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <Schedule sx={{ color: '#f59e0b' }} />
-                  <Typography variant="body2" color="text.secondary">On Hold</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>On Hold</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#f59e0b">{metrics.holdCount}</Typography>
               </CardContent>
@@ -454,7 +465,7 @@ const StoreReplenishment = ({ onBack }) => {
         </Grid>
       )}
 
-      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0, width: '100%' }}>
+      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0, width: '100%', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         <DataGrid
           rows={data}
           columns={columns}
@@ -466,7 +477,20 @@ const StoreReplenishment = ({ onBack }) => {
           pageSizeOptions={[10, 25, 50, 100]}
           checkboxSelection
           disableRowSelectionOnClick
-          sx={stoxTheme.getDataGridSx()}
+          sx={{
+            ...stoxTheme.getDataGridSx(),
+            ...(darkMode && {
+              '& .MuiDataGrid-root': { color: colors.text, bgcolor: colors.paper },
+              '& .MuiDataGrid-cell': { borderColor: colors.border, color: colors.text },
+              '& .MuiDataGrid-columnHeaders': { bgcolor: colors.cardBg, borderColor: colors.border, color: colors.text },
+              '& .MuiDataGrid-columnHeaderTitle': { color: colors.text },
+              '& .MuiDataGrid-row': { bgcolor: colors.paper, '&:hover': { bgcolor: alpha(colors.primary, 0.08) } },
+              '& .MuiDataGrid-footerContainer': { borderColor: colors.border, bgcolor: colors.cardBg },
+              '& .MuiTablePagination-root': { color: colors.text },
+              '& .MuiCheckbox-root': { color: colors.textSecondary },
+              '& .MuiDataGrid-toolbarContainer': { color: colors.text },
+            })
+          }}
         />
       </Paper>
 

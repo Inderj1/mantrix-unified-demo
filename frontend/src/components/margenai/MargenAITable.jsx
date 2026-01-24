@@ -92,7 +92,19 @@ const margenAPI = {
   }
 };
 
-const MargenAITable = ({ onRowClick, onBack }) => {
+const MargenAITable = ({ onRowClick, onBack, darkMode = false }) => {
+  const getColors = (darkMode) => ({
+    primary: darkMode ? '#4da6ff' : '#0a6ed1',
+    text: darkMode ? '#e6edf3' : '#1e293b',
+    textSecondary: darkMode ? '#8b949e' : '#64748b',
+    background: darkMode ? '#0d1117' : '#f8fbfd',
+    paper: darkMode ? '#161b22' : '#ffffff',
+    cardBg: darkMode ? '#21262d' : '#ffffff',
+    border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+  });
+
+  const colors = getColors(darkMode);
+
   // State management
   const [sorting, setSorting] = useState([]);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -607,7 +619,7 @@ const MargenAITable = ({ onRowClick, onBack }) => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 3, bgcolor: colors.background, minHeight: '100vh' }}>
       {/* Header with Breadcrumbs */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -618,13 +630,13 @@ const MargenAITable = ({ onRowClick, onBack }) => {
               onClick={onBack}
               sx={{
                 textDecoration: 'none',
-                color: 'text.primary',
+                color: colors.text,
                 '&:hover': { textDecoration: 'underline' },
               }}
             >
               MARGEN.AI
             </Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
+            <Typography sx={{ color: colors.primary }} variant="body1" fontWeight={600}>
               Product Overview
             </Typography>
           </Breadcrumbs>
@@ -636,15 +648,15 @@ const MargenAITable = ({ onRowClick, onBack }) => {
         </Stack>
       </Box>
 
-      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+      <Paper sx={{ width: '100%', overflow: 'hidden', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         {/* Header */}
-        <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+        <Box sx={{ p: 2, borderBottom: 1, borderColor: colors.border }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
           <Box>
-            <Typography variant="h6" fontWeight={600}>
+            <Typography variant="h6" fontWeight={600} sx={{ color: colors.text }}>
               MargenAI Analytics
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: colors.textSecondary }}>
               {data.length} {drillDownLevel === 0 ? 'products' : drillDownLevel === 1 ? 'segments' : 'transactions'} • Real PostgreSQL Data
             </Typography>
           </Box>
@@ -690,7 +702,7 @@ const MargenAITable = ({ onRowClick, onBack }) => {
 
       {/* Breadcrumbs */}
       {drillDownLevel > 0 && (
-        <Box sx={{ p: 2, bgcolor: '#f5f5f5', borderBottom: 1, borderColor: 'divider' }}>
+        <Box sx={{ p: 2, bgcolor: darkMode ? '#161b22' : '#f5f5f5', borderBottom: 1, borderColor: colors.border }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
             {getBreadcrumbs().map((crumb, index) => (
               <Link
@@ -704,7 +716,7 @@ const MargenAITable = ({ onRowClick, onBack }) => {
                   gap: 0.5,
                   textDecoration: 'none',
                   cursor: index < getBreadcrumbs().length - 1 ? 'pointer' : 'default',
-                  color: index < getBreadcrumbs().length - 1 ? 'primary.main' : 'text.primary',
+                  color: index < getBreadcrumbs().length - 1 ? colors.primary : colors.text,
                   fontWeight: index === getBreadcrumbs().length - 1 ? 600 : 400,
                 }}
               >
@@ -718,7 +730,7 @@ const MargenAITable = ({ onRowClick, onBack }) => {
 
       {/* Filters - Only show on products level */}
       {drillDownLevel === 0 && (
-        <Box sx={{ p: 2, bgcolor: '#f5f5f5', borderBottom: 1, borderColor: 'divider' }}>
+        <Box sx={{ p: 2, bgcolor: darkMode ? '#161b22' : '#f5f5f5', borderBottom: 1, borderColor: colors.border }}>
           <Stack direction="row" spacing={2} alignItems="center">
             <TextField
               placeholder="Search products..."
@@ -776,17 +788,17 @@ const MargenAITable = ({ onRowClick, onBack }) => {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id} style={{ backgroundColor: '#fafafa' }}>
+              <tr key={headerGroup.id} style={{ backgroundColor: darkMode ? '#161b22' : '#fafafa' }}>
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
                     style={{
                       padding: '12px',
                       textAlign: 'left',
-                      borderBottom: '2px solid #e0e0e0',
+                      borderBottom: `2px solid ${colors.border}`,
                       fontWeight: 600,
                       fontSize: '0.875rem',
-                      color: '#424242',
+                      color: colors.text,
                       cursor: header.column.getCanSort() ? 'pointer' : 'default',
                       userSelect: 'none',
                     }}
@@ -807,11 +819,11 @@ const MargenAITable = ({ onRowClick, onBack }) => {
               <tr
                 key={row.id}
                 style={{
-                  borderBottom: '1px solid #e0e0e0',
+                  borderBottom: `1px solid ${colors.border}`,
                   cursor: 'pointer',
                   transition: 'background-color 0.2s',
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f5f5f5')}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = darkMode ? 'rgba(255,255,255,0.05)' : '#f5f5f5')}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '')}
                 onClick={() => {
                   if (drillDownLevel < 2) {
@@ -838,8 +850,8 @@ const MargenAITable = ({ onRowClick, onBack }) => {
       </Box>
 
       {/* Pagination */}
-      <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="body2" color="text.secondary">
+      <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: darkMode ? '#161b22' : 'transparent' }}>
+        <Typography variant="body2" sx={{ color: colors.textSecondary }}>
           {Object.keys(rowSelection).length} of {data.length} row(s) selected
         </Typography>
         <Stack direction="row" spacing={2} alignItems="center">

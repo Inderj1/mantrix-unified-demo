@@ -36,7 +36,18 @@ import stoxTheme from './stoxTheme';
 import DataSourceChip from './DataSourceChip';
 import { getTileDataConfig } from './stoxDataConfig';
 
-const StoreForecast = ({ onBack }) => {
+const StoreForecast = ({ onBack, darkMode = false }) => {
+  const getColors = (darkMode) => ({
+    primary: darkMode ? '#4da6ff' : '#0a6ed1',
+    text: darkMode ? '#e6edf3' : '#1e293b',
+    textSecondary: darkMode ? '#8b949e' : '#64748b',
+    background: darkMode ? '#0d1117' : '#f8fbfd',
+    paper: darkMode ? '#161b22' : '#ffffff',
+    cardBg: darkMode ? '#21262d' : '#ffffff',
+    border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+  });
+
+  const colors = getColors(darkMode);
   const tileConfig = getTileDataConfig('store-forecast');
   const [forecastData, setForecastData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -361,15 +372,15 @@ const StoreForecast = ({ onBack }) => {
   ];
 
   return (
-    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: colors.background }}>
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 3: Prediction</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Store System</Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>Tile 1: Demand Forecasting</Typography>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text }}>CORE.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text }}>Layer 3: Prediction</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text }}>Store System</Link>
+            <Typography sx={{ color: colors.primary }} variant="body1" fontWeight={600}>Tile 1: Demand Forecasting</Typography>
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>
         </Stack>
@@ -377,10 +388,10 @@ const StoreForecast = ({ onBack }) => {
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
               <TrendingUp sx={{ fontSize: 32, color: '#106ebe' }} />
-              <Typography variant="h4" fontWeight={700}>Tile 1: Demand Forecasting (Baseline)</Typography>
+              <Typography variant="h4" fontWeight={700} sx={{ color: colors.text }}>Tile 1: Demand Forecasting (Baseline)</Typography>
               <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: colors.textSecondary }}>
               {granularity === 'daily'
                 ? 'Daily tracking - 30-day forecast with weekend patterns and promotions'
                 : granularity === 'weekly'
@@ -404,44 +415,44 @@ const StoreForecast = ({ onBack }) => {
       {metrics && (
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#106ebe', 0.1)} 0%, ${alpha('#106ebe', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#106ebe', 0.1)} 0%, ${alpha('#106ebe', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <ShowChart sx={{ color: '#106ebe' }} />
-                  <Typography variant="body2" color="text.secondary">Total Forecasts</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Total Forecasts</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#106ebe">{metrics.totalForecasts}</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#10b981', 0.1)} 0%, ${alpha('#10b981', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#10b981', 0.1)} 0%, ${alpha('#10b981', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <CheckCircle sx={{ color: '#10b981' }} />
-                  <Typography variant="body2" color="text.secondary">Avg Confidence</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Avg Confidence</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#10b981">{metrics.avgConfidence}%</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2b88d8', 0.1)} 0%, ${alpha('#2b88d8', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2b88d8', 0.1)} 0%, ${alpha('#2b88d8', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <TrendingUp sx={{ color: '#2b88d8' }} />
-                  <Typography variant="body2" color="text.secondary">Total Units</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Total Units</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#2b88d8">{metrics.totalUnits.toLocaleString()}</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#0078d4', 0.1)} 0%, ${alpha('#0078d4', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#0078d4', 0.1)} 0%, ${alpha('#0078d4', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <CalendarToday sx={{ color: '#0078d4' }} />
-                  <Typography variant="body2" color="text.secondary">Forecast Horizon</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Forecast Horizon</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#0078d4">{metrics.forecastHorizon}</Typography>
               </CardContent>
@@ -450,7 +461,7 @@ const StoreForecast = ({ onBack }) => {
         </Grid>
       )}
 
-      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0, width: '100%' }}>
+      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0, width: '100%', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         <DataGrid
           rows={forecastData}
           columns={columns}
@@ -462,7 +473,20 @@ const StoreForecast = ({ onBack }) => {
           pageSizeOptions={[10, 25, 50, 100]}
           checkboxSelection
           disableRowSelectionOnClick
-          sx={stoxTheme.getDataGridSx()}
+          sx={{
+            ...stoxTheme.getDataGridSx(),
+            ...(darkMode && {
+              '& .MuiDataGrid-root': { color: colors.text, bgcolor: colors.paper },
+              '& .MuiDataGrid-cell': { borderColor: colors.border, color: colors.text },
+              '& .MuiDataGrid-columnHeaders': { bgcolor: colors.cardBg, borderColor: colors.border, color: colors.text },
+              '& .MuiDataGrid-columnHeaderTitle': { color: colors.text },
+              '& .MuiDataGrid-row': { bgcolor: colors.paper, '&:hover': { bgcolor: alpha(colors.primary, 0.08) } },
+              '& .MuiDataGrid-footerContainer': { borderColor: colors.border, bgcolor: colors.cardBg },
+              '& .MuiTablePagination-root': { color: colors.text },
+              '& .MuiCheckbox-root': { color: colors.textSecondary },
+              '& .MuiDataGrid-toolbarContainer': { color: colors.text },
+            })
+          }}
         />
       </Paper>
     </Box>

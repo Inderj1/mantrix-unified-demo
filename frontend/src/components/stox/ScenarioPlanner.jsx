@@ -67,8 +67,19 @@ import {
 import DataSourceChip from './DataSourceChip';
 import { getTileDataConfig } from './stoxDataConfig';
 
-const ScenarioPlanner = ({ onBack }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const ScenarioPlanner = ({ onBack, darkMode = false }) => {
   const tileConfig = getTileDataConfig('scenario-planner');
+  const colors = getColors(darkMode);
   // Scenario State
   const [scenarioName, setScenarioName] = useState('New Scenario');
   const [activeScenario, setActiveScenario] = useState('custom');
@@ -333,7 +344,7 @@ const ScenarioPlanner = ({ onBack }) => {
   ];
 
   return (
-    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', overflowY: 'auto', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ mb: 2 }}>
@@ -399,7 +410,7 @@ const ScenarioPlanner = ({ onBack }) => {
       />
 
       {/* Impact Drivers */}
-      <Paper sx={{ p: 3, mb: 3 }}>
+      <Paper sx={{ p: 3, mb: 3, bgcolor: colors.paper, borderColor: colors.border }}>
         <Typography variant="h6" fontWeight={600} sx={{ mb: 3 }}>
           Impact Drivers
         </Typography>
@@ -527,7 +538,7 @@ const ScenarioPlanner = ({ onBack }) => {
 
       {/* Scenario Comparison */}
       {baselineMetrics && scenarioMetrics && (
-        <Paper sx={{ p: 3, mb: 3 }}>
+        <Paper sx={{ p: 3, mb: 3, bgcolor: colors.paper, borderColor: colors.border }}>
           <Typography variant="h6" fontWeight={600} sx={{ mb: 3 }}>
             Scenario Impact (vs Baseline)
           </Typography>
@@ -535,7 +546,7 @@ const ScenarioPlanner = ({ onBack }) => {
           <Grid container spacing={2}>
             {/* Total POS */}
             <Grid item xs={12} sm={6} md={3}>
-              <Card sx={{ borderLeft: '4px solid #2196f3' }}>
+              <Card sx={{ borderLeft: '4px solid #2196f3', bgcolor: colors.cardBg, borderColor: colors.border }}>
                 <CardContent>
                   <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                     <Box>
@@ -556,7 +567,7 @@ const ScenarioPlanner = ({ onBack }) => {
 
             {/* Revenue */}
             <Grid item xs={12} sm={6} md={3}>
-              <Card sx={{ borderLeft: '4px solid #4caf50' }}>
+              <Card sx={{ borderLeft: '4px solid #4caf50', bgcolor: colors.cardBg, borderColor: colors.border }}>
                 <CardContent>
                   <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                     <Box>
@@ -577,7 +588,7 @@ const ScenarioPlanner = ({ onBack }) => {
 
             {/* Inventory Requirement */}
             <Grid item xs={12} sm={6} md={3}>
-              <Card sx={{ borderLeft: '4px solid #ff9800' }}>
+              <Card sx={{ borderLeft: '4px solid #ff9800', bgcolor: colors.cardBg, borderColor: colors.border }}>
                 <CardContent>
                   <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                     <Box>
@@ -598,7 +609,7 @@ const ScenarioPlanner = ({ onBack }) => {
 
             {/* Cash Impact */}
             <Grid item xs={12} sm={6} md={3}>
-              <Card sx={{ borderLeft: '4px solid #9c27b0' }}>
+              <Card sx={{ borderLeft: '4px solid #9c27b0', bgcolor: colors.cardBg, borderColor: colors.border }}>
                 <CardContent>
                   <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                     <Box>

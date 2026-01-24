@@ -65,7 +65,12 @@ const getColors = (darkMode) => ({
   error: darkMode ? '#ff6b6b' : '#ef4444',
   info: darkMode ? '#4da6ff' : '#3b82f6',
   text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
   grey: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
 });
 
 // Alert type to specific actions mapping
@@ -282,7 +287,7 @@ const KitAlertDetail = ({ alert, onBack, onAction, darkMode = false }) => {
               <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
                 {alert.title}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                 {alert.message}
               </Typography>
             </Box>
@@ -294,9 +299,9 @@ const KitAlertDetail = ({ alert, onBack, onAction, darkMode = false }) => {
       <Grid container spacing={2} mb={3}>
         {/* Column 1: Business Context */}
         <Grid item xs={12} md={4}>
-          <Card variant="outlined" sx={{ height: '100%' }}>
+          <Card variant="outlined" sx={{ height: '100%', bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
             <CardContent>
-              <Typography variant="subtitle2" fontWeight={600} gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="subtitle2" fontWeight={600} gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, color: colors.text }}>
                 <BusinessIcon fontSize="small" sx={{ color: colors.primary }} />
                 Business Context
               </Typography>
@@ -306,8 +311,8 @@ const KitAlertDetail = ({ alert, onBack, onAction, darkMode = false }) => {
                 {alert.customer && (
                   <>
                     <Box>
-                      <Typography variant="caption" color="text.secondary">Customer</Typography>
-                      <Typography variant="body2" fontWeight={600}>{alert.customer.name}</Typography>
+                      <Typography variant="caption" sx={{ color: colors.textSecondary }}>Customer</Typography>
+                      <Typography variant="body2" fontWeight={600} sx={{ color: colors.text }}>{alert.customer.name}</Typography>
                       <Box display="flex" gap={0.5} mt={0.5}>
                         <Chip label={alert.customer.segment} size="small" variant="outlined" sx={{ height: 20, fontSize: '0.65rem' }} />
                         <Chip label={alert.customer.region} size="small" variant="outlined" sx={{ height: 20, fontSize: '0.65rem' }} />
@@ -317,29 +322,29 @@ const KitAlertDetail = ({ alert, onBack, onAction, darkMode = false }) => {
                 )}
                 {alert.quote_id && (
                   <Box>
-                    <Typography variant="caption" color="text.secondary">Quote ID</Typography>
-                    <Typography variant="body2" fontWeight={600}>{alert.quote_id}</Typography>
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>Quote ID</Typography>
+                    <Typography variant="body2" fontWeight={600} sx={{ color: colors.text }}>{alert.quote_id}</Typography>
                   </Box>
                 )}
                 {alert.material && (
                   <Box>
-                    <Typography variant="caption" color="text.secondary">Material</Typography>
-                    <Typography variant="body2" fontWeight={600}>{alert.material}</Typography>
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>Material</Typography>
+                    <Typography variant="body2" fontWeight={600} sx={{ color: colors.text }}>{alert.material}</Typography>
                   </Box>
                 )}
                 {alert.ml_model && (
                   <Box>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                       <PsychologyIcon sx={{ fontSize: 14, mr: 0.5, verticalAlign: 'middle' }} />
                       ML Model
                     </Typography>
-                    <Typography variant="body2" fontWeight={600}>{alert.ml_model}</Typography>
+                    <Typography variant="body2" fontWeight={600} sx={{ color: colors.text }}>{alert.ml_model}</Typography>
                   </Box>
                 )}
                 <Divider />
                 <Box display="flex" justifyContent="space-between">
                   <Box>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                       <AttachMoneyIcon sx={{ fontSize: 14, mr: 0.5, verticalAlign: 'middle' }} />
                       Revenue Impact
                     </Typography>
@@ -348,7 +353,7 @@ const KitAlertDetail = ({ alert, onBack, onAction, darkMode = false }) => {
                     </Typography>
                   </Box>
                   <Box textAlign="right">
-                    <Typography variant="caption" color="text.secondary">Confidence</Typography>
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>Confidence</Typography>
                     <Typography variant="h6" fontWeight={700} color="primary.main">
                       {Math.round((alert.confidence_score || 0) * 100)}%
                     </Typography>
@@ -356,7 +361,7 @@ const KitAlertDetail = ({ alert, onBack, onAction, darkMode = false }) => {
                 </Box>
                 {alert.margin_impact > 0 && (
                   <Box>
-                    <Typography variant="caption" color="text.secondary">Margin Impact</Typography>
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>Margin Impact</Typography>
                     <Typography variant="body2" fontWeight={600} color="warning.main">
                       ${alert.margin_impact.toLocaleString()}
                     </Typography>
@@ -364,9 +369,9 @@ const KitAlertDetail = ({ alert, onBack, onAction, darkMode = false }) => {
                 )}
                 {alert.sales_rep && (
                   <Box>
-                    <Typography variant="caption" color="text.secondary">Sales Rep</Typography>
-                    <Typography variant="body2" fontWeight={600}>{alert.sales_rep.name}</Typography>
-                    <Typography variant="caption" color="text.secondary">{alert.sales_rep.role}</Typography>
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>Sales Rep</Typography>
+                    <Typography variant="body2" fontWeight={600} sx={{ color: colors.text }}>{alert.sales_rep.name}</Typography>
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>{alert.sales_rep.role}</Typography>
                   </Box>
                 )}
               </Box>
@@ -376,9 +381,9 @@ const KitAlertDetail = ({ alert, onBack, onAction, darkMode = false }) => {
 
         {/* Column 2: Timeline */}
         <Grid item xs={12} md={4}>
-          <Card variant="outlined" sx={{ height: '100%' }}>
+          <Card variant="outlined" sx={{ height: '100%', bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
             <CardContent>
-              <Typography variant="subtitle2" fontWeight={600} gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="subtitle2" fontWeight={600} gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, color: colors.text }}>
                 <ScheduleIcon fontSize="small" sx={{ color: colors.primary }} />
                 Activity Timeline
               </Typography>
@@ -420,13 +425,13 @@ const KitAlertDetail = ({ alert, onBack, onAction, darkMode = false }) => {
                       {getTimelineIcon(item.action)}
                     </Box>
                     <Box flex={1}>
-                      <Typography variant="body2" fontWeight={600} sx={{ textTransform: 'capitalize' }}>
+                      <Typography variant="body2" fontWeight={600} sx={{ textTransform: 'capitalize', color: colors.text }}>
                         {item.action.replace(/_/g, ' ')}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary" display="block">
+                      <Typography variant="caption" sx={{ color: colors.textSecondary }} display="block">
                         {item.notes}
                       </Typography>
-                      <Typography variant="caption" color="text.disabled">
+                      <Typography variant="caption" sx={{ color: colors.textSecondary, opacity: 0.7 }}>
                         {item.by} - {formatDateTime(item.at)}
                       </Typography>
                     </Box>
@@ -439,9 +444,9 @@ const KitAlertDetail = ({ alert, onBack, onAction, darkMode = false }) => {
 
         {/* Column 3: Actions Panel */}
         <Grid item xs={12} md={4}>
-          <Card variant="outlined" sx={{ height: '100%' }}>
+          <Card variant="outlined" sx={{ height: '100%', bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
             <CardContent>
-              <Typography variant="subtitle2" fontWeight={600} gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="subtitle2" fontWeight={600} gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, color: colors.text }}>
                 <AssignmentIcon fontSize="small" sx={{ color: colors.primary }} />
                 Recommended Actions
               </Typography>
@@ -465,7 +470,7 @@ const KitAlertDetail = ({ alert, onBack, onAction, darkMode = false }) => {
                       AI Recommendation
                     </Typography>
                   </Box>
-                  <Typography variant="body2" sx={{ mb: 1 }}>
+                  <Typography variant="body2" sx={{ mb: 1, color: colors.text }}>
                     <strong>{alert.ai_suggestion.action.replace(/_/g, ' ').toUpperCase()}</strong>: {alert.ai_suggestion.reason}
                   </Typography>
                   <Box display="flex" alignItems="center" gap={1}>
@@ -474,7 +479,7 @@ const KitAlertDetail = ({ alert, onBack, onAction, darkMode = false }) => {
                       value={alert.ai_suggestion.confidence * 100}
                       sx={{ flex: 1, height: 6, borderRadius: 3 }}
                     />
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                       {Math.round(alert.ai_suggestion.confidence * 100)}% confidence
                     </Typography>
                   </Box>
@@ -482,7 +487,7 @@ const KitAlertDetail = ({ alert, onBack, onAction, darkMode = false }) => {
               )}
 
               {/* Type-Specific Action Buttons */}
-              <Typography variant="caption" color="text.secondary" display="block" mb={1}>
+              <Typography variant="caption" sx={{ color: colors.textSecondary }} display="block" mb={1}>
                 Actions for {ALERT_TYPE_LABELS[alert.type] || alert.type}
               </Typography>
               <Grid container spacing={1} mb={2}>
@@ -514,7 +519,7 @@ const KitAlertDetail = ({ alert, onBack, onAction, darkMode = false }) => {
               <Divider sx={{ my: 2 }} />
 
               {/* General Actions */}
-              <Typography variant="caption" color="text.secondary" display="block" mb={1}>
+              <Typography variant="caption" sx={{ color: colors.textSecondary }} display="block" mb={1}>
                 General Actions
               </Typography>
               <Grid container spacing={1}>
@@ -570,25 +575,25 @@ const KitAlertDetail = ({ alert, onBack, onAction, darkMode = false }) => {
       </Grid>
 
       {/* Alert Metadata */}
-      <Card variant="outlined">
+      <Card variant="outlined" sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
         <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
           <Box display="flex" alignItems="center" gap={3} flexWrap="wrap">
             <Box display="flex" alignItems="center" gap={0.5}>
               <AccessTimeIcon fontSize="small" sx={{ color: colors.grey }} />
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                 Triggered: {formatDateTime(alert.triggered_at)}
               </Typography>
             </Box>
             <Box display="flex" alignItems="center" gap={0.5}>
               <ScheduleIcon fontSize="small" sx={{ color: colors.grey }} />
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                 Alert ID: {alert.id}
               </Typography>
             </Box>
             {alert.metrics && Object.keys(alert.metrics).length > 0 && (
               <Box display="flex" alignItems="center" gap={0.5}>
                 <InfoIcon fontSize="small" sx={{ color: colors.grey }} />
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                   {Object.entries(alert.metrics).slice(0, 3).map(([k, v]) =>
                     `${k.replace(/_/g, ' ')}: ${typeof v === 'number' ? (v < 1 ? `${Math.round(v * 100)}%` : v.toLocaleString()) : v}`
                   ).join(' | ')}
@@ -600,18 +605,29 @@ const KitAlertDetail = ({ alert, onBack, onAction, darkMode = false }) => {
       </Card>
 
       {/* Action Confirmation Dialog */}
-      <Dialog open={!!actionConfirmDialog} onClose={() => setActionConfirmDialog(null)} maxWidth="sm" fullWidth>
+      <Dialog
+        open={!!actionConfirmDialog}
+        onClose={() => setActionConfirmDialog(null)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: colors.cardBg,
+            border: `1px solid ${colors.border}`,
+          }
+        }}
+      >
         <DialogTitle>
           <Box display="flex" alignItems="center" gap={1}>
             {actionConfirmDialog && React.createElement(actionConfirmDialog.icon, { color: actionConfirmDialog.color })}
-            Confirm: {actionConfirmDialog?.label}
+            <Typography sx={{ color: colors.text }}>Confirm: {actionConfirmDialog?.label}</Typography>
           </Box>
         </DialogTitle>
         <DialogContent>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <Typography variant="body2" sx={{ color: colors.textSecondary, mb: 2 }}>
             {actionConfirmDialog?.description}
           </Typography>
-          <Typography variant="body2">
+          <Typography variant="body2" sx={{ color: colors.text }}>
             This action will be recorded in the activity timeline for <strong>{alert.customer?.name || 'this insight'}</strong>.
           </Typography>
         </DialogContent>
@@ -628,8 +644,19 @@ const KitAlertDetail = ({ alert, onBack, onAction, darkMode = false }) => {
       </Dialog>
 
       {/* Add Note Dialog */}
-      <Dialog open={noteDialog} onClose={() => setNoteDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Add Note</DialogTitle>
+      <Dialog
+        open={noteDialog}
+        onClose={() => setNoteDialog(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: colors.cardBg,
+            border: `1px solid ${colors.border}`,
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: colors.text }}>Add Note</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -649,8 +676,19 @@ const KitAlertDetail = ({ alert, onBack, onAction, darkMode = false }) => {
       </Dialog>
 
       {/* Snooze Dialog */}
-      <Dialog open={snoozeDialog} onClose={() => setSnoozeDialog(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>Snooze Insight</DialogTitle>
+      <Dialog
+        open={snoozeDialog}
+        onClose={() => setSnoozeDialog(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: colors.cardBg,
+            border: `1px solid ${colors.border}`,
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: colors.text }}>Snooze Insight</DialogTitle>
         <DialogContent>
           <FormControl fullWidth sx={{ mt: 1 }}>
             <InputLabel>Duration</InputLabel>
@@ -671,8 +709,19 @@ const KitAlertDetail = ({ alert, onBack, onAction, darkMode = false }) => {
       </Dialog>
 
       {/* Assign Dialog */}
-      <Dialog open={assignDialog} onClose={() => setAssignDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Assign Insight</DialogTitle>
+      <Dialog
+        open={assignDialog}
+        onClose={() => setAssignDialog(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: colors.cardBg,
+            border: `1px solid ${colors.border}`,
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: colors.text }}>Assign Insight</DialogTitle>
         <DialogContent>
           <FormControl fullWidth sx={{ mt: 1 }}>
             <InputLabel>Assign To</InputLabel>
@@ -694,8 +743,19 @@ const KitAlertDetail = ({ alert, onBack, onAction, darkMode = false }) => {
       </Dialog>
 
       {/* Resolve Dialog */}
-      <Dialog open={resolveDialog} onClose={() => setResolveDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Resolve Insight</DialogTitle>
+      <Dialog
+        open={resolveDialog}
+        onClose={() => setResolveDialog(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: colors.cardBg,
+            border: `1px solid ${colors.border}`,
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: colors.text }}>Resolve Insight</DialogTitle>
         <DialogContent>
           <FormControl fullWidth sx={{ mt: 1, mb: 2 }}>
             <InputLabel>Resolution Type</InputLabel>

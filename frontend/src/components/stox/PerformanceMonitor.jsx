@@ -133,7 +133,18 @@ const generateKPIData = () => {
   });
 };
 
-const PerformanceMonitor = ({ onBack }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const PerformanceMonitor = ({ onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -353,7 +364,7 @@ const PerformanceMonitor = ({ onBack }) => {
         <Grid container spacing={2}>
           {/* KPI Summary Cards */}
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: '4px solid #0891b2' }}>
+            <Card sx={{ borderLeft: '4px solid #0891b2' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Typography variant="caption" color="text.secondary">Target</Typography>
                 <Typography variant="h5" fontWeight={700}>
@@ -363,7 +374,7 @@ const PerformanceMonitor = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: '4px solid #10b981' }}>
+            <Card sx={{ borderLeft: '4px solid #10b981' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Typography variant="caption" color="text.secondary">Actual</Typography>
                 <Typography variant="h5" fontWeight={700} color={parseFloat(selectedKPI.achievement) >= 95 ? 'success.main' : parseFloat(selectedKPI.achievement) >= 80 ? 'warning.main' : 'error.main'}>
@@ -373,7 +384,7 @@ const PerformanceMonitor = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: '4px solid #0078d4' }}>
+            <Card sx={{ borderLeft: '4px solid #0078d4' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Typography variant="caption" color="text.secondary">Achievement</Typography>
                 <Typography variant="h5" fontWeight={700}>{selectedKPI.achievement}%</Typography>
@@ -381,7 +392,7 @@ const PerformanceMonitor = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: parseFloat(selectedKPI.change) >= 0 ? (selectedKPI.isLowerBetter ? '4px solid #ef4444' : '4px solid #10b981') : (selectedKPI.isLowerBetter ? '4px solid #10b981' : '4px solid #ef4444') }}>
+            <Card sx={{ borderLeft: parseFloat(selectedKPI.change) >= 0 ? (selectedKPI.isLowerBetter ? '4px solid #ef4444' : '4px solid #10b981') : (selectedKPI.isLowerBetter ? '4px solid #10b981' : '4px solid #ef4444') , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Typography variant="caption" color="text.secondary">Period Change</Typography>
                 <Typography variant="h5" fontWeight={700}>
@@ -393,7 +404,7 @@ const PerformanceMonitor = ({ onBack }) => {
 
           {/* Trend Chart */}
           <Grid item xs={12} md={8}>
-            <Card>
+            <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Typography variant="subtitle1" fontWeight={700} gutterBottom>6-Week Trend</Typography>
                 <Box sx={{ height: 280 }}>
@@ -418,7 +429,7 @@ const PerformanceMonitor = ({ onBack }) => {
 
           {/* KPI Details */}
           <Grid item xs={12} md={4}>
-            <Card>
+            <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Typography variant="subtitle1" fontWeight={700} gutterBottom>KPI Details</Typography>
                 <Grid container spacing={2}>
@@ -456,7 +467,7 @@ const PerformanceMonitor = ({ onBack }) => {
 
           {/* Category Distribution */}
           <Grid item xs={12} md={4}>
-            <Card>
+            <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Typography variant="subtitle1" fontWeight={700} gutterBottom>KPIs by Category</Typography>
                 <Box sx={{ height: 200, display: 'flex', justifyContent: 'center' }}>
@@ -478,12 +489,12 @@ const PerformanceMonitor = ({ onBack }) => {
   };
 
   return (
-    <Box sx={{ p: 3, height: '100%', overflow: 'auto', bgcolor: '#f8fafc' }}>
+    <Box sx={{ p: 3, height: '100%', overflow: 'auto', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline' } }}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}>
               STOX.AI
             </Link>
             <Typography color="primary" variant="body1" fontWeight={600}>
@@ -519,7 +530,7 @@ const PerformanceMonitor = ({ onBack }) => {
           {metrics && (
             <Grid container spacing={2} sx={{ mb: 3 }}>
               <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #f59e0b' }}>
+                <Card sx={{ borderLeft: '4px solid #f59e0b' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">Total KPIs</Typography>
                     <Typography variant="h5" fontWeight={700}>{metrics.totalKPIs}</Typography>
@@ -527,7 +538,7 @@ const PerformanceMonitor = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #10b981' }}>
+                <Card sx={{ borderLeft: '4px solid #10b981' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">On Track</Typography>
                     <Typography variant="h5" fontWeight={700} color="success.main">{metrics.onTrackCount}</Typography>
@@ -535,7 +546,7 @@ const PerformanceMonitor = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #f59e0b' }}>
+                <Card sx={{ borderLeft: '4px solid #f59e0b' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">At Risk</Typography>
                     <Typography variant="h5" fontWeight={700} color="warning.main">{metrics.atRiskCount}</Typography>
@@ -543,7 +554,7 @@ const PerformanceMonitor = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #ef4444' }}>
+                <Card sx={{ borderLeft: '4px solid #ef4444' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">Off Track</Typography>
                     <Typography variant="h5" fontWeight={700} color="error.main">{metrics.offTrackCount}</Typography>
@@ -551,7 +562,7 @@ const PerformanceMonitor = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #0078d4' }}>
+                <Card sx={{ borderLeft: '4px solid #0078d4' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">Avg Achievement</Typography>
                     <Typography variant="h5" fontWeight={700}>{metrics.avgAchievement}%</Typography>
@@ -559,7 +570,7 @@ const PerformanceMonitor = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #0891b2' }}>
+                <Card sx={{ borderLeft: '4px solid #0891b2' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">Improving</Typography>
                     <Typography variant="h5" fontWeight={700} color="info.main">{metrics.improvingCount}</Typography>
@@ -570,7 +581,7 @@ const PerformanceMonitor = ({ onBack }) => {
           )}
 
           {/* Filters */}
-          <Paper sx={{ p: 2, mb: 2 }}>
+          <Paper sx={{ p: 2, mb: 2 , bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
             <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
               <FilterListIcon color="action" />
               <FormControl size="small" sx={{ minWidth: 140 }}>
@@ -608,7 +619,7 @@ const PerformanceMonitor = ({ onBack }) => {
           </Paper>
 
           {/* Data Grid */}
-          <Paper sx={{ height: 500 }}>
+          <Paper sx={{ height: 500, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
             <DataGrid
               rows={filteredData}
               columns={columns}
@@ -624,7 +635,30 @@ const PerformanceMonitor = ({ onBack }) => {
                   quickFilterProps: { debounceMs: 500 },
                 },
               }}
-              sx={stoxTheme.getDataGridSx({ clickable: true })}
+              sx={{
+                ...stoxTheme.getDataGridSx({ clickable: true }),
+                ...(darkMode && {
+                  '& .MuiDataGrid-columnHeaders': {
+                    backgroundColor: colors.cardBg,
+                    color: colors.text,
+                    borderBottom: `1px solid ${colors.border}`,
+                  },
+                  '& .MuiDataGrid-cell': {
+                    color: colors.text,
+                    borderBottom: `1px solid ${colors.border}`,
+                  },
+                  '& .MuiDataGrid-row': {
+                    '&:hover': {
+                      backgroundColor: alpha(colors.primary, 0.08),
+                    },
+                  },
+                  '& .MuiDataGrid-footerContainer': {
+                    backgroundColor: colors.cardBg,
+                    borderTop: `1px solid ${colors.border}`,
+                    color: colors.text,
+                  },
+                }),
+              }}
               initialState={{
                 pagination: { paginationModel: { pageSize: 25 } },
               }}

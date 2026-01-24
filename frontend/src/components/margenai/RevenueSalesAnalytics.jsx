@@ -42,7 +42,7 @@ import InteractiveChart from './shared/InteractiveChart';
 import SafeChart from './shared/SafeChart';
 import { apiService } from '../../services/api';
 
-const RevenueSalesAnalytics = ({ revenueData, growthData, summaryData, onDrillDown, onBack }) => {
+const RevenueSalesAnalytics = ({ revenueData, growthData, summaryData, onDrillDown, onBack, darkMode = false }) => {
   const chartInstanceId = useId();
   const [groupBy, setGroupBy] = useState('customer');
   const [timePeriod, setTimePeriod] = useState('ytd');
@@ -50,6 +50,18 @@ const RevenueSalesAnalytics = ({ revenueData, growthData, summaryData, onDrillDo
   const [selectedMetric, setSelectedMetric] = useState(null);
   const [drillDownDialog, setDrillDownDialog] = useState(false);
   const [drillDownData, setDrillDownData] = useState(null);
+
+  const getColors = (darkMode) => ({
+    primary: darkMode ? '#4da6ff' : '#0a6ed1',
+    text: darkMode ? '#e6edf3' : '#1e293b',
+    textSecondary: darkMode ? '#8b949e' : '#64748b',
+    background: darkMode ? '#0d1117' : '#f8fbfd',
+    paper: darkMode ? '#161b22' : '#ffffff',
+    cardBg: darkMode ? '#21262d' : '#ffffff',
+    border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+  });
+
+  const colors = getColors(darkMode);
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('en-US', {
@@ -117,16 +129,16 @@ const RevenueSalesAnalytics = ({ revenueData, growthData, summaryData, onDrillDo
         {/* Summary Cards */}
         <Grid container spacing={3} sx={{ mb: 3 }}>
           <Grid item xs={12} md={3}>
-            <Card 
-              elevation={2} 
-              sx={{ cursor: 'pointer', '&:hover': { boxShadow: 4 } }}
+            <Card
+              elevation={2}
+              sx={{ cursor: 'pointer', '&:hover': { boxShadow: 4 }, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}
               onClick={() => handleTableDrillDown({ metric: 'revenue' }, 'summary')}
             >
               <CardContent>
-                <Typography color="textSecondary" gutterBottom>
+                <Typography sx={{ color: colors.textSecondary }} gutterBottom>
                   Total Revenue
                 </Typography>
-                <Typography variant="h5">
+                <Typography variant="h5" sx={{ color: colors.text }}>
                   {formatCurrency(summary.total_revenue || 0)}
                 </Typography>
                 <Box display="flex" alignItems="center" gap={0.5} mt={1}>
@@ -142,39 +154,39 @@ const RevenueSalesAnalytics = ({ revenueData, growthData, summaryData, onDrillDo
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card elevation={2}>
+            <Card elevation={2} sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
-                <Typography color="textSecondary" gutterBottom>
+                <Typography sx={{ color: colors.textSecondary }} gutterBottom>
                   Gross Margin
                 </Typography>
-                <Typography variant="h5">
+                <Typography variant="h5" sx={{ color: colors.text }}>
                   {formatCurrency(summary.total_gross_margin || 0)}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                   {(summary.overall_margin_pct || 0).toFixed(1)}% of Revenue
                 </Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card elevation={2}>
+            <Card elevation={2} sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
-                <Typography color="textSecondary" gutterBottom>
+                <Typography sx={{ color: colors.textSecondary }} gutterBottom>
                   Avg Deal Size
                 </Typography>
-                <Typography variant="h5">
+                <Typography variant="h5" sx={{ color: colors.text }}>
                   {formatCurrency(growthData?.pipeline_metrics?.avg_deal_size || 0)}
                 </Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card elevation={2}>
+            <Card elevation={2} sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
-                <Typography color="textSecondary" gutterBottom>
+                <Typography sx={{ color: colors.textSecondary }} gutterBottom>
                   Win Rate
                 </Typography>
-                <Typography variant="h5">
+                <Typography variant="h5" sx={{ color: colors.text }}>
                   {growthData?.market_position?.win_rate || 0}%
                 </Typography>
               </CardContent>
@@ -183,9 +195,9 @@ const RevenueSalesAnalytics = ({ revenueData, growthData, summaryData, onDrillDo
         </Grid>
 
         {/* Revenue Table with Drill-Down */}
-        <Paper elevation={2} sx={{ mb: 3 }}>
-          <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
-            <Typography variant="h6">Revenue Analysis</Typography>
+        <Paper elevation={2} sx={{ mb: 3, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
+          <Box sx={{ p: 2, borderBottom: 1, borderColor: colors.border }}>
+            <Typography variant="h6" sx={{ color: colors.text }}>Revenue Analysis</Typography>
           </Box>
           <DrillDownTable
             data={data}
@@ -203,8 +215,8 @@ const RevenueSalesAnalytics = ({ revenueData, growthData, summaryData, onDrillDo
         </Paper>
 
         {/* Waterfall Chart */}
-        <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
+        <Paper elevation={2} sx={{ p: 3, mb: 3, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
+          <Typography variant="h6" gutterBottom sx={{ color: colors.text }}>
             Revenue to Profit Waterfall
           </Typography>
           <InteractiveChart
@@ -242,8 +254,8 @@ const RevenueSalesAnalytics = ({ revenueData, growthData, summaryData, onDrillDo
     return (
       <>
         {/* Sales Pipeline */}
-        <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
+        <Paper elevation={2} sx={{ p: 3, mb: 3, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
+          <Typography variant="h6" gutterBottom sx={{ color: colors.text }}>
             Sales Pipeline Analysis
           </Typography>
           <Grid container spacing={3}>
@@ -302,8 +314,8 @@ const RevenueSalesAnalytics = ({ revenueData, growthData, summaryData, onDrillDo
         </Paper>
 
         {/* Product Performance */}
-        <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
+        <Paper elevation={2} sx={{ p: 3, mb: 3, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
+          <Typography variant="h6" gutterBottom sx={{ color: colors.text }}>
             Product Performance
           </Typography>
           <DrillDownTable
@@ -327,8 +339,8 @@ const RevenueSalesAnalytics = ({ revenueData, growthData, summaryData, onDrillDo
         </Paper>
 
         {/* Sales Organization Performance */}
-        <Paper elevation={2} sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom>
+        <Paper elevation={2} sx={{ p: 3, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
+          <Typography variant="h6" gutterBottom sx={{ color: colors.text }}>
             Sales Organization Performance
           </Typography>
           <InteractiveChart
@@ -383,7 +395,7 @@ const RevenueSalesAnalytics = ({ revenueData, growthData, summaryData, onDrillDo
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 3, bgcolor: colors.background, minHeight: '100vh' }}>
       {/* Header with Breadcrumbs */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -394,13 +406,13 @@ const RevenueSalesAnalytics = ({ revenueData, growthData, summaryData, onDrillDo
               onClick={onBack}
               sx={{
                 textDecoration: 'none',
-                color: 'text.primary',
+                color: colors.text,
                 '&:hover': { textDecoration: 'underline' },
               }}
             >
               MARGEN.AI
             </Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
+            <Typography sx={{ color: colors.primary }} variant="body1" fontWeight={600}>
               Revenue & Sales
             </Typography>
           </Breadcrumbs>
@@ -413,7 +425,7 @@ const RevenueSalesAnalytics = ({ revenueData, growthData, summaryData, onDrillDo
       </Box>
 
       {/* Filters */}
-      <Paper elevation={2} sx={{ p: 2, mb: 3 }}>
+      <Paper elevation={2} sx={{ p: 2, mb: 3, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} md={3}>
             <FormControl fullWidth size="small">

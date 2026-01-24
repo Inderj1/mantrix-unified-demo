@@ -20,7 +20,18 @@ import excelProcessorApi from '../services/excelProcessorApi';
 import ExcelTemplatesManager from './ExcelTemplatesManager';
 import CreateExcelTemplateModal from './CreateExcelTemplateModal';
 
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 const ExcelAIProcessor = ({ onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   // Tab state
   const [activeTab, setActiveTab] = useState(0); // 0 = Excel AI Processor, 1 = Templates
 
@@ -467,7 +478,7 @@ const ExcelAIProcessor = ({ onBack, darkMode = false }) => {
     return (
       <Box>
         {/* Template Selection */}
-        <Paper sx={{ p: 3, mb: 3 }}>
+        <Paper sx={{ p: 3, mb: 3, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
             <TableChart sx={{ fontSize: 20, color: '#3b82f6' }} />
             <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#3b82f6' }}>
@@ -707,7 +718,7 @@ const ExcelAIProcessor = ({ onBack, darkMode = false }) => {
         </Typography>
       </Box>
 
-      <Paper sx={{ p: 3, mb: 3, bgcolor: darkMode ? '#161b22' : 'white' }}>
+      <Paper sx={{ p: 3, mb: 3, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         <Stepper
           activeStep={templateBuilder.step}
           sx={{
@@ -1051,7 +1062,7 @@ const ExcelAIProcessor = ({ onBack, darkMode = false }) => {
               </Grid>
             </Grid>
 
-            <Paper sx={{ p: 3, mt: 3, bgcolor: darkMode ? '#21262d' : '#f9fafb', border: '1px solid', borderColor: 'divider' }}>
+            <Paper sx={{ p: 3, mt: 3, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2 }}>Configuration Summary</Typography>
               <Stack spacing={1}>
                 <Box sx={{ display: 'flex', gap: 1 }}>
@@ -2357,7 +2368,7 @@ const ExcelAIProcessor = ({ onBack, darkMode = false }) => {
                 </Grid>
 
                 {/* Insights List */}
-                <Paper sx={{ p: 2, mb: 3, bgcolor: darkMode ? '#161b22' : 'white', border: '1px solid', borderColor: 'divider' }}>
+                <Paper sx={{ p: 2, mb: 3, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
                   <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2 }}>Key Insights</Typography>
                   <Stack spacing={1.5}>
                     {processedResults.insights.map((insight, i) => (
@@ -2566,32 +2577,32 @@ const ExcelAIProcessor = ({ onBack, darkMode = false }) => {
       height: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      background: 'linear-gradient(180deg, rgba(219, 234, 254, 0.1) 0%, rgba(255, 255, 255, 1) 50%)'
+      bgcolor: colors.background,
     }}>
       {/* Header */}
-      <Paper elevation={1} sx={{ p: 2, borderRadius: 0, flexShrink: 0 }}>
+      <Paper elevation={1} sx={{ p: 2, borderRadius: 0, flexShrink: 0, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         <Box sx={{ maxWidth: 1400, mx: 'auto', px: 2 }}>
           <Breadcrumbs separator={<NavigateNext fontSize="small" />} sx={{ mb: 2 }}>
             <Link
               onClick={onBack}
               sx={{
                 cursor: 'pointer',
-                color: 'text.secondary',
+                color: colors.textSecondary,
                 textDecoration: 'none',
-                '&:hover': { color: 'primary.main' }
+                '&:hover': { color: colors.primary }
               }}
             >
               Document Intelligence
             </Link>
-            <Typography color="primary" fontWeight={600}>Excel AI Processor</Typography>
+            <Typography sx={{ color: colors.primary }} fontWeight={600}>Excel AI Processor</Typography>
           </Breadcrumbs>
 
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Psychology sx={{ fontSize: 48, color: 'primary.main' }} />
+              <Psychology sx={{ fontSize: 48, color: colors.primary }} />
               <Box>
-                <Typography variant="h5" fontWeight={700}>Excel AI Processor</Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>Excel AI Processor</Typography>
+                <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                   Create custom templates to process Excel files with AI
                 </Typography>
               </Box>

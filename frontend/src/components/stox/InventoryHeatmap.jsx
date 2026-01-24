@@ -68,6 +68,16 @@ const formatCurrency = (value) => {
   return `$${value.toLocaleString()}`;
 };
 
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 // TabPanel Component
 function TabPanel({ children, value, index, ...other }) {
   return (
@@ -83,7 +93,8 @@ function TabPanel({ children, value, index, ...other }) {
   );
 }
 
-const InventoryHeatmap = ({ onBack }) => {
+const InventoryHeatmap = ({ onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [locationMetrics, setLocationMetrics] = useState([]);
@@ -334,7 +345,8 @@ const InventoryHeatmap = ({ onBack }) => {
       flexDirection: 'column',
       overflowY: 'auto',
       overflowX: 'hidden',
-      maxWidth: '100vw'
+      maxWidth: '100vw',
+      bgcolor: colors.background
     }}>
       {/* Header with Breadcrumbs */}
       <Box sx={{ mb: 3 }}>
@@ -382,18 +394,18 @@ const InventoryHeatmap = ({ onBack }) => {
         {/* Summary Cards */}
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card>
+            <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                   <Box>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                       Optimal Locations
                     </Typography>
                     <Typography variant="h4" fontWeight="bold" color="success.main">
                       {optimalCount}
                     </Typography>
                   </Box>
-                  <Avatar sx={{ bgcolor: '#E8F5E9', color: '#2E7D32' }}>
+                  <Avatar sx={{ bgcolor: darkMode ? 'rgba(46, 125, 50, 0.2)' : '#E8F5E9', color: '#2E7D32' }}>
                     <CheckCircleIcon />
                   </Avatar>
                 </Stack>
@@ -401,18 +413,18 @@ const InventoryHeatmap = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card>
+            <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                   <Box>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                       Critical Locations
                     </Typography>
                     <Typography variant="h4" fontWeight="bold" color="error.main">
                       {criticalCount}
                     </Typography>
                   </Box>
-                  <Avatar sx={{ bgcolor: '#FFEBEE', color: '#C62828' }}>
+                  <Avatar sx={{ bgcolor: darkMode ? 'rgba(198, 40, 40, 0.2)' : '#FFEBEE', color: '#C62828' }}>
                     <ErrorIcon />
                   </Avatar>
                 </Stack>
@@ -420,18 +432,18 @@ const InventoryHeatmap = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card>
+            <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                   <Box>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                       Avg Stock Level
                     </Typography>
-                    <Typography variant="h4" fontWeight="bold">
+                    <Typography variant="h4" fontWeight="bold" sx={{ color: colors.text }}>
                       {avgStockLevel}%
                     </Typography>
                   </Box>
-                  <Avatar sx={{ bgcolor: '#E3F2FD', color: '#2b88d8' }}>
+                  <Avatar sx={{ bgcolor: darkMode ? 'rgba(43, 136, 216, 0.2)' : '#E3F2FD', color: '#2b88d8' }}>
                     <InventoryIcon />
                   </Avatar>
                 </Stack>
@@ -439,18 +451,18 @@ const InventoryHeatmap = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card>
+            <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                   <Box>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                       Total Capacity
                     </Typography>
-                    <Typography variant="h5" fontWeight="bold">
+                    <Typography variant="h5" fontWeight="bold" sx={{ color: colors.text }}>
                       {formatNumber(totalCapacity)}
                     </Typography>
                   </Box>
-                  <Avatar sx={{ bgcolor: '#F3E5F5', color: '#7B1FA2' }}>
+                  <Avatar sx={{ bgcolor: darkMode ? 'rgba(123, 31, 162, 0.2)' : '#F3E5F5', color: '#7B1FA2' }}>
                     <WarehouseIcon />
                   </Avatar>
                 </Stack>
@@ -476,12 +488,20 @@ const InventoryHeatmap = ({ onBack }) => {
         )}
 
         {/* Tabs */}
-        <Paper sx={{ mb: 2 }}>
+        <Paper sx={{ mb: 2, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           <Tabs
             value={activeTab}
             onChange={(e, newValue) => setActiveTab(newValue)}
             indicatorColor="primary"
             textColor="primary"
+            sx={{
+              '& .MuiTab-root': {
+                color: colors.textSecondary,
+                '&.Mui-selected': {
+                  color: colors.primary,
+                },
+              },
+            }}
           >
             <Tab label="Plant Distribution" />
             <Tab label="Working Capital" />
@@ -499,31 +519,62 @@ const InventoryHeatmap = ({ onBack }) => {
         overflow: 'hidden',
         width: '100%',
         height: 'calc(100vh - 520px)',
-        minHeight: 500
+        minHeight: 500,
+        bgcolor: colors.paper,
+        border: `1px solid ${colors.border}`
       }}>
         <DataGrid
           autoHeight={false}
           sx={{
             flex: 1,
             width: '100%',
-            border: '1px solid rgba(0,0,0,0.08)',
+            bgcolor: colors.paper,
+            color: colors.text,
+            border: `1px solid ${colors.border}`,
+            '& .MuiDataGrid-columnHeaders': {
+              bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+              color: colors.text,
+              borderBottom: `1px solid ${colors.border}`,
+            },
+            '& .MuiDataGrid-columnHeaderTitle': {
+              color: colors.text,
+              fontWeight: 600,
+            },
+            '& .MuiDataGrid-cell': {
+              color: colors.text,
+              borderBottom: `1px solid ${colors.border}`,
+            },
             '& .MuiDataGrid-row:hover': {
-              backgroundColor: '#f5f5f5',
+              backgroundColor: darkMode ? 'rgba(255,255,255,0.05)' : '#f5f5f5',
             },
             '& .optimal-row': {
               borderLeft: '4px solid #4CAF50',
-              backgroundColor: '#F1F8F4',
+              backgroundColor: darkMode ? 'rgba(76, 175, 80, 0.15)' : '#F1F8F4',
             },
             '& .normal-row': {
               borderLeft: '4px solid #42A5F5',
             },
             '& .low-row': {
               borderLeft: '4px solid #FF9800',
-              backgroundColor: '#FFF8E1',
+              backgroundColor: darkMode ? 'rgba(255, 152, 0, 0.15)' : '#FFF8E1',
             },
             '& .critical-row': {
               borderLeft: '4px solid #F44336',
-              backgroundColor: '#FFEBEE',
+              backgroundColor: darkMode ? 'rgba(244, 67, 54, 0.15)' : '#FFEBEE',
+            },
+            '& .MuiDataGrid-footerContainer': {
+              bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+              borderTop: `1px solid ${colors.border}`,
+              color: colors.text,
+            },
+            '& .MuiTablePagination-root': {
+              color: colors.text,
+            },
+            '& .MuiDataGrid-toolbarContainer': {
+              color: colors.text,
+              '& .MuiButton-root': {
+                color: colors.text,
+              },
             },
           }}
           rows={data}
@@ -553,7 +604,7 @@ const InventoryHeatmap = ({ onBack }) => {
 
       {/* Tab 2: Working Capital */}
       <TabPanel value={activeTab} index={1}>
-        <Paper sx={{ p: 3, height: 'calc(100vh - 520px)', minHeight: 400, display: 'flex', flexDirection: 'column' }}>
+        <Paper sx={{ p: 3, height: 'calc(100vh - 520px)', minHeight: 400, display: 'flex', flexDirection: 'column', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           {loading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
               <LinearProgress sx={{ width: '50%' }} />
@@ -562,6 +613,35 @@ const InventoryHeatmap = ({ onBack }) => {
             <DataGrid
               autoHeight={false}
               rows={locationMetrics.map((item, idx) => ({ id: idx + 1, ...item }))}
+              sx={{
+                flex: 1,
+                bgcolor: colors.paper,
+                color: colors.text,
+                '& .MuiDataGrid-columnHeaders': {
+                  bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                  color: colors.text,
+                  borderBottom: `1px solid ${colors.border}`,
+                },
+                '& .MuiDataGrid-columnHeaderTitle': {
+                  color: colors.text,
+                  fontWeight: 600,
+                },
+                '& .MuiDataGrid-cell': {
+                  color: colors.text,
+                  borderBottom: `1px solid ${colors.border}`,
+                },
+                '& .MuiDataGrid-row:hover': {
+                  backgroundColor: darkMode ? 'rgba(255,255,255,0.05)' : '#f5f5f5',
+                },
+                '& .MuiDataGrid-footerContainer': {
+                  bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                  borderTop: `1px solid ${colors.border}`,
+                  color: colors.text,
+                },
+                '& .MuiTablePagination-root': {
+                  color: colors.text,
+                },
+              }}
               columns={[
                 {
                   field: 'plant',
@@ -686,12 +766,6 @@ const InventoryHeatmap = ({ onBack }) => {
                 sorting: { sortModel: [{ field: 'total_working_capital', sort: 'desc' }] },
               }}
               slots={{ toolbar: GridToolbar }}
-              sx={{
-                flex: 1,
-                '& .MuiDataGrid-row:hover': {
-                  backgroundColor: '#f5f5f5',
-                },
-              }}
             />
           )}
         </Paper>
@@ -699,7 +773,7 @@ const InventoryHeatmap = ({ onBack }) => {
 
       {/* Tab 3: Performance Matrix */}
       <TabPanel value={activeTab} index={2}>
-        <Paper sx={{ p: 3, height: 'calc(100vh - 520px)', minHeight: 400, display: 'flex', flexDirection: 'column' }}>
+        <Paper sx={{ p: 3, height: 'calc(100vh - 520px)', minHeight: 400, display: 'flex', flexDirection: 'column', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           {loading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
               <LinearProgress sx={{ width: '50%' }} />
@@ -708,6 +782,35 @@ const InventoryHeatmap = ({ onBack }) => {
             <DataGrid
               autoHeight={false}
               rows={plantPerformance.map((item, idx) => ({ id: idx + 1, ...item }))}
+              sx={{
+                flex: 1,
+                bgcolor: colors.paper,
+                color: colors.text,
+                '& .MuiDataGrid-columnHeaders': {
+                  bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                  color: colors.text,
+                  borderBottom: `1px solid ${colors.border}`,
+                },
+                '& .MuiDataGrid-columnHeaderTitle': {
+                  color: colors.text,
+                  fontWeight: 600,
+                },
+                '& .MuiDataGrid-cell': {
+                  color: colors.text,
+                  borderBottom: `1px solid ${colors.border}`,
+                },
+                '& .MuiDataGrid-row:hover': {
+                  backgroundColor: darkMode ? 'rgba(255,255,255,0.05)' : '#f5f5f5',
+                },
+                '& .MuiDataGrid-footerContainer': {
+                  bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                  borderTop: `1px solid ${colors.border}`,
+                  color: colors.text,
+                },
+                '& .MuiTablePagination-root': {
+                  color: colors.text,
+                },
+              }}
               columns={[
                 {
                   field: 'plant',
@@ -869,12 +972,6 @@ const InventoryHeatmap = ({ onBack }) => {
                 pagination: { paginationModel: { pageSize: 25 } },
               }}
               slots={{ toolbar: GridToolbar }}
-              sx={{
-                flex: 1,
-                '& .MuiDataGrid-row:hover': {
-                  backgroundColor: '#f5f5f5',
-                },
-              }}
             />
           )}
         </Paper>

@@ -152,7 +152,18 @@ const generateSAPData = () => {
   });
 };
 
-const SAPDataHub = ({ onBack, onTileClick }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const SAPDataHub = ({ onBack, onTileClick, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedSystem, setSelectedSystem] = useState(null);
@@ -685,20 +696,20 @@ const SAPDataHub = ({ onBack, onTileClick }) => {
 
   // Main render
   return (
-    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline', color: colors.primary }, cursor: 'pointer' }}>
               STOX.AI
             </Link>
-            <Link component="button" variant="body1" onClick={() => selectedSystem ? setSelectedSystem(null) : onBack()} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+            <Link component="button" variant="body1" onClick={() => selectedSystem ? setSelectedSystem(null) : onBack()} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline', color: colors.primary }, cursor: 'pointer' }}>
               Layer 1: Foundation
             </Link>
             {selectedSystem ? (
               <>
-                <Link component="button" variant="body1" onClick={() => setSelectedSystem(null)} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+                <Link component="button" variant="body1" onClick={() => setSelectedSystem(null)} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline', color: colors.primary }, cursor: 'pointer' }}>
                   SAP Data Hub
                 </Link>
                 <Typography color="primary" variant="body1" fontWeight={600}>{selectedSystem.name}</Typography>
@@ -731,14 +742,14 @@ const SAPDataHub = ({ onBack, onTileClick }) => {
               { label: 'Errors (24h)', value: summaryStats.errors24h, sub: summaryStats.errors24h === 0 ? 'No errors' : 'Warnings', color: summaryStats.errors24h === 0 ? '#10b981' : '#f59e0b', icon: <WarningIcon /> },
             ].map((stat, idx) => (
               <Grid item xs={6} sm={4} md={2} key={idx}>
-                <Card variant="outlined" sx={{ borderLeft: `3px solid ${stat.color}` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid ${stat.color}`, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
                     <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
                       <Box sx={{ color: stat.color, display: 'flex' }}>{stat.icon}</Box>
-                      <Typography sx={{ fontSize: '0.6rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 0.5 }}>{stat.label}</Typography>
+                      <Typography sx={{ fontSize: '0.6rem', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5 }}>{stat.label}</Typography>
                     </Stack>
-                    <Typography sx={{ fontSize: '1.3rem', fontWeight: 700, color: '#1e293b' }}>{stat.value}</Typography>
-                    <Typography sx={{ fontSize: '0.65rem', color: '#64748b' }}>{stat.sub}</Typography>
+                    <Typography sx={{ fontSize: '1.3rem', fontWeight: 700, color: colors.text }}>{stat.value}</Typography>
+                    <Typography sx={{ fontSize: '0.65rem', color: colors.textSecondary }}>{stat.sub}</Typography>
                   </CardContent>
                 </Card>
               </Grid>
@@ -751,10 +762,10 @@ const SAPDataHub = ({ onBack, onTileClick }) => {
       {selectedSystem ? (
         renderDetailView()
       ) : (
-        <Paper elevation={0} variant="outlined" sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: alpha('#64748b', 0.2), background: `linear-gradient(90deg, ${alpha('#0284c7', 0.05)}, ${alpha('#64748b', 0.02)})` }}>
+        <Paper elevation={0} variant="outlined" sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
+          <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: colors.border, background: darkMode ? alpha('#0284c7', 0.08) : `linear-gradient(90deg, ${alpha('#0284c7', 0.05)}, ${alpha('#64748b', 0.02)})` }}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: '#0078d4' }}>
+              <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: colors.primary }}>
                 SAP System Connections — <Typography component="span" sx={{ color: '#0891b2' }}>Click to View Details</Typography>
               </Typography>
               <Chip label="RFC · OData · BTP · CDS · ODP" size="small" sx={{ fontSize: '0.6rem', bgcolor: alpha('#06b6d4', 0.1), color: '#0891b2' }} />
@@ -773,7 +784,39 @@ const SAPDataHub = ({ onBack, onTileClick }) => {
               initialState={{
                 pagination: { paginationModel: { pageSize: 10 } },
               }}
-              sx={stoxTheme.getDataGridSx({ clickable: true })}
+              sx={{
+                ...stoxTheme.getDataGridSx({ clickable: true }),
+                bgcolor: colors.paper,
+                '& .MuiDataGrid-columnHeaders': {
+                  bgcolor: darkMode ? '#161b22' : '#f8fafc',
+                  borderBottom: `1px solid ${colors.border}`,
+                },
+                '& .MuiDataGrid-columnHeaderTitle': {
+                  color: colors.text,
+                  fontWeight: 600,
+                },
+                '& .MuiDataGrid-cell': {
+                  borderBottom: `1px solid ${colors.border}`,
+                  color: colors.text,
+                },
+                '& .MuiDataGrid-row': {
+                  bgcolor: colors.paper,
+                  '&:hover': {
+                    bgcolor: darkMode ? alpha('#4da6ff', 0.08) : alpha('#0a6ed1', 0.04),
+                  },
+                },
+                '& .MuiDataGrid-footerContainer': {
+                  borderTop: `1px solid ${colors.border}`,
+                  bgcolor: darkMode ? '#161b22' : '#f8fafc',
+                },
+                '& .MuiTablePagination-root': {
+                  color: colors.text,
+                },
+                '& .MuiDataGrid-toolbarContainer': {
+                  color: colors.text,
+                  borderBottom: `1px solid ${colors.border}`,
+                },
+              }}
               slots={{ toolbar: GridToolbar }}
               slotProps={{
                 toolbar: {

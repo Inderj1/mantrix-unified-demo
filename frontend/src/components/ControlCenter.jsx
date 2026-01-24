@@ -32,8 +32,19 @@ import PlatformSettings from './controlcenter/PlatformSettings';
 import UserProfileManager from './UserProfileManager';
 import CommsConfig from './CommsConfig';
 
-const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const ControlCenter = ({ apiHealth, onRefreshStatus, darkMode = false }) => {
   const [activeTab, setActiveTab] = useState(0);
+  const colors = getColors(darkMode);
 
   const tabs = [
     {
@@ -111,9 +122,9 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
   ];
 
   return (
-    <Box sx={{ minHeight: '100%', bgcolor: '#f8fbfd' }}>
+    <Box sx={{ minHeight: '100%', bgcolor: colors.background }}>
       {/* Header */}
-      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, bgcolor: colors.paper, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={2}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Box
@@ -131,10 +142,10 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
               <SettingsIcon sx={{ fontSize: 28, color: '#fff' }} />
             </Box>
             <Box>
-              <Typography variant="h4" fontWeight={700} sx={{ color: '#1e293b' }}>
+              <Typography variant="h4" fontWeight={700} sx={{ color: colors.text }}>
                 Control Center
               </Typography>
-              <Typography variant="body2" sx={{ color: '#64748b' }}>
+              <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                 Centralized platform management and monitoring dashboard
               </Typography>
             </Box>
@@ -188,16 +199,16 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
               sx={{
                 p: 2,
                 borderRadius: 3,
-                bgcolor: 'white',
+                bgcolor: colors.paper,
                 boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               }}
             >
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Box>
-                  <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 500 }}>
+                  <Typography variant="caption" sx={{ color: colors.textSecondary, fontWeight: 500 }}>
                     {stat.label}
                   </Typography>
-                  <Typography variant="h5" fontWeight={700} sx={{ color: '#1e293b' }}>
+                  <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
                     {stat.value}
                   </Typography>
                 </Box>
@@ -232,7 +243,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
                 p: 2,
                 borderRadius: 3,
                 cursor: tab.disabled ? 'not-allowed' : 'pointer',
-                bgcolor: activeTab === index ? alpha('#0078d4', 0.05) : 'white',
+                bgcolor: activeTab === index ? alpha('#0078d4', 0.05) : colors.paper,
                 boxShadow: activeTab === index
                   ? '0 4px 12px rgba(0,120,212,0.15)'
                   : '0 1px 3px rgba(0,0,0,0.08)',
@@ -240,6 +251,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
                 transition: 'all 0.3s ease',
                 position: 'relative',
                 overflow: 'hidden',
+                border: `1px solid ${colors.border}`,
                 '&:hover': !tab.disabled && {
                   transform: 'translateY(-4px)',
                   boxShadow: '0 8px 20px rgba(0,0,0,0.1)',
@@ -268,7 +280,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
                       variant="subtitle2"
                       fontWeight={600}
                       sx={{
-                        color: activeTab === index ? '#1e293b' : '#475569',
+                        color: activeTab === index ? colors.text : colors.textSecondary,
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -283,7 +295,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
                   <Typography
                     variant="caption"
                     sx={{
-                      color: '#94a3b8',
+                      color: colors.textSecondary,
                       display: 'block',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
@@ -304,7 +316,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
                     fontWeight: 600,
                     bgcolor: activeTab === index ? alpha(tab.color, 0.12) : alpha('#64748b', 0.08),
                     color: activeTab === index ? tab.color : '#64748b',
-                    border: '1px solid rgba(0,0,0,0.08)',
+                    border: `1px solid ${colors.border}`,
                   }}
                 />
               </Box>
@@ -319,12 +331,13 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
         sx={{
           p: 3,
           borderRadius: 3,
-          bgcolor: 'white',
+          bgcolor: colors.paper,
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
           minHeight: 400,
+          border: `1px solid ${colors.border}`,
         }}
       >
-        {tabs[activeTab].component}
+        {React.cloneElement(tabs[activeTab].component, { darkMode })}
       </Paper>
     </Box>
   );

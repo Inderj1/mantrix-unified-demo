@@ -80,26 +80,26 @@ function AuthButton() {
         startIcon={<LoginIcon />}
         onClick={() => openSignIn()}
         fullWidth
-        sx={{ 
-          py: 1.25,
+        sx={{
+          py: 1.5,
           px: 3,
-          fontSize: '0.95rem',
+          fontSize: '1rem',
           fontFamily: 'Poppins, sans-serif',
-          fontWeight: 500,
+          fontWeight: 600,
           textTransform: 'none',
-          bgcolor: '#1976d2',
+          bgcolor: '#00357a',
           color: 'white',
-          borderRadius: '8px',
-          boxShadow: '0 4px 14px rgba(25, 118, 210, 0.25)',
+          borderRadius: '10px',
+          boxShadow: '0 4px 14px rgba(0, 53, 122, 0.3)',
           '&:hover': {
-            bgcolor: '#1565c0',
-            boxShadow: '0 6px 20px rgba(25, 118, 210, 0.35)',
-            transform: 'translateY(-1px)',
+            bgcolor: '#ff751f',
+            boxShadow: '0 6px 20px rgba(255, 117, 31, 0.4)',
+            transform: 'translateY(-2px)',
           },
-          transition: 'all 0.2s ease',
+          transition: 'all 0.3s ease',
         }}
       >
-        Sign In
+        Sign In to Continue
       </Button>
     );
   }

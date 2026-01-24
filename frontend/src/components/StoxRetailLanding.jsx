@@ -201,8 +201,20 @@ const dcTiles = [
   },
 ];
 
-const StoxRetailLanding = ({ onBack, onTileClick }) => {
+const StoxRetailLanding = ({ onBack, onTileClick, darkMode = false }) => {
   const [view, setView] = useState('categories'); // 'categories', 'store', or 'dc'
+
+  const getColors = (darkMode) => ({
+    primary: darkMode ? '#4da6ff' : '#0a6ed1',
+    text: darkMode ? '#e6edf3' : '#1e293b',
+    textSecondary: darkMode ? '#8b949e' : '#64748b',
+    background: darkMode ? '#0d1117' : '#f8fbfd',
+    paper: darkMode ? '#161b22' : '#ffffff',
+    cardBg: darkMode ? '#21262d' : '#ffffff',
+    border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+  });
+
+  const colors = getColors(darkMode);
 
   const handleCategoryClick = (categoryId) => {
     if (categoryId === 'store-system') {
@@ -225,26 +237,26 @@ const StoxRetailLanding = ({ onBack, onTileClick }) => {
   // Render Store System tiles
   if (view === 'store') {
     return (
-      <Box sx={{ p: 3, height: '100%', overflowY: 'auto', background: 'linear-gradient(180deg, rgba(219, 234, 254, 0.1) 0%, rgba(255, 255, 255, 1) 50%)' }}>
-        <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+      <Box sx={{ p: 3, height: '100%', overflowY: 'auto', background: colors.background }}>
+        <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.1)', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-            <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-              <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline' } }}>STOX.AI</Link>
-              <Link component="button" variant="body1" onClick={handleBackToCategories} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline' } }}>Retail</Link>
-              <Typography color="primary" variant="body1" fontWeight={600}>Store System</Typography>
+            <Breadcrumbs separator={<NavigateNextIcon fontSize="small" sx={{ color: colors.textSecondary }} />}>
+              <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}>STOX.AI</Link>
+              <Link component="button" variant="body1" onClick={handleBackToCategories} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}>Retail</Link>
+              <Typography sx={{ color: colors.primary }} variant="body1" fontWeight={600}>Store System</Typography>
             </Breadcrumbs>
-            <Button startIcon={<ArrowBackIcon />} onClick={handleBackToCategories} variant="outlined" size="small">Back</Button>
+            <Button startIcon={<ArrowBackIcon />} onClick={handleBackToCategories} variant="outlined" size="small" sx={{ borderColor: colors.border, color: colors.text, '&:hover': { borderColor: colors.primary } }}>Back</Button>
           </Stack>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ width: 4, height: 60, bgcolor: MODULE_COLOR, borderRadius: 2 }} />
+            <Box sx={{ width: 4, height: 60, bgcolor: colors.primary, borderRadius: 2 }} />
             <Box>
               <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
-                <Avatar sx={{ width: 32, height: 32, bgcolor: MODULE_COLOR }}><StorefrontIcon sx={{ fontSize: 18 }} /></Avatar>
-                <Typography variant="h5" fontWeight={700} sx={{ color: MODULE_COLOR }}>Store System</Typography>
-                <Chip label="5 Tiles" size="small" sx={{ bgcolor: alpha(MODULE_COLOR, 0.1), color: MODULE_COLOR, fontWeight: 600, fontSize: '0.7rem' }} />
+                <Avatar sx={{ width: 32, height: 32, bgcolor: colors.primary }}><StorefrontIcon sx={{ fontSize: 18 }} /></Avatar>
+                <Typography variant="h5" fontWeight={700} sx={{ color: colors.primary }}>Store System</Typography>
+                <Chip label="5 Tiles" size="small" sx={{ bgcolor: alpha(colors.primary, 0.15), color: colors.primary, fontWeight: 600, fontSize: '0.7rem' }} />
               </Stack>
-              <Typography variant="body2" color="text.secondary">End-to-end store inventory optimization from forecast simulation to stock transfer execution</Typography>
+              <Typography variant="body2" sx={{ color: colors.textSecondary }}>End-to-end store inventory optimization from forecast simulation to stock transfer execution</Typography>
             </Box>
           </Box>
         </Paper>
@@ -258,15 +270,15 @@ const StoxRetailLanding = ({ onBack, onTileClick }) => {
                     height: 200,
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
-                    border: '1px solid rgba(0,0,0,0.08)',
+                    border: `1px solid ${colors.border}`,
                     borderRadius: 3,
                     position: 'relative',
-                    bgcolor: 'white',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                    bgcolor: colors.cardBg,
+                    boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.1)',
                     '&:hover': {
                       transform: 'translateY(-6px)',
-                      boxShadow: `0 20px 40px ${alpha(tile.color, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,
-                      '& .tile-icon': { transform: 'scale(1.1)', bgcolor: tile.color, color: 'white' },
+                      boxShadow: darkMode ? `0 20px 40px ${alpha(colors.primary, 0.2)}, 0 8px 16px rgba(0,0,0,0.4)` : `0 20px 40px ${alpha(colors.primary, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,
+                      '& .tile-icon': { transform: 'scale(1.1)', bgcolor: colors.primary, color: 'white' },
                       '& .tile-arrow': { opacity: 1, transform: 'translateX(4px)' },
                     },
                   }}
@@ -274,16 +286,16 @@ const StoxRetailLanding = ({ onBack, onTileClick }) => {
                 >
                   <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                      <Avatar className="tile-icon" sx={{ width: 40, height: 40, bgcolor: alpha(tile.color, 0.1), color: tile.color, transition: 'all 0.3s ease' }}>
+                      <Avatar className="tile-icon" sx={{ width: 40, height: 40, bgcolor: alpha(colors.primary, 0.15), color: colors.primary, transition: 'all 0.3s ease' }}>
                         <tile.icon sx={{ fontSize: 22 }} />
                       </Avatar>
                     </Box>
-                    <Typography variant="body1" sx={{ fontWeight: 700, color: tile.color, mb: 0.5, fontSize: '0.9rem' }}>{tile.title}</Typography>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500, mb: 1, fontSize: '0.7rem', opacity: 0.8 }}>{tile.subtitle}</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{tile.description}</Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha(tile.color, 0.1) }}>
-                      <Chip label={`${tile.stats.value} ${tile.stats.label}`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha(tile.color, 0.08), color: tile.color, fontWeight: 600 }} />
-                      <ArrowForwardIcon className="tile-arrow" sx={{ color: tile.color, fontSize: 18, opacity: 0.5, transition: 'all 0.3s ease' }} />
+                    <Typography variant="body1" sx={{ fontWeight: 700, color: colors.primary, mb: 0.5, fontSize: '0.9rem' }}>{tile.title}</Typography>
+                    <Typography variant="caption" sx={{ color: colors.textSecondary, fontWeight: 500, mb: 1, fontSize: '0.7rem', opacity: 0.8 }}>{tile.subtitle}</Typography>
+                    <Typography variant="body2" sx={{ color: colors.textSecondary, mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{tile.description}</Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: `1px solid ${colors.border}` }}>
+                      <Chip label={`${tile.stats.value} ${tile.stats.label}`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha(colors.primary, 0.12), color: colors.primary, fontWeight: 600 }} />
+                      <ArrowForwardIcon className="tile-arrow" sx={{ color: colors.primary, fontSize: 18, opacity: 0.5, transition: 'all 0.3s ease' }} />
                     </Box>
                   </CardContent>
                 </Card>
@@ -298,26 +310,26 @@ const StoxRetailLanding = ({ onBack, onTileClick }) => {
   // Render DC System tiles
   if (view === 'dc') {
     return (
-      <Box sx={{ p: 3, height: '100%', overflowY: 'auto', background: 'linear-gradient(180deg, rgba(219, 234, 254, 0.1) 0%, rgba(255, 255, 255, 1) 50%)' }}>
-        <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+      <Box sx={{ p: 3, height: '100%', overflowY: 'auto', background: colors.background }}>
+        <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.1)', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-            <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-              <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline' } }}>STOX.AI</Link>
-              <Link component="button" variant="body1" onClick={handleBackToCategories} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline' } }}>Retail</Link>
-              <Typography color="primary" variant="body1" fontWeight={600}>Distribution Center System</Typography>
+            <Breadcrumbs separator={<NavigateNextIcon fontSize="small" sx={{ color: colors.textSecondary }} />}>
+              <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}>STOX.AI</Link>
+              <Link component="button" variant="body1" onClick={handleBackToCategories} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}>Retail</Link>
+              <Typography sx={{ color: colors.primary }} variant="body1" fontWeight={600}>Distribution Center System</Typography>
             </Breadcrumbs>
-            <Button startIcon={<ArrowBackIcon />} onClick={handleBackToCategories} variant="outlined" size="small">Back</Button>
+            <Button startIcon={<ArrowBackIcon />} onClick={handleBackToCategories} variant="outlined" size="small" sx={{ borderColor: colors.border, color: colors.text, '&:hover': { borderColor: colors.primary } }}>Back</Button>
           </Stack>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ width: 4, height: 60, background: 'linear-gradient(180deg, #0078d4 0%, #005a9e 100%)', borderRadius: 2 }} />
+            <Box sx={{ width: 4, height: 60, bgcolor: colors.primary, borderRadius: 2 }} />
             <Box>
               <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
-                <Avatar sx={{ width: 32, height: 32, bgcolor: MODULE_COLOR }}><WarehouseIcon sx={{ fontSize: 18 }} /></Avatar>
-                <Typography variant="h5" fontWeight={700} sx={{ color: MODULE_COLOR }}>Distribution Center System</Typography>
-                <Chip label="7 Modules" size="small" sx={{ bgcolor: alpha(MODULE_COLOR, 0.1), color: MODULE_COLOR, fontWeight: 600, fontSize: '0.7rem' }} />
+                <Avatar sx={{ width: 32, height: 32, bgcolor: colors.primary }}><WarehouseIcon sx={{ fontSize: 18 }} /></Avatar>
+                <Typography variant="h5" fontWeight={700} sx={{ color: colors.primary }}>Distribution Center System</Typography>
+                <Chip label="7 Modules" size="small" sx={{ bgcolor: alpha(colors.primary, 0.15), color: colors.primary, fontWeight: 600, fontSize: '0.7rem' }} />
               </Stack>
-              <Typography variant="body2" color="text.secondary">Comprehensive DC management including demand aggregation, BOM, and supplier execution</Typography>
+              <Typography variant="body2" sx={{ color: colors.textSecondary }}>Comprehensive DC management including demand aggregation, BOM, and supplier execution</Typography>
             </Box>
           </Box>
         </Paper>
@@ -331,15 +343,15 @@ const StoxRetailLanding = ({ onBack, onTileClick }) => {
                     height: 200,
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
-                    border: '1px solid rgba(0,0,0,0.08)',
+                    border: `1px solid ${colors.border}`,
                     borderRadius: 3,
                     position: 'relative',
-                    bgcolor: 'white',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                    bgcolor: colors.cardBg,
+                    boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.1)',
                     '&:hover': {
                       transform: 'translateY(-6px)',
-                      boxShadow: `0 20px 40px ${alpha(tile.color, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,
-                      '& .tile-icon': { transform: 'scale(1.1)', bgcolor: tile.color, color: 'white' },
+                      boxShadow: darkMode ? `0 20px 40px ${alpha(colors.primary, 0.2)}, 0 8px 16px rgba(0,0,0,0.4)` : `0 20px 40px ${alpha(colors.primary, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,
+                      '& .tile-icon': { transform: 'scale(1.1)', bgcolor: colors.primary, color: 'white' },
                       '& .tile-arrow': { opacity: 1, transform: 'translateX(4px)' },
                     },
                   }}
@@ -347,16 +359,16 @@ const StoxRetailLanding = ({ onBack, onTileClick }) => {
                 >
                   <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                      <Avatar className="tile-icon" sx={{ width: 40, height: 40, bgcolor: alpha(tile.color, 0.1), color: tile.color, transition: 'all 0.3s ease' }}>
+                      <Avatar className="tile-icon" sx={{ width: 40, height: 40, bgcolor: alpha(colors.primary, 0.15), color: colors.primary, transition: 'all 0.3s ease' }}>
                         <tile.icon sx={{ fontSize: 22 }} />
                       </Avatar>
                     </Box>
-                    <Typography variant="body1" sx={{ fontWeight: 700, color: tile.color, mb: 0.5, fontSize: '0.9rem' }}>{tile.title}</Typography>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500, mb: 1, fontSize: '0.7rem', opacity: 0.8 }}>{tile.subtitle}</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{tile.description}</Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha(tile.color, 0.1) }}>
-                      <Chip label={`${tile.stats.value} ${tile.stats.label}`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha(tile.color, 0.08), color: tile.color, fontWeight: 600 }} />
-                      <ArrowForwardIcon className="tile-arrow" sx={{ color: tile.color, fontSize: 18, opacity: 0.5, transition: 'all 0.3s ease' }} />
+                    <Typography variant="body1" sx={{ fontWeight: 700, color: colors.primary, mb: 0.5, fontSize: '0.9rem' }}>{tile.title}</Typography>
+                    <Typography variant="caption" sx={{ color: colors.textSecondary, fontWeight: 500, mb: 1, fontSize: '0.7rem', opacity: 0.8 }}>{tile.subtitle}</Typography>
+                    <Typography variant="body2" sx={{ color: colors.textSecondary, mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{tile.description}</Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: `1px solid ${colors.border}` }}>
+                      <Chip label={`${tile.stats.value} ${tile.stats.label}`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha(colors.primary, 0.12), color: colors.primary, fontWeight: 600 }} />
+                      <ArrowForwardIcon className="tile-arrow" sx={{ color: colors.primary, fontSize: 18, opacity: 0.5, transition: 'all 0.3s ease' }} />
                     </Box>
                   </CardContent>
                 </Card>
@@ -370,25 +382,25 @@ const StoxRetailLanding = ({ onBack, onTileClick }) => {
 
   // Render main categories view (Store System and DC System)
   return (
-    <Box sx={{ p: 3, height: '100%', overflowY: 'auto', background: 'linear-gradient(180deg, rgba(219, 234, 254, 0.1) 0%, rgba(255, 255, 255, 1) 50%)' }}>
-      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+    <Box sx={{ p: 3, height: '100%', overflowY: 'auto', background: colors.background }}>
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.1)', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline' } }}>STOX.AI</Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>Retail</Typography>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" sx={{ color: colors.textSecondary }} />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}>STOX.AI</Link>
+            <Typography sx={{ color: colors.primary }} variant="body1" fontWeight={600}>Retail</Typography>
           </Breadcrumbs>
-          <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>
+          <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ borderColor: colors.border, color: colors.text, '&:hover': { borderColor: colors.primary } }}>Back</Button>
         </Stack>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Box sx={{ width: 4, height: 60, bgcolor: MODULE_COLOR, borderRadius: 2 }} />
+          <Box sx={{ width: 4, height: 60, bgcolor: colors.primary, borderRadius: 2 }} />
           <Box>
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
-              <Avatar sx={{ width: 32, height: 32, bgcolor: MODULE_COLOR }}><StorefrontIcon sx={{ fontSize: 18 }} /></Avatar>
-              <Typography variant="h5" fontWeight={700} sx={{ color: MODULE_COLOR }}>STOX.AI (RETAIL)</Typography>
-              <Chip label="2 Systems" size="small" sx={{ bgcolor: alpha(MODULE_COLOR, 0.1), color: MODULE_COLOR, fontWeight: 600, fontSize: '0.7rem' }} />
+              <Avatar sx={{ width: 32, height: 32, bgcolor: colors.primary }}><StorefrontIcon sx={{ fontSize: 18 }} /></Avatar>
+              <Typography variant="h5" fontWeight={700} sx={{ color: colors.primary }}>STOX.AI (RETAIL)</Typography>
+              <Chip label="2 Systems" size="small" sx={{ bgcolor: alpha(colors.primary, 0.15), color: colors.primary, fontWeight: 600, fontSize: '0.7rem' }} />
             </Stack>
-            <Typography variant="body2" color="text.secondary">Store & Distribution Center Inventory Intelligence</Typography>
+            <Typography variant="body2" sx={{ color: colors.textSecondary }}>Store & Distribution Center Inventory Intelligence</Typography>
           </Box>
         </Box>
       </Paper>
@@ -403,15 +415,15 @@ const StoxRetailLanding = ({ onBack, onTileClick }) => {
                   height: 200,
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
-                  border: '1px solid rgba(0,0,0,0.08)',
+                  border: `1px solid ${colors.border}`,
                   borderRadius: 3,
                   position: 'relative',
-                  bgcolor: 'white',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  bgcolor: colors.cardBg,
+                  boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.1)',
                   '&:hover': {
                     transform: 'translateY(-6px)',
-                    boxShadow: `0 20px 40px ${alpha(category.color, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,
-                    '& .category-icon': { transform: 'scale(1.1)', bgcolor: category.color, color: 'white' },
+                    boxShadow: darkMode ? `0 20px 40px ${alpha(colors.primary, 0.2)}, 0 8px 16px rgba(0,0,0,0.4)` : `0 20px 40px ${alpha(colors.primary, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,
+                    '& .category-icon': { transform: 'scale(1.1)', bgcolor: colors.primary, color: 'white' },
                     '& .category-arrow': { opacity: 1, transform: 'translateX(4px)' },
                   },
                 }}
@@ -419,17 +431,17 @@ const StoxRetailLanding = ({ onBack, onTileClick }) => {
               >
                 <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                    <Avatar className="category-icon" sx={{ width: 40, height: 40, bgcolor: alpha(category.color, 0.1), color: category.color, transition: 'all 0.3s ease' }}>
+                    <Avatar className="category-icon" sx={{ width: 40, height: 40, bgcolor: alpha(colors.primary, 0.15), color: colors.primary, transition: 'all 0.3s ease' }}>
                       <category.icon sx={{ fontSize: 22 }} />
                     </Avatar>
-                    <Chip label={`${category.stats.value} ${category.stats.label}`} size="small" sx={{ height: 22, fontSize: '0.65rem', fontWeight: 700, bgcolor: category.color, color: 'white' }} />
+                    <Chip label={`${category.stats.value} ${category.stats.label}`} size="small" sx={{ height: 22, fontSize: '0.65rem', fontWeight: 700, bgcolor: colors.primary, color: 'white' }} />
                   </Box>
-                  <Typography variant="body1" sx={{ fontWeight: 700, color: category.color, mb: 0.5, fontSize: '0.9rem' }}>{category.title}</Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500, mb: 1, fontSize: '0.7rem', opacity: 0.8 }}>{category.subtitle}</Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{category.description}</Typography>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha(category.color, 0.1) }}>
-                    <Typography variant="body2" sx={{ color: category.color, fontWeight: 600, fontSize: '0.7rem' }}>{category.id === 'store-system' ? 'Explore Tiles' : 'Explore Modules'}</Typography>
-                    <ArrowForwardIcon className="category-arrow" sx={{ color: category.color, fontSize: 18, opacity: 0.5, transition: 'all 0.3s ease' }} />
+                  <Typography variant="body1" sx={{ fontWeight: 700, color: colors.primary, mb: 0.5, fontSize: '0.9rem' }}>{category.title}</Typography>
+                  <Typography variant="caption" sx={{ color: colors.textSecondary, fontWeight: 500, mb: 1, fontSize: '0.7rem', opacity: 0.8 }}>{category.subtitle}</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary, mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{category.description}</Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: `1px solid ${colors.border}` }}>
+                    <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 600, fontSize: '0.7rem' }}>{category.id === 'store-system' ? 'Explore Tiles' : 'Explore Modules'}</Typography>
+                    <ArrowForwardIcon className="category-arrow" sx={{ color: colors.primary, fontSize: 18, opacity: 0.5, transition: 'all 0.3s ease' }} />
                   </Box>
                 </CardContent>
               </Card>
@@ -440,8 +452,8 @@ const StoxRetailLanding = ({ onBack, onTileClick }) => {
 
       <Box sx={{ mt: 4, textAlign: 'center' }}>
         <Stack direction="row" spacing={2} justifyContent="center" alignItems="center">
-          <LightbulbIcon sx={{ color: 'warning.main' }} />
-          <Typography variant="body2" color="text.secondary">
+          <LightbulbIcon sx={{ color: darkMode ? '#ffa726' : '#f57c00' }} />
+          <Typography variant="body2" sx={{ color: colors.textSecondary }}>
             Store System: Forecast to Execution | DC System: Aggregation to Supplier Management
           </Typography>
         </Stack>

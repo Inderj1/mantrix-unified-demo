@@ -34,22 +34,26 @@ import {
   ViewList as ViewListIcon,
 } from '@mui/icons-material';
 
-// Blue/grey color palette
-const colors = {
-  primary: '#0a6ed1',
-  secondary: '#0854a0',
-  dark: '#354a5f',
-  slate: '#475569',
-  grey: '#64748b',
-  light: '#94a3b8',
-  success: '#10b981',
-  warning: '#f59e0b',
-  error: '#ef4444',
-  text: '#1e293b',
-  bg: '#f8fbfd',
-};
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  secondary: darkMode ? '#5cb3ff' : '#0854a0',
+  dark: darkMode ? '#8b949e' : '#354a5f',
+  slate: darkMode ? '#8b949e' : '#475569',
+  grey: darkMode ? '#8b949e' : '#64748b',
+  light: darkMode ? '#6e7681' : '#94a3b8',
+  success: darkMode ? '#3fb950' : '#10b981',
+  warning: darkMode ? '#d29922' : '#f59e0b',
+  error: darkMode ? '#f85149' : '#ef4444',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
 
-const CommsConfig = () => {
+const CommsConfig = ({ darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [activeTab, setActiveTab] = useState(0);
   const [communicationTypes, setCommunicationTypes] = useState([]);
   const [selectedType, setSelectedType] = useState(null);
@@ -440,7 +444,7 @@ const CommsConfig = () => {
                 EMAIL INTEL Configuration
               </Typography>
             </Stack>
-            <Typography variant="body2" sx={{ color: colors.grey }}>
+            <Typography variant="body2" sx={{ color: colors.textSecondary }}>
               Configure communication types and custom fields
             </Typography>
           </Box>
@@ -471,8 +475,8 @@ const CommsConfig = () => {
         sx={{
           mb: 3,
           borderRadius: 2,
-          border: '1px solid',
-          borderColor: alpha(colors.primary, 0.1),
+          border: `1px solid ${colors.border}`,
+          bgcolor: colors.paper,
         }}
       >
         <Tabs
@@ -482,7 +486,7 @@ const CommsConfig = () => {
             '& .MuiTab-root': {
               textTransform: 'none',
               fontWeight: 600,
-              color: colors.grey,
+              color: colors.textSecondary,
               '&.Mui-selected': { color: colors.primary },
             },
             '& .MuiTabs-indicator': { bgcolor: colors.primary, height: 3 },
@@ -498,12 +502,12 @@ const CommsConfig = () => {
           elevation={0}
           sx={{
             borderRadius: 2,
-            border: '1px solid',
-            borderColor: alpha(colors.primary, 0.1),
+            border: `1px solid ${colors.border}`,
+            bgcolor: colors.paper,
             overflow: 'hidden',
           }}
         >
-          <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${alpha(colors.primary, 0.1)}` }}>
+          <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${colors.border}` }}>
             <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
               Communication Types
             </Typography>
@@ -524,13 +528,14 @@ const CommsConfig = () => {
               pageSize={10}
               onRowClick={(params) => setSelectedType(params.row)}
               sx={{
-                border: '1px solid rgba(0,0,0,0.08)',
+                border: `1px solid ${colors.border}`,
                 '& .MuiDataGrid-columnHeaders': {
                   bgcolor: alpha(colors.primary, 0.03),
-                  borderBottom: `1px solid ${alpha(colors.primary, 0.1)}`,
+                  borderBottom: `1px solid ${colors.border}`,
                 },
                 '& .MuiDataGrid-cell': {
-                  borderBottom: `1px solid ${alpha(colors.primary, 0.05)}`,
+                  borderBottom: `1px solid ${colors.border}`,
+                  color: colors.text,
                 },
                 '& .MuiDataGrid-row:hover': {
                   bgcolor: alpha(colors.primary, 0.03),
@@ -546,12 +551,12 @@ const CommsConfig = () => {
           elevation={0}
           sx={{
             borderRadius: 2,
-            border: '1px solid',
-            borderColor: alpha(colors.primary, 0.1),
+            border: `1px solid ${colors.border}`,
+            bgcolor: colors.paper,
             overflow: 'hidden',
           }}
         >
-          <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${alpha(colors.primary, 0.1)}` }}>
+          <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${colors.border}` }}>
             <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
               Fields for: {selectedType.display_name}
             </Typography>
@@ -571,13 +576,14 @@ const CommsConfig = () => {
               columns={fieldColumns}
               pageSize={10}
               sx={{
-                border: '1px solid rgba(0,0,0,0.08)',
+                border: `1px solid ${colors.border}`,
                 '& .MuiDataGrid-columnHeaders': {
                   bgcolor: alpha(colors.primary, 0.03),
-                  borderBottom: `1px solid ${alpha(colors.primary, 0.1)}`,
+                  borderBottom: `1px solid ${colors.border}`,
                 },
                 '& .MuiDataGrid-cell': {
-                  borderBottom: `1px solid ${alpha(colors.primary, 0.05)}`,
+                  borderBottom: `1px solid ${colors.border}`,
+                  color: colors.text,
                 },
                 '& .MuiDataGrid-row:hover': {
                   bgcolor: alpha(colors.primary, 0.03),
@@ -688,7 +694,7 @@ const CommsConfig = () => {
           </Stack>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          <Button onClick={() => setOpenTypeDialog(false)} sx={{ color: colors.grey }}>
+          <Button onClick={() => setOpenTypeDialog(false)} sx={{ color: colors.textSecondary }}>
             Cancel
           </Button>
           <Button
@@ -867,7 +873,7 @@ const CommsConfig = () => {
           </Grid>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          <Button onClick={() => setOpenFieldDialog(false)} sx={{ color: colors.grey }}>
+          <Button onClick={() => setOpenFieldDialog(false)} sx={{ color: colors.textSecondary }}>
             Cancel
           </Button>
           <Button

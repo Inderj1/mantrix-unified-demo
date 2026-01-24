@@ -89,6 +89,16 @@ import {
 // Chart colors
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7c7c', '#8dd1e1', '#d084d0', '#ffb347', '#67b7dc'];
 
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 // Helper function: Debounce utility
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -179,7 +189,9 @@ const SAMPLE_QUERIES = [
   }
 ];
 
-const SimpleChatInterface = () => {
+const SimpleChatInterface = ({ darkMode = false }) => {
+  const colors = getColors(darkMode);
+
   // Get authenticated user from Clerk
   const { user, isLoaded: isUserLoaded } = useUser();
 
@@ -956,7 +968,14 @@ const SimpleChatInterface = () => {
     const chartData = prepareChartData(results);
     if (!chartData || !chartData.hasNumericData) {
       return (
-        <Alert severity="info">
+        <Alert
+          severity="info"
+          sx={{
+            bgcolor: darkMode ? alpha('#2196f3', 0.15) : undefined,
+            color: colors.text,
+            '& .MuiAlert-icon': { color: darkMode ? '#64b5f6' : undefined },
+          }}
+        >
           No numeric data available for visualization. Switch to table view.
         </Alert>
       );
@@ -1025,7 +1044,15 @@ const SimpleChatInterface = () => {
     return (
       <Box>
         {transformationMsg && (
-          <Alert severity="info" sx={{ mb: 2 }}>
+          <Alert
+            severity="info"
+            sx={{
+              mb: 2,
+              bgcolor: darkMode ? alpha('#2196f3', 0.15) : undefined,
+              color: colors.text,
+              '& .MuiAlert-icon': { color: darkMode ? '#64b5f6' : undefined },
+            }}
+          >
             {transformationMsg}
           </Alert>
         )}
@@ -1197,7 +1224,14 @@ const SimpleChatInterface = () => {
       case 'scatter':
         if (numericColumns.length < 2) {
           return (
-            <Alert severity="warning">
+            <Alert
+              severity="warning"
+              sx={{
+                bgcolor: darkMode ? alpha('#ff9800', 0.15) : undefined,
+                color: colors.text,
+                '& .MuiAlert-icon': { color: darkMode ? '#ffa726' : undefined },
+              }}
+            >
               Scatter plot requires at least 2 numeric columns for X and Y axes.
             </Alert>
           );
@@ -1233,7 +1267,14 @@ const SimpleChatInterface = () => {
       case 'radar':
         if (numericColumns.length < 3) {
           return (
-            <Alert severity="warning">
+            <Alert
+              severity="warning"
+              sx={{
+                bgcolor: darkMode ? alpha('#ff9800', 0.15) : undefined,
+                color: colors.text,
+                '& .MuiAlert-icon': { color: darkMode ? '#ffa726' : undefined },
+              }}
+            >
               Radar chart works best with at least 3 numeric dimensions.
             </Alert>
           );
@@ -1332,8 +1373,8 @@ const SimpleChatInterface = () => {
                 {message.timestamp.toLocaleTimeString()}
               </Typography>
             </Paper>
-            <Avatar sx={{ bgcolor: 'grey.500' }}>
-              <PersonIcon />
+            <Avatar sx={{ bgcolor: darkMode ? alpha(colors.text, 0.2) : 'grey.500' }}>
+              <PersonIcon sx={{ color: colors.text }} />
             </Avatar>
           </Stack>
         </Box>
@@ -1360,8 +1401,11 @@ const SimpleChatInterface = () => {
               sx={{
                 mb: 2,
                 borderLeft: '4px solid',
-                borderLeftColor: 'primary.main',
-                background: 'linear-gradient(to right, rgba(25, 118, 210, 0.03), rgba(255, 255, 255, 1))',
+                borderLeftColor: colors.primary,
+                background: darkMode
+                  ? `linear-gradient(to right, ${alpha(colors.primary, 0.08)}, ${colors.paper})`
+                  : 'linear-gradient(to right, rgba(25, 118, 210, 0.03), rgba(255, 255, 255, 1))',
+                border: `1px solid ${colors.border}`,
               }}
             >
               <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
@@ -1372,7 +1416,7 @@ const SimpleChatInterface = () => {
                       component="div"
                       sx={{
                         lineHeight: 1.7,
-                        color: 'text.primary',
+                        color: colors.text,
                       }}
                     >
                       {(() => {
@@ -1402,10 +1446,10 @@ const SimpleChatInterface = () => {
 
                             elements.push(
                               <Box key={`list-${i}`} component="div" sx={{ ml: 2, mb: 0.5, display: 'flex', alignItems: 'flex-start' }}>
-                                <Typography variant="body2" component="span" sx={{ mr: 1, fontWeight: 600, color: 'primary.main' }}>
+                                <Typography variant="body2" component="span" sx={{ mr: 1, fontWeight: 600, color: colors.primary }}>
                                   •
                                 </Typography>
-                                <Typography variant="body2" component="span" sx={{ flex: 1 }}>
+                                <Typography variant="body2" component="span" sx={{ flex: 1, color: colors.text }}>
                                   {listItemText}
                                 </Typography>
                               </Box>
@@ -1431,7 +1475,15 @@ const SimpleChatInterface = () => {
                       })()}
                     </Typography>
                     {message.error && (
-                      <Alert severity="error" sx={{ mt: 2 }}>
+                      <Alert
+                        severity="error"
+                        sx={{
+                          mt: 2,
+                          bgcolor: darkMode ? alpha('#f44336', 0.15) : undefined,
+                          color: colors.text,
+                          '& .MuiAlert-icon': { color: darkMode ? '#ef5350' : undefined },
+                        }}
+                      >
                         {message.error}
                       </Alert>
                     )}
@@ -1449,7 +1501,7 @@ const SimpleChatInterface = () => {
 
             {/* SQL Query Display - Collapsible with Edit Mode */}
             {message.sql && (
-              <Accordion sx={{ mb: 2, bgcolor: 'grey.100' }}>
+              <Accordion sx={{ mb: 2, bgcolor: darkMode ? colors.cardBg : 'grey.100', border: `1px solid ${colors.border}` }}>
                 <AccordionSummary
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls="sql-content"
@@ -1485,7 +1537,7 @@ const SimpleChatInterface = () => {
                     </ToggleButton>
                   </Stack>
                 </AccordionSummary>
-                <AccordionDetails sx={{ bgcolor: editMode[message.id] ? 'background.paper' : 'grey.900', p: 2 }}>
+                <AccordionDetails sx={{ bgcolor: editMode[message.id] ? colors.paper : (darkMode ? '#0d1117' : 'grey.900'), p: 2 }}>
                   {editMode[message.id] ? (
                     <Box>
                       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
@@ -1495,6 +1547,16 @@ const SimpleChatInterface = () => {
                             exclusive
                             onChange={(e, v) => v && setSqlTheme(v)}
                             size="small"
+                            sx={{
+                              '& .MuiToggleButton-root': {
+                                color: colors.text,
+                                borderColor: colors.border,
+                                '&.Mui-selected': {
+                                  bgcolor: alpha(colors.primary, 0.15),
+                                  color: colors.primary,
+                                },
+                              },
+                            }}
                           >
                             <ToggleButton value="github">Light</ToggleButton>
                             <ToggleButton value="monokai">Dark</ToggleButton>
@@ -1563,9 +1625,9 @@ const SimpleChatInterface = () => {
 
             {/* Results Table */}
             {message.results && message.results.length > 0 && (
-              <Paper elevation={1} sx={{ p: 2 }}>
+              <Paper elevation={1} sx={{ p: 2, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                 <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
-                  <Typography variant="h6">
+                  <Typography variant="h6" sx={{ color: colors.text }}>
                     Results ({message.results.length} rows)
                   </Typography>
                   <Stack direction="row" spacing={1}>
@@ -1573,6 +1635,7 @@ const SimpleChatInterface = () => {
                       size="small"
                       startIcon={<DownloadIcon />}
                       onClick={() => downloadCSV(message.results)}
+                      sx={{ color: colors.primary, borderColor: colors.border }}
                     >
                       Export CSV
                     </Button>
@@ -1650,6 +1713,16 @@ const SimpleChatInterface = () => {
                       exclusive
                       onChange={(e, v) => v && setVisualizationType(prev => ({ ...prev, [message.id]: v }))}
                       size="small"
+                      sx={{
+                        '& .MuiToggleButton-root': {
+                          color: colors.text,
+                          borderColor: colors.border,
+                          '&.Mui-selected': {
+                            bgcolor: alpha(colors.primary, 0.15),
+                            color: colors.primary,
+                          },
+                        },
+                      }}
                     >
                       <ToggleButton value="table">
                         <MuiTooltip title="Table View"><TableChartIcon /></MuiTooltip>
@@ -1818,13 +1891,54 @@ const SimpleChatInterface = () => {
                           density="compact"
                           disableRowSelectionOnClick
                           sx={{
+                            bgcolor: colors.cardBg,
+                            border: `1px solid ${colors.border}`,
+                            color: colors.text,
+                            '& .MuiDataGrid-main': {
+                              bgcolor: colors.cardBg,
+                            },
                             '& .MuiDataGrid-cell': {
                               fontSize: '0.875rem',
+                              color: colors.text,
+                              borderColor: colors.border,
                             },
                             '& .MuiDataGrid-columnHeaders': {
-                              backgroundColor: 'action.hover',
+                              bgcolor: darkMode ? '#21262d' : '#f8fafc',
                               fontSize: '0.875rem',
                               fontWeight: 600,
+                              color: colors.text,
+                              borderColor: colors.border,
+                            },
+                            '& .MuiDataGrid-columnHeader': {
+                              bgcolor: darkMode ? '#21262d' : '#f8fafc',
+                              color: colors.text,
+                            },
+                            '& .MuiDataGrid-columnHeaderTitle': {
+                              color: colors.text,
+                              fontWeight: 600,
+                            },
+                            '& .MuiDataGrid-row': {
+                              bgcolor: colors.cardBg,
+                              '&:hover': {
+                                bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                              },
+                            },
+                            '& .MuiDataGrid-footerContainer': {
+                              bgcolor: darkMode ? '#21262d' : '#f8fafc',
+                              borderColor: colors.border,
+                              color: colors.text,
+                            },
+                            '& .MuiTablePagination-root': {
+                              color: colors.text,
+                            },
+                            '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                              color: colors.textSecondary,
+                            },
+                            '& .MuiIconButton-root': {
+                              color: colors.textSecondary,
+                            },
+                            '& .MuiDataGrid-virtualScroller': {
+                              bgcolor: colors.cardBg,
                             },
                           }}
                         />
@@ -1832,7 +1946,15 @@ const SimpleChatInterface = () => {
                     } catch (err) {
                       console.error('Error rendering DataGrid:', err);
                       return (
-                        <Alert severity="error" sx={{ m: 2 }}>
+                        <Alert
+                          severity="error"
+                          sx={{
+                            m: 2,
+                            bgcolor: darkMode ? alpha('#f44336', 0.15) : undefined,
+                            color: colors.text,
+                            '& .MuiAlert-icon': { color: darkMode ? '#ef5350' : undefined },
+                          }}
+                        >
                           Error displaying results: {err.message}
                         </Alert>
                       );
@@ -1886,7 +2008,7 @@ const SimpleChatInterface = () => {
 
             {/* No results message */}
             {message.results && message.results.length === 0 && message.sql && (
-              <Paper elevation={1} sx={{ p: 2, bgcolor: 'warning.light' }}>
+              <Paper elevation={1} sx={{ p: 2, bgcolor: darkMode ? alpha('#ff9800', 0.15) : 'warning.light', border: `1px solid ${colors.border}` }}>
                 <Typography variant="body2">
                   The query executed successfully but returned no results.
                 </Typography>
@@ -1944,14 +2066,14 @@ const SimpleChatInterface = () => {
         sx={{
           p: 1,
           borderBottom: 1,
-          borderColor: 'divider',
+          borderColor: colors.border,
           display: 'flex',
           alignItems: 'center',
           justifyContent: historyOpen ? 'space-between' : 'center',
           cursor: 'pointer',
-          bgcolor: 'grey.100',
+          bgcolor: colors.cardBg,
           '&:hover': {
-            bgcolor: 'grey.200',
+            bgcolor: darkMode ? alpha(colors.primary, 0.1) : 'grey.200',
           },
         }}
         onClick={() => setHistoryOpen(!historyOpen)}
@@ -1959,8 +2081,8 @@ const SimpleChatInterface = () => {
         {historyOpen ? (
           <>
             <Stack direction="row" spacing={1} alignItems="center">
-              <HistoryIcon color="action" />
-              <Typography variant="subtitle2" fontWeight="bold">
+              <HistoryIcon sx={{ color: colors.textSecondary }} />
+              <Typography variant="subtitle2" fontWeight="bold" sx={{ color: colors.text }}>
                 Conversation History
               </Typography>
             </Stack>
@@ -1989,6 +2111,13 @@ const SimpleChatInterface = () => {
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
+                  bgcolor: darkMode ? colors.paper : undefined,
+                  color: colors.text,
+                  '& fieldset': { borderColor: colors.border },
+                },
+                '& .MuiInputBase-input::placeholder': {
+                  color: colors.textSecondary,
+                  opacity: 1,
                 },
               }}
             />
@@ -2006,14 +2135,14 @@ const SimpleChatInterface = () => {
                 width: '6px',
               },
               '&::-webkit-scrollbar-track': {
-                backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
                 borderRadius: '3px',
               },
               '&::-webkit-scrollbar-thumb': {
-                backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
                 borderRadius: '3px',
                 '&:hover': {
-                  backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                  backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
                 },
               },
             }}>
@@ -2022,7 +2151,7 @@ const SimpleChatInterface = () => {
               <CircularProgress size={24} />
             </Box>
           ) : conversations.length === 0 ? (
-            <Typography variant="body2" color="text.secondary" align="center">
+            <Typography variant="body2" sx={{ color: colors.textSecondary }} align="center">
               No conversations yet
             </Typography>
           ) : (
@@ -2039,7 +2168,7 @@ const SimpleChatInterface = () => {
                         px: 1,
                         py: 0.5,
                         fontWeight: 600,
-                        color: 'text.secondary',
+                        color: colors.textSecondary,
                         display: 'block'
                       }}
                     >
@@ -2063,16 +2192,16 @@ const SimpleChatInterface = () => {
                             elevation={0}
                             sx={{
                               p: 1.5,
-                              bgcolor: isActive ? alpha('#0a6ed1', 0.1) : 'grey.50',
+                              bgcolor: isActive ? alpha(colors.primary, 0.15) : colors.cardBg,
                               cursor: 'pointer',
                               border: isActive ? '2px solid' : '1px solid',
-                              borderColor: isActive ? '#0a6ed1' : alpha('#000', 0.08),
+                              borderColor: isActive ? colors.primary : colors.border,
                               borderRadius: 1.5,
                               transition: 'all 0.15s ease-in-out',
                               overflow: 'hidden',
                               '&:hover': {
-                                bgcolor: isActive ? alpha('#0a6ed1', 0.15) : 'grey.100',
-                                borderColor: isActive ? '#0a6ed1' : alpha('#0a6ed1', 0.3),
+                                bgcolor: isActive ? alpha(colors.primary, 0.2) : (darkMode ? alpha(colors.primary, 0.05) : 'grey.100'),
+                                borderColor: isActive ? colors.primary : alpha(colors.primary, 0.3),
                               },
                             }}
                           >
@@ -2086,7 +2215,7 @@ const SimpleChatInterface = () => {
                                       overflow: 'hidden',
                                       textOverflow: 'ellipsis',
                                       whiteSpace: 'nowrap',
-                                      color: isActive ? '#0a6ed1' : 'text.primary',
+                                      color: isActive ? colors.primary : colors.text,
                                     }}
                                   >
                                     {displayTitle}
@@ -2101,7 +2230,7 @@ const SimpleChatInterface = () => {
                                         whiteSpace: 'nowrap',
                                         fontSize: '0.7rem',
                                         fontStyle: 'italic',
-                                        color: 'text.secondary',
+                                        color: colors.textSecondary,
                                         display: 'block',
                                       }}
                                     >
@@ -2110,7 +2239,7 @@ const SimpleChatInterface = () => {
                                   )}
 
                                   <Stack direction="row" spacing={1} alignItems="center">
-                                    <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.secondary' }}>
+                                    <Typography variant="caption" sx={{ fontSize: '0.65rem', color: colors.textSecondary }}>
                                       {new Date(conv.updated_at || conv.updatedAt).toLocaleDateString(undefined, {
                                         month: 'short',
                                         day: 'numeric',
@@ -2126,8 +2255,8 @@ const SimpleChatInterface = () => {
                                           height: 16,
                                           fontSize: '0.65rem',
                                           minWidth: 20,
-                                          bgcolor: alpha('#0a6ed1', 0.1),
-                                          color: '#0a6ed1',
+                                          bgcolor: alpha(colors.primary, 0.15),
+                                          color: colors.primary,
                                         }}
                                       />
                                     )}
@@ -2167,15 +2296,18 @@ const SimpleChatInterface = () => {
           
           {/* Clear All Button at bottom */}
           {conversations.length > 0 && (
-            <Box sx={{ p: 2, pt: 1, borderTop: 1, borderColor: 'divider' }}>
+            <Box sx={{ p: 2, pt: 1, borderTop: 1, borderColor: colors.border }}>
               <Stack spacing={1}>
                 <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
                   <Chip
-                    icon={<HistoryIcon />}
+                    icon={<HistoryIcon sx={{ color: colors.textSecondary }} />}
                     label={`${conversations.length} conversation${conversations.length !== 1 ? 's' : ''}`}
                     size="small"
                     variant="outlined"
-                    sx={{ borderColor: 'divider' }}
+                    sx={{
+                      borderColor: colors.border,
+                      color: colors.text,
+                    }}
                   />
                 </Box>
                 <Button
@@ -2184,11 +2316,12 @@ const SimpleChatInterface = () => {
                   startIcon={<DeleteOutlineIcon />}
                   onClick={handleClearAllConversations}
                   sx={{
-                    color: 'text.secondary',
-                    borderColor: 'divider',
+                    color: colors.textSecondary,
+                    borderColor: colors.border,
                     '&:hover': {
-                      borderColor: 'action.hover',
-                      bgcolor: 'action.hover',
+                      borderColor: colors.primary,
+                      bgcolor: alpha(colors.primary, 0.05),
+                      color: colors.text,
                     },
                   }}
                   variant="outlined"
@@ -2210,7 +2343,8 @@ const SimpleChatInterface = () => {
       minHeight: 0,
       display: 'flex',
       position: 'relative',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      bgcolor: colors.background,
     }}>
       {/* Main Content Area */}
       <Box sx={{
@@ -2224,7 +2358,7 @@ const SimpleChatInterface = () => {
         transition: 'margin-right 0.2s ease-in-out',
       }}>
         {/* Header */}
-        <Paper elevation={1} sx={{ p: 1.5, borderRadius: 0, position: 'relative', zIndex: 10, flexShrink: 0 }}>
+        <Paper elevation={1} sx={{ p: 1.5, borderRadius: 0, position: 'relative', zIndex: 10, flexShrink: 0, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             {/* Left section */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -2239,12 +2373,12 @@ const SimpleChatInterface = () => {
               />
               <Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Typography variant="h5" fontWeight={700}>
+                  <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
                     AXIS.AI
                   </Typography>
                   <Chip label="v2.0 Research" size="small" color="success" sx={{ height: 20 }} />
                 </Box>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                   {mode === 'chat'
                     ? 'Ask questions about your data in natural language'
                     : 'Conduct comprehensive data analysis with AI-powered research'}
@@ -2270,6 +2404,12 @@ const SimpleChatInterface = () => {
                     '& .MuiToggleButton-root': {
                       textTransform: 'none',
                       px: 2,
+                      color: colors.text,
+                      borderColor: colors.border,
+                      '&.Mui-selected': {
+                        bgcolor: alpha(colors.primary, 0.15),
+                        color: colors.primary,
+                      },
                     }
                   }}
                 >
@@ -2282,8 +2422,8 @@ const SimpleChatInterface = () => {
                     Research
                   </ToggleButton>
                 </ToggleButtonGroup>
-                
-                <Divider orientation="vertical" flexItem />
+
+                <Divider orientation="vertical" flexItem sx={{ borderColor: colors.border }} />
                 
                 {mode === 'chat' && (
                   <Button
@@ -2311,29 +2451,36 @@ const SimpleChatInterface = () => {
         {mode === 'chat' ? (
           <>
             {/* Sub-tabs for Chat Mode */}
-            <Paper sx={{ mx: 2, mt: 1 }}>
-              <Tabs 
-                value={viewMode} 
+            <Paper sx={{ mx: 2, mt: 1, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
+              <Tabs
+                value={viewMode}
                 onChange={(e, v) => setViewMode(v)}
-                sx={{ 
-                  borderBottom: 1, 
-                  borderColor: 'divider',
+                sx={{
+                  borderBottom: 1,
+                  borderColor: colors.border,
                   '& .MuiTab-root': {
                     textTransform: 'none',
                     minHeight: 48,
-                  }
+                    color: colors.textSecondary,
+                    '&.Mui-selected': {
+                      color: colors.primary,
+                    },
+                  },
+                  '& .MuiTabs-indicator': {
+                    backgroundColor: colors.primary,
+                  },
                 }}
               >
-                <Tab 
-                  value="chat" 
-                  label="Chat" 
-                  icon={<ChatIcon sx={{ fontSize: 18 }} />} 
+                <Tab
+                  value="chat"
+                  label="Chat"
+                  icon={<ChatIcon sx={{ fontSize: 18 }} />}
                   iconPosition="start"
                 />
-                <Tab 
-                  value="history" 
-                  label="Execution History" 
-                  icon={<HistoryIcon sx={{ fontSize: 18 }} />} 
+                <Tab
+                  value="history"
+                  label="Execution History"
+                  icon={<HistoryIcon sx={{ fontSize: 18 }} />}
                   iconPosition="start"
                 />
               </Tabs>
@@ -2344,15 +2491,18 @@ const SimpleChatInterface = () => {
               <>
                 {/* Sample Queries Panel */}
                 {showSampleQueries && messages.length === 0 && (
-              <Accordion 
-            defaultExpanded 
-            sx={{ 
-              flexShrink: 0, 
-              mx: 2, 
+              <Accordion
+            defaultExpanded
+            sx={{
+              flexShrink: 0,
+              mx: 2,
               mt: 1,
               mb: 1,
+              bgcolor: colors.paper,
+              border: `1px solid ${colors.border}`,
               '& .MuiAccordionSummary-root': {
                 minHeight: 40,
+                bgcolor: darkMode ? colors.cardBg : undefined,
                 '& .MuiAccordionSummary-content': {
                   margin: '8px 0',
                 }
@@ -2360,11 +2510,12 @@ const SimpleChatInterface = () => {
               '& .MuiAccordionDetails-root': {
                 pt: 1,
                 pb: 2,
+                bgcolor: colors.paper,
               }
             }}
           >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: colors.text }} />}>
+              <Typography variant="h6" sx={{ fontSize: '1rem', color: colors.text }}>
                 Sample Queries - Click to try
               </Typography>
             </AccordionSummary>
@@ -2373,7 +2524,7 @@ const SimpleChatInterface = () => {
                 {SAMPLE_QUERIES.map((section) => (
                   <Grid item xs={12} sm={6} md={3} key={section.category}>
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600, color: 'text.secondary' }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600, color: colors.textSecondary }}>
                         {section.category}
                       </Typography>
                       <Stack spacing={1}>
@@ -2383,17 +2534,21 @@ const SimpleChatInterface = () => {
                             label={query}
                             size="small"
                             onClick={() => setInputMessage(query)}
-                            sx={{ 
+                            sx={{
                               cursor: 'pointer',
                               justifyContent: 'flex-start',
                               height: 'auto',
+                              bgcolor: colors.cardBg,
+                              color: colors.text,
+                              border: `1px solid ${colors.border}`,
                               '& .MuiChip-label': {
                                 whiteSpace: 'normal',
                                 padding: '8px 12px',
                               },
                               '&:hover': {
-                                bgcolor: 'primary.light',
-                                color: 'primary.contrastText',
+                                bgcolor: alpha(colors.primary, 0.15),
+                                color: colors.primary,
+                                borderColor: colors.primary,
                               }
                             }}
                           />
@@ -2417,7 +2572,7 @@ const SimpleChatInterface = () => {
             px: 2,
             pt: 2,
             pb: 1, // Reduced bottom padding
-            bgcolor: 'background.default',
+            bgcolor: colors.background,
             display: 'flex',
             flexDirection: 'column',
             // Custom scrollbar styling
@@ -2425,14 +2580,14 @@ const SimpleChatInterface = () => {
               width: '8px',
             },
             '&::-webkit-scrollbar-track': {
-              backgroundColor: 'rgba(0, 0, 0, 0.05)',
+              backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
               borderRadius: '4px',
             },
             '&::-webkit-scrollbar-thumb': {
-              backgroundColor: 'rgba(0, 0, 0, 0.2)',
+              backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
               borderRadius: '4px',
               '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
               },
             },
           }}>
@@ -2465,8 +2620,8 @@ const SimpleChatInterface = () => {
                   }}
                 />
                 <Box>
-                  <CircularProgress size={20} />
-                  <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+                  <CircularProgress size={20} sx={{ color: colors.primary }} />
+                  <Typography variant="body2" sx={{ color: colors.textSecondary, ml: 2 }}>
                     Processing your query...
                   </Typography>
                 </Box>
@@ -2475,10 +2630,10 @@ const SimpleChatInterface = () => {
           </Box>
         </Box>
 
-        <Divider sx={{ flexShrink: 0 }} />
+        <Divider sx={{ flexShrink: 0, borderColor: colors.border }} />
 
         {/* Input Area - Fixed */}
-        <Paper elevation={3} sx={{ px: 2, py: 1.5, borderRadius: 0, flexShrink: 0 }}>
+        <Paper elevation={3} sx={{ px: 2, py: 1.5, borderRadius: 0, flexShrink: 0, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           <Box sx={{ width: '100%' }}>
             <Stack direction="row" spacing={2}>
               <TextField
@@ -2492,7 +2647,14 @@ const SimpleChatInterface = () => {
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 2,
-                  }
+                    bgcolor: darkMode ? colors.paper : undefined,
+                    color: colors.text,
+                    '& fieldset': { borderColor: colors.border },
+                  },
+                  '& .MuiInputBase-input::placeholder': {
+                    color: colors.textSecondary,
+                    opacity: 1,
+                  },
                 }}
               />
               <Button
@@ -2532,27 +2694,27 @@ const SimpleChatInterface = () => {
             p: 3
           }}>
             <Box sx={{ textAlign: 'center', maxWidth: 600 }}>
-              <ResearchIcon sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
+              <ResearchIcon sx={{ fontSize: 64, color: colors.primary, mb: 2 }} />
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5, mb: 1 }}>
-                <Typography variant="h4">
+                <Typography variant="h4" sx={{ color: colors.text }}>
                   Deep Research
                 </Typography>
                 <Chip
                   label="BETA"
                   size="small"
                   sx={{
-                    bgcolor: 'warning.light',
-                    color: 'warning.dark',
+                    bgcolor: darkMode ? alpha('#ff9800', 0.2) : 'warning.light',
+                    color: darkMode ? '#ffa726' : 'warning.dark',
                     fontWeight: 700,
                     fontSize: '0.7rem',
                     height: 22
                   }}
                 />
               </Box>
-              <Typography variant="caption" color="warning.main" sx={{ display: 'block', mb: 2, fontStyle: 'italic' }}>
+              <Typography variant="caption" sx={{ color: darkMode ? '#ffa726' : 'warning.main', display: 'block', mb: 2, fontStyle: 'italic' }}>
                 Undergoing Pilot - Your feedback helps us improve
               </Typography>
-              <Typography variant="body1" color="text.secondary" paragraph>
+              <Typography variant="body1" sx={{ color: colors.textSecondary }} paragraph>
                 Ask complex financial questions that require comprehensive analysis.
                 Our AI agents will collaborate to provide detailed insights with data validation,
                 trend analysis, and actionable recommendations.
@@ -2586,7 +2748,7 @@ const SimpleChatInterface = () => {
             </Stack>
             
             <Box sx={{ mt: 4, maxWidth: 800 }}>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" gutterBottom sx={{ color: colors.text }}>
                 Example Research Questions:
               </Typography>
               <Grid container spacing={2}>
@@ -2597,18 +2759,23 @@ const SimpleChatInterface = () => {
                   "Evaluate the financial impact of our supply chain initiatives on COGS and profitability"
                 ].map((question, index) => (
                   <Grid item xs={12} sm={6} key={index}>
-                    <Paper 
-                      sx={{ 
-                        p: 2, 
+                    <Paper
+                      sx={{
+                        p: 2,
                         cursor: 'pointer',
-                        '&:hover': { bgcolor: 'action.hover' }
+                        bgcolor: colors.paper,
+                        border: `1px solid ${colors.border}`,
+                        '&:hover': {
+                          bgcolor: darkMode ? alpha(colors.primary, 0.1) : 'action.hover',
+                          borderColor: colors.primary,
+                        }
                       }}
                       onClick={() => {
                         setDeepResearchQuestion(question);
                         setShowDeepResearch(true);
                       }}
                     >
-                      <Typography variant="body2">
+                      <Typography variant="body2" sx={{ color: colors.text }}>
                         {question}
                       </Typography>
                     </Paper>
@@ -2637,10 +2804,12 @@ const SimpleChatInterface = () => {
           }
         }}
       >
-        <DialogTitle sx={{ 
-          borderBottom: 1, 
-          borderColor: 'divider',
+        <DialogTitle sx={{
+          borderBottom: 1,
+          borderColor: colors.border,
           pb: 2,
+          bgcolor: colors.paper,
+          color: colors.text,
         }}>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Stack direction="row" spacing={1} alignItems="center">
@@ -2657,7 +2826,7 @@ const SimpleChatInterface = () => {
             </IconButton>
           </Stack>
         </DialogTitle>
-        <DialogContent sx={{ p: 3 }}>
+        <DialogContent sx={{ p: 3, bgcolor: colors.background }}>
           {activeAnalysis || analysisLoading ? (
             <ResultAnalysis
               analysis={activeAnalysis}
@@ -2681,7 +2850,7 @@ const SimpleChatInterface = () => {
           }
         }}
       >
-        <DialogContent sx={{ p: 0 }}>
+        <DialogContent sx={{ p: 0, bgcolor: colors.background }}>
           {showDetailedResults && detailedResultsData && (
             <MantraxResultsView
               query={detailedResultsData.query}

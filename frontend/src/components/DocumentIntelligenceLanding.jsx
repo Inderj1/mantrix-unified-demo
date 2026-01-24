@@ -27,8 +27,19 @@ import { apiService } from '../services/api';
 // Single consistent blue for all modules
 const MODULE_COLOR = '#0078d4';
 
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 const DocumentIntelligenceLanding = ({ onBack, darkMode = false }) => {
   const primaryBlue = MODULE_COLOR;
+  const colors = getColors(darkMode);
 
   const [selectedView, setSelectedView] = useState(null);
   const [documentCount, setDocumentCount] = useState(0);
@@ -108,7 +119,7 @@ const DocumentIntelligenceLanding = ({ onBack, darkMode = false }) => {
   ];
 
   return (
-    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: darkMode ? '#0d1117' : '#f6f8fa' }}>
+    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: colors.background }}>
       {/* Header - Enterprise Pulse Style */}
       <Paper
         elevation={0}
@@ -116,7 +127,8 @@ const DocumentIntelligenceLanding = ({ onBack, darkMode = false }) => {
           p: 2.5,
           borderRadius: 0,
           flexShrink: 0,
-          bgcolor: darkMode ? '#161b22' : '#fff',
+          bgcolor: colors.paper,
+          border: `1px solid ${colors.border}`,
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         }}
       >
@@ -137,7 +149,7 @@ const DocumentIntelligenceLanding = ({ onBack, darkMode = false }) => {
               <HubIcon sx={{ fontSize: 28, color: primaryBlue }} />
             </Box>
             <Box>
-              <Typography variant="h5" fontWeight={600} sx={{ color: darkMode ? '#e6edf3' : '#1e293b' }}>
+              <Typography variant="h5" fontWeight={600} sx={{ color: colors.text }}>
                 Document Intelligence
               </Typography>
               <Typography variant="body2" sx={{ color: primaryBlue, fontSize: '0.875rem' }}>
@@ -162,11 +174,11 @@ const DocumentIntelligenceLanding = ({ onBack, darkMode = false }) => {
                         height: 200,
                         cursor: 'pointer',
                         transition: 'all 0.3s ease',
-                        border: '1px solid rgba(0,0,0,0.08)',
+                        border: `1px solid ${colors.border}`,
                         borderRadius: 3,
                         overflow: 'hidden',
                         position: 'relative',
-                        bgcolor: 'white',
+                        bgcolor: colors.cardBg,
                         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                         '&:hover': {
                           transform: 'translateY(-6px)',
@@ -211,12 +223,12 @@ const DocumentIntelligenceLanding = ({ onBack, darkMode = false }) => {
                         </Typography>
 
                         {/* Subtitle */}
-                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500, mb: 1, fontSize: '0.7rem', opacity: 0.8 }}>
+                        <Typography variant="caption" sx={{ color: colors.textSecondary, fontWeight: 500, mb: 1, fontSize: '0.7rem', opacity: 0.8 }}>
                           {tile.subtitle}
                         </Typography>
 
                         {/* Description */}
-                        <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        <Typography variant="body2" sx={{ color: colors.textSecondary, mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                           {tile.description}
                         </Typography>
 

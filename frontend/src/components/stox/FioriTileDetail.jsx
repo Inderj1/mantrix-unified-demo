@@ -709,7 +709,18 @@ const getTileMetrics = (tileId, data) => {
   ];
 };
 
-const FioriTileDetail = ({ tileId, tileTitle, moduleColor, onBack }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const FioriTileDetail = ({ tileId, tileTitle, moduleColor, onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -754,7 +765,7 @@ const FioriTileDetail = ({ tileId, tileTitle, moduleColor, onBack }) => {
   console.log('FioriTileDetail rendering:', { tileId, dataLength: data.length, metricsCount: metrics.length });
 
   return (
-    <Box sx={{ p: 2, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <Box sx={{ p: 2, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 2, flexShrink: 0 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
@@ -790,7 +801,7 @@ const FioriTileDetail = ({ tileId, tileTitle, moduleColor, onBack }) => {
           </Stack>
         </Stack>
 
-        <Typography variant="h5" fontWeight={700} sx={{ color: moduleColor }}>
+        <Typography variant="h5" fontWeight={700} sx={{ color: darkMode ? colors.text : moduleColor }}>
           {tileTitle}
         </Typography>
       </Box>
@@ -807,7 +818,9 @@ const FioriTileDetail = ({ tileId, tileTitle, moduleColor, onBack }) => {
                 '&:hover': {
                   transform: 'translateY(-4px)',
                   boxShadow: 3,
-                }
+                },
+                bgcolor: colors.cardBg,
+                border: `1px solid ${colors.border}`,
               }}>
                 <CardContent sx={{ p: 1.5 }}>
                   <Stack direction="row" spacing={1.5} alignItems="flex-start">
@@ -823,7 +836,7 @@ const FioriTileDetail = ({ tileId, tileTitle, moduleColor, onBack }) => {
                       <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem', display: 'block', mb: 0.25 }}>
                         {metric.label}
                       </Typography>
-                      <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '1.1rem', mb: 0.25 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '1.1rem', mb: 0.25, color: colors.text }}>
                         {metric.value}
                       </Typography>
                       {metric.trend && (
@@ -853,7 +866,7 @@ const FioriTileDetail = ({ tileId, tileTitle, moduleColor, onBack }) => {
         <Grid container spacing={2} sx={{ mb: 2, flexShrink: 0 }}>
           {[1, 2, 3, 4].map((i) => (
             <Grid item xs={12} sm={6} md={3} key={i}>
-              <Card sx={{ height: '100vh' }}>
+              <Card sx={{ height: '100vh' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                 <CardContent sx={{ p: 1.5 }}>
                   <Stack direction="row" spacing={1.5} alignItems="flex-start">
                     <Avatar sx={{ bgcolor: alpha('#ccc', 0.3), width: 40, height: 40 }}>
@@ -874,7 +887,7 @@ const FioriTileDetail = ({ tileId, tileTitle, moduleColor, onBack }) => {
 
       {/* Data Grid */}
       <Box sx={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-        <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           <DataGrid
             rows={data}
             columns={columns}
@@ -895,12 +908,25 @@ const FioriTileDetail = ({ tileId, tileTitle, moduleColor, onBack }) => {
               },
               '& .MuiDataGrid-cell': {
                 fontSize: '0.8rem',
+                color: colors.text,
+                borderBottom: `1px solid ${colors.border}`,
               },
               '& .MuiDataGrid-columnHeaders': {
-                backgroundColor: moduleColor,
-                color: 'white',
+                backgroundColor: darkMode ? colors.cardBg : moduleColor,
+                color: darkMode ? colors.text : 'white',
                 fontSize: '0.85rem',
                 fontWeight: 700,
+                borderBottom: `1px solid ${colors.border}`,
+              },
+              '& .MuiDataGrid-row': {
+                '&:hover': {
+                  backgroundColor: alpha(colors.primary, 0.08),
+                },
+              },
+              '& .MuiDataGrid-footerContainer': {
+                backgroundColor: colors.cardBg,
+                borderTop: `1px solid ${colors.border}`,
+                color: colors.text,
               },
             }}
             initialState={{

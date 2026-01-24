@@ -15,6 +15,17 @@ import {
 } from '@mui/icons-material';
 import { getSeverityLevel } from './CategoryIcons';
 
+// Dark mode color helper
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 /**
  * MarketSignalTable - Reusable table component for displaying market signals using MUI DataGrid
  *
@@ -23,13 +34,16 @@ import { getSeverityLevel } from './CategoryIcons';
  * - onViewDetails: Handler for View Details button
  * - onSimulate: Handler for Simulate Impact button
  * - compact: Whether to show compact view (default: false)
+ * - darkMode: Whether dark mode is enabled
  */
 const MarketSignalTable = ({
   signals = [],
   onViewDetails,
   onSimulate,
   compact = false,
+  darkMode = false,
 }) => {
+  const colors = getColors(darkMode);
   const [paginationModel, setPaginationModel] = useState({
     pageSize: 10,
     page: 0,
@@ -75,18 +89,18 @@ const MarketSignalTable = ({
       minWidth: 200,
       renderCell: (params) => (
         <Box>
-          <Typography variant="body2" fontWeight={500}>
+          <Typography variant="body2" fontWeight={500} sx={{ color: colors.text }}>
             {params.value}
           </Typography>
           {params.row.description && !compact && (
             <Typography
               variant="caption"
-              color="text.secondary"
               sx={{
                 display: 'block',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
+                color: colors.textSecondary,
               }}
             >
               {params.row.description}
@@ -102,8 +116,8 @@ const MarketSignalTable = ({
       minWidth: 150,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <LocationIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-          <Typography variant="body2">{params.value}</Typography>
+          <LocationIcon sx={{ fontSize: 16, color: colors.textSecondary }} />
+          <Typography variant="body2" sx={{ color: colors.text }}>{params.value}</Typography>
         </Box>
       ),
     },
@@ -139,7 +153,7 @@ const MarketSignalTable = ({
         headerName: 'Time to Impact',
         width: 130,
         renderCell: (params) => (
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: colors.textSecondary }}>
             {params.value}
           </Typography>
         ),
@@ -227,10 +241,10 @@ const MarketSignalTable = ({
         }}
       >
         <CheckIcon sx={{ fontSize: 64, color: '#4caf50', mb: 2 }} />
-        <Typography variant="h6" color="text.secondary" gutterBottom>
+        <Typography variant="h6" sx={{ color: colors.textSecondary }} gutterBottom>
           No Active Signals
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: colors.textSecondary }}>
           All clear for this category
         </Typography>
       </Box>
@@ -253,17 +267,59 @@ const MarketSignalTable = ({
           },
         }}
         sx={{
-          border: '1px solid rgba(0,0,0,0.08)',
-          '& .MuiDataGrid-row:hover': {
-            backgroundColor: '#f9f9f9',
-            cursor: 'pointer',
+          border: `1px solid ${colors.border}`,
+          bgcolor: colors.paper,
+          color: colors.text,
+          '& .MuiDataGrid-row': {
+            bgcolor: colors.paper,
+            '&:hover': {
+              backgroundColor: darkMode ? 'rgba(255,255,255,0.05)' : '#f9f9f9',
+              cursor: 'pointer',
+            },
           },
-          '& .MuiDataGrid-cell:focus': {
-            outline: 'none',
+          '& .MuiDataGrid-cell': {
+            borderColor: colors.border,
+            color: colors.text,
+            '&:focus': {
+              outline: 'none',
+            },
           },
           '& .MuiDataGrid-columnHeaders': {
-            backgroundColor: '#f5f5f5',
+            backgroundColor: darkMode ? colors.cardBg : '#f5f5f5',
+            borderColor: colors.border,
             fontWeight: 600,
+            color: colors.text,
+          },
+          '& .MuiDataGrid-columnHeader': {
+            color: colors.text,
+          },
+          '& .MuiDataGrid-columnHeaderTitle': {
+            color: colors.text,
+            fontWeight: 600,
+          },
+          '& .MuiDataGrid-footerContainer': {
+            borderColor: colors.border,
+            bgcolor: colors.paper,
+          },
+          '& .MuiTablePagination-root': {
+            color: colors.text,
+          },
+          '& .MuiTablePagination-select': {
+            color: colors.text,
+          },
+          '& .MuiTablePagination-selectIcon': {
+            color: colors.text,
+          },
+          '& .MuiTablePagination-displayedRows': {
+            color: colors.text,
+          },
+          '& .MuiDataGrid-iconButtonContainer': {
+            '& .MuiIconButton-root': {
+              color: colors.text,
+            },
+          },
+          '& .MuiDataGrid-sortIcon': {
+            color: colors.text,
           },
         }}
       />

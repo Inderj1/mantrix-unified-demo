@@ -37,6 +37,7 @@ const EnhancedSidebar = ({
   setSelectedTab,
   apiHealth,
   useSapTheme,
+  darkMode = false,
 }) => {
   const menuItems = [
     {
@@ -118,9 +119,13 @@ const EnhancedSidebar = ({
     },
   ];
 
-  const sidebarBgColor = useSapTheme ? 'background.paper' : '#0f0f23';
-  const sidebarTextColor = useSapTheme ? 'text.primary' : '#e0e0e0';
-  const hoverBgColor = useSapTheme ? 'action.hover' : 'rgba(255,255,255,0.08)';
+  // Dark mode colors
+  const sidebarBgColor = darkMode ? '#0d1117' : (useSapTheme ? 'background.paper' : '#0f0f23');
+  const sidebarTextColor = darkMode ? '#ffffff' : (useSapTheme ? 'text.primary' : '#e0e0e0');
+  const hoverBgColor = darkMode ? 'rgba(255,255,255,0.08)' : (useSapTheme ? 'action.hover' : 'rgba(255,255,255,0.08)');
+  const headerBgColor = darkMode ? '#161b22' : 'background.paper';
+  const borderColor = darkMode ? 'rgba(255,255,255,0.15)' : (useSapTheme ? 'divider' : 'rgba(255,255,255,0.1)');
+  const sectionTextColor = darkMode ? 'rgba(255,255,255,0.85)' : (useSapTheme ? 'text.secondary' : 'rgba(255,255,255,0.4)');
 
   return (
     <Drawer
@@ -143,62 +148,68 @@ const EnhancedSidebar = ({
       {/* Header */}
       <Box
         sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          p: 2,
-          minHeight: 64,
-          bgcolor: useSapTheme ? 'background.paper' : 'background.paper',
+          p: drawerOpen ? 2 : 1,
+          minHeight: 70,
+          background: darkMode
+            ? 'linear-gradient(135deg, #161b22 0%, #0d1117 100%)'
+            : 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
           borderBottom: '1px solid',
-          borderColor: useSapTheme ? 'divider' : 'rgba(255,255,255,0.1)',
+          borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
           position: 'relative',
         }}
       >
         {drawerOpen ? (
-          <>
-            {/* Logo - Left aligned */}
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            {/* Logo */}
             <Box
+              component="img"
+              src="/MANTRIX_AI.svg"
+              alt="MANTRIX AI"
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                flex: 1,
+                height: 40,
+                width: 'auto',
+                objectFit: 'contain',
+                filter: darkMode
+                  ? 'invert(1) hue-rotate(180deg)'
+                  : 'none',
+                transition: 'all 0.2s ease',
               }}
-            >
-              <Box
-                component="img"
-                src="/mantra9.png"
-                alt="CloudMantra"
-                sx={{
-                  height: 40,
-                  width: 'auto',
-                  objectFit: 'contain',
-                }}
-              />
-            </Box>
+            />
 
             {/* Hamburger Menu Button */}
             <IconButton
               onClick={() => setDrawerOpen(!drawerOpen)}
               size="small"
               sx={{
-                color: useSapTheme ? 'text.primary' : 'text.primary',
+                color: darkMode ? '#8b949e' : '#64748b',
+                bgcolor: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
+                borderRadius: 1.5,
+                '&:hover': {
+                  bgcolor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+                  color: darkMode ? '#e6edf3' : '#0f172a',
+                },
               }}
             >
-              <MenuOpenIcon />
+              <MenuOpenIcon fontSize="small" />
             </IconButton>
-          </>
+          </Box>
         ) : (
           /* Centered Menu Button when collapsed */
-          <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', pt: 0.5 }}>
             <IconButton
               onClick={() => setDrawerOpen(!drawerOpen)}
               size="small"
               sx={{
-                color: useSapTheme ? 'text.primary' : 'text.primary',
+                color: darkMode ? '#8b949e' : '#64748b',
+                bgcolor: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
+                borderRadius: 1.5,
+                '&:hover': {
+                  bgcolor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+                  color: darkMode ? '#e6edf3' : '#0f172a',
+                },
               }}
             >
-              <MenuIcon />
+              <MenuIcon fontSize="small" />
             </IconButton>
           </Box>
         )}
@@ -215,7 +226,7 @@ const EnhancedSidebar = ({
                   px: 2,
                   py: 0.5,
                   display: 'block',
-                  color: useSapTheme ? 'text.secondary' : 'rgba(255,255,255,0.4)',
+                  color: sectionTextColor,
                   fontWeight: 700,
                   letterSpacing: '0.1em',
                   textTransform: 'uppercase',
@@ -243,7 +254,7 @@ const EnhancedSidebar = ({
                       mx: 0.25,
                       minHeight: 36,
                       transition: 'all 0.2s',
-                      color: useSapTheme ? 'inherit' : sidebarTextColor,
+                      color: darkMode ? sidebarTextColor : (useSapTheme ? 'inherit' : sidebarTextColor),
                       position: 'relative',
                       overflow: 'hidden',
                       opacity: item.disabled ? 0.5 : 1,
@@ -301,6 +312,8 @@ const EnhancedSidebar = ({
                           bgcolor:
                             selectedTab === item.id
                               ? 'transparent'
+                              : darkMode
+                              ? `${item.color}35`
                               : useSapTheme
                               ? `${item.color}15`
                               : `${item.color}20`,
@@ -421,9 +434,7 @@ const EnhancedSidebar = ({
                 sx={{
                   my: 2,
                   mx: 2,
-                  borderColor: useSapTheme
-                    ? 'divider'
-                    : 'rgba(255,255,255,0.08)',
+                  borderColor: borderColor,
                 }}
               />
             )}
@@ -436,8 +447,8 @@ const EnhancedSidebar = ({
         sx={{
           p: 1,
           borderTop: 1,
-          borderColor: useSapTheme ? 'divider' : 'rgba(255,255,255,0.08)',
-          bgcolor: useSapTheme ? 'background.default' : 'rgba(0,0,0,0.2)',
+          borderColor: borderColor,
+          bgcolor: darkMode ? '#161b22' : (useSapTheme ? 'background.default' : 'rgba(0,0,0,0.2)'),
         }}
       >
         <ListItemButton
@@ -446,7 +457,8 @@ const EnhancedSidebar = ({
             borderRadius: 2,
             bgcolor: selectedTab === 4 ? '#FF9800' + '20' : 'transparent',
             border: '1px solid',
-            borderColor: selectedTab === 4 ? '#FF9800' : 'divider',
+            borderColor: selectedTab === 4 ? '#FF9800' : borderColor,
+            color: sidebarTextColor,
             '&:hover': {
               bgcolor: '#FF9800' + '10',
             },
@@ -458,7 +470,7 @@ const EnhancedSidebar = ({
           {drawerOpen && (
             <ListItemText
               primary="CONTROL CENTER"
-              primaryTypographyProps={{ fontWeight: 600, fontSize: '0.9rem' }}
+              primaryTypographyProps={{ fontWeight: 600, fontSize: '0.9rem', color: sidebarTextColor }}
             />
           )}
         </ListItemButton>

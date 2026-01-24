@@ -49,6 +49,16 @@ import { LAM_PLANTS, LAM_VENDORS, LAM_MATERIALS, LAM_MATERIAL_PLANT_DATA, getMat
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, ChartTooltip, Legend, Filler);
 
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 // Generate lead time data using Arizona Beverages data
 const generateLeadTimeData = () => {
   // Build materials from LAM_MATERIAL_PLANT_DATA with vendor assignments
@@ -119,7 +129,8 @@ const generateDetailData = (id, data) => {
   return sku;
 };
 
-const SupplyLeadTime = ({ onBack, onTileClick }) => {
+const SupplyLeadTime = ({ onBack, onTileClick, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -499,7 +510,7 @@ const SupplyLeadTime = ({ onBack, onTileClick }) => {
   };
 
   return (
-    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -588,11 +599,11 @@ const SupplyLeadTime = ({ onBack, onTileClick }) => {
           )}
 
           {/* Filters */}
-          <Paper sx={{ p: 2, mb: 2, display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-            <FilterListIcon sx={{ color: '#64748b' }} />
+          <Paper sx={{ p: 2, mb: 2, display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
+            <FilterListIcon sx={{ color: colors.textSecondary }} />
             <FormControl size="small" sx={{ minWidth: 120 }}>
               <InputLabel>Reliability</InputLabel>
-              <Select value={filters.reliability} label="Reliability" onChange={(e) => handleFilterChange('reliability', e.target.value)}>
+              <Select value={filters.reliability} label="Reliability" onChange={(e) => handleFilterChange('reliability', e.target.value)} sx={{ bgcolor: colors.paper }}>
                 <MenuItem value="all">All</MenuItem>
                 <MenuItem value="Excellent">Excellent</MenuItem>
                 <MenuItem value="Good">Good</MenuItem>
@@ -602,25 +613,25 @@ const SupplyLeadTime = ({ onBack, onTileClick }) => {
             </FormControl>
             <FormControl size="small" sx={{ minWidth: 120 }}>
               <InputLabel>Plant</InputLabel>
-              <Select value={filters.plant} label="Plant" onChange={(e) => handleFilterChange('plant', e.target.value)}>
+              <Select value={filters.plant} label="Plant" onChange={(e) => handleFilterChange('plant', e.target.value)} sx={{ bgcolor: colors.paper }}>
                 <MenuItem value="all">All Plants</MenuItem>
                 {uniquePlants.map(p => <MenuItem key={p} value={p}>{p}</MenuItem>)}
               </Select>
             </FormControl>
             <FormControl size="small" sx={{ minWidth: 140 }}>
               <InputLabel>Vendor</InputLabel>
-              <Select value={filters.vendor} label="Vendor" onChange={(e) => handleFilterChange('vendor', e.target.value)}>
+              <Select value={filters.vendor} label="Vendor" onChange={(e) => handleFilterChange('vendor', e.target.value)} sx={{ bgcolor: colors.paper }}>
                 <MenuItem value="all">All Vendors</MenuItem>
                 {uniqueVendors.map(v => <MenuItem key={v} value={v}>{v}</MenuItem>)}
               </Select>
             </FormControl>
-            <Typography sx={{ ml: 'auto', fontSize: '0.8rem', color: '#64748b' }}>
+            <Typography sx={{ ml: 'auto', fontSize: '0.8rem', color: colors.textSecondary }}>
               Showing {filteredData.length} of {data.length} items
             </Typography>
           </Paper>
 
           {/* DataGrid */}
-          <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0, width: '100%' }}>
+          <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0, width: '100%', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
             <DataGrid
               rows={filteredData}
               columns={columns}
@@ -633,7 +644,19 @@ const SupplyLeadTime = ({ onBack, onTileClick }) => {
               checkboxSelection
               disableRowSelectionOnClick
               onRowClick={handleRowClick}
-              sx={stoxTheme.getDataGridSx({ clickable: true })}
+              sx={{
+                ...stoxTheme.getDataGridSx({ clickable: true }),
+                ...(darkMode && {
+                  '& .MuiDataGrid-root': { color: colors.text },
+                  '& .MuiDataGrid-cell': { borderColor: colors.border, color: colors.text },
+                  '& .MuiDataGrid-columnHeaders': { bgcolor: colors.cardBg, borderColor: colors.border, color: colors.text },
+                  '& .MuiDataGrid-columnHeaderTitle': { color: colors.text, fontWeight: 600 },
+                  '& .MuiDataGrid-row': { borderColor: colors.border, '&:hover': { bgcolor: alpha(colors.primary, 0.1) } },
+                  '& .MuiDataGrid-footerContainer': { bgcolor: colors.cardBg, borderColor: colors.border },
+                  '& .MuiTablePagination-root': { color: colors.text },
+                  '& .MuiIconButton-root': { color: colors.textSecondary },
+                }),
+              }}
             />
           </Paper>
         </>

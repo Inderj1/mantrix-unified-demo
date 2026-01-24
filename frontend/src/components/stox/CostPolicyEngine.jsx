@@ -55,6 +55,16 @@ const formatCurrency = (value) => {
 
 const formatPercent = (value) => `${value.toFixed(1)}%`;
 
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 // Generate cost policy data using Arizona Beverages materials
 const generateCostData = () => {
   // Use LAM_MATERIALS to build cost policy data
@@ -108,7 +118,8 @@ const generateCostData = () => {
   });
 };
 
-const CostPolicyEngine = ({ onBack, onTileClick }) => {
+const CostPolicyEngine = ({ onBack, onTileClick, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -439,7 +450,7 @@ const CostPolicyEngine = ({ onBack, onTileClick }) => {
   };
 
   return (
-    <Box sx={{ p: 3, height: '100%', overflow: 'auto', bgcolor: '#f8fafc' }}>
+    <Box sx={{ p: 3, height: '100%', overflow: 'auto', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -531,12 +542,12 @@ const CostPolicyEngine = ({ onBack, onTileClick }) => {
           )}
 
           {/* Filters */}
-          <Paper sx={{ p: 2, mb: 2 }}>
+          <Paper sx={{ p: 2, mb: 2, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
             <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
               <FilterListIcon color="action" />
               <FormControl size="small" sx={{ minWidth: 140 }}>
                 <InputLabel>Status</InputLabel>
-                <Select value={filters.status} label="Status" onChange={(e) => setFilters({ ...filters, status: e.target.value })}>
+                <Select value={filters.status} label="Status" onChange={(e) => setFilters({ ...filters, status: e.target.value })} sx={{ bgcolor: colors.paper }}>
                   <MenuItem value="all">All Status</MenuItem>
                   <MenuItem value="Active">Active</MenuItem>
                   <MenuItem value="Pending Review">Pending Review</MenuItem>
@@ -545,7 +556,7 @@ const CostPolicyEngine = ({ onBack, onTileClick }) => {
               </FormControl>
               <FormControl size="small" sx={{ minWidth: 140 }}>
                 <InputLabel>Category</InputLabel>
-                <Select value={filters.category} label="Category" onChange={(e) => setFilters({ ...filters, category: e.target.value })}>
+                <Select value={filters.category} label="Category" onChange={(e) => setFilters({ ...filters, category: e.target.value })} sx={{ bgcolor: colors.paper }}>
                   <MenuItem value="all">All Categories</MenuItem>
                   <MenuItem value="Mechanical">Mechanical</MenuItem>
                   <MenuItem value="Electronics">Electronics</MenuItem>
@@ -555,7 +566,7 @@ const CostPolicyEngine = ({ onBack, onTileClick }) => {
               </FormControl>
               <FormControl size="small" sx={{ minWidth: 140 }}>
                 <InputLabel>Cost Method</InputLabel>
-                <Select value={filters.costType} label="Cost Method" onChange={(e) => setFilters({ ...filters, costType: e.target.value })}>
+                <Select value={filters.costType} label="Cost Method" onChange={(e) => setFilters({ ...filters, costType: e.target.value })} sx={{ bgcolor: colors.paper }}>
                   <MenuItem value="all">All Methods</MenuItem>
                   <MenuItem value="Standard">Standard</MenuItem>
                   <MenuItem value="Moving Avg">Moving Avg</MenuItem>
@@ -578,7 +589,7 @@ const CostPolicyEngine = ({ onBack, onTileClick }) => {
           </Paper>
 
           {/* Data Grid */}
-          <Paper sx={{ height: 500 }}>
+          <Paper sx={{ height: 500, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
             <DataGrid
               rows={filteredData}
               columns={columns}
@@ -594,7 +605,19 @@ const CostPolicyEngine = ({ onBack, onTileClick }) => {
                   quickFilterProps: { debounceMs: 500 },
                 },
               }}
-              sx={stoxTheme.getDataGridSx({ clickable: true })}
+              sx={{
+                ...stoxTheme.getDataGridSx({ clickable: true }),
+                ...(darkMode && {
+                  '& .MuiDataGrid-root': { color: colors.text },
+                  '& .MuiDataGrid-cell': { borderColor: colors.border, color: colors.text },
+                  '& .MuiDataGrid-columnHeaders': { bgcolor: colors.cardBg, borderColor: colors.border, color: colors.text },
+                  '& .MuiDataGrid-columnHeaderTitle': { color: colors.text, fontWeight: 600 },
+                  '& .MuiDataGrid-row': { borderColor: colors.border, '&:hover': { bgcolor: alpha(colors.primary, 0.1) } },
+                  '& .MuiDataGrid-footerContainer': { bgcolor: colors.cardBg, borderColor: colors.border },
+                  '& .MuiTablePagination-root': { color: colors.text },
+                  '& .MuiIconButton-root': { color: colors.textSecondary },
+                }),
+              }}
               initialState={{
                 pagination: { paginationModel: { pageSize: 25 } },
               }}

@@ -58,6 +58,16 @@ import { getTileDataConfig } from './stoxDataConfig';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, ChartTooltip, Legend, Filler);
 
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 const formatCurrency = (value) => {
   if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
   if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
@@ -106,8 +116,9 @@ const generateScenarioData = () => {
   });
 };
 
-const WhatIfSimulator = ({ onBack }) => {
+const WhatIfSimulator = ({ onBack, darkMode = false }) => {
   const tileConfig = getTileDataConfig('what-if-simulator');
+  const colors = getColors(darkMode);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -343,7 +354,7 @@ const WhatIfSimulator = ({ onBack }) => {
         <Grid container spacing={2}>
           {/* Impact Summary Cards */}
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: '4px solid #0891b2' }}>
+            <Card sx={{ borderLeft: '4px solid #0891b2', bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent>
                 <Typography variant="caption" color="text.secondary">Service Level Impact</Typography>
                 <Typography variant="h5" fontWeight={700} color={parseFloat(selectedScenario.serviceLevelDelta) >= 0 ? 'success.main' : 'error.main'}>
@@ -353,7 +364,7 @@ const WhatIfSimulator = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: '4px solid #10b981' }}>
+            <Card sx={{ borderLeft: '4px solid #10b981', bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent>
                 <Typography variant="caption" color="text.secondary">Cost Impact</Typography>
                 <Typography variant="h5" fontWeight={700} color={selectedScenario.stockValueDelta <= 0 ? 'success.main' : 'error.main'}>
@@ -363,7 +374,7 @@ const WhatIfSimulator = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: '4px solid #f59e0b' }}>
+            <Card sx={{ borderLeft: '4px solid #f59e0b', bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent>
                 <Typography variant="caption" color="text.secondary">Stockout Change</Typography>
                 <Typography variant="h5" fontWeight={700} color={selectedScenario.stockoutsDelta <= 0 ? 'success.main' : 'error.main'}>
@@ -373,7 +384,7 @@ const WhatIfSimulator = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: '4px solid #0078d4' }}>
+            <Card sx={{ borderLeft: '4px solid #0078d4', bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent>
                 <Typography variant="caption" color="text.secondary">Simulated SL</Typography>
                 <Typography variant="h5" fontWeight={700}>{selectedScenario.simulatedServiceLevel}%</Typography>
@@ -383,7 +394,7 @@ const WhatIfSimulator = ({ onBack }) => {
 
           {/* Simulation Parameters */}
           <Grid item xs={12} md={6}>
-            <Card>
+            <Card sx={{ bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent>
                 <Typography variant="subtitle1" fontWeight={700} gutterBottom>Simulation Parameters</Typography>
                 <Grid container spacing={3}>
@@ -473,7 +484,7 @@ const WhatIfSimulator = ({ onBack }) => {
 
           {/* Comparison Chart */}
           <Grid item xs={12} md={6}>
-            <Card>
+            <Card sx={{ bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent>
                 <Typography variant="subtitle1" fontWeight={700} gutterBottom>Baseline vs Simulated</Typography>
                 <Box sx={{ height: 280 }}>
@@ -482,8 +493,11 @@ const WhatIfSimulator = ({ onBack }) => {
                     options={{
                       responsive: true,
                       maintainAspectRatio: false,
-                      plugins: { legend: { position: 'top' } },
-                      scales: { y: { beginAtZero: true } },
+                      plugins: { legend: { position: 'top', labels: { color: colors.text } } },
+                      scales: {
+                        y: { beginAtZero: true, ticks: { color: colors.textSecondary }, grid: { color: colors.border } },
+                        x: { ticks: { color: colors.textSecondary }, grid: { color: colors.border } },
+                      },
                     }}
                   />
                 </Box>
@@ -493,7 +507,7 @@ const WhatIfSimulator = ({ onBack }) => {
 
           {/* Trend Chart */}
           <Grid item xs={12}>
-            <Card>
+            <Card sx={{ bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent>
                 <Typography variant="subtitle1" fontWeight={700} gutterBottom>Service Level Projection</Typography>
                 <Box sx={{ height: 250 }}>
@@ -502,8 +516,11 @@ const WhatIfSimulator = ({ onBack }) => {
                     options={{
                       responsive: true,
                       maintainAspectRatio: false,
-                      plugins: { legend: { position: 'top' } },
-                      scales: { y: { min: 85, max: 100, title: { display: true, text: 'Service Level %' } } },
+                      plugins: { legend: { position: 'top', labels: { color: colors.text } } },
+                      scales: {
+                        y: { min: 85, max: 100, title: { display: true, text: 'Service Level %', color: colors.text }, ticks: { color: colors.textSecondary }, grid: { color: colors.border } },
+                        x: { ticks: { color: colors.textSecondary }, grid: { color: colors.border } },
+                      },
                     }}
                   />
                 </Box>
@@ -516,7 +533,7 @@ const WhatIfSimulator = ({ onBack }) => {
   };
 
   return (
-    <Box sx={{ p: 3, height: '100%', overflow: 'auto', bgcolor: '#f8fafc' }}>
+    <Box sx={{ p: 3, height: '100%', overflow: 'auto', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -555,7 +572,7 @@ const WhatIfSimulator = ({ onBack }) => {
           {metrics && (
             <Grid container spacing={2} sx={{ mb: 3 }}>
               <Grid item xs={12} sm={6} md={2.4}>
-                <Card sx={{ borderLeft: '4px solid #0078d4' }}>
+                <Card sx={{ borderLeft: '4px solid #0078d4', bgcolor: colors.cardBg, borderColor: colors.border }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">Total Scenarios</Typography>
                     <Typography variant="h5" fontWeight={700}>{metrics.totalScenarios}</Typography>
@@ -563,7 +580,7 @@ const WhatIfSimulator = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2.4}>
-                <Card sx={{ borderLeft: '4px solid #10b981' }}>
+                <Card sx={{ borderLeft: '4px solid #10b981', bgcolor: colors.cardBg, borderColor: colors.border }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">Completed</Typography>
                     <Typography variant="h5" fontWeight={700} color="success.main">{metrics.completedCount}</Typography>
@@ -571,7 +588,7 @@ const WhatIfSimulator = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2.4}>
-                <Card sx={{ borderLeft: '4px solid #64748b' }}>
+                <Card sx={{ borderLeft: '4px solid #64748b', bgcolor: colors.cardBg, borderColor: colors.border }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">Draft</Typography>
                     <Typography variant="h5" fontWeight={700}>{metrics.draftCount}</Typography>
@@ -579,7 +596,7 @@ const WhatIfSimulator = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2.4}>
-                <Card sx={{ borderLeft: '4px solid #0891b2' }}>
+                <Card sx={{ borderLeft: '4px solid #0891b2', bgcolor: colors.cardBg, borderColor: colors.border }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">Avg SL Impact</Typography>
                     <Typography variant="h5" fontWeight={700} color={parseFloat(metrics.avgServiceLevelImpact) >= 0 ? 'success.main' : 'error.main'}>
@@ -589,7 +606,7 @@ const WhatIfSimulator = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2.4}>
-                <Card sx={{ borderLeft: '4px solid #f59e0b' }}>
+                <Card sx={{ borderLeft: '4px solid #f59e0b', bgcolor: colors.cardBg, borderColor: colors.border }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">Total Cost Impact</Typography>
                     <Typography variant="h5" fontWeight={700} color={metrics.totalCostImpact <= 0 ? 'success.main' : 'error.main'}>
@@ -602,7 +619,7 @@ const WhatIfSimulator = ({ onBack }) => {
           )}
 
           {/* Filters */}
-          <Paper sx={{ p: 2, mb: 2 }}>
+          <Paper sx={{ p: 2, mb: 2, bgcolor: colors.paper, borderColor: colors.border }}>
             <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
               <FilterListIcon color="action" />
               <FormControl size="small" sx={{ minWidth: 140 }}>
@@ -642,7 +659,7 @@ const WhatIfSimulator = ({ onBack }) => {
           </Paper>
 
           {/* Data Grid */}
-          <Paper sx={{ height: 500 }}>
+          <Paper sx={{ height: 500, bgcolor: colors.paper, borderColor: colors.border }}>
             <DataGrid
               rows={filteredData}
               columns={columns}

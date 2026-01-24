@@ -172,7 +172,18 @@ const generateRecommendationsData = () => {
   });
 };
 
-const RecommendationsHub = ({ onBack, onTileClick }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const RecommendationsHub = ({ onBack, onTileClick, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -504,7 +515,7 @@ const RecommendationsHub = ({ onBack, onTileClick }) => {
         <Grid container spacing={2}>
           {/* Working Capital Impact Cards */}
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: '4px solid #106ebe' }}>
+            <Card sx={{ borderLeft: '4px solid #106ebe' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.5 }}>
                   <AccountBalance sx={{ fontSize: 16, color: '#106ebe' }} />
@@ -518,7 +529,7 @@ const RecommendationsHub = ({ onBack, onTileClick }) => {
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: '4px solid #10b981' }}>
+            <Card sx={{ borderLeft: '4px solid #10b981' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.5 }}>
                   <Savings sx={{ fontSize: 16, color: '#10b981' }} />
@@ -532,7 +543,7 @@ const RecommendationsHub = ({ onBack, onTileClick }) => {
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: '4px solid #0078d4' }}>
+            <Card sx={{ borderLeft: '4px solid #0078d4' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.5 }}>
                   <TrendingUp sx={{ fontSize: 16, color: '#0078d4' }} />
@@ -544,7 +555,7 @@ const RecommendationsHub = ({ onBack, onTileClick }) => {
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: selectedRec.serviceRisk > 0.5 ? '4px solid #f59e0b' : '4px solid #10b981' }}>
+            <Card sx={{ borderLeft: selectedRec.serviceRisk > 0.5 ? '4px solid #f59e0b' : '4px solid #10b981' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.5 }}>
                   {selectedRec.serviceRisk > 0.5 ? <Warning sx={{ fontSize: 16, color: '#f59e0b' }} /> : <CheckCircle sx={{ fontSize: 16, color: '#10b981' }} />}
@@ -560,7 +571,7 @@ const RecommendationsHub = ({ onBack, onTileClick }) => {
 
           {/* Recommendation Details */}
           <Grid item xs={12} md={6}>
-            <Card>
+            <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Typography variant="subtitle1" fontWeight={700} gutterBottom>
                   <Lightbulb sx={{ fontSize: 20, mr: 1, verticalAlign: 'middle', color: '#f59e0b' }} />
@@ -596,7 +607,7 @@ const RecommendationsHub = ({ onBack, onTileClick }) => {
 
           {/* Impact Breakdown */}
           <Grid item xs={12} md={6}>
-            <Card>
+            <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Typography variant="subtitle1" fontWeight={700} gutterBottom>Impact Breakdown</Typography>
                 <Box sx={{ height: 220 }}>
@@ -617,7 +628,7 @@ const RecommendationsHub = ({ onBack, onTileClick }) => {
 
           {/* Review History */}
           <Grid item xs={12} md={6}>
-            <Card>
+            <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Typography variant="subtitle1" fontWeight={700} gutterBottom>Review Information</Typography>
                 <Grid container spacing={2}>
@@ -641,7 +652,7 @@ const RecommendationsHub = ({ onBack, onTileClick }) => {
 
           {/* Category Distribution */}
           <Grid item xs={12} md={6}>
-            <Card>
+            <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Typography variant="subtitle1" fontWeight={700} gutterBottom>Recommendations by Category</Typography>
                 <Box sx={{ height: 180, display: 'flex', justifyContent: 'center' }}>
@@ -663,15 +674,15 @@ const RecommendationsHub = ({ onBack, onTileClick }) => {
   };
 
   return (
-    <Box sx={{ p: 3, height: '100%', overflow: 'auto', bgcolor: '#f8fafc' }}>
+    <Box sx={{ p: 3, height: '100%', overflow: 'auto', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
               STOX.AI
             </Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
               Layer 6: Execution
             </Link>
             <Typography color="primary" variant="body1" fontWeight={600}>
@@ -707,7 +718,7 @@ const RecommendationsHub = ({ onBack, onTileClick }) => {
           {metrics && (
             <Grid container spacing={2} sx={{ mb: 3 }}>
               <Grid item xs={12} sm={6} md={3}>
-                <Card sx={{ borderLeft: '4px solid #106ebe' }}>
+                <Card sx={{ borderLeft: '4px solid #106ebe' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Stack direction="row" alignItems="center" spacing={1}>
                       <AccountBalance sx={{ fontSize: 18, color: '#106ebe' }} />
@@ -719,7 +730,7 @@ const RecommendationsHub = ({ onBack, onTileClick }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-                <Card sx={{ borderLeft: '4px solid #10b981' }}>
+                <Card sx={{ borderLeft: '4px solid #10b981' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Stack direction="row" alignItems="center" spacing={1}>
                       <Savings sx={{ fontSize: 18, color: '#10b981' }} />
@@ -731,7 +742,7 @@ const RecommendationsHub = ({ onBack, onTileClick }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-                <Card sx={{ borderLeft: '4px solid #0078d4' }}>
+                <Card sx={{ borderLeft: '4px solid #0078d4' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Stack direction="row" alignItems="center" spacing={1}>
                       <TrendingUp sx={{ fontSize: 18, color: '#0078d4' }} />
@@ -743,7 +754,7 @@ const RecommendationsHub = ({ onBack, onTileClick }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-                <Card sx={{ borderLeft: '4px solid #f59e0b' }}>
+                <Card sx={{ borderLeft: '4px solid #f59e0b' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Stack direction="row" alignItems="center" spacing={1}>
                       <Schedule sx={{ fontSize: 18, color: '#f59e0b' }} />
@@ -758,7 +769,7 @@ const RecommendationsHub = ({ onBack, onTileClick }) => {
           )}
 
           {/* Filters */}
-          <Paper sx={{ p: 2, mb: 2 }}>
+          <Paper sx={{ p: 2, mb: 2 , bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
             <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
               <FilterListIcon color="action" />
               <FormControl size="small" sx={{ minWidth: 140 }}>
@@ -807,7 +818,7 @@ const RecommendationsHub = ({ onBack, onTileClick }) => {
           </Paper>
 
           {/* Data Grid */}
-          <Paper sx={{ height: 500 }}>
+          <Paper sx={{ height: 500, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
             <DataGrid
               rows={filteredData}
               columns={columns}
@@ -823,7 +834,30 @@ const RecommendationsHub = ({ onBack, onTileClick }) => {
                   quickFilterProps: { debounceMs: 500 },
                 },
               }}
-              sx={stoxTheme.getDataGridSx({ clickable: true })}
+              sx={{
+                ...stoxTheme.getDataGridSx({ clickable: true }),
+                ...(darkMode && {
+                  '& .MuiDataGrid-columnHeaders': {
+                    backgroundColor: colors.cardBg,
+                    color: colors.text,
+                    borderBottom: `1px solid ${colors.border}`,
+                  },
+                  '& .MuiDataGrid-cell': {
+                    color: colors.text,
+                    borderBottom: `1px solid ${colors.border}`,
+                  },
+                  '& .MuiDataGrid-row': {
+                    '&:hover': {
+                      backgroundColor: alpha(colors.primary, 0.08),
+                    },
+                  },
+                  '& .MuiDataGrid-footerContainer': {
+                    backgroundColor: colors.cardBg,
+                    borderTop: `1px solid ${colors.border}`,
+                    color: colors.text,
+                  },
+                }),
+              }}
               initialState={{
                 pagination: { paginationModel: { pageSize: 25 } },
               }}

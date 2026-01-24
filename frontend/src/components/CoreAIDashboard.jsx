@@ -139,7 +139,19 @@ const COLORS = {
 // Alias for compatibility
 const chartColors = COLORS;
 
-const CoreAIDashboard = () => {
+// Dark mode color helper
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const CoreAIDashboard = ({ darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -830,7 +842,7 @@ const CoreAIDashboard = () => {
           <Grid container spacing={2}>
             {performanceInsights.insights.performance_highlights?.map((highlight, index) => (
               <Grid item xs={12} md={6} lg={3} key={index}>
-                <Card variant="outlined">
+                <Card variant="outlined" sx={{ bgcolor: colors.cardBg, borderColor: colors.border }}>
                   <CardContent>
                     <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                       <Typography variant="subtitle2" color="textSecondary">
@@ -944,7 +956,7 @@ const CoreAIDashboard = () => {
               
               {/* Conversation History */}
               {conversations.map((conv, index) => (
-                <Box key={index} sx={{ mb: 3, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
+                <Box key={index} sx={{ mb: 3, p: 2, bgcolor: darkMode ? alpha('#fff', 0.05) : 'grey.50', borderRadius: 1, border: `1px solid ${colors.border}` }}>
                   <Typography variant="subtitle2" color="primary" gutterBottom>
                     Q: {conv.question}
                   </Typography>
@@ -1071,7 +1083,7 @@ const CoreAIDashboard = () => {
           <Grid container spacing={2}>
             {recommendations.recommendations.strategic_recommendations?.map((rec, index) => (
               <Grid item xs={12} key={index}>
-                <Card variant="outlined">
+                <Card variant="outlined" sx={{ bgcolor: colors.cardBg, borderColor: colors.border }}>
                   <CardContent>
                     <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
                       <Box>
@@ -1113,7 +1125,7 @@ const CoreAIDashboard = () => {
                       </Grid>
                       
                       <Grid item xs={12} md={4}>
-                        <Box sx={{ bgcolor: 'grey.100', p: 2, borderRadius: 1 }}>
+                        <Box sx={{ bgcolor: darkMode ? alpha('#000', 0.2) : 'grey.100', p: 2, borderRadius: 1 }}>
                           <Typography variant="subtitle2" gutterBottom>Implementation Steps</Typography>
                           <List dense>
                             {rec.implementation_steps?.slice(0, 3).map((step, idx) => (
@@ -1256,7 +1268,7 @@ const CoreAIDashboard = () => {
               
               {/* Conversation History */}
               {conversations.map((conv, index) => (
-                <Box key={index} sx={{ mb: 3, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
+                <Box key={index} sx={{ mb: 3, p: 2, bgcolor: darkMode ? alpha('#fff', 0.05) : 'grey.50', borderRadius: 1, border: `1px solid ${colors.border}` }}>
                   <Typography variant="subtitle2" color="primary" gutterBottom>
                     Q: {conv.question}
                   </Typography>
@@ -1299,7 +1311,7 @@ const CoreAIDashboard = () => {
   }
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box sx={{ flexGrow: 1, bgcolor: colors.background }}>
       {/* Global Styles for animations */}
       <GlobalStyles
         styles={{
@@ -1319,24 +1331,24 @@ const CoreAIDashboard = () => {
           },
         }}
       />
-      
-      {/* Modern Header Section - Light Theme */}
-      <Box sx={{ 
-        background: '#ffffff',
+
+      {/* Modern Header Section */}
+      <Box sx={{
+        background: colors.paper,
         borderRadius: 2,
         p: 3,
         mb: 3,
-        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-        border: '1px solid #e5e7eb'
+        boxShadow: darkMode ? 'none' : '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+        border: `1px solid ${colors.border}`,
       }}>
         {/* Header Content */}
         <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={3}>
           <Box>
-            <Typography 
-              variant="h4" 
-              component="h1" 
-              sx={{ 
-                color: '#111827',
+            <Typography
+              variant="h4"
+              component="h1"
+              sx={{
+                color: colors.text,
                 fontWeight: 700,
                 letterSpacing: '-0.025em',
                 mb: 0.5
@@ -1344,10 +1356,10 @@ const CoreAIDashboard = () => {
             >
               Margen.AI | Financial Transaction Assistant
             </Typography>
-            <Typography 
-              variant="body1" 
-              sx={{ 
-                color: '#6b7280',
+            <Typography
+              variant="body1"
+              sx={{
+                color: colors.textSecondary,
                 fontSize: '1rem'
               }}
             >
@@ -1355,39 +1367,39 @@ const CoreAIDashboard = () => {
             </Typography>
           </Box>
           <Box display="flex" gap={2} alignItems="center">
-            <Box sx={{ 
-              display: 'flex', 
-              alignItems: 'center', 
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
               gap: 1,
-              background: '#f3f4f6',
+              background: darkMode ? alpha('#fff', 0.05) : '#f3f4f6',
               borderRadius: 2,
               px: 2,
               py: 0.75,
-              border: '1px solid #e5e7eb'
+              border: `1px solid ${colors.border}`
             }}>
-              <Box sx={{ 
-                width: 8, 
-                height: 8, 
-                borderRadius: '50%', 
+              <Box sx={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
                 background: '#10b981',
                 animation: 'pulse 2s infinite'
               }} />
-              <Typography sx={{ color: '#374151', fontSize: '0.875rem', fontWeight: 500 }}>
+              <Typography sx={{ color: colors.text, fontSize: '0.875rem', fontWeight: 500 }}>
                 Live
               </Typography>
-              <Typography sx={{ color: '#6b7280', fontSize: '0.875rem' }}>
+              <Typography sx={{ color: colors.textSecondary, fontSize: '0.875rem' }}>
                 {lastUpdate.toLocaleTimeString()}
               </Typography>
             </Box>
-            <IconButton 
-              onClick={fetchDashboardData} 
+            <IconButton
+              onClick={fetchDashboardData}
               disabled={loading}
-              sx={{ 
-                color: '#374151',
-                background: '#f3f4f6',
-                border: '1px solid #e5e7eb',
+              sx={{
+                color: colors.text,
+                background: darkMode ? alpha('#fff', 0.05) : '#f3f4f6',
+                border: `1px solid ${colors.border}`,
                 '&:hover': {
-                  background: '#e5e7eb'
+                  background: darkMode ? alpha('#fff', 0.1) : '#e5e7eb'
                 }
               }}
             >
@@ -1401,18 +1413,18 @@ const CoreAIDashboard = () => {
           {getKPIData().map((kpi, index) => (
             <Grid item xs={12} sm={6} md={3} key={index}>
               <Box sx={{
-                background: '#f9fafb',
+                background: colors.cardBg,
                 borderRadius: 1.5,
                 p: 2,
-                border: '1px solid #e5e7eb',
+                border: `1px solid ${colors.border}`,
                 transition: 'all 0.2s ease',
                 '&:hover': {
-                  borderColor: '#d1d5db',
-                  boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+                  borderColor: darkMode ? alpha('#fff', 0.2) : '#d1d5db',
+                  boxShadow: darkMode ? 'none' : '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
                 }
               }}>
-                <Typography sx={{ 
-                  color: '#6b7280', 
+                <Typography sx={{
+                  color: colors.textSecondary,
                   fontSize: '0.75rem',
                   mb: 0.5,
                   fontWeight: 600,
@@ -1421,8 +1433,8 @@ const CoreAIDashboard = () => {
                 }}>
                   {kpi.title}
                 </Typography>
-                <Typography sx={{ 
-                  color: '#111827', 
+                <Typography sx={{
+                  color: colors.text,
                   fontSize: '1.875rem',
                   fontWeight: 700,
                   lineHeight: 1.2,
@@ -1431,8 +1443,8 @@ const CoreAIDashboard = () => {
                   {kpi.value}
                 </Typography>
                 {kpi.subtitle && (
-                  <Typography sx={{ 
-                    color: '#4b5563', 
+                  <Typography sx={{
+                    color: colors.textSecondary,
                     fontSize: '0.875rem',
                     mb: 0.5
                   }}>
@@ -1466,16 +1478,17 @@ const CoreAIDashboard = () => {
       </Box>
 
       {/* Main Content Tabs - Modern Light Style */}
-      <Paper sx={{ 
+      <Paper sx={{
         width: '100%',
-        background: '#ffffff',
+        background: colors.paper,
         borderRadius: 2,
         overflow: 'hidden',
-        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
+        boxShadow: darkMode ? 'none' : '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+        border: `1px solid ${colors.border}`
       }}>
         <Box sx={{
-          borderBottom: '1px solid #e5e7eb',
-          background: '#f9fafb'
+          borderBottom: `1px solid ${colors.border}`,
+          background: darkMode ? alpha('#fff', 0.02) : '#f9fafb'
         }}>
           <Tabs 
             value={activeTab} 
@@ -1488,18 +1501,18 @@ const CoreAIDashboard = () => {
                 height: 3
               },
               '& .MuiTab-root': {
-                color: '#6b7280',
+                color: colors.textSecondary,
                 textTransform: 'none',
                 fontSize: '0.875rem',
                 fontWeight: 500,
                 minHeight: 48,
                 px: 2.5,
                 '&:hover': {
-                  color: '#374151',
-                  background: 'rgba(0, 0, 0, 0.02)'
+                  color: colors.text,
+                  background: darkMode ? alpha('#fff', 0.05) : 'rgba(0, 0, 0, 0.02)'
                 },
                 '&.Mui-selected': {
-                  color: '#1f2937',
+                  color: colors.text,
                   fontWeight: 600
                 }
               },
@@ -1524,7 +1537,7 @@ const CoreAIDashboard = () => {
           {activeTab === 0 && (
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
-                <Card>
+                <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
                       Customer Segment Distribution
@@ -1534,7 +1547,7 @@ const CoreAIDashboard = () => {
                 </Card>
               </Grid>
               <Grid item xs={12} md={6}>
-                <Card>
+                <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
                       Revenue Trends by Segment
@@ -1544,7 +1557,7 @@ const CoreAIDashboard = () => {
                 </Card>
               </Grid>
               <Grid item xs={12}>
-                <Card>
+                <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
                       Top Customers
@@ -1568,7 +1581,7 @@ const CoreAIDashboard = () => {
               
               {/* Customer Segment Trends */}
               <Grid item xs={12} md={6}>
-                <Card>
+                <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
                       Customer Segment Evolution
@@ -1604,7 +1617,7 @@ const CoreAIDashboard = () => {
               
               {/* Customer Lifetime Value Distribution */}
               <Grid item xs={12} md={6}>
-                <Card>
+                <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
                       Customer Lifetime Value Distribution
@@ -1630,7 +1643,7 @@ const CoreAIDashboard = () => {
               
               {/* Top Customers by Segment - Clickable for drill down */}
               <Grid item xs={12}>
-                <Card>
+                <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
                       Top Customers by Segment (Click to drill down)
@@ -1685,7 +1698,7 @@ const CoreAIDashboard = () => {
               
               {/* Cohort Retention Analysis */}
               <Grid item xs={12}>
-                <Card>
+                <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                       <Typography variant="h6">
@@ -1706,7 +1719,7 @@ const CoreAIDashboard = () => {
                     {cohortRetentionData && cohortRetentionData.records && (
                       <Grid container spacing={2} sx={{ mb: 3 }}>
                         <Grid item xs={12} md={3}>
-                          <Card variant="outlined">
+                          <Card variant="outlined" sx={{ bgcolor: colors.cardBg, borderColor: colors.border }}>
                             <CardContent>
                               <Typography variant="subtitle2" color="textSecondary">
                                 Latest Cohort Size
@@ -1721,7 +1734,7 @@ const CoreAIDashboard = () => {
                           </Card>
                         </Grid>
                         <Grid item xs={12} md={3}>
-                          <Card variant="outlined">
+                          <Card variant="outlined" sx={{ bgcolor: colors.cardBg, borderColor: colors.border }}>
                             <CardContent>
                               <Typography variant="subtitle2" color="textSecondary">
                                 Average 3-Month Retention
@@ -1743,7 +1756,7 @@ const CoreAIDashboard = () => {
                           </Card>
                         </Grid>
                         <Grid item xs={12} md={3}>
-                          <Card variant="outlined">
+                          <Card variant="outlined" sx={{ bgcolor: colors.cardBg, borderColor: colors.border }}>
                             <CardContent>
                               <Typography variant="subtitle2" color="textSecondary">
                                 Best Performing Cohort
@@ -1763,7 +1776,7 @@ const CoreAIDashboard = () => {
                           </Card>
                         </Grid>
                         <Grid item xs={12} md={3}>
-                          <Card variant="outlined">
+                          <Card variant="outlined" sx={{ bgcolor: colors.cardBg, borderColor: colors.border }}>
                             <CardContent>
                               <Typography variant="subtitle2" color="textSecondary">
                                 Retention Trend
@@ -2119,7 +2132,7 @@ const CoreAIDashboard = () => {
                     <Grid container spacing={2}>
                       {cohortInsights.insights.key_findings?.map((finding, index) => (
                         <Grid item xs={12} md={6} key={index}>
-                          <Card variant="outlined">
+                          <Card variant="outlined" sx={{ bgcolor: colors.cardBg, borderColor: colors.border }}>
                             <CardContent>
                               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                                 <Chip 
@@ -3360,7 +3373,7 @@ const CoreAIDashboard = () => {
                 )}
                 
                 {/* Data Table Display */}
-                <Card>
+                <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent>
                     {tableLoading ? (
                       <Box display="flex" justifyContent="center" p={4}>

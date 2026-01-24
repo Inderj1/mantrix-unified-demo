@@ -30,7 +30,6 @@ import {
   NotificationsActive as AlertsIcon,
   Lightbulb as OpportunityIcon,
 } from '@mui/icons-material';
-import stoxTheme from '../stox/stoxTheme';
 import KitAlertDetail from './KitAlertDetail';
 import {
   generateKitAlerts,
@@ -46,7 +45,27 @@ const getColors = (darkMode) => ({
   warning: darkMode ? '#f59e0b' : '#f59e0b',
   error: darkMode ? '#ff6b6b' : '#ef4444',
   text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
   grey: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+// Menu props for dark mode dropdowns
+const getMenuProps = (darkMode, colors) => ({
+  PaperProps: {
+    sx: {
+      bgcolor: darkMode ? colors.cardBg : undefined,
+      border: darkMode ? `1px solid ${colors.border}` : undefined,
+      '& .MuiMenuItem-root': {
+        color: colors.text,
+        '&:hover': { bgcolor: darkMode ? 'rgba(255,255,255,0.08)' : undefined },
+        '&.Mui-selected': { bgcolor: darkMode ? 'rgba(77,166,255,0.15)' : undefined },
+      },
+    },
+  },
 });
 
 const getSeverityColor = (severity) => {
@@ -287,79 +306,94 @@ const KitAlertsView = ({ onBack, darkMode = false }) => {
   }
 
   return (
-    <Box>
+    <Box sx={{ bgcolor: colors.background, minHeight: '100%' }}>
       {/* Header */}
-      <Box display="flex" alignItems="center" gap={2} mb={3}>
-        <IconButton onClick={onBack} sx={{ bgcolor: alpha(colors.primary, 0.1) }}>
-          <ArrowBackIcon />
-        </IconButton>
-        <Box
-          sx={{
-            width: 48,
-            height: 48,
-            borderRadius: 2,
-            bgcolor: alpha(colors.primary, 0.1),
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <PsychologyIcon sx={{ fontSize: 24, color: colors.primary }} />
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.1)', bgcolor: colors.paper }}>
+        <Box display="flex" alignItems="center" gap={2}>
+          <IconButton
+            onClick={onBack}
+            sx={{
+              bgcolor: alpha(colors.primary, darkMode ? 0.2 : 0.1),
+              color: colors.primary,
+              '&:hover': { bgcolor: alpha(colors.primary, darkMode ? 0.3 : 0.2) }
+            }}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          <Box
+            sx={{
+              width: 48,
+              height: 48,
+              borderRadius: 2,
+              bgcolor: alpha(colors.primary, darkMode ? 0.2 : 0.1),
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <PsychologyIcon sx={{ fontSize: 24, color: colors.primary }} />
+          </Box>
+          <Box flex={1}>
+            <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
+              Proactive Alerts
+            </Typography>
+            <Typography variant="body2" sx={{ color: colors.grey }}>
+              AI-driven alerts from intelligent monitoring agents
+            </Typography>
+          </Box>
+          <IconButton
+            onClick={() => setKitAlerts(generateKitAlerts(8))}
+            sx={{
+              color: colors.text,
+              '&:hover': { bgcolor: alpha(colors.primary, 0.1) }
+            }}
+          >
+            <RefreshIcon />
+          </IconButton>
         </Box>
-        <Box flex={1}>
-          <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
-            Proactive Alerts
-          </Typography>
-          <Typography variant="body2" sx={{ color: colors.grey }}>
-            AI-driven alerts from intelligent monitoring agents
-          </Typography>
-        </Box>
-        <IconButton onClick={() => setKitAlerts(generateKitAlerts(8))}>
-          <RefreshIcon />
-        </IconButton>
-      </Box>
+      </Paper>
 
       {/* KPI Cards */}
-      <Grid container spacing={2} mb={3}>
+      <Grid container spacing={2} mb={3} sx={{ px: 2 }}>
         <Grid item xs={6} sm={3}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha(colors.error, 0.2), bgcolor: alpha(colors.error, 0.03) }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha(colors.error, 0.2), bgcolor: darkMode ? alpha(colors.error, 0.1) : alpha(colors.error, 0.03) }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
-                <Typography variant="caption" color="text.secondary">Active Insights</Typography>
-                <Typography variant="h4" fontWeight={700} color="error.main">{stats.activeAlerts}</Typography>
+                <Typography variant="caption" sx={{ color: colors.textSecondary }}>Active Insights</Typography>
+                <Typography variant="h4" fontWeight={700} sx={{ color: colors.error }}>{stats.activeAlerts}</Typography>
               </Box>
               <WarningIcon sx={{ color: colors.error, fontSize: 32 }} />
             </Box>
           </Paper>
         </Grid>
         <Grid item xs={6} sm={3}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha(colors.success, 0.2), bgcolor: alpha(colors.success, 0.03) }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha(colors.success, 0.2), bgcolor: darkMode ? alpha(colors.success, 0.1) : alpha(colors.success, 0.03) }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
-                <Typography variant="caption" color="text.secondary">Opportunities</Typography>
-                <Typography variant="h4" fontWeight={700} color="success.main">{stats.opportunities || 0}</Typography>
+                <Typography variant="caption" sx={{ color: colors.textSecondary }}>Opportunities</Typography>
+                <Typography variant="h4" fontWeight={700} sx={{ color: colors.success }}>{stats.opportunities || 0}</Typography>
               </Box>
               <OpportunityIcon sx={{ color: colors.success, fontSize: 32 }} />
             </Box>
           </Paper>
         </Grid>
         <Grid item xs={6} sm={3}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha(colors.warning, 0.2), bgcolor: alpha(colors.warning, 0.03) }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha(colors.warning, 0.2), bgcolor: darkMode ? alpha(colors.warning, 0.1) : alpha(colors.warning, 0.03) }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
-                <Typography variant="caption" color="text.secondary">Revenue at Risk</Typography>
-                <Typography variant="h4" fontWeight={700} color="warning.dark">${((stats.revenueAtRisk || 0) / 1000).toFixed(0)}K</Typography>
+                <Typography variant="caption" sx={{ color: colors.textSecondary }}>Revenue at Risk</Typography>
+                <Typography variant="h4" fontWeight={700} sx={{ color: colors.warning }}>${((stats.revenueAtRisk || 0) / 1000).toFixed(0)}K</Typography>
               </Box>
               <AttachMoneyIcon sx={{ color: colors.warning, fontSize: 32 }} />
             </Box>
           </Paper>
         </Grid>
         <Grid item xs={6} sm={3}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha(colors.primary, 0.2), bgcolor: alpha(colors.primary, 0.03) }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha(colors.primary, 0.2), bgcolor: darkMode ? alpha(colors.primary, 0.1) : alpha(colors.primary, 0.03) }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
-                <Typography variant="caption" color="text.secondary">Model Health</Typography>
-                <Typography variant="h4" fontWeight={700} color="primary.main">{stats.modelHealth || '98%'}</Typography>
+                <Typography variant="caption" sx={{ color: colors.textSecondary }}>Model Health</Typography>
+                <Typography variant="h4" fontWeight={700} sx={{ color: colors.primary }}>{stats.modelHealth || '98%'}</Typography>
               </Box>
               <TrendingUpIcon sx={{ color: colors.primary, fontSize: 32 }} />
             </Box>
@@ -368,7 +402,14 @@ const KitAlertsView = ({ onBack, darkMode = false }) => {
       </Grid>
 
       {/* Filters and DataGrid */}
-      <Card variant="outlined" sx={{ bgcolor: darkMode ? '#161b22' : undefined }}>
+      <Card
+        variant="outlined"
+        sx={{
+          mx: 2,
+          bgcolor: colors.cardBg,
+          borderColor: colors.border,
+        }}
+      >
         <CardContent>
           {/* Search and Filters */}
           <Grid container spacing={2} mb={2}>
@@ -382,16 +423,25 @@ const KitAlertsView = ({ onBack, darkMode = false }) => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon fontSize="small" />
+                      <SearchIcon fontSize="small" sx={{ color: colors.textSecondary }} />
                     </InputAdornment>
                   ),
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    bgcolor: darkMode ? colors.paper : undefined,
+                    color: colors.text,
+                    '& fieldset': { borderColor: colors.border },
+                    '&:hover fieldset': { borderColor: colors.primary },
+                  },
+                  '& .MuiInputBase-input': { color: colors.text },
                 }}
               />
             </Grid>
             <Grid item xs={6} md={2}>
-              <FormControl fullWidth size="small">
+              <FormControl fullWidth size="small" sx={{ '& .MuiInputLabel-root': { color: colors.textSecondary }, '& .MuiOutlinedInput-root': { bgcolor: darkMode ? colors.paper : undefined, color: colors.text, '& fieldset': { borderColor: colors.border } }, '& .MuiSelect-icon': { color: colors.textSecondary } }}>
                 <InputLabel>Priority</InputLabel>
-                <Select value={severityFilter} label="Priority" onChange={(e) => setSeverityFilter(e.target.value)}>
+                <Select value={severityFilter} label="Priority" onChange={(e) => setSeverityFilter(e.target.value)} MenuProps={getMenuProps(darkMode, colors)}>
                   <MenuItem value="all">All</MenuItem>
                   <MenuItem value="critical">Critical</MenuItem>
                   <MenuItem value="high">High</MenuItem>
@@ -401,9 +451,9 @@ const KitAlertsView = ({ onBack, darkMode = false }) => {
               </FormControl>
             </Grid>
             <Grid item xs={6} md={2}>
-              <FormControl fullWidth size="small">
+              <FormControl fullWidth size="small" sx={{ '& .MuiInputLabel-root': { color: colors.textSecondary }, '& .MuiOutlinedInput-root': { bgcolor: darkMode ? colors.paper : undefined, color: colors.text, '& fieldset': { borderColor: colors.border } }, '& .MuiSelect-icon': { color: colors.textSecondary } }}>
                 <InputLabel>Category</InputLabel>
-                <Select value={categoryFilter} label="Category" onChange={(e) => setCategoryFilter(e.target.value)}>
+                <Select value={categoryFilter} label="Category" onChange={(e) => setCategoryFilter(e.target.value)} MenuProps={getMenuProps(darkMode, colors)}>
                   <MenuItem value="all">All Categories</MenuItem>
                   <MenuItem value="stox_inventory">STOX.AI Inventory</MenuItem>
                   <MenuItem value="pricing_intelligence">Pricing Intelligence</MenuItem>
@@ -413,33 +463,33 @@ const KitAlertsView = ({ onBack, darkMode = false }) => {
               </FormControl>
             </Grid>
             <Grid item xs={6} md={2}>
-              <FormControl fullWidth size="small">
+              <FormControl fullWidth size="small" sx={{ '& .MuiInputLabel-root': { color: colors.textSecondary }, '& .MuiOutlinedInput-root': { bgcolor: darkMode ? colors.paper : undefined, color: colors.text, '& fieldset': { borderColor: colors.border } }, '& .MuiSelect-icon': { color: colors.textSecondary } }}>
                 <InputLabel>Type</InputLabel>
-                <Select value={typeFilter} label="Type" onChange={(e) => setTypeFilter(e.target.value)}>
+                <Select value={typeFilter} label="Type" onChange={(e) => setTypeFilter(e.target.value)} MenuProps={getMenuProps(darkMode, colors)}>
                   <MenuItem value="all">All Types</MenuItem>
-                  <MenuItem disabled sx={{ opacity: 0.7, fontWeight: 600, fontSize: '0.7rem', bgcolor: 'action.hover' }}>— STOX.AI Inventory —</MenuItem>
+                  <MenuItem disabled sx={{ opacity: 0.7, fontWeight: 600, fontSize: '0.7rem', bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'action.hover' }}>— STOX.AI Inventory —</MenuItem>
                   <MenuItem value="stockout_risk">Stockout Risk</MenuItem>
                   <MenuItem value="reorder_point_reached">Reorder Point Reached</MenuItem>
                   <MenuItem value="excess_inventory">Excess Inventory</MenuItem>
                   <MenuItem value="dc_rebalance_needed">DC Rebalance Needed</MenuItem>
                   <MenuItem value="seasonal_demand_shift">Seasonal Demand Shift</MenuItem>
-                  <MenuItem disabled sx={{ opacity: 0.7, fontWeight: 600, fontSize: '0.7rem', bgcolor: 'action.hover' }}>— Pricing Intelligence —</MenuItem>
+                  <MenuItem disabled sx={{ opacity: 0.7, fontWeight: 600, fontSize: '0.7rem', bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'action.hover' }}>— Pricing Intelligence —</MenuItem>
                   <MenuItem value="price_below_optimal">Price Below Optimal</MenuItem>
                   <MenuItem value="margin_erosion">Margin Erosion</MenuItem>
-                  <MenuItem disabled sx={{ opacity: 0.7, fontWeight: 600, fontSize: '0.7rem', bgcolor: 'action.hover' }}>— Customer Intelligence —</MenuItem>
+                  <MenuItem disabled sx={{ opacity: 0.7, fontWeight: 600, fontSize: '0.7rem', bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'action.hover' }}>— Customer Intelligence —</MenuItem>
                   <MenuItem value="order_gap_detected">Order Gap Detected</MenuItem>
                   <MenuItem value="churn_risk_high">High Churn Risk</MenuItem>
                   <MenuItem value="reorder_opportunity">Reorder Opportunity</MenuItem>
-                  <MenuItem disabled sx={{ opacity: 0.7, fontWeight: 600, fontSize: '0.7rem', bgcolor: 'action.hover' }}>— Operations —</MenuItem>
+                  <MenuItem disabled sx={{ opacity: 0.7, fontWeight: 600, fontSize: '0.7rem', bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'action.hover' }}>— Operations —</MenuItem>
                   <MenuItem value="lead_time_risk">Lead Time Risk</MenuItem>
                   <MenuItem value="upsell_opportunity">Upsell Opportunity</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={6} md={3}>
-              <FormControl fullWidth size="small">
+              <FormControl fullWidth size="small" sx={{ '& .MuiInputLabel-root': { color: colors.textSecondary }, '& .MuiOutlinedInput-root': { bgcolor: darkMode ? colors.paper : undefined, color: colors.text, '& fieldset': { borderColor: colors.border } }, '& .MuiSelect-icon': { color: colors.textSecondary } }}>
                 <InputLabel>Status</InputLabel>
-                <Select value={statusFilter} label="Status" onChange={(e) => setStatusFilter(e.target.value)}>
+                <Select value={statusFilter} label="Status" onChange={(e) => setStatusFilter(e.target.value)} MenuProps={getMenuProps(darkMode, colors)}>
                   <MenuItem value="all">All</MenuItem>
                   <MenuItem value="new">New</MenuItem>
                   <MenuItem value="acknowledged">Acknowledged</MenuItem>
@@ -451,7 +501,7 @@ const KitAlertsView = ({ onBack, darkMode = false }) => {
           </Grid>
 
           {/* DataGrid */}
-          <Paper sx={{ width: '100%', bgcolor: darkMode ? '#161b22' : undefined }}>
+          <Paper sx={{ width: '100%', bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
             <DataGrid
               rows={filteredAlerts}
               columns={columns}
@@ -464,7 +514,47 @@ const KitAlertsView = ({ onBack, darkMode = false }) => {
               initialState={{ pagination: { paginationModel: { pageSize: 12 } } }}
               pageSizeOptions={[12, 25, 50]}
               onRowClick={(params) => setSelectedAlert(params.row)}
-              sx={stoxTheme.getDataGridSx({ clickable: true, darkMode })}
+              sx={{
+                border: 'none',
+                '& .MuiDataGrid-columnHeaders': {
+                  bgcolor: darkMode ? '#21262d' : '#f8fafc',
+                  color: colors.text,
+                  borderBottom: `1px solid ${colors.border}`,
+                },
+                '& .MuiDataGrid-columnHeaderTitle': {
+                  fontWeight: 600,
+                  color: colors.text,
+                },
+                '& .MuiDataGrid-cell': {
+                  borderBottom: `1px solid ${colors.border}`,
+                  color: colors.text,
+                },
+                '& .MuiDataGrid-row': {
+                  cursor: 'pointer',
+                  '&:hover': {
+                    bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                  },
+                },
+                '& .MuiDataGrid-footerContainer': {
+                  bgcolor: darkMode ? '#21262d' : '#f8fafc',
+                  borderTop: `1px solid ${colors.border}`,
+                  color: colors.text,
+                },
+                '& .MuiTablePagination-root': {
+                  color: colors.text,
+                },
+                '& .MuiDataGrid-toolbarContainer': {
+                  bgcolor: darkMode ? '#161b22' : undefined,
+                  '& .MuiButton-root': { color: colors.text },
+                  '& .MuiInputBase-root': { color: colors.text },
+                },
+                '& .MuiCheckbox-root': {
+                  color: colors.textSecondary,
+                },
+                '& .MuiDataGrid-selectedRowCount': {
+                  color: colors.textSecondary,
+                },
+              }}
               localeText={{
                 noRowsLabel: 'No insights matching current filters',
               }}

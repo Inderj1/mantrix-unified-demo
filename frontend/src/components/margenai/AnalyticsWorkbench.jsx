@@ -64,6 +64,16 @@ import PriceVolumeAnalytics from './workbench/PriceVolumeAnalytics';
 
 const drawerWidth = 280;
 
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 const analyticsModules = [
   {
     category: 'Customer Intelligence',
@@ -101,7 +111,8 @@ const analyticsModules = [
   },
 ];
 
-const AnalyticsWorkbench = ({ onBack }) => {
+const AnalyticsWorkbench = ({ onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const theme = useTheme();
   const [selectedModule, setSelectedModule] = useState('rfm-segmentation');
   const [drawerOpen, setDrawerOpen] = useState(true);
@@ -183,7 +194,7 @@ const AnalyticsWorkbench = ({ onBack }) => {
   };
 
   return (
-    <Box sx={{ display: 'flex', height: '100%', position: 'relative', flexDirection: 'column', p: 3 }}>
+    <Box sx={{ display: 'flex', height: '100%', position: 'relative', flexDirection: 'column', p: 3, bgcolor: colors.background }}>
       {/* Header with Breadcrumbs */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -223,10 +234,11 @@ const AnalyticsWorkbench = ({ onBack }) => {
             boxSizing: 'border-box',
             position: 'relative',
             height: '100%',
-            borderRight: `1px solid ${theme.palette.divider}`,
-            background: theme.palette.mode === 'dark' 
+            borderRight: `1px solid ${colors.border}`,
+            background: darkMode
               ? 'linear-gradient(180deg, #1a1a2e 0%, #16213e 100%)'
               : 'linear-gradient(180deg, #f5f7fa 0%, #ffffff 100%)',
+            bgcolor: colors.paper,
           },
         }}
         variant="persistent"
@@ -234,11 +246,11 @@ const AnalyticsWorkbench = ({ onBack }) => {
         open={drawerOpen}
       >
         <Box sx={{ 
-          p: 2, 
-          display: 'flex', 
-          alignItems: 'center', 
+          p: 2,
+          display: 'flex',
+          alignItems: 'center',
           justifyContent: 'space-between',
-          borderBottom: `1px solid ${theme.palette.divider}`,
+          borderBottom: `1px solid ${colors.border}`,
         }}>
           <Typography variant="h6" sx={{ fontWeight: 600 }}>
             Analytics
@@ -303,12 +315,12 @@ const AnalyticsWorkbench = ({ onBack }) => {
       {/* Main Content Area */}
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
         {/* Top Toolbar */}
-        <Paper 
-          elevation={0} 
-          sx={{ 
-            p: 2, 
-            borderBottom: `1px solid ${theme.palette.divider}`,
-            background: theme.palette.background.paper,
+        <Paper
+          elevation={0}
+          sx={{
+            p: 2,
+            borderBottom: `1px solid ${colors.border}`,
+            bgcolor: colors.paper,
           }}
         >
           <Stack direction="row" alignItems="center" justifyContent="space-between">
@@ -353,12 +365,10 @@ const AnalyticsWorkbench = ({ onBack }) => {
         </Paper>
 
         {/* Content Container */}
-        <Box sx={{ 
-          flexGrow: 1, 
+        <Box sx={{
+          flexGrow: 1,
           overflow: 'auto',
-          background: theme.palette.mode === 'dark'
-            ? theme.palette.background.default
-            : '#f5f7fa',
+          bgcolor: colors.background,
         }}>
           {loading ? (
             <Box sx={{ 

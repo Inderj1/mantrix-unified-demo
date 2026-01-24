@@ -38,8 +38,22 @@ import {
 } from '@tanstack/react-table';
 import { useSegmentAnalytics } from '../../hooks/useMargenData';
 
-const SegmentAnalytics = ({ onBack }) => {
+const getColors = (darkMode) => ({
+  background: darkMode ? '#0a0e27' : '#ffffff',
+  paper: darkMode ? '#111936' : '#ffffff',
+  paperBorder: darkMode ? '#1e293b' : '#e0e0e0',
+  text: {
+    primary: darkMode ? '#e2e8f0' : '#1a202c',
+    secondary: darkMode ? '#94a3b8' : '#64748b',
+  },
+  tableHeader: darkMode ? '#1e293b' : '#fafafa',
+  tableRow: darkMode ? '#151f3d' : '#f5f5f5',
+  tableBorder: darkMode ? '#1e293b' : '#e0e0e0',
+});
+
+const SegmentAnalytics = ({ onBack, darkMode = false }) => {
   const theme = useTheme();
+  const colors = getColors(darkMode);
   const { data: segmentData, loading, error, refetch } = useSegmentAnalytics();
   const [refreshing, setRefreshing] = useState(false);
   const [sorting, setSorting] = useState([]);
@@ -225,7 +239,7 @@ const SegmentAnalytics = ({ onBack }) => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 3, bgcolor: colors.background, minHeight: '100vh' }}>
       {/* Header with Breadcrumbs */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -288,7 +302,7 @@ const SegmentAnalytics = ({ onBack }) => {
                   <Typography variant="h4" fontWeight={600} color="primary">
                     {summaryMetrics.totalSegments}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: colors.text.secondary }}>
                     Total Segments
                   </Typography>
                 </Box>
@@ -299,14 +313,14 @@ const SegmentAnalytics = ({ onBack }) => {
         </Grid>
 
         <Grid item xs={12} md={2}>
-          <Card sx={{ height: '100%' }}>
+          <Card sx={{ height: '100%', bgcolor: colors.paper, border: `1px solid ${colors.paperBorder}` }}>
             <CardContent>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Box>
-                  <Typography variant="h4" fontWeight={600}>
+                  <Typography variant="h4" fontWeight={600} sx={{ color: colors.text.primary }}>
                     {summaryMetrics.totalCustomers?.toLocaleString() || '0'}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: colors.text.secondary }}>
                     Total Customers
                   </Typography>
                 </Box>
@@ -317,14 +331,14 @@ const SegmentAnalytics = ({ onBack }) => {
         </Grid>
 
         <Grid item xs={12} md={2}>
-          <Card sx={{ height: '100%' }}>
+          <Card sx={{ height: '100%', bgcolor: colors.paper, border: `1px solid ${colors.paperBorder}` }}>
             <CardContent>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Box>
                   <Typography variant="h4" fontWeight={600} color="success.main">
                     ${summaryMetrics.totalRevenue?.toLocaleString() || '0'}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: colors.text.secondary }}>
                     Total Revenue
                   </Typography>
                 </Box>
@@ -335,18 +349,18 @@ const SegmentAnalytics = ({ onBack }) => {
         </Grid>
 
         <Grid item xs={12} md={2}>
-          <Card sx={{ height: '100%' }}>
+          <Card sx={{ height: '100%', bgcolor: colors.paper, border: `1px solid ${colors.paperBorder}` }}>
             <CardContent>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Box>
-                  <Typography 
-                    variant="h4" 
-                    fontWeight={600} 
+                  <Typography
+                    variant="h4"
+                    fontWeight={600}
                     color={summaryMetrics.avgMarginPct > 0 ? 'success.main' : 'error.main'}
                   >
                     {summaryMetrics.avgMarginPct?.toFixed(1) || '0.0'}%
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: colors.text.secondary }}>
                     Avg Margin
                   </Typography>
                 </Box>
@@ -357,14 +371,14 @@ const SegmentAnalytics = ({ onBack }) => {
         </Grid>
 
         <Grid item xs={12} md={2}>
-          <Card sx={{ height: '100%' }}>
+          <Card sx={{ height: '100%', bgcolor: colors.paper, border: `1px solid ${colors.paperBorder}` }}>
             <CardContent>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Box>
                   <Typography variant="h4" fontWeight={600} color="success.main">
                     {summaryMetrics.healthySegments}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: colors.text.secondary }}>
                     High Margin
                   </Typography>
                 </Box>
@@ -375,14 +389,14 @@ const SegmentAnalytics = ({ onBack }) => {
         </Grid>
 
         <Grid item xs={12} md={2}>
-          <Card sx={{ height: '100%' }}>
+          <Card sx={{ height: '100%', bgcolor: colors.paper, border: `1px solid ${colors.paperBorder}` }}>
             <CardContent>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Box>
                   <Typography variant="h4" fontWeight={600} color="primary">
                     {summaryMetrics.highValueSegments}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: colors.text.secondary }}>
                     High Value
                   </Typography>
                 </Box>
@@ -394,12 +408,12 @@ const SegmentAnalytics = ({ onBack }) => {
       </Grid>
 
       {/* Segments Table */}
-      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
-          <Typography variant="h6" fontWeight={600}>
+      <Paper sx={{ width: '100%', overflow: 'hidden', bgcolor: colors.paper, border: `1px solid ${colors.paperBorder}` }}>
+        <Box sx={{ p: 2, borderBottom: 1, borderColor: colors.paperBorder }}>
+          <Typography variant="h6" fontWeight={600} sx={{ color: colors.text.primary }}>
             Segment Performance Analysis
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: colors.text.secondary }}>
             {data.length} customer segments • Sorted by revenue performance
           </Typography>
         </Box>
@@ -408,17 +422,17 @@ const SegmentAnalytics = ({ onBack }) => {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id} style={{ backgroundColor: '#fafafa' }}>
+                <tr key={headerGroup.id} style={{ backgroundColor: colors.tableHeader }}>
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}
                       style={{
                         padding: '12px',
                         textAlign: 'left',
-                        borderBottom: '2px solid #e0e0e0',
+                        borderBottom: `2px solid ${colors.tableBorder}`,
                         fontWeight: 600,
                         fontSize: '0.875rem',
-                        color: '#424242',
+                        color: colors.text.primary,
                         cursor: header.column.getCanSort() ? 'pointer' : 'default',
                         userSelect: 'none',
                       }}
@@ -439,10 +453,10 @@ const SegmentAnalytics = ({ onBack }) => {
                 <tr
                   key={row.id}
                   style={{
-                    borderBottom: '1px solid #e0e0e0',
+                    borderBottom: `1px solid ${colors.tableBorder}`,
                     transition: 'background-color 0.2s',
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f5f5f5')}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.tableRow)}
                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '')}
                 >
                   {row.getVisibleCells().map((cell) => (

@@ -179,7 +179,18 @@ const isInventoryQuestion = (query) => {
   return { valid: true, message: '' };
 };
 
-const CommandCenter = ({ onBack, onTileClick }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const CommandCenter = ({ onBack, onTileClick, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [exceptions, setExceptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [kpis, setKpis] = useState(null);
@@ -315,7 +326,7 @@ const CommandCenter = ({ onBack, onTileClick }) => {
       <Box sx={{ mb: 3, flexShrink: 0 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>STOX.AI</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>Command Center</Typography>
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>
@@ -341,7 +352,7 @@ const CommandCenter = ({ onBack, onTileClick }) => {
       {/* Main Content */}
       <Box sx={{ flex: 1, display: 'flex', gap: 2, overflow: 'hidden', minHeight: 0 }}>
         {/* Left Panel - AI Chat */}
-        <Paper sx={{ width: 420, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <Paper sx={{ width: 420, display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           <Box sx={{ p: 1, borderBottom: '1px solid', borderColor: 'divider', bgcolor: alpha('#0078d4', 0.05), flexShrink: 0 }}>
             <Stack direction="row" alignItems="center" spacing={1}>
               <Avatar sx={{ width: 28, height: 28, bgcolor: '#0078d4' }}>
@@ -368,10 +379,10 @@ const CommandCenter = ({ onBack, onTileClick }) => {
                     p: 1,
                     borderRadius: 1.5,
                     bgcolor: msg.type === 'user' ? '#0078d4' : alpha('#0078d4', 0.08),
-                    color: msg.type === 'user' ? 'white' : 'text.primary',
+                    color: msg.type === 'user' ? 'white' : colors.text,
                   }}
                 >
-                  <Typography variant="caption" sx={{ fontSize: '0.75rem', lineHeight: 1.4 }}>
+                  <Typography variant="caption" sx={{ fontSize: '0.75rem', lineHeight: 1.4, color: msg.type === 'user' ? 'white' : colors.text }}>
                     {msg.text}
                   </Typography>
                 </Box>
@@ -408,7 +419,7 @@ const CommandCenter = ({ onBack, onTileClick }) => {
           {kpis && (
             <Grid container spacing={1} sx={{ mb: 2, flexShrink: 0 }}>
               <Grid item xs={3}>
-                <Card sx={{ borderLeft: '3px solid #0078d4' }}>
+                <Card sx={{ borderLeft: '3px solid #0078d4' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ py: 1, px: 1.5, '&:last-child': { pb: 1 } }}>
                     <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>WC Tied Up</Typography>
                     <Typography variant="h6" fontWeight={700} color="#0078d4">${(kpis.totalWCTied / 1000000).toFixed(2)}M</Typography>
@@ -416,7 +427,7 @@ const CommandCenter = ({ onBack, onTileClick }) => {
                 </Card>
               </Grid>
               <Grid item xs={3}>
-                <Card sx={{ borderLeft: '3px solid #10b981' }}>
+                <Card sx={{ borderLeft: '3px solid #10b981' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ py: 1, px: 1.5, '&:last-child': { pb: 1 } }}>
                     <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>Potential Savings</Typography>
                     <Typography variant="h6" fontWeight={700} color="#10b981">${(kpis.potentialSavings / 1000).toFixed(0)}K</Typography>
@@ -424,7 +435,7 @@ const CommandCenter = ({ onBack, onTileClick }) => {
                 </Card>
               </Grid>
               <Grid item xs={3}>
-                <Card sx={{ borderLeft: `3px solid ${kpis.serviceLevel < kpis.serviceLevelTarget ? '#f59e0b' : '#10b981'}` }}>
+                <Card sx={{ borderLeft: `3px solid ${kpis.serviceLevel < kpis.serviceLevelTarget ? '#f59e0b' : '#10b981'}`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ py: 1, px: 1.5, '&:last-child': { pb: 1 } }}>
                     <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>Service Level</Typography>
                     <Typography variant="h6" fontWeight={700} color={kpis.serviceLevel < kpis.serviceLevelTarget ? '#f59e0b' : '#10b981'}>
@@ -434,7 +445,7 @@ const CommandCenter = ({ onBack, onTileClick }) => {
                 </Card>
               </Grid>
               <Grid item xs={3}>
-                <Card sx={{ borderLeft: '3px solid #005a9e' }}>
+                <Card sx={{ borderLeft: '3px solid #005a9e' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ py: 1, px: 1.5, '&:last-child': { pb: 1 } }}>
                     <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>Inv. Turns</Typography>
                     <Typography variant="h6" fontWeight={700} color="#005a9e">{kpis.inventoryTurns}x</Typography>
@@ -445,7 +456,7 @@ const CommandCenter = ({ onBack, onTileClick }) => {
           )}
 
           {/* Quick Navigation - Compact inline */}
-          <Paper sx={{ p: 1, mb: 2, flexShrink: 0 }}>
+          <Paper sx={{ p: 1, mb: 2, flexShrink: 0 , bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
             <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap alignItems="center">
               <Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ mr: 0.5 }}>Quick:</Typography>
               {[
@@ -476,7 +487,7 @@ const CommandCenter = ({ onBack, onTileClick }) => {
           </Paper>
 
           {/* Exceptions Panel */}
-          <Paper sx={{ flexShrink: 0 }}>
+          <Paper sx={{ flexShrink: 0, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
             <Box sx={{ p: 1, borderBottom: '1px solid', borderColor: 'divider', bgcolor: alpha('#0078d4', 0.03), flexShrink: 0 }}>
               <Stack direction="row" alignItems="center" justifyContent="space-between">
                 <Stack direction="row" alignItems="center" spacing={1}>

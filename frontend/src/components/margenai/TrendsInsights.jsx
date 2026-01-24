@@ -39,7 +39,18 @@ import {
 } from '@mui/icons-material';
 import { useTrendsInsights } from '../../hooks/useMargenData';
 
-const TrendsInsights = ({ onBack }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const TrendsInsights = ({ onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const theme = useTheme();
   const [refreshing, setRefreshing] = useState(false);
   const [monthsBack, setMonthsBack] = useState(12);
@@ -96,7 +107,7 @@ const TrendsInsights = ({ onBack }) => {
         <Grid item xs={12}>
           <Grid container spacing={2}>
             <Grid item xs={12} md={3}>
-              <Card>
+              <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                 <CardContent>
                   <Stack direction="row" justifyContent="space-between" alignItems="center">
                     <Box>
@@ -128,7 +139,7 @@ const TrendsInsights = ({ onBack }) => {
             </Grid>
 
             <Grid item xs={12} md={3}>
-              <Card>
+              <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                 <CardContent>
                   <Stack direction="row" justifyContent="space-between" alignItems="center">
                     <Box>
@@ -160,7 +171,7 @@ const TrendsInsights = ({ onBack }) => {
             </Grid>
 
             <Grid item xs={12} md={3}>
-              <Card>
+              <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                 <CardContent>
                   <Stack direction="row" justifyContent="space-between" alignItems="center">
                     <Box>
@@ -192,7 +203,7 @@ const TrendsInsights = ({ onBack }) => {
             </Grid>
 
             <Grid item xs={12} md={3}>
-              <Card>
+              <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                 <CardContent>
                   <Stack direction="row" justifyContent="space-between" alignItems="center">
                     <Box>
@@ -216,9 +227,9 @@ const TrendsInsights = ({ onBack }) => {
 
         {/* Monthly Trends Table */}
         <Grid item xs={12}>
-          <Paper>
-            <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
-              <Typography variant="h6" fontWeight={600}>
+          <Paper sx={{ bgcolor: colors.paper }}>
+            <Box sx={{ p: 2, borderBottom: 1, borderColor: colors.border }}>
+              <Typography variant="h6" fontWeight={600} sx={{ color: colors.text }}>
                 Monthly Performance Trends
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -227,7 +238,7 @@ const TrendsInsights = ({ onBack }) => {
             </Box>
             <Box sx={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead style={{ backgroundColor: '#fafafa' }}>
+                <thead style={{ backgroundColor: darkMode ? colors.cardBg : '#fafafa' }}>
                   <tr>
                     <th style={{ padding: '12px', textAlign: 'left', fontWeight: 600 }}>Period</th>
                     <th style={{ padding: '12px', textAlign: 'left', fontWeight: 600 }}>Revenue</th>
@@ -307,7 +318,7 @@ const TrendsInsights = ({ onBack }) => {
       <Grid container spacing={3}>
         {/* Key Insights Cards */}
         <Grid item xs={12} md={6}>
-          <Card>
+          <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
             <CardContent>
               <Typography variant="h6" fontWeight={600} gutterBottom>
                 Top Performing Segment
@@ -332,9 +343,9 @@ const TrendsInsights = ({ onBack }) => {
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <Card>
+          <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
             <CardContent>
-              <Typography variant="h6" fontWeight={600} gutterBottom>
+              <Typography variant="h6" fontWeight={600} gutterBottom sx={{ color: colors.text }}>
                 Highest Margin Segment
               </Typography>
               {insightsData.highest_margin_segment ? (
@@ -358,9 +369,9 @@ const TrendsInsights = ({ onBack }) => {
 
         {/* Segment Health Summary */}
         <Grid item xs={12}>
-          <Card>
+          <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
             <CardContent>
-              <Typography variant="h6" fontWeight={600} gutterBottom>
+              <Typography variant="h6" fontWeight={600} gutterBottom sx={{ color: colors.text }}>
                 Segment Health Overview
               </Typography>
               {insightsData.segment_health_summary ? (
@@ -416,9 +427,9 @@ const TrendsInsights = ({ onBack }) => {
         {/* At Risk Segments */}
         {insightsData.at_risk_segments?.length > 0 && (
           <Grid item xs={12}>
-            <Card>
+            <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
-                <Typography variant="h6" fontWeight={600} gutterBottom>
+                <Typography variant="h6" fontWeight={600} gutterBottom sx={{ color: colors.text }}>
                   Segments Requiring Attention
                 </Typography>
                 <Grid container spacing={2}>
@@ -463,7 +474,7 @@ const TrendsInsights = ({ onBack }) => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 3, bgcolor: colors.background }}>
       {/* Header with Breadcrumbs */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -533,11 +544,11 @@ const TrendsInsights = ({ onBack }) => {
       </Stack>
 
       {/* Tabs */}
-      <Paper sx={{ mb: 3 }}>
-        <Tabs 
-          value={activeTab} 
+      <Paper sx={{ mb: 3, bgcolor: colors.paper }}>
+        <Tabs
+          value={activeTab}
           onChange={(e, v) => setActiveTab(v)}
-          sx={{ borderBottom: 1, borderColor: 'divider' }}
+          sx={{ borderBottom: 1, borderColor: colors.border }}
         >
           <Tab 
             label="Monthly Trends" 

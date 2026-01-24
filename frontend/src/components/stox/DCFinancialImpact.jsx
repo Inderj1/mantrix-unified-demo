@@ -10,7 +10,19 @@ import stoxTheme from './stoxTheme';
 import DataSourceChip from './DataSourceChip';
 import { getTileDataConfig } from './stoxDataConfig';
 
-const DCFinancialImpact = ({ onBack }) => {
+// Dark Mode Color Helper
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const DCFinancialImpact = ({ onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const tileConfig = getTileDataConfig('dc-financial-impact');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -168,7 +180,7 @@ const DCFinancialImpact = ({ onBack }) => {
   ];
 
   return (
-    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: colors.background }}>
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
@@ -244,7 +256,7 @@ const DCFinancialImpact = ({ onBack }) => {
         </Grid>
       )}
 
-      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         <DataGrid
           rows={data}
           columns={columns}

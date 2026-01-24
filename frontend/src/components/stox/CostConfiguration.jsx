@@ -10,6 +10,17 @@ import {
 } from '@mui/icons-material';
 import stoxTheme from './stoxTheme';
 
+// Dark Mode Color Helper
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 /**
  * Cost Configuration Panel
  *
@@ -59,7 +70,8 @@ const defaultCostConfig = {
   backorderAdmin: 75,
 };
 
-const CostConfiguration = ({ onBack, onSave, onTileClick }) => {
+const CostConfiguration = ({ onBack, onSave, onTileClick, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [config, setConfig] = useState(defaultCostConfig);
   const [expanded, setExpanded] = useState(['holding', 'ordering', 'stockout']);
   const [hasChanges, setHasChanges] = useState(false);
@@ -123,7 +135,7 @@ const CostConfiguration = ({ onBack, onSave, onTileClick }) => {
   );
 
   return (
-    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -160,7 +172,7 @@ const CostConfiguration = ({ onBack, onSave, onTileClick }) => {
       {/* Summary Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} md={4}>
-          <Card sx={{ borderLeft: '4px solid #106ebe' }}>
+          <Card sx={{ borderLeft: '4px solid #106ebe', bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
             <CardContent>
               <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                 <AccountBalance sx={{ color: '#106ebe' }} />
@@ -172,7 +184,7 @@ const CostConfiguration = ({ onBack, onSave, onTileClick }) => {
           </Card>
         </Grid>
         <Grid item xs={12} md={4}>
-          <Card sx={{ borderLeft: '4px solid #10b981' }}>
+          <Card sx={{ borderLeft: '4px solid #10b981', bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
             <CardContent>
               <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                 <LocalShipping sx={{ color: '#10b981' }} />
@@ -184,7 +196,7 @@ const CostConfiguration = ({ onBack, onSave, onTileClick }) => {
           </Card>
         </Grid>
         <Grid item xs={12} md={4}>
-          <Card sx={{ borderLeft: '4px solid #ef4444' }}>
+          <Card sx={{ borderLeft: '4px solid #ef4444', bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
             <CardContent>
               <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                 <Warning sx={{ color: '#ef4444' }} />
@@ -414,7 +426,7 @@ const CostConfiguration = ({ onBack, onSave, onTileClick }) => {
         </Accordion>
 
         {/* Formula Reference */}
-        <Paper sx={{ p: 2, mt: 2, bgcolor: alpha('#64748b', 0.05) }}>
+        <Paper sx={{ p: 2, mt: 2, bgcolor: darkMode ? alpha('#64748b', 0.1) : alpha('#64748b', 0.05), border: `1px solid ${colors.border}` }}>
           <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
             <Calculate sx={{ color: '#64748b' }} />
             <Typography variant="subtitle2" fontWeight={700}>Key Formulas</Typography>

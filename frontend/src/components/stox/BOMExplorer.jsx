@@ -50,7 +50,19 @@ import {
   Add,
 } from '@mui/icons-material';
 
-const BOMExplorer = ({ onBack }) => {
+// Dark Mode Color Helper
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const BOMExplorer = ({ onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [sopData, setSOPData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -490,6 +502,7 @@ const BOMExplorer = ({ onBack }) => {
       display: 'flex',
       flexDirection: 'column',
       overflowY: 'auto',
+      bgcolor: colors.background
     }}>
       {/* Header with Breadcrumbs */}
       <Box sx={{ mb: 3 }}>
@@ -507,7 +520,7 @@ const BOMExplorer = ({ onBack }) => {
             >
               STOX.AI
             </Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
+            <Typography sx={{ color: colors.primary }} variant="body1" fontWeight={600}>
               BOM Drill-Down Explorer
             </Typography>
           </Breadcrumbs>
@@ -526,7 +539,7 @@ const BOMExplorer = ({ onBack }) => {
           <Typography variant="h4" fontWeight={700}>
             BOM Drill-Down Explorer
           </Typography>
-          <Typography variant="subtitle1" color="text.secondary">
+          <Typography variant="subtitle1" sx={{ color: colors.textSecondary }}>
             Component Requirements
           </Typography>
         </Box>
@@ -570,7 +583,7 @@ const BOMExplorer = ({ onBack }) => {
       {metrics && (
         <Grid container spacing={1.5} sx={{ mb: 2 }}>
           <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ boxShadow: 'none', border: '1px solid #E1E4E8' }}>
+            <Card sx={{ boxShadow: 'none', border: `1px solid ${colors.border}`, bgcolor: colors.cardBg }}>
               <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
                   <Info sx={{ fontSize: 18, color: 'primary.main' }} />
@@ -579,7 +592,7 @@ const BOMExplorer = ({ onBack }) => {
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem', textTransform: 'uppercase' }}>
                   Total Requirement
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: '#0F3460', fontSize: '1.25rem' }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: colors.text, fontSize: '1.25rem' }}>
                   {metrics.total_requirement.toLocaleString()}
                 </Typography>
               </CardContent>
@@ -587,7 +600,7 @@ const BOMExplorer = ({ onBack }) => {
           </Grid>
 
           <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ boxShadow: 'none', border: '1px solid #E1E4E8' }}>
+            <Card sx={{ boxShadow: 'none', border: `1px solid ${colors.border}`, bgcolor: colors.cardBg }}>
               <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
                   <CheckCircle sx={{ fontSize: 18, color: 'success.main' }} />
@@ -596,7 +609,7 @@ const BOMExplorer = ({ onBack }) => {
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem', textTransform: 'uppercase' }}>
                   Available Stock
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: '#0F3460', fontSize: '1.25rem' }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: colors.text, fontSize: '1.25rem' }}>
                   {metrics.total_available.toLocaleString()}
                 </Typography>
               </CardContent>
@@ -604,7 +617,7 @@ const BOMExplorer = ({ onBack }) => {
           </Grid>
 
           <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ boxShadow: 'none', border: '1px solid #E1E4E8' }}>
+            <Card sx={{ boxShadow: 'none', border: `1px solid ${colors.border}`, bgcolor: colors.cardBg }}>
               <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
                   <Warning sx={{ fontSize: 18, color: 'error.main' }} />
@@ -613,7 +626,7 @@ const BOMExplorer = ({ onBack }) => {
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem', textTransform: 'uppercase' }}>
                   Total Shortage
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: '#0F3460', fontSize: '1.25rem' }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: colors.text, fontSize: '1.25rem' }}>
                   {metrics.total_shortage.toLocaleString()}
                 </Typography>
               </CardContent>
@@ -621,7 +634,7 @@ const BOMExplorer = ({ onBack }) => {
           </Grid>
 
           <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ boxShadow: 'none', border: '1px solid #E1E4E8' }}>
+            <Card sx={{ boxShadow: 'none', border: `1px solid ${colors.border}`, bgcolor: colors.cardBg }}>
               <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
                   <Warning sx={{ fontSize: 18, color: 'error.main' }} />
@@ -630,7 +643,7 @@ const BOMExplorer = ({ onBack }) => {
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem', textTransform: 'uppercase' }}>
                   Critical Components
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: '#0F3460', fontSize: '1.25rem' }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: colors.text, fontSize: '1.25rem' }}>
                   {metrics.critical_components}
                 </Typography>
               </CardContent>
@@ -638,7 +651,7 @@ const BOMExplorer = ({ onBack }) => {
           </Grid>
 
           <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ boxShadow: 'none', border: '1px solid #E1E4E8' }}>
+            <Card sx={{ boxShadow: 'none', border: `1px solid ${colors.border}`, bgcolor: colors.cardBg }}>
               <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
                   <Info sx={{ fontSize: 18, color: 'warning.main' }} />
@@ -647,7 +660,7 @@ const BOMExplorer = ({ onBack }) => {
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem', textTransform: 'uppercase' }}>
                   Warning Components
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: '#0F3460', fontSize: '1.25rem' }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: colors.text, fontSize: '1.25rem' }}>
                   {metrics.warning_components}
                 </Typography>
               </CardContent>
@@ -655,7 +668,7 @@ const BOMExplorer = ({ onBack }) => {
           </Grid>
 
           <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ boxShadow: 'none', border: '1px solid #E1E4E8' }}>
+            <Card sx={{ boxShadow: 'none', border: `1px solid ${colors.border}`, bgcolor: colors.cardBg }}>
               <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
                   <Speed sx={{ fontSize: 18, color: 'info.main' }} />
@@ -664,7 +677,7 @@ const BOMExplorer = ({ onBack }) => {
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem', textTransform: 'uppercase' }}>
                   Avg Lead Time
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: '#0F3460', fontSize: '1.25rem' }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: colors.text, fontSize: '1.25rem' }}>
                   {metrics.avg_lead_time.toFixed(1)}d
                 </Typography>
               </CardContent>
@@ -674,15 +687,15 @@ const BOMExplorer = ({ onBack }) => {
       )}
 
       {/* Main Content */}
-      <Paper sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+      <Paper sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         {/* Table Toolbar */}
         <Box sx={{
           p: 2,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          borderBottom: '1px solid #E1E4E8',
-          backgroundColor: '#fafafa'
+          borderBottom: `1px solid ${colors.border}`,
+          backgroundColor: darkMode ? 'rgba(255,255,255,0.02)' : '#fafafa'
         }}>
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button
@@ -729,14 +742,14 @@ const BOMExplorer = ({ onBack }) => {
             }}
             sx={{
               '& .MuiDataGrid-row:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                backgroundColor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0, 0, 0, 0.04)',
               },
               '& .MuiDataGrid-cell': {
-                borderBottom: '1px solid rgba(224, 224, 224, 1)',
+                borderBottom: `1px solid ${colors.border}`,
               },
               '& .MuiDataGrid-columnHeaders': {
-                backgroundColor: '#f5f5f5',
-                borderBottom: '2px solid rgba(224, 224, 224, 1)',
+                backgroundColor: darkMode ? 'rgba(255,255,255,0.02)' : '#f5f5f5',
+                borderBottom: `2px solid ${colors.border}`,
               },
             }}
             initialState={{

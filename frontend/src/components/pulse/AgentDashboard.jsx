@@ -58,7 +58,7 @@ import {
   ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 
-const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
+const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack, darkMode = false }) => {
   const [agents, setAgents] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const [stats, setStats] = useState(null);
@@ -68,6 +68,18 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
   const [refineDialog, setRefineDialog] = useState(false);
   const [refineFeedback, setRefineFeedback] = useState('');
   const [configDialog, setConfigDialog] = useState(false);
+
+  const getColors = (darkMode) => ({
+    primary: darkMode ? '#4da6ff' : '#0a6ed1',
+    text: darkMode ? '#e6edf3' : '#1e293b',
+    textSecondary: darkMode ? '#8b949e' : '#64748b',
+    background: darkMode ? '#0d1117' : '#f8fbfd',
+    paper: darkMode ? '#161b22' : '#ffffff',
+    cardBg: darkMode ? '#21262d' : '#ffffff',
+    border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+  });
+
+  const colors = getColors(darkMode);
 
   // Search, Filter, and Pagination state
   const [searchQuery, setSearchQuery] = useState('');
@@ -434,18 +446,16 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
     },
   ], []);
 
-  // Blue/grey color palette
-  const colors = {
-    primary: '#0a6ed1',
-    secondary: '#0854a0',
-    dark: '#354a5f',
-    slate: '#475569',
-    grey: '#64748b',
-    light: '#94a3b8',
-    success: '#10b981',
-    warning: '#f59e0b',
-    error: '#ef4444',
-    text: '#1e293b',
+  // Additional theme colors
+  const themeColors = {
+    secondary: darkMode ? '#0854a0' : '#0854a0',
+    dark: darkMode ? '#d1d9e0' : '#354a5f',
+    slate: darkMode ? '#cbd5e0' : '#475569',
+    grey: darkMode ? '#8b949e' : '#64748b',
+    light: darkMode ? '#6e7681' : '#94a3b8',
+    success: darkMode ? '#26d07c' : '#10b981',
+    warning: darkMode ? '#f59e0b' : '#f59e0b',
+    error: darkMode ? '#ff6b6b' : '#ef4444',
   };
 
   // Calculate stats from agents data if API stats are empty
@@ -482,7 +492,7 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
   const hasDemoData = demoAlerts.length > 0 || demoAgents.length > 0;
 
   return (
-    <Box>
+    <Box sx={{ bgcolor: colors.background, minHeight: '100vh', pb: 4 }}>
       {/* Header with Stats */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Box display="flex" alignItems="center" gap={2}>
@@ -544,7 +554,8 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
               p: 2,
               borderRadius: 2,
               border: '1px solid',
-              borderColor: alpha(colors.primary, 0.1),
+              borderColor: colors.border,
+              bgcolor: colors.paper,
               position: 'relative',
               overflow: 'hidden',
               '&::before': {
@@ -560,7 +571,7 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
           >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Box>
-                <Typography variant="caption" sx={{ color: colors.grey, fontWeight: 500 }}>
+                <Typography variant="caption" sx={{ color: colors.textSecondary, fontWeight: 500 }}>
                   Active Agents
                 </Typography>
                 <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
@@ -592,7 +603,8 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
               p: 2,
               borderRadius: 2,
               border: '1px solid',
-              borderColor: alpha(colors.primary, 0.1),
+              borderColor: colors.border,
+              bgcolor: colors.paper,
               position: 'relative',
               overflow: 'hidden',
               '&::before': {
@@ -602,13 +614,13 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
                 left: 0,
                 right: 0,
                 height: 3,
-                background: `linear-gradient(90deg, ${colors.warning} 0%, ${alpha(colors.warning, 0.5)} 100%)`,
+                background: `linear-gradient(90deg, ${themeColors.warning} 0%, ${alpha(themeColors.warning, 0.5)} 100%)`,
               },
             }}
           >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Box>
-                <Typography variant="caption" sx={{ color: colors.grey, fontWeight: 500 }}>
+                <Typography variant="caption" sx={{ color: colors.textSecondary, fontWeight: 500 }}>
                   Active Alerts
                 </Typography>
                 <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
@@ -620,11 +632,11 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
                   width: 40,
                   height: 40,
                   borderRadius: 1.5,
-                  bgcolor: alpha(colors.warning, 0.1),
+                  bgcolor: alpha(themeColors.warning, 0.1),
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: colors.warning,
+                  color: themeColors.warning,
                 }}
               >
                 <WarningIcon />
@@ -640,7 +652,8 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
               p: 2,
               borderRadius: 2,
               border: '1px solid',
-              borderColor: alpha(colors.primary, 0.1),
+              borderColor: colors.border,
+              bgcolor: colors.paper,
               position: 'relative',
               overflow: 'hidden',
               '&::before': {
@@ -650,13 +663,13 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
                 left: 0,
                 right: 0,
                 height: 3,
-                background: `linear-gradient(90deg, ${colors.success} 0%, ${alpha(colors.success, 0.5)} 100%)`,
+                background: `linear-gradient(90deg, ${themeColors.success} 0%, ${alpha(themeColors.success, 0.5)} 100%)`,
               },
             }}
           >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Box>
-                <Typography variant="caption" sx={{ color: colors.grey, fontWeight: 500 }}>
+                <Typography variant="caption" sx={{ color: colors.textSecondary, fontWeight: 500 }}>
                   Accuracy Rate
                 </Typography>
                 <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
@@ -668,11 +681,11 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
                   width: 40,
                   height: 40,
                   borderRadius: 1.5,
-                  bgcolor: alpha(colors.success, 0.1),
+                  bgcolor: alpha(themeColors.success, 0.1),
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: colors.success,
+                  color: themeColors.success,
                 }}
               >
                 <TrendingUpIcon />
@@ -688,7 +701,8 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
               p: 2,
               borderRadius: 2,
               border: '1px solid',
-              borderColor: alpha(colors.primary, 0.1),
+              borderColor: colors.border,
+              bgcolor: colors.paper,
               position: 'relative',
               overflow: 'hidden',
               '&::before': {
@@ -698,13 +712,13 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
                 left: 0,
                 right: 0,
                 height: 3,
-                background: `linear-gradient(90deg, ${colors.secondary} 0%, ${alpha(colors.secondary, 0.5)} 100%)`,
+                background: `linear-gradient(90deg, ${themeColors.secondary} 0%, ${alpha(themeColors.secondary, 0.5)} 100%)`,
               },
             }}
           >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Box>
-                <Typography variant="caption" sx={{ color: colors.grey, fontWeight: 500 }}>
+                <Typography variant="caption" sx={{ color: colors.textSecondary, fontWeight: 500 }}>
                   Total Agents
                 </Typography>
                 <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
@@ -716,11 +730,11 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
                   width: 40,
                   height: 40,
                   borderRadius: 1.5,
-                  bgcolor: alpha(colors.secondary, 0.1),
+                  bgcolor: alpha(themeColors.secondary, 0.1),
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: colors.secondary,
+                  color: themeColors.secondary,
                 }}
               >
                 <RadarIcon />
@@ -732,18 +746,18 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
 
       {/* Active Alerts */}
       {activeAlerts.length > 0 && (
-        <Card variant="outlined" sx={{ mb: 2 }}>
+        <Card variant="outlined" sx={{ mb: 2, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
             <Box display="flex" alignItems="center" justifyContent="space-between" mb={1.5}>
               <Box display="flex" alignItems="center" gap={1}>
-                <WarningIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
-                <Typography variant="subtitle2" fontWeight={600}>
+                <WarningIcon sx={{ fontSize: 18, color: colors.textSecondary }} />
+                <Typography variant="subtitle2" fontWeight={600} sx={{ color: colors.text }}>
                   Active Alerts
                 </Typography>
               </Box>
               <Chip label={activeAlerts.length} size="small" color="error" />
             </Box>
-            <Divider sx={{ mb: 2 }} />
+            <Divider sx={{ mb: 2, borderColor: colors.border }} />
             <Box sx={{ maxHeight: 250, overflow: 'auto' }}>
               {activeAlerts.map((alert) => {
                 const isDemo = alert.monitor_name && alert.monitor_name.includes('[DEMO]');
@@ -754,10 +768,12 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
                     sx={{
                       p: 1.5,
                       mb: 1,
+                      bgcolor: colors.cardBg,
+                      border: `1px solid ${colors.border}`,
                       ...(isDemo && {
-                        bgcolor: 'rgba(33, 150, 243, 0.03)',
+                        bgcolor: darkMode ? 'rgba(77, 166, 255, 0.1)' : 'rgba(33, 150, 243, 0.03)',
+                        border: '1.5px solid',
                         borderColor: 'info.light',
-                        borderWidth: 1.5
                       })
                     }}
                   >
@@ -829,18 +845,18 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
       )}
 
       {/* Agents List */}
-      <Card variant="outlined">
+      <Card variant="outlined" sx={{ bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
           <Box display="flex" alignItems="center" justifyContent="space-between" mb={1.5}>
             <Box display="flex" alignItems="center" gap={1}>
-              <Typography variant="subtitle2" fontWeight={600}>
+              <Typography variant="subtitle2" fontWeight={600} sx={{ color: colors.text }}>
                 Your Agents
               </Typography>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                 ({filteredAndSortedAgents.length})
               </Typography>
             </Box>
-            <IconButton onClick={loadData} size="small">
+            <IconButton onClick={loadData} size="small" sx={{ color: colors.text }}>
               <RefreshIcon />
             </IconButton>
           </Box>
@@ -908,9 +924,9 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
             </Grid>
           </Box>
 
-          <Divider sx={{ mb: 1.5 }} />
+          <Divider sx={{ mb: 1.5, borderColor: colors.border }} />
 
-          <Paper sx={{ width: '100%' }}>
+          <Paper sx={{ width: '100%', bgcolor: colors.cardBg, border: '1px solid', borderColor: colors.border }}>
             <DataGrid
               rows={filteredAndSortedAgents}
               columns={columns}
@@ -926,7 +942,17 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
                 setSelectedAgent(params.row);
                 setConfigDialog(true);
               }}
-              sx={stoxTheme.getDataGridSx({ clickable: true })}
+              sx={{
+                ...stoxTheme.getDataGridSx({ clickable: true }),
+                bgcolor: colors.cardBg,
+                '& .MuiDataGrid-root': { color: colors.text },
+                '& .MuiDataGrid-cell': { borderColor: colors.border, color: colors.text },
+                '& .MuiDataGrid-columnHeaders': { borderColor: colors.border, bgcolor: colors.paper },
+                '& .MuiDataGrid-columnHeaderTitle': { color: colors.text },
+                '& .MuiDataGrid-footerContainer': { borderColor: colors.border, bgcolor: colors.paper },
+                '& .MuiTablePagination-root': { color: colors.text },
+                '& .MuiDataGrid-row:hover': { bgcolor: darkMode ? 'rgba(77, 166, 255, 0.08)' : 'action.hover' },
+              }}
               localeText={{
                 noRowsLabel: 'No agents yet. Create your first agent to get started!',
               }}
@@ -971,10 +997,11 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
       </Menu>
 
       {/* Refine Dialog */}
-      <Dialog open={refineDialog} onClose={() => setRefineDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Refine Agent</DialogTitle>
+      <Dialog open={refineDialog} onClose={() => setRefineDialog(false)} maxWidth="sm" fullWidth
+        PaperProps={{ sx: { bgcolor: colors.paper, borderColor: colors.border, border: '1px solid' } }}>
+        <DialogTitle sx={{ color: colors.text }}>Refine Agent</DialogTitle>
         <DialogContent>
-          <Typography variant="body2" color="text.secondary" mb={2}>
+          <Typography variant="body2" sx={{ color: colors.textSecondary }} mb={2}>
             Describe how you want to improve this agent. The AI will update the agent's query based on your feedback.
           </Typography>
           <TextField
@@ -984,7 +1011,14 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
             placeholder="Example: Add region breakdown, include only active customers, compare with same period last year"
             value={refineFeedback}
             onChange={(e) => setRefineFeedback(e.target.value)}
-            sx={{ mb: 2 }}
+            sx={{
+              mb: 2,
+              '& .MuiOutlinedInput-root': {
+                bgcolor: colors.cardBg,
+                color: colors.text,
+                '& fieldset': { borderColor: colors.border },
+              }
+            }}
           />
           <Box display="flex" justifyContent="flex-end" gap={1}>
             <Button onClick={() => setRefineDialog(false)}>Cancel</Button>
@@ -1000,28 +1034,29 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack }) => {
       </Dialog>
 
       {/* Agent Configuration Dialog */}
-      <Dialog open={configDialog} onClose={() => setConfigDialog(false)} maxWidth="lg" fullWidth>
+      <Dialog open={configDialog} onClose={() => setConfigDialog(false)} maxWidth="lg" fullWidth
+        PaperProps={{ sx: { bgcolor: colors.paper, borderColor: colors.border, border: '1px solid' } }}>
         <DialogTitle>
           <Box display="flex" alignItems="center" justifyContent="space-between">
             <Box display="flex" alignItems="center" gap={1}>
-              <SettingsIcon />
-              <Typography variant="h6">Configure Agent</Typography>
+              <SettingsIcon sx={{ color: colors.text }} />
+              <Typography variant="h6" sx={{ color: colors.text }}>Configure Agent</Typography>
             </Box>
-            <IconButton onClick={() => setConfigDialog(false)}>
+            <IconButton onClick={() => setConfigDialog(false)} sx={{ color: colors.text }}>
               <CloseIcon />
             </IconButton>
           </Box>
         </DialogTitle>
         <DialogContent sx={{ pt: 2 }}>
           {selectedAgent ? (
-            <AgentConfigForm agent={selectedAgent} onClose={() => {
+            <AgentConfigForm agent={selectedAgent} darkMode={darkMode} onClose={() => {
               setConfigDialog(false);
-              fetchAgents();
+              loadData();
             }} />
           ) : (
             <Box sx={{ p: 3, textAlign: 'center' }}>
               <CircularProgress />
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+              <Typography variant="body2" sx={{ color: colors.textSecondary, mt: 2 }}>
                 Loading agent configuration...
               </Typography>
             </Box>

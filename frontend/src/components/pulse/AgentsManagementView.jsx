@@ -25,7 +25,6 @@ import {
   alpha,
 } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import stoxTheme from '../stox/stoxTheme';
 import AgentConfigForm from './AgentConfigForm';
 import {
   ArrowBack as ArrowBackIcon,
@@ -57,7 +56,39 @@ const getColors = (darkMode) => ({
   warning: darkMode ? '#f59e0b' : '#f59e0b',
   error: darkMode ? '#ff6b6b' : '#ef4444',
   text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
   grey: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+// Common form control styling for dark mode
+const getFormControlSx = (colors, darkMode) => ({
+  '& .MuiInputLabel-root': { color: colors.textSecondary },
+  '& .MuiOutlinedInput-root': {
+    bgcolor: darkMode ? colors.paper : undefined,
+    color: colors.text,
+    '& fieldset': { borderColor: colors.border },
+    '&:hover fieldset': { borderColor: colors.primary },
+  },
+  '& .MuiSelect-icon': { color: colors.textSecondary },
+});
+
+// Menu props for dark mode dropdowns
+const getMenuProps = (darkMode, colors) => ({
+  PaperProps: {
+    sx: {
+      bgcolor: darkMode ? colors.cardBg : undefined,
+      border: darkMode ? `1px solid ${colors.border}` : undefined,
+      '& .MuiMenuItem-root': {
+        color: colors.text,
+        '&:hover': { bgcolor: darkMode ? 'rgba(255,255,255,0.08)' : undefined },
+        '&.Mui-selected': { bgcolor: darkMode ? 'rgba(77,166,255,0.15)' : undefined },
+      },
+    },
+  },
 });
 
 const AgentsManagementView = ({ userId = 'persona', onBack, onCreateAgent, darkMode = false }) => {
@@ -325,62 +356,71 @@ const AgentsManagementView = ({ userId = 'persona', onBack, onCreateAgent, darkM
   }
 
   return (
-    <Box>
+    <Box sx={{ bgcolor: colors.background, minHeight: '100%' }}>
       {/* Header */}
-      <Box display="flex" alignItems="center" gap={2} mb={3}>
-        <IconButton onClick={onBack} sx={{ bgcolor: alpha(colors.primary, 0.1) }}>
-          <ArrowBackIcon />
-        </IconButton>
-        <Box
-          sx={{
-            width: 48,
-            height: 48,
-            borderRadius: 2,
-            bgcolor: alpha(colors.primary, 0.1),
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <AgentsIcon sx={{ fontSize: 24, color: colors.primary }} />
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.1)', bgcolor: colors.paper }}>
+        <Box display="flex" alignItems="center" gap={2}>
+          <IconButton
+            onClick={onBack}
+            sx={{
+              bgcolor: alpha(colors.primary, darkMode ? 0.2 : 0.1),
+              color: colors.primary,
+              '&:hover': { bgcolor: alpha(colors.primary, darkMode ? 0.3 : 0.2) }
+            }}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          <Box
+            sx={{
+              width: 48,
+              height: 48,
+              borderRadius: 2,
+              bgcolor: alpha(colors.primary, darkMode ? 0.2 : 0.1),
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <AgentsIcon sx={{ fontSize: 24, color: colors.primary }} />
+          </Box>
+          <Box flex={1}>
+            <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
+              Agents Management
+            </Typography>
+            <Typography variant="body2" sx={{ color: colors.grey }}>
+              Configure and manage AI monitoring agents
+            </Typography>
+          </Box>
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<AddIcon />}
+            onClick={onCreateAgent}
+            sx={{ bgcolor: colors.primary, '&:hover': { bgcolor: colors.secondary } }}
+          >
+            New Agent
+          </Button>
         </Box>
-        <Box flex={1}>
-          <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
-            Agents Management
-          </Typography>
-          <Typography variant="body2" sx={{ color: colors.grey }}>
-            Configure and manage AI monitoring agents
-          </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          size="small"
-          startIcon={<AddIcon />}
-          onClick={onCreateAgent}
-          sx={{ bgcolor: colors.primary, '&:hover': { bgcolor: colors.secondary } }}
-        >
-          New Agent
-        </Button>
-      </Box>
+      </Paper>
 
       {/* Stats Cards */}
-      <Grid container spacing={2} mb={3}>
+      <Grid container spacing={2} mb={3} sx={{ px: 2 }}>
         <Grid item xs={6} sm={2}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha(colors.success, 0.2), bgcolor: alpha(colors.success, 0.03) }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha(colors.success, 0.2), bgcolor: darkMode ? alpha(colors.success, 0.1) : alpha(colors.success, 0.03) }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
-                <Typography variant="caption" color="text.secondary">Active</Typography>
-                <Typography variant="h4" fontWeight={700} color="success.main">{stats.activeAgents}</Typography>
+                <Typography variant="caption" sx={{ color: colors.textSecondary }}>Active</Typography>
+                <Typography variant="h4" fontWeight={700} sx={{ color: colors.success }}>{stats.activeAgents}</Typography>
               </Box>
               <CheckCircleIcon sx={{ color: colors.success, fontSize: 28 }} />
             </Box>
           </Paper>
         </Grid>
         <Grid item xs={6} sm={2}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha('#8b5cf6', 0.2), bgcolor: alpha('#8b5cf6', 0.03) }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha('#8b5cf6', 0.2), bgcolor: darkMode ? alpha('#8b5cf6', 0.1) : alpha('#8b5cf6', 0.03) }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
-                <Typography variant="caption" color="text.secondary">ML Models</Typography>
+                <Typography variant="caption" sx={{ color: colors.textSecondary }}>ML Models</Typography>
                 <Typography variant="h4" fontWeight={700} sx={{ color: '#8b5cf6' }}>{stats.mlModelsAgents}</Typography>
               </Box>
               <PsychologyIcon sx={{ color: '#8b5cf6', fontSize: 28 }} />
@@ -388,10 +428,10 @@ const AgentsManagementView = ({ userId = 'persona', onBack, onCreateAgent, darkM
           </Paper>
         </Grid>
         <Grid item xs={6} sm={2}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha('#10b981', 0.2), bgcolor: alpha('#10b981', 0.03) }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha('#10b981', 0.2), bgcolor: darkMode ? alpha('#10b981', 0.1) : alpha('#10b981', 0.03) }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
-                <Typography variant="caption" color="text.secondary">Pricing Intel</Typography>
+                <Typography variant="caption" sx={{ color: colors.textSecondary }}>Pricing Intel</Typography>
                 <Typography variant="h4" fontWeight={700} sx={{ color: '#10b981' }}>{stats.pricingAgents}</Typography>
               </Box>
               <TrendingUpIcon sx={{ color: '#10b981', fontSize: 28 }} />
@@ -399,10 +439,10 @@ const AgentsManagementView = ({ userId = 'persona', onBack, onCreateAgent, darkM
           </Paper>
         </Grid>
         <Grid item xs={6} sm={2}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha('#0ea5e9', 0.2), bgcolor: alpha('#0ea5e9', 0.03) }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha('#0ea5e9', 0.2), bgcolor: darkMode ? alpha('#0ea5e9', 0.1) : alpha('#0ea5e9', 0.03) }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
-                <Typography variant="caption" color="text.secondary">Customer Intel</Typography>
+                <Typography variant="caption" sx={{ color: colors.textSecondary }}>Customer Intel</Typography>
                 <Typography variant="h4" fontWeight={700} sx={{ color: '#0ea5e9' }}>{stats.customerAgents}</Typography>
               </Box>
               <PeopleIcon sx={{ color: '#0ea5e9', fontSize: 28 }} />
@@ -410,10 +450,10 @@ const AgentsManagementView = ({ userId = 'persona', onBack, onCreateAgent, darkM
           </Paper>
         </Grid>
         <Grid item xs={6} sm={2}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha('#f59e0b', 0.2), bgcolor: alpha('#f59e0b', 0.03) }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha('#f59e0b', 0.2), bgcolor: darkMode ? alpha('#f59e0b', 0.1) : alpha('#f59e0b', 0.03) }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
-                <Typography variant="caption" color="text.secondary">Operations</Typography>
+                <Typography variant="caption" sx={{ color: colors.textSecondary }}>Operations</Typography>
                 <Typography variant="h4" fontWeight={700} sx={{ color: '#f59e0b' }}>{stats.operationsAgents}</Typography>
               </Box>
               <LocalShippingIcon sx={{ color: '#f59e0b', fontSize: 28 }} />
@@ -421,11 +461,11 @@ const AgentsManagementView = ({ userId = 'persona', onBack, onCreateAgent, darkM
           </Paper>
         </Grid>
         <Grid item xs={6} sm={2}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha(colors.primary, 0.2), bgcolor: alpha(colors.primary, 0.03) }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha(colors.primary, 0.2), bgcolor: darkMode ? alpha(colors.primary, 0.1) : alpha(colors.primary, 0.03) }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
-                <Typography variant="caption" color="text.secondary">Total</Typography>
-                <Typography variant="h4" fontWeight={700} color="primary.main">{stats.totalAgents}</Typography>
+                <Typography variant="caption" sx={{ color: colors.textSecondary }}>Total</Typography>
+                <Typography variant="h4" fontWeight={700} sx={{ color: colors.primary }}>{stats.totalAgents}</Typography>
               </Box>
               <AgentsIcon sx={{ color: colors.primary, fontSize: 28 }} />
             </Box>
@@ -434,7 +474,7 @@ const AgentsManagementView = ({ userId = 'persona', onBack, onCreateAgent, darkM
       </Grid>
 
       {/* Agents DataGrid */}
-      <Card variant="outlined" sx={{ bgcolor: darkMode ? '#161b22' : undefined }}>
+      <Card variant="outlined" sx={{ mx: 2, bgcolor: colors.cardBg, borderColor: colors.border }}>
         <CardContent>
           {/* Search and Filters */}
           <Grid container spacing={2} mb={2}>
@@ -446,14 +486,23 @@ const AgentsManagementView = ({ userId = 'persona', onBack, onCreateAgent, darkM
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 InputProps={{
-                  startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment>,
+                  startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" sx={{ color: colors.textSecondary }} /></InputAdornment>,
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    bgcolor: darkMode ? colors.paper : undefined,
+                    color: colors.text,
+                    '& fieldset': { borderColor: colors.border },
+                    '&:hover fieldset': { borderColor: colors.primary },
+                  },
+                  '& .MuiInputBase-input': { color: colors.text },
                 }}
               />
             </Grid>
             <Grid item xs={6} md={2}>
-              <FormControl fullWidth size="small">
+              <FormControl fullWidth size="small" sx={getFormControlSx(colors, darkMode)}>
                 <InputLabel>Status</InputLabel>
-                <Select value={statusFilter} label="Status" onChange={(e) => setStatusFilter(e.target.value)}>
+                <Select value={statusFilter} label="Status" onChange={(e) => setStatusFilter(e.target.value)} MenuProps={getMenuProps(darkMode, colors)}>
                   <MenuItem value="all">All</MenuItem>
                   <MenuItem value="active">Active</MenuItem>
                   <MenuItem value="paused">Paused</MenuItem>
@@ -461,9 +510,9 @@ const AgentsManagementView = ({ userId = 'persona', onBack, onCreateAgent, darkM
               </FormControl>
             </Grid>
             <Grid item xs={6} md={2}>
-              <FormControl fullWidth size="small">
+              <FormControl fullWidth size="small" sx={getFormControlSx(colors, darkMode)}>
                 <InputLabel>Severity</InputLabel>
-                <Select value={severityFilter} label="Severity" onChange={(e) => setSeverityFilter(e.target.value)}>
+                <Select value={severityFilter} label="Severity" onChange={(e) => setSeverityFilter(e.target.value)} MenuProps={getMenuProps(darkMode, colors)}>
                   <MenuItem value="all">All</MenuItem>
                   <MenuItem value="high">High</MenuItem>
                   <MenuItem value="medium">Medium</MenuItem>
@@ -472,9 +521,9 @@ const AgentsManagementView = ({ userId = 'persona', onBack, onCreateAgent, darkM
               </FormControl>
             </Grid>
             <Grid item xs={6} md={2}>
-              <FormControl fullWidth size="small">
+              <FormControl fullWidth size="small" sx={getFormControlSx(colors, darkMode)}>
                 <InputLabel>Category</InputLabel>
-                <Select value={categoryFilter} label="Category" onChange={(e) => setCategoryFilter(e.target.value)}>
+                <Select value={categoryFilter} label="Category" onChange={(e) => setCategoryFilter(e.target.value)} MenuProps={getMenuProps(darkMode, colors)}>
                   <MenuItem value="all">All Categories</MenuItem>
                   <MenuItem value="ordly_ml_models">ML Models</MenuItem>
                   <MenuItem value="ordly_pricing">Pricing Intel</MenuItem>
@@ -489,18 +538,18 @@ const AgentsManagementView = ({ userId = 'persona', onBack, onCreateAgent, darkM
                   size="small"
                   color={showDemoOnly ? 'primary' : 'default'}
                   onClick={() => setShowDemoOnly(!showDemoOnly)}
-                  sx={{ border: '1px solid', borderColor: showDemoOnly ? 'primary.main' : 'divider' }}
+                  sx={{ border: '1px solid', borderColor: showDemoOnly ? 'primary.main' : colors.border, color: colors.text }}
                 >
                   <FilterListIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <IconButton onClick={loadData} size="small">
+              <IconButton onClick={loadData} size="small" sx={{ color: colors.text }}>
                 <RefreshIcon />
               </IconButton>
             </Grid>
           </Grid>
 
-          <Paper sx={{ width: '100%', bgcolor: darkMode ? '#161b22' : undefined }}>
+          <Paper sx={{ width: '100%', bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
             <DataGrid
               rows={filteredAgents}
               columns={columns}
@@ -516,7 +565,40 @@ const AgentsManagementView = ({ userId = 'persona', onBack, onCreateAgent, darkM
                 setSelectedAgent(params.row);
                 setConfigDialog(true);
               }}
-              sx={stoxTheme.getDataGridSx({ clickable: true, darkMode })}
+              sx={{
+                border: 'none',
+                '& .MuiDataGrid-columnHeaders': {
+                  bgcolor: darkMode ? '#21262d' : '#f8fafc',
+                  color: colors.text,
+                  borderBottom: `1px solid ${colors.border}`,
+                },
+                '& .MuiDataGrid-columnHeaderTitle': {
+                  fontWeight: 600,
+                  color: colors.text,
+                },
+                '& .MuiDataGrid-cell': {
+                  borderBottom: `1px solid ${colors.border}`,
+                  color: colors.text,
+                },
+                '& .MuiDataGrid-row': {
+                  cursor: 'pointer',
+                  '&:hover': { bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)' },
+                },
+                '& .MuiDataGrid-footerContainer': {
+                  bgcolor: darkMode ? '#21262d' : '#f8fafc',
+                  borderTop: `1px solid ${colors.border}`,
+                  color: colors.text,
+                },
+                '& .MuiTablePagination-root': { color: colors.text },
+                '& .MuiDataGrid-toolbarContainer': {
+                  bgcolor: darkMode ? '#161b22' : undefined,
+                  '& .MuiButton-root': { color: colors.text },
+                  '& .MuiInputBase-root': { color: colors.text },
+                },
+                '& .MuiCheckbox-root': { color: colors.textSecondary },
+                '& .MuiDataGrid-selectedRowCount': { color: colors.textSecondary },
+                '& .MuiIconButton-root': { color: colors.textSecondary },
+              }}
               localeText={{ noRowsLabel: 'No agents yet. Create your first agent to get started!' }}
             />
           </Paper>
@@ -524,31 +606,48 @@ const AgentsManagementView = ({ userId = 'persona', onBack, onCreateAgent, darkM
       </Card>
 
       {/* Context Menu */}
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+        PaperProps={{
+          sx: {
+            bgcolor: darkMode ? colors.cardBg : undefined,
+            border: darkMode ? `1px solid ${colors.border}` : undefined,
+            '& .MuiMenuItem-root': { color: colors.text },
+          },
+        }}
+      >
         <MenuItem onClick={() => { handleMenuClose(); setConfigDialog(true); }}>
-          <SettingsIcon fontSize="small" sx={{ mr: 1 }} /> Configure
+          <SettingsIcon fontSize="small" sx={{ mr: 1, color: colors.textSecondary }} /> Configure
         </MenuItem>
         <MenuItem onClick={() => handleTestAgent(selectedAgent)}>
-          <PlayArrowIcon fontSize="small" sx={{ mr: 1 }} /> Execute Now
+          <PlayArrowIcon fontSize="small" sx={{ mr: 1, color: colors.textSecondary }} /> Execute Now
         </MenuItem>
         <MenuItem onClick={() => { handleMenuClose(); setRefineDialog(true); }}>
-          <EditIcon fontSize="small" sx={{ mr: 1 }} /> Refine Agent
+          <EditIcon fontSize="small" sx={{ mr: 1, color: colors.textSecondary }} /> Refine Agent
         </MenuItem>
         <MenuItem onClick={() => handleToggleAgent(selectedAgent)}>
-          {selectedAgent?.enabled ? <PauseIcon fontSize="small" sx={{ mr: 1 }} /> : <PlayArrowIcon fontSize="small" sx={{ mr: 1 }} />}
+          {selectedAgent?.enabled ? <PauseIcon fontSize="small" sx={{ mr: 1, color: colors.textSecondary }} /> : <PlayArrowIcon fontSize="small" sx={{ mr: 1, color: colors.textSecondary }} />}
           {selectedAgent?.enabled ? 'Pause' : 'Resume'}
         </MenuItem>
-        <Divider />
-        <MenuItem onClick={() => handleDeleteAgent(selectedAgent)} sx={{ color: 'error.main' }}>
+        <Divider sx={{ borderColor: colors.border }} />
+        <MenuItem onClick={() => handleDeleteAgent(selectedAgent)} sx={{ color: colors.error }}>
           <DeleteIcon fontSize="small" sx={{ mr: 1 }} /> Delete
         </MenuItem>
       </Menu>
 
       {/* Refine Dialog */}
-      <Dialog open={refineDialog} onClose={() => setRefineDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Refine Agent</DialogTitle>
+      <Dialog
+        open={refineDialog}
+        onClose={() => setRefineDialog(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ sx: { bgcolor: darkMode ? colors.paper : undefined, color: colors.text } }}
+      >
+        <DialogTitle sx={{ color: colors.text }}>Refine Agent</DialogTitle>
         <DialogContent>
-          <Typography variant="body2" color="text.secondary" mb={2}>
+          <Typography variant="body2" sx={{ color: colors.textSecondary, mb: 2 }}>
             Describe how you want to improve this agent.
           </Typography>
           <TextField
@@ -558,29 +657,43 @@ const AgentsManagementView = ({ userId = 'persona', onBack, onCreateAgent, darkM
             placeholder="Example: Add region breakdown, include only active customers"
             value={refineFeedback}
             onChange={(e) => setRefineFeedback(e.target.value)}
-            sx={{ mb: 2 }}
+            sx={{
+              mb: 2,
+              '& .MuiOutlinedInput-root': {
+                bgcolor: darkMode ? colors.cardBg : undefined,
+                color: colors.text,
+                '& fieldset': { borderColor: colors.border },
+              },
+              '& .MuiInputBase-input': { color: colors.text },
+            }}
           />
           <Box display="flex" justifyContent="flex-end" gap={1}>
-            <Button onClick={() => setRefineDialog(false)}>Cancel</Button>
+            <Button onClick={() => setRefineDialog(false)} sx={{ color: colors.text }}>Cancel</Button>
             <Button variant="contained" onClick={handleRefineAgent} disabled={!refineFeedback}>Refine Agent</Button>
           </Box>
         </DialogContent>
       </Dialog>
 
       {/* Agent Configuration Dialog */}
-      <Dialog open={configDialog} onClose={() => setConfigDialog(false)} maxWidth="lg" fullWidth>
-        <DialogTitle>
+      <Dialog
+        open={configDialog}
+        onClose={() => setConfigDialog(false)}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{ sx: { bgcolor: darkMode ? colors.paper : undefined, color: colors.text } }}
+      >
+        <DialogTitle sx={{ color: colors.text }}>
           <Box display="flex" alignItems="center" justifyContent="space-between">
             <Box display="flex" alignItems="center" gap={1}>
-              <SettingsIcon />
-              <Typography variant="h6">Configure Agent</Typography>
+              <SettingsIcon sx={{ color: colors.text }} />
+              <Typography variant="h6" sx={{ color: colors.text }}>Configure Agent</Typography>
             </Box>
-            <IconButton onClick={() => setConfigDialog(false)}><CloseIcon /></IconButton>
+            <IconButton onClick={() => setConfigDialog(false)} sx={{ color: colors.text }}><CloseIcon /></IconButton>
           </Box>
         </DialogTitle>
         <DialogContent sx={{ pt: 2 }}>
           {selectedAgent ? (
-            <AgentConfigForm agent={selectedAgent} onClose={() => { setConfigDialog(false); loadData(); }} />
+            <AgentConfigForm agent={selectedAgent} onClose={() => { setConfigDialog(false); loadData(); }} darkMode={darkMode} />
           ) : (
             <Box sx={{ p: 3, textAlign: 'center' }}>
               <CircularProgress />

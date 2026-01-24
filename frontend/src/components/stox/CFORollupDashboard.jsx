@@ -116,12 +116,23 @@ const generateCFOData = () => {
   };
 };
 
-const CFORollupDashboard = ({ onBack, onTileClick }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const CFORollupDashboard = ({ onBack, onTileClick, darkMode = false }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Get tile data config for data source indicator
   const tileConfig = getTileDataConfig('cfo-rollup-dashboard');
+  const colors = getColors(darkMode);
 
   useEffect(() => {
     loadData();
@@ -206,7 +217,7 @@ const CFORollupDashboard = ({ onBack, onTileClick }) => {
   };
 
   return (
-    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -241,7 +252,7 @@ const CFORollupDashboard = ({ onBack, onTileClick }) => {
         {/* Top KPI Cards */}
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ borderLeft: '4px solid #106ebe', height: '100%' }}>
+            <Card sx={{ borderLeft: '4px solid #106ebe', height: '100%', bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
                   <Box>
@@ -256,7 +267,7 @@ const CFORollupDashboard = ({ onBack, onTileClick }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ borderLeft: '4px solid #10b981', height: '100%' }}>
+            <Card sx={{ borderLeft: '4px solid #10b981', height: '100%', bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
                   <Box>
@@ -274,7 +285,7 @@ const CFORollupDashboard = ({ onBack, onTileClick }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ borderLeft: '4px solid #f59e0b', height: '100%' }}>
+            <Card sx={{ borderLeft: '4px solid #f59e0b', height: '100%', bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
                   <Box>
@@ -295,7 +306,7 @@ const CFORollupDashboard = ({ onBack, onTileClick }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ borderLeft: '4px solid #0078d4', height: '100%' }}>
+            <Card sx={{ borderLeft: '4px solid #0078d4', height: '100%', bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
                   <Box>
@@ -316,7 +327,7 @@ const CFORollupDashboard = ({ onBack, onTileClick }) => {
         <Grid container spacing={2} sx={{ mb: 2 }}>
           {/* WC Decomposition */}
           <Grid item xs={12} md={3}>
-            <Card sx={{ height: 280 }}>
+            <Card sx={{ height: 280, bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent>
                 <Typography variant="subtitle2" fontWeight={700} gutterBottom>WC Decomposition</Typography>
                 <Box sx={{ height: 200 }}>
@@ -326,7 +337,7 @@ const CFORollupDashboard = ({ onBack, onTileClick }) => {
                       responsive: true,
                       maintainAspectRatio: false,
                       plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } },
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 }, color: colors.text } },
                         tooltip: {
                           callbacks: { label: (ctx) => `${ctx.label}: ${formatCurrency(ctx.raw)}` },
                         },
@@ -341,7 +352,7 @@ const CFORollupDashboard = ({ onBack, onTileClick }) => {
 
           {/* Cash Release by Confidence */}
           <Grid item xs={12} md={3}>
-            <Card sx={{ height: 280 }}>
+            <Card sx={{ height: 280, bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent>
                 <Typography variant="subtitle2" fontWeight={700} gutterBottom>Cash Release by Confidence</Typography>
                 <Box sx={{ height: 200 }}>
@@ -351,7 +362,7 @@ const CFORollupDashboard = ({ onBack, onTileClick }) => {
                       responsive: true,
                       maintainAspectRatio: false,
                       plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } },
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 }, color: colors.text } },
                         tooltip: {
                           callbacks: { label: (ctx) => `${ctx.label}: ${formatCurrency(ctx.raw)}` },
                         },
@@ -366,7 +377,7 @@ const CFORollupDashboard = ({ onBack, onTileClick }) => {
 
           {/* WC Trend */}
           <Grid item xs={12} md={6}>
-            <Card sx={{ height: 280 }}>
+            <Card sx={{ height: 280, bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent>
                 <Typography variant="subtitle2" fontWeight={700} gutterBottom>Working Capital Trend (12 Months)</Typography>
                 <Box sx={{ height: 210 }}>
@@ -376,14 +387,19 @@ const CFORollupDashboard = ({ onBack, onTileClick }) => {
                       responsive: true,
                       maintainAspectRatio: false,
                       plugins: {
-                        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 } } },
+                        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 }, color: colors.text } },
                         tooltip: {
                           callbacks: { label: (ctx) => `${ctx.dataset.label}: ${formatCurrency(ctx.raw)}` },
                         },
                       },
                       scales: {
                         y: {
-                          ticks: { callback: (v) => formatCurrency(v) },
+                          ticks: { callback: (v) => formatCurrency(v), color: colors.textSecondary },
+                          grid: { color: colors.border },
+                        },
+                        x: {
+                          ticks: { color: colors.textSecondary },
+                          grid: { color: colors.border },
                         },
                       },
                     }}
@@ -398,7 +414,7 @@ const CFORollupDashboard = ({ onBack, onTileClick }) => {
         <Grid container spacing={2}>
           {/* Plant Performance */}
           <Grid item xs={12} md={6}>
-            <Card sx={{ height: 320 }}>
+            <Card sx={{ height: 320, bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent>
                 <Typography variant="subtitle2" fontWeight={700} gutterBottom>Plant/DC Performance</Typography>
                 <Box sx={{ height: 200, mb: 2 }}>
@@ -408,11 +424,12 @@ const CFORollupDashboard = ({ onBack, onTileClick }) => {
                       responsive: true,
                       maintainAspectRatio: false,
                       plugins: {
-                        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 } } },
+                        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 }, color: colors.text } },
                       },
                       scales: {
-                        y: { title: { display: true, text: 'WC ($M)' }, position: 'left' },
-                        y1: { title: { display: true, text: 'Release ($K)' }, position: 'right', grid: { drawOnChartArea: false } },
+                        y: { title: { display: true, text: 'WC ($M)', color: colors.text }, position: 'left', ticks: { color: colors.textSecondary }, grid: { color: colors.border } },
+                        y1: { title: { display: true, text: 'Release ($K)', color: colors.text }, position: 'right', grid: { drawOnChartArea: false }, ticks: { color: colors.textSecondary } },
+                        x: { ticks: { color: colors.textSecondary }, grid: { color: colors.border } },
                       },
                     }}
                   />
@@ -469,7 +486,7 @@ const CFORollupDashboard = ({ onBack, onTileClick }) => {
 
           {/* Top Recommendations */}
           <Grid item xs={12} md={6}>
-            <Card sx={{ height: 320 }}>
+            <Card sx={{ height: 320, bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
                   <Typography variant="subtitle2" fontWeight={700}>Top Cash Release Recommendations</Typography>

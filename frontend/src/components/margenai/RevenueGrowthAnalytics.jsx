@@ -46,11 +46,23 @@ import stoxTheme from '../stox/stoxTheme';
 
 const API_BASE = `${import.meta.env.VITE_API_URL || ''}/api/v1/margen/csg`;
 
-const RevenueGrowthAnalytics = ({ onBack }) => {
+const RevenueGrowthAnalytics = ({ onBack, darkMode = false }) => {
   const theme = useTheme();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
+
+  const getColors = (darkMode) => ({
+    primary: darkMode ? '#4da6ff' : '#0a6ed1',
+    text: darkMode ? '#e6edf3' : '#1e293b',
+    textSecondary: darkMode ? '#8b949e' : '#64748b',
+    background: darkMode ? '#0d1117' : '#f8fbfd',
+    paper: darkMode ? '#161b22' : '#ffffff',
+    cardBg: darkMode ? '#21262d' : '#ffffff',
+    border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+  });
+
+  const colors = getColors(darkMode);
 
   // State for data
   const [summary, setSummary] = useState(null);
@@ -218,7 +230,7 @@ const RevenueGrowthAnalytics = ({ onBack }) => {
   }
 
   return (
-    <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: '#f8fafc' }}>
+    <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -229,13 +241,13 @@ const RevenueGrowthAnalytics = ({ onBack }) => {
               onClick={onBack}
               sx={{
                 textDecoration: 'none',
-                color: 'text.primary',
+                color: colors.text,
                 '&:hover': { textDecoration: 'underline' },
               }}
             >
               MARGEN.AI
             </Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
+            <Typography sx={{ color: colors.primary }} variant="body1" fontWeight={600}>
               Revenue & Growth Analytics
             </Typography>
           </Breadcrumbs>
@@ -266,10 +278,10 @@ const RevenueGrowthAnalytics = ({ onBack }) => {
           </Stack>
         </Stack>
 
-        <Typography variant="h4" fontWeight={700} gutterBottom>
+        <Typography variant="h4" fontWeight={700} gutterBottom sx={{ color: colors.text }}>
           Revenue & Growth Analytics
         </Typography>
-        <Typography variant="body1" color="text.secondary">
+        <Typography variant="body1" sx={{ color: colors.textSecondary }}>
           Top-line revenue performance, growth trends, and sales analysis by product, channel, and region
         </Typography>
       </Box>
@@ -284,17 +296,17 @@ const RevenueGrowthAnalytics = ({ onBack }) => {
       <Grid container spacing={2} sx={{ mb: 3 }}>
         {kpiCards.map((kpi, index) => (
           <Grid item xs={12} sm={6} md={3} key={index}>
-            <Card sx={{ height: '100%', border: `1px solid ${alpha(kpi.color, 0.2)}` }}>
+            <Card sx={{ height: '100%', bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
                   <Box>
-                    <Typography variant="caption" color="text.secondary" gutterBottom>
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }} gutterBottom>
                       {kpi.title}
                     </Typography>
                     <Typography variant="h5" fontWeight={700} sx={{ color: kpi.color, mb: 0.5 }}>
                       {kpi.value}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                       {kpi.subtitle}
                     </Typography>
                   </Box>
@@ -318,8 +330,24 @@ const RevenueGrowthAnalytics = ({ onBack }) => {
       </Grid>
 
       {/* Tabs for different views */}
-      <Paper sx={{ mb: 3 }}>
-        <Tabs value={activeTab} onChange={(e, v) => setActiveTab(v)} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+      <Paper sx={{ mb: 3, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
+        <Tabs
+          value={activeTab}
+          onChange={(e, v) => setActiveTab(v)}
+          sx={{
+            borderBottom: 1,
+            borderColor: colors.border,
+            '& .MuiTab-root': {
+              color: colors.textSecondary,
+              '&.Mui-selected': {
+                color: colors.primary,
+              },
+            },
+            '& .MuiTabs-indicator': {
+              backgroundColor: colors.primary,
+            },
+          }}
+        >
           <Tab label="By Product System" icon={<ProductIcon />} iconPosition="start" />
           <Tab label="By Distributor" icon={<BusinessIcon />} iconPosition="start" />
           <Tab label="By Region" icon={<LocationIcon />} iconPosition="start" />
@@ -352,7 +380,35 @@ const RevenueGrowthAnalytics = ({ onBack }) => {
             pageSizeOptions={[10, 25, 50, 100]}
             checkboxSelection
             disableRowSelectionOnClick
-            sx={stoxTheme.getDataGridSx()}
+            sx={{
+              ...stoxTheme.getDataGridSx(),
+              bgcolor: darkMode ? '#0d1117' : 'transparent',
+              '& .MuiDataGrid-columnHeaders': {
+                bgcolor: darkMode ? '#161b22' : '#f8fafc',
+                color: colors.text,
+                borderBottom: `1px solid ${colors.border}`,
+              },
+              '& .MuiDataGrid-cell': {
+                color: colors.text,
+                borderBottom: `1px solid ${colors.border}`,
+              },
+              '& .MuiDataGrid-row': {
+                '&:hover': {
+                  bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+                },
+              },
+              '& .MuiDataGrid-footerContainer': {
+                bgcolor: darkMode ? '#161b22' : '#f8fafc',
+                borderTop: `1px solid ${colors.border}`,
+                color: colors.text,
+              },
+              '& .MuiTablePagination-root': {
+                color: colors.text,
+              },
+              '& .MuiIconButton-root': {
+                color: colors.text,
+              },
+            }}
           />
         </Box>
       </Paper>

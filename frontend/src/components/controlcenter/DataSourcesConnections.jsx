@@ -55,7 +55,26 @@ import {
 // Import DataCatalog component
 import DataCatalog from '../DataCatalog';
 
-const DataSourcesConnections = () => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  secondary: darkMode ? '#5cb3ff' : '#0854a0',
+  dark: darkMode ? '#8b949e' : '#354a5f',
+  slate: darkMode ? '#8b949e' : '#475569',
+  grey: darkMode ? '#8b949e' : '#64748b',
+  light: darkMode ? '#6e7681' : '#94a3b8',
+  success: darkMode ? '#3fb950' : '#10b981',
+  warning: darkMode ? '#d29922' : '#f59e0b',
+  error: darkMode ? '#f85149' : '#ef4444',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const DataSourcesConnections = ({ darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [activeTab, setActiveTab] = useState(0);
   const [selectedConnection, setSelectedConnection] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -64,21 +83,6 @@ const DataSourcesConnections = () => {
   const [testingConnection, setTestingConnection] = useState(false);
   const [connections, setConnections] = useState({ databases: [], apis: [], integrations: [] });
   const [loading, setLoading] = useState(true);
-
-  // Blue/grey color palette
-  const colors = {
-    primary: '#0a6ed1',
-    secondary: '#0854a0',
-    dark: '#354a5f',
-    slate: '#475569',
-    grey: '#64748b',
-    light: '#94a3b8',
-    success: '#10b981',
-    warning: '#f59e0b',
-    error: '#ef4444',
-    text: '#1e293b',
-    bg: '#f8fbfd',
-  };
 
   useEffect(() => {
     fetchDataSources();
@@ -177,8 +181,9 @@ const DataSourcesConnections = () => {
         sx={{
           height: '100%',
           borderRadius: 3,
-          bgcolor: 'white',
+          bgcolor: colors.cardBg,
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          border: `1px solid ${colors.border}`,
           transition: 'all 0.3s ease',
           '&:hover': {
             transform: 'translateY(-4px)',
@@ -207,7 +212,7 @@ const DataSourcesConnections = () => {
                 <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
                   {db.name}
                 </Typography>
-                <Typography variant="caption" sx={{ color: colors.grey }}>
+                <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                   {db.host}
                 </Typography>
               </Box>
@@ -298,8 +303,9 @@ const DataSourcesConnections = () => {
         sx={{
           height: '100%',
           borderRadius: 3,
-          bgcolor: 'white',
+          bgcolor: colors.cardBg,
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          border: `1px solid ${colors.border}`,
           transition: 'all 0.3s ease',
           '&:hover': {
             transform: 'translateY(-4px)',
@@ -328,7 +334,7 @@ const DataSourcesConnections = () => {
                 <Typography variant="subtitle2" fontWeight={600} sx={{ color: colors.text }}>
                   {integration.name}
                 </Typography>
-                <Typography variant="caption" sx={{ color: colors.grey, fontSize: '0.7rem' }}>
+                <Typography variant="caption" sx={{ color: colors.textSecondary, fontSize: '0.7rem' }}>
                   {integration.endpoint}
                 </Typography>
               </Box>
@@ -438,7 +444,7 @@ const DataSourcesConnections = () => {
           <Typography variant="h6" fontWeight={600} sx={{ color: colors.text }}>
             Data Sources & Connections
           </Typography>
-          <Typography variant="body2" sx={{ color: colors.grey }}>
+          <Typography variant="body2" sx={{ color: colors.textSecondary }}>
             Manage database connections, API integrations, and external services
           </Typography>
         </Box>
@@ -452,8 +458,9 @@ const DataSourcesConnections = () => {
             sx={{
               p: 2,
               borderRadius: 3,
-              bgcolor: 'white',
+              bgcolor: colors.paper,
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: `1px solid ${colors.border}`,
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -461,7 +468,7 @@ const DataSourcesConnections = () => {
                 <Typography variant="h4" fontWeight={700} sx={{ color: colors.text }}>
                   {connections.databases.length}
                 </Typography>
-                <Typography variant="body2" sx={{ color: colors.grey }}>
+                <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                   Databases
                 </Typography>
               </Box>
@@ -488,8 +495,9 @@ const DataSourcesConnections = () => {
             sx={{
               p: 2,
               borderRadius: 3,
-              bgcolor: 'white',
+              bgcolor: colors.paper,
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: `1px solid ${colors.border}`,
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -497,7 +505,7 @@ const DataSourcesConnections = () => {
                 <Typography variant="h4" fontWeight={700} sx={{ color: colors.text }}>
                   {connections.integrations.length}
                 </Typography>
-                <Typography variant="body2" sx={{ color: colors.grey }}>
+                <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                   Integrations
                 </Typography>
               </Box>
@@ -524,8 +532,9 @@ const DataSourcesConnections = () => {
             sx={{
               p: 2,
               borderRadius: 3,
-              bgcolor: 'white',
+              bgcolor: colors.paper,
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: `1px solid ${colors.border}`,
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -534,7 +543,7 @@ const DataSourcesConnections = () => {
                   {connections.databases.filter(d => d.status === 'connected').length +
                    connections.integrations.filter(i => i.status === 'connected' || i.status === 'healthy').length}
                 </Typography>
-                <Typography variant="body2" sx={{ color: colors.grey }}>
+                <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                   Active
                 </Typography>
               </Box>
@@ -563,8 +572,9 @@ const DataSourcesConnections = () => {
         sx={{
           mb: 3,
           borderRadius: 3,
-          bgcolor: 'white',
+          bgcolor: colors.paper,
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          border: `1px solid ${colors.border}`,
         }}
       >
         <Tabs
@@ -575,7 +585,7 @@ const DataSourcesConnections = () => {
             '& .MuiTab-root': {
               textTransform: 'none',
               fontWeight: 600,
-              color: colors.grey,
+              color: colors.textSecondary,
               '&.Mui-selected': {
                 color: colors.primary,
               },
@@ -607,7 +617,7 @@ const DataSourcesConnections = () => {
 
       {activeTab === 2 && (
         <Box>
-          <DataCatalog />
+          <DataCatalog darkMode={darkMode} />
         </Box>
       )}
 

@@ -48,6 +48,21 @@ import {
 // Single consistent blue for all modules
 const MODULE_COLOR = '#0078d4';
 
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  secondary: darkMode ? '#2d8ce6' : '#0854a0',
+  success: darkMode ? '#36d068' : '#10b981',
+  warning: darkMode ? '#f59e0b' : '#f59e0b',
+  error: darkMode ? '#ff6b6b' : '#ef4444',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  grey: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 // Main category tiles: RETAIL and MANUFACTURING
 const categoryTiles = [
   {
@@ -370,7 +385,8 @@ const subTilesByLayer = {
   ],
 };
 
-const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView }) => {
+const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [view, setView] = useState(initialView || 'categories'); // 'categories', 'manufacturing', or layer ID
   const [selectedLayer, setSelectedLayer] = useState(null);
 
@@ -417,22 +433,22 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView }) =
         height: '100%',
         overflowY: 'auto',
         overflowX: 'hidden',
-        background: 'linear-gradient(180deg, rgba(219, 234, 254, 0.1) 0%, rgba(255, 255, 255, 1) 50%)',
+        bgcolor: colors.background,
       }}>
         {/* Header with Breadcrumbs */}
-        <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+        <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.1)', bgcolor: colors.paper }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
             <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-              <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline' } }}>
+              <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}>
                 CORE.AI
               </Link>
-              <Link component="button" variant="body1" onClick={handleBackToCategories} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline' } }}>
+              <Link component="button" variant="body1" onClick={handleBackToCategories} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}>
                 STOX.AI
               </Link>
-              <Link component="button" variant="body1" onClick={handleBackToLayers} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline' } }}>
+              <Link component="button" variant="body1" onClick={handleBackToLayers} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}>
                 Manufacturing
               </Link>
-              <Typography color="primary" variant="body1" fontWeight={600}>
+              <Typography sx={{ color: colors.primary }} variant="body1" fontWeight={600}>
                 Layer {currentLayer?.layer}: {currentLayer?.title}
               </Typography>
             </Breadcrumbs>
@@ -448,12 +464,12 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView }) =
                 <Avatar sx={{ width: 32, height: 32, bgcolor: currentLayer?.color }}>
                   {currentLayer && <currentLayer.icon sx={{ fontSize: 18 }} />}
                 </Avatar>
-                <Typography variant="h5" fontWeight={700} sx={{ color: currentLayer?.color }}>
+                <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
                   Layer {currentLayer?.layer}: {currentLayer?.title}
                 </Typography>
-                <Chip label={`${currentSubTiles.length} Modules`} size="small" sx={{ bgcolor: alpha(currentLayer?.color || '#0078d4', 0.1), color: currentLayer?.color, fontWeight: 600, fontSize: '0.7rem' }} />
+                <Chip label={`${currentSubTiles.length} Modules`} size="small" sx={{ bgcolor: alpha(currentLayer?.color || '#0078d4', darkMode ? 0.2 : 0.1), color: currentLayer?.color, fontWeight: 600, fontSize: '0.7rem' }} />
               </Stack>
-              <Typography variant="body2" color="text.secondary">{currentLayer?.description}</Typography>
+              <Typography variant="body2" sx={{ color: colors.textSecondary }}>{currentLayer?.description}</Typography>
             </Box>
           </Box>
         </Paper>
@@ -468,11 +484,11 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView }) =
                     height: 200,
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
-                    border: '1px solid rgba(0,0,0,0.08)',
+                    border: `1px solid ${colors.border}`,
                     borderRadius: 3,
                     position: 'relative',
-                    bgcolor: 'white',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                    bgcolor: colors.cardBg,
+                    boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.1)',
                     '&:hover': {
                       transform: 'translateY(-6px)',
                       boxShadow: `0 20px 40px ${alpha(module.color, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,
@@ -484,15 +500,15 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView }) =
                 >
                   <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                      <Avatar className="module-icon" sx={{ width: 40, height: 40, bgcolor: alpha(module.color, 0.1), color: module.color, transition: 'all 0.3s ease' }}>
+                      <Avatar className="module-icon" sx={{ width: 40, height: 40, bgcolor: alpha(module.color, darkMode ? 0.2 : 0.1), color: module.color, transition: 'all 0.3s ease' }}>
                         <module.icon sx={{ fontSize: 22 }} />
                       </Avatar>
                     </Box>
                     <Typography variant="body1" sx={{ fontWeight: 700, color: module.color, mb: 0.5, fontSize: '0.9rem' }}>{module.title}</Typography>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500, mb: 1, fontSize: '0.7rem', opacity: 0.8 }}>{module.subtitle}</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{module.description}</Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha(module.color, 0.1) }}>
-                      <Chip label={`${module.stats.value} ${module.stats.label}`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha(module.color, 0.08), color: module.color, fontWeight: 600 }} />
+                    <Typography variant="caption" sx={{ color: colors.textSecondary, fontWeight: 500, mb: 1, fontSize: '0.7rem', opacity: 0.8 }}>{module.subtitle}</Typography>
+                    <Typography variant="body2" sx={{ color: colors.textSecondary, mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{module.description}</Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha(module.color, darkMode ? 0.2 : 0.1) }}>
+                      <Chip label={`${module.stats.value} ${module.stats.label}`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha(module.color, darkMode ? 0.2 : 0.08), color: module.color, fontWeight: 600 }} />
                       <ArrowForwardIcon className="module-arrow" sx={{ color: module.color, fontSize: 18, opacity: 0.5, transition: 'all 0.3s ease' }} />
                     </Box>
                   </CardContent>
@@ -508,17 +524,17 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView }) =
   // Render Manufacturing 6-layer view
   if (view === 'manufacturing') {
     return (
-      <Box sx={{ p: 3, height: '100%', overflowY: 'auto', background: 'linear-gradient(180deg, rgba(219, 234, 254, 0.1) 0%, rgba(255, 255, 255, 1) 50%)' }}>
-        <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+      <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: colors.background }}>
+        <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.1)', bgcolor: colors.paper }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
             <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-              <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline' } }}>
+              <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}>
                 CORE.AI
               </Link>
-              <Link component="button" variant="body1" onClick={handleBackToCategories} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline' } }}>
+              <Link component="button" variant="body1" onClick={handleBackToCategories} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}>
                 STOX.AI
               </Link>
-              <Typography color="primary" variant="body1" fontWeight={600}>Manufacturing</Typography>
+              <Typography sx={{ color: colors.primary }} variant="body1" fontWeight={600}>Manufacturing</Typography>
             </Breadcrumbs>
             <Button startIcon={<ArrowBackIcon />} onClick={handleBackToCategories} variant="outlined" size="small">Back</Button>
           </Stack>
@@ -528,10 +544,10 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView }) =
             <Box>
               <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
                 <Avatar sx={{ width: 32, height: 32, bgcolor: MODULE_COLOR }}><FactoryIcon sx={{ fontSize: 18 }} /></Avatar>
-                <Typography variant="h5" fontWeight={700} sx={{ color: MODULE_COLOR }}>STOX.AI (MANUFACTURING)</Typography>
-                <Chip label="6-Layer Architecture" size="small" sx={{ bgcolor: alpha(MODULE_COLOR, 0.1), color: MODULE_COLOR, fontWeight: 600, fontSize: '0.7rem' }} />
+                <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>STOX.AI (MANUFACTURING)</Typography>
+                <Chip label="6-Layer Architecture" size="small" sx={{ bgcolor: alpha(MODULE_COLOR, darkMode ? 0.2 : 0.1), color: MODULE_COLOR, fontWeight: 600, fontSize: '0.7rem' }} />
               </Stack>
-              <Typography variant="body2" color="text.secondary">Plant & Supply Chain Optimization Platform</Typography>
+              <Typography variant="body2" sx={{ color: colors.textSecondary }}>Plant & Supply Chain Optimization Platform</Typography>
             </Box>
           </Box>
         </Paper>
@@ -545,11 +561,11 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView }) =
                     height: 200,
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
-                    border: '1px solid rgba(0,0,0,0.08)',
+                    border: `1px solid ${colors.border}`,
                     borderRadius: 3,
                     position: 'relative',
-                    bgcolor: 'white',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                    bgcolor: colors.cardBg,
+                    boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.1)',
                     '&:hover': {
                       transform: 'translateY(-6px)',
                       boxShadow: `0 20px 40px ${alpha(layer.color, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,
@@ -561,16 +577,16 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView }) =
                 >
                   <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                      <Avatar className="layer-icon" sx={{ width: 40, height: 40, bgcolor: alpha(layer.color, 0.1), color: layer.color, transition: 'all 0.3s ease' }}>
+                      <Avatar className="layer-icon" sx={{ width: 40, height: 40, bgcolor: alpha(layer.color, darkMode ? 0.2 : 0.1), color: layer.color, transition: 'all 0.3s ease' }}>
                         <layer.icon sx={{ fontSize: 22 }} />
                       </Avatar>
                       <Chip label={`L${layer.layer}`} size="small" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700, bgcolor: layer.color, color: 'white' }} />
                     </Box>
                     <Typography variant="body1" sx={{ fontWeight: 700, color: layer.color, mb: 0.5, fontSize: '0.9rem' }}>{layer.title}</Typography>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500, mb: 1, fontSize: '0.7rem', opacity: 0.8 }}>{layer.subtitle}</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{layer.description}</Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha(layer.color, 0.1) }}>
-                      <Chip icon={<LayersIcon sx={{ fontSize: 12 }} />} label={`${layer.tileCount} ${layer.tileCount === 1 ? 'Module' : 'Modules'}`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha(layer.color, 0.08), color: layer.color, fontWeight: 600, '& .MuiChip-icon': { color: layer.color } }} />
+                    <Typography variant="caption" sx={{ color: colors.textSecondary, fontWeight: 500, mb: 1, fontSize: '0.7rem', opacity: 0.8 }}>{layer.subtitle}</Typography>
+                    <Typography variant="body2" sx={{ color: colors.textSecondary, mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{layer.description}</Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha(layer.color, darkMode ? 0.2 : 0.1) }}>
+                      <Chip icon={<LayersIcon sx={{ fontSize: 12 }} />} label={`${layer.tileCount} ${layer.tileCount === 1 ? 'Module' : 'Modules'}`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha(layer.color, darkMode ? 0.2 : 0.08), color: layer.color, fontWeight: 600, '& .MuiChip-icon': { color: layer.color } }} />
                       <ArrowForwardIcon className="layer-arrow" sx={{ color: layer.color, fontSize: 18, opacity: 0.5, transition: 'all 0.3s ease' }} />
                     </Box>
                   </CardContent>
@@ -583,7 +599,7 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView }) =
         <Box sx={{ mt: 4, textAlign: 'center' }}>
           <Stack direction="row" spacing={2} justifyContent="center" alignItems="center">
             <LightbulbIcon sx={{ color: 'warning.main' }} />
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: colors.textSecondary }}>
               Navigate through the 6-layer architecture: Foundation → Diagnostics → Prediction → Optimization → Sandbox → Execution
             </Typography>
           </Stack>
@@ -594,14 +610,14 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView }) =
 
   // Render main categories view (RETAIL and MANUFACTURING)
   return (
-    <Box sx={{ p: 3, height: '100%', overflowY: 'auto', background: 'linear-gradient(180deg, rgba(219, 234, 254, 0.1) 0%, rgba(255, 255, 255, 1) 50%)' }}>
-      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+    <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: colors.background }}>
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.1)', bgcolor: colors.paper }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline' } }}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}>
               CORE.AI
             </Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>STOX.AI</Typography>
+            <Typography sx={{ color: colors.primary }} variant="body1" fontWeight={600}>STOX.AI</Typography>
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>
         </Stack>
@@ -611,10 +627,10 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView }) =
           <Box>
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
               <Avatar sx={{ width: 32, height: 32, bgcolor: MODULE_COLOR }}><InventoryIcon sx={{ fontSize: 18 }} /></Avatar>
-              <Typography variant="h5" fontWeight={700} sx={{ color: MODULE_COLOR }}>STOX.AI</Typography>
-              <Chip label="2 Modules" size="small" sx={{ bgcolor: alpha('#0078d4', 0.1), color: MODULE_COLOR, fontWeight: 600, fontSize: '0.7rem' }} />
+              <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>STOX.AI</Typography>
+              <Chip label="2 Modules" size="small" sx={{ bgcolor: alpha(MODULE_COLOR, darkMode ? 0.2 : 0.1), color: MODULE_COLOR, fontWeight: 600, fontSize: '0.7rem' }} />
             </Stack>
-            <Typography variant="body2" color="text.secondary">Smart Inventory & Supply Chain Optimization Platform</Typography>
+            <Typography variant="body2" sx={{ color: colors.textSecondary }}>Smart Inventory & Supply Chain Optimization Platform</Typography>
           </Box>
         </Box>
       </Paper>
@@ -629,11 +645,11 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView }) =
                   height: 200,
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
-                  border: '1px solid rgba(0,0,0,0.08)',
+                  border: `1px solid ${colors.border}`,
                   borderRadius: 3,
                   position: 'relative',
-                  bgcolor: 'white',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  bgcolor: colors.cardBg,
+                  boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.1)',
                   '&:hover': {
                     transform: 'translateY(-6px)',
                     boxShadow: `0 20px 40px ${alpha(category.color, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,
@@ -645,15 +661,15 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView }) =
               >
                 <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                    <Avatar className="category-icon" sx={{ width: 40, height: 40, bgcolor: alpha(category.color, 0.1), color: category.color, transition: 'all 0.3s ease' }}>
+                    <Avatar className="category-icon" sx={{ width: 40, height: 40, bgcolor: alpha(category.color, darkMode ? 0.2 : 0.1), color: category.color, transition: 'all 0.3s ease' }}>
                       <category.icon sx={{ fontSize: 22 }} />
                     </Avatar>
                     <Chip label={`${category.stats.value} ${category.stats.label}`} size="small" sx={{ height: 22, fontSize: '0.65rem', fontWeight: 700, bgcolor: category.color, color: 'white' }} />
                   </Box>
                   <Typography variant="body1" sx={{ fontWeight: 700, color: category.color, mb: 0.5, fontSize: '0.9rem' }}>{category.title}</Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500, mb: 1, fontSize: '0.7rem', opacity: 0.8 }}>{category.subtitle}</Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{category.description}</Typography>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha(category.color, 0.1) }}>
+                  <Typography variant="caption" sx={{ color: colors.textSecondary, fontWeight: 500, mb: 1, fontSize: '0.7rem', opacity: 0.8 }}>{category.subtitle}</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary, mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{category.description}</Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha(category.color, darkMode ? 0.2 : 0.1) }}>
                     <Typography variant="body2" sx={{ color: category.color, fontWeight: 600, fontSize: '0.7rem' }}>Explore</Typography>
                     <ArrowForwardIcon className="category-arrow" sx={{ color: category.color, fontSize: 18, opacity: 0.5, transition: 'all 0.3s ease' }} />
                   </Box>
@@ -667,7 +683,7 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView }) =
       <Box sx={{ mt: 4, textAlign: 'center' }}>
         <Stack direction="row" spacing={2} justifyContent="center" alignItems="center">
           <LightbulbIcon sx={{ color: 'warning.main' }} />
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: colors.textSecondary }}>
             Choose Retail for store & DC optimization or Manufacturing for plant-level supply chain management
           </Typography>
         </Stack>

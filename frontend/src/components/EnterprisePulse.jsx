@@ -10,7 +10,7 @@ import EnterprisePulseLanding from './pulse/EnterprisePulseLanding';
 import KitAlertsView from './pulse/KitAlertsView';
 import AgentsManagementView from './pulse/AgentsManagementView';
 
-const EnterprisePulse = () => {
+const EnterprisePulse = ({ darkMode = false }) => {
   const { user } = useUser();
   // Use fixed 'persona' ID for persona-based insights
   const userId = 'persona';
@@ -18,6 +18,9 @@ const EnterprisePulse = () => {
   const [selectedView, setSelectedView] = useState(null);
   const [alertCount, setAlertCount] = useState(12);
   const [agentCount, setAgentCount] = useState(8);
+
+  // Dark mode colors
+  const bgColor = darkMode ? '#0d1117' : '#f5f5f5';
 
   const handleTileClick = (tileId) => {
     setSelectedView(tileId);
@@ -30,8 +33,8 @@ const EnterprisePulse = () => {
   // Render ML Insights view (KitAlertsView)
   if (selectedView === 'alerts') {
     return (
-      <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: '#f5f5f5' }}>
-        <KitAlertsView onBack={handleBack} />
+      <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: bgColor }}>
+        <KitAlertsView onBack={handleBack} darkMode={darkMode} />
       </Box>
     );
   }
@@ -44,7 +47,7 @@ const EnterprisePulse = () => {
         height: '100%',
         overflowY: 'auto',
         overflowX: 'hidden',
-        bgcolor: '#f5f5f5'
+        bgcolor: bgColor
       }}>
         {/* Agent Creation Wizard Dialog */}
         <Dialog
@@ -60,6 +63,7 @@ const EnterprisePulse = () => {
               onSave={() => {
                 setShowWizard(false);
               }}
+              darkMode={darkMode}
             />
           </DialogContent>
         </Dialog>
@@ -68,6 +72,7 @@ const EnterprisePulse = () => {
           userId={userId}
           onBack={handleBack}
           onCreateAgent={() => setShowWizard(true)}
+          darkMode={darkMode}
         />
       </Box>
     );
@@ -75,11 +80,12 @@ const EnterprisePulse = () => {
 
   // Render landing page with tiles
   return (
-    <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: '#f5f5f5' }}>
+    <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: bgColor }}>
       <EnterprisePulseLanding
         onTileClick={handleTileClick}
         alertCount={alertCount}
         agentCount={agentCount}
+        darkMode={darkMode}
       />
     </Box>
   );

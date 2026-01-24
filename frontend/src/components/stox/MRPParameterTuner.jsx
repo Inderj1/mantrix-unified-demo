@@ -50,6 +50,17 @@ import stoxTheme from './stoxTheme';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, ChartTooltip, Legend, Filler);
 
+// Dark Mode Color Helper
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 const formatCurrency = (value) => {
   if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
   if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;

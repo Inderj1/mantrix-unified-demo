@@ -13,7 +13,18 @@ import TreeDataGrid from './TreeDataGrid';
 import DataSourceChip from './DataSourceChip';
 import { getTileDataConfig } from './stoxDataConfig';
 
-const DCDemandAggregation = ({ onBack }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const DCDemandAggregation = ({ onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const tileConfig = getTileDataConfig('dc-demand-aggregation');
   // Use persistent data hook
   const { data, loading, refetch } = useDCDemandData();
@@ -194,25 +205,25 @@ const DCDemandAggregation = ({ onBack }) => {
   ];
 
   return (
-    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: colors.background }}>
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>DC System</Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>Forecast Layer</Typography>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text }}>CORE.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text }}>DC System</Link>
+            <Typography color="primary" variant="body1" fontWeight={600} sx={{ color: colors.primary }}>Forecast Layer</Typography>
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>
         </Stack>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-              <TrendingUp sx={{ fontSize: 32, color: '#2b88d8' }} />
-              <Typography variant="h4" fontWeight={700}>DC Forecast Layer</Typography>
+              <TrendingUp sx={{ fontSize: 32, color: colors.primary }} />
+              <Typography variant="h4" fontWeight={700} sx={{ color: colors.text }}>DC Forecast Layer</Typography>
               <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: colors.textSecondary }}>
               Aggregate demand forecasts from all store locations and channels for centralized planning
             </Typography>
           </Box>
@@ -226,44 +237,44 @@ const DCDemandAggregation = ({ onBack }) => {
       {metrics && (
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2b88d8', 0.1)} 0%, ${alpha('#2b88d8', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2b88d8', 0.1)} 0%, ${alpha('#2b88d8', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <Warehouse sx={{ color: '#2b88d8' }} />
-                  <Typography variant="body2" color="text.secondary">Total DCs</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Total DCs</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#2b88d8">{metrics.totalDCs}</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#106ebe', 0.1)} 0%, ${alpha('#106ebe', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#106ebe', 0.1)} 0%, ${alpha('#106ebe', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <TrendingUp sx={{ color: '#106ebe' }} />
-                  <Typography variant="body2" color="text.secondary">Total Demand</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Total Demand</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#106ebe">{(metrics.totalDemand / 1000).toFixed(1)}K</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#10b981', 0.1)} 0%, ${alpha('#10b981', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#10b981', 0.1)} 0%, ${alpha('#10b981', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <Layers sx={{ color: '#10b981' }} />
-                  <Typography variant="body2" color="text.secondary">Avg Weekly Mean</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Avg Weekly Mean</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#10b981">{(metrics.avgWeeklyMean / 1000).toFixed(1)}K</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#f59e0b', 0.1)} 0%, ${alpha('#f59e0b', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#f59e0b', 0.1)} 0%, ${alpha('#f59e0b', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <Store sx={{ color: '#f59e0b' }} />
-                  <Typography variant="body2" color="text.secondary">Channels Tracked</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Channels Tracked</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#f59e0b">{metrics.channelsTracked}</Typography>
               </CardContent>
@@ -272,7 +283,7 @@ const DCDemandAggregation = ({ onBack }) => {
         </Grid>
       )}
 
-      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         <TreeDataGrid
           rows={filteredRows}
           columns={columns}
@@ -294,35 +305,46 @@ const DCDemandAggregation = ({ onBack }) => {
           sx={{
             '& .MuiDataGrid-cell': {
               fontSize: '0.8rem',
+              color: colors.text,
+              borderColor: colors.border,
             },
             '& .MuiDataGrid-columnHeaders': {
-              backgroundColor: '#f8fafc',
-              color: '#1e293b',
+              backgroundColor: darkMode ? '#21262d' : '#f8fafc',
+              color: colors.text,
               fontSize: '0.85rem',
               fontWeight: 700,
-              borderBottom: '2px solid #64748b',
+              borderBottom: `2px solid ${colors.border}`,
             },
             '& .MuiDataGrid-cell:focus': { outline: 'none' },
+            '& .MuiDataGrid-row': {
+              bgcolor: colors.paper,
+              '&:hover': {
+                bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+              },
+            },
+            bgcolor: colors.paper,
+            color: colors.text,
+            border: `1px solid ${colors.border}`,
           }}
         />
       </Paper>
 
       {/* Level 3: Statistical Details Modal */}
-      <Dialog open={detailsOpen} onClose={() => setDetailsOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>
+      <Dialog open={detailsOpen} onClose={() => setDetailsOpen(false)} maxWidth="md" fullWidth PaperProps={{ sx: { bgcolor: colors.paper, border: `1px solid ${colors.border}` } }}>
+        <DialogTitle sx={{ bgcolor: colors.paper, borderBottom: `1px solid ${colors.border}` }}>
           <Stack direction="row" alignItems="center" spacing={2}>
             <Info color="primary" />
             <Box>
-              <Typography variant="h6">Channel Statistical Details</Typography>
+              <Typography variant="h6" sx={{ color: colors.text }}>Channel Statistical Details</Typography>
               {selectedChannel && (
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                   {selectedChannel.channel_name} - {selectedChannel.dc_location} - {selectedChannel.product_sku}
                 </Typography>
               )}
             </Box>
           </Stack>
         </DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ bgcolor: colors.paper }}>
           {selectedChannel && (
             <Box>
               <Typography variant="subtitle1" fontWeight={600} gutterBottom>Step 1: Channel Forecast</Typography>

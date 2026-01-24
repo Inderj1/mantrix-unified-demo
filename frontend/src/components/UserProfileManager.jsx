@@ -25,22 +25,26 @@ import TuneIcon from '@mui/icons-material/Tune';
 import { useUser } from '@clerk/clerk-react';
 import { apiService } from '../services/api';
 
-// Blue/grey color palette
-const colors = {
-  primary: '#0a6ed1',
-  secondary: '#0854a0',
-  dark: '#354a5f',
-  slate: '#475569',
-  grey: '#64748b',
-  light: '#94a3b8',
-  success: '#10b981',
-  warning: '#f59e0b',
-  error: '#ef4444',
-  text: '#1e293b',
-  bg: '#f8fbfd',
-};
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  secondary: darkMode ? '#5cb3ff' : '#0854a0',
+  dark: darkMode ? '#8b949e' : '#354a5f',
+  slate: darkMode ? '#8b949e' : '#475569',
+  grey: darkMode ? '#8b949e' : '#64748b',
+  light: darkMode ? '#6e7681' : '#94a3b8',
+  success: darkMode ? '#3fb950' : '#10b981',
+  warning: darkMode ? '#d29922' : '#f59e0b',
+  error: darkMode ? '#f85149' : '#ef4444',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
 
-const UserProfileManager = () => {
+const UserProfileManager = ({ darkMode = false }) => {
+  const colors = getColors(darkMode);
   const { user } = useUser();
   const [profile, setProfile] = useState(null);
   const [roleTemplates, setRoleTemplates] = useState([]);
@@ -223,7 +227,7 @@ const UserProfileManager = () => {
               AI Persona
             </Typography>
           </Stack>
-          <Typography variant="body2" sx={{ color: colors.grey }}>
+          <Typography variant="body2" sx={{ color: colors.textSecondary }}>
             Select your business role to get personalized AI insights tailored to your perspective
           </Typography>
         </Box>
@@ -248,8 +252,8 @@ const UserProfileManager = () => {
           sx={{
             p: 3,
             borderRadius: 2,
-            border: '1px solid',
-            borderColor: alpha(colors.primary, 0.1),
+            border: `1px solid ${colors.border}`,
+            bgcolor: colors.paper,
             position: 'relative',
             overflow: 'hidden',
             '&::before': {
@@ -357,8 +361,8 @@ const UserProfileManager = () => {
           sx={{
             p: 3,
             borderRadius: 2,
-            border: '1px solid',
-            borderColor: alpha(colors.primary, 0.1),
+            border: `1px solid ${colors.border}`,
+            bgcolor: colors.paper,
             position: 'relative',
             overflow: 'hidden',
             '&::before': {
@@ -423,7 +427,7 @@ const UserProfileManager = () => {
                 borderRadius: 1.5,
               }}
             >
-              <Typography variant="body2" sx={{ color: colors.grey }}>
+              <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                 {currentTemplate.description}
               </Typography>
             </Paper>
@@ -436,8 +440,8 @@ const UserProfileManager = () => {
           sx={{
             p: 3,
             borderRadius: 2,
-            border: '1px solid',
-            borderColor: alpha(colors.primary, 0.1),
+            border: `1px solid ${colors.border}`,
+            bgcolor: colors.paper,
             position: 'relative',
             overflow: 'hidden',
             '&::before': {

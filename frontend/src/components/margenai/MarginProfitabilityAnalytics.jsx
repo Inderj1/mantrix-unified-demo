@@ -50,7 +50,18 @@ const API_BASE = `${import.meta.env.VITE_API_URL || ''}/api/v1/margen/csg`;
 
 const COLORS = ['#10b981', '#2b88d8', '#f59e0b', '#ef4444', '#8b5cf6'];
 
-const MarginProfitabilityAnalytics = ({ onBack }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const MarginProfitabilityAnalytics = ({ onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const theme = useTheme();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -245,7 +256,7 @@ const MarginProfitabilityAnalytics = ({ onBack }) => {
   }
 
   return (
-    <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: '#f8fafc' }}>
+    <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -311,7 +322,7 @@ const MarginProfitabilityAnalytics = ({ onBack }) => {
       <Grid container spacing={2} sx={{ mb: 3 }}>
         {kpiCards.map((kpi, index) => (
           <Grid item xs={12} sm={6} md={3} key={index}>
-            <Card sx={{ height: '100%', border: `1px solid ${alpha(kpi.color, 0.2)}` }}>
+            <Card sx={{ height: '100%', border: `1px solid ${alpha(kpi.color, 0.2)}`, bgcolor: colors.cardBg }}>
               <CardContent>
                 <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
                   <Box>
@@ -348,7 +359,7 @@ const MarginProfitabilityAnalytics = ({ onBack }) => {
       {topPerformers && (
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} md={6}>
-            <Card sx={{ height: '100%', border: `2px solid ${alpha('#10b981', 0.3)}`, bgcolor: alpha('#10b981', 0.02) }}>
+            <Card sx={{ height: '100%', border: `2px solid ${alpha('#10b981', 0.3)}`, bgcolor: darkMode ? colors.cardBg : alpha('#10b981', 0.02) }}>
               <CardContent>
                 <Stack direction="row" spacing={2} alignItems="center">
                   <StarIcon sx={{ fontSize: 40, color: '#10b981' }} />
@@ -368,7 +379,7 @@ const MarginProfitabilityAnalytics = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} md={6}>
-            <Card sx={{ height: '100%', border: `2px solid ${alpha('#2b88d8', 0.3)}`, bgcolor: alpha('#2b88d8', 0.02) }}>
+            <Card sx={{ height: '100%', border: `2px solid ${alpha('#2b88d8', 0.3)}`, bgcolor: darkMode ? colors.cardBg : alpha('#2b88d8', 0.02) }}>
               <CardContent>
                 <Stack direction="row" spacing={2} alignItems="center">
                   <StarIcon sx={{ fontSize: 40, color: '#2b88d8' }} />
@@ -391,8 +402,8 @@ const MarginProfitabilityAnalytics = ({ onBack }) => {
       )}
 
       {/* Tabs for different views */}
-      <Paper sx={{ mb: 3 }}>
-        <Tabs value={activeTab} onChange={(e, v) => setActiveTab(v)} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+      <Paper sx={{ mb: 3, bgcolor: colors.paper }}>
+        <Tabs value={activeTab} onChange={(e, v) => setActiveTab(v)} sx={{ borderBottom: 1, borderColor: colors.border }}>
           <Tab label="By Product System" icon={<ProductIcon />} iconPosition="start" />
           <Tab label="By Distributor" icon={<BusinessIcon />} iconPosition="start" />
         </Tabs>
@@ -421,7 +432,13 @@ const MarginProfitabilityAnalytics = ({ onBack }) => {
             pageSizeOptions={[10, 25, 50, 100]}
             checkboxSelection
             disableRowSelectionOnClick
-            sx={stoxTheme.getDataGridSx()}
+            sx={{
+              ...stoxTheme.getDataGridSx(),
+              bgcolor: colors.paper,
+              '& .MuiDataGrid-cell': { color: colors.text, borderColor: colors.border },
+              '& .MuiDataGrid-columnHeaders': { bgcolor: darkMode ? colors.cardBg : '#fafafa', color: colors.text, borderColor: colors.border },
+              '& .MuiDataGrid-footerContainer': { bgcolor: colors.paper, borderColor: colors.border },
+            }}
           />
         </Box>
       </Paper>

@@ -28,6 +28,21 @@ import {
 // Single consistent blue for all modules
 const MODULE_COLOR = '#0078d4';
 
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  secondary: darkMode ? '#2d8ce6' : '#0854a0',
+  success: darkMode ? '#36d068' : '#10b981',
+  warning: darkMode ? '#f59e0b' : '#f59e0b',
+  error: darkMode ? '#ff6b6b' : '#ef4444',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  grey: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 const aiModules = [
   {
     id: 'margen',
@@ -101,7 +116,9 @@ const aiModules = [
   },
 ];
 
-const CoreAILanding = ({ onTileClick }) => {
+const CoreAILanding = ({ onTileClick, darkMode = false }) => {
+  const colors = getColors(darkMode);
+
   const handleTileClick = (module) => {
     if (module.status === 'active' && onTileClick) {
       onTileClick(module.id);
@@ -114,10 +131,10 @@ const CoreAILanding = ({ onTileClick }) => {
       height: '100%',
       overflowY: 'auto',
       overflowX: 'hidden',
-      background: 'linear-gradient(180deg, rgba(10, 110, 209, 0.05) 0%, rgba(255, 255, 255, 1) 50%)',
+      bgcolor: colors.background,
     }}>
       {/* Header */}
-      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.1)', bgcolor: colors.paper }}>
         {/* System Identity Badge */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Box sx={{
@@ -131,21 +148,21 @@ const CoreAILanding = ({ onTileClick }) => {
               <Avatar sx={{ width: 32, height: 32, bgcolor: MODULE_COLOR }}>
                 <SpeedIcon sx={{ fontSize: 18 }} />
               </Avatar>
-              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: MODULE_COLOR }}>
+              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: colors.text }}>
                 CORE.AI
               </Typography>
               <Chip
                 label="7 Modules"
                 size="small"
                 sx={{
-                  bgcolor: alpha(MODULE_COLOR, 0.1),
+                  bgcolor: alpha(MODULE_COLOR, darkMode ? 0.2 : 0.1),
                   color: MODULE_COLOR,
                   fontWeight: 600,
                   fontSize: '0.7rem'
                 }}
               />
             </Stack>
-            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+            <Typography variant="body2" sx={{ fontSize: '0.85rem', color: colors.textSecondary }}>
               Operational Intelligence Suite - AI-powered analytics and optimization platform
             </Typography>
           </Box>
@@ -165,12 +182,12 @@ const CoreAILanding = ({ onTileClick }) => {
                   cursor: module.status === 'active' ? 'pointer' : 'default',
                   opacity: module.status === 'coming-soon' ? 0.7 : 1,
                   transition: 'all 0.3s ease',
-                  border: '1px solid rgba(0,0,0,0.08)',
+                  border: `1px solid ${colors.border}`,
                   borderRadius: 3,
                   overflow: 'hidden',
                   position: 'relative',
-                  bgcolor: 'white',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  bgcolor: colors.cardBg,
+                  boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.1)',
                   '&:hover': module.status === 'active' ? {
                     transform: 'translateY(-6px)',
                     boxShadow: `0 20px 40px ${alpha(module.color, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,
@@ -195,7 +212,7 @@ const CoreAILanding = ({ onTileClick }) => {
                       sx={{
                         width: 40,
                         height: 40,
-                        bgcolor: alpha(module.color, 0.1),
+                        bgcolor: alpha(module.color, darkMode ? 0.2 : 0.1),
                         color: module.color,
                         transition: 'all 0.3s ease',
                       }}
@@ -203,7 +220,7 @@ const CoreAILanding = ({ onTileClick }) => {
                       <module.icon sx={{ fontSize: 22 }} />
                     </Avatar>
                     {module.status === 'coming-soon' && (
-                      <Chip label="Soon" size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha('#64748b', 0.1), color: '#64748b', fontWeight: 600 }} />
+                      <Chip label="Soon" size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha('#64748b', darkMode ? 0.2 : 0.1), color: '#64748b', fontWeight: 600 }} />
                     )}
                   </Box>
 
@@ -213,18 +230,18 @@ const CoreAILanding = ({ onTileClick }) => {
                   </Typography>
 
                   {/* Subtitle */}
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500, mb: 1, fontSize: '0.7rem', opacity: 0.8 }}>
+                  <Typography variant="caption" sx={{ color: colors.textSecondary, fontWeight: 500, mb: 1, fontSize: '0.7rem', opacity: 0.8 }}>
                     {module.subtitle}
                   </Typography>
 
                   {/* Description */}
-                  <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary, mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                     {module.description}
                   </Typography>
 
                   {/* Footer */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha(module.color, 0.1) }}>
-                    <Chip label={`${module.stats.value} ${module.stats.label}`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha(module.color, 0.08), color: module.color, fontWeight: 600 }} />
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha(module.color, darkMode ? 0.2 : 0.1) }}>
+                    <Chip label={`${module.stats.value} ${module.stats.label}`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha(module.color, darkMode ? 0.2 : 0.08), color: module.color, fontWeight: 600 }} />
                     {module.status === 'active' && (
                       <ArrowForwardIcon className="module-arrow" sx={{ color: module.color, fontSize: 18, opacity: 0.5, transition: 'all 0.3s ease' }} />
                     )}
@@ -240,7 +257,7 @@ const CoreAILanding = ({ onTileClick }) => {
       <Box sx={{ mt: 6, textAlign: 'center' }}>
         <Stack direction="row" spacing={2} justifyContent="center" alignItems="center">
           <LightbulbIcon sx={{ color: 'warning.main' }} />
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: colors.textSecondary }}>
             Powered by advanced machine learning and real-time data analytics
           </Typography>
         </Stack>

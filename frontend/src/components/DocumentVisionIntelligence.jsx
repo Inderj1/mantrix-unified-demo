@@ -164,8 +164,19 @@ const generateDocumentData = (docType, count = 15) => {
   return documentData[docType] || [];
 };
 
-const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const DocumentVisionIntelligence = ({ onNavigateToConfig, darkMode = false }) => {
   const theme = useTheme();
+  const colors = getColors(darkMode);
   const [selectedType, setSelectedType] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -415,16 +426,16 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
     );
 
     return (
-      <Box sx={{ p: 3, height: '100%', overflowY: 'auto' }}>
-        <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+      <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: colors.background }}>
+        <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <DocumentIcon sx={{ fontSize: 40, color: '#0078d4' }} />
               <Box>
-                <Typography variant="h5" fontWeight={600}>
+                <Typography variant="h5" fontWeight={600} sx={{ color: colors.text }}>
                   VISION STUDIO
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                   AI-powered OCR and document processing platform
                 </Typography>
               </Box>
@@ -456,7 +467,9 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
             sx={{
               mt: 2,
               '& .MuiOutlinedInput-root': {
-                backgroundColor: alpha(theme.palette.primary.main, 0.02),
+                bgcolor: darkMode ? colors.paper : alpha(theme.palette.primary.main, 0.02),
+                color: colors.text,
+                '& fieldset': { borderColor: colors.border },
               },
             }}
           />
@@ -472,11 +485,11 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
                     height: 200,
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
-                    border: '1px solid rgba(0,0,0,0.08)',
+                    border: `1px solid ${colors.border}`,
                     borderRadius: 3,
                     overflow: 'hidden',
                     position: 'relative',
-                    bgcolor: 'white',
+                    bgcolor: colors.cardBg,
                     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                     '&:hover': {
                       transform: 'translateY(-6px)',
@@ -540,7 +553,7 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
                     <Typography variant="body1" sx={{ fontWeight: 700, color: type.color, mb: 0.5, fontSize: '0.9rem', lineHeight: 1.3 }}>
                       {type.display_name}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    <Typography variant="body2" sx={{ color: colors.textSecondary, mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {type.description}
                     </Typography>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha(type.color, 0.1) }}>
@@ -610,18 +623,18 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
   const currentTypeIndex = documentTypes.findIndex(t => t.id === selectedType.id);
 
   return (
-    <Box>
+    <Box sx={{ bgcolor: colors.background }}>
       {/* Header */}
-      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
-            <Button startIcon={<ArrowBackIcon />} onClick={() => setSelectedType(null)} variant="text" sx={{ mb: 1 }}>
+            <Button startIcon={<ArrowBackIcon />} onClick={() => setSelectedType(null)} variant="text" sx={{ mb: 1, color: colors.text }}>
               Back to Document Types
             </Button>
-            <Typography variant="h4" fontWeight={700} gutterBottom>
+            <Typography variant="h4" fontWeight={700} gutterBottom sx={{ color: colors.text }}>
               {selectedType.display_name}
             </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Typography variant="body1" sx={{ color: colors.textSecondary }}>
               {selectedType.description}
             </Typography>
           </Box>
@@ -637,7 +650,7 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
       </Paper>
 
       {/* Data Grid */}
-      <Paper>
+      <Paper sx={{ bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         <Box sx={{ height: 650, width: '100%' }}>
           <DataGrid
             rows={documentData[selectedType.name] || []}
@@ -652,15 +665,27 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
             disableRowSelectionOnClick
             slots={{ toolbar: CustomToolbar }}
             sx={{
-              border: '1px solid rgba(0,0,0,0.08)',
+              border: `1px solid ${colors.border}`,
+              color: colors.text,
+              bgcolor: colors.paper,
               '& .MuiDataGrid-cell:focus': { outline: 'none' },
               '& .MuiDataGrid-row:hover': {
                 backgroundColor: alpha(theme.palette.primary.main, 0.05),
               },
               '& .MuiDataGrid-columnHeaders': {
-                backgroundColor: theme.palette.mode === 'light' ? 'grey.100' : 'grey.900',
+                backgroundColor: darkMode ? colors.cardBg : 'grey.100',
                 fontSize: '0.875rem',
                 fontWeight: 600,
+                color: colors.text,
+                borderBottom: `1px solid ${colors.border}`,
+              },
+              '& .MuiDataGrid-cell': {
+                borderBottom: `1px solid ${colors.border}`,
+                color: colors.text,
+              },
+              '& .MuiDataGrid-footerContainer': {
+                borderTop: `1px solid ${colors.border}`,
+                backgroundColor: darkMode ? colors.cardBg : undefined,
               },
             }}
           />
@@ -690,7 +715,7 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
                 </Grid>
               </Grid>
               <Box sx={{
-                bgcolor: 'grey.100',
+                bgcolor: darkMode ? colors.cardBg : 'grey.100',
                 p: 3,
                 borderRadius: 2,
                 textAlign: 'center',
@@ -698,11 +723,12 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                border: `1px solid ${colors.border}`,
               }}>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                   📄 Document image would be displayed here
                   <br />
-                  <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>
+                  <Typography variant="caption" sx={{ mt: 1, display: 'block', color: colors.textSecondary }}>
                     Path: {imageDialog.imageUrl}
                   </Typography>
                 </Typography>

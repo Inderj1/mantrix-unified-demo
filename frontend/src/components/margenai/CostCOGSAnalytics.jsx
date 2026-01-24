@@ -36,7 +36,18 @@ import stoxTheme from '../stox/stoxTheme';
 
 const API_BASE = `${import.meta.env.VITE_API_URL || ''}/api/v1/margen/csg`;
 
-const CostCOGSAnalytics = ({ onBack }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const CostCOGSAnalytics = ({ onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const theme = useTheme();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -225,7 +236,7 @@ const CostCOGSAnalytics = ({ onBack }) => {
   }
 
   return (
-    <Box sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -301,6 +312,7 @@ const CostCOGSAnalytics = ({ onBack }) => {
               sx={{
                 background: `linear-gradient(135deg, ${alpha(kpi.color, 0.1)} 0%, ${alpha(kpi.color, 0.05)} 100%)`,
                 border: `1px solid ${alpha(kpi.color, 0.2)}`,
+                bgcolor: colors.cardBg,
               }}
             >
               <CardContent>
@@ -337,8 +349,8 @@ const CostCOGSAnalytics = ({ onBack }) => {
       </Grid>
 
       {/* Tabs for different views */}
-      <Paper sx={{ mb: 3, flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <Tabs value={activeTab} onChange={(e, v) => setActiveTab(v)} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+      <Paper sx={{ mb: 3, flex: 1, display: 'flex', flexDirection: 'column', bgcolor: colors.paper }}>
+        <Tabs value={activeTab} onChange={(e, v) => setActiveTab(v)} sx={{ borderBottom: 1, borderColor: colors.border }}>
           <Tab label="By Product System" icon={<ProductIcon />} iconPosition="start" />
           <Tab label="By Distributor" icon={<BusinessIcon />} iconPosition="start" />
           <Tab label="By Item" icon={<CategoryIcon />} iconPosition="start" />
@@ -371,7 +383,13 @@ const CostCOGSAnalytics = ({ onBack }) => {
             pageSizeOptions={[10, 25, 50, 100]}
             checkboxSelection
             disableRowSelectionOnClick
-            sx={stoxTheme.getDataGridSx()}
+            sx={{
+              ...stoxTheme.getDataGridSx(),
+              bgcolor: colors.paper,
+              '& .MuiDataGrid-cell': { color: colors.text, borderColor: colors.border },
+              '& .MuiDataGrid-columnHeaders': { bgcolor: darkMode ? colors.cardBg : '#fafafa', color: colors.text, borderColor: colors.border },
+              '& .MuiDataGrid-footerContainer': { bgcolor: colors.paper, borderColor: colors.border },
+            }}
           />
         </Box>
       </Paper>

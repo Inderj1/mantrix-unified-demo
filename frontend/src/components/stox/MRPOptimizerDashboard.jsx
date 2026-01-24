@@ -125,8 +125,19 @@ const formatCurrency = (val) => {
   return sign + '$' + abs.toFixed(0);
 };
 
-const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const MRPOptimizerDashboard = ({ onBack, onTileClick, darkMode = false }) => {
   const theme = useTheme();
+  const colors = getColors(darkMode);
   const [loading, setLoading] = useState(true);
   const [materials, setMaterials] = useState([]);
   const [scenarioState, setScenarioState] = useState({});
@@ -359,12 +370,13 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
         sx={{
           mb: 2,
           border: 1,
-          borderColor: isModified ? theme.palette.primary.main : 'divider',
+          borderColor: isModified ? colors.primary : colors.border,
           borderRadius: 2,
           overflow: 'hidden',
           transition: 'all 0.2s',
+          bgcolor: colors.paper,
           '&:hover': {
-            borderColor: alpha(theme.palette.primary.main, 0.5),
+            borderColor: alpha(colors.primary, 0.5),
           }
         }}
       >
@@ -374,9 +386,9 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           p: 2,
-          bgcolor: 'background.default',
+          bgcolor: colors.background,
           borderBottom: 1,
-          borderColor: 'divider',
+          borderColor: colors.border,
         }}>
           <Stack direction="row" spacing={2} alignItems="center">
             <Checkbox
@@ -385,16 +397,17 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
               size="small"
             />
             <Stack direction="row" spacing={1} alignItems="center">
-              <Typography variant="body1" fontWeight={700} sx={{ fontFamily: 'monospace' }}>
+              <Typography variant="body1" fontWeight={700} sx={{ fontFamily: 'monospace', color: colors.text }}>
                 {m.id}
               </Typography>
               <Chip
                 label={m.plant}
                 size="small"
                 sx={{
-                  bgcolor: alpha(theme.palette.text.secondary, 0.1),
+                  bgcolor: alpha(colors.textSecondary, 0.1),
                   fontFamily: 'monospace',
                   fontSize: '0.7rem',
+                  color: colors.text,
                 }}
               />
               <Chip
@@ -414,7 +427,7 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
                   fontSize: '0.65rem',
                 }}
               />
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                 {m.name} • {m.plantName}
               </Typography>
             </Stack>
@@ -438,10 +451,10 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
         {/* Card Body - Two Column Layout */}
         <Grid container>
           {/* MRP Type Section (Left) */}
-          <Grid item xs={12} md={6} sx={{ p: 2.5, borderRight: { md: 1 }, borderColor: 'divider' }}>
+          <Grid item xs={12} md={6} sx={{ p: 2.5, borderRight: { md: 1 }, borderColor: colors.border }}>
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
-              <ScheduleIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-              <Typography variant="caption" fontWeight={700} color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              <ScheduleIcon sx={{ fontSize: 16, color: colors.textSecondary }} />
+              <Typography variant="caption" fontWeight={700} sx={{ color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                 MRP Type
               </Typography>
             </Stack>
@@ -502,6 +515,12 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
               <Select
                 value={scenario.mrpType || m.currentMRP}
                 onChange={(e) => updateMRPType(key, e.target.value)}
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border },
+                  '& .MuiSvgIcon-root': { color: colors.text },
+                  bgcolor: colors.paper,
+                  color: colors.text,
+                }}
               >
                 {Object.entries(mrpTypes).map(([code, info]) => (
                   <MenuItem key={code} value={code}>{code} - {info.name}</MenuItem>
@@ -545,8 +564,8 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
           {/* MRP Parameters Section (Right) */}
           <Grid item xs={12} md={6} sx={{ p: 2.5 }}>
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
-              <BarChartIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-              <Typography variant="caption" fontWeight={700} color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              <BarChartIcon sx={{ fontSize: 16, color: colors.textSecondary }} />
+              <Typography variant="caption" fontWeight={700} sx={{ color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                 MRP Parameters
               </Typography>
             </Stack>
@@ -554,13 +573,13 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
             <Grid container spacing={1.5}>
               {/* Safety Stock */}
               <Grid item xs={6} md={3}>
-                <Box sx={{ p: 1.5, bgcolor: 'background.default', borderRadius: 1 }}>
-                  <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 600 }}>
+                <Box sx={{ p: 1.5, bgcolor: colors.background, borderRadius: 1 }}>
+                  <Typography variant="caption" sx={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 600, color: colors.textSecondary }}>
                     Safety Stock
                   </Typography>
                   <Stack direction="row" spacing={0.5} alignItems="center" justifyContent="center" sx={{ mt: 1 }}>
                     <Chip label={m.safetyStock} size="small" sx={{ bgcolor: alpha(theme.palette.info.main, 0.15), color: theme.palette.info.main, fontFamily: 'monospace', fontWeight: 600 }} />
-                    <Typography variant="caption" color="text.secondary">→</Typography>
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>→</Typography>
                     <TextField
                       type="number"
                       size="small"
@@ -578,6 +597,7 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
                         },
                         '& .MuiOutlinedInput-root': {
                           bgcolor: ssDelta > 0 ? alpha(theme.palette.error.main, 0.1) : ssDelta < 0 ? alpha(theme.palette.success.main, 0.1) : alpha(theme.palette.primary.main, 0.1),
+                          '& fieldset': { borderColor: colors.border },
                         }
                       }}
                     />
@@ -586,7 +606,7 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
                     display: 'block',
                     textAlign: 'center',
                     mt: 0.5,
-                    color: ssDelta > 0 ? theme.palette.error.main : ssDelta < 0 ? theme.palette.success.main : 'text.secondary',
+                    color: ssDelta > 0 ? theme.palette.error.main : ssDelta < 0 ? theme.palette.success.main : colors.textSecondary,
                     fontWeight: 600,
                   }}>
                     {ssDelta !== 0 ? (ssDelta > 0 ? '+' : '') + ssDelta : '—'}
@@ -596,13 +616,13 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
 
               {/* Reorder Point */}
               <Grid item xs={6} md={3}>
-                <Box sx={{ p: 1.5, bgcolor: 'background.default', borderRadius: 1 }}>
-                  <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 600 }}>
+                <Box sx={{ p: 1.5, bgcolor: colors.background, borderRadius: 1 }}>
+                  <Typography variant="caption" sx={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 600, color: colors.textSecondary }}>
                     Reorder Point
                   </Typography>
                   <Stack direction="row" spacing={0.5} alignItems="center" justifyContent="center" sx={{ mt: 1 }}>
                     <Chip label={m.rop} size="small" sx={{ bgcolor: alpha(theme.palette.info.main, 0.15), color: theme.palette.info.main, fontFamily: 'monospace', fontWeight: 600 }} />
-                    <Typography variant="caption" color="text.secondary">→</Typography>
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>→</Typography>
                     <TextField
                       type="number"
                       size="small"
@@ -620,6 +640,7 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
                         },
                         '& .MuiOutlinedInput-root': {
                           bgcolor: ropDelta !== 0 ? (ropDelta > 0 ? alpha(theme.palette.error.main, 0.1) : alpha(theme.palette.success.main, 0.1)) : alpha(theme.palette.primary.main, 0.1),
+                          '& fieldset': { borderColor: colors.border },
                         }
                       }}
                     />
@@ -628,7 +649,7 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
                     display: 'block',
                     textAlign: 'center',
                     mt: 0.5,
-                    color: ropDelta > 0 ? theme.palette.error.main : ropDelta < 0 ? theme.palette.success.main : 'text.secondary',
+                    color: ropDelta > 0 ? theme.palette.error.main : ropDelta < 0 ? theme.palette.success.main : colors.textSecondary,
                     fontWeight: 600,
                   }}>
                     {ropDelta !== 0 ? (ropDelta > 0 ? '+' : '') + ropDelta : '—'}
@@ -638,13 +659,13 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
 
               {/* Lot Size */}
               <Grid item xs={6} md={3}>
-                <Box sx={{ p: 1.5, bgcolor: 'background.default', borderRadius: 1 }}>
-                  <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 600 }}>
+                <Box sx={{ p: 1.5, bgcolor: colors.background, borderRadius: 1 }}>
+                  <Typography variant="caption" sx={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 600, color: colors.textSecondary }}>
                     Lot Size
                   </Typography>
                   <Stack direction="row" spacing={0.5} alignItems="center" justifyContent="center" sx={{ mt: 1 }}>
                     <Chip label={m.lotSize} size="small" sx={{ bgcolor: alpha(theme.palette.info.main, 0.15), color: theme.palette.info.main, fontFamily: 'monospace', fontWeight: 600 }} />
-                    <Typography variant="caption" color="text.secondary">→</Typography>
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>→</Typography>
                     <TextField
                       type="number"
                       size="small"
@@ -662,6 +683,7 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
                         },
                         '& .MuiOutlinedInput-root': {
                           bgcolor: lotDelta !== 0 ? (lotDelta > 0 ? alpha(theme.palette.error.main, 0.1) : alpha(theme.palette.success.main, 0.1)) : alpha(theme.palette.primary.main, 0.1),
+                          '& fieldset': { borderColor: colors.border },
                         }
                       }}
                     />
@@ -670,7 +692,7 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
                     display: 'block',
                     textAlign: 'center',
                     mt: 0.5,
-                    color: lotDelta > 0 ? theme.palette.error.main : lotDelta < 0 ? theme.palette.success.main : 'text.secondary',
+                    color: lotDelta > 0 ? theme.palette.error.main : lotDelta < 0 ? theme.palette.success.main : colors.textSecondary,
                     fontWeight: 600,
                   }}>
                     {lotDelta !== 0 ? (lotDelta > 0 ? '+' : '') + lotDelta : '—'}
@@ -680,14 +702,14 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
 
               {/* Lead Time (Read-only) */}
               <Grid item xs={6} md={3}>
-                <Box sx={{ p: 1.5, bgcolor: 'background.default', borderRadius: 1 }}>
-                  <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 600 }}>
+                <Box sx={{ p: 1.5, bgcolor: colors.background, borderRadius: 1 }}>
+                  <Typography variant="caption" sx={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 600, color: colors.textSecondary }}>
                     Lead Time
                   </Typography>
-                  <Typography variant="body1" fontWeight={600} color="text.secondary" sx={{ fontFamily: 'monospace', textAlign: 'center', mt: 1 }}>
+                  <Typography variant="body1" fontWeight={600} sx={{ fontFamily: 'monospace', textAlign: 'center', mt: 1, color: colors.textSecondary }}>
                     {m.leadTime} days
                   </Typography>
-                  <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', mt: 0.5, color: 'text.secondary' }}>
+                  <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', mt: 0.5, color: colors.textSecondary }}>
                     Fixed
                   </Typography>
                 </Box>
@@ -700,9 +722,9 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
                   borderRadius: 1,
                   background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)}, ${alpha(theme.palette.info.main, 0.1)})`,
                   border: 1,
-                  borderColor: alpha(theme.palette.primary.main, 0.2),
+                  borderColor: alpha(colors.primary, 0.2),
                 }}>
-                  <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 600 }}>
+                  <Typography variant="caption" sx={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 600, color: colors.textSecondary }}>
                     Working Capital Impact
                   </Typography>
                   <Typography
@@ -726,13 +748,13 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
   };
 
   return (
-    <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: 'background.default' }}>
+    <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>STOX.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>Layer 5: Sandbox</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline', color: colors.primary }, cursor: 'pointer' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline', color: colors.primary }, cursor: 'pointer' }}>Layer 5: Sandbox</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>MRP Optimizer</Typography>
           </Breadcrumbs>
 
@@ -743,14 +765,14 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
         </Stack>
 
         <Stack direction="row" spacing={2} alignItems="center">
-          <Box sx={{ width: 4, height: 50, bgcolor: 'primary.main', borderRadius: 1 }} />
+          <Box sx={{ width: 4, height: 50, bgcolor: colors.primary, borderRadius: 1 }} />
           <Box>
             <Stack direction="row" spacing={1} alignItems="center">
-              <LayersIcon sx={{ color: 'primary.main' }} />
-              <Typography variant="h5" fontWeight={700}>MRP Optimizer</Typography>
-              <Chip label="Layer 5 - Sandbox" size="small" sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1), color: 'primary.main' }} />
+              <LayersIcon sx={{ color: colors.primary }} />
+              <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>MRP Optimizer</Typography>
+              <Chip label="Layer 5 - Sandbox" size="small" sx={{ bgcolor: alpha(colors.primary, 0.1), color: colors.primary }} />
             </Stack>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: colors.textSecondary }}>
               MRP Type ↔ Parameter Optimization by SKU/Plant
             </Typography>
           </Box>
@@ -769,8 +791,8 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
           { label: 'Net Value Impact', value: formatCurrency(stats.netValueDelta), color: stats.netValueDelta > 0 ? theme.palette.error.main : stats.netValueDelta < 0 ? theme.palette.success.main : theme.palette.text.secondary },
         ].map((stat, i) => (
           <Grid item xs={6} sm={4} md={2.4} key={i}>
-            <Card sx={{ p: 1.5 }}>
-              <Typography variant="caption" color="text.secondary">{stat.label}</Typography>
+            <Card sx={{ p: 1.5, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
+              <Typography variant="caption" sx={{ color: colors.textSecondary }}>{stat.label}</Typography>
               <Typography variant="h6" fontWeight={700} sx={{ color: stat.color }}>{stat.value}</Typography>
             </Card>
           </Grid>
@@ -778,12 +800,22 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
       </Grid>
 
       {/* Filter Bar */}
-      <Paper sx={{ p: 2, mb: 2 }}>
+      <Paper sx={{ p: 2, mb: 2, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems="center" justifyContent="space-between">
           <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap">
             <FormControl size="small" sx={{ minWidth: 140 }}>
               <InputLabel>Material Type</InputLabel>
-              <Select value={filters.type} label="Material Type" onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value }))}>
+              <Select
+                value={filters.type}
+                label="Material Type"
+                onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value }))}
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border },
+                  '& .MuiSvgIcon-root': { color: colors.text },
+                  bgcolor: colors.paper,
+                  color: colors.text,
+                }}
+              >
                 <MenuItem value="all">All Types</MenuItem>
                 <MenuItem value="FERT">Finished Goods</MenuItem>
                 <MenuItem value="HALB">Semi-Finished</MenuItem>
@@ -792,7 +824,17 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
             </FormControl>
             <FormControl size="small" sx={{ minWidth: 140 }}>
               <InputLabel>Plant</InputLabel>
-              <Select value={filters.plant} label="Plant" onChange={(e) => setFilters(prev => ({ ...prev, plant: e.target.value }))}>
+              <Select
+                value={filters.plant}
+                label="Plant"
+                onChange={(e) => setFilters(prev => ({ ...prev, plant: e.target.value }))}
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border },
+                  '& .MuiSvgIcon-root': { color: colors.text },
+                  bgcolor: colors.paper,
+                  color: colors.text,
+                }}
+              >
                 <MenuItem value="all">All Plants</MenuItem>
                 <MenuItem value="1000">1000 - Keasbey</MenuItem>
                 <MenuItem value="2000">2000 - Santa Clarita</MenuItem>
@@ -801,7 +843,17 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
             </FormControl>
             <FormControl size="small" sx={{ minWidth: 140 }}>
               <InputLabel>MRP Type</InputLabel>
-              <Select value={filters.mrpType} label="MRP Type" onChange={(e) => setFilters(prev => ({ ...prev, mrpType: e.target.value }))}>
+              <Select
+                value={filters.mrpType}
+                label="MRP Type"
+                onChange={(e) => setFilters(prev => ({ ...prev, mrpType: e.target.value }))}
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border },
+                  '& .MuiSvgIcon-root': { color: colors.text },
+                  bgcolor: colors.paper,
+                  color: colors.text,
+                }}
+              >
                 <MenuItem value="all">All MRP Types</MenuItem>
                 <MenuItem value="VB">VB - Reorder Point</MenuItem>
                 <MenuItem value="PD">PD - MRP</MenuItem>
@@ -815,7 +867,16 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
               value={filters.search}
               onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
               InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment> }}
-              sx={{ width: 180 }}
+              sx={{
+                width: 180,
+                '& .MuiOutlinedInput-root': {
+                  bgcolor: colors.paper,
+                  '& fieldset': { borderColor: colors.border },
+                  '&:hover fieldset': { borderColor: colors.primary },
+                  color: colors.text,
+                },
+                '& .MuiInputBase-input': { color: colors.text },
+              }}
             />
           </Stack>
           <Stack direction="row" spacing={1}>
@@ -843,8 +904,8 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
           <MaterialCard key={getKey(m)} m={m} />
         ))}
         {filteredMaterials.length === 0 && !loading && (
-          <Paper sx={{ p: 4, textAlign: 'center' }}>
-            <Typography color="text.secondary">No materials match your filters</Typography>
+          <Paper sx={{ p: 4, textAlign: 'center', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
+            <Typography sx={{ color: colors.textSecondary }}>No materials match your filters</Typography>
           </Paper>
         )}
       </Box>
@@ -865,11 +926,13 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
           zIndex: 1000,
           borderRadius: 2,
           boxShadow: 3,
+          bgcolor: colors.paper,
+          border: `1px solid ${colors.border}`,
         }}
       >
         <Stack direction="row" spacing={2} alignItems="center">
-          <Typography variant="body2" color="text.secondary">
-            <strong style={{ color: theme.palette.primary.main }}>{selectedMaterials.size}</strong> selected
+          <Typography variant="body2" sx={{ color: colors.textSecondary }}>
+            <strong style={{ color: colors.primary }}>{selectedMaterials.size}</strong> selected
           </Typography>
           <Button size="small" variant="outlined" onClick={applyAllRecommendations}>
             Accept All Recommendations

@@ -52,6 +52,16 @@ import stoxTheme from './stoxTheme';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, ChartTooltip, Legend);
 
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 // Import Arizona Beverages data
 import {
   LAM_PLANTS,
@@ -111,7 +121,8 @@ const generateWritebackData = () => {
   });
 };
 
-const SAPWriteback = ({ onBack }) => {
+const SAPWriteback = ({ onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -451,7 +462,7 @@ const SAPWriteback = ({ onBack }) => {
   };
 
   return (
-    <Box sx={{ p: 3, height: '100%', overflow: 'auto', bgcolor: '#f8fafc' }}>
+    <Box sx={{ p: 3, height: '100%', overflow: 'auto', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -540,12 +551,12 @@ const SAPWriteback = ({ onBack }) => {
           )}
 
           {/* Filters */}
-          <Paper sx={{ p: 2, mb: 2 }}>
+          <Paper sx={{ p: 2, mb: 2, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
             <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
               <FilterListIcon color="action" />
               <FormControl size="small" sx={{ minWidth: 140 }}>
                 <InputLabel>Status</InputLabel>
-                <Select value={filters.status} label="Status" onChange={(e) => setFilters({ ...filters, status: e.target.value })}>
+                <Select value={filters.status} label="Status" onChange={(e) => setFilters({ ...filters, status: e.target.value })} sx={{ bgcolor: colors.paper }}>
                   <MenuItem value="all">All Status</MenuItem>
                   <MenuItem value="Completed">Completed</MenuItem>
                   <MenuItem value="In Progress">In Progress</MenuItem>
@@ -556,7 +567,7 @@ const SAPWriteback = ({ onBack }) => {
               </FormControl>
               <FormControl size="small" sx={{ minWidth: 140 }}>
                 <InputLabel>System</InputLabel>
-                <Select value={filters.system} label="System" onChange={(e) => setFilters({ ...filters, system: e.target.value })}>
+                <Select value={filters.system} label="System" onChange={(e) => setFilters({ ...filters, system: e.target.value })} sx={{ bgcolor: colors.paper }}>
                   <MenuItem value="all">All Systems</MenuItem>
                   <MenuItem value="S4P">S4P (Production)</MenuItem>
                   <MenuItem value="S4D">S4D (Development)</MenuItem>
@@ -564,7 +575,7 @@ const SAPWriteback = ({ onBack }) => {
               </FormControl>
               <FormControl size="small" sx={{ minWidth: 140 }}>
                 <InputLabel>SAP Target</InputLabel>
-                <Select value={filters.target} label="SAP Target" onChange={(e) => setFilters({ ...filters, target: e.target.value })}>
+                <Select value={filters.target} label="SAP Target" onChange={(e) => setFilters({ ...filters, target: e.target.value })} sx={{ bgcolor: colors.paper }}>
                   <MenuItem value="all">All Targets</MenuItem>
                   <MenuItem value="MM02">MM02</MenuItem>
                   <MenuItem value="MD02">MD02</MenuItem>
@@ -591,7 +602,7 @@ const SAPWriteback = ({ onBack }) => {
           </Paper>
 
           {/* Data Grid */}
-          <Paper sx={{ height: 500 }}>
+          <Paper sx={{ height: 500, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
             <DataGrid
               rows={filteredData}
               columns={columns}
@@ -607,7 +618,19 @@ const SAPWriteback = ({ onBack }) => {
                   quickFilterProps: { debounceMs: 500 },
                 },
               }}
-              sx={stoxTheme.getDataGridSx({ clickable: true })}
+              sx={{
+                ...stoxTheme.getDataGridSx({ clickable: true }),
+                ...(darkMode && {
+                  '& .MuiDataGrid-root': { color: colors.text },
+                  '& .MuiDataGrid-cell': { borderColor: colors.border, color: colors.text },
+                  '& .MuiDataGrid-columnHeaders': { bgcolor: colors.cardBg, borderColor: colors.border, color: colors.text },
+                  '& .MuiDataGrid-columnHeaderTitle': { color: colors.text, fontWeight: 600 },
+                  '& .MuiDataGrid-row': { borderColor: colors.border, '&:hover': { bgcolor: alpha(colors.primary, 0.1) } },
+                  '& .MuiDataGrid-footerContainer': { bgcolor: colors.cardBg, borderColor: colors.border },
+                  '& .MuiTablePagination-root': { color: colors.text },
+                  '& .MuiIconButton-root': { color: colors.textSecondary },
+                }),
+              }}
               initialState={{
                 pagination: { paginationModel: { pageSize: 25 } },
               }}

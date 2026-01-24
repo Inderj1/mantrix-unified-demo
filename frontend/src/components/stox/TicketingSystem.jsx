@@ -21,7 +21,18 @@ import {
 import { useTickets, cancelTicket } from '../../hooks/useTickets';
 import stoxTheme from './stoxTheme';
 
-const TicketingSystem = ({ onBack }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const TicketingSystem = ({ onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [statusFilter, setStatusFilter] = useState('All');
   const [typeFilter, setTypeFilter] = useState('All');
   const [priorityFilter, setPriorityFilter] = useState('All');
@@ -266,7 +277,7 @@ const TicketingSystem = ({ onBack }) => {
       minWidth: 250,
       flex: 2,
       renderCell: (params) => (
-        <Typography variant="body2" sx={{ fontSize: '0.8rem', fontWeight: 600 }}>
+        <Typography variant="body2" sx={{ fontSize: '0.8rem', fontWeight: 600, color: colors.text }}>
           {params.value}
         </Typography>
       ),
@@ -277,7 +288,7 @@ const TicketingSystem = ({ onBack }) => {
       minWidth: 280,
       flex: 2.5,
       renderCell: (params) => (
-        <Typography variant="body2" sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+        <Typography variant="body2" sx={{ fontSize: '0.75rem', color: colors.textSecondary }}>
           {params.value}
         </Typography>
       ),
@@ -288,7 +299,7 @@ const TicketingSystem = ({ onBack }) => {
       minWidth: 150,
       flex: 1,
       renderCell: (params) => (
-        <Typography variant="body2" sx={{ fontSize: '0.75rem' }}>
+        <Typography variant="body2" sx={{ fontSize: '0.75rem', color: colors.text }}>
           {params.value || 'System'}
         </Typography>
       ),
@@ -355,7 +366,7 @@ const TicketingSystem = ({ onBack }) => {
       minWidth: 160,
       flex: 1.2,
       renderCell: (params) => (
-        <Typography variant="body2" sx={{ fontSize: '0.75rem', fontFamily: 'monospace' }}>
+        <Typography variant="body2" sx={{ fontSize: '0.75rem', fontFamily: 'monospace', color: colors.text }}>
           {new Date(params.value).toLocaleString('en-US', {
             month: 'short',
             day: 'numeric',
@@ -398,21 +409,36 @@ const TicketingSystem = ({ onBack }) => {
     },
   ];
 
+  // Helper for dark mode dropdown menus
+  const getMenuProps = () => ({
+    PaperProps: {
+      sx: {
+        bgcolor: darkMode ? colors.cardBg : undefined,
+        border: darkMode ? `1px solid ${colors.border}` : undefined,
+        '& .MuiMenuItem-root': {
+          color: colors.text,
+          '&:hover': { bgcolor: darkMode ? 'rgba(255,255,255,0.08)' : undefined },
+          '&.Mui-selected': { bgcolor: darkMode ? 'rgba(255,255,255,0.12)' : undefined },
+        },
+      },
+    },
+  });
+
   return (
-    <Box sx={{ p: 3, height: '100%', overflowY: 'auto' }}>
+    <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: colors.background }}>
       {/* Header */}
-      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <TicketIcon sx={{ fontSize: 40, color: '#10b981' }} />
           <Box sx={{ flex: 1 }}>
-            <Typography variant="h5" fontWeight={600}>
+            <Typography variant="h5" fontWeight={600} sx={{ color: colors.text }}>
               COMMAND TOWER
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: colors.textSecondary }}>
               Action tracking & audit trail for all execution operations
             </Typography>
           </Box>
-          <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">
+          <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ color: colors.primary, borderColor: colors.primary }}>
             Back
           </Button>
         </Box>
@@ -421,49 +447,49 @@ const TicketingSystem = ({ onBack }) => {
       {/* Metrics Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ bgcolor: alpha('#2b88d8', 0.05), borderLeft: `4px solid #2b88d8` }}>
+          <Card sx={{ bgcolor: darkMode ? alpha('#2b88d8', 0.15) : alpha('#2b88d8', 0.05), borderLeft: `4px solid #2b88d8`, border: `1px solid ${colors.border}` }}>
             <CardContent sx={{ py: 1.5, px: 2 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>Total Tickets</Typography>
+              <Typography variant="caption" sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>Total Tickets</Typography>
               <Typography variant="h5" fontWeight={700} sx={{ color: '#2b88d8' }}>{metrics.total}</Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ bgcolor: alpha('#2b88d8', 0.05), borderLeft: `4px solid #2b88d8` }}>
+          <Card sx={{ bgcolor: darkMode ? alpha('#2b88d8', 0.15) : alpha('#2b88d8', 0.05), borderLeft: `4px solid #2b88d8`, border: `1px solid ${colors.border}` }}>
             <CardContent sx={{ py: 1.5, px: 2 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>Open</Typography>
+              <Typography variant="caption" sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>Open</Typography>
               <Typography variant="h5" fontWeight={700} sx={{ color: '#2b88d8' }}>{metrics.open}</Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ bgcolor: alpha('#06b6d4', 0.05), borderLeft: `4px solid #06b6d4` }}>
+          <Card sx={{ bgcolor: darkMode ? alpha('#06b6d4', 0.15) : alpha('#06b6d4', 0.05), borderLeft: `4px solid #06b6d4`, border: `1px solid ${colors.border}` }}>
             <CardContent sx={{ py: 1.5, px: 2 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>In Progress</Typography>
+              <Typography variant="caption" sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>In Progress</Typography>
               <Typography variant="h5" fontWeight={700} sx={{ color: '#06b6d4' }}>{metrics.inProgress}</Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ bgcolor: alpha('#10b981', 0.05), borderLeft: `4px solid #10b981` }}>
+          <Card sx={{ bgcolor: darkMode ? alpha('#10b981', 0.15) : alpha('#10b981', 0.05), borderLeft: `4px solid #10b981`, border: `1px solid ${colors.border}` }}>
             <CardContent sx={{ py: 1.5, px: 2 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>Completed</Typography>
+              <Typography variant="caption" sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>Completed</Typography>
               <Typography variant="h5" fontWeight={700} sx={{ color: '#10b981' }}>{metrics.completed}</Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ bgcolor: alpha('#ef4444', 0.05), borderLeft: `4px solid #ef4444` }}>
+          <Card sx={{ bgcolor: darkMode ? alpha('#ef4444', 0.15) : alpha('#ef4444', 0.05), borderLeft: `4px solid #ef4444`, border: `1px solid ${colors.border}` }}>
             <CardContent sx={{ py: 1.5, px: 2 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>Failed</Typography>
+              <Typography variant="caption" sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>Failed</Typography>
               <Typography variant="h5" fontWeight={700} sx={{ color: '#ef4444' }}>{metrics.failed}</Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ bgcolor: alpha('#64748b', 0.05), borderLeft: `4px solid #64748b` }}>
+          <Card sx={{ bgcolor: darkMode ? alpha('#64748b', 0.15) : alpha('#64748b', 0.05), borderLeft: `4px solid #64748b`, border: `1px solid ${colors.border}` }}>
             <CardContent sx={{ py: 1.5, px: 2 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>Cancelled</Typography>
+              <Typography variant="caption" sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>Cancelled</Typography>
               <Typography variant="h5" fontWeight={700} sx={{ color: '#64748b' }}>{metrics.cancelled}</Typography>
             </CardContent>
           </Card>
@@ -471,26 +497,35 @@ const TicketingSystem = ({ onBack }) => {
       </Grid>
 
       {/* Filters */}
-      <Paper elevation={0} sx={{ p: 2, mb: 2, border: '1px solid', borderColor: 'divider' }}>
+      <Paper elevation={0} sx={{ p: 2, mb: 2, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         <Stack direction="row" spacing={2} alignItems="center">
-          <FilterListIcon sx={{ color: 'text.secondary' }} />
+          <FilterListIcon sx={{ color: colors.textSecondary }} />
           <TextField
             size="small"
             placeholder="Search operations, users, descriptions..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            sx={{ minWidth: 320 }}
+            sx={{
+              minWidth: 320,
+              '& .MuiOutlinedInput-root': {
+                bgcolor: darkMode ? colors.cardBg : undefined,
+                color: colors.text,
+                '& fieldset': { borderColor: colors.border },
+                '&:hover fieldset': { borderColor: colors.primary },
+              },
+              '& .MuiInputBase-input::placeholder': { color: colors.textSecondary, opacity: 1 },
+            }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon fontSize="small" />
+                  <SearchIcon fontSize="small" sx={{ color: colors.textSecondary }} />
                 </InputAdornment>
               ),
             }}
           />
-          <FormControl size="small" sx={{ minWidth: 150 }}>
+          <FormControl size="small" sx={{ minWidth: 150, '& .MuiInputLabel-root': { color: colors.textSecondary }, '& .MuiOutlinedInput-root': { bgcolor: darkMode ? colors.cardBg : undefined, color: colors.text, '& fieldset': { borderColor: colors.border } } }}>
             <InputLabel>Module</InputLabel>
-            <Select value={moduleFilter} onChange={(e) => setModuleFilter(e.target.value)} label="Module">
+            <Select value={moduleFilter} onChange={(e) => setModuleFilter(e.target.value)} label="Module" MenuProps={getMenuProps()}>
               <MenuItem value="All">All Modules</MenuItem>
               <MenuItem value="STOX.AI">STOX.AI</MenuItem>
               <MenuItem value="ORDLY.AI">ORDLY.AI</MenuItem>
@@ -499,9 +534,9 @@ const TicketingSystem = ({ onBack }) => {
               <MenuItem value="Enterprise Pulse">Enterprise Pulse</MenuItem>
             </Select>
           </FormControl>
-          <FormControl size="small" sx={{ minWidth: 150 }}>
+          <FormControl size="small" sx={{ minWidth: 150, '& .MuiInputLabel-root': { color: colors.textSecondary }, '& .MuiOutlinedInput-root': { bgcolor: darkMode ? colors.cardBg : undefined, color: colors.text, '& fieldset': { borderColor: colors.border } } }}>
             <InputLabel>Type</InputLabel>
-            <Select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} label="Type">
+            <Select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} label="Type" MenuProps={getMenuProps()}>
               <MenuItem value="All">All Types</MenuItem>
               {/* STOX.AI */}
               <MenuItem value="REORDER_TRIGGERED">Reorder Triggered</MenuItem>
@@ -527,9 +562,9 @@ const TicketingSystem = ({ onBack }) => {
               <MenuItem value="PULSE_ALERT">Pulse Alert</MenuItem>
             </Select>
           </FormControl>
-          <FormControl size="small" sx={{ minWidth: 130 }}>
+          <FormControl size="small" sx={{ minWidth: 130, '& .MuiInputLabel-root': { color: colors.textSecondary }, '& .MuiOutlinedInput-root': { bgcolor: darkMode ? colors.cardBg : undefined, color: colors.text, '& fieldset': { borderColor: colors.border } } }}>
             <InputLabel>Status</InputLabel>
-            <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} label="Status">
+            <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} label="Status" MenuProps={getMenuProps()}>
               <MenuItem value="All">All Statuses</MenuItem>
               <MenuItem value="Open">Open</MenuItem>
               <MenuItem value="In Progress">In Progress</MenuItem>
@@ -538,9 +573,9 @@ const TicketingSystem = ({ onBack }) => {
               <MenuItem value="Cancelled">Cancelled</MenuItem>
             </Select>
           </FormControl>
-          <FormControl size="small" sx={{ minWidth: 120 }}>
+          <FormControl size="small" sx={{ minWidth: 120, '& .MuiInputLabel-root': { color: colors.textSecondary }, '& .MuiOutlinedInput-root': { bgcolor: darkMode ? colors.cardBg : undefined, color: colors.text, '& fieldset': { borderColor: colors.border } } }}>
             <InputLabel>Priority</InputLabel>
-            <Select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)} label="Priority">
+            <Select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)} label="Priority" MenuProps={getMenuProps()}>
               <MenuItem value="All">All</MenuItem>
               <MenuItem value="Critical">Critical</MenuItem>
               <MenuItem value="High">High</MenuItem>
@@ -549,17 +584,17 @@ const TicketingSystem = ({ onBack }) => {
             </Select>
           </FormControl>
           <Box sx={{ flex: 1 }} />
-          <Button startIcon={<Refresh />} onClick={refresh} variant="outlined" size="small">
+          <Button startIcon={<Refresh />} onClick={refresh} variant="outlined" size="small" sx={{ color: colors.primary, borderColor: colors.primary }}>
             Refresh
           </Button>
-          <Button startIcon={<Download />} variant="outlined" size="small">
+          <Button startIcon={<Download />} variant="outlined" size="small" sx={{ color: colors.primary, borderColor: colors.primary }}>
             Export
           </Button>
         </Stack>
       </Paper>
 
       {/* Data Grid */}
-      <Paper elevation={0} sx={{ height: 600, border: '1px solid', borderColor: 'divider' }}>
+      <Paper elevation={0} sx={{ height: 600, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         <DataGrid
           rows={tickets}
           columns={columns}
@@ -577,108 +612,143 @@ const TicketingSystem = ({ onBack }) => {
               quickFilterProps: { debounceMs: 500 },
             },
           }}
-          sx={stoxTheme.getDataGridSx({ clickable: true })}
+          sx={{
+            border: 'none',
+            '& .MuiDataGrid-columnHeaders': {
+              bgcolor: darkMode ? '#21262d' : '#f8fafc',
+              color: colors.text,
+              borderBottom: `1px solid ${colors.border}`,
+            },
+            '& .MuiDataGrid-columnHeaderTitle': {
+              fontWeight: 600,
+              fontSize: '0.75rem',
+              color: colors.text,
+            },
+            '& .MuiDataGrid-cell': {
+              color: colors.text,
+              borderBottom: `1px solid ${colors.border}`,
+            },
+            '& .MuiDataGrid-row': {
+              '&:hover': { bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)' },
+            },
+            '& .MuiDataGrid-footerContainer': {
+              bgcolor: darkMode ? '#21262d' : '#f8fafc',
+              color: colors.text,
+              borderTop: `1px solid ${colors.border}`,
+            },
+            '& .MuiTablePagination-root': { color: colors.text },
+            '& .MuiTablePagination-selectLabel': { color: colors.textSecondary },
+            '& .MuiTablePagination-displayedRows': { color: colors.text },
+            '& .MuiIconButton-root': { color: colors.textSecondary },
+            '& .MuiDataGrid-toolbarContainer': {
+              bgcolor: darkMode ? '#21262d' : '#f8fafc',
+              borderBottom: `1px solid ${colors.border}`,
+              '& .MuiButton-root': { color: colors.text },
+              '& .MuiInputBase-root': { color: colors.text, bgcolor: darkMode ? colors.cardBg : undefined },
+            },
+            '& .MuiCheckbox-root': { color: colors.textSecondary },
+          }}
         />
       </Paper>
 
       {/* Ticket Details Dialog */}
-      <Dialog open={detailsOpen} onClose={() => setDetailsOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>
+      <Dialog open={detailsOpen} onClose={() => setDetailsOpen(false)} maxWidth="md" fullWidth PaperProps={{ sx: { bgcolor: colors.paper, color: colors.text } }}>
+        <DialogTitle sx={{ bgcolor: colors.cardBg, borderBottom: `1px solid ${colors.border}` }}>
           <Stack direction="row" alignItems="center" spacing={2}>
             <TicketIcon sx={{ color: '#2b88d8' }} />
             <Box>
-              <Typography variant="h6" fontWeight={700}>
+              <Typography variant="h6" fontWeight={700} sx={{ color: colors.text }}>
                 Operation Details
               </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+              <Typography variant="caption" sx={{ fontFamily: 'monospace', color: colors.textSecondary }}>
                 {selectedTicket && formatTicketId(selectedTicket)}
               </Typography>
             </Box>
           </Stack>
         </DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ bgcolor: colors.paper }}>
           {selectedTicket && (
-            <Box>
+            <Box sx={{ pt: 2 }}>
               {/* Status and Priority */}
               <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
                 <Box>
-                  <Typography variant="caption" color="text.secondary">Status</Typography>
+                  <Typography variant="caption" sx={{ color: colors.textSecondary }}>Status</Typography>
                   <Box sx={{ mt: 0.5 }}>
                     <Chip label={selectedTicket.status} color={selectedTicket.status === 'Completed' ? 'success' : selectedTicket.status === 'Failed' ? 'error' : 'primary'} size="small" />
                   </Box>
                 </Box>
                 <Box>
-                  <Typography variant="caption" color="text.secondary">Priority</Typography>
+                  <Typography variant="caption" sx={{ color: colors.textSecondary }}>Priority</Typography>
                   <Box sx={{ mt: 0.5 }}>
                     <Chip label={selectedTicket.priority} size="small" sx={{ bgcolor: alpha(selectedTicket.priority === 'High' ? '#ef4444' : '#2b88d8', 0.1), color: selectedTicket.priority === 'High' ? '#ef4444' : '#2b88d8' }} />
                   </Box>
                 </Box>
                 <Box>
-                  <Typography variant="caption" color="text.secondary">Type</Typography>
+                  <Typography variant="caption" sx={{ color: colors.textSecondary }}>Type</Typography>
                   <Box sx={{ mt: 0.5 }}>
-                    <Chip label={selectedTicket.ticket_type} size="small" />
+                    <Chip label={selectedTicket.ticket_type} size="small" sx={{ bgcolor: darkMode ? colors.cardBg : undefined }} />
                   </Box>
                 </Box>
               </Stack>
 
-              <Divider sx={{ my: 2 }} />
+              <Divider sx={{ my: 2, borderColor: colors.border }} />
 
               {/* Basic Info */}
               <Table size="small">
                 <TableBody>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600, width: '30%' }}>Module</TableCell>
-                    <TableCell>{selectedTicket.source_module}</TableCell>
+                    <TableCell sx={{ fontWeight: 600, width: '30%', color: colors.text, borderBottom: `1px solid ${colors.border}` }}>Module</TableCell>
+                    <TableCell sx={{ color: colors.text, borderBottom: `1px solid ${colors.border}` }}>{selectedTicket.source_module}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600 }}>Source Tile</TableCell>
-                    <TableCell>{selectedTicket.source_tile || 'N/A'}</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: colors.text, borderBottom: `1px solid ${colors.border}` }}>Source Tile</TableCell>
+                    <TableCell sx={{ color: colors.text, borderBottom: `1px solid ${colors.border}` }}>{selectedTicket.source_tile || 'N/A'}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600 }}>Title</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>{selectedTicket.title}</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: colors.text, borderBottom: `1px solid ${colors.border}` }}>Title</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: colors.text, borderBottom: `1px solid ${colors.border}` }}>{selectedTicket.title}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600 }}>Description</TableCell>
-                    <TableCell>{selectedTicket.description}</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: colors.text, borderBottom: `1px solid ${colors.border}` }}>Description</TableCell>
+                    <TableCell sx={{ color: colors.text, borderBottom: `1px solid ${colors.border}` }}>{selectedTicket.description}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600 }}>User/Agent</TableCell>
-                    <TableCell>{selectedTicket.user_name || 'System'}</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: colors.text, borderBottom: `1px solid ${colors.border}` }}>User/Agent</TableCell>
+                    <TableCell sx={{ color: colors.text, borderBottom: `1px solid ${colors.border}` }}>{selectedTicket.user_name || 'System'}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600 }}>Created</TableCell>
-                    <TableCell>{new Date(selectedTicket.created_at).toLocaleString()}</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: colors.text, borderBottom: `1px solid ${colors.border}` }}>Created</TableCell>
+                    <TableCell sx={{ color: colors.text, borderBottom: `1px solid ${colors.border}` }}>{new Date(selectedTicket.created_at).toLocaleString()}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600 }}>Last Updated</TableCell>
-                    <TableCell>{new Date(selectedTicket.updated_at).toLocaleString()}</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: colors.text, borderBottom: `1px solid ${colors.border}` }}>Last Updated</TableCell>
+                    <TableCell sx={{ color: colors.text, borderBottom: `1px solid ${colors.border}` }}>{new Date(selectedTicket.updated_at).toLocaleString()}</TableCell>
                   </TableRow>
                   {selectedTicket.completed_at && (
                     <TableRow>
-                      <TableCell sx={{ fontWeight: 600 }}>Completed</TableCell>
-                      <TableCell>{new Date(selectedTicket.completed_at).toLocaleString()}</TableCell>
+                      <TableCell sx={{ fontWeight: 600, color: colors.text, borderBottom: `1px solid ${colors.border}` }}>Completed</TableCell>
+                      <TableCell sx={{ color: colors.text, borderBottom: `1px solid ${colors.border}` }}>{new Date(selectedTicket.completed_at).toLocaleString()}</TableCell>
                     </TableRow>
                   )}
                 </TableBody>
               </Table>
 
-              <Divider sx={{ my: 2 }} />
+              <Divider sx={{ my: 2, borderColor: colors.border }} />
 
               {/* Operational Metadata */}
-              <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>
+              <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1, color: colors.text }}>
                 Operational Details
               </Typography>
-              <Box sx={{ bgcolor: alpha('#2b88d8', 0.05), p: 2, borderRadius: 1, border: '1px solid', borderColor: alpha('#2b88d8', 0.2) }}>
+              <Box sx={{ bgcolor: darkMode ? alpha('#2b88d8', 0.15) : alpha('#2b88d8', 0.05), p: 2, borderRadius: 1, border: `1px solid ${darkMode ? alpha('#2b88d8', 0.3) : alpha('#2b88d8', 0.2)}` }}>
                 {selectedTicket.metadata && Object.keys(selectedTicket.metadata).length > 0 ? (
                   <Table size="small">
                     <TableBody>
                       {Object.entries(selectedTicket.metadata).map(([key, value]) => (
                         <TableRow key={key}>
-                          <TableCell sx={{ fontWeight: 600, width: '40%', border: '1px solid rgba(0,0,0,0.08)', py: 0.5 }}>
+                          <TableCell sx={{ fontWeight: 600, width: '40%', border: `1px solid ${colors.border}`, py: 0.5, color: colors.text }}>
                             {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                           </TableCell>
-                          <TableCell sx={{ border: '1px solid rgba(0,0,0,0.08)', py: 0.5, fontFamily: typeof value === 'number' ? 'monospace' : 'inherit' }}>
+                          <TableCell sx={{ border: `1px solid ${colors.border}`, py: 0.5, fontFamily: typeof value === 'number' ? 'monospace' : 'inherit', color: colors.text }}>
                             {typeof value === 'number' ? value.toLocaleString() : String(value)}
                           </TableCell>
                         </TableRow>
@@ -686,7 +756,7 @@ const TicketingSystem = ({ onBack }) => {
                     </TableBody>
                   </Table>
                 ) : (
-                  <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                  <Typography variant="body2" sx={{ fontStyle: 'italic', color: colors.textSecondary }}>
                     No additional operational details available
                   </Typography>
                 )}
@@ -694,17 +764,17 @@ const TicketingSystem = ({ onBack }) => {
             </Box>
           )}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDetailsOpen(false)}>Close</Button>
+        <DialogActions sx={{ bgcolor: colors.cardBg, borderTop: `1px solid ${colors.border}` }}>
+          <Button onClick={() => setDetailsOpen(false)} sx={{ color: colors.primary }}>Close</Button>
         </DialogActions>
       </Dialog>
 
       {/* Cancel Ticket Dialog */}
-      <Dialog open={cancelDialogOpen} onClose={() => setCancelDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Cancel Ticket</DialogTitle>
-        <DialogContent>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Are you sure you want to cancel operation <strong>{selectedTicket && formatTicketId(selectedTicket)}</strong>?
+      <Dialog open={cancelDialogOpen} onClose={() => setCancelDialogOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { bgcolor: colors.paper, color: colors.text } }}>
+        <DialogTitle sx={{ bgcolor: colors.cardBg, borderBottom: `1px solid ${colors.border}`, color: colors.text }}>Cancel Ticket</DialogTitle>
+        <DialogContent sx={{ bgcolor: colors.paper, pt: 2 }}>
+          <Typography variant="body2" sx={{ mb: 2, color: colors.textSecondary, pt: 1 }}>
+            Are you sure you want to cancel operation <strong style={{ color: colors.text }}>{selectedTicket && formatTicketId(selectedTicket)}</strong>?
           </Typography>
           <TextField
             fullWidth
@@ -714,10 +784,20 @@ const TicketingSystem = ({ onBack }) => {
             value={cancelReason}
             onChange={(e) => setCancelReason(e.target.value)}
             placeholder="Please provide a reason for cancelling this ticket..."
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                bgcolor: darkMode ? colors.cardBg : undefined,
+                color: colors.text,
+                '& fieldset': { borderColor: colors.border },
+                '&:hover fieldset': { borderColor: colors.primary },
+              },
+              '& .MuiInputLabel-root': { color: colors.textSecondary },
+              '& .MuiInputBase-input::placeholder': { color: colors.textSecondary, opacity: 1 },
+            }}
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => { setCancelDialogOpen(false); setCancelReason(''); }}>
+        <DialogActions sx={{ bgcolor: colors.cardBg, borderTop: `1px solid ${colors.border}` }}>
+          <Button onClick={() => { setCancelDialogOpen(false); setCancelReason(''); }} sx={{ color: colors.primary }}>
             Back
           </Button>
           <Button onClick={confirmCancelTicket} variant="contained" color="error" disabled={!cancelReason.trim()}>

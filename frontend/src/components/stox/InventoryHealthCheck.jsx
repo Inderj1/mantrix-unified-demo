@@ -53,6 +53,16 @@ const formatCurrency = (value) => {
   return `$${value}`;
 };
 
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 // Generate mock inventory health data
 const generateHealthData = () => {
   const materials = [
@@ -129,7 +139,8 @@ const generateDetailData = (id, data) => {
   return sku;
 };
 
-const InventoryHealthCheck = ({ onBack }) => {
+const InventoryHealthCheck = ({ onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -352,9 +363,9 @@ const InventoryHealthCheck = ({ onBack }) => {
         <Grid container spacing={2} sx={{ mb: 3 }}>
           {/* Health Score Card */}
           <Grid item xs={12} md={4}>
-            <Card variant="outlined">
+            <Card variant="outlined" sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent sx={{ p: 2, textAlign: 'center' }}>
-                <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 2 }}>
+                <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 2 }}>
                   Health Score
                 </Typography>
                 <Typography
@@ -388,10 +399,10 @@ const InventoryHealthCheck = ({ onBack }) => {
 
           {/* Inventory Position */}
           <Grid item xs={12} md={4}>
-            <Card variant="outlined">
+            <Card variant="outlined" sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent sx={{ p: 2 }}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>
                     Inventory Position
                   </Typography>
                   <Chip label="MARD/MBEW" size="small" sx={{ fontSize: '0.6rem', height: 20, bgcolor: alpha('#06b6d4', 0.1), color: '#0891b2' }} />
@@ -403,9 +414,9 @@ const InventoryHealthCheck = ({ onBack }) => {
                   { label: 'In Transit', value: `${selectedSku.inTransit.toLocaleString()} EA` },
                   { label: 'Total Stock Value', value: formatCurrency(selectedSku.stockValue), bold: true },
                 ].map((item, idx) => (
-                  <Box key={idx} sx={{ display: 'flex', justifyContent: 'space-between', py: 1, borderBottom: idx < 4 ? '1px solid' : 'none', borderColor: alpha('#64748b', 0.1) }}>
-                    <Typography sx={{ fontSize: '0.8rem', color: '#64748b', fontWeight: item.bold ? 600 : 400 }}>{item.label}</Typography>
-                    <Typography sx={{ fontSize: '0.8rem', fontWeight: item.bold ? 700 : 600, color: item.highlight ? '#ef4444' : item.bold ? '#06b6d4' : '#1e293b' }}>
+                  <Box key={idx} sx={{ display: 'flex', justifyContent: 'space-between', py: 1, borderBottom: idx < 4 ? '1px solid' : 'none', borderColor: colors.border }}>
+                    <Typography sx={{ fontSize: '0.8rem', color: colors.textSecondary, fontWeight: item.bold ? 600 : 400 }}>{item.label}</Typography>
+                    <Typography sx={{ fontSize: '0.8rem', fontWeight: item.bold ? 700 : 600, color: item.highlight ? '#ef4444' : item.bold ? '#06b6d4' : colors.text }}>
                       {item.value}
                     </Typography>
                   </Box>
@@ -416,10 +427,10 @@ const InventoryHealthCheck = ({ onBack }) => {
 
           {/* Planning Parameters */}
           <Grid item xs={12} md={4}>
-            <Card variant="outlined">
+            <Card variant="outlined" sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent sx={{ p: 2 }}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>
                     Planning Parameters
                   </Typography>
                   <Chip label="MARC/MM02" size="small" sx={{ fontSize: '0.6rem', height: 20, bgcolor: alpha('#06b6d4', 0.1), color: '#0891b2' }} />
@@ -431,9 +442,9 @@ const InventoryHealthCheck = ({ onBack }) => {
                   { label: 'Avg Daily Usage', value: `${selectedSku.avgDailyUsage} EA/day` },
                   { label: 'Stockout Events (30d)', value: selectedSku.stockoutEvents, highlight: selectedSku.stockoutEvents > 0 },
                 ].map((item, idx) => (
-                  <Box key={idx} sx={{ display: 'flex', justifyContent: 'space-between', py: 1, borderBottom: idx < 4 ? '1px solid' : 'none', borderColor: alpha('#64748b', 0.1) }}>
-                    <Typography sx={{ fontSize: '0.8rem', color: '#64748b' }}>{item.label}</Typography>
-                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: item.highlight ? '#ef4444' : '#1e293b' }}>
+                  <Box key={idx} sx={{ display: 'flex', justifyContent: 'space-between', py: 1, borderBottom: idx < 4 ? '1px solid' : 'none', borderColor: colors.border }}>
+                    <Typography sx={{ fontSize: '0.8rem', color: colors.textSecondary }}>{item.label}</Typography>
+                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: item.highlight ? '#ef4444' : colors.text }}>
                       {item.value}
                     </Typography>
                   </Box>
@@ -444,9 +455,9 @@ const InventoryHealthCheck = ({ onBack }) => {
         </Grid>
 
         {/* Health Trend Chart */}
-        <Card variant="outlined">
+        <Card variant="outlined" sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <CardContent sx={{ p: 2 }}>
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 2 }}>
+            <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 2 }}>
               Health Score Trend (6 Months)
             </Typography>
             <Box sx={{ height: 200 }}>
@@ -468,8 +479,8 @@ const InventoryHealthCheck = ({ onBack }) => {
                   maintainAspectRatio: false,
                   plugins: { legend: { display: false } },
                   scales: {
-                    x: { grid: { color: 'rgba(0,0,0,0.06)' }, ticks: { color: '#64748b', font: { size: 10 } } },
-                    y: { grid: { color: 'rgba(0,0,0,0.06)' }, ticks: { color: '#64748b', font: { size: 10 } }, min: 0, max: 100 },
+                    x: { grid: { color: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)' }, ticks: { color: colors.textSecondary, font: { size: 10 } } },
+                    y: { grid: { color: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)' }, ticks: { color: colors.textSecondary, font: { size: 10 } }, min: 0, max: 100 },
                   },
                 }}
               />
@@ -481,7 +492,7 @@ const InventoryHealthCheck = ({ onBack }) => {
   };
 
   return (
-    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -505,10 +516,10 @@ const InventoryHealthCheck = ({ onBack }) => {
           <>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
               <HealthIcon sx={{ fontSize: 40, color: '#06b6d4' }} />
-              <Typography variant="h5" fontWeight={600}>Inventory Health Check</Typography>
+              <Typography variant="h5" fontWeight={600} sx={{ color: colors.text }}>Inventory Health Check</Typography>
               <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: colors.textSecondary }}>
               Monitor inventory health scores, excess stock, coverage metrics, and service levels
             </Typography>
           </>
@@ -523,49 +534,49 @@ const InventoryHealthCheck = ({ onBack }) => {
           {metrics && (
             <Grid container spacing={2} sx={{ mb: 3 }}>
               <Grid item xs={12} sm={6} md={2}>
-                <Card variant="outlined" sx={{ borderLeft: `3px solid #10b981` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #10b981`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Healthy</Typography>
+                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Healthy</Typography>
                     <Typography variant="h4" fontWeight={700} color="#059669">{metrics.healthy}</Typography>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card variant="outlined" sx={{ borderLeft: `3px solid #f59e0b` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #f59e0b`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Moderate</Typography>
+                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Moderate</Typography>
                     <Typography variant="h4" fontWeight={700} color="#d97706">{metrics.moderate}</Typography>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card variant="outlined" sx={{ borderLeft: `3px solid #ef4444` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #ef4444`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Critical</Typography>
+                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Critical</Typography>
                     <Typography variant="h4" fontWeight={700} color="#dc2626">{metrics.critical}</Typography>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card variant="outlined" sx={{ borderLeft: `3px solid #ef4444` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #ef4444`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Excess $</Typography>
+                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Excess $</Typography>
                     <Typography variant="h4" fontWeight={700} color="#dc2626">{formatCurrency(metrics.totalExcess)}</Typography>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card variant="outlined" sx={{ borderLeft: `3px solid #f59e0b` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #f59e0b`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Fill Rate</Typography>
+                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Fill Rate</Typography>
                     <Typography variant="h4" fontWeight={700} color="#d97706">{metrics.avgFillRate}%</Typography>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card variant="outlined" sx={{ borderLeft: `3px solid #06b6d4` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #06b6d4`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Avg Turns</Typography>
+                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Avg Turns</Typography>
                     <Typography variant="h4" fontWeight={700} color="#0891b2">{metrics.avgTurns}x</Typography>
                   </CardContent>
                 </Card>
@@ -574,11 +585,13 @@ const InventoryHealthCheck = ({ onBack }) => {
           )}
 
           {/* Filters */}
-          <Paper sx={{ p: 2, mb: 2, display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-            <FilterListIcon sx={{ color: '#64748b' }} />
+          <Paper sx={{ p: 2, mb: 2, display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
+            <FilterListIcon sx={{ color: colors.textSecondary }} />
             <FormControl size="small" sx={{ minWidth: 120 }}>
-              <InputLabel>Status</InputLabel>
-              <Select value={filters.status} label="Status" onChange={(e) => handleFilterChange('status', e.target.value)}>
+              <InputLabel sx={{ color: colors.textSecondary }}>Status</InputLabel>
+              <Select value={filters.status} label="Status" onChange={(e) => handleFilterChange('status', e.target.value)}
+                sx={{ color: colors.text, '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border }, '& .MuiSvgIcon-root': { color: colors.text } }}
+                MenuProps={{ PaperProps: { sx: { bgcolor: colors.paper, border: `1px solid ${colors.border}`, '& .MuiMenuItem-root': { color: colors.text, '&:hover': { bgcolor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)' } } } } }}>
                 <MenuItem value="all">All</MenuItem>
                 <MenuItem value="Healthy">Healthy</MenuItem>
                 <MenuItem value="Moderate">Moderate</MenuItem>
@@ -586,8 +599,10 @@ const InventoryHealthCheck = ({ onBack }) => {
               </Select>
             </FormControl>
             <FormControl size="small" sx={{ minWidth: 100 }}>
-              <InputLabel>ABC</InputLabel>
-              <Select value={filters.abc} label="ABC" onChange={(e) => handleFilterChange('abc', e.target.value)}>
+              <InputLabel sx={{ color: colors.textSecondary }}>ABC</InputLabel>
+              <Select value={filters.abc} label="ABC" onChange={(e) => handleFilterChange('abc', e.target.value)}
+                sx={{ color: colors.text, '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border }, '& .MuiSvgIcon-root': { color: colors.text } }}
+                MenuProps={{ PaperProps: { sx: { bgcolor: colors.paper, border: `1px solid ${colors.border}`, '& .MuiMenuItem-root': { color: colors.text, '&:hover': { bgcolor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)' } } } } }}>
                 <MenuItem value="all">All</MenuItem>
                 <MenuItem value="A">A</MenuItem>
                 <MenuItem value="B">B</MenuItem>
@@ -595,8 +610,10 @@ const InventoryHealthCheck = ({ onBack }) => {
               </Select>
             </FormControl>
             <FormControl size="small" sx={{ minWidth: 100 }}>
-              <InputLabel>XYZ</InputLabel>
-              <Select value={filters.xyz} label="XYZ" onChange={(e) => handleFilterChange('xyz', e.target.value)}>
+              <InputLabel sx={{ color: colors.textSecondary }}>XYZ</InputLabel>
+              <Select value={filters.xyz} label="XYZ" onChange={(e) => handleFilterChange('xyz', e.target.value)}
+                sx={{ color: colors.text, '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border }, '& .MuiSvgIcon-root': { color: colors.text } }}
+                MenuProps={{ PaperProps: { sx: { bgcolor: colors.paper, border: `1px solid ${colors.border}`, '& .MuiMenuItem-root': { color: colors.text, '&:hover': { bgcolor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)' } } } } }}>
                 <MenuItem value="all">All</MenuItem>
                 <MenuItem value="X">X</MenuItem>
                 <MenuItem value="Y">Y</MenuItem>
@@ -604,19 +621,21 @@ const InventoryHealthCheck = ({ onBack }) => {
               </Select>
             </FormControl>
             <FormControl size="small" sx={{ minWidth: 120 }}>
-              <InputLabel>Plant</InputLabel>
-              <Select value={filters.plant} label="Plant" onChange={(e) => handleFilterChange('plant', e.target.value)}>
+              <InputLabel sx={{ color: colors.textSecondary }}>Plant</InputLabel>
+              <Select value={filters.plant} label="Plant" onChange={(e) => handleFilterChange('plant', e.target.value)}
+                sx={{ color: colors.text, '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border }, '& .MuiSvgIcon-root': { color: colors.text } }}
+                MenuProps={{ PaperProps: { sx: { bgcolor: colors.paper, border: `1px solid ${colors.border}`, '& .MuiMenuItem-root': { color: colors.text, '&:hover': { bgcolor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)' } } } } }}>
                 <MenuItem value="all">All Plants</MenuItem>
                 {uniquePlants.map(p => <MenuItem key={p} value={p}>{p}</MenuItem>)}
               </Select>
             </FormControl>
-            <Typography sx={{ ml: 'auto', fontSize: '0.8rem', color: '#64748b' }}>
+            <Typography sx={{ ml: 'auto', fontSize: '0.8rem', color: colors.textSecondary }}>
               Showing {filteredData.length} of {data.length} items
             </Typography>
           </Paper>
 
           {/* DataGrid */}
-          <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0, width: '100%' }}>
+          <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0, width: '100%', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
             <DataGrid
               rows={filteredData}
               columns={columns}
@@ -629,7 +648,43 @@ const InventoryHealthCheck = ({ onBack }) => {
               checkboxSelection
               disableRowSelectionOnClick
               onRowClick={handleRowClick}
-              sx={stoxTheme.getDataGridSx({ clickable: true })}
+              sx={{
+                ...stoxTheme.getDataGridSx({ clickable: true }),
+                bgcolor: colors.paper,
+                color: colors.text,
+                '& .MuiDataGrid-columnHeaders': {
+                  bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                  color: colors.text,
+                  borderBottom: `1px solid ${colors.border}`,
+                },
+                '& .MuiDataGrid-columnHeaderTitle': {
+                  color: colors.text,
+                  fontWeight: 600,
+                },
+                '& .MuiDataGrid-cell': {
+                  color: colors.text,
+                  borderBottom: `1px solid ${colors.border}`,
+                },
+                '& .MuiDataGrid-row': {
+                  '&:hover': {
+                    bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                  },
+                },
+                '& .MuiDataGrid-footerContainer': {
+                  bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                  borderTop: `1px solid ${colors.border}`,
+                  color: colors.text,
+                },
+                '& .MuiTablePagination-root': {
+                  color: colors.text,
+                },
+                '& .MuiDataGrid-toolbarContainer': {
+                  color: colors.text,
+                  '& .MuiButton-root': {
+                    color: colors.text,
+                  },
+                },
+              }}
             />
           </Paper>
         </>

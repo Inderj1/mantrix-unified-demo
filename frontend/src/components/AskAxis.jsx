@@ -28,8 +28,21 @@ import {
 import { usePageContext } from '../contexts/PageContextProvider';
 import chatStorageService from '../services/chatStorageService';
 
-const AskAxis = () => {
+// Dark mode color helper
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+  messagesBg: darkMode ? '#0d1117' : '#f5f5f5',
+});
+
+const AskAxis = ({ darkMode = false }) => {
   const theme = useTheme();
+  const colors = getColors(darkMode);
   const { context, getContextKey, getContextDescription } = usePageContext();
 
   // UI State
@@ -283,7 +296,7 @@ const AskAxis = () => {
               <Box
                 sx={{
                   bgcolor: alpha(theme.palette.primary.main, 0.05),
-                  borderBottom: `1px solid ${theme.palette.divider}`,
+                  borderBottom: `1px solid ${colors.border}`,
                 }}
               >
                 <Box
@@ -298,7 +311,7 @@ const AskAxis = () => {
                 >
                   <Stack direction="row" spacing={1} alignItems="center">
                     <SparkleIcon sx={{ fontSize: 16, color: 'primary.main' }} />
-                    <Typography variant="caption" fontWeight={600} color="text.secondary">
+                    <Typography variant="caption" fontWeight={600} sx={{ color: colors.textSecondary }}>
                       Context: {getContextDescription()}
                     </Typography>
                   </Stack>
@@ -332,13 +345,13 @@ const AskAxis = () => {
                   flex: 1,
                   overflowY: 'auto',
                   p: 2,
-                  bgcolor: '#f5f5f5',
+                  bgcolor: colors.messagesBg,
                 }}
               >
                 {messages.length === 0 ? (
                   <Box sx={{ textAlign: 'center', py: 4 }}>
-                    <BrainIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
+                    <BrainIcon sx={{ fontSize: 64, color: colors.textSecondary, mb: 2 }} />
+                    <Typography variant="body2" sx={{ color: colors.textSecondary }} gutterBottom>
                       Ask me anything about this page
                     </Typography>
                     <Stack direction="row" spacing={0.5} flexWrap="wrap" justifyContent="center" sx={{ mt: 2 }}>
@@ -368,9 +381,10 @@ const AskAxis = () => {
                           sx={{
                             p: 1.5,
                             maxWidth: '80%',
-                            bgcolor: message.role === 'user' ? 'primary.main' : 'white',
-                            color: message.role === 'user' ? 'white' : 'text.primary',
+                            bgcolor: message.role === 'user' ? 'primary.main' : colors.paper,
+                            color: message.role === 'user' ? 'white' : colors.text,
                             borderRadius: 2,
+                            border: message.role === 'user' ? 'none' : `1px solid ${colors.border}`,
                             ...(message.isError && {
                               bgcolor: 'error.light',
                               color: 'white',
@@ -395,7 +409,7 @@ const AskAxis = () => {
                     ))}
                     {isLoading && (
                       <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
-                        <Paper elevation={1} sx={{ p: 1.5, borderRadius: 2 }}>
+                        <Paper elevation={1} sx={{ p: 1.5, borderRadius: 2, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
                           <CircularProgress size={20} />
                         </Paper>
                       </Box>
@@ -406,7 +420,7 @@ const AskAxis = () => {
               </Box>
 
               {/* Input Area */}
-              <Box sx={{ p: 2, bgcolor: 'background.paper', borderTop: `1px solid ${theme.palette.divider}` }}>
+              <Box sx={{ p: 2, bgcolor: colors.paper, borderTop: `1px solid ${colors.border}` }}>
                 <Stack direction="row" spacing={1}>
                   <TextField
                     ref={inputRef}
@@ -444,7 +458,7 @@ const AskAxis = () => {
                     <SendIcon />
                   </IconButton>
                 </Stack>
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                <Typography variant="caption" sx={{ color: colors.textSecondary, display: 'block', mt: 0.5 }}>
                   Press Enter to send • Shift+Enter for new line
                 </Typography>
               </Box>

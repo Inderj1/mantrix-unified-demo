@@ -69,6 +69,16 @@ const formatLocalCurrency = (value, currency) => {
   return lamFormatCurrency(value, currency);
 };
 
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 // Generate plant data using ACTUAL Arizona Beverages data
 const generatePlantData = () => {
   const plantDescriptions = {
@@ -263,7 +273,8 @@ const generatePlantData = () => {
   });
 };
 
-const PlantInventoryIntelligence = ({ onBack, onTileClick }) => {
+const PlantInventoryIntelligence = ({ onBack, onTileClick, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const tileConfig = getTileDataConfig('plant-inventory-intelligence');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -510,13 +521,13 @@ const PlantInventoryIntelligence = ({ onBack, onTileClick }) => {
     },
     scales: {
       x: {
-        grid: { color: 'rgba(0,0,0,0.06)' },
-        ticks: { color: '#64748b', font: { size: 10 } },
+        grid: { color: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)' },
+        ticks: { color: colors.textSecondary, font: { size: 10 } },
       },
       y: {
-        grid: { color: 'rgba(0,0,0,0.06)' },
+        grid: { color: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)' },
         ticks: {
-          color: '#64748b',
+          color: colors.textSecondary,
           font: { size: 10 },
           callback: (v) => `$${v}M`,
         },
@@ -567,12 +578,12 @@ const PlantInventoryIntelligence = ({ onBack, onTileClick }) => {
             { label: 'Working Capital', value: formatCurrency(selectedPlant.workingCapital), sub: `Inv + AR(${selectedPlant.dso}d) - AP(${selectedPlant.dpo}d)`, color: isHealthy ? '#10b981' : '#f59e0b', icon: <AssessmentIcon /> },
           ].map((stat, idx) => (
             <Grid item xs={6} sm={3} key={idx}>
-              <Card variant="outlined">
+              <Card variant="outlined" sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                 <CardContent sx={{ py: 2, px: 2, textAlign: 'center', '&:last-child': { pb: 2 } }}>
                   <Box sx={{ color: stat.color, mb: 1 }}>{stat.icon}</Box>
                   <Typography sx={{ fontSize: '1.5rem', fontWeight: 700, color: stat.color }}>{stat.value}</Typography>
-                  <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 0.5 }}>{stat.label}</Typography>
-                  <Typography sx={{ fontSize: '0.65rem', color: '#64748b', mt: 0.5 }}>{stat.sub}</Typography>
+                  <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5 }}>{stat.label}</Typography>
+                  <Typography sx={{ fontSize: '0.65rem', color: colors.textSecondary, mt: 0.5 }}>{stat.sub}</Typography>
                 </CardContent>
               </Card>
             </Grid>
@@ -580,11 +591,11 @@ const PlantInventoryIntelligence = ({ onBack, onTileClick }) => {
         </Grid>
 
         {/* Inventory Health Breakdown */}
-        <Card variant="outlined" sx={{ mb: 3 }}>
+        <Card variant="outlined" sx={{ mb: 3, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <CardContent sx={{ p: 2 }}>
             <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
               <AssessmentIcon sx={{ color: '#0891b2' }} />
-              <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
+              <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>
                 Inventory Health Breakdown
               </Typography>
               <Chip label="MARD / MSEG / MC50" size="small" sx={{ ml: 'auto', fontSize: '0.6rem', height: 20, bgcolor: alpha('#06b6d4', 0.1), color: '#0891b2' }} />
@@ -601,11 +612,11 @@ const PlantInventoryIntelligence = ({ onBack, onTileClick }) => {
                 <Grid item xs={6} sm={4} md={2} key={idx}>
                   <Box sx={{ p: 1.5, bgcolor: alpha(item.color, 0.05), borderRadius: 1, borderLeft: `3px solid ${item.color}` }}>
                     <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.5 }}>
-                      <Typography sx={{ fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase' }}>{item.label}</Typography>
-                      <Typography sx={{ fontSize: '0.6rem', color: '#64748b' }}>{item.skus}</Typography>
+                      <Typography sx={{ fontSize: '0.65rem', color: colors.textSecondary, textTransform: 'uppercase' }}>{item.label}</Typography>
+                      <Typography sx={{ fontSize: '0.6rem', color: colors.textSecondary }}>{item.skus}</Typography>
                     </Stack>
-                    <Typography sx={{ fontSize: '1.1rem', fontWeight: 700, color: '#1e293b' }}>{item.value}</Typography>
-                    <Typography sx={{ fontSize: '0.6rem', color: '#64748b' }}>{item.pct}</Typography>
+                    <Typography sx={{ fontSize: '1.1rem', fontWeight: 700, color: colors.text }}>{item.value}</Typography>
+                    <Typography sx={{ fontSize: '0.6rem', color: colors.textSecondary }}>{item.pct}</Typography>
                   </Box>
                 </Grid>
               ))}
@@ -614,11 +625,11 @@ const PlantInventoryIntelligence = ({ onBack, onTileClick }) => {
         </Card>
 
         {/* Working Capital Breakdown - Cash-to-Cash Cycle */}
-        <Card variant="outlined" sx={{ mb: 3 }}>
+        <Card variant="outlined" sx={{ mb: 3, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <CardContent sx={{ p: 2 }}>
             <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
               <AttachMoneyIcon sx={{ color: '#0891b2' }} />
-              <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
+              <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>
                 Working Capital & Cash-to-Cash Cycle
               </Typography>
               <Chip label="FI/CO + BSID/BSIK" size="small" sx={{ ml: 'auto', fontSize: '0.6rem', height: 20, bgcolor: alpha('#06b6d4', 0.1), color: '#0891b2' }} />
@@ -631,22 +642,22 @@ const PlantInventoryIntelligence = ({ onBack, onTileClick }) => {
                 { label: 'Net Working Capital', value: formatCurrency(selectedPlant.workingCapital), pct: `C2C: ${selectedPlant.cash2cashDays} days`, color: '#a855f7', sign: '=' },
               ].map((item, idx) => (
                 <Grid item xs={6} sm={3} key={idx}>
-                  <Box sx={{ p: 1.5, bgcolor: alpha(item.color, 0.05), borderRadius: 1, borderLeft: `3px solid ${item.color}` }}>
+                  <Box sx={{ p: 1.5, bgcolor: alpha(item.color, darkMode ? 0.15 : 0.05), borderRadius: 1, borderLeft: `3px solid ${item.color}` }}>
                     <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.5 }}>
-                      <Typography sx={{ fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase' }}>{item.label}</Typography>
+                      <Typography sx={{ fontSize: '0.65rem', color: colors.textSecondary, textTransform: 'uppercase' }}>{item.label}</Typography>
                       <Chip label={item.sign} size="small" sx={{ minWidth: 24, height: 18, fontSize: '0.7rem', fontWeight: 700, bgcolor: alpha(item.color, 0.15), color: item.color }} />
                     </Stack>
-                    <Typography sx={{ fontSize: '1.2rem', fontWeight: 700, color: '#1e293b' }}>{item.value}</Typography>
-                    <Typography sx={{ fontSize: '0.6rem', color: '#64748b' }}>{item.pct}</Typography>
+                    <Typography sx={{ fontSize: '1.2rem', fontWeight: 700, color: colors.text }}>{item.value}</Typography>
+                    <Typography sx={{ fontSize: '0.6rem', color: colors.textSecondary }}>{item.pct}</Typography>
                   </Box>
                 </Grid>
               ))}
             </Grid>
-            <Box sx={{ mt: 2, p: 1.5, bgcolor: alpha('#64748b', 0.05), borderRadius: 1 }}>
-              <Typography sx={{ fontSize: '0.65rem', color: '#64748b' }}>
+            <Box sx={{ mt: 2, p: 1.5, bgcolor: alpha(colors.textSecondary, darkMode ? 0.15 : 0.05), borderRadius: 1 }}>
+              <Typography sx={{ fontSize: '0.65rem', color: colors.textSecondary }}>
                 <strong>Cash-to-Cash Cycle Formula:</strong> DOS ({Math.round(selectedPlant.daysCoverage)}d) + DSO ({selectedPlant.dso}d) - DPO ({selectedPlant.dpo}d) = <strong>{selectedPlant.cash2cashDays} days</strong>
               </Typography>
-              <Typography sx={{ fontSize: '0.6rem', color: '#64748b', mt: 0.5 }}>
+              <Typography sx={{ fontSize: '0.6rem', color: colors.textSecondary, mt: 0.5 }}>
                 This means cash is tied up for {selectedPlant.cash2cashDays} days from paying suppliers to collecting from customers.
               </Typography>
             </Box>
@@ -657,9 +668,9 @@ const PlantInventoryIntelligence = ({ onBack, onTileClick }) => {
         <Grid container spacing={2} sx={{ mb: 3 }}>
           {/* Trend Chart */}
           <Grid item xs={12} md={6}>
-            <Card variant="outlined">
+            <Card variant="outlined" sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent sx={{ p: 2 }}>
-                <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 2 }}>
+                <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 2 }}>
                   Inventory Value Trend (6 Mo)
                 </Typography>
                 <Box sx={{ height: 180 }}>
@@ -685,9 +696,9 @@ const PlantInventoryIntelligence = ({ onBack, onTileClick }) => {
 
           {/* ABC/XYZ Matrix */}
           <Grid item xs={12} md={6}>
-            <Card variant="outlined">
+            <Card variant="outlined" sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent sx={{ p: 2 }}>
-                <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 2 }}>
+                <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 2 }}>
                   ABC/XYZ Segmentation Matrix
                 </Typography>
                 <Grid container spacing={1}>
@@ -695,14 +706,14 @@ const PlantInventoryIntelligence = ({ onBack, onTileClick }) => {
                   <Grid item xs={3}><Box sx={{ textAlign: 'center', py: 1 }} /></Grid>
                   {['X', 'Y', 'Z'].map((col) => (
                     <Grid item xs={3} key={col}>
-                      <Typography sx={{ textAlign: 'center', fontSize: '0.75rem', fontWeight: 600, color: '#64748b' }}>{col}</Typography>
+                      <Typography sx={{ textAlign: 'center', fontSize: '0.75rem', fontWeight: 600, color: colors.textSecondary }}>{col}</Typography>
                     </Grid>
                   ))}
                   {/* Matrix Rows */}
                   {['A', 'B', 'C'].map((row) => (
                     <React.Fragment key={row}>
                       <Grid item xs={3}>
-                        <Typography sx={{ textAlign: 'center', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', py: 2 }}>{row}</Typography>
+                        <Typography sx={{ textAlign: 'center', fontSize: '0.75rem', fontWeight: 600, color: colors.textSecondary, py: 2 }}>{row}</Typography>
                       </Grid>
                       {['X', 'Y', 'Z'].map((col) => {
                         const key = `${row}${col}`;
@@ -714,9 +725,9 @@ const PlantInventoryIntelligence = ({ onBack, onTileClick }) => {
                         };
                         return (
                           <Grid item xs={3} key={key}>
-                            <Box sx={{ textAlign: 'center', py: 1.5, px: 1, bgcolor: alpha(cellColors[key], 0.1), borderRadius: 1 }}>
+                            <Box sx={{ textAlign: 'center', py: 1.5, px: 1, bgcolor: alpha(cellColors[key], darkMode ? 0.2 : 0.1), borderRadius: 1 }}>
                               <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: cellColors[key] }}>{cell.count}</Typography>
-                              <Typography sx={{ fontSize: '0.6rem', color: '#64748b' }}>{formatCurrency(cell.value)}</Typography>
+                              <Typography sx={{ fontSize: '0.6rem', color: colors.textSecondary }}>{formatCurrency(cell.value)}</Typography>
                             </Box>
                           </Grid>
                         );
@@ -732,11 +743,11 @@ const PlantInventoryIntelligence = ({ onBack, onTileClick }) => {
         {/* Performance KPIs */}
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} md={8}>
-            <Card variant="outlined">
+            <Card variant="outlined" sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent sx={{ p: 2 }}>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
                   <SpeedIcon sx={{ color: '#0891b2' }} />
-                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>
                     Performance KPIs
                   </Typography>
                   <Chip label="MVER / VBAP / LIPS" size="small" sx={{ ml: 'auto', fontSize: '0.6rem', height: 20, bgcolor: alpha('#06b6d4', 0.1), color: '#0891b2' }} />
@@ -751,9 +762,9 @@ const PlantInventoryIntelligence = ({ onBack, onTileClick }) => {
                     { label: 'Cash-to-Cash Days', value: Math.round(selectedPlant.cash2cashDays), delta: isHealthy ? '-6 days' : isCritical ? '+38 days' : '+12 days', color: selectedPlant.cash2cashDays <= 45 ? '#10b981' : selectedPlant.cash2cashDays <= 70 ? '#f59e0b' : '#ef4444' },
                   ].map((kpi, idx) => (
                     <Grid item xs={6} sm={4} md={2} key={idx}>
-                      <Box sx={{ textAlign: 'center', p: 1.5, bgcolor: alpha('#64748b', 0.03), borderRadius: 1 }}>
+                      <Box sx={{ textAlign: 'center', p: 1.5, bgcolor: alpha(colors.textSecondary, darkMode ? 0.1 : 0.03), borderRadius: 1 }}>
                         <Typography sx={{ fontSize: '1.5rem', fontWeight: 700, color: kpi.color }}>{kpi.value}</Typography>
-                        <Typography sx={{ fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase' }}>{kpi.label}</Typography>
+                        <Typography sx={{ fontSize: '0.65rem', color: colors.textSecondary, textTransform: 'uppercase' }}>{kpi.label}</Typography>
                         <Typography sx={{ fontSize: '0.6rem', color: kpi.delta.startsWith('+') ? '#ef4444' : '#10b981', mt: 0.5 }}>{kpi.delta}</Typography>
                       </Box>
                     </Grid>
@@ -765,30 +776,30 @@ const PlantInventoryIntelligence = ({ onBack, onTileClick }) => {
 
           {/* P&L Impact */}
           <Grid item xs={12} md={4}>
-            <Card variant="outlined">
+            <Card variant="outlined" sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent sx={{ p: 2 }}>
-                <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 2 }}>
+                <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 2 }}>
                   Inventory P&L Impact
                 </Typography>
                 <Stack spacing={1}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 1.5, bgcolor: alpha('#10b981', 0.08), borderRadius: 1 }}>
-                    <Typography sx={{ fontSize: '0.75rem', color: '#64748b' }}>COGS (Inventory Sold)</Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 1.5, bgcolor: alpha('#10b981', darkMode ? 0.15 : 0.08), borderRadius: 1 }}>
+                    <Typography sx={{ fontSize: '0.75rem', color: colors.textSecondary }}>COGS (Inventory Sold)</Typography>
                     <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: '#10b981' }}>{formatCurrency(selectedPlant.cogs)}</Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 1.5, bgcolor: alpha('#ef4444', 0.08), borderRadius: 1 }}>
-                    <Typography sx={{ fontSize: '0.75rem', color: '#64748b' }}>Carrying Cost</Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 1.5, bgcolor: alpha('#ef4444', darkMode ? 0.15 : 0.08), borderRadius: 1 }}>
+                    <Typography sx={{ fontSize: '0.75rem', color: colors.textSecondary }}>Carrying Cost</Typography>
                     <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: '#ef4444' }}>-{formatCurrency(selectedPlant.carryingCost)}</Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 1.5, bgcolor: alpha('#ef4444', 0.08), borderRadius: 1 }}>
-                    <Typography sx={{ fontSize: '0.75rem', color: '#64748b' }}>Stockout Cost</Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 1.5, bgcolor: alpha('#ef4444', darkMode ? 0.15 : 0.08), borderRadius: 1 }}>
+                    <Typography sx={{ fontSize: '0.75rem', color: colors.textSecondary }}>Stockout Cost</Typography>
                     <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: '#ef4444' }}>-{formatCurrency(selectedPlant.stockoutCost)}</Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 1.5, bgcolor: alpha('#ef4444', 0.08), borderRadius: 1 }}>
-                    <Typography sx={{ fontSize: '0.75rem', color: '#64748b' }}>Obsolescence Write-off</Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 1.5, bgcolor: alpha('#ef4444', darkMode ? 0.15 : 0.08), borderRadius: 1 }}>
+                    <Typography sx={{ fontSize: '0.75rem', color: colors.textSecondary }}>Obsolescence Write-off</Typography>
                     <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: '#ef4444' }}>-{formatCurrency(selectedPlant.obsoleteCost)}</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 1.5, bgcolor: alpha('#06b6d4', 0.1), borderRadius: 1, border: '1px solid', borderColor: alpha('#06b6d4', 0.3) }}>
-                    <Typography sx={{ fontSize: '0.75rem', color: '#64748b' }}>Gross Margin</Typography>
+                    <Typography sx={{ fontSize: '0.75rem', color: colors.textSecondary }}>Gross Margin</Typography>
                     <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: '#06b6d4' }}>{formatCurrency(selectedPlant.grossMargin)}</Typography>
                   </Box>
                 </Stack>
@@ -798,9 +809,9 @@ const PlantInventoryIntelligence = ({ onBack, onTileClick }) => {
         </Grid>
 
         {/* Alerts */}
-        <Card variant="outlined">
+        <Card variant="outlined" sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <CardContent sx={{ p: 2 }}>
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 2 }}>
+            <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 2 }}>
               Active Alerts & Actions
             </Typography>
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
@@ -836,7 +847,7 @@ const PlantInventoryIntelligence = ({ onBack, onTileClick }) => {
 
   // Main render
   return (
-    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -894,14 +905,14 @@ const PlantInventoryIntelligence = ({ onBack, onTileClick }) => {
               { label: 'Fill Rate', value: `${summaryStats.avgFillRate.toFixed(1)}%`, sub: '+1.2% vs target', color: '#10b981', icon: <CheckCircle /> },
             ].map((stat, idx) => (
               <Grid item xs={6} sm={4} md={2} key={idx}>
-                <Card variant="outlined" sx={{ borderLeft: `3px solid ${stat.color}` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid ${stat.color}`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
                     <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
                       <Box sx={{ color: stat.color, display: 'flex' }}>{stat.icon}</Box>
-                      <Typography sx={{ fontSize: '0.6rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 0.5 }}>{stat.label}</Typography>
+                      <Typography sx={{ fontSize: '0.6rem', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5 }}>{stat.label}</Typography>
                     </Stack>
-                    <Typography sx={{ fontSize: '1.3rem', fontWeight: 700, color: '#1e293b' }}>{stat.value}</Typography>
-                    <Typography sx={{ fontSize: '0.65rem', color: '#64748b' }}>{stat.sub}</Typography>
+                    <Typography sx={{ fontSize: '1.3rem', fontWeight: 700, color: colors.text }}>{stat.value}</Typography>
+                    <Typography sx={{ fontSize: '0.65rem', color: colors.textSecondary }}>{stat.sub}</Typography>
                   </CardContent>
                 </Card>
               </Grid>
@@ -915,8 +926,8 @@ const PlantInventoryIntelligence = ({ onBack, onTileClick }) => {
       {selectedPlant ? (
         renderDetailView()
       ) : (
-        <Paper elevation={0} variant="outlined" sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: alpha('#64748b', 0.2), background: `linear-gradient(90deg, ${alpha('#0284c7', 0.05)}, ${alpha('#64748b', 0.02)})` }}>
+        <Paper elevation={0} variant="outlined" sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
+          <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: colors.border, background: darkMode ? `linear-gradient(90deg, ${alpha('#0284c7', 0.15)}, ${alpha('#64748b', 0.08)})` : `linear-gradient(90deg, ${alpha('#0284c7', 0.05)}, ${alpha('#64748b', 0.02)})` }}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
               <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: '#0078d4' }}>
                 Plant Inventory Summary — <Typography component="span" sx={{ color: '#0891b2' }}>Click to Drill Down</Typography>
@@ -937,7 +948,43 @@ const PlantInventoryIntelligence = ({ onBack, onTileClick }) => {
               initialState={{
                 pagination: { paginationModel: { pageSize: 10 } },
               }}
-              sx={stoxTheme.getDataGridSx({ clickable: true })}
+              sx={{
+                ...stoxTheme.getDataGridSx({ clickable: true }),
+                bgcolor: colors.paper,
+                color: colors.text,
+                '& .MuiDataGrid-columnHeaders': {
+                  bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                  color: colors.text,
+                  borderBottom: `1px solid ${colors.border}`,
+                },
+                '& .MuiDataGrid-columnHeaderTitle': {
+                  color: colors.text,
+                  fontWeight: 600,
+                },
+                '& .MuiDataGrid-cell': {
+                  color: colors.text,
+                  borderBottom: `1px solid ${colors.border}`,
+                },
+                '& .MuiDataGrid-row': {
+                  '&:hover': {
+                    bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                  },
+                },
+                '& .MuiDataGrid-footerContainer': {
+                  bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                  borderTop: `1px solid ${colors.border}`,
+                  color: colors.text,
+                },
+                '& .MuiTablePagination-root': {
+                  color: colors.text,
+                },
+                '& .MuiDataGrid-toolbarContainer': {
+                  color: colors.text,
+                  '& .MuiButton-root': {
+                    color: colors.text,
+                  },
+                },
+              }}
               slots={{ toolbar: GridToolbar }}
               slotProps={{
                 toolbar: {

@@ -34,22 +34,26 @@ import {
   Edit as EditIcon,
 } from '@mui/icons-material';
 
-// Blue/grey color palette
-const colors = {
-  primary: '#0a6ed1',
-  secondary: '#0854a0',
-  dark: '#354a5f',
-  slate: '#475569',
-  grey: '#64748b',
-  light: '#94a3b8',
-  success: '#10b981',
-  warning: '#f59e0b',
-  error: '#ef4444',
-  text: '#1e293b',
-  bg: '#f8fbfd',
-};
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  secondary: darkMode ? '#5cb3ff' : '#0854a0',
+  dark: darkMode ? '#8b949e' : '#354a5f',
+  slate: darkMode ? '#8b949e' : '#475569',
+  grey: darkMode ? '#8b949e' : '#64748b',
+  light: darkMode ? '#6e7681' : '#94a3b8',
+  success: darkMode ? '#3fb950' : '#10b981',
+  warning: darkMode ? '#d29922' : '#f59e0b',
+  error: darkMode ? '#f85149' : '#ef4444',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
 
-const PlatformSettings = () => {
+const PlatformSettings = ({ darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [settings, setSettings] = useState({
     emailNotifications: true,
     slackNotifications: false,
@@ -112,8 +116,9 @@ const PlatformSettings = () => {
             sx={{
               p: 3,
               borderRadius: 3,
-              bgcolor: 'white',
+              bgcolor: colors.paper,
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: `1px solid ${colors.border}`,
             }}
           >
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
@@ -147,7 +152,7 @@ const PlatformSettings = () => {
                     }}
                   />
                 }
-                label={<Typography variant="body2" sx={{ color: colors.dark }}>Auto-refresh dashboards</Typography>}
+                label={<Typography variant="body2" sx={{ color: colors.text }}>Auto-refresh dashboards</Typography>}
               />
               <FormControlLabel
                 control={
@@ -160,7 +165,7 @@ const PlatformSettings = () => {
                 label={<Typography variant="body2" sx={{ color: colors.light }}>Dark mode (coming soon)</Typography>}
               />
               <FormControl fullWidth size="small">
-                <InputLabel sx={{ color: colors.grey }}>Data Retention (days)</InputLabel>
+                <InputLabel sx={{ color: colors.textSecondary }}>Data Retention (days)</InputLabel>
                 <Select
                   value={settings.dataRetention}
                   label="Data Retention (days)"
@@ -179,7 +184,7 @@ const PlatformSettings = () => {
                 </Select>
               </FormControl>
               <FormControl fullWidth size="small">
-                <InputLabel sx={{ color: colors.grey }}>Cache Expiry (hours)</InputLabel>
+                <InputLabel sx={{ color: colors.textSecondary }}>Cache Expiry (hours)</InputLabel>
                 <Select
                   value={settings.cacheExpiry}
                   label="Cache Expiry (hours)"
@@ -208,8 +213,9 @@ const PlatformSettings = () => {
             sx={{
               p: 3,
               borderRadius: 3,
-              bgcolor: 'white',
+              bgcolor: colors.paper,
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: `1px solid ${colors.border}`,
             }}
           >
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
@@ -243,7 +249,7 @@ const PlatformSettings = () => {
                     }}
                   />
                 }
-                label={<Typography variant="body2" sx={{ color: colors.dark }}>Email notifications</Typography>}
+                label={<Typography variant="body2" sx={{ color: colors.text }}>Email notifications</Typography>}
               />
               <FormControlLabel
                 control={
@@ -256,7 +262,7 @@ const PlatformSettings = () => {
                     }}
                   />
                 }
-                label={<Typography variant="body2" sx={{ color: colors.dark }}>Slack notifications</Typography>}
+                label={<Typography variant="body2" sx={{ color: colors.text }}>Slack notifications</Typography>}
               />
               <TextField
                 fullWidth
@@ -297,8 +303,9 @@ const PlatformSettings = () => {
             sx={{
               p: 3,
               borderRadius: 3,
-              bgcolor: 'white',
+              bgcolor: colors.paper,
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: `1px solid ${colors.border}`,
             }}
           >
             <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
@@ -337,12 +344,12 @@ const PlatformSettings = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ color: colors.grey, fontWeight: 600, borderBottom: `1px solid ${alpha(colors.primary, 0.1)}` }}>Job Name</TableCell>
-                    <TableCell sx={{ color: colors.grey, fontWeight: 600, borderBottom: `1px solid ${alpha(colors.primary, 0.1)}` }}>Schedule</TableCell>
-                    <TableCell sx={{ color: colors.grey, fontWeight: 600, borderBottom: `1px solid ${alpha(colors.primary, 0.1)}` }}>Status</TableCell>
-                    <TableCell sx={{ color: colors.grey, fontWeight: 600, borderBottom: `1px solid ${alpha(colors.primary, 0.1)}` }}>Last Run</TableCell>
-                    <TableCell sx={{ color: colors.grey, fontWeight: 600, borderBottom: `1px solid ${alpha(colors.primary, 0.1)}` }}>Next Run</TableCell>
-                    <TableCell align="right" sx={{ color: colors.grey, fontWeight: 600, borderBottom: `1px solid ${alpha(colors.primary, 0.1)}` }}>Actions</TableCell>
+                    <TableCell sx={{ color: colors.textSecondary, fontWeight: 600, borderBottom: `1px solid ${colors.border}` }}>Job Name</TableCell>
+                    <TableCell sx={{ color: colors.textSecondary, fontWeight: 600, borderBottom: `1px solid ${colors.border}` }}>Schedule</TableCell>
+                    <TableCell sx={{ color: colors.textSecondary, fontWeight: 600, borderBottom: `1px solid ${colors.border}` }}>Status</TableCell>
+                    <TableCell sx={{ color: colors.textSecondary, fontWeight: 600, borderBottom: `1px solid ${colors.border}` }}>Last Run</TableCell>
+                    <TableCell sx={{ color: colors.textSecondary, fontWeight: 600, borderBottom: `1px solid ${colors.border}` }}>Next Run</TableCell>
+                    <TableCell align="right" sx={{ color: colors.textSecondary, fontWeight: 600, borderBottom: `1px solid ${colors.border}` }}>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -352,7 +359,7 @@ const PlatformSettings = () => {
                       hover
                       sx={{
                         '&:hover': { bgcolor: alpha(colors.primary, 0.03) },
-                        '& td': { borderBottom: `1px solid ${alpha(colors.primary, 0.05)}` },
+                        '& td': { borderBottom: `1px solid ${colors.border}` },
                       }}
                     >
                       <TableCell>
@@ -361,7 +368,7 @@ const PlatformSettings = () => {
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2" sx={{ color: colors.grey }}>
+                        <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                           {job.schedule}
                         </Typography>
                       </TableCell>
@@ -380,12 +387,12 @@ const PlatformSettings = () => {
                         />
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2" sx={{ color: colors.grey }}>
+                        <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                           {job.lastRun}
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2" sx={{ color: colors.grey }}>
+                        <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                           {job.nextRun}
                         </Typography>
                       </TableCell>
@@ -434,8 +441,8 @@ const PlatformSettings = () => {
             <Button
               variant="outlined"
               sx={{
-                borderColor: colors.grey,
-                color: colors.grey,
+                borderColor: colors.textSecondary,
+                color: colors.textSecondary,
                 '&:hover': { borderColor: colors.dark, bgcolor: alpha(colors.grey, 0.05) },
               }}
             >

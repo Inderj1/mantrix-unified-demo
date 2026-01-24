@@ -31,6 +31,21 @@ import {
 // Single consistent blue for all modules
 const MODULE_COLOR = '#0078d4';
 
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  secondary: darkMode ? '#2d8ce6' : '#0854a0',
+  success: darkMode ? '#36d068' : '#10b981',
+  warning: darkMode ? '#f59e0b' : '#f59e0b',
+  error: darkMode ? '#ff6b6b' : '#ef4444',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  grey: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 const margenModules = [
   {
     id: 'revenue-growth',
@@ -94,7 +109,9 @@ const margenModules = [
   },
 ];
 
-const MargenAILanding = ({ onTileClick, onBack }) => {
+const MargenAILanding = ({ onTileClick, onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
+
   const handleTileClick = (moduleId) => {
     console.log('MargenAI tile clicked:', moduleId);
     if (onTileClick) {
@@ -108,25 +125,25 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
       height: '100%',
       overflowY: 'auto',
       overflowX: 'hidden',
-      background: 'linear-gradient(180deg, rgba(10, 110, 209, 0.05) 0%, rgba(255, 255, 255, 1) 50%)',
+      bgcolor: colors.background,
     }}>
       {/* Header with Breadcrumbs */}
-      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.1)', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" sx={{ color: colors.textSecondary }} />}>
             <Link
               component="button"
               variant="body1"
               onClick={onBack}
               sx={{
                 textDecoration: 'none',
-                color: 'text.primary',
-                '&:hover': { textDecoration: 'underline' }
+                color: colors.text,
+                '&:hover': { textDecoration: 'underline', color: colors.primary }
               }}
             >
               CORE.AI
             </Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
+            <Typography sx={{ color: colors.primary }} variant="body1" fontWeight={600}>
               MARGEN.AI
             </Typography>
           </Breadcrumbs>
@@ -136,7 +153,14 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
             onClick={onBack}
             variant="outlined"
             size="small"
-            sx={{ borderColor: 'divider' }}
+            sx={{
+              borderColor: colors.border,
+              color: colors.text,
+              '&:hover': {
+                borderColor: colors.primary,
+                bgcolor: alpha(colors.primary, 0.08)
+              }
+            }}
           >
             Back
           </Button>
@@ -155,21 +179,21 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
               <Avatar sx={{ width: 32, height: 32, bgcolor: MODULE_COLOR }}>
                 <AssessmentIcon sx={{ fontSize: 18 }} />
               </Avatar>
-              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: MODULE_COLOR }}>
+              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: colors.text }}>
                 MARGEN.AI
               </Typography>
               <Chip
                 label="6 Modules"
                 size="small"
                 sx={{
-                  bgcolor: alpha(MODULE_COLOR, 0.1),
+                  bgcolor: alpha(MODULE_COLOR, darkMode ? 0.2 : 0.1),
                   color: MODULE_COLOR,
                   fontWeight: 600,
                   fontSize: '0.7rem'
                 }}
               />
             </Stack>
-            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+            <Typography variant="body2" sx={{ fontSize: '0.85rem', color: colors.textSecondary }}>
               Arizona Beverages COPA Analytics & Margin Intelligence Platform
             </Typography>
           </Box>
@@ -187,15 +211,18 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
                   cursor: module.status === 'active' ? 'pointer' : 'default',
                   opacity: module.status === 'coming-soon' ? 0.7 : 1,
                   transition: 'all 0.3s ease',
-                  border: '1px solid rgba(0,0,0,0.08)',
+                  border: `1px solid ${colors.border}`,
                   borderRadius: 3,
                   overflow: 'hidden',
                   position: 'relative',
-                  bgcolor: 'white',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  bgcolor: colors.cardBg,
+                  boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.1)',
                   '&:hover': module.status === 'active' ? {
                     transform: 'translateY(-6px)',
-                    boxShadow: `0 20px 40px ${alpha(module.color, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,
+                    boxShadow: darkMode
+                      ? `0 20px 40px ${alpha(module.color, 0.25)}, 0 8px 16px rgba(0,0,0,0.6)`
+                      : `0 20px 40px ${alpha(module.color, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,
+                    borderColor: alpha(module.color, 0.3),
                     '& .module-icon': {
                       transform: 'scale(1.1)',
                       bgcolor: module.color,
@@ -217,7 +244,7 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
                       sx={{
                         width: 40,
                         height: 40,
-                        bgcolor: alpha(module.color, 0.1),
+                        bgcolor: alpha(module.color, darkMode ? 0.2 : 0.1),
                         color: module.color,
                         transition: 'all 0.3s ease',
                       }}
@@ -225,7 +252,7 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
                       <module.icon sx={{ fontSize: 22 }} />
                     </Avatar>
                     {module.status === 'coming-soon' && (
-                      <Chip label="Soon" size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha('#64748b', 0.1), color: '#64748b', fontWeight: 600 }} />
+                      <Chip label="Soon" size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha('#64748b', darkMode ? 0.2 : 0.1), color: '#64748b', fontWeight: 600 }} />
                     )}
                   </Box>
 
@@ -235,18 +262,18 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
                   </Typography>
 
                   {/* Subtitle */}
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500, mb: 1, fontSize: '0.7rem', opacity: 0.8 }}>
+                  <Typography variant="caption" sx={{ color: colors.textSecondary, fontWeight: 500, mb: 1, fontSize: '0.7rem', opacity: 0.8 }}>
                     {module.subtitle}
                   </Typography>
 
                   {/* Description */}
-                  <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary, mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                     {module.description}
                   </Typography>
 
                   {/* Footer */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha(module.color, 0.1) }}>
-                    <Chip label={`${module.stats.value} ${module.stats.label}`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha(module.color, 0.08), color: module.color, fontWeight: 600 }} />
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha(module.color, darkMode ? 0.2 : 0.1) }}>
+                    <Chip label={`${module.stats.value} ${module.stats.label}`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha(module.color, darkMode ? 0.2 : 0.08), color: module.color, fontWeight: 600 }} />
                     {module.status === 'active' && (
                       <ArrowForwardIcon className="module-arrow" sx={{ color: module.color, fontSize: 18, opacity: 0.5, transition: 'all 0.3s ease' }} />
                     )}
@@ -261,8 +288,8 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
       {/* Info Section */}
       <Box sx={{ mt: 6, textAlign: 'center' }}>
         <Stack direction="row" spacing={2} justifyContent="center" alignItems="center">
-          <LightbulbIcon sx={{ color: 'warning.main' }} />
-          <Typography variant="body2" color="text.secondary">
+          <LightbulbIcon sx={{ color: colors.warning }} />
+          <Typography variant="body2" sx={{ color: colors.textSecondary }}>
             MARGEN.AI provides intelligent margin analytics and COPA insights powered by Arizona Beverages financial data
           </Typography>
         </Stack>

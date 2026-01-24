@@ -222,6 +222,14 @@ import {
   FilterList as FilterListIcon,
   Forum as ForumIcon,
   Lock as LockIcon,
+  DarkMode as DarkModeIcon,
+  LightMode as LightModeIcon,
+  TrendingUp as TrendingUpIcon,
+  Speed as SpeedIcon,
+  Security as SecurityIcon,
+  AutoGraph as AutoGraphIcon,
+  Inventory as InventoryIcon,
+  SmartToy as SmartToyIcon,
 } from '@mui/icons-material';
 
 
@@ -252,6 +260,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [selectedTab, setSelectedTab] = usePersistedState('mantrix-selectedTab', 0);
   const [drawerOpen, setDrawerOpen] = usePersistedState('mantrix-drawerOpen', false);
+  const [darkMode, setDarkMode] = usePersistedState('mantrix-darkMode', false);
   const [coreAIView, setCoreAIView] = useState('landing'); // 'landing', 'margen', 'stox', 'route', 'reveq'
   const [stoxView, setStoxView] = usePersistedState('mantrix-stoxView', 'landing'); // 'landing', 'stoxshift'
   const [margenView, setMargenView] = usePersistedState('mantrix-margenView', 'landing'); // 'landing', 'revenue-sales', 'cost-operations', etc.
@@ -564,9 +573,10 @@ function App() {
 
   return (
     <ThemeProvider theme={currentTheme}>
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: (selectedTab === 1 && coreAIView === 'stox' && stoxView === 'supply-chain-map') ? 'white' : 'background.default' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: darkMode ? '#0d1117' : ((selectedTab === 1 && coreAIView === 'stox' && stoxView === 'supply-chain-map') ? 'white' : 'background.default') }}>
       {/* Enhanced Sidebar */}
       <EnhancedSidebar
+        darkMode={darkMode}
         drawerOpen={drawerOpen}
         setDrawerOpen={setDrawerOpen}
         selectedTab={selectedTab}
@@ -583,13 +593,33 @@ function App() {
         overflow: 'hidden',
         width: '100%'
       }}>
-        <AppBar position="static" elevation={0} sx={{ bgcolor: 'white', color: 'text.primary' }}>
+        <AppBar position="static" elevation={0} sx={{
+          bgcolor: darkMode ? '#161b22' : 'white',
+          color: darkMode ? '#e6edf3' : 'text.primary',
+          borderBottom: darkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.08)',
+        }}>
           <Toolbar>
             {/* Global Search */}
             <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
-              <GlobalSearch onNavigate={handleSearchNavigation} />
+              <GlobalSearch darkMode={darkMode} onNavigate={handleSearchNavigation} />
             </Box>
-            
+
+            {/* Dark Mode Toggle */}
+            <MuiTooltip title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
+              <IconButton
+                onClick={() => setDarkMode(!darkMode)}
+                sx={{
+                  ml: 1,
+                  bgcolor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)',
+                  '&:hover': {
+                    bgcolor: darkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.08)',
+                  },
+                }}
+              >
+                {darkMode ? <LightModeIcon sx={{ color: '#f59e0b' }} /> : <DarkModeIcon sx={{ color: '#64748b' }} />}
+              </IconButton>
+            </MuiTooltip>
+
             {/* Authentication Button */}
             <Box sx={{ ml: 2 }}>
               <AuthButton />
@@ -608,7 +638,7 @@ function App() {
           {/* Unified Chat Interface */}
           {selectedTab === 0 && (
             <Box sx={{ height: 'calc(100vh - 180px)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-              <SimpleChatInterface />
+              <SimpleChatInterface darkMode={darkMode} />
             </Box>
           )}
 
@@ -621,7 +651,7 @@ function App() {
             }}>
               <Fade in={coreAIView === 'landing'} timeout={300}>
                 <Box sx={{ display: coreAIView === 'landing' ? 'block' : 'none', height: '100%' }}>
-                  <CoreAILanding onTileClick={(moduleId) => {
+                  <CoreAILanding darkMode={darkMode} onTileClick={(moduleId) => {
                     if (moduleId === 'margen') {
                       setCoreAIView('margen');
                     } else if (moduleId === 'stox') {
@@ -652,6 +682,7 @@ function App() {
                 <Box sx={{ display: coreAIView === 'margen' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
                   {margenView === 'landing' && (
                     <MargenAILanding
+                      darkMode={darkMode}
                       onBack={() => setCoreAIView('landing')}
                       onTileClick={(moduleId) => {
                         console.log('MargenAI tile clicked:', moduleId);
@@ -660,23 +691,23 @@ function App() {
                     />
                   )}
                   {margenView === 'revenue-growth' && (
-                    <RevenueGrowthAnalytics onBack={() => setMargenView('landing')} />
+                    <RevenueGrowthAnalytics darkMode={darkMode} onBack={() => setMargenView('landing')} />
                   )}
                   {margenView === 'cost-cogs' && (
-                    <CostCOGSAnalytics onBack={() => setMargenView('landing')} />
+                    <CostCOGSAnalytics darkMode={darkMode} onBack={() => setMargenView('landing')} />
                   )}
                   {margenView === 'margin-profitability' && (
-                    <MarginProfitabilityAnalytics onBack={() => setMargenView('landing')} />
+                    <MarginProfitabilityAnalytics darkMode={darkMode} onBack={() => setMargenView('landing')} />
                   )}
                   {margenView === 'pl-gl-explorer' && (
-                    <PLGLExplorerAnalytics onBack={() => setMargenView('landing')} />
+                    <PLGLExplorerAnalytics darkMode={darkMode} onBack={() => setMargenView('landing')} />
                   )}
                   {margenView === 'drivers-whatif' && (
-                    <FinancialDriversAnalytics onBack={() => setMargenView('landing')} />
+                    <FinancialDriversAnalytics darkMode={darkMode} onBack={() => setMargenView('landing')} />
                   )}
                   {margenView === 'ask-margen' && (
                     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                      <AskMargen onBack={() => setMargenView('landing')} />
+                      <AskMargen darkMode={darkMode} onBack={() => setMargenView('landing')} />
                     </Box>
                   )}
                 </Box>
@@ -690,6 +721,7 @@ function App() {
                 }}>
                   {(stoxView === 'landing' || stoxView === 'store-modules' || stoxView === 'dc-modules') && (
                     <StoxAILanding
+                      darkMode={darkMode}
                       onBack={() => {
                         if (stoxView === 'store-modules' || stoxView === 'dc-modules') {
                           setStoxView('landing');
@@ -758,6 +790,7 @@ function App() {
                   )}
                   {stoxView === 'retail-landing' && (
                     <StoxRetailLanding
+                      darkMode={darkMode}
                       onBack={() => setStoxView('landing')}
                       onTileClick={(moduleId) => {
                         console.log('STOX Retail tile clicked:', moduleId);
@@ -769,158 +802,160 @@ function App() {
                     <StoxShiftAI onBack={() => setStoxView('landing')} />
                   )} */}
                   {stoxView === 'shortage-detector' && (
-                    <ShortageDetector onBack={() => setStoxView('landing')} />
+                    <ShortageDetector darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'inventory-heatmap' && (
-                    <InventoryHeatmap onBack={() => setStoxView('landing')} />
+                    <InventoryHeatmap darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'reallocation-optimizer' && (
-                    <ReallocationOptimizer onBack={() => setStoxView('landing')} />
+                    <ReallocationOptimizer darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'inbound-risk-monitor' && (
-                    <InboundRiskMonitor onBack={() => setStoxView('landing')} />
+                    <InboundRiskMonitor darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'aging-stock-intelligence' && (
-                    <AgingStockIntelligence onBack={() => setStoxView('landing')} />
+                    <AgingStockIntelligence darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'demand-workbench' && (
-                    <DemandWorkbench onBack={() => setStoxView('landing')} />
+                    <DemandWorkbench darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'sell-through-analytics' && (
-                    <SellThroughAnalytics onBack={() => setStoxView('landing')} />
+                    <SellThroughAnalytics darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'sell-in-forecast' && (
-                    <SellInForecast onBack={() => setStoxView('landing')} />
+                    <SellInForecast darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'sku-aggregation' && (
-                    <SKUAggregation onBack={() => setStoxView('landing')} />
+                    <SKUAggregation darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'bom-explorer' && (
-                    <BOMExplorer onBack={() => setStoxView('landing')} />
+                    <BOMExplorer darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {/* component-consolidation now uses ModuleTilesView */}
                   {stoxView === 'store-deployment' && (
-                    <StoreDeployment onBack={() => setStoxView('landing')} />
+                    <StoreDeployment darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'executive-command' && (
-                    <ExecutiveCommandCenter onBack={() => setStoxView('landing')} />
+                    <ExecutiveCommandCenter darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'scenario-planner' && (
-                    <ScenarioPlanner onBack={() => setStoxView('landing')} />
+                    <ScenarioPlanner darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {/* New Store System Modules */}
                   {stoxView === 'tile0-forecast-simulation' && (
-                    <Tile0ForecastSimulation onBack={() => setStoxView('store-modules')} />
+                    <Tile0ForecastSimulation darkMode={darkMode} onBack={() => setStoxView('store-modules')} />
                   )}
                   {stoxView === 'store-forecasting' && (
-                    <StoreForecast onBack={() => setStoxView('store-modules')} />
+                    <StoreForecast darkMode={darkMode} onBack={() => setStoxView('store-modules')} />
                   )}
                   {stoxView === 'store-health-monitor' && (
-                    <StoreHealthMonitor onBack={() => setStoxView('store-modules')} />
+                    <StoreHealthMonitor darkMode={darkMode} onBack={() => setStoxView('store-modules')} />
                   )}
                   {stoxView === 'store-optimization' && (
-                    <StoreOptimization onBack={() => setStoxView('store-modules')} />
+                    <StoreOptimization darkMode={darkMode} onBack={() => setStoxView('store-modules')} />
                   )}
                   {stoxView === 'store-replenishment' && (
-                    <StoreReplenishment onBack={() => setStoxView('store-modules')} />
+                    <StoreReplenishment darkMode={darkMode} onBack={() => setStoxView('store-modules')} />
                   )}
                   {stoxView === 'store-financial-impact' && (
-                    <StoreFinancialImpact onBack={() => setStoxView('store-modules')} />
+                    <StoreFinancialImpact darkMode={darkMode} onBack={() => setStoxView('store-modules')} />
                   )}
                   {stoxView === 'supply-chain-map' && (
-                    <SupplyChainMap onBack={() => setStoxView('landing')} />
+                    <SupplyChainMap darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'demand-intelligence' && (
-                    <DemandIntelligence onBack={() => setStoxView('landing')} />
+                    <DemandIntelligence darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'forecasting-engine' && (
-                    <ForecastingEngine onBack={() => setStoxView('landing')} />
+                    <ForecastingEngine darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'sap-data-hub' && (
-                    <SAPDataHub onBack={() => setStoxView('landing')} />
+                    <SAPDataHub darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'plant-inventory-intelligence' && (
-                    <PlantInventoryIntelligence onBack={() => setStoxView('landing')} />
+                    <PlantInventoryIntelligence darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'inventory-health-check' && (
-                    <InventoryHealthCheck onBack={() => setStoxView('landing')} />
+                    <InventoryHealthCheck darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'inventory-dashboard' && (
-                    <InventoryDashboard onBack={() => setStoxView('landing')} onTileClick={(tileId) => setStoxView(tileId)} />
+                    <InventoryDashboard darkMode={darkMode} onBack={() => setStoxView('landing')} onTileClick={(tileId) => setStoxView(tileId)} />
                   )}
                   {stoxView === 'working-capital-baseline' && (
-                    <WorkingCapitalBaseline onBack={() => setStoxView('landing')} />
+                    <WorkingCapitalBaseline darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'command-center' && (
                     <CommandCenter
+                      darkMode={darkMode}
                       onBack={() => setStoxView('landing')}
                       onTileClick={(tileId) => setStoxView(tileId)}
                     />
                   )}
                   {stoxView === 'supply-lead-time' && (
-                    <SupplyLeadTime onBack={() => setStoxView('landing')} />
+                    <SupplyLeadTime darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'cost-policy-engine' && (
-                    <CostPolicyEngine onBack={() => setStoxView('landing')} />
+                    <CostPolicyEngine darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'cost-configuration' && (
-                    <CostConfiguration onBack={() => setStoxView('landing')} />
+                    <CostConfiguration darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'supplier-terms-impact' && (
-                    <SupplierTermsImpact onBack={() => setStoxView('landing')} />
+                    <SupplierTermsImpact darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'mrp-parameter-optimizer' && (
-                    <MRPParameterOptimizer onBack={() => setStoxView('landing')} />
+                    <MRPParameterOptimizer darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'mrp-parameter-tuner' && (
-                    <MRPParameterTuner onBack={() => setStoxView('landing')} />
+                    <MRPParameterTuner darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'mrp-optimizer' && (
-                    <MRPOptimizerDashboard onBack={() => setStoxView('landing')} />
+                    <MRPOptimizerDashboard darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'what-if-simulator' && (
-                    <WhatIfSimulator onBack={() => setStoxView('landing')} />
+                    <WhatIfSimulator darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'recommendations-hub' && (
-                    <RecommendationsHub onBack={() => setStoxView('landing')} />
+                    <RecommendationsHub darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'sap-writeback' && (
-                    <SAPWriteback onBack={() => setStoxView('landing')} />
+                    <SAPWriteback darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'performance-monitor' && (
-                    <PerformanceMonitor onBack={() => setStoxView('landing')} />
+                    <PerformanceMonitor darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'cfo-rollup-dashboard' && (
-                    <CFORollupDashboard onBack={() => setStoxView('landing')} />
+                    <CFORollupDashboard darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'cash-release-timeline' && (
-                    <CashReleaseTimeline onBack={() => setStoxView('landing')} />
+                    <CashReleaseTimeline darkMode={darkMode} onBack={() => setStoxView('landing')} />
                   )}
                   {/* DC System Modules */}
                   {stoxView === 'dc-demand-aggregation' && (
-                    <DCDemandAggregation onBack={() => setStoxView('dc-modules')} />
+                    <DCDemandAggregation darkMode={darkMode} onBack={() => setStoxView('dc-modules')} />
                   )}
                   {stoxView === 'dc-health-monitor' && (
-                    <DCHealthMonitor onBack={() => setStoxView('dc-modules')} />
+                    <DCHealthMonitor darkMode={darkMode} onBack={() => setStoxView('dc-modules')} />
                   )}
                   {stoxView === 'dc-optimization' && (
-                    <DCOptimization onBack={() => setStoxView('dc-modules')} />
+                    <DCOptimization darkMode={darkMode} onBack={() => setStoxView('dc-modules')} />
                   )}
                   {stoxView === 'dc-bom' && (
-                    <DCBOM onBack={() => setStoxView('dc-modules')} />
+                    <DCBOM darkMode={darkMode} onBack={() => setStoxView('dc-modules')} />
                   )}
                   {stoxView === 'dc-lot-size' && (
-                    <DCLotSize onBack={() => setStoxView('dc-modules')} />
+                    <DCLotSize darkMode={darkMode} onBack={() => setStoxView('dc-modules')} />
                   )}
                   {stoxView === 'dc-supplier-exec' && (
-                    <DCSupplierExecution onBack={() => setStoxView('dc-modules')} />
+                    <DCSupplierExecution darkMode={darkMode} onBack={() => setStoxView('dc-modules')} />
                   )}
                   {stoxView === 'dc-financial-impact' && (
-                    <DCFinancialImpact onBack={() => setStoxView('dc-modules')} />
+                    <DCFinancialImpact darkMode={darkMode} onBack={() => setStoxView('dc-modules')} />
                   )}
                   {/* PRD Module Tiles Views */}
                   {['demand-flow', 'demand-forecasting', 'outbound-replenishment', 'dc-inventory', 'supply-planning', 'bom-explosion', 'component-consolidation', 'analytics-whatif'].includes(stoxView) && !currentFioriTile && (
                     <ModuleTilesView
+                      darkMode={darkMode}
                       moduleId={stoxView}
                       onBack={(target) => {
                         if (target === 'stox') {
@@ -953,6 +988,7 @@ function App() {
                   {/* Fiori Tile Detail View */}
                   {currentFioriTile && (
                     <FioriTileDetail
+                      darkMode={darkMode}
                       tileId={currentFioriTile.tileId}
                       tileTitle={currentFioriTile.tileId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                       moduleColor={currentFioriTile.moduleColor}
@@ -976,6 +1012,7 @@ function App() {
                 <Box sx={{ display: coreAIView === 'route' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
                   {routeView === 'landing' && (
                     <RouteAILanding
+                      darkMode={darkMode}
                       onBack={() => setCoreAIView('landing')}
                       onTileClick={(moduleId) => {
                         console.log('RouteAI tile clicked:', moduleId);
@@ -984,25 +1021,25 @@ function App() {
                     />
                   )}
                   {routeView === 'fleet-management' && (
-                    <FleetManagement onBack={() => setRouteView('landing')} />
+                    <FleetManagement darkMode={darkMode} onBack={() => setRouteView('landing')} />
                   )}
                   {routeView === 'route-optimization' && (
-                    <RouteOptimization onBack={() => setRouteView('landing')} />
+                    <RouteOptimization darkMode={darkMode} onBack={() => setRouteView('landing')} />
                   )}
                   {routeView === 'delivery-tracking' && (
-                    <DeliveryTracking onBack={() => setRouteView('landing')} />
+                    <DeliveryTracking darkMode={darkMode} onBack={() => setRouteView('landing')} />
                   )}
                   {routeView === 'performance-analytics' && (
-                    <PerformanceAnalytics onBack={() => setRouteView('landing')} />
+                    <PerformanceAnalytics darkMode={darkMode} onBack={() => setRouteView('landing')} />
                   )}
                   {routeView === 'fuel-management' && (
-                    <FuelManagement onBack={() => setRouteView('landing')} />
+                    <FuelManagement darkMode={darkMode} onBack={() => setRouteView('landing')} />
                   )}
                   {routeView === 'maintenance-scheduler' && (
-                    <MaintenanceScheduler onBack={() => setRouteView('landing')} />
+                    <MaintenanceScheduler darkMode={darkMode} onBack={() => setRouteView('landing')} />
                   )}
                   {!['landing', 'fleet-management', 'route-optimization', 'delivery-tracking', 'performance-analytics', 'fuel-management', 'maintenance-scheduler'].includes(routeView) && (
-                    <RouteAI onBack={() => setRouteView('landing')} />
+                    <RouteAI darkMode={darkMode} onBack={() => setRouteView('landing')} />
                   )}
                 </Box>
               </Fade>
@@ -1010,6 +1047,7 @@ function App() {
                 <Box sx={{ display: coreAIView === 'reveq' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
                   {reveqView === 'landing' && (
                     <ReveqAILanding
+                      darkMode={darkMode}
                       onBack={() => setCoreAIView('landing')}
                       onTileClick={(moduleId) => {
                         setReveqView(moduleId);
@@ -1043,13 +1081,14 @@ function App() {
               </Fade>
               <Fade in={coreAIView === 'process-mining'} timeout={300}>
                 <Box sx={{ display: coreAIView === 'process-mining' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
-                  <ProcessMiningPage onBack={() => setCoreAIView('landing')} />
+                  <ProcessMiningPage darkMode={darkMode} onBack={() => setCoreAIView('landing')} />
                 </Box>
               </Fade>
               <Fade in={coreAIView === 'ordly'} timeout={300}>
                 <Box sx={{ display: coreAIView === 'ordly' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
                   {ordlyView === 'landing' && (
                     <OrdlyAILanding
+                      darkMode={darkMode}
                       onBack={() => setCoreAIView('landing')}
                       onTileClick={(moduleId) => {
                         console.log('OrdlyAI tile clicked:', moduleId);
@@ -1059,6 +1098,7 @@ function App() {
                   )}
                   {ordlyView === 'sales-order-pipeline' && (
                     <SalesOrderPipeline
+                      darkMode={darkMode}
                       onBack={() => setOrdlyView('landing')}
                       onNavigate={(view) => {
                         if (view === 'customer-intent-cockpit') {
@@ -1071,6 +1111,7 @@ function App() {
                   )}
                   {ordlyView === 'customer-intent-cockpit' && (
                     <CustomerIntentCockpit
+                      darkMode={darkMode}
                       onBack={() => setOrdlyView('landing')}
                       onNavigate={(view) => {
                         if (view === 'sku-decisioning') {
@@ -1081,6 +1122,7 @@ function App() {
                   )}
                   {ordlyView === 'sku-decisioning' && (
                     <SkuDecisioning
+                      darkMode={darkMode}
                       onBack={() => setOrdlyView('landing')}
                       onNavigate={(view) => {
                         if (view === 'lead-time-recommendation') {
@@ -1091,6 +1133,7 @@ function App() {
                   )}
                   {ordlyView === 'lead-time-recommendation' && (
                     <LeadTimeRecommendation
+                      darkMode={darkMode}
                       onBack={() => setOrdlyView('landing')}
                       onNavigate={(view) => {
                         if (view === 'sap-commit-trace') {
@@ -1100,28 +1143,28 @@ function App() {
                     />
                   )}
                   {ordlyView === 'order-value-control-tower' && (
-                    <OrderValueControlTower onBack={() => setOrdlyView('landing')} />
+                    <OrderValueControlTower darkMode={darkMode} onBack={() => setOrdlyView('landing')} />
                   )}
                   {ordlyView === 'sku-bom-optimizer' && (
-                    <SkuBomOptimizer onBack={() => setOrdlyView('landing')} />
+                    <SkuBomOptimizer darkMode={darkMode} onBack={() => setOrdlyView('landing')} />
                   )}
                   {ordlyView === 'sap-commit-trace' && (
-                    <SapCommitTrace onBack={() => setOrdlyView('landing')} />
+                    <SapCommitTrace darkMode={darkMode} onBack={() => setOrdlyView('landing')} />
                   )}
                   {ordlyView === 'learning-loop' && (
-                    <LearningLoop onBack={() => setOrdlyView('landing')} />
+                    <LearningLoop darkMode={darkMode} onBack={() => setOrdlyView('landing')} />
                   )}
                   {ordlyView === 'demand-signal' && (
-                    <DemandSignal onBack={() => setOrdlyView('landing')} />
+                    <DemandSignal darkMode={darkMode} onBack={() => setOrdlyView('landing')} />
                   )}
                   {ordlyView === 'network-optimizer' && (
-                    <NetworkOptimizer onBack={() => setOrdlyView('landing')} />
+                    <NetworkOptimizer darkMode={darkMode} onBack={() => setOrdlyView('landing')} />
                   )}
                   {ordlyView === 'arbitration' && (
-                    <Arbitration onBack={() => setOrdlyView('landing')} />
+                    <Arbitration darkMode={darkMode} onBack={() => setOrdlyView('landing')} />
                   )}
                   {ordlyView === 'sap-commit' && (
-                    <SapCommit onBack={() => setOrdlyView('landing')} />
+                    <SapCommit darkMode={darkMode} onBack={() => setOrdlyView('landing')} />
                   )}
                 </Box>
               </Fade>
@@ -1129,6 +1172,7 @@ function App() {
                 <Box sx={{ display: coreAIView === 'o2c' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
                   {o2cView === 'landing' && (
                     <O2CAILanding
+                      darkMode={darkMode}
                       onBack={() => setCoreAIView('landing')}
                       onTileClick={(moduleId) => {
                         console.log('O2C tile clicked:', moduleId);
@@ -1142,6 +1186,7 @@ function App() {
                 <Box sx={{ display: coreAIView === 'traxx' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
                   {traxxView === 'landing' && (
                     <TraxxAILanding
+                      darkMode={darkMode}
                       onBack={() => setCoreAIView('landing')}
                       onTileClick={(moduleId) => {
                         console.log('TraxxAI tile clicked:', moduleId);
@@ -1150,19 +1195,19 @@ function App() {
                     />
                   )}
                   {traxxView === 'kit-control-tower' && (
-                    <KitControlTower onBack={() => setTraxxView('landing')} />
+                    <KitControlTower darkMode={darkMode} onBack={() => setTraxxView('landing')} />
                   )}
                   {traxxView === 'who-must-act-now' && (
-                    <WhoMustActNow onBack={() => setTraxxView('landing')} />
+                    <WhoMustActNow darkMode={darkMode} onBack={() => setTraxxView('landing')} />
                   )}
                   {traxxView === 'logistics-economics' && (
-                    <LogisticsEconomics onBack={() => setTraxxView('landing')} />
+                    <LogisticsEconomics darkMode={darkMode} onBack={() => setTraxxView('landing')} />
                   )}
                   {traxxView === 'realized-margin-cash' && (
-                    <RealizedMarginCash onBack={() => setTraxxView('landing')} />
+                    <RealizedMarginCash darkMode={darkMode} onBack={() => setTraxxView('landing')} />
                   )}
                   {traxxView === 'surgery-readiness' && (
-                    <SurgeryReadiness onBack={() => setTraxxView('landing')} />
+                    <SurgeryReadiness darkMode={darkMode} onBack={() => setTraxxView('landing')} />
                   )}
                 </Box>
               </Fade>
@@ -1174,19 +1219,19 @@ function App() {
             <Box sx={{ height: 'calc(100vh - 180px)' }}>
               <Fade in={axisAIView === 'landing'} timeout={300}>
                 <Box sx={{ display: axisAIView === 'landing' ? 'block' : 'none', height: '100%' }}>
-                  <AxisAIDashboard onTileClick={(moduleId) => {
+                  <AxisAIDashboard darkMode={darkMode} onTileClick={(moduleId) => {
                     setAxisAIView(moduleId);
                   }} />
                 </Box>
               </Fade>
               <Fade in={axisAIView === 'forecast'} timeout={300}>
                 <Box sx={{ display: axisAIView === 'forecast' ? 'block' : 'none', height: '100%' }}>
-                  <ForecastAIDashboard onBack={() => setAxisAIView('landing')} />
+                  <ForecastAIDashboard darkMode={darkMode} onBack={() => setAxisAIView('landing')} />
                 </Box>
               </Fade>
               <Fade in={axisAIView === 'scenario'} timeout={300}>
                 <Box sx={{ display: axisAIView === 'scenario' ? 'block' : 'none', height: '100%' }}>
-                  <ScenarioAIDashboard onBack={() => setAxisAIView('landing')} />
+                  <ScenarioAIDashboard darkMode={darkMode} onBack={() => setAxisAIView('landing')} />
                 </Box>
               </Fade>
             </Box>
@@ -1195,12 +1240,12 @@ function App() {
           {/* MARKETS.AI Tab - Dynamic Integration */}
           {selectedTab === 3 && (
             <Box sx={{ height: 'calc(100vh - 180px)', overflowY: 'auto' }}>
-              <MarketsAIDashboard />
+              <MarketsAIDashboard darkMode={darkMode} />
             </Box>
           )}
 
           {/* Control Center */}
-          {selectedTab === 4 && <ControlCenter apiHealth={apiHealth} onRefreshStatus={checkApiHealth} />}
+          {selectedTab === 4 && <ControlCenter darkMode={darkMode} apiHealth={apiHealth} onRefreshStatus={checkApiHealth} />}
 
           {/* Old Data Explorer code - can be removed */}
           {false && selectedTab === 5 && (
@@ -1509,43 +1554,43 @@ function App() {
           )}
 
           {/* Document Intelligence Tab */}
-          {selectedTab === 6 && <DocumentIntelligenceLanding />}
+          {selectedTab === 6 && <DocumentIntelligenceLanding darkMode={darkMode} />}
 
           {/* Process Mining Tab */}
-          {selectedTab === 7 && <ProcessMiningPage />}
+          {selectedTab === 7 && <ProcessMiningPage darkMode={darkMode} />}
           
           {/* Enterprise Pulse Tab */}
           {selectedTab === 8 && (
             <Box sx={{ height: 'calc(100vh - 180px)' }}>
-              <EnterprisePulse />
+              <EnterprisePulse darkMode={darkMode} />
             </Box>
           )}
           
           {/* Vision AI Tab */}
           {selectedTab === 9 && (
             <Box sx={{ height: 'calc(100vh - 180px)', overflow: 'auto' }}>
-              <DocumentVisionIntelligence onNavigateToConfig={() => setSelectedTab(4)} />
+              <DocumentVisionIntelligence darkMode={darkMode} onNavigateToConfig={() => setSelectedTab(4)} />
             </Box>
           )}
 
           {/* COMMAND TOWER Tab */}
           {selectedTab === 10 && (
             <Box sx={{ height: 'calc(100vh - 180px)', overflow: 'auto' }}>
-              <TicketingSystem onBack={() => setSelectedTab(1)} />
+              <TicketingSystem darkMode={darkMode} onBack={() => setSelectedTab(1)} />
             </Box>
           )}
 
           {/* EMAIL INTEL Tab */}
           {selectedTab === 13 && (
             <Box sx={{ height: 'calc(100vh - 180px)', overflow: 'auto' }}>
-              <EmailIntelligence onNavigateToConfig={() => setSelectedTab(4)} />
+              <EmailIntelligence darkMode={darkMode} onNavigateToConfig={() => setSelectedTab(4)} />
             </Box>
           )}
 
           {/* ROUTE.AI Tab */}
           {selectedTab === 15 && (
             <Box sx={{ height: 'calc(100vh - 180px)', overflow: 'auto' }}>
-              <RouteAI />
+              <RouteAI darkMode={darkMode} />
             </Box>
           )}
 
@@ -1749,201 +1794,373 @@ function AuthenticatedApp() {
 
   // If not signed in, show enhanced login screen
   if (!isSignedIn) {
+    // Brand colors from MANTRIX logo
+    const brandNavy = '#00357a';
+    const brandOrange = '#ff751f';
+
+    const features = [
+      { icon: <SmartToyIcon />, title: 'AI-Powered Analytics', desc: 'Natural language queries across your enterprise data' },
+      { icon: <InventoryIcon />, title: 'Inventory Intelligence', desc: 'Real-time stock optimization and demand forecasting' },
+      { icon: <TrendingUpIcon />, title: 'Predictive Insights', desc: 'ML-driven forecasting and trend analysis' },
+      { icon: <SpeedIcon />, title: 'Real-Time Dashboards', desc: 'Live operational metrics and KPI tracking' },
+    ];
+
     return (
-      <Box sx={{ 
-        display: 'flex', 
+      <Box sx={{
+        display: 'flex',
         minHeight: '100vh',
-        bgcolor: '#fafbfc',
         fontFamily: 'Poppins, sans-serif',
-        justifyContent: 'center',
-        alignItems: 'center',
-        position: 'relative',
       }}>
-        {/* Import Poppins font */}
         <style>
           {`
             @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-            
             @keyframes fadeInUp {
-              from {
-                opacity: 0;
-                transform: translateY(20px);
-              }
-              to {
-                opacity: 1;
-                transform: translateY(0);
-              }
+              from { opacity: 0; transform: translateY(30px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes fadeInLeft {
+              from { opacity: 0; transform: translateX(-30px); }
+              to { opacity: 1; transform: translateX(0); }
+            }
+            @keyframes float {
+              0%, 100% { transform: translateY(0px); }
+              50% { transform: translateY(-10px); }
+            }
+            @keyframes shimmer {
+              0% { background-position: -200% 0; }
+              100% { background-position: 200% 0; }
             }
           `}
         </style>
-        
-        {/* Background decoration */}
+
+        {/* Left Panel - Branding */}
         <Box sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          overflow: 'hidden',
-          zIndex: 0,
-        }}>
-          <Box sx={{
-            position: 'absolute',
-            top: '-50%',
-            right: '-25%',
-            width: '80%',
-            height: '100%',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(25, 118, 210, 0.03) 0%, transparent 60%)',
-          }} />
-          <Box sx={{
-            position: 'absolute',
-            bottom: '-50%',
-            left: '-25%',
-            width: '80%',
-            height: '100%',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(25, 118, 210, 0.02) 0%, transparent 60%)',
-          }} />
-        </Box>
-        {/* Login Form */}
-        <Paper sx={{ 
-          p: { xs: 3, sm: 4, md: 5 },
-          maxWidth: 420,
-          width: '90%',
-          borderRadius: '16px',
-          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.08)',
-          background: 'white',
+          display: { xs: 'none', md: 'flex' },
+          flexDirection: 'column',
+          width: '50%',
+          background: `linear-gradient(135deg, ${brandNavy} 0%, #001d42 50%, #002952 100%)`,
           position: 'relative',
-          zIndex: 1,
-          border: '1px solid rgba(0, 0, 0, 0.04)',
-          animation: 'fadeInUp 0.6s ease-out',
+          overflow: 'auto',
+          p: { md: 4, lg: 5, xl: 6 },
+          minHeight: '100vh',
         }}>
-          {/* Logo */}
-          <Box sx={{ textAlign: 'center', mb: 2 }}>
-            <img
-              src="/drinkaz.png"
-              alt="Drinkaz"
-              style={{ height: 140, objectFit: 'contain', margin: '-20px 0' }}
-            />
-          </Box>
-            
-          <Typography sx={{ 
-            fontSize: { xs: '1.1rem', sm: '1.5rem' },
-            fontWeight: 600, 
-            mb: 1.5, 
-            textAlign: 'center',
-            color: '#0f172a',
-            fontFamily: 'Poppins, sans-serif',
-            letterSpacing: '-0.5px',
-            whiteSpace: 'nowrap',
-          }}>
-            Decision Intelligence Platform
-          </Typography>
-          <Typography sx={{ 
-            fontSize: '0.875rem',
-            mb: 4, 
-            textAlign: 'center', 
-            color: '#64748b',
-            fontFamily: 'Poppins, sans-serif',
-            fontWeight: 400,
-          }}>
-            Transform enterprise data into actionable insights
-          </Typography>
-            
-          {/* Auth Button */}
-          <Box sx={{ mb: 4 }}>
-            <AuthButton />
-          </Box>
-          
-          <Divider sx={{ my: 4 }}>
-            <Typography sx={{ 
-              fontSize: '0.75rem',
-              color: '#94a3b8',
-              fontFamily: 'Poppins, sans-serif',
-              letterSpacing: '0.5px',
-              textTransform: 'uppercase',
+          {/* Floating decorations with brand orange */}
+          <Box sx={{
+            position: 'absolute',
+            top: '10%',
+            right: '10%',
+            width: 300,
+            height: 300,
+            borderRadius: '50%',
+            background: `radial-gradient(circle, ${brandOrange}15 0%, transparent 70%)`,
+            animation: 'float 6s ease-in-out infinite',
+          }} />
+          <Box sx={{
+            position: 'absolute',
+            bottom: '15%',
+            left: '5%',
+            width: 200,
+            height: 200,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%)',
+            animation: 'float 8s ease-in-out infinite 1s',
+          }} />
+          <Box sx={{
+            position: 'absolute',
+            top: '50%',
+            right: '25%',
+            width: 150,
+            height: 150,
+            borderRadius: '50%',
+            background: `radial-gradient(circle, ${brandOrange}10 0%, transparent 70%)`,
+            animation: 'float 7s ease-in-out infinite 0.5s',
+          }} />
+
+          {/* Diagonal accent line */}
+          <Box sx={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            width: '120%',
+            height: 4,
+            background: `linear-gradient(90deg, transparent 0%, ${brandOrange} 50%, transparent 100%)`,
+            transform: 'rotate(-5deg) translateY(100px)',
+            opacity: 0.6,
+          }} />
+
+          {/* Grid pattern overlay */}
+          <Box sx={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `
+              linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px',
+          }} />
+
+          {/* Content */}
+          <Box sx={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column' }}>
+            {/* Logo with light background */}
+            <Box sx={{
+              mb: 4,
+              animation: 'fadeInLeft 0.6s ease-out',
+              display: 'inline-block',
             }}>
-              Secure Authentication
-            </Typography>
-          </Divider>
-          
-          {/* Security Features */}
-          <Box sx={{ mt: 4 }}>
-            <Box sx={{ 
-              display: 'flex', 
-              justifyContent: 'center',
-              alignItems: 'center', 
-              gap: 3,
-              mb: 3,
-            }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <LockIcon sx={{ fontSize: 16, color: '#64748b' }} />
-                <Typography sx={{ 
-                  fontSize: '0.8rem',
-                  color: '#64748b',
-                  fontFamily: 'Poppins, sans-serif',
-                }}>
-                  256-bit SSL
-                </Typography>
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <CheckCircleIcon sx={{ fontSize: 16, color: '#64748b' }} />
-                <Typography sx={{ 
-                  fontSize: '0.8rem',
-                  color: '#64748b',
-                  fontFamily: 'Poppins, sans-serif',
-                }}>
-                  SSO Enabled
-                </Typography>
+              <Box sx={{
+                bgcolor: '#f0f4f8',
+                px: 2.5,
+                py: 1.5,
+                borderRadius: 2,
+                boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+                border: `1px solid rgba(255,255,255,0.1)`,
+              }}>
+                <img
+                  src="/MANTRIX_AI.svg"
+                  alt="MANTRIX AI"
+                  style={{ height: 40, objectFit: 'contain', display: 'block' }}
+                />
               </Box>
             </Box>
-            
-            <Typography sx={{ 
+
+            {/* Hero text */}
+            <Box sx={{ mb: 4, animation: 'fadeInLeft 0.6s ease-out 0.2s', animationFillMode: 'both' }}>
+              <Typography sx={{
+                fontSize: { md: '1.8rem', lg: '2.2rem', xl: '2.5rem' },
+                fontWeight: 700,
+                color: '#ffffff',
+                lineHeight: 1.2,
+                mb: 2,
+                fontFamily: 'Poppins, sans-serif',
+              }}>
+                Decision Intelligence
+                <br />
+                <Box component="span" sx={{ color: brandOrange }}>
+                  Platform
+                </Box>
+              </Typography>
+              <Typography sx={{
+                fontSize: '1.1rem',
+                color: 'rgba(255,255,255,0.7)',
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: 400,
+                maxWidth: 400,
+              }}>
+                Transform enterprise data into actionable insights with AI-powered analytics
+              </Typography>
+            </Box>
+
+            {/* Features */}
+            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+              {features.map((feature, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 2,
+                    p: 2,
+                    borderRadius: 2,
+                    bgcolor: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    backdropFilter: 'blur(10px)',
+                    transition: 'all 0.3s ease',
+                    animation: `fadeInLeft 0.5s ease-out ${0.3 + index * 0.1}s`,
+                    animationFillMode: 'both',
+                    '&:hover': {
+                      bgcolor: 'rgba(255,255,255,0.08)',
+                      transform: 'translateX(8px)',
+                      borderColor: `${brandOrange}50`,
+                    },
+                  }}
+                >
+                  <Box sx={{
+                    p: 1,
+                    borderRadius: 1.5,
+                    bgcolor: `${brandOrange}25`,
+                    color: brandOrange,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    {feature.icon}
+                  </Box>
+                  <Box>
+                    <Typography sx={{
+                      fontSize: '0.95rem',
+                      fontWeight: 600,
+                      color: '#ffffff',
+                      fontFamily: 'Poppins, sans-serif',
+                      mb: 0.3,
+                    }}>
+                      {feature.title}
+                    </Typography>
+                    <Typography sx={{
+                      fontSize: '0.8rem',
+                      color: 'rgba(255,255,255,0.6)',
+                      fontFamily: 'Poppins, sans-serif',
+                    }}>
+                      {feature.desc}
+                    </Typography>
+                  </Box>
+                </Box>
+              ))}
+            </Box>
+
+            {/* Bottom stats */}
+            <Box sx={{
+              display: 'flex',
+              gap: 4,
+              mt: 3,
+              pt: 3,
+              borderTop: '1px solid rgba(255,255,255,0.1)',
+              animation: 'fadeInLeft 0.6s ease-out 0.8s',
+              animationFillMode: 'both',
+            }}>
+              {[
+                { value: 'ERP', label: 'Integrated' },
+                { value: 'AI', label: 'Powered' },
+                { value: 'Real-time', label: 'Analytics' },
+              ].map((stat, i) => (
+                <Box key={i}>
+                  <Typography sx={{ fontSize: '1.25rem', fontWeight: 700, color: brandOrange, fontFamily: 'Poppins, sans-serif' }}>
+                    {stat.value}
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', fontFamily: 'Poppins, sans-serif' }}>
+                    {stat.label}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          </Box>
+        </Box>
+
+        {/* Right Panel - Login Form */}
+        <Box sx={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          bgcolor: '#f8fafc',
+          p: { xs: 3, sm: 6 },
+          position: 'relative',
+        }}>
+          {/* Subtle background pattern */}
+          <Box sx={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `radial-gradient(circle at 25% 25%, ${brandNavy}08 0%, transparent 50%),
+                              radial-gradient(circle at 75% 75%, ${brandOrange}05 0%, transparent 50%)`,
+          }} />
+
+          <Box sx={{
+            width: '100%',
+            maxWidth: 400,
+            position: 'relative',
+            zIndex: 1,
+            animation: 'fadeInUp 0.6s ease-out',
+          }}>
+            {/* Mobile logo */}
+            <Box sx={{ display: { xs: 'block', md: 'none' }, textAlign: 'center', mb: 4 }}>
+              <img src="/MANTRIX_AI.svg" alt="MANTRIX AI" style={{ height: 45 }} />
+            </Box>
+
+            <Typography sx={{
+              fontSize: '1.75rem',
+              fontWeight: 700,
+              color: brandNavy,
+              fontFamily: 'Poppins, sans-serif',
+              mb: 1,
+            }}>
+              Welcome back
+            </Typography>
+            <Typography sx={{
+              fontSize: '0.95rem',
+              color: '#64748b',
+              fontFamily: 'Poppins, sans-serif',
+              mb: 4,
+            }}>
+              Sign in to access your dashboard
+            </Typography>
+
+            {/* Auth Button */}
+            <Box sx={{ mb: 4 }}>
+              <AuthButton />
+            </Box>
+
+            <Divider sx={{ my: 4 }}>
+              <Typography sx={{
+                fontSize: '0.7rem',
+                color: '#94a3b8',
+                fontFamily: 'Poppins, sans-serif',
+                letterSpacing: '1px',
+                textTransform: 'uppercase',
+              }}>
+                Enterprise Security
+              </Typography>
+            </Divider>
+
+            {/* Security badges */}
+            <Box sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: 3,
+              mb: 4,
+            }}>
+              {[
+                { icon: <LockIcon sx={{ fontSize: 18 }} />, label: '256-bit SSL' },
+                { icon: <SecurityIcon sx={{ fontSize: 18 }} />, label: 'SOC 2' },
+                { icon: <CheckCircleIcon sx={{ fontSize: 18 }} />, label: 'SSO' },
+              ].map((badge, i) => (
+                <Box key={i} sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.75,
+                  px: 1.5,
+                  py: 0.75,
+                  borderRadius: 2,
+                  bgcolor: `${brandNavy}08`,
+                  border: `1px solid ${brandNavy}15`,
+                }}>
+                  <Box sx={{ color: brandNavy }}>{badge.icon}</Box>
+                  <Typography sx={{ fontSize: '0.75rem', color: '#475569', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>
+                    {badge.label}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+
+            {/* Terms */}
+            <Typography sx={{
               fontSize: '0.75rem',
               color: '#94a3b8',
               fontFamily: 'Poppins, sans-serif',
               textAlign: 'center',
-              mt: 4,
+              lineHeight: 1.6,
             }}>
-              By signing in, you agree to our Terms of Service and Privacy Policy
+              By signing in, you agree to our{' '}
+              <Box component="span" sx={{ color: brandNavy, cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>
+                Terms of Service
+              </Box>
+              {' '}and{' '}
+              <Box component="span" sx={{ color: brandNavy, cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>
+                Privacy Policy
+              </Box>
             </Typography>
-            
+
+            {/* Copyright */}
             <Typography sx={{
               fontSize: '0.7rem',
               color: '#cbd5e1',
               fontFamily: 'Poppins, sans-serif',
               textAlign: 'center',
-              mt: 2,
+              mt: 4,
             }}>
-              © 2024 Arizona. All rights reserved.
+              © 2024 Arizona Beverages. All rights reserved.
             </Typography>
-
-            {/* Powered by CloudMantra */}
-            <Box sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 1,
-              mt: 3,
-              pt: 2,
-              borderTop: '1px solid rgba(0, 0, 0, 0.06)',
-            }}>
-              <Typography sx={{
-                fontSize: '0.7rem',
-                color: '#94a3b8',
-                fontFamily: 'Poppins, sans-serif',
-              }}>
-                Powered by
-              </Typography>
-              <img
-                src="/mantra9.png"
-                alt="CloudMantra"
-                style={{ height: 32, objectFit: 'contain' }}
-              />
-            </Box>
           </Box>
-        </Paper>
+        </Box>
       </Box>
     );
   }
@@ -1999,8 +2216,110 @@ function AppWithAuth() {
     return <App />;
   }
   
+  // Clerk appearance customization to match MANTRIX branding
+  const clerkAppearance = {
+    layout: {
+      socialButtonsPlacement: 'top',
+      logoPlacement: 'inside',
+      showOptionalFields: false,
+    },
+    variables: {
+      colorPrimary: '#00357a',
+      colorText: '#0f172a',
+      colorTextSecondary: '#64748b',
+      colorBackground: '#ffffff',
+      colorInputBackground: '#f8fafc',
+      colorInputText: '#0f172a',
+      borderRadius: '8px',
+      fontFamily: 'Poppins, Inter, system-ui, sans-serif',
+    },
+    elements: {
+      rootBox: {
+        fontFamily: 'Poppins, Inter, system-ui, sans-serif',
+      },
+      card: {
+        boxShadow: '0 25px 50px -12px rgba(0, 53, 122, 0.15)',
+        borderRadius: '16px',
+        border: '1px solid #e2e8f0',
+      },
+      headerTitle: {
+        fontWeight: 600,
+        fontSize: '1.5rem',
+        color: '#00357a',
+      },
+      headerSubtitle: {
+        color: '#64748b',
+      },
+      socialButtonsBlockButton: {
+        borderRadius: '8px',
+        border: '1px solid #e2e8f0',
+        '&:hover': {
+          backgroundColor: '#f8fafc',
+          borderColor: '#00357a',
+        },
+      },
+      formButtonPrimary: {
+        backgroundColor: '#00357a',
+        borderRadius: '8px',
+        fontWeight: 500,
+        textTransform: 'none',
+        '&:hover': {
+          backgroundColor: '#002952',
+        },
+      },
+      formFieldInput: {
+        borderRadius: '8px',
+        border: '1px solid #e2e8f0',
+        '&:focus': {
+          borderColor: '#00357a',
+          boxShadow: '0 0 0 3px rgba(0, 53, 122, 0.1)',
+        },
+      },
+      footerActionLink: {
+        color: '#00357a',
+        fontWeight: 500,
+        '&:hover': {
+          color: '#ff751f',
+        },
+      },
+      identityPreviewEditButton: {
+        color: '#00357a',
+      },
+      formFieldLabel: {
+        color: '#0f172a',
+        fontWeight: 500,
+      },
+      dividerLine: {
+        backgroundColor: '#e2e8f0',
+      },
+      dividerText: {
+        color: '#94a3b8',
+      },
+    },
+  };
+
+  // Clerk localization to customize text
+  const clerkLocalization = {
+    signIn: {
+      start: {
+        title: 'Sign in to MANTRIX AI',
+        subtitle: 'Welcome back! Please sign in to continue',
+      },
+    },
+    signUp: {
+      start: {
+        title: 'Create your MANTRIX AI account',
+        subtitle: 'Get started with enterprise intelligence',
+      },
+    },
+  };
+
   return (
-    <ClerkProvider publishableKey={clerkPubKey}>
+    <ClerkProvider
+      publishableKey={clerkPubKey}
+      appearance={clerkAppearance}
+      localization={clerkLocalization}
+    >
       <AuthenticatedApp />
     </ClerkProvider>
   );

@@ -28,7 +28,14 @@ const getColors = (darkMode) => ({
   warning: darkMode ? '#f59e0b' : '#f59e0b',
   error: darkMode ? '#ff6b6b' : '#ef4444',
   text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
   grey: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+  shadow: darkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.1)',
+  hoverShadow: darkMode ? '0 20px 40px rgba(0,0,0,0.5)' : '0 20px 40px rgba(0,120,212,0.12), 0 8px 16px rgba(0,0,0,0.06)',
 });
 
 const EnterprisePulseLanding = ({ onTileClick, alertCount = 0, agentCount = 0, darkMode = false }) => {
@@ -57,9 +64,9 @@ const EnterprisePulseLanding = ({ onTileClick, alertCount = 0, agentCount = 0, d
   ];
 
   return (
-    <Box>
+    <Box sx={{ bgcolor: colors.background, minHeight: '100%' }}>
       {/* Header */}
-      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: colors.shadow, bgcolor: colors.paper }}>
         <Box display="flex" alignItems="center" gap={2}>
           <Box
             sx={{
@@ -99,15 +106,15 @@ const EnterprisePulseLanding = ({ onTileClick, alertCount = 0, agentCount = 0, d
                     height: 200,
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
-                    border: '1px solid rgba(0,0,0,0.08)',
+                    border: `1px solid ${colors.border}`,
                     borderRadius: 3,
                     overflow: 'hidden',
                     position: 'relative',
-                    bgcolor: 'white',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                    bgcolor: colors.cardBg,
+                    boxShadow: colors.shadow,
                     '&:hover': {
                       transform: 'translateY(-6px)',
-                      boxShadow: `0 20px 40px ${alpha(tile.color, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,
+                      boxShadow: colors.hoverShadow,
                       '& .module-icon': {
                         transform: 'scale(1.1)',
                         bgcolor: tile.color,
@@ -128,7 +135,7 @@ const EnterprisePulseLanding = ({ onTileClick, alertCount = 0, agentCount = 0, d
                         sx={{
                           width: 40,
                           height: 40,
-                          bgcolor: alpha(tile.color, 0.1),
+                          bgcolor: alpha(tile.color, darkMode ? 0.2 : 0.1),
                           color: tile.color,
                           transition: 'all 0.3s ease',
                         }}
@@ -143,18 +150,18 @@ const EnterprisePulseLanding = ({ onTileClick, alertCount = 0, agentCount = 0, d
                     </Typography>
 
                     {/* Subtitle */}
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500, mb: 1, fontSize: '0.7rem', opacity: 0.8 }}>
+                    <Typography variant="caption" sx={{ color: colors.textSecondary, fontWeight: 500, mb: 1, fontSize: '0.7rem', opacity: 0.8 }}>
                       {tile.subtitle}
                     </Typography>
 
                     {/* Description */}
-                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    <Typography variant="body2" sx={{ color: colors.textSecondary, mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {tile.description}
                     </Typography>
 
                     {/* Footer */}
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha(tile.color, 0.1) }}>
-                      <Chip label={`${tile.stats.value} ${tile.stats.label}`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha(tile.color, 0.08), color: tile.color, fontWeight: 600 }} />
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: darkMode ? alpha(tile.color, 0.2) : alpha(tile.color, 0.1) }}>
+                      <Chip label={`${tile.stats.value} ${tile.stats.label}`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha(tile.color, darkMode ? 0.15 : 0.08), color: tile.color, fontWeight: 600 }} />
                       <ArrowForwardIcon className="module-arrow" sx={{ color: tile.color, fontSize: 18, opacity: 0.5, transition: 'all 0.3s ease' }} />
                     </Box>
                   </CardContent>

@@ -54,9 +54,21 @@ import {
 } from '@mui/icons-material';
 import { apiService } from '../services/api';
 
-const DocumentIntelligence = ({ onBack }) => {
+// Dark mode color helper
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const DocumentIntelligence = ({ onBack, darkMode = false }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const colors = getColors(darkMode);
   
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -298,15 +310,15 @@ const DocumentIntelligence = ({ onBack }) => {
   const drawerWidth = 320;
 
   const DocumentsList = () => (
-    <Box sx={{ p: 2, height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ p: 2, height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column', bgcolor: colors.paper }}>
       {/* Upload Section */}
       <Box sx={{ mb: 3 }}>
         <Box
           sx={{
             p: 3,
             border: '2px dashed',
-            borderColor: dragActive ? 'primary.main' : 'divider',
-            bgcolor: dragActive ? 'action.hover' : 'background.paper',
+            borderColor: dragActive ? 'primary.main' : colors.border,
+            bgcolor: dragActive ? (darkMode ? alpha('#fff', 0.05) : 'action.hover') : colors.cardBg,
             cursor: 'pointer',
             transition: 'all 0.3s',
             textAlign: 'center',
@@ -326,8 +338,8 @@ const DocumentIntelligence = ({ onBack }) => {
             style={{ display: 'none' }}
             accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.png,.jpg,.jpeg"
           />
-          <UploadIcon sx={{ fontSize: 32, color: 'text.secondary', mb: 1 }} />
-          <Typography variant="body2">
+          <UploadIcon sx={{ fontSize: 32, color: colors.textSecondary, mb: 1 }} />
+          <Typography variant="body2" sx={{ color: colors.text }}>
             Drop files or click to upload
           </Typography>
         </Box>
@@ -335,7 +347,7 @@ const DocumentIntelligence = ({ onBack }) => {
 
       {/* Document List Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h6">
+        <Typography variant="h6" sx={{ color: colors.text }}>
           Documents ({uploadedFiles.length})
         </Typography>
         <Stack direction="row" spacing={1}>
@@ -381,11 +393,11 @@ const DocumentIntelligence = ({ onBack }) => {
                 sx={{
                   cursor: 'pointer',
                   '&:hover': {
-                    backgroundColor: 'action.hover',
+                    backgroundColor: darkMode ? alpha('#fff', 0.05) : 'action.hover',
                   },
-                  backgroundColor: comparisonMode 
-                    ? selectedDocuments.some(d => d.document_id === file.document_id) ? 'action.selected' : 'inherit'
-                    : selectedFile?.document_id === file.document_id ? 'action.selected' : 'inherit'
+                  backgroundColor: comparisonMode
+                    ? selectedDocuments.some(d => d.document_id === file.document_id) ? (darkMode ? alpha('#fff', 0.1) : 'action.selected') : 'inherit'
+                    : selectedFile?.document_id === file.document_id ? (darkMode ? alpha('#fff', 0.1) : 'action.selected') : 'inherit'
                 }}
                 onClick={() => handleDocumentSelection(file)}
               >
@@ -438,9 +450,9 @@ const DocumentIntelligence = ({ onBack }) => {
   );
 
   return (
-    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: colors.background }}>
       {/* Header */}
-      <Paper sx={{ p: 2, zIndex: 1, borderRadius: 0 }}>
+      <Paper sx={{ p: 2, zIndex: 1, borderRadius: 0, bgcolor: colors.paper, borderBottom: `1px solid ${colors.border}` }}>
         <Box sx={{ maxWidth: 1400, mx: 'auto', px: 2 }}>
           {/* Breadcrumbs */}
           {onBack && (
@@ -449,14 +461,14 @@ const DocumentIntelligence = ({ onBack }) => {
                 onClick={onBack}
                 sx={{
                   cursor: 'pointer',
-                  color: 'text.secondary',
+                  color: colors.textSecondary,
                   textDecoration: 'none',
-                  '&:hover': { color: 'primary.main' },
+                  '&:hover': { color: colors.primary },
                 }}
               >
                 Document Intelligence
               </Link>
-              <Typography color="primary" fontWeight={600}>
+              <Typography color="primary" fontWeight={600} sx={{ color: colors.primary }}>
                 Document Analysis & Q&A
               </Typography>
             </Breadcrumbs>
@@ -480,10 +492,10 @@ const DocumentIntelligence = ({ onBack }) => {
                 <ArticleIcon sx={{ fontSize: 32, color: '#7c3aed' }} />
               </Avatar>
               <Box>
-                <Typography variant="h5" fontWeight={700}>
+                <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
                   Document Analysis & Q&A
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                   Upload, analyze, and extract insights from your documents using AI
                 </Typography>
               </Box>
@@ -519,7 +531,8 @@ const DocumentIntelligence = ({ onBack }) => {
               position: 'relative',
               height: '100%',
               borderRight: '1px solid',
-              borderColor: 'divider',
+              borderColor: colors.border,
+              bgcolor: colors.paper,
             },
           }}
         >
@@ -532,8 +545,8 @@ const DocumentIntelligence = ({ onBack }) => {
             <Stack spacing={3}>
               {/* Quick Actions */}
               {selectedFile && !comparisonMode && (
-                <Paper sx={{ p: 2 }}>
-                  <Typography variant="subtitle1" gutterBottom>
+                <Paper sx={{ p: 2, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
+                  <Typography variant="subtitle1" gutterBottom sx={{ color: colors.text }}>
                     Quick Actions for: <strong>{selectedFile.filename}</strong>
                   </Typography>
                   <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
@@ -579,8 +592,8 @@ const DocumentIntelligence = ({ onBack }) => {
 
               {/* Loading State */}
               {loading && (
-                <Paper sx={{ p: 3 }}>
-                  <Typography variant="h6" gutterBottom>
+                <Paper sx={{ p: 3, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
+                  <Typography variant="h6" gutterBottom sx={{ color: colors.text }}>
                     Processing...
                   </Typography>
                   <LinearProgress />
@@ -589,27 +602,27 @@ const DocumentIntelligence = ({ onBack }) => {
 
               {/* Analysis Results */}
               {analysis && !loading && (
-                <Card>
+                <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                      <Typography variant="h6">Analysis Results</Typography>
+                      <Typography variant="h6" sx={{ color: colors.text }}>Analysis Results</Typography>
                       <IconButton size="small" onClick={() => setAnalysis(null)}>
                         <DeleteIcon />
                       </IconButton>
                     </Box>
                     
                     <Box sx={{ mb: 3 }}>
-                      <Typography variant="subtitle2" gutterBottom color="primary">
+                      <Typography variant="subtitle2" gutterBottom sx={{ color: colors.primary }}>
                         Summary
                       </Typography>
-                      <Typography variant="body2" paragraph sx={{ whiteSpace: 'pre-wrap' }}>
+                      <Typography variant="body2" paragraph sx={{ whiteSpace: 'pre-wrap', color: colors.text }}>
                         {analysis.summary}
                       </Typography>
                     </Box>
 
                     {analysis.keyPoints.length > 0 && (
                       <Box sx={{ mb: 3 }}>
-                        <Typography variant="subtitle2" gutterBottom color="primary">
+                        <Typography variant="subtitle2" gutterBottom sx={{ color: colors.primary }}>
                           Key Points
                         </Typography>
                         <List dense>
@@ -629,30 +642,30 @@ const DocumentIntelligence = ({ onBack }) => {
                     <Grid container spacing={2}>
                       <Grid item xs={4}>
                         <Box textAlign="center">
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                             Completeness
                           </Typography>
-                          <Typography variant="h6">
+                          <Typography variant="h6" sx={{ color: colors.text }}>
                             {analysis.dataQuality.completeness}%
                           </Typography>
                         </Box>
                       </Grid>
                       <Grid item xs={4}>
                         <Box textAlign="center">
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                             Accuracy
                           </Typography>
-                          <Typography variant="h6">
+                          <Typography variant="h6" sx={{ color: colors.text }}>
                             {analysis.dataQuality.accuracy}%
                           </Typography>
                         </Box>
                       </Grid>
                       <Grid item xs={4}>
                         <Box textAlign="center">
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                             Consistency
                           </Typography>
-                          <Typography variant="h6">
+                          <Typography variant="h6" sx={{ color: colors.text }}>
                             {analysis.dataQuality.consistency}%
                           </Typography>
                         </Box>
@@ -664,10 +677,10 @@ const DocumentIntelligence = ({ onBack }) => {
 
               {/* Extracted Data */}
               {extractedData && !loading && (
-                <Card>
+                <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                      <Typography variant="h6">Extracted Data</Typography>
+                      <Typography variant="h6" sx={{ color: colors.text }}>Extracted Data</Typography>
                       <Stack direction="row" spacing={1}>
                         <IconButton
                           size="small"
@@ -687,14 +700,14 @@ const DocumentIntelligence = ({ onBack }) => {
                         </IconButton>
                       </Stack>
                     </Box>
-                    <Box sx={{ 
-                      bgcolor: 'grey.100', 
-                      p: 2, 
+                    <Box sx={{
+                      bgcolor: darkMode ? alpha('#000', 0.2) : 'grey.100',
+                      p: 2,
                       borderRadius: 1,
                       maxHeight: 300,
                       overflow: 'auto'
                     }}>
-                      <pre style={{ margin: 0, fontSize: '0.875rem', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                      <pre style={{ margin: 0, fontSize: '0.875rem', whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: darkMode ? colors.text : 'inherit' }}>
                         {JSON.stringify(extractedData, null, 2)}
                       </pre>
                     </Box>
@@ -703,15 +716,15 @@ const DocumentIntelligence = ({ onBack }) => {
               )}
 
               {/* Q&A Section */}
-              <Card>
+              <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                 <CardContent>
-                  <Typography variant="h6" gutterBottom>
+                  <Typography variant="h6" gutterBottom sx={{ color: colors.text }}>
                     Ask Questions
                   </Typography>
-                  
+
                   {(selectedFile || selectedDocuments.length > 0) && (
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                         Asking about: {
                           comparisonMode && selectedDocuments.length > 0
                             ? `${selectedDocuments.length} documents`
@@ -781,11 +794,11 @@ const DocumentIntelligence = ({ onBack }) => {
                   {/* Answer Display */}
                   {questionAnswer && (
                     <Box sx={{ mt: 3 }}>
-                      <Divider sx={{ mb: 2 }} />
-                      <Typography variant="subtitle2" gutterBottom color="primary">
+                      <Divider sx={{ mb: 2, borderColor: colors.border }} />
+                      <Typography variant="subtitle2" gutterBottom sx={{ color: colors.primary }}>
                         Answer
                       </Typography>
-                      <Typography variant="body2" paragraph sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                      <Typography variant="body2" paragraph sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: colors.text }}>
                         {questionAnswer.answer}
                       </Typography>
                       {questionAnswer.confidence && (
@@ -798,7 +811,7 @@ const DocumentIntelligence = ({ onBack }) => {
                       )}
                       {questionAnswer.follow_up_questions && questionAnswer.follow_up_questions.length > 0 && (
                         <Box>
-                          <Typography variant="caption" color="text.secondary" gutterBottom>
+                          <Typography variant="caption" sx={{ color: colors.textSecondary }} gutterBottom>
                             Follow-up questions:
                           </Typography>
                           <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1, mt: 1 }}>

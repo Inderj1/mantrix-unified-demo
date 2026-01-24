@@ -188,7 +188,19 @@ const SAMPLE_QUERIES = [
   }
 ];
 
-const AskMargen = ({ onBack }) => {
+// Dark mode color helper
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const AskMargen = ({ onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   // Get authenticated user from Clerk
   const { user, isLoaded: isUserLoaded } = useUser();
 
@@ -1385,7 +1397,7 @@ const AskMargen = ({ onBack }) => {
                 mb: 1.5,
                 border: `1.5px solid ${alpha('#1873b4', 0.25)}`,
                 borderRadius: 2,
-                bgcolor: 'white',
+                bgcolor: colors.cardBg,
               }}
             >
               <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
@@ -1395,7 +1407,7 @@ const AskMargen = ({ onBack }) => {
                       variant="body2"
                       sx={{
                         lineHeight: 1.7,
-                        color: 'text.primary',
+                        color: colors.text,
                       }}
                     >
                       {(() => {
@@ -2014,7 +2026,7 @@ const AskMargen = ({ onBack }) => {
                         px: 1,
                         py: 0.5,
                         fontWeight: 600,
-                        color: 'text.secondary',
+                        color: colors.textSecondary,
                         display: 'block'
                       }}
                     >
@@ -2061,7 +2073,7 @@ const AskMargen = ({ onBack }) => {
                                       overflow: 'hidden',
                                       textOverflow: 'ellipsis',
                                       whiteSpace: 'nowrap',
-                                      color: isActive ? '#1873b4' : 'text.primary',
+                                      color: isActive ? '#1873b4' : colors.text,
                                     }}
                                   >
                                     {displayTitle}
@@ -2076,7 +2088,7 @@ const AskMargen = ({ onBack }) => {
                                         whiteSpace: 'nowrap',
                                         fontSize: '0.7rem',
                                         fontStyle: 'italic',
-                                        color: 'text.secondary',
+                                        color: colors.textSecondary,
                                         display: 'block',
                                       }}
                                     >
@@ -2085,7 +2097,7 @@ const AskMargen = ({ onBack }) => {
                                   )}
 
                                   <Stack direction="row" spacing={1} alignItems="center">
-                                    <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.secondary' }}>
+                                    <Typography variant="caption" sx={{ fontSize: '0.65rem', color: colors.textSecondary }}>
                                       {new Date(conv.updated_at || conv.updatedAt).toLocaleDateString(undefined, {
                                         month: 'short',
                                         day: 'numeric',
@@ -2159,7 +2171,7 @@ const AskMargen = ({ onBack }) => {
                   startIcon={<DeleteOutlineIcon />}
                   onClick={handleClearAllConversations}
                   sx={{
-                    color: 'text.secondary',
+                    color: colors.textSecondary,
                     borderColor: 'divider',
                     '&:hover': {
                       borderColor: 'action.hover',
@@ -2186,7 +2198,7 @@ const AskMargen = ({ onBack }) => {
       display: 'flex',
       position: 'relative',
       overflow: 'hidden',
-      bgcolor: '#f8fbfd'  // Light blue background
+      bgcolor: colors.background
     }}>
       {/* Main Content Area */}
       <Box sx={{
@@ -2210,7 +2222,7 @@ const AskMargen = ({ onBack }) => {
             zIndex: 100,
             flexShrink: 0,
             borderBottom: `2px solid ${alpha('#1873b4', 0.2)}`,
-            bgcolor: 'white'
+            bgcolor: colors.paper
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -2298,7 +2310,7 @@ const AskMargen = ({ onBack }) => {
               position: 'sticky',
               top: 90,
               zIndex: 90,
-              bgcolor: 'white'
+              bgcolor: colors.paper
             }}>
               <Tabs
                 value={viewMode}
@@ -2354,7 +2366,7 @@ const AskMargen = ({ onBack }) => {
                 {SAMPLE_QUERIES.slice(0, 3).map((section) => (
                   <Grid item xs={12} sm={4} key={section.category}>
                     <Box>
-                      <Typography variant="caption" sx={{ display: 'block', mb: 0.25, fontWeight: 600, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.55rem' }}>
+                      <Typography variant="caption" sx={{ display: 'block', mb: 0.25, fontWeight: 600, color: colors.textSecondary, textTransform: 'uppercase', fontSize: '0.55rem' }}>
                         {section.category}
                       </Typography>
                       <Stack spacing={0.25}>
@@ -2370,7 +2382,7 @@ const AskMargen = ({ onBack }) => {
                               fontSize: '0.65rem',
                               height: 'auto',
                               py: 0.2,
-                              bgcolor: 'white',
+                              bgcolor: colors.paper,
                               border: `1px solid ${alpha('#1873b4', 0.2)}`,
                               '&:hover': {
                                 bgcolor: alpha('#1873b4', 0.1),

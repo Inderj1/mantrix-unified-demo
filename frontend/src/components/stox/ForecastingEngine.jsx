@@ -204,7 +204,18 @@ const generateDetailData = (skuId, mainData) => {
   };
 };
 
-const ForecastingEngine = ({ onBack, onTileClick }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const ForecastingEngine = ({ onBack, onTileClick, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -620,16 +631,16 @@ const ForecastingEngine = ({ onBack, onTileClick }) => {
 
   // Main render
   return (
-    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>STOX.AI</Link>
-            <Link component="button" variant="body1" onClick={() => selectedSku ? setSelectedSku(null) : onBack()} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>Layer 3: Prediction</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline', color: colors.primary }, cursor: 'pointer' }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={() => selectedSku ? setSelectedSku(null) : onBack()} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline', color: colors.primary }, cursor: 'pointer' }}>Layer 3: Prediction</Link>
             {selectedSku ? (
               <>
-                <Link component="button" variant="body1" onClick={() => setSelectedSku(null)} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>Forecasting Engine</Link>
+                <Link component="button" variant="body1" onClick={() => setSelectedSku(null)} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline', color: colors.primary }, cursor: 'pointer' }}>Forecasting Engine</Link>
                 <Typography color="primary" variant="body1" fontWeight={600}>{selectedSku.material} Detail</Typography>
               </>
             ) : (
@@ -647,11 +658,11 @@ const ForecastingEngine = ({ onBack, onTileClick }) => {
         {!selectedSku && (
           <>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-              <PsychologyIcon sx={{ fontSize: 40, color: '#0078d4' }} />
-              <Typography variant="h5" fontWeight={600}>Forecasting Engine</Typography>
+              <PsychologyIcon sx={{ fontSize: 40, color: colors.primary }} />
+              <Typography variant="h5" fontWeight={600} sx={{ color: colors.text }}>Forecasting Engine</Typography>
               <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: colors.textSecondary }}>
               AI-powered demand forecasting with model selection, accuracy tracking, and confidence intervals
             </Typography>
             <Chip
@@ -671,56 +682,56 @@ const ForecastingEngine = ({ onBack, onTileClick }) => {
           {metrics && (
             <Grid container spacing={2} sx={{ mb: 3 }}>
               <Grid item xs={12} sm={6} md={2}>
-                <Card variant="outlined" sx={{ borderLeft: `3px solid #10b981` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #10b981`, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Excellent</Typography>
+                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Excellent</Typography>
                     <Typography variant="h4" fontWeight={700} color="#059669">{metrics.excellent}</Typography>
-                    <Typography sx={{ fontSize: '0.65rem', color: '#64748b' }}>MAPE &lt; 10%</Typography>
+                    <Typography sx={{ fontSize: '0.65rem', color: colors.textSecondary }}>MAPE &lt; 10%</Typography>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card variant="outlined" sx={{ borderLeft: `3px solid #f59e0b` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #f59e0b`, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Good</Typography>
+                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Good</Typography>
                     <Typography variant="h4" fontWeight={700} color="#d97706">{metrics.good}</Typography>
-                    <Typography sx={{ fontSize: '0.65rem', color: '#64748b' }}>MAPE 10-20%</Typography>
+                    <Typography sx={{ fontSize: '0.65rem', color: colors.textSecondary }}>MAPE 10-20%</Typography>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card variant="outlined" sx={{ borderLeft: `3px solid #f97316` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #f97316`, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Fair</Typography>
+                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Fair</Typography>
                     <Typography variant="h4" fontWeight={700} color="#ea580c">{metrics.fair}</Typography>
-                    <Typography sx={{ fontSize: '0.65rem', color: '#64748b' }}>MAPE 20-30%</Typography>
+                    <Typography sx={{ fontSize: '0.65rem', color: colors.textSecondary }}>MAPE 20-30%</Typography>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card variant="outlined" sx={{ borderLeft: `3px solid #ef4444` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #ef4444`, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Poor</Typography>
+                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Poor</Typography>
                     <Typography variant="h4" fontWeight={700} color="#dc2626">{metrics.poor}</Typography>
-                    <Typography sx={{ fontSize: '0.65rem', color: '#64748b' }}>MAPE &gt; 30%</Typography>
+                    <Typography sx={{ fontSize: '0.65rem', color: colors.textSecondary }}>MAPE &gt; 30%</Typography>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card variant="outlined" sx={{ borderLeft: `3px solid #2b88d8` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #2b88d8`, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Over-Fcst</Typography>
+                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Over-Fcst</Typography>
                     <Typography variant="h4" fontWeight={700} color="#0284c7">{metrics.overForecasting}</Typography>
-                    <Typography sx={{ fontSize: '0.65rem', color: '#64748b' }}>Bias &gt; +5%</Typography>
+                    <Typography sx={{ fontSize: '0.65rem', color: colors.textSecondary }}>Bias &gt; +5%</Typography>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card variant="outlined" sx={{ borderLeft: `3px solid #0078d4` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #0078d4`, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Under-Fcst</Typography>
+                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Under-Fcst</Typography>
                     <Typography variant="h4" fontWeight={700} color="#005a9e">{metrics.underForecasting}</Typography>
-                    <Typography sx={{ fontSize: '0.65rem', color: '#64748b' }}>Bias &lt; -5%</Typography>
+                    <Typography sx={{ fontSize: '0.65rem', color: colors.textSecondary }}>Bias &lt; -5%</Typography>
                   </CardContent>
                 </Card>
               </Grid>
@@ -728,14 +739,20 @@ const ForecastingEngine = ({ onBack, onTileClick }) => {
           )}
 
           {/* Filters */}
-          <Paper sx={{ p: 2, mb: 2, display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-            <FilterListIcon sx={{ color: '#64748b' }} />
+          <Paper sx={{ p: 2, mb: 2, display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' , bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
+            <FilterListIcon sx={{ color: colors.textSecondary }} />
             <FormControl size="small" sx={{ minWidth: 140 }}>
               <InputLabel>Model</InputLabel>
               <Select
                 value={filters.model}
                 label="Model"
                 onChange={(e) => handleFilterChange('model', e.target.value)}
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border },
+                  '& .MuiSvgIcon-root': { color: colors.text },
+                  bgcolor: colors.paper,
+                  color: colors.text,
+                }}
               >
                 <MenuItem value="all">All Models</MenuItem>
                 {forecastModels.map(m => <MenuItem key={m} value={m}>{m}</MenuItem>)}
@@ -747,6 +764,12 @@ const ForecastingEngine = ({ onBack, onTileClick }) => {
                 value={filters.accuracy}
                 label="Accuracy"
                 onChange={(e) => handleFilterChange('accuracy', e.target.value)}
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border },
+                  '& .MuiSvgIcon-root': { color: colors.text },
+                  bgcolor: colors.paper,
+                  color: colors.text,
+                }}
               >
                 <MenuItem value="all">All</MenuItem>
                 <MenuItem value="Excellent">Excellent</MenuItem>
@@ -761,6 +784,12 @@ const ForecastingEngine = ({ onBack, onTileClick }) => {
                 value={filters.bias}
                 label="Bias"
                 onChange={(e) => handleFilterChange('bias', e.target.value)}
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border },
+                  '& .MuiSvgIcon-root': { color: colors.text },
+                  bgcolor: colors.paper,
+                  color: colors.text,
+                }}
               >
                 <MenuItem value="all">All</MenuItem>
                 <MenuItem value="over">Over-forecasting</MenuItem>
@@ -774,18 +803,24 @@ const ForecastingEngine = ({ onBack, onTileClick }) => {
                 value={filters.plant}
                 label="Plant"
                 onChange={(e) => handleFilterChange('plant', e.target.value)}
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border },
+                  '& .MuiSvgIcon-root': { color: colors.text },
+                  bgcolor: colors.paper,
+                  color: colors.text,
+                }}
               >
                 <MenuItem value="all">All Plants</MenuItem>
                 {uniquePlants.map(p => <MenuItem key={p} value={p}>{p}</MenuItem>)}
               </Select>
             </FormControl>
-            <Typography sx={{ ml: 'auto', fontSize: '0.8rem', color: '#64748b' }}>
+            <Typography sx={{ ml: 'auto', fontSize: '0.8rem', color: colors.textSecondary }}>
               Showing {filteredData.length} of {data.length} items
             </Typography>
           </Paper>
 
           {/* DataGrid */}
-          <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0, width: '100%' }}>
+          <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0, width: '100%', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
             <DataGrid
               rows={filteredData}
               columns={columns}
@@ -798,7 +833,39 @@ const ForecastingEngine = ({ onBack, onTileClick }) => {
               checkboxSelection
               disableRowSelectionOnClick
               onRowClick={handleRowClick}
-              sx={stoxTheme.getDataGridSx()}
+              sx={{
+                ...stoxTheme.getDataGridSx(),
+                bgcolor: colors.paper,
+                '& .MuiDataGrid-columnHeaders': {
+                  bgcolor: darkMode ? '#161b22' : '#f8fafc',
+                  borderBottom: `1px solid ${colors.border}`,
+                },
+                '& .MuiDataGrid-columnHeaderTitle': {
+                  color: colors.text,
+                  fontWeight: 600,
+                },
+                '& .MuiDataGrid-cell': {
+                  borderBottom: `1px solid ${colors.border}`,
+                  color: colors.text,
+                },
+                '& .MuiDataGrid-row': {
+                  bgcolor: colors.paper,
+                  '&:hover': {
+                    bgcolor: darkMode ? alpha('#4da6ff', 0.08) : alpha('#0a6ed1', 0.04),
+                  },
+                },
+                '& .MuiDataGrid-footerContainer': {
+                  borderTop: `1px solid ${colors.border}`,
+                  bgcolor: darkMode ? '#161b22' : '#f8fafc',
+                },
+                '& .MuiTablePagination-root': {
+                  color: colors.text,
+                },
+                '& .MuiDataGrid-toolbarContainer': {
+                  color: colors.text,
+                  borderBottom: `1px solid ${colors.border}`,
+                },
+              }}
             />
           </Paper>
         </>

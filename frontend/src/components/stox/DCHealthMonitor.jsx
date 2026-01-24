@@ -11,7 +11,18 @@ import { useDCHealthData } from '../../hooks/useStoxData';
 import DataSourceChip from './DataSourceChip';
 import { getTileDataConfig } from './stoxDataConfig';
 
-const DCHealthMonitor = ({ onBack }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const DCHealthMonitor = ({ onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const tileConfig = getTileDataConfig('dc-health-monitor');
   // Use persistent data hook
   const { data, loading, refetch } = useDCHealthData();
@@ -139,25 +150,25 @@ const DCHealthMonitor = ({ onBack }) => {
   ];
 
   return (
-    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: colors.background }}>
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>DC System</Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>Health Monitor</Typography>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text }}>CORE.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text }}>DC System</Link>
+            <Typography color="primary" variant="body1" fontWeight={600} sx={{ color: colors.primary }}>Health Monitor</Typography>
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>
         </Stack>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-              <ShowChart sx={{ fontSize: 32, color: '#106ebe' }} />
-              <Typography variant="h4" fontWeight={700}>DC Health Monitor</Typography>
+              <ShowChart sx={{ fontSize: 32, color: colors.primary }} />
+              <Typography variant="h4" fontWeight={700} sx={{ color: colors.text }}>DC Health Monitor</Typography>
               <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
-            <Typography variant="body2" color="text.secondary">Real-time visibility into DC inventory health, stock levels, and availability across network</Typography>
+            <Typography variant="body2" sx={{ color: colors.textSecondary }}>Real-time visibility into DC inventory health, stock levels, and availability across network</Typography>
           </Box>
           <Stack direction="row" spacing={1}>
             <Tooltip title="Refresh"><IconButton onClick={refetch} color="primary"><Refresh /></IconButton></Tooltip>
@@ -199,10 +210,10 @@ const DCHealthMonitor = ({ onBack }) => {
 
       {/* Quick Filters */}
       {metrics && (
-        <Paper sx={{ p: 2, mb: 2, bgcolor: alpha('#f8fafc', 1), border: '1px solid #e2e8f0' }}>
+        <Paper sx={{ p: 2, mb: 2, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           <Stack direction="row" alignItems="center" spacing={2}>
-            <FilterList sx={{ color: '#64748b' }} />
-            <Typography variant="subtitle2" fontWeight={600} color="text.secondary">Quick Filters:</Typography>
+            <FilterList sx={{ color: colors.textSecondary }} />
+            <Typography variant="subtitle2" fontWeight={600} sx={{ color: colors.textSecondary }}>Quick Filters:</Typography>
             <Chip
               label="All"
               onClick={() => setAlertFilter('all')}
@@ -237,44 +248,44 @@ const DCHealthMonitor = ({ onBack }) => {
       {metrics && (
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#10b981', 0.1)} 0%, ${alpha('#10b981', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#10b981', 0.1)} 0%, ${alpha('#10b981', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <CheckCircle sx={{ color: '#10b981' }} />
-                  <Typography variant="body2" color="text.secondary">Healthy</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Healthy</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#10b981">{metrics.healthyCount}</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#f59e0b', 0.1)} 0%, ${alpha('#f59e0b', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#f59e0b', 0.1)} 0%, ${alpha('#f59e0b', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <Warning sx={{ color: '#f59e0b' }} />
-                  <Typography variant="body2" color="text.secondary">Warning</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Warning</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#f59e0b">{metrics.warningCount}</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#ef4444', 0.1)} 0%, ${alpha('#ef4444', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#ef4444', 0.1)} 0%, ${alpha('#ef4444', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <Error sx={{ color: '#ef4444' }} />
-                  <Typography variant="body2" color="text.secondary">Critical</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Critical</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#ef4444">{metrics.criticalCount}</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#106ebe', 0.1)} 0%, ${alpha('#106ebe', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#106ebe', 0.1)} 0%, ${alpha('#106ebe', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <ShowChart sx={{ color: '#106ebe' }} />
-                  <Typography variant="body2" color="text.secondary">Avg Health Score</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Avg Health Score</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#106ebe">{metrics.avgHealthScore}</Typography>
               </CardContent>
@@ -283,7 +294,7 @@ const DCHealthMonitor = ({ onBack }) => {
         </Grid>
       )}
 
-      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         <DataGrid
           rows={filteredData}
           columns={columns}
@@ -295,7 +306,27 @@ const DCHealthMonitor = ({ onBack }) => {
           pageSizeOptions={[10, 25, 50, 100]}
           checkboxSelection
           disableRowSelectionOnClick
-          sx={stoxTheme.getDataGridSx()}
+          sx={{
+            ...stoxTheme.getDataGridSx(),
+            '& .MuiDataGrid-cell': {
+              color: colors.text,
+              borderColor: colors.border,
+            },
+            '& .MuiDataGrid-columnHeaders': {
+              backgroundColor: darkMode ? '#21262d' : '#f8fafc',
+              color: colors.text,
+              borderBottom: `2px solid ${colors.border}`,
+            },
+            '& .MuiDataGrid-row': {
+              bgcolor: colors.paper,
+              '&:hover': {
+                bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+              },
+            },
+            bgcolor: colors.paper,
+            color: colors.text,
+            border: `1px solid ${colors.border}`,
+          }}
         />
       </Paper>
     </Box>

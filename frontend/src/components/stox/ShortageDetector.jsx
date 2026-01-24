@@ -120,7 +120,20 @@ function TabPanel({ children, value, index, ...other }) {
   );
 }
 
-const ShortageDetector = ({ onBack }) => {
+// Dark mode color helper
+const getColors = (darkMode) => ({
+  background: darkMode ? '#1a1a1a' : '#ffffff',
+  paper: darkMode ? '#242424' : '#ffffff',
+  text: {
+    primary: darkMode ? '#ffffff' : '#000000',
+    secondary: darkMode ? '#b0b0b0' : '#666666',
+  },
+  border: darkMode ? '#333333' : 'rgba(0,0,0,0.08)',
+  hover: darkMode ? '#2a2a2a' : '#f5f5f5',
+});
+
+const ShortageDetector = ({ onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [predictions, setPredictions] = useState([]);
@@ -431,7 +444,8 @@ const ShortageDetector = ({ onBack }) => {
       flexDirection: 'column',
       overflowY: 'auto',
       overflowX: 'hidden',
-      maxWidth: '100vw'
+      maxWidth: '100vw',
+      bgcolor: colors.background,
     }}>
       {/* Header with Breadcrumbs */}
       <Box sx={{ mb: 3 }}>
@@ -498,7 +512,10 @@ const ShortageDetector = ({ onBack }) => {
         {/* Summary Cards */}
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card>
+            <Card sx={{
+              bgcolor: colors.paper,
+              border: darkMode ? `1px solid ${colors.border}` : 'none',
+            }}>
               <CardContent>
                 <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                   <Box>
@@ -517,7 +534,10 @@ const ShortageDetector = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card>
+            <Card sx={{
+              bgcolor: colors.paper,
+              border: darkMode ? `1px solid ${colors.border}` : 'none',
+            }}>
               <CardContent>
                 <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                   <Box>
@@ -536,7 +556,10 @@ const ShortageDetector = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card>
+            <Card sx={{
+              bgcolor: colors.paper,
+              border: darkMode ? `1px solid ${colors.border}` : 'none',
+            }}>
               <CardContent>
                 <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                   <Box>
@@ -555,7 +578,10 @@ const ShortageDetector = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card>
+            <Card sx={{
+              bgcolor: colors.paper,
+              border: darkMode ? `1px solid ${colors.border}` : 'none',
+            }}>
               <CardContent>
                 <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                   <Box>
@@ -592,7 +618,11 @@ const ShortageDetector = ({ onBack }) => {
         )}
 
         {/* Tabs */}
-        <Paper sx={{ mb: 2 }}>
+        <Paper sx={{
+          mb: 2,
+          bgcolor: colors.paper,
+          border: darkMode ? `1px solid ${colors.border}` : 'none',
+        }}>
           <Tabs
             value={activeTab}
             onChange={(e, newValue) => setActiveTab(newValue)}
@@ -615,24 +645,62 @@ const ShortageDetector = ({ onBack }) => {
         overflow: 'hidden',
         width: '100%',
         height: 'calc(100vh - 520px)',
-        minHeight: 500
+        minHeight: 500,
+        bgcolor: colors.paper,
+        border: darkMode ? `1px solid ${colors.border}` : 'none',
       }}>
         <DataGrid
           autoHeight={false}
           sx={{
             height: '100vh',
             width: '100%',
-            border: '1px solid rgba(0,0,0,0.08)',
-            '& .MuiDataGrid-row:hover': {
-              backgroundColor: '#f5f5f5',
+            border: darkMode ? `1px solid ${colors.border}` : '1px solid rgba(0,0,0,0.08)',
+            bgcolor: colors.paper,
+            color: colors.text.primary,
+            '& .MuiDataGrid-cell': {
+              color: colors.text.primary,
+              borderColor: colors.border,
+            },
+            '& .MuiDataGrid-columnHeaders': {
+              bgcolor: darkMode ? '#1e1e1e' : '#fafafa',
+              color: colors.text.primary,
+              borderColor: colors.border,
+            },
+            '& .MuiDataGrid-columnHeader': {
+              color: colors.text.primary,
+            },
+            '& .MuiDataGrid-footerContainer': {
+              bgcolor: darkMode ? '#1e1e1e' : '#fafafa',
+              borderColor: colors.border,
+            },
+            '& .MuiDataGrid-row': {
+              bgcolor: colors.paper,
+              '&:hover': {
+                backgroundColor: colors.hover,
+              },
+            },
+            '& .MuiDataGrid-row.Mui-selected': {
+              bgcolor: darkMode ? '#2a2a2a' : '#f0f0f0',
+              '&:hover': {
+                bgcolor: darkMode ? '#333333' : '#e0e0e0',
+              },
+            },
+            '& .MuiCheckbox-root': {
+              color: darkMode ? '#b0b0b0' : 'inherit',
+            },
+            '& .MuiTablePagination-root': {
+              color: colors.text.primary,
+            },
+            '& .MuiIconButton-root': {
+              color: colors.text.primary,
             },
             '& .critical-row': {
               borderLeft: '4px solid #F44336',
-              backgroundColor: '#FFEBEE',
+              backgroundColor: darkMode ? '#3a1a1a' : '#FFEBEE',
             },
             '& .high-row': {
               borderLeft: '4px solid #FF9800',
-              backgroundColor: '#FFF3E0',
+              backgroundColor: darkMode ? '#3a2a1a' : '#FFF3E0',
             },
             '& .medium-row': {
               borderLeft: '4px solid #42A5F5',
@@ -668,7 +736,11 @@ const ShortageDetector = ({ onBack }) => {
 
       {/* Tab 2: 3-Month Forecast */}
       <TabPanel value={activeTab} index={1}>
-        <Paper sx={{ p: 3 }}>
+        <Paper sx={{
+          p: 3,
+          bgcolor: colors.paper,
+          border: darkMode ? `1px solid ${colors.border}` : 'none',
+        }}>
           {loading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
               <LinearProgress sx={{ width: '50%' }} />
@@ -682,6 +754,39 @@ const ShortageDetector = ({ onBack }) => {
           ) : (
             <DataGrid
               rows={predictions.map((item, idx) => ({ id: idx + 1, ...item }))}
+              sx={{
+                border: darkMode ? `1px solid ${colors.border}` : '1px solid rgba(0,0,0,0.08)',
+                bgcolor: colors.paper,
+                color: colors.text.primary,
+                '& .MuiDataGrid-cell': {
+                  color: colors.text.primary,
+                  borderColor: colors.border,
+                },
+                '& .MuiDataGrid-columnHeaders': {
+                  bgcolor: darkMode ? '#1e1e1e' : '#fafafa',
+                  color: colors.text.primary,
+                  borderColor: colors.border,
+                },
+                '& .MuiDataGrid-columnHeader': {
+                  color: colors.text.primary,
+                },
+                '& .MuiDataGrid-footerContainer': {
+                  bgcolor: darkMode ? '#1e1e1e' : '#fafafa',
+                  borderColor: colors.border,
+                },
+                '& .MuiDataGrid-row': {
+                  bgcolor: colors.paper,
+                  '&:hover': {
+                    backgroundColor: colors.hover,
+                  },
+                },
+                '& .MuiTablePagination-root': {
+                  color: colors.text.primary,
+                },
+                '& .MuiIconButton-root': {
+                  color: colors.text.primary,
+                },
+              }}
               columns={[
                 {
                   field: 'material_id',
@@ -791,11 +896,6 @@ const ShortageDetector = ({ onBack }) => {
                 pagination: { paginationModel: { pageSize: 25 } },
               }}
               slots={{ toolbar: GridToolbar }}
-              sx={{
-                '& .MuiDataGrid-row:hover': {
-                  backgroundColor: '#f5f5f5',
-                },
-              }}
             />
           )}
         </Paper>
@@ -803,7 +903,11 @@ const ShortageDetector = ({ onBack }) => {
 
       {/* Tab 3: Material Deep Dive */}
       <TabPanel value={activeTab} index={2}>
-        <Paper sx={{ p: 3 }}>
+        <Paper sx={{
+          p: 3,
+          bgcolor: colors.paper,
+          border: darkMode ? `1px solid ${colors.border}` : 'none',
+        }}>
           {loading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
               <LinearProgress sx={{ width: '50%' }} />

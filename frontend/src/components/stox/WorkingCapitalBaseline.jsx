@@ -15,6 +15,16 @@ import DataSourceChip from './DataSourceChip';
 import { getTileDataConfig } from './stoxDataConfig';
 import stoxService from '../../services/stoxService';
 
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 /**
  * Working Capital Baseline - Tile 2.5
  *
@@ -32,7 +42,7 @@ import stoxService from '../../services/stoxService';
  * - Pipeline Stock: Lead time driven (Lead Time × Daily Demand)
  * - Excess/Obsolete: Policy error (shouldn't exist)
  */
-const WorkingCapitalBaseline = ({ onBack }) => {
+const WorkingCapitalBaseline = ({ onBack, darkMode = false }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -45,6 +55,7 @@ const WorkingCapitalBaseline = ({ onBack }) => {
 
   // Get tile data config for data source indicator
   const tileConfig = getTileDataConfig('working-capital-baseline');
+  const colors = getColors(darkMode);
 
   useEffect(() => {
     fetchData();
@@ -334,7 +345,7 @@ const WorkingCapitalBaseline = ({ onBack }) => {
   };
 
   return (
-    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -369,7 +380,7 @@ const WorkingCapitalBaseline = ({ onBack }) => {
       {metrics && (
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#106ebe', 0.1)} 0%, ${alpha('#106ebe', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#106ebe', darkMode ? 0.2 : 0.1)} 0%, ${alpha('#106ebe', darkMode ? 0.1 : 0.05)} 100%)`, bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <AttachMoney sx={{ color: '#106ebe' }} />
@@ -383,7 +394,7 @@ const WorkingCapitalBaseline = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#10b981', 0.1)} 0%, ${alpha('#10b981', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#10b981', darkMode ? 0.2 : 0.1)} 0%, ${alpha('#10b981', darkMode ? 0.1 : 0.05)} 100%)`, bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <Savings sx={{ color: '#10b981' }} />
@@ -397,7 +408,7 @@ const WorkingCapitalBaseline = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#0078d4', 0.1)} 0%, ${alpha('#0078d4', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#0078d4', darkMode ? 0.2 : 0.1)} 0%, ${alpha('#0078d4', darkMode ? 0.1 : 0.05)} 100%)`, bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <Speed sx={{ color: '#0078d4' }} />
@@ -411,7 +422,7 @@ const WorkingCapitalBaseline = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#f59e0b', 0.1)} 0%, ${alpha('#f59e0b', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#f59e0b', darkMode ? 0.2 : 0.1)} 0%, ${alpha('#f59e0b', darkMode ? 0.1 : 0.05)} 100%)`, bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <Timeline sx={{ color: '#f59e0b' }} />
@@ -434,7 +445,7 @@ const WorkingCapitalBaseline = ({ onBack }) => {
 
       {/* WC Decomposition Summary Bar */}
       {metrics && (
-        <Paper sx={{ p: 2, mb: 2 }}>
+        <Paper sx={{ p: 2, mb: 2, bgcolor: colors.paper, borderColor: colors.border }}>
           <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
             <PieChartIcon sx={{ color: '#64748b' }} />
             <Typography variant="subtitle1" fontWeight={600}>Working Capital Decomposition</Typography>
@@ -501,7 +512,7 @@ const WorkingCapitalBaseline = ({ onBack }) => {
       </Stack>
 
       {/* Data Grid */}
-      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: colors.paper, borderColor: colors.border }}>
         <DataGrid
           rows={filteredData}
           columns={columns}
@@ -543,7 +554,7 @@ const WorkingCapitalBaseline = ({ onBack }) => {
 
               {/* Key Metrics */}
               <Grid item xs={12} md={6}>
-                <Paper sx={{ p: 2, bgcolor: alpha('#106ebe', 0.05) }}>
+                <Paper sx={{ p: 2, bgcolor: alpha('#106ebe', darkMode ? 0.15 : 0.05), borderColor: colors.border }}>
                   <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2 }}>Current State</Typography>
                   <Stack spacing={1.5}>
                     <Stack direction="row" justifyContent="space-between">
@@ -584,7 +595,7 @@ const WorkingCapitalBaseline = ({ onBack }) => {
 
               {/* Optimal vs Current */}
               <Grid item xs={12} md={6}>
-                <Paper sx={{ p: 2, bgcolor: alpha('#10b981', 0.05) }}>
+                <Paper sx={{ p: 2, bgcolor: alpha('#10b981', darkMode ? 0.15 : 0.05), borderColor: colors.border }}>
                   <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2 }}>Optimal vs Current</Typography>
                   <Stack spacing={1.5}>
                     <Stack direction="row" justifyContent="space-between">
@@ -615,7 +626,7 @@ const WorkingCapitalBaseline = ({ onBack }) => {
 
               {/* Parameters */}
               <Grid item xs={12}>
-                <Paper sx={{ p: 2, bgcolor: alpha('#64748b', 0.05) }}>
+                <Paper sx={{ p: 2, bgcolor: alpha('#64748b', darkMode ? 0.15 : 0.05), borderColor: colors.border }}>
                   <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2 }}>Inventory Parameters</Typography>
                   <Grid container spacing={2}>
                     <Grid item xs={6} md={3}>

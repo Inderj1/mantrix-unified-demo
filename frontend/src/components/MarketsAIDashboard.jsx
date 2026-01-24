@@ -39,12 +39,24 @@ import { usePersistedState } from '../hooks/usePersistedState';
 // Single consistent blue for all modules
 const MODULE_COLOR = '#0078d4';
 
+// Dark mode color helper
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 /**
  * MarketsAIDashboard - Main dashboard for market intelligence
  * Tile-based layout showing all 15 market signal categories
  * Updated styling to match STOX.AI and MARGEN.AI
  */
-const MarketsAIDashboard = () => {
+const MarketsAIDashboard = ({ darkMode = false }) => {
+  const colors = getColors(darkMode);
   const categories = getCategoriesArray();
 
   // State - persisted configuration (all categories disabled by default)
@@ -143,10 +155,17 @@ const MarketsAIDashboard = () => {
       height: '100%',
       overflowY: 'auto',
       overflowX: 'hidden',
-      background: 'linear-gradient(180deg, rgba(10, 110, 209, 0.05) 0%, rgba(255, 255, 255, 1) 50%)',
+      bgcolor: colors.background,
     }}>
       {/* Header */}
-      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+      <Paper elevation={0} sx={{
+        p: 2,
+        borderRadius: 0,
+        mb: 3,
+        bgcolor: colors.paper,
+        border: `1px solid ${colors.border}`,
+        boxShadow: darkMode ? 'none' : '0 2px 8px rgba(0,0,0,0.1)'
+      }}>
         {/* System Identity Badge */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Box sx={{
@@ -188,7 +207,7 @@ const MarketsAIDashboard = () => {
                 />
               )}
             </Stack>
-            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+            <Typography variant="body2" sx={{ fontSize: '0.85rem', color: colors.textSecondary }}>
               Comprehensive market signal monitoring across 15 intelligence categories
             </Typography>
           </Box>
@@ -213,22 +232,22 @@ const MarketsAIDashboard = () => {
           <Card
             sx={{
               height: '100%',
-              border: '1px solid rgba(0,0,0,0.08)',
+              border: `1px solid ${colors.border}`,
               borderRadius: 3,
-              bgcolor: 'white',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              bgcolor: colors.cardBg,
+              boxShadow: darkMode ? 'none' : '0 2px 8px rgba(0,0,0,0.1)',
               position: 'relative',
               overflow: 'hidden',
             }}
           >
             <CardContent sx={{ py: 1.5, px: 2 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+              <Typography variant="caption" sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>
                 Active Categories
               </Typography>
               <Typography variant="h5" fontWeight={700} sx={{ color: MODULE_COLOR }}>
                 {enabledCategories.length} / {categories.length}
               </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
+              <Typography variant="caption" sx={{ fontSize: '0.65rem', color: colors.textSecondary }}>
                 Monitoring enabled
               </Typography>
             </CardContent>
@@ -239,22 +258,22 @@ const MarketsAIDashboard = () => {
           <Card
             sx={{
               height: '100%',
-              border: '1px solid rgba(0,0,0,0.08)',
+              border: `1px solid ${colors.border}`,
               borderRadius: 3,
-              bgcolor: 'white',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              bgcolor: colors.cardBg,
+              boxShadow: darkMode ? 'none' : '0 2px 8px rgba(0,0,0,0.1)',
               position: 'relative',
               overflow: 'hidden',
             }}
           >
             <CardContent sx={{ py: 1.5, px: 2 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+              <Typography variant="caption" sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>
                 Critical Signals
               </Typography>
               <Typography variant="h5" fontWeight={700} color="error.main">
                 {criticalSignals.length}
               </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
+              <Typography variant="caption" sx={{ fontSize: '0.65rem', color: colors.textSecondary }}>
                 Require immediate action
               </Typography>
             </CardContent>
@@ -265,16 +284,16 @@ const MarketsAIDashboard = () => {
           <Card
             sx={{
               height: '100%',
-              border: '1px solid rgba(0,0,0,0.08)',
+              border: `1px solid ${colors.border}`,
               borderRadius: 3,
-              bgcolor: 'white',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              bgcolor: colors.cardBg,
+              boxShadow: darkMode ? 'none' : '0 2px 8px rgba(0,0,0,0.1)',
               position: 'relative',
               overflow: 'hidden',
             }}
           >
             <CardContent sx={{ py: 1.5, px: 2 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+              <Typography variant="caption" sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>
                 Total Business Impact
               </Typography>
               <Typography
@@ -284,7 +303,7 @@ const MarketsAIDashboard = () => {
               >
                 {formatCurrency(totalImpact)}
               </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
+              <Typography variant="caption" sx={{ fontSize: '0.65rem', color: colors.textSecondary }}>
                 {totalImpact >= 0 ? 'Opportunity value' : 'At risk'}
               </Typography>
             </CardContent>
@@ -295,22 +314,22 @@ const MarketsAIDashboard = () => {
           <Card
             sx={{
               height: '100%',
-              border: '1px solid rgba(0,0,0,0.08)',
+              border: `1px solid ${colors.border}`,
               borderRadius: 3,
-              bgcolor: 'white',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              bgcolor: colors.cardBg,
+              boxShadow: darkMode ? 'none' : '0 2px 8px rgba(0,0,0,0.1)',
               position: 'relative',
               overflow: 'hidden',
             }}
           >
             <CardContent sx={{ py: 1.5, px: 2 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+              <Typography variant="caption" sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>
                 Active Signals
               </Typography>
               <Typography variant="h5" fontWeight={700} sx={{ color: MODULE_COLOR }}>
                 {totalActiveSignals}
               </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
+              <Typography variant="caption" sx={{ fontSize: '0.65rem', color: colors.textSecondary }}>
                 Across all categories
               </Typography>
             </CardContent>
@@ -341,6 +360,7 @@ const MarketsAIDashboard = () => {
                   onClick={() => isEnabled && handleTileClick(category.id)}
                   onConfigClick={() => setConfigPanelOpen(true)}
                   index={index}
+                  darkMode={darkMode}
                 />
               </Grid>
             );
@@ -352,7 +372,7 @@ const MarketsAIDashboard = () => {
       <Box sx={{ mt: 6, textAlign: 'center' }}>
         <Stack direction="row" spacing={2} justifyContent="center" alignItems="center">
           <LightbulbIcon sx={{ color: 'warning.main' }} />
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: colors.textSecondary }}>
             MARKETS.AI provides comprehensive market signal monitoring powered by real-time data analytics
           </Typography>
         </Stack>
@@ -371,6 +391,7 @@ const MarketsAIDashboard = () => {
           sx: {
             height: '90vh',
             maxHeight: '90vh',
+            bgcolor: colors.paper,
           }
         }}
       >
@@ -384,6 +405,7 @@ const MarketsAIDashboard = () => {
             }}
             onViewSignalDetails={handleViewSignalDetails}
             onSimulateImpact={handleSimulateImpact}
+            darkMode={darkMode}
           />
         )}
       </Dialog>
@@ -394,6 +416,7 @@ const MarketsAIDashboard = () => {
         onClose={() => setConfigPanelOpen(false)}
         enabledCategories={enabledCategories}
         onSave={handleConfigSave}
+        darkMode={darkMode}
       />
 
       {/* Signal Detail Dialog */}
@@ -402,18 +425,23 @@ const MarketsAIDashboard = () => {
         onClose={() => setSignalDetailDialog(null)}
         maxWidth="md"
         fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: colors.paper,
+          }
+        }}
       >
         {signalDetailDialog && (
           <>
-            <DialogTitle>
+            <DialogTitle sx={{ bgcolor: colors.paper }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h6">{signalDetailDialog.name}</Typography>
+                <Typography variant="h6" sx={{ color: colors.text }}>{signalDetailDialog.name}</Typography>
                 <IconButton onClick={() => setSignalDetailDialog(null)}>
-                  <CloseIcon />
+                  <CloseIcon sx={{ color: colors.text }} />
                 </IconButton>
               </Box>
             </DialogTitle>
-            <DialogContent>
+            <DialogContent sx={{ bgcolor: colors.paper }}>
               <Box sx={{ py: 2 }}>
                 <Alert severity="warning" sx={{ mb: 2 }}>
                   <AlertTitle>Signal Details</AlertTitle>
@@ -422,34 +450,34 @@ const MarketsAIDashboard = () => {
 
                 <Grid container spacing={2}>
                   <Grid item xs={6}>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                       Location
                     </Typography>
-                    <Typography variant="body1" fontWeight={500}>
+                    <Typography variant="body1" fontWeight={500} sx={{ color: colors.text }}>
                       {signalDetailDialog.location}
                     </Typography>
                   </Grid>
                   <Grid item xs={6}>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                       Business Impact
                     </Typography>
-                    <Typography variant="body1" fontWeight={500}>
+                    <Typography variant="body1" fontWeight={500} sx={{ color: colors.text }}>
                       {formatCurrency(signalDetailDialog.impactValue)}
                     </Typography>
                   </Grid>
                   <Grid item xs={6}>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                       Time to Impact
                     </Typography>
-                    <Typography variant="body1" fontWeight={500}>
+                    <Typography variant="body1" fontWeight={500} sx={{ color: colors.text }}>
                       {signalDetailDialog.timeToImpact}
                     </Typography>
                   </Grid>
                   <Grid item xs={6}>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                       Severity
                     </Typography>
-                    <Typography variant="body1" fontWeight={500}>
+                    <Typography variant="body1" fontWeight={500} sx={{ color: colors.text }}>
                       {signalDetailDialog.severity}
                     </Typography>
                   </Grid>
@@ -457,13 +485,13 @@ const MarketsAIDashboard = () => {
 
                 {signalDetailDialog.recommendations && signalDetailDialog.recommendations.length > 0 && (
                   <Box sx={{ mt: 3 }}>
-                    <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                    <Typography variant="subtitle2" fontWeight={600} gutterBottom sx={{ color: colors.text }}>
                       Recommended Actions:
                     </Typography>
                     <Box component="ul" sx={{ pl: 2 }}>
                       {signalDetailDialog.recommendations.map((rec, idx) => (
                         <Box component="li" key={idx} sx={{ mb: 1 }}>
-                          <Typography variant="body2">{rec}</Typography>
+                          <Typography variant="body2" sx={{ color: colors.text }}>{rec}</Typography>
                         </Box>
                       ))}
                     </Box>
@@ -471,7 +499,7 @@ const MarketsAIDashboard = () => {
                 )}
               </Box>
             </DialogContent>
-            <DialogActions>
+            <DialogActions sx={{ bgcolor: colors.paper }}>
               <Button onClick={() => setSignalDetailDialog(null)}>Close</Button>
               <Button
                 variant="contained"

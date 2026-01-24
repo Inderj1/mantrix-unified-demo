@@ -48,10 +48,22 @@ const categories = [
   { id: 'cfo', label: 'Finance', icon: AttachMoneyIcon, color: '#f59e0b', description: 'Financial Monitoring' },
 ];
 
-const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
+const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user', darkMode = false }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const getColors = (darkMode) => ({
+    primary: darkMode ? '#4da6ff' : '#0a6ed1',
+    text: darkMode ? '#e6edf3' : '#1e293b',
+    textSecondary: darkMode ? '#8b949e' : '#64748b',
+    background: darkMode ? '#0d1117' : '#f8fbfd',
+    paper: darkMode ? '#161b22' : '#ffffff',
+    cardBg: darkMode ? '#21262d' : '#ffffff',
+    border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+  });
+
+  const colors = getColors(darkMode);
 
   // Form state
   const [templates, setTemplates] = useState([]);
@@ -201,7 +213,7 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
       case 0:
         return (
           <Box>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" gutterBottom sx={{ color: colors.text }}>
               Create Your Proactive Agent
             </Typography>
 
@@ -240,7 +252,7 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
             {/* Quick Templates */}
             {filteredTemplates.length > 0 && (
               <Box mb={3}>
-                <Typography variant="subtitle2" gutterBottom>
+                <Typography variant="subtitle2" gutterBottom sx={{ color: colors.text }}>
                   {selectedCategory === 'all' ? 'Quick Start Templates' : `${categories.find(c => c.id === selectedCategory)?.label} Templates`}
                 </Typography>
                 <Grid container spacing={2}>
@@ -253,9 +265,10 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
                           sx={{
                             cursor: 'pointer',
                             border: selectedTemplate?.id === template.id ? 2 : 1,
-                            borderColor: selectedTemplate?.id === template.id ? catInfo.color : 'divider',
+                            borderColor: selectedTemplate?.id === template.id ? catInfo.color : colors.border,
+                            bgcolor: colors.cardBg,
                             transition: 'all 0.2s',
-                            '&:hover': { borderColor: catInfo.color, bgcolor: 'action.hover' }
+                            '&:hover': { borderColor: catInfo.color, bgcolor: darkMode ? 'rgba(77, 166, 255, 0.08)' : 'action.hover' }
                           }}
                           onClick={() => {
                             setSelectedTemplate(template);
@@ -264,7 +277,7 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
                         >
                           <CardContent>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                              <Typography variant="subtitle1" fontWeight={600}>
+                              <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
                                 {template.name}
                               </Typography>
                               <Chip
@@ -278,10 +291,10 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
                                 }}
                               />
                             </Box>
-                            <Typography variant="body2" color="text.secondary" mb={1}>
+                            <Typography variant="body2" sx={{ color: colors.textSecondary }} mb={1}>
                               {template.description}
                             </Typography>
-                            <Typography variant="caption" color="text.disabled">
+                            <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                               {template.default_frequency} · {template.default_severity} severity
                             </Typography>
                           </CardContent>
@@ -305,7 +318,7 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
 
             {/* Custom Query */}
             <Box>
-              <Typography variant="subtitle2" gutterBottom>
+              <Typography variant="subtitle2" gutterBottom sx={{ color: colors.text }}>
                 Describe What You Want the Agent to Execute
               </Typography>
               <TextField
@@ -319,10 +332,17 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
                   setSelectedTemplate(null);
                 }}
                 variant="outlined"
-                sx={{ mt: 1 }}
+                sx={{
+                  mt: 1,
+                  '& .MuiOutlinedInput-root': {
+                    bgcolor: colors.cardBg,
+                    color: colors.text,
+                    '& fieldset': { borderColor: colors.border },
+                  }
+                }}
               />
               <Box mt={1}>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                   Try: "Show inventory levels below safety stock", "Track gross margin by region monthly", "Monitor late deliveries over 3 days"
                 </Typography>
               </Box>
@@ -333,7 +353,7 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
       case 1:
         return (
           <Box>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" gutterBottom sx={{ color: colors.text }}>
               Configure Agent Settings
             </Typography>
 
@@ -419,10 +439,10 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
               {/* Preview Data */}
               {agentData?.preview_data && (
                 <Grid item xs={12}>
-                  <Typography variant="subtitle2" gutterBottom>
+                  <Typography variant="subtitle2" gutterBottom sx={{ color: colors.text }}>
                     Data Preview
                   </Typography>
-                  <Paper variant="outlined" sx={{ p: 2, bgcolor: 'grey.50' }}>
+                  <Paper variant="outlined" sx={{ p: 2, bgcolor: colors.cardBg, borderColor: colors.border }}>
                     <DataGrid
                       rows={agentData.preview_data.map((row, idx) => ({ id: idx, ...row }))}
                       columns={Object.keys(agentData.preview_data[0] || {}).map(key => ({
@@ -434,6 +454,12 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
                       autoHeight
                       hideFooter
                       density="compact"
+                      sx={{
+                        '& .MuiDataGrid-root': { bgcolor: colors.cardBg, color: colors.text },
+                        '& .MuiDataGrid-cell': { borderColor: colors.border, color: colors.text },
+                        '& .MuiDataGrid-columnHeaders': { borderColor: colors.border, bgcolor: colors.paper },
+                        '& .MuiDataGrid-columnHeaderTitle': { color: colors.text },
+                      }}
                     />
                   </Paper>
                 </Grid>
@@ -445,27 +471,27 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
       case 2:
         return (
           <Box>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" gutterBottom sx={{ color: colors.text }}>
               Review & Deploy Agent
             </Typography>
 
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <Paper variant="outlined" sx={{ p: 2 }}>
-                  <Typography variant="subtitle2" color="primary" gutterBottom>
+                <Paper variant="outlined" sx={{ p: 2, bgcolor: colors.paper, borderColor: colors.border }}>
+                  <Typography variant="subtitle2" sx={{ color: colors.primary }} gutterBottom>
                     Agent Details
                   </Typography>
                   <Grid container spacing={1}>
                     <Grid item xs={6}>
-                      <Typography variant="caption" color="text.secondary">Name:</Typography>
-                      <Typography variant="body2" fontWeight={600}>{configuration.name}</Typography>
+                      <Typography variant="caption" sx={{ color: colors.textSecondary }}>Name:</Typography>
+                      <Typography variant="body2" fontWeight={600} sx={{ color: colors.text }}>{configuration.name}</Typography>
                     </Grid>
                     <Grid item xs={3}>
-                      <Typography variant="caption" color="text.secondary">Frequency:</Typography>
-                      <Typography variant="body2">{configuration.frequency}</Typography>
+                      <Typography variant="caption" sx={{ color: colors.textSecondary }}>Frequency:</Typography>
+                      <Typography variant="body2" sx={{ color: colors.text }}>{configuration.frequency}</Typography>
                     </Grid>
                     <Grid item xs={3}>
-                      <Typography variant="caption" color="text.secondary">Severity:</Typography>
+                      <Typography variant="caption" sx={{ color: colors.textSecondary }}>Severity:</Typography>
                       <Chip label={configuration.severity} size="small" color={
                         configuration.severity === 'high' ? 'error' :
                         configuration.severity === 'medium' ? 'warning' : 'default'
@@ -476,14 +502,14 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
               </Grid>
 
               <Grid item xs={12}>
-                <Paper variant="outlined" sx={{ p: 2 }}>
-                  <Typography variant="subtitle2" color="primary" gutterBottom>
+                <Paper variant="outlined" sx={{ p: 2, bgcolor: colors.paper, borderColor: colors.border }}>
+                  <Typography variant="subtitle2" sx={{ color: colors.primary }} gutterBottom>
                     Query
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" mb={1}>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }} mb={1}>
                     {agentData?.natural_language_query}
                   </Typography>
-                  <Paper sx={{ p: 2, bgcolor: 'grey.900', color: 'grey.100', fontFamily: 'monospace', fontSize: 12, overflow: 'auto' }}>
+                  <Paper sx={{ p: 2, bgcolor: darkMode ? '#0d1117' : 'grey.900', color: darkMode ? colors.text : 'grey.100', fontFamily: 'monospace', fontSize: 12, overflow: 'auto', border: '1px solid', borderColor: colors.border }}>
                     {agentData?.sql_query}
                   </Paper>
                 </Paper>
@@ -491,11 +517,11 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user' }) => {
 
               {configuration.alertCondition && (
                 <Grid item xs={12}>
-                  <Paper variant="outlined" sx={{ p: 2 }}>
-                    <Typography variant="subtitle2" color="primary" gutterBottom>
+                  <Paper variant="outlined" sx={{ p: 2, bgcolor: colors.paper, borderColor: colors.border }}>
+                    <Typography variant="subtitle2" sx={{ color: colors.primary }} gutterBottom>
                       Alert Condition
                     </Typography>
-                    <Typography variant="body2" fontFamily="monospace">
+                    <Typography variant="body2" fontFamily="monospace" sx={{ color: colors.text }}>
                       {configuration.alertCondition}
                     </Typography>
                   </Paper>

@@ -93,7 +93,18 @@ const formatBytes = (bytes) => {
   return `${bytes} bytes`;
 };
 
-const DataCatalog = () => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const DataCatalog = ({ darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [currentView, setCurrentView] = useState(0);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -357,7 +368,7 @@ const DataCatalog = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 3, bgcolor: colors.background, minHeight: '100vh' }}>
       {/* Error Display */}
       {error && (
         <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
@@ -368,20 +379,20 @@ const DataCatalog = () => {
       {/* Header with Quick Stats */}
       <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid item xs={12}>
-          <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
+          <Typography variant="h4" sx={{ mb: 3, fontWeight: 600, color: colors.text }}>
             Data Catalog
           </Typography>
         </Grid>
-        
+
         {/* Quick Stats Cards */}
         <Grid item xs={12} md={3}>
-          <Card>
+          <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <DatabaseIcon sx={{ mr: 1, color: 'primary.main' }} />
-                <Typography variant="h6">{catalogData.stats.totalTables}</Typography>
+                <Typography variant="h6" sx={{ color: colors.text }}>{catalogData.stats.totalTables}</Typography>
               </Box>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                 Total Tables
               </Typography>
               <LinearProgress 
@@ -392,15 +403,15 @@ const DataCatalog = () => {
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} md={3}>
-          <Card>
+          <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <ViewInArIcon sx={{ mr: 1, color: 'secondary.main' }} />
-                <Typography variant="h6">{catalogData.stats.totalViews}</Typography>
+                <Typography variant="h6" sx={{ color: colors.text }}>{catalogData.stats.totalViews}</Typography>
               </Box>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                 Views & Materialized
               </Typography>
               <Chip 
@@ -412,15 +423,15 @@ const DataCatalog = () => {
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} md={3}>
-          <Card>
+          <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <StorageIcon sx={{ mr: 1, color: 'info.main' }} />
-                <Typography variant="h6">{formatBytes(catalogData.stats.totalSize)}</Typography>
+                <Typography variant="h6" sx={{ color: colors.text }}>{formatBytes(catalogData.stats.totalSize)}</Typography>
               </Box>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                 Total Storage
               </Typography>
               <Box sx={{ display: 'flex', gap: 0.5, mt: 1 }}>
@@ -431,15 +442,15 @@ const DataCatalog = () => {
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} md={3}>
-          <Card>
+          <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <SpeedIcon sx={{ mr: 1, color: getQualityColor(catalogData.dataQuality.score) + '.main' }} />
-                <Typography variant="h6">{catalogData.dataQuality.score}%</Typography>
+                <Typography variant="h6" sx={{ color: colors.text }}>{catalogData.dataQuality.score}%</Typography>
               </Box>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                 Data Quality Score
               </Typography>
               <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
@@ -459,11 +470,20 @@ const DataCatalog = () => {
       </Grid>
 
       {/* Navigation Tabs */}
-      <Paper sx={{ mb: 3 }}>
-        <Tabs 
-          value={currentView} 
+      <Paper sx={{ mb: 3, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
+        <Tabs
+          value={currentView}
           onChange={(e, v) => setCurrentView(v)}
-          sx={{ borderBottom: 1, borderColor: 'divider' }}
+          sx={{
+            borderBottom: 1,
+            borderColor: colors.border,
+            '& .MuiTab-root': {
+              color: colors.textSecondary,
+            },
+            '& .Mui-selected': {
+              color: colors.primary,
+            },
+          }}
         >
           <Tab label="Overview" icon={<AssessmentIcon />} iconPosition="start" />
           <Tab label="Tables & Schemas" icon={<TableChartIcon />} iconPosition="start" />
@@ -478,19 +498,19 @@ const DataCatalog = () => {
             <Grid container spacing={3}>
               {/* Popular Tables */}
               <Grid item xs={12} md={6}>
-                <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
+                <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', color: colors.text }}>
                   <TrendingUpIcon sx={{ mr: 1 }} />
                   Popular Tables
                 </Typography>
                 <Stack spacing={2}>
                   {catalogData.popularTables.map((table, idx) => (
-                    <Paper key={idx} variant="outlined" sx={{ p: 2 }}>
+                    <Paper key={idx} variant="outlined" sx={{ p: 2, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
                         <Box>
-                          <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+                          <Typography variant="subtitle1" sx={{ fontWeight: 500, color: colors.text }}>
                             {table.name}
                           </Typography>
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                             {table.schema} • {table.dataSource}
                           </Typography>
                           <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
@@ -521,29 +541,29 @@ const DataCatalog = () => {
 
               {/* Recent Updates */}
               <Grid item xs={12} md={6}>
-                <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
+                <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', color: colors.text }}>
                   <UpdateIcon sx={{ mr: 1 }} />
                   Recent Updates
                 </Typography>
                 <Stack spacing={2}>
                   {catalogData.recentUpdates.map((update, idx) => (
-                    <Paper key={idx} variant="outlined" sx={{ p: 2 }}>
+                    <Paper key={idx} variant="outlined" sx={{ p: 2, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Box>
-                          <Typography variant="subtitle2">
+                          <Typography variant="subtitle2" sx={{ color: colors.text }}>
                             {update.table}
                           </Typography>
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                             {update.schema} • {update.type.replace('_', ' ')}
                           </Typography>
                         </Box>
                         <Box sx={{ textAlign: 'right' }}>
-                          <Chip 
-                            size="small" 
+                          <Chip
+                            size="small"
                             label={update.status}
                             color={update.status === 'success' ? 'success' : 'error'}
                           />
-                          <Typography variant="caption" display="block" sx={{ mt: 0.5 }}>
+                          <Typography variant="caption" display="block" sx={{ mt: 0.5, color: colors.textSecondary }}>
                             {update.timestamp}
                           </Typography>
                         </Box>
@@ -555,25 +575,25 @@ const DataCatalog = () => {
 
               {/* Data Sources Status */}
               <Grid item xs={12}>
-                <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
+                <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', color: colors.text }}>
                   <StorageIcon sx={{ mr: 1 }} />
                   Data Sources
                 </Typography>
                 <Grid container spacing={2}>
                   {catalogData.dataSources.map((source, idx) => (
                     <Grid item xs={12} md={4} key={idx}>
-                      <Paper variant="outlined" sx={{ p: 2 }}>
+                      <Paper variant="outlined" sx={{ p: 2, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                           {getStatusIcon(source.status)}
-                          <Typography variant="subtitle1" sx={{ ml: 1 }}>
+                          <Typography variant="subtitle1" sx={{ ml: 1, color: colors.text }}>
                             {source.name}
                           </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                             {source.tables} tables
                           </Typography>
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                             Last sync: {source.lastSync}
                           </Typography>
                         </Box>
@@ -598,17 +618,29 @@ const DataCatalog = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   InputProps={{
-                    startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
+                    startAdornment: <SearchIcon sx={{ mr: 1, color: colors.textSecondary }} />,
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      bgcolor: colors.cardBg,
+                      color: colors.text,
+                      '& fieldset': { borderColor: colors.border },
+                    },
                   }}
                 />
               </Grid>
               <Grid item xs={12} md={3}>
                 <FormControl fullWidth>
-                  <InputLabel>Data Source</InputLabel>
+                  <InputLabel sx={{ color: colors.textSecondary }}>Data Source</InputLabel>
                   <Select
                     value={selectedDataSource}
                     label="Data Source"
                     onChange={(e) => setSelectedDataSource(e.target.value)}
+                    sx={{
+                      bgcolor: colors.cardBg,
+                      color: colors.text,
+                      '& fieldset': { borderColor: colors.border },
+                    }}
                   >
                     <MenuItem value="all">All Sources</MenuItem>
                     <MenuItem value="BigQuery">BigQuery</MenuItem>
@@ -659,11 +691,11 @@ const DataCatalog = () => {
               </Box>
             ) : (
               filterTables().map((schema, idx) => (
-                <Accordion key={idx} defaultExpanded={idx === 0}>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Accordion key={idx} defaultExpanded={idx === 0} sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: colors.text }} />}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <DatabaseIcon />
-                      <Typography variant="h6">
+                      <DatabaseIcon sx={{ color: colors.text }} />
+                      <Typography variant="h6" sx={{ color: colors.text }}>
                         {schema.source} - {schema.database}
                       </Typography>
                       <Chip size="small" label={`${schema.tables.length} tables`} />
@@ -672,22 +704,22 @@ const DataCatalog = () => {
                   <AccordionDetails>
                     <TableContainer>
                       <Table>
-                        <TableHead>
+                        <TableHead sx={{ bgcolor: darkMode ? colors.paper : 'grey.100' }}>
                           <TableRow>
-                            <TableCell>Table Name</TableCell>
-                            <TableCell>Type</TableCell>
-                            <TableCell>Description</TableCell>
-                            <TableCell align="right">Rows</TableCell>
-                            <TableCell align="right">Size</TableCell>
-                            <TableCell>Quality</TableCell>
-                            <TableCell>Last Updated</TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell sx={{ color: colors.text, borderColor: colors.border }}>Table Name</TableCell>
+                            <TableCell sx={{ color: colors.text, borderColor: colors.border }}>Type</TableCell>
+                            <TableCell sx={{ color: colors.text, borderColor: colors.border }}>Description</TableCell>
+                            <TableCell align="right" sx={{ color: colors.text, borderColor: colors.border }}>Rows</TableCell>
+                            <TableCell align="right" sx={{ color: colors.text, borderColor: colors.border }}>Size</TableCell>
+                            <TableCell sx={{ color: colors.text, borderColor: colors.border }}>Quality</TableCell>
+                            <TableCell sx={{ color: colors.text, borderColor: colors.border }}>Last Updated</TableCell>
+                            <TableCell sx={{ color: colors.text, borderColor: colors.border }}>Actions</TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
                           {schema.tables.map((table, tableIdx) => (
                             <TableRow key={tableIdx} hover>
-                              <TableCell>
+                              <TableCell sx={{ color: colors.text, borderColor: colors.border }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                   <TableChartIcon fontSize="small" color="primary" />
                                   <Typography variant="body2" fontWeight="medium">
@@ -708,13 +740,13 @@ const DataCatalog = () => {
                                   )}
                                 </Box>
                               </TableCell>
-                              <TableCell>
+                              <TableCell sx={{ color: colors.text, borderColor: colors.border }}>
                                 <Chip size="small" label={table.type} />
                               </TableCell>
-                              <TableCell>{table.description}</TableCell>
-                              <TableCell align="right">{formatNumber(table.rowCount)}</TableCell>
-                              <TableCell align="right">{formatBytes(table.sizeBytes)}</TableCell>
-                              <TableCell>
+                              <TableCell sx={{ color: colors.text, borderColor: colors.border }}>{table.description}</TableCell>
+                              <TableCell align="right" sx={{ color: colors.text, borderColor: colors.border }}>{formatNumber(table.rowCount)}</TableCell>
+                              <TableCell align="right" sx={{ color: colors.text, borderColor: colors.border }}>{formatBytes(table.sizeBytes)}</TableCell>
+                              <TableCell sx={{ color: colors.text, borderColor: colors.border }}>
                                 <Chip 
                                   size="small" 
                                   label={`${table.quality.score}%`}
@@ -722,8 +754,8 @@ const DataCatalog = () => {
                                   variant={table.quality.issues > 0 ? 'outlined' : 'filled'}
                                 />
                               </TableCell>
-                              <TableCell>{table.lastModified}</TableCell>
-                              <TableCell>
+                              <TableCell sx={{ color: colors.text, borderColor: colors.border }}>{table.lastModified}</TableCell>
+                              <TableCell sx={{ color: colors.text, borderColor: colors.border }}>
                                 <Stack direction="row" spacing={1}>
                                   <Tooltip title="View details">
                                     <IconButton 
@@ -788,16 +820,16 @@ const DataCatalog = () => {
             <Alert severity="info" sx={{ mb: 2 }}>
               Data lineage visualization helps you understand how data flows through your system
             </Alert>
-            <Box sx={{ 
-              height: 400, 
-              border: '1px dashed #ccc', 
+            <Box sx={{
+              height: 400,
+              border: `1px dashed ${colors.border}`,
               borderRadius: 2,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              bgcolor: 'background.default'
+              bgcolor: colors.cardBg
             }}>
-              <Typography color="text.secondary">
+              <Typography sx={{ color: colors.textSecondary }}>
                 Data lineage visualization coming soon...
               </Typography>
             </Box>
@@ -809,27 +841,27 @@ const DataCatalog = () => {
           <Box sx={{ p: 3 }}>
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
-                <Typography variant="h6" gutterBottom>Data Quality Overview</Typography>
-                <Paper variant="outlined" sx={{ p: 2 }}>
+                <Typography variant="h6" gutterBottom sx={{ color: colors.text }}>Data Quality Overview</Typography>
+                <Paper variant="outlined" sx={{ p: 2, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <CircularProgress 
-                      variant="determinate" 
-                      value={catalogData.dataQuality.score} 
+                    <CircularProgress
+                      variant="determinate"
+                      value={catalogData.dataQuality.score}
                       size={80}
                       thickness={8}
                     />
                     <Box sx={{ ml: 3 }}>
-                      <Typography variant="h4">{catalogData.dataQuality.score}%</Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="h4" sx={{ color: colors.text }}>{catalogData.dataQuality.score}%</Typography>
+                      <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                         Overall Quality Score
                       </Typography>
                     </Box>
                   </Box>
-                  <Divider sx={{ my: 2 }} />
+                  <Divider sx={{ my: 2, borderColor: colors.border }} />
                   <Stack spacing={1}>
                     {catalogData.dataQuality.issues.map((issue, idx) => (
                       <Box key={idx} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography variant="body2">
+                        <Typography variant="body2" sx={{ color: colors.text }}>
                           {issue.severity.charAt(0).toUpperCase() + issue.severity.slice(1)} severity issues
                         </Typography>
                         <Chip 
@@ -842,35 +874,35 @@ const DataCatalog = () => {
                   </Stack>
                 </Paper>
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
-                <Typography variant="h6" gutterBottom>Usage Statistics</Typography>
-                <Paper variant="outlined" sx={{ p: 2 }}>
+                <Typography variant="h6" gutterBottom sx={{ color: colors.text }}>Usage Statistics</Typography>
+                <Paper variant="outlined" sx={{ p: 2, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <Stack spacing={2}>
                     <Box>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                         Most queried table
                       </Typography>
-                      <Typography variant="h6">CE11000</Typography>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="h6" sx={{ color: colors.text }}>CE11000</Typography>
+                      <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                         1,245 queries this week
                       </Typography>
                     </Box>
-                    <Divider />
+                    <Divider sx={{ borderColor: colors.border }} />
                     <Box>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                         Average query response time
                       </Typography>
-                      <Typography variant="h6">0.8s</Typography>
+                      <Typography variant="h6" sx={{ color: colors.text }}>0.8s</Typography>
                       <Chip size="small" label="15% faster than last week" color="success" />
                     </Box>
-                    <Divider />
+                    <Divider sx={{ borderColor: colors.border }} />
                     <Box>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                         Active users
                       </Typography>
-                      <Typography variant="h6">42</Typography>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="h6" sx={{ color: colors.text }}>42</Typography>
+                      <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                         In the last 24 hours
                       </Typography>
                     </Box>
@@ -891,52 +923,52 @@ const DataCatalog = () => {
       >
         {selectedTable && (
           <>
-            <DialogTitle>
+            <DialogTitle sx={{ bgcolor: colors.paper, borderColor: colors.border }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h6">{selectedTable.name}</Typography>
+                <Typography variant="h6" sx={{ color: colors.text }}>{selectedTable.name}</Typography>
                 <IconButton onClick={() => setDetailsOpen(false)}>
-                  <CloseIcon />
+                  <CloseIcon sx={{ color: colors.text }} />
                 </IconButton>
               </Box>
             </DialogTitle>
-            <DialogContent dividers>
+            <DialogContent dividers sx={{ bgcolor: colors.paper, borderColor: colors.border }}>
               <Grid container spacing={3}>
                 {/* Table Information */}
                 <Grid item xs={12}>
-                  <Typography variant="body1" paragraph>
+                  <Typography variant="body1" paragraph sx={{ color: colors.text }}>
                     {selectedTable.description}
                   </Typography>
-                  
+
                   <Grid container spacing={2} sx={{ mb: 3 }}>
                     <Grid item xs={3}>
-                      <Typography variant="subtitle2" color="text.secondary">
+                      <Typography variant="subtitle2" sx={{ color: colors.textSecondary }}>
                         Dataset
                       </Typography>
-                      <Typography variant="body2">
+                      <Typography variant="body2" sx={{ color: colors.text }}>
                         {selectedTable.dataset || 'N/A'}
                       </Typography>
                     </Grid>
                     <Grid item xs={3}>
-                      <Typography variant="subtitle2" color="text.secondary">
+                      <Typography variant="subtitle2" sx={{ color: colors.textSecondary }}>
                         Row Count
                       </Typography>
-                      <Typography variant="body2">
+                      <Typography variant="body2" sx={{ color: colors.text }}>
                         {formatNumber(selectedTable.rowCount)}
                       </Typography>
                     </Grid>
                     <Grid item xs={3}>
-                      <Typography variant="subtitle2" color="text.secondary">
+                      <Typography variant="subtitle2" sx={{ color: colors.textSecondary }}>
                         Size
                       </Typography>
-                      <Typography variant="body2">
+                      <Typography variant="body2" sx={{ color: colors.text }}>
                         {formatBytes(selectedTable.sizeBytes)}
                       </Typography>
                     </Grid>
                     <Grid item xs={3}>
-                      <Typography variant="subtitle2" color="text.secondary">
+                      <Typography variant="subtitle2" sx={{ color: colors.textSecondary }}>
                         Last Modified
                       </Typography>
-                      <Typography variant="body2">
+                      <Typography variant="body2" sx={{ color: colors.text }}>
                         {selectedTable.lastModified}
                       </Typography>
                     </Grid>
@@ -946,35 +978,35 @@ const DataCatalog = () => {
                 {/* Column Information */}
                 {selectedTable.detailed?.columns && (
                   <Grid item xs={12}>
-                    <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, color: colors.text }}>
                       <TableChartIcon />
                       Columns ({selectedTable.detailed.columns.length})
                     </Typography>
-                    
-                    <TableContainer component={Paper} variant="outlined">
+
+                    <TableContainer component={Paper} variant="outlined" sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                       <Table size="small">
-                        <TableHead>
+                        <TableHead sx={{ bgcolor: darkMode ? colors.paper : 'grey.100' }}>
                           <TableRow>
-                            <TableCell>Column Name</TableCell>
-                            <TableCell>Type</TableCell>
-                            <TableCell>Mode</TableCell>
-                            <TableCell>Description</TableCell>
+                            <TableCell sx={{ color: colors.text, borderColor: colors.border }}>Column Name</TableCell>
+                            <TableCell sx={{ color: colors.text, borderColor: colors.border }}>Type</TableCell>
+                            <TableCell sx={{ color: colors.text, borderColor: colors.border }}>Mode</TableCell>
+                            <TableCell sx={{ color: colors.text, borderColor: colors.border }}>Description</TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
                           {selectedTable.detailed.columns.map((column, idx) => (
                             <TableRow key={idx}>
-                              <TableCell>
+                              <TableCell sx={{ color: colors.text, borderColor: colors.border }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                   {column.mode === 'REQUIRED' && (
                                     <KeyIcon fontSize="small" color="primary" />
                                   )}
-                                  <Typography variant="body2" fontWeight="medium">
+                                  <Typography variant="body2" fontWeight="medium" sx={{ color: colors.text }}>
                                     {column.name}
                                   </Typography>
                                 </Box>
                               </TableCell>
-                              <TableCell>
+                              <TableCell sx={{ color: colors.text, borderColor: colors.border }}>
                                 <Chip 
                                   label={column.type} 
                                   size="small" 
@@ -987,16 +1019,16 @@ const DataCatalog = () => {
                                   variant="outlined"
                                 />
                               </TableCell>
-                              <TableCell>
-                                <Chip 
-                                  label={column.mode || 'NULLABLE'} 
+                              <TableCell sx={{ color: colors.text, borderColor: colors.border }}>
+                                <Chip
+                                  label={column.mode || 'NULLABLE'}
                                   size="small"
                                   color={column.mode === 'REQUIRED' ? 'error' : 'default'}
                                   variant="outlined"
                                 />
                               </TableCell>
-                              <TableCell>
-                                <Typography variant="body2" color="text.secondary">
+                              <TableCell sx={{ color: colors.text, borderColor: colors.border }}>
+                                <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                                   {column.description || 'No description'}
                                 </Typography>
                               </TableCell>
@@ -1013,7 +1045,7 @@ const DataCatalog = () => {
                   <Grid item xs={12}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2 }}>
                       <CircularProgress size={20} />
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                         Loading column details...
                       </Typography>
                     </Box>
@@ -1021,7 +1053,7 @@ const DataCatalog = () => {
                 )}
               </Grid>
             </DialogContent>
-            <DialogActions>
+            <DialogActions sx={{ bgcolor: colors.paper, borderColor: colors.border }}>
               <Button startIcon={<DownloadIcon />}>Export Schema</Button>
               <Button startIcon={<CodeIcon />} variant="contained">
                 Generate Query

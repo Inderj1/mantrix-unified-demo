@@ -25,13 +25,25 @@ import SmsIcon from '@mui/icons-material/Sms';
 import PhoneIcon from '@mui/icons-material/Phone';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 
-const AgentConfigForm = ({ agent, onClose, isNew = false }) => {
+const AgentConfigForm = ({ agent, onClose, isNew = false, darkMode = false }) => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
   // Core fields are read-only for existing agents
   const isReadOnly = !isNew && agent?.id;
+
+  const getColors = (darkMode) => ({
+    primary: darkMode ? '#4da6ff' : '#0a6ed1',
+    text: darkMode ? '#e6edf3' : '#1e293b',
+    textSecondary: darkMode ? '#8b949e' : '#64748b',
+    background: darkMode ? '#0d1117' : '#f8fbfd',
+    paper: darkMode ? '#161b22' : '#ffffff',
+    cardBg: darkMode ? '#21262d' : '#ffffff',
+    border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+  });
+
+  const colors = getColors(darkMode);
 
   const [config, setConfig] = useState({
     name: '',
@@ -258,11 +270,11 @@ const AgentConfigForm = ({ agent, onClose, isNew = false }) => {
 
           <Grid container spacing={2}>
             <Grid item xs={6} sm={4}>
-              <Card variant="outlined" sx={{ height: '100%' }}>
+              <Card variant="outlined" sx={{ height: '100%', bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <EmailIcon sx={{ mr: 1, color: 'primary.main' }} fontSize="small" />
-                    <Typography variant="body2">Email</Typography>
+                    <EmailIcon sx={{ mr: 1, color: colors.primary }} fontSize="small" />
+                    <Typography variant="body2" sx={{ color: colors.text }}>Email</Typography>
                   </Box>
                   <FormControlLabel
                     control={
@@ -272,18 +284,18 @@ const AgentConfigForm = ({ agent, onClose, isNew = false }) => {
                         onChange={() => handleNotificationToggle('email')}
                       />
                     }
-                    label={<Typography variant="caption">{config.notification_config.email ? 'On' : 'Off'}</Typography>}
+                    label={<Typography variant="caption" sx={{ color: colors.textSecondary }}>{config.notification_config.email ? 'On' : 'Off'}</Typography>}
                   />
                 </CardContent>
               </Card>
             </Grid>
 
             <Grid item xs={6} sm={4}>
-              <Card variant="outlined" sx={{ height: '100%' }}>
+              <Card variant="outlined" sx={{ height: '100%', bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <SmsIcon sx={{ mr: 1, color: 'primary.main' }} fontSize="small" />
-                    <Typography variant="body2">SMS</Typography>
+                    <SmsIcon sx={{ mr: 1, color: colors.primary }} fontSize="small" />
+                    <Typography variant="body2" sx={{ color: colors.text }}>SMS</Typography>
                   </Box>
                   <FormControlLabel
                     control={
@@ -293,18 +305,18 @@ const AgentConfigForm = ({ agent, onClose, isNew = false }) => {
                         onChange={() => handleNotificationToggle('sms')}
                       />
                     }
-                    label={<Typography variant="caption">{config.notification_config.sms ? 'On' : 'Off'}</Typography>}
+                    label={<Typography variant="caption" sx={{ color: colors.textSecondary }}>{config.notification_config.sms ? 'On' : 'Off'}</Typography>}
                   />
                 </CardContent>
               </Card>
             </Grid>
 
             <Grid item xs={6} sm={4}>
-              <Card variant="outlined" sx={{ height: '100%' }}>
+              <Card variant="outlined" sx={{ height: '100%', bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <PhoneIcon sx={{ mr: 1, color: 'primary.main' }} fontSize="small" />
-                    <Typography variant="body2">Voice Call</Typography>
+                    <PhoneIcon sx={{ mr: 1, color: colors.primary }} fontSize="small" />
+                    <Typography variant="body2" sx={{ color: colors.text }}>Voice Call</Typography>
                   </Box>
                   <FormControlLabel
                     control={
@@ -314,18 +326,18 @@ const AgentConfigForm = ({ agent, onClose, isNew = false }) => {
                         onChange={() => handleNotificationToggle('voice_call')}
                       />
                     }
-                    label={<Typography variant="caption">{config.notification_config.voice_call ? 'On' : 'Off'}</Typography>}
+                    label={<Typography variant="caption" sx={{ color: colors.textSecondary }}>{config.notification_config.voice_call ? 'On' : 'Off'}</Typography>}
                   />
                 </CardContent>
               </Card>
             </Grid>
 
             <Grid item xs={6} sm={4}>
-              <Card variant="outlined" sx={{ height: '100%' }}>
+              <Card variant="outlined" sx={{ height: '100%', bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <NotificationsIcon sx={{ mr: 1, color: 'primary.main' }} fontSize="small" />
-                    <Typography variant="body2">Slack</Typography>
+                    <NotificationsIcon sx={{ mr: 1, color: colors.primary }} fontSize="small" />
+                    <Typography variant="body2" sx={{ color: colors.text }}>Slack</Typography>
                   </Box>
                   <FormControlLabel
                     control={
@@ -335,18 +347,18 @@ const AgentConfigForm = ({ agent, onClose, isNew = false }) => {
                         onChange={() => handleNotificationToggle('slack')}
                       />
                     }
-                    label={<Typography variant="caption">{config.notification_config.slack ? 'On' : 'Off'}</Typography>}
+                    label={<Typography variant="caption" sx={{ color: colors.textSecondary }}>{config.notification_config.slack ? 'On' : 'Off'}</Typography>}
                   />
                 </CardContent>
               </Card>
             </Grid>
 
             <Grid item xs={6} sm={4}>
-              <Card variant="outlined" sx={{ height: '100%' }}>
+              <Card variant="outlined" sx={{ height: '100%', bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <NotificationsIcon sx={{ mr: 1, color: 'primary.main' }} fontSize="small" />
-                    <Typography variant="body2">Teams</Typography>
+                    <NotificationsIcon sx={{ mr: 1, color: colors.primary }} fontSize="small" />
+                    <Typography variant="body2" sx={{ color: colors.text }}>Teams</Typography>
                   </Box>
                   <FormControlLabel
                     control={
@@ -356,17 +368,17 @@ const AgentConfigForm = ({ agent, onClose, isNew = false }) => {
                         onChange={() => handleNotificationToggle('teams')}
                       />
                     }
-                    label={<Typography variant="caption">{config.notification_config.teams ? 'On' : 'Off'}</Typography>}
+                    label={<Typography variant="caption" sx={{ color: colors.textSecondary }}>{config.notification_config.teams ? 'On' : 'Off'}</Typography>}
                   />
                 </CardContent>
               </Card>
             </Grid>
 
             <Grid item xs={12} sm={8}>
-              <Card variant="outlined" sx={{ bgcolor: 'primary.50', height: '100%' }}>
+              <Card variant="outlined" sx={{ bgcolor: colors.cardBg, height: '100%', border: `1px solid ${colors.border}` }}>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 600, color: colors.text }}>
                       🤖 AI Agent Analysis
                     </Typography>
                   </Box>
@@ -379,7 +391,7 @@ const AgentConfigForm = ({ agent, onClose, isNew = false }) => {
                       />
                     }
                     label={
-                      <Typography variant="caption">
+                      <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                         {config.notification_config.ai_agent
                           ? 'AI analysis enabled'
                           : 'Enable AI analysis'}

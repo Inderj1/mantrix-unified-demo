@@ -21,6 +21,17 @@ import {
 import MarketSignalTable from './MarketSignalTable';
 import { getSeverityLevel } from './CategoryIcons';
 
+// Dark mode color helper
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 /**
  * MarketCategoryDetail - Expanded view for a market signal category
  *
@@ -30,6 +41,7 @@ import { getSeverityLevel } from './CategoryIcons';
  * - onClose: Handler to close the detail view
  * - onViewSignalDetails: Handler for viewing individual signal details
  * - onSimulateImpact: Handler for simulating impact
+ * - darkMode: Whether dark mode is enabled
  */
 const MarketCategoryDetail = ({
   category,
@@ -37,7 +49,9 @@ const MarketCategoryDetail = ({
   onClose,
   onViewSignalDetails,
   onSimulateImpact,
+  darkMode = false,
 }) => {
+  const colors = getColors(darkMode);
   const IconComponent = category.icon;
 
   // Calculate summary metrics
@@ -75,6 +89,7 @@ const MarketCategoryDetail = ({
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
+        bgcolor: colors.paper,
       }}
     >
       {/* Header */}
@@ -94,16 +109,16 @@ const MarketCategoryDetail = ({
             <IconComponent sx={{ fontSize: 28, color: category.color }} />
           </Box>
           <Box>
-            <Typography variant="h5" fontWeight={700}>
+            <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
               {category.name} - Active Signals
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: colors.textSecondary }}>
               {category.description}
             </Typography>
           </Box>
         </Box>
         <IconButton onClick={onClose}>
-          <CloseIcon />
+          <CloseIcon sx={{ color: colors.text }} />
         </IconButton>
       </Box>
 
@@ -111,9 +126,13 @@ const MarketCategoryDetail = ({
       <Grid container spacing={2} sx={{ mb: 2, px: 3, flexShrink: 0 }}>
         {/* Total Signals */}
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ height: '100%', bgcolor: '#f5f5f5' }}>
+          <Card sx={{
+            height: '100%',
+            bgcolor: darkMode ? colors.cardBg : '#f5f5f5',
+            border: `1px solid ${colors.border}`
+          }}>
             <CardContent>
-              <Typography variant="caption" color="text.secondary" gutterBottom>
+              <Typography variant="caption" sx={{ color: colors.textSecondary }} gutterBottom>
                 Total Signals
               </Typography>
               <Typography variant="h4" fontWeight={700} color={category.color}>
@@ -141,9 +160,15 @@ const MarketCategoryDetail = ({
 
         {/* Business Impact */}
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ height: '100%', bgcolor: totalImpact >= 0 ? '#e8f5e9' : '#ffebee' }}>
+          <Card sx={{
+            height: '100%',
+            bgcolor: darkMode
+              ? colors.cardBg
+              : (totalImpact >= 0 ? '#e8f5e9' : '#ffebee'),
+            border: `1px solid ${colors.border}`
+          }}>
             <CardContent>
-              <Typography variant="caption" color="text.secondary" gutterBottom>
+              <Typography variant="caption" sx={{ color: colors.textSecondary }} gutterBottom>
                 Total Business Impact
               </Typography>
               <Typography
@@ -153,7 +178,7 @@ const MarketCategoryDetail = ({
               >
                 {formatCurrency(totalImpact)}
               </Typography>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                 {totalImpact >= 0 ? 'Opportunity Value' : 'At Risk'}
               </Typography>
             </CardContent>
@@ -163,11 +188,15 @@ const MarketCategoryDetail = ({
         {/* Affected SKUs */}
         {totalAffectedSKUs > 0 && (
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ height: '100%', bgcolor: '#fff3e0' }}>
+            <Card sx={{
+              height: '100%',
+              bgcolor: darkMode ? colors.cardBg : '#fff3e0',
+              border: `1px solid ${colors.border}`
+            }}>
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                   <InventoryIcon sx={{ fontSize: 20, color: '#ff9800' }} />
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                     Affected SKUs
                   </Typography>
                 </Box>
@@ -182,22 +211,26 @@ const MarketCategoryDetail = ({
         {/* Affected Suppliers/Customers */}
         {(totalAffectedSuppliers > 0 || totalAffectedCustomers > 0) && (
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ height: '100%', bgcolor: '#e3f2fd' }}>
+            <Card sx={{
+              height: '100%',
+              bgcolor: darkMode ? colors.cardBg : '#e3f2fd',
+              border: `1px solid ${colors.border}`
+            }}>
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                   <PeopleIcon sx={{ fontSize: 20, color: '#2196f3' }} />
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                     Affected Partners
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                   {totalAffectedSuppliers > 0 && (
-                    <Typography variant="body2" color="text.primary">
+                    <Typography variant="body2" sx={{ color: colors.text }}>
                       {totalAffectedSuppliers} Suppliers
                     </Typography>
                   )}
                   {totalAffectedCustomers > 0 && (
-                    <Typography variant="body2" color="text.primary">
+                    <Typography variant="body2" sx={{ color: colors.text }}>
                       {totalAffectedCustomers} Customers
                     </Typography>
                   )}
@@ -253,13 +286,14 @@ const MarketCategoryDetail = ({
 
       {/* Signals Table */}
       <Box sx={{ flex: 1, overflow: 'auto', px: 3, pb: 3 }}>
-        <Typography variant="h6" fontWeight={600} gutterBottom sx={{ mb: 2 }}>
+        <Typography variant="h6" fontWeight={600} gutterBottom sx={{ mb: 2, color: colors.text }}>
           Active Signals ({totalSignals})
         </Typography>
         <MarketSignalTable
           signals={signals}
           onViewDetails={onViewSignalDetails}
           onSimulate={onSimulateImpact}
+          darkMode={darkMode}
         />
       </Box>
     </Box>

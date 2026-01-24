@@ -56,6 +56,16 @@ const formatCurrency = (value) => {
   return `$${value}`;
 };
 
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 // Generate EOQ Cost Curve data
 const generateEOQCurveData = (annualDemand, orderingCost, unitCost, holdingRate) => {
   const holdingCostPerUnit = unitCost * holdingRate;
@@ -187,7 +197,8 @@ const generateMRPData = () => {
   });
 };
 
-const MRPParameterOptimizer = ({ onBack, onTileClick }) => {
+const MRPParameterOptimizer = ({ onBack, onTileClick, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState(null);
@@ -672,7 +683,7 @@ const MRPParameterOptimizer = ({ onBack, onTileClick }) => {
   };
 
   return (
-    <Box sx={{ p: 3, height: '100%', overflow: 'auto', bgcolor: '#f8fafc' }}>
+    <Box sx={{ p: 3, height: '100%', overflow: 'auto', bgcolor: colors.background }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -761,12 +772,12 @@ const MRPParameterOptimizer = ({ onBack, onTileClick }) => {
           )}
 
           {/* Filters */}
-          <Paper sx={{ p: 2, mb: 2 }}>
+          <Paper sx={{ p: 2, mb: 2, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
             <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
               <FilterListIcon color="action" />
               <FormControl size="small" sx={{ minWidth: 140 }}>
                 <InputLabel>SS Action</InputLabel>
-                <Select value={filters.ssOptimization} label="SS Action" onChange={(e) => setFilters({ ...filters, ssOptimization: e.target.value })}>
+                <Select value={filters.ssOptimization} label="SS Action" onChange={(e) => setFilters({ ...filters, ssOptimization: e.target.value })} sx={{ bgcolor: colors.paper }}>
                   <MenuItem value="all">All Actions</MenuItem>
                   <MenuItem value="Reduce">Reduce</MenuItem>
                   <MenuItem value="Increase">Increase</MenuItem>
@@ -775,7 +786,7 @@ const MRPParameterOptimizer = ({ onBack, onTileClick }) => {
               </FormControl>
               <FormControl size="small" sx={{ minWidth: 140 }}>
                 <InputLabel>Risk Level</InputLabel>
-                <Select value={filters.stockoutRisk} label="Risk Level" onChange={(e) => setFilters({ ...filters, stockoutRisk: e.target.value })}>
+                <Select value={filters.stockoutRisk} label="Risk Level" onChange={(e) => setFilters({ ...filters, stockoutRisk: e.target.value })} sx={{ bgcolor: colors.paper }}>
                   <MenuItem value="all">All Levels</MenuItem>
                   <MenuItem value="Low">Low</MenuItem>
                   <MenuItem value="Medium">Medium</MenuItem>
@@ -784,7 +795,7 @@ const MRPParameterOptimizer = ({ onBack, onTileClick }) => {
               </FormControl>
               <FormControl size="small" sx={{ minWidth: 140 }}>
                 <InputLabel>MRP Type</InputLabel>
-                <Select value={filters.mrpType} label="MRP Type" onChange={(e) => setFilters({ ...filters, mrpType: e.target.value })}>
+                <Select value={filters.mrpType} label="MRP Type" onChange={(e) => setFilters({ ...filters, mrpType: e.target.value })} sx={{ bgcolor: colors.paper }}>
                   <MenuItem value="all">All Types</MenuItem>
                   <MenuItem value="PD">PD</MenuItem>
                   <MenuItem value="VB">VB</MenuItem>
@@ -806,7 +817,7 @@ const MRPParameterOptimizer = ({ onBack, onTileClick }) => {
           </Paper>
 
           {/* Data Grid */}
-          <Paper sx={{ height: 500 }}>
+          <Paper sx={{ height: 500, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
             <DataGrid
               rows={filteredData}
               columns={columns}
@@ -822,7 +833,19 @@ const MRPParameterOptimizer = ({ onBack, onTileClick }) => {
                   quickFilterProps: { debounceMs: 500 },
                 },
               }}
-              sx={stoxTheme.getDataGridSx({ clickable: true })}
+              sx={{
+                ...stoxTheme.getDataGridSx({ clickable: true }),
+                ...(darkMode && {
+                  '& .MuiDataGrid-root': { color: colors.text },
+                  '& .MuiDataGrid-cell': { borderColor: colors.border, color: colors.text },
+                  '& .MuiDataGrid-columnHeaders': { bgcolor: colors.cardBg, borderColor: colors.border, color: colors.text },
+                  '& .MuiDataGrid-columnHeaderTitle': { color: colors.text, fontWeight: 600 },
+                  '& .MuiDataGrid-row': { borderColor: colors.border, '&:hover': { bgcolor: alpha(colors.primary, 0.1) } },
+                  '& .MuiDataGrid-footerContainer': { bgcolor: colors.cardBg, borderColor: colors.border },
+                  '& .MuiTablePagination-root': { color: colors.text },
+                  '& .MuiIconButton-root': { color: colors.textSecondary },
+                }),
+              }}
               initialState={{
                 pagination: { paginationModel: { pageSize: 25 } },
               }}

@@ -10,7 +10,18 @@ import stoxTheme from './stoxTheme';
 import DataSourceChip from './DataSourceChip';
 import { getTileDataConfig } from './stoxDataConfig';
 
-const DCLotSize = ({ onBack }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const DCLotSize = ({ onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const tileConfig = getTileDataConfig('dc-lot-size');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -198,25 +209,25 @@ const DCLotSize = ({ onBack }) => {
   ];
 
   return (
-    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: colors.background }}>
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>DC System</Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>Lot Size Optimization</Typography>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text }}>CORE.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text }}>STOX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text }}>DC System</Link>
+            <Typography color="primary" variant="body1" fontWeight={600} sx={{ color: colors.primary }}>Lot Size Optimization</Typography>
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">Back</Button>
         </Stack>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-              <Inventory sx={{ fontSize: 32, color: '#1e3a8a' }} />
-              <Typography variant="h4" fontWeight={700}>Lot Size Optimization</Typography>
+              <Inventory sx={{ fontSize: 32, color: colors.primary }} />
+              <Typography variant="h4" fontWeight={700} sx={{ color: colors.text }}>Lot Size Optimization</Typography>
               <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
-            <Typography variant="body2" color="text.secondary">Economic order quantity and lot size optimization for procurement efficiency</Typography>
+            <Typography variant="body2" sx={{ color: colors.textSecondary }}>Economic order quantity and lot size optimization for procurement efficiency</Typography>
           </Box>
           <Stack direction="row" spacing={1}>
             <Tooltip title="Refresh"><IconButton onClick={fetchData} color="primary"><Refresh /></IconButton></Tooltip>
@@ -228,44 +239,44 @@ const DCLotSize = ({ onBack }) => {
       {metrics && (
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#1e3a8a', 0.1)} 0%, ${alpha('#1e3a8a', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#1e3a8a', 0.1)} 0%, ${alpha('#1e3a8a', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <Inventory sx={{ color: '#1e3a8a' }} />
-                  <Typography variant="body2" color="text.secondary">Total Records</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Total Records</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#1e3a8a">{metrics.totalRecords}</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#10b981', 0.1)} 0%, ${alpha('#10b981', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#10b981', 0.1)} 0%, ${alpha('#10b981', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <TrendingUp sx={{ color: '#10b981' }} />
-                  <Typography variant="body2" color="text.secondary">Optimal</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Optimal</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#10b981">{metrics.optimalCount}</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2b88d8', 0.1)} 0%, ${alpha('#2b88d8', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2b88d8', 0.1)} 0%, ${alpha('#2b88d8', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <AttachMoney sx={{ color: '#2b88d8' }} />
-                  <Typography variant="body2" color="text.secondary">Total Savings</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Total Savings</Typography>
                 </Stack>
                 <Typography variant="h5" fontWeight={700} color="#2b88d8">${(metrics.totalSavings / 1000).toFixed(1)}K</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#106ebe', 0.1)} 0%, ${alpha('#106ebe', 0.05)} 100%)` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#106ebe', 0.1)} 0%, ${alpha('#106ebe', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                   <LocalShipping sx={{ color: '#106ebe' }} />
-                  <Typography variant="body2" color="text.secondary">Avg EOQ</Typography>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>Avg EOQ</Typography>
                 </Stack>
                 <Typography variant="h4" fontWeight={700} color="#106ebe">{metrics.avgEOQ.toLocaleString()}</Typography>
               </CardContent>
@@ -274,7 +285,7 @@ const DCLotSize = ({ onBack }) => {
         </Grid>
       )}
 
-      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         <DataGrid
           rows={data}
           columns={columns}
@@ -286,7 +297,27 @@ const DCLotSize = ({ onBack }) => {
           pageSizeOptions={[10, 25, 50, 100]}
           checkboxSelection
           disableRowSelectionOnClick
-          sx={stoxTheme.getDataGridSx()}
+          sx={{
+            ...stoxTheme.getDataGridSx(),
+            '& .MuiDataGrid-cell': {
+              color: colors.text,
+              borderColor: colors.border,
+            },
+            '& .MuiDataGrid-columnHeaders': {
+              backgroundColor: darkMode ? '#21262d' : '#f8fafc',
+              color: colors.text,
+              borderBottom: `2px solid ${colors.border}`,
+            },
+            '& .MuiDataGrid-row': {
+              bgcolor: colors.paper,
+              '&:hover': {
+                bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+              },
+            },
+            bgcolor: colors.paper,
+            color: colors.text,
+            border: `1px solid ${colors.border}`,
+          }}
         />
       </Paper>
     </Box>

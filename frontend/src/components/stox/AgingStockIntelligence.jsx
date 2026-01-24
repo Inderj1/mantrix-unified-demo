@@ -39,6 +39,17 @@ import stoxService from '../../services/stoxService';
 import DataSourceChip from './DataSourceChip';
 import { getTileDataConfig } from './stoxDataConfig';
 
+// Dark Mode Color Helper
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 // Utility Functions
 const formatNumber = (value) => {
   return value.toLocaleString();
@@ -83,7 +94,8 @@ function TabPanel({ children, value, index, ...other }) {
   );
 }
 
-const AgingStockIntelligence = ({ onBack }) => {
+const AgingStockIntelligence = ({ onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
   const [error, setError] = useState(null);
@@ -495,7 +507,8 @@ const AgingStockIntelligence = ({ onBack }) => {
       flexDirection: 'column',
       overflowY: 'auto',
       overflowX: 'hidden',
-      maxWidth: '100vw'
+      maxWidth: '100vw',
+      bgcolor: colors.background
     }}>
       {/* Header with Breadcrumbs */}
       <Box sx={{ mb: 3 }}>
@@ -512,7 +525,7 @@ const AgingStockIntelligence = ({ onBack }) => {
           >
             STOX.AI
           </Link>
-          <Typography color="primary" variant="body1" fontWeight={600}>
+          <Typography sx={{ color: colors.primary }} variant="body1" fontWeight={600}>
             Aging Stock Intelligence
           </Typography>
         </Breadcrumbs>
@@ -534,7 +547,7 @@ const AgingStockIntelligence = ({ onBack }) => {
               </Typography>
               <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
-            <Typography variant="subtitle1" color="text.secondary">
+            <Typography variant="subtitle1" sx={{ color: colors.textSecondary }}>
               Smart obsolescence prevention and clearance strategies
             </Typography>
           </Box>
@@ -543,7 +556,7 @@ const AgingStockIntelligence = ({ onBack }) => {
         {/* Summary Cards */}
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={12} sm={6} md={4}>
-            <Card>
+            <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                   <Box>
@@ -562,7 +575,7 @@ const AgingStockIntelligence = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
-            <Card>
+            <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                   <Box>
@@ -581,7 +594,7 @@ const AgingStockIntelligence = ({ onBack }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
-            <Card>
+            <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                   <Box>
@@ -602,7 +615,7 @@ const AgingStockIntelligence = ({ onBack }) => {
         </Grid>
 
         {/* Tabs */}
-        <Paper sx={{ mb: 2 }}>
+        <Paper sx={{ mb: 2, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           <Tabs
             value={activeTab}
             onChange={(e, newValue) => setActiveTab(newValue)}
@@ -626,7 +639,7 @@ const AgingStockIntelligence = ({ onBack }) => {
 
       {/* Tab Panels */}
       <TabPanel value={activeTab} index={0}>
-        <Paper sx={{ p: 3, height: 600 }}>
+        <Paper sx={{ p: 3, height: 600, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           <DataGrid
             rows={agingInventory}
             columns={agingColumns}
@@ -643,9 +656,9 @@ const AgingStockIntelligence = ({ onBack }) => {
               },
             }}
             sx={{
-              border: '1px solid rgba(0,0,0,0.08)',
+              border: `1px solid ${colors.border}`,
               '& .MuiDataGrid-row:hover': {
-                backgroundColor: '#f5f5f5',
+                backgroundColor: darkMode ? 'rgba(255,255,255,0.05)' : '#f5f5f5',
               },
             }}
           />
@@ -653,7 +666,7 @@ const AgingStockIntelligence = ({ onBack }) => {
       </TabPanel>
 
       <TabPanel value={activeTab} index={1}>
-        <Paper sx={{ p: 3, height: 600 }}>
+        <Paper sx={{ p: 3, height: 600, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           <DataGrid
             rows={obsolescenceRisk}
             columns={obsolescenceColumns}
@@ -670,9 +683,9 @@ const AgingStockIntelligence = ({ onBack }) => {
               },
             }}
             sx={{
-              border: '1px solid rgba(0,0,0,0.08)',
+              border: `1px solid ${colors.border}`,
               '& .MuiDataGrid-row:hover': {
-                backgroundColor: '#f5f5f5',
+                backgroundColor: darkMode ? 'rgba(255,255,255,0.05)' : '#f5f5f5',
               },
             }}
           />
@@ -680,7 +693,7 @@ const AgingStockIntelligence = ({ onBack }) => {
       </TabPanel>
 
       <TabPanel value={activeTab} index={2}>
-        <Paper sx={{ p: 3, height: 600 }}>
+        <Paper sx={{ p: 3, height: 600, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           <DataGrid
             rows={clearanceRecs}
             columns={clearanceColumns}
@@ -697,9 +710,9 @@ const AgingStockIntelligence = ({ onBack }) => {
               },
             }}
             sx={{
-              border: '1px solid rgba(0,0,0,0.08)',
+              border: `1px solid ${colors.border}`,
               '& .MuiDataGrid-row:hover': {
-                backgroundColor: '#f5f5f5',
+                backgroundColor: darkMode ? 'rgba(255,255,255,0.05)' : '#f5f5f5',
               },
             }}
           />

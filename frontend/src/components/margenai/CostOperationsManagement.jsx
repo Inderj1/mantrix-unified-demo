@@ -43,7 +43,18 @@ import DrillDownTable from './shared/DrillDownTable';
 import InteractiveChart from './shared/InteractiveChart';
 import SafeChart from './shared/SafeChart';
 
-const CostOperationsManagement = ({ cashData, revenueData, onDrillDown, onBack }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const CostOperationsManagement = ({ cashData, revenueData, onDrillDown, onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const chartId = useId();
   const [activeTab, setActiveTab] = useState(0);
   const [selectedDivision, setSelectedDivision] = useState(null);
@@ -483,7 +494,7 @@ const CostOperationsManagement = ({ cashData, revenueData, onDrillDown, onBack }
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 3, bgcolor: colors.background }}>
       {/* Header with Breadcrumbs */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -512,12 +523,13 @@ const CostOperationsManagement = ({ cashData, revenueData, onDrillDown, onBack }
         </Stack>
       </Box>
 
-      <Paper elevation={1} sx={{ mb: 3 }}>
+      <Paper elevation={1} sx={{ mb: 3, bgcolor: colors.paper }}>
         <Tabs
           value={activeTab}
           onChange={(e, newValue) => setActiveTab(newValue)}
           indicatorColor="primary"
           textColor="primary"
+          sx={{ borderBottom: 1, borderColor: colors.border }}
         >
           <Tab label="COGS Analysis" />
           <Tab label="Cash Flow" />

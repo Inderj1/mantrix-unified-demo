@@ -61,7 +61,18 @@ import './shared/chartSetup'; // Import Chart.js setup to register components fi
 import { Line, Bar } from 'react-chartjs-2';
 import InteractiveChart from './shared/InteractiveChart';
 
-const PredictiveInsights = ({ actionData, growthData, summaryData, onDrillDown, onBack }) => {
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
+const PredictiveInsights = ({ actionData, growthData, summaryData, onDrillDown, onBack, darkMode = false }) => {
+  const colors = getColors(darkMode);
   const [activeTab, setActiveTab] = useState(0);
   const [selectedScenario, setSelectedScenario] = useState('Base Case');
   const [forecastHorizon, setForecastHorizon] = useState(12); // months
@@ -125,14 +136,16 @@ const PredictiveInsights = ({ actionData, growthData, summaryData, onDrillDown, 
         <Grid container spacing={3}>
           {opportunities.map((opp) => (
             <Grid item xs={12} md={6} lg={4} key={opp.id}>
-              <Card 
+              <Card
                 elevation={2}
-                sx={{ 
+                sx={{
                   height: '100%',
                   display: 'flex',
                   flexDirection: 'column',
                   cursor: 'pointer',
-                  '&:hover': { boxShadow: 4 }
+                  '&:hover': { boxShadow: 4 },
+                  bgcolor: colors.cardBg,
+                  border: `1px solid ${colors.border}`,
                 }}
                 onClick={() => setSelectedOpportunity(opp)}
               >
@@ -229,8 +242,8 @@ const PredictiveInsights = ({ actionData, growthData, summaryData, onDrillDown, 
         </Grid>
 
         {/* GL Impact Summary */}
-        <Paper elevation={2} sx={{ mt: 3, p: 3 }}>
-          <Typography variant="h6" gutterBottom>
+        <Paper elevation={2} sx={{ mt: 3, p: 3, bgcolor: colors.paper }}>
+          <Typography variant="h6" gutterBottom sx={{ color: colors.text }}>
             Projected GL Impact
           </Typography>
           <Grid container spacing={3}>
@@ -337,7 +350,7 @@ const PredictiveInsights = ({ actionData, growthData, summaryData, onDrillDown, 
         </Typography>
 
         {/* Forecast Controls */}
-        <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
+        <Paper elevation={2} sx={{ p: 3, mb: 3, bgcolor: colors.paper }}>
           <Grid container spacing={3} alignItems="center">
             <Grid item xs={12} md={3}>
               <Typography gutterBottom>Forecast Horizon</Typography>
@@ -393,7 +406,7 @@ const PredictiveInsights = ({ actionData, growthData, summaryData, onDrillDown, 
         </Paper>
 
         {/* Forecast Chart */}
-        <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
+        <Paper elevation={2} sx={{ p: 3, mb: 3, bgcolor: colors.paper }}>
           <InteractiveChart
             type="line"
             data={chartData}
@@ -444,8 +457,8 @@ const PredictiveInsights = ({ actionData, growthData, summaryData, onDrillDown, 
         <Grid container spacing={3}>
           {/* Parameter Controls */}
           <Grid item xs={12} md={4}>
-            <Paper elevation={2} sx={{ p: 3 }}>
-              <Typography variant="subtitle1" gutterBottom>
+            <Paper elevation={2} sx={{ p: 3, bgcolor: colors.paper }}>
+              <Typography variant="subtitle1" gutterBottom sx={{ color: colors.text }}>
                 Adjust Parameters
               </Typography>
               
@@ -518,8 +531,8 @@ const PredictiveInsights = ({ actionData, growthData, summaryData, onDrillDown, 
 
           {/* Scenario Comparison */}
           <Grid item xs={12} md={8}>
-            <Paper elevation={2} sx={{ p: 3 }}>
-              <Typography variant="subtitle1" gutterBottom>
+            <Paper elevation={2} sx={{ p: 3, bgcolor: colors.paper }}>
+              <Typography variant="subtitle1" gutterBottom sx={{ color: colors.text }}>
                 Scenario Comparison
               </Typography>
               
@@ -646,15 +659,16 @@ const PredictiveInsights = ({ actionData, growthData, summaryData, onDrillDown, 
         <Grid container spacing={3}>
           {risks.map((risk) => (
             <Grid item xs={12} key={risk.id}>
-              <Paper 
-                elevation={2} 
-                sx={{ 
+              <Paper
+                elevation={2}
+                sx={{
                   p: 3,
                   borderLeft: 4,
-                  borderColor: 
-                    risk.severity === 'high' ? 'error.main' : 
-                    risk.severity === 'medium' ? 'warning.main' : 
-                    'info.main'
+                  borderColor:
+                    risk.severity === 'high' ? 'error.main' :
+                    risk.severity === 'medium' ? 'warning.main' :
+                    'info.main',
+                  bgcolor: colors.paper,
                 }}
               >
                 <Grid container spacing={2} alignItems="center">
@@ -719,7 +733,7 @@ const PredictiveInsights = ({ actionData, growthData, summaryData, onDrillDown, 
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 3, bgcolor: colors.background }}>
       {/* Header with Breadcrumbs */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -748,7 +762,7 @@ const PredictiveInsights = ({ actionData, growthData, summaryData, onDrillDown, 
         </Stack>
       </Box>
 
-      <Paper elevation={1} sx={{ mb: 3 }}>
+      <Paper elevation={1} sx={{ mb: 3, bgcolor: colors.paper }}>
         <Tabs
           value={activeTab}
           onChange={(e, newValue) => setActiveTab(newValue)}
@@ -756,6 +770,7 @@ const PredictiveInsights = ({ actionData, growthData, summaryData, onDrillDown, 
           textColor="primary"
           variant="scrollable"
           scrollButtons="auto"
+          sx={{ borderBottom: 1, borderColor: colors.border }}
         >
           <Tab label="Opportunities" icon={<MoneyIcon />} iconPosition="start" />
           <Tab label="Forecasts" icon={<TimelineIcon />} iconPosition="start" />

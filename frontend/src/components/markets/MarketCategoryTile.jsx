@@ -16,6 +16,17 @@ import {
 } from '@mui/icons-material';
 import { getSeverityLevel } from './CategoryIcons';
 
+// Dark mode color helper
+const getColors = (darkMode) => ({
+  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  text: darkMode ? '#e6edf3' : '#1e293b',
+  textSecondary: darkMode ? '#8b949e' : '#64748b',
+  background: darkMode ? '#0d1117' : '#f8fbfd',
+  paper: darkMode ? '#161b22' : '#ffffff',
+  cardBg: darkMode ? '#21262d' : '#ffffff',
+  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+});
+
 /**
  * MarketCategoryTile - Individual tile for each market signal category
  * Styled to match STOX.AI and MARGEN.AI tile appearance
@@ -28,6 +39,7 @@ import { getSeverityLevel } from './CategoryIcons';
  * - onClick: Handler when tile is clicked
  * - onConfigClick: Handler for config icon click
  * - index: Index for staggered animation
+ * - darkMode: Whether dark mode is enabled
  */
 const MarketCategoryTile = ({
   category,
@@ -38,7 +50,9 @@ const MarketCategoryTile = ({
   onClick,
   onConfigClick,
   index = 0,
+  darkMode = false,
 }) => {
+  const colors = getColors(darkMode);
   const IconComponent = category.icon;
   const severityLevel = getSeverityLevel(highestSeverity);
 
@@ -50,15 +64,17 @@ const MarketCategoryTile = ({
           cursor: enabled ? 'pointer' : 'default',
           opacity: enabled ? 1 : 0.6,
           transition: 'all 0.3s ease',
-          border: '1px solid rgba(0,0,0,0.08)',
+          border: `1px solid ${colors.border}`,
           borderRadius: 3,
           overflow: 'hidden',
           position: 'relative',
-          bgcolor: 'white',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          bgcolor: colors.cardBg,
+          boxShadow: darkMode ? 'none' : '0 2px 8px rgba(0,0,0,0.1)',
           '&:hover': enabled ? {
             transform: 'translateY(-6px)',
-            boxShadow: `0 20px 40px ${alpha(category.color, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,
+            boxShadow: darkMode
+              ? `0 20px 40px ${alpha(category.color, 0.2)}`
+              : `0 20px 40px ${alpha(category.color, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,
             '& .module-icon': {
               transform: 'scale(1.1)',
               bgcolor: category.color,
@@ -111,7 +127,7 @@ const MarketCategoryTile = ({
           </Typography>
 
           {/* Description */}
-          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+          <Typography variant="body2" sx={{ color: colors.textSecondary, mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
             {category.description}
           </Typography>
 
