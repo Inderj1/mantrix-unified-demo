@@ -1369,6 +1369,7 @@ const SimpleChatInterface = () => {
                   <Box sx={{ flex: 1 }}>
                     <Typography
                       variant="body2"
+                      component="div"
                       sx={{
                         lineHeight: 1.7,
                         color: 'text.primary',

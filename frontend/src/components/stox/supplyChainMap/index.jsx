@@ -17,7 +17,7 @@ import MapIcon from '@mui/icons-material/Map';
 import MapView from './MapView';
 import LeftSidebar from './LeftSidebar';
 import RightPanel from './RightPanel';
-import BottomPanel from './BottomPanel';
+// BottomPanel (Insights Engine) removed
 import FacilityDetailsPanel from './FacilityDetailsPanel';
 import TruckDetailsPanel from './TruckDetailsPanel';
 import AlertDetailsPanel from './AlertDetailsPanel';
@@ -46,7 +46,7 @@ export default function SupplyChainMap({ onBack }) {
   const [selectedStore, setSelectedStore] = useState(null);
   const [selectedTruck, setSelectedTruck] = useState(null);
   const [selectedAlert, setSelectedAlert] = useState(null);
-  const [bottomPanelCollapsed, setBottomPanelCollapsed] = useState(false);
+  // bottomPanelCollapsed state removed with Insights Engine
   const [filters, setFilters] = useState({
     trucks: true,
     stores: true,
@@ -197,7 +197,7 @@ export default function SupplyChainMap({ onBack }) {
   }
 
   return (
-    <Box sx={{ width: '100%', height: '100vh', position: 'relative', overflow: 'hidden', bgcolor: '#f8fafc' }}>
+    <Box sx={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', bgcolor: '#f8fafc' }}>
       {/* Top Header Bar */}
       {!isFullScreen && (
         <Box
@@ -345,14 +345,14 @@ export default function SupplyChainMap({ onBack }) {
           top: isFullScreen ? 0 : 48,
           left: isFullScreen ? 0 : 280,
           right: isFullScreen ? 0 : 280,
-          bottom: isFullScreen ? 0 : (bottomPanelCollapsed ? 32 : 100),
+          bottom: isFullScreen ? 0 : 0,
           zIndex: 500,
           overflow: 'hidden',
         }}
       >
         <Box sx={{ width: '100%', height: '100%', position: 'relative' }}>
           <MapView
-            key={`map-${isFullScreen}-${bottomPanelCollapsed}`}
+            key={`map-${isFullScreen}`}
             trucks={trucks}
             stores={stores}
             alerts={alerts}
@@ -398,7 +398,7 @@ export default function SupplyChainMap({ onBack }) {
 
       {/* Left Sidebar */}
       {!isFullScreen && (
-        <Box sx={{ position: 'absolute', top: 48, left: 0, bottom: bottomPanelCollapsed ? 32 : 100, width: 280, zIndex: 600, transition: 'bottom 0.3s ease' }}>
+        <Box sx={{ position: 'absolute', top: 48, left: 0, bottom: 0, width: 280, zIndex: 600 }}>
           <LeftSidebar
             trucks={trucks}
             stores={stores}
@@ -412,7 +412,7 @@ export default function SupplyChainMap({ onBack }) {
 
       {/* Right Panel */}
       {!isFullScreen && (
-        <Box sx={{ position: 'absolute', top: 48, right: 0, bottom: bottomPanelCollapsed ? 32 : 100, width: 280, zIndex: 600, transition: 'bottom 0.3s ease' }}>
+        <Box sx={{ position: 'absolute', top: 48, right: 0, bottom: 0, width: 280, zIndex: 600 }}>
           <RightPanel
             agents={agents}
             actionsToday={autopilotStatus?.actions_today || 0}
@@ -422,17 +422,7 @@ export default function SupplyChainMap({ onBack }) {
         </Box>
       )}
 
-      {/* Bottom Panel */}
-      {!isFullScreen && (
-        <BottomPanel
-          pendingDecisions={separateActions(aiActions).pending}
-          completedActions={separateActions(aiActions).completed}
-          onApprove={handleApproveAction}
-          onReject={handleRejectAction}
-          collapsed={bottomPanelCollapsed}
-          onToggleCollapsed={setBottomPanelCollapsed}
-        />
-      )}
+      {/* Bottom Panel (Insights Engine) removed */}
 
       {/* Detail Panels */}
       {selectedStore && (

@@ -24,6 +24,8 @@ from src.api.pdf_extraction_routes import router as pdf_extraction_router
 from src.api.command_tower_routes import router as command_tower_router
 from src.api.ordlyai_routes import router as ordlyai_router
 from src.api.bigquery_routes import router as bigquery_router
+from src.api.pdf_templates_routes import router as pdf_templates_router
+from src.api.excel_templates_routes import router as excel_templates_router
 
 # Configure structured logging
 structlog.configure(
@@ -145,6 +147,8 @@ app.include_router(pdf_extraction_router, prefix="/api/v1/pdf")
 app.include_router(command_tower_router)
 app.include_router(ordlyai_router)
 app.include_router(bigquery_router)  # AXIS.AI BigQuery routes
+app.include_router(pdf_templates_router, prefix="/api/v1")  # PDF Templates CRUD
+app.include_router(excel_templates_router, prefix="/api/v1")  # Excel Templates CRUD
 
 # Mount static files for generated outputs
 # Output directory is at project root, not backend

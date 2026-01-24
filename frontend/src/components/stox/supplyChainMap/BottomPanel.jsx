@@ -29,14 +29,14 @@ export default function BottomPanel({
   const successfulActions = completedActions.filter(a => a.status === 'completed').length;
   const successRate = completedActions.length > 0 ? Math.round((successfulActions / completedActions.length) * 100) : 100;
 
-  // Insight cards with Lam Research supply chain data
+  // Insight cards with Arizona Beverages supply chain data
   const insights = [
     {
       id: 1,
       icon: TrendingUpIcon,
       category: 'Demand',
       categoryColor: 'blue',
-      description: 'TSMC N3 expansion: +40% etch demand',
+      description: 'Walmart Q2 order: +25% Green Tea demand',
       confidence: 91,
     },
     {
@@ -44,7 +44,7 @@ export default function BottomPanel({
       icon: WarningAmberIcon,
       category: 'Risk',
       categoryColor: 'orange',
-      description: 'Korea plant at 65% - Samsung order risk',
+      description: 'Douglas GA at 65% - Publix order risk',
       confidence: 94,
     },
     {
@@ -52,7 +52,7 @@ export default function BottomPanel({
       icon: SavingsIcon,
       category: 'Savings',
       categoryColor: 'emerald',
-      description: 'Reduce Fremont safety stock - free $675K',
+      description: 'Reduce Keasbey safety stock - free $85K',
       confidence: 92,
     },
     {
@@ -60,7 +60,7 @@ export default function BottomPanel({
       icon: InventoryIcon,
       category: 'Stock',
       categoryColor: 'purple',
-      description: 'Austria plant at 58% - EMEA impacted',
+      description: 'Lakeland FL at 58% - Southeast impacted',
       confidence: 89,
     },
     {
@@ -68,7 +68,7 @@ export default function BottomPanel({
       icon: LocalShippingIcon,
       category: 'Shipment',
       categoryColor: 'cyan',
-      description: 'AIR-001 Korea: Etch systems ETA 14hrs',
+      description: 'SHP-001 Keasbey: Green Tea ETA 14hrs',
       confidence: 96,
     },
     {
@@ -76,7 +76,7 @@ export default function BottomPanel({
       icon: AccessTimeIcon,
       category: 'Transfer',
       categoryColor: 'amber',
-      description: 'Taiwan→Korea: 3 systems pending approval',
+      description: 'Keasbey→Douglas: 15K cases pending',
       confidence: 88,
     },
   ];

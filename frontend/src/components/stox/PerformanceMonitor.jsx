@@ -53,7 +53,7 @@ import { getTileDataConfig } from './stoxDataConfig';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, ArcElement, Title, ChartTooltip, Legend, Filler);
 
-// Import Lam Research data
+// Import Arizona Beverages data
 import {
   LAM_PLANTS,
   LAM_MATERIAL_PLANT_DATA,
@@ -68,9 +68,9 @@ const formatCurrency = (value) => {
   return `$${value}`;
 };
 
-// Generate performance KPI data using Lam Research metrics
+// Generate performance KPI data using Arizona Beverages metrics
 const generateKPIData = () => {
-  // Calculate actual metrics from Lam Research data
+  // Calculate actual metrics from Arizona Beverages data
   const avgTurns = LAM_MATERIAL_PLANT_DATA.reduce((sum, d) => sum + d.turns, 0) / LAM_MATERIAL_PLANT_DATA.length;
   const avgDOS = LAM_MATERIAL_PLANT_DATA.reduce((sum, d) => sum + d.dos, 0) / LAM_MATERIAL_PLANT_DATA.length;
   const avgFillRate = LAM_MATERIAL_PLANT_DATA.reduce((sum, d) => sum + d.fillRate, 0) / LAM_MATERIAL_PLANT_DATA.length;

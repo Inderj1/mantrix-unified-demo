@@ -69,12 +69,12 @@ const formatLocalCurrency = (value, currency) => {
   return lamFormatCurrency(value, currency);
 };
 
-// Generate plant data using ACTUAL Lam Research data
+// Generate plant data using ACTUAL Arizona Beverages data
 const generatePlantData = () => {
   const plantDescriptions = {
     '1000': 'S/4HANA 2023 - Primary Manufacturing - Americas HQ',
     '2000': 'S/4HANA 2023 - Assembly Operations - Pacific Northwest',
-    '3000': 'S/4HANA 2022 - Manufacturing Hub - South Korea',
+    '3000': 'S/4HANA 2022 - Manufacturing Hub - Douglas GA',
     '4000': 'S/4HANA 2022 - Manufacturing Hub - Taiwan',
     '5000': 'S/4HANA 2021 - European Operations - Austria',
   };

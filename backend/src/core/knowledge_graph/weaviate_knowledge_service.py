@@ -502,34 +502,274 @@ FROM current, previous""",
         """Fallback metric lookup using keyword matching."""
         query_lower = query.lower()
 
-        # Basic keyword-to-metric mapping
+        # Comprehensive metric mapping with SQL formulas
+        # Format: keyword -> (code, name, formula_text, formula_sql, is_available, components)
         keyword_metrics = {
-            "roic": ("ROIC", "Return on Invested Capital", "NOPAT / Invested Capital"),
-            "return on invested capital": ("ROIC", "Return on Invested Capital", "NOPAT / Invested Capital"),
-            "roa": ("ROA", "Return on Assets", "Net Income / Total Assets"),
-            "return on assets": ("ROA", "Return on Assets", "Net Income / Total Assets"),
-            "roe": ("ROE", "Return on Equity", "Net Income / Shareholders Equity"),
-            "return on equity": ("ROE", "Return on Equity", "Net Income / Shareholders Equity"),
-            "gross margin": ("GROSS_MARGIN", "Gross Margin", "Revenue - COGS"),
-            "revenue": ("REVENUE", "Revenue", "Sum of all revenue"),
-            "ebitda": ("EBITDA", "EBITDA", "Operating Income + D&A"),
-            "net income": ("NET_INCOME", "Net Income", "Revenue - All Expenses"),
+            # === AVAILABLE METRICS (can be calculated from dataset_25m_table) ===
+            "gross margin": (
+                "GROSS_MARGIN",
+                "Gross Margin",
+                "(Gross_Revenue - Cogs) / Gross_Revenue * 100",
+                "ROUND((SUM(Gross_Revenue) - SUM(Cogs)) / NULLIF(SUM(Gross_Revenue), 0) * 100, 2) AS gross_margin_pct",
+                True,
+                ["Gross_Revenue", "Cogs"]
+            ),
+            "gross margin %": (
+                "GROSS_MARGIN_PCT",
+                "Gross Margin %",
+                "(Gross_Revenue - Cogs) / Gross_Revenue * 100",
+                "ROUND((SUM(Gross_Revenue) - SUM(Cogs)) / NULLIF(SUM(Gross_Revenue), 0) * 100, 2) AS gross_margin_pct",
+                True,
+                ["Gross_Revenue", "Cogs"]
+            ),
+            "gross profit": (
+                "GROSS_PROFIT",
+                "Gross Profit",
+                "Gross_Revenue - Cogs",
+                "SUM(Gross_Revenue) - SUM(Cogs) AS gross_profit",
+                True,
+                ["Gross_Revenue", "Cogs"]
+            ),
+            "revenue": (
+                "REVENUE",
+                "Revenue",
+                "Sum of Gross_Revenue",
+                "SUM(Gross_Revenue) AS total_revenue",
+                True,
+                ["Gross_Revenue"]
+            ),
+            "total revenue": (
+                "TOTAL_REVENUE",
+                "Total Revenue",
+                "Sum of Gross_Revenue",
+                "SUM(Gross_Revenue) AS total_revenue",
+                True,
+                ["Gross_Revenue"]
+            ),
+            "net sales": (
+                "NET_SALES",
+                "Net Sales",
+                "Sum of Net_Sales",
+                "SUM(Net_Sales) AS net_sales",
+                True,
+                ["Net_Sales"]
+            ),
+            "cogs": (
+                "COGS",
+                "Cost of Goods Sold",
+                "Sum of Cogs or Total_COGS",
+                "SUM(Cogs) AS total_cogs",
+                True,
+                ["Cogs", "Total_COGS"]
+            ),
+            "cost of goods sold": (
+                "COGS",
+                "Cost of Goods Sold",
+                "Sum of Cogs",
+                "SUM(Cogs) AS total_cogs",
+                True,
+                ["Cogs"]
+            ),
+            "operating income": (
+                "OPERATING_INCOME",
+                "Operating Income / EBIT",
+                "Net_Sales - Total_COGS",
+                "SUM(Net_Sales) - SUM(Total_COGS) AS operating_income",
+                True,
+                ["Net_Sales", "Total_COGS"]
+            ),
+            "ebit": (
+                "EBIT",
+                "Earnings Before Interest & Tax",
+                "Net_Sales - Total_COGS",
+                "SUM(Net_Sales) - SUM(Total_COGS) AS ebit",
+                True,
+                ["Net_Sales", "Total_COGS"]
+            ),
+            "net margin": (
+                "NET_MARGIN",
+                "Net Margin %",
+                "Sales_Margin_of_Net_Sales / Net_Sales * 100",
+                "ROUND(SUM(Sales_Margin_of_Net_Sales) / NULLIF(SUM(Net_Sales), 0) * 100, 2) AS net_margin_pct",
+                True,
+                ["Sales_Margin_of_Net_Sales", "Net_Sales"]
+            ),
+            "net margin %": (
+                "NET_MARGIN_PCT",
+                "Net Margin %",
+                "Sales_Margin_of_Net_Sales / Net_Sales * 100",
+                "ROUND(SUM(Sales_Margin_of_Net_Sales) / NULLIF(SUM(Net_Sales), 0) * 100, 2) AS net_margin_pct",
+                True,
+                ["Sales_Margin_of_Net_Sales", "Net_Sales"]
+            ),
+            "contribution margin": (
+                "CONTRIBUTION_MARGIN",
+                "Contribution Margin",
+                "Net_Sales - Variable Costs (Ingredients + Packaging + Incoming_Freight)",
+                "SUM(Net_Sales) - SUM(Ingredients) - SUM(Packaging) - SUM(Incoming_Freight) AS contribution_margin",
+                True,
+                ["Net_Sales", "Ingredients", "Packaging", "Incoming_Freight"]
+            ),
+            "profit per unit": (
+                "PROFIT_PER_UNIT",
+                "Profit per Unit",
+                "Sales_Margin_of_Net_Sales / Inv_Quantity",
+                "ROUND(SUM(Sales_Margin_of_Net_Sales) / NULLIF(SUM(Inv_Quantity), 0), 2) AS profit_per_unit",
+                True,
+                ["Sales_Margin_of_Net_Sales", "Inv_Quantity"]
+            ),
+            "revenue per customer": (
+                "REVENUE_PER_CUSTOMER",
+                "Revenue per Customer",
+                "SUM(Gross_Revenue) / COUNT(DISTINCT Customer)",
+                "ROUND(SUM(Gross_Revenue) / NULLIF(COUNT(DISTINCT Sold_to_Name), 0), 2) AS revenue_per_customer",
+                True,
+                ["Gross_Revenue", "Sold_to_Name"]
+            ),
+            "average order value": (
+                "AVG_ORDER_VALUE",
+                "Average Order Value",
+                "SUM(Net_Sales) / COUNT(DISTINCT Order_ID)",
+                "ROUND(SUM(Net_Sales) / NULLIF(COUNT(DISTINCT Sales_Order), 0), 2) AS avg_order_value",
+                True,
+                ["Net_Sales", "Sales_Order"]
+            ),
+            "quantity": (
+                "QUANTITY",
+                "Total Quantity",
+                "Sum of Inv_Quantity",
+                "SUM(Inv_Quantity) AS total_quantity",
+                True,
+                ["Inv_Quantity"]
+            ),
+            "units sold": (
+                "UNITS_SOLD",
+                "Units Sold",
+                "Sum of Inv_Quantity",
+                "SUM(Inv_Quantity) AS units_sold",
+                True,
+                ["Inv_Quantity"]
+            ),
+            "average price": (
+                "AVG_PRICE",
+                "Average Price",
+                "Net_Sales / Inv_Quantity",
+                "ROUND(SUM(Net_Sales) / NULLIF(SUM(Inv_Quantity), 0), 2) AS avg_price",
+                True,
+                ["Net_Sales", "Inv_Quantity"]
+            ),
+
+            # === UNAVAILABLE METRICS (require balance sheet data not in dataset) ===
+            "roi": (
+                "ROI",
+                "Return on Investment",
+                "Net Profit / Investment - REQUIRES BALANCE SHEET DATA",
+                "-- ROI cannot be calculated: requires Net Profit and Investment/Capital data from balance sheet. Alternative: Use Gross Margin % which shows (Revenue - COGS) / Revenue",
+                False,
+                ["Net_Profit", "Investment", "Capital"]
+            ),
+            "return on investment": (
+                "ROI",
+                "Return on Investment",
+                "Net Profit / Investment - REQUIRES BALANCE SHEET DATA",
+                "-- ROI cannot be calculated: requires balance sheet data. Alternative: Use Gross Margin % or Contribution Margin %",
+                False,
+                ["Net_Profit", "Investment", "Capital"]
+            ),
+            "roic": (
+                "ROIC",
+                "Return on Invested Capital",
+                "NOPAT / Invested Capital - REQUIRES BALANCE SHEET DATA",
+                "-- ROIC cannot be calculated: requires Net Operating Profit After Tax (NOPAT) and Invested Capital from balance sheet",
+                False,
+                ["NOPAT", "Invested_Capital"]
+            ),
+            "return on invested capital": (
+                "ROIC",
+                "Return on Invested Capital",
+                "NOPAT / Invested Capital - REQUIRES BALANCE SHEET DATA",
+                "-- ROIC cannot be calculated: requires balance sheet data. Alternative: Use Gross Margin % or Net Margin %",
+                False,
+                ["NOPAT", "Invested_Capital"]
+            ),
+            "roce": (
+                "ROCE",
+                "Return on Capital Employed",
+                "Operating Income / Capital Employed - REQUIRES BALANCE SHEET DATA",
+                "-- ROCE cannot be calculated: requires Total Assets and Current Liabilities from balance sheet. Alternative: Use Operating Margin %",
+                False,
+                ["Operating_Income", "Total_Assets", "Current_Liabilities"]
+            ),
+            "roa": (
+                "ROA",
+                "Return on Assets",
+                "Net Income / Total Assets - REQUIRES BALANCE SHEET DATA",
+                "-- ROA cannot be calculated: requires Net Income and Total Assets from balance sheet",
+                False,
+                ["Net_Income", "Total_Assets"]
+            ),
+            "return on assets": (
+                "ROA",
+                "Return on Assets",
+                "Net Income / Total Assets - REQUIRES BALANCE SHEET DATA",
+                "-- ROA cannot be calculated: requires balance sheet data. Alternative: Use Operating Income or Gross Profit",
+                False,
+                ["Net_Income", "Total_Assets"]
+            ),
+            "roe": (
+                "ROE",
+                "Return on Equity",
+                "Net Income / Shareholders Equity - REQUIRES BALANCE SHEET DATA",
+                "-- ROE cannot be calculated: requires Net Income and Shareholders Equity from balance sheet",
+                False,
+                ["Net_Income", "Shareholders_Equity"]
+            ),
+            "return on equity": (
+                "ROE",
+                "Return on Equity",
+                "Net Income / Shareholders Equity - REQUIRES BALANCE SHEET DATA",
+                "-- ROE cannot be calculated: requires balance sheet data. Alternative: Use Net Margin %",
+                False,
+                ["Net_Income", "Shareholders_Equity"]
+            ),
+            "ebitda": (
+                "EBITDA",
+                "EBITDA",
+                "Operating Income + Depreciation & Amortization - REQUIRES D&A DATA",
+                "-- EBITDA cannot be calculated: requires Depreciation & Amortization data. Alternative: Use Operating Income (EBIT)",
+                False,
+                ["Operating_Income", "Depreciation", "Amortization"]
+            ),
+            "net income": (
+                "NET_INCOME",
+                "Net Income",
+                "Revenue - All Expenses (including taxes, interest) - REQUIRES FULL P&L",
+                "-- Net Income requires full P&L including taxes and interest. Alternative: Use Sales_Margin_of_Net_Sales",
+                False,
+                ["All_Revenue", "All_Expenses", "Taxes", "Interest"]
+            ),
         }
 
-        for keyword, (code, name, formula) in keyword_metrics.items():
+        for keyword, metric_data in keyword_metrics.items():
             if keyword in query_lower:
+                code, name, formula, formula_sql, is_available, components = metric_data
+
+                description = f"{name} metric"
+                if not is_available:
+                    description = f"{name} - NOT AVAILABLE in current dataset (requires balance sheet/P&L data)"
+
                 return MetricMatch(
                     metric_code=code,
                     metric_name=name,
-                    description=f"{name} metric",
+                    description=description,
                     formula=formula,
-                    formula_sql="",
+                    formula_sql=formula_sql if is_available else "",
                     synonyms=[],
-                    components=[],
-                    is_percentage="%" in name or "return" in name.lower(),
-                    is_currency="%" not in name and "return" not in name.lower(),
+                    components=components,
+                    is_percentage="%" in name or "margin" in name.lower() or "return" in name.lower(),
+                    is_currency=not ("%" in name or "margin" in name.lower() or "return" in name.lower() or "quantity" in name.lower() or "units" in name.lower()),
                     category="financial",
-                    confidence=0.8
+                    confidence=0.9 if is_available else 0.5
                 )
 
         return None

@@ -66,13 +66,14 @@ import CoreAILanding from './components/CoreAILanding';
 import MargenAIDashboard from './components/margenai/MargenAIDashboard';
 import MargenAILanding from './components/MargenAILanding';
 import ReveqAILanding from './components/ReveqAILanding';
-import AssetTracking from './components/reveqai/AssetTracking';
-import RevenueAnalytics from './components/reveqai/RevenueAnalytics';
-import UtilizationMetrics from './components/reveqai/UtilizationMetrics';
-import ReveqPerformanceDashboard from './components/reveqai/PerformanceDashboard';
-import ReveqMaintenanceScheduler from './components/reveqai/MaintenanceScheduler';
-import EfficiencyOptimizer from './components/reveqai/EfficiencyOptimizer';
-import FinancialWorkbench from './components/reveqai/FinancialWorkbench';
+// TODO: Restore reveqai components
+// import AssetTracking from './components/reveqai/AssetTracking';
+// import RevenueAnalytics from './components/reveqai/RevenueAnalytics';
+// import UtilizationMetrics from './components/reveqai/UtilizationMetrics';
+// import ReveqPerformanceDashboard from './components/reveqai/PerformanceDashboard';
+// import ReveqMaintenanceScheduler from './components/reveqai/MaintenanceScheduler';
+// import EfficiencyOptimizer from './components/reveqai/EfficiencyOptimizer';
+// import FinancialWorkbench from './components/reveqai/FinancialWorkbench';
 import MargenAITable from './components/margenai/MargenAITable';
 import SegmentAnalytics from './components/margenai/SegmentAnalytics';
 import RevenueSalesAnalytics from './components/margenai/RevenueSalesAnalytics';
@@ -92,6 +93,7 @@ import ResultsTable from './components/ResultsTable';
 import EnterprisePulse from './components/EnterprisePulse';
 // import StoxShiftAI from './components/StoxShiftAI'; // File doesn't exist
 import StoxAILanding from './components/StoxAILanding';
+import StoxRetailLanding from './components/StoxRetailLanding';
 import ShortageDetector from './components/stox/ShortageDetector';
 import InventoryHeatmap from './components/stox/InventoryHeatmap';
 import ReallocationOptimizer from './components/stox/ReallocationOptimizer';
@@ -118,6 +120,7 @@ import ForecastingEngine from './components/stox/ForecastingEngine.jsx';
 import SAPDataHub from './components/stox/SAPDataHub.jsx';
 import PlantInventoryIntelligence from './components/stox/PlantInventoryIntelligence.jsx';
 import InventoryHealthCheck from './components/stox/InventoryHealthCheck.jsx';
+import InventoryDashboard from './components/stox/InventoryDashboard.jsx';
 import WorkingCapitalBaseline from './components/stox/WorkingCapitalBaseline.jsx';
 import CommandCenter from './components/stox/CommandCenter.jsx';
 import SupplyLeadTime from './components/stox/SupplyLeadTime.jsx';
@@ -128,6 +131,7 @@ import CashReleaseTimeline from './components/stox/CashReleaseTimeline.jsx';
 import SupplierTermsImpact from './components/stox/SupplierTermsImpact.jsx';
 import MRPParameterOptimizer from './components/stox/MRPParameterOptimizer.jsx';
 import MRPParameterTuner from './components/stox/MRPParameterTuner.jsx';
+import MRPOptimizerDashboard from './components/stox/MRPOptimizerDashboard.jsx';
 import WhatIfSimulator from './components/stox/WhatIfSimulator.jsx';
 import RecommendationsHub from './components/stox/RecommendationsHub.jsx';
 import SAPWriteback from './components/stox/SAPWriteback.jsx';
@@ -161,12 +165,19 @@ import DemandSignal from './components/ordlyai/DemandSignal';
 import NetworkOptimizer from './components/ordlyai/NetworkOptimizer';
 import Arbitration from './components/ordlyai/Arbitration';
 import SapCommit from './components/ordlyai/SapCommit';
+import O2CAILanding from './components/O2CAILanding';
 import FleetManagement from './components/routeai/FleetManagement';
 import RouteOptimization from './components/routeai/RouteOptimization';
 import DeliveryTracking from './components/routeai/DeliveryTracking';
 import PerformanceAnalytics from './components/routeai/PerformanceAnalytics';
 import FuelManagement from './components/routeai/FuelManagement';
 import MaintenanceScheduler from './components/routeai/MaintenanceScheduler';
+import TraxxAILanding from './components/TraxxAILanding';
+import KitControlTower from './components/traxxai/KitControlTower';
+import WhoMustActNow from './components/traxxai/WhoMustActNow';
+import LogisticsEconomics from './components/traxxai/LogisticsEconomics';
+import RealizedMarginCash from './components/traxxai/RealizedMarginCash';
+import SurgeryReadiness from './components/traxxai/SurgeryReadiness';
 import { sapFioriTheme, sapChartColors } from './themes/sapFioriTheme';
 import { defaultTheme } from './themes/defaultTheme';
 import {
@@ -247,6 +258,8 @@ function App() {
   const [routeView, setRouteView] = usePersistedState('mantrix-routeView', 'landing'); // 'landing', module IDs
   const [reveqView, setReveqView] = usePersistedState('mantrix-reveqView', 'landing'); // 'landing', module IDs
   const [ordlyView, setOrdlyView] = usePersistedState('mantrix-ordlyView', 'landing'); // 'landing', module IDs
+  const [o2cView, setO2cView] = usePersistedState('mantrix-o2cView', 'landing'); // 'landing', module IDs
+  const [traxxView, setTraxxView] = usePersistedState('mantrix-traxxView', 'landing'); // 'landing', 'nexxt-smade', 'nexxt-operations'
   const [currentFioriTile, setCurrentFioriTile] = useState(null); // { tileId, title, moduleId, moduleColor }
   const [axisAIView, setAxisAIView] = useState('landing'); // 'landing', 'forecast', 'budget', 'driver', 'scenario', 'insights'
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
@@ -625,6 +638,12 @@ function App() {
                     } else if (moduleId === 'ordly') {
                       setCoreAIView('ordly');
                       setOrdlyView('landing');
+                    } else if (moduleId === 'o2c') {
+                      setCoreAIView('o2c');
+                      setO2cView('landing');
+                    } else if (moduleId === 'traxx') {
+                      setCoreAIView('traxx');
+                      setTraxxView('landing');
                     }
                   }} />
                 </Box>
@@ -679,7 +698,9 @@ function App() {
                         }
                       }}
                       onCategorySelect={(category) => {
-                        if (category === 'store') {
+                        if (category === 'retail') {
+                          setStoxView('retail-landing');
+                        } else if (category === 'store') {
                           setStoxView('store-modules');
                         } else if (category === 'dc') {
                           setStoxView('dc-modules');
@@ -728,10 +749,19 @@ function App() {
                         } else if (moduleId === 'executive-command') {
                           console.log('Setting stoxView to: executive-command');
                           setStoxView('executive-command');
-                        } else if (['demand-flow', 'demand-forecasting', 'outbound-replenishment', 'dc-inventory', 'supply-planning', 'bom-explosion', 'component-consolidation', 'analytics-whatif', 'tile0-forecast-simulation', 'store-forecasting', 'store-health-monitor', 'store-optimization', 'store-replenishment', 'store-financial-impact', 'supply-chain-map', 'dc-demand-aggregation', 'dc-health-monitor', 'dc-optimization', 'dc-bom', 'dc-lot-size', 'dc-supplier-exec', 'dc-financial-impact', 'demand-intelligence', 'forecasting-engine', 'sap-data-hub', 'plant-inventory-intelligence', 'inventory-health-check', 'working-capital-baseline', 'command-center', 'supply-lead-time', 'cost-policy-engine', 'cost-configuration', 'mrp-parameter-optimizer', 'mrp-parameter-tuner', 'what-if-simulator', 'recommendations-hub', 'sap-writeback', 'performance-monitor', 'cfo-rollup-dashboard', 'cash-release-timeline', 'supplier-terms-impact'].includes(moduleId)) {
+                        } else if (['demand-flow', 'demand-forecasting', 'outbound-replenishment', 'dc-inventory', 'supply-planning', 'bom-explosion', 'component-consolidation', 'analytics-whatif', 'tile0-forecast-simulation', 'store-forecasting', 'store-health-monitor', 'store-optimization', 'store-replenishment', 'store-financial-impact', 'supply-chain-map', 'dc-demand-aggregation', 'dc-health-monitor', 'dc-optimization', 'dc-bom', 'dc-lot-size', 'dc-supplier-exec', 'dc-financial-impact', 'demand-intelligence', 'forecasting-engine', 'sap-data-hub', 'plant-inventory-intelligence', 'inventory-health-check', 'inventory-dashboard', 'working-capital-baseline', 'command-center', 'supply-lead-time', 'cost-policy-engine', 'cost-configuration', 'mrp-parameter-optimizer', 'mrp-parameter-tuner', 'mrp-optimizer', 'what-if-simulator', 'recommendations-hub', 'sap-writeback', 'performance-monitor', 'cfo-rollup-dashboard', 'cash-release-timeline', 'supplier-terms-impact'].includes(moduleId)) {
                           console.log('Setting stoxView to module tiles:', moduleId);
                           setStoxView(moduleId);
                         }
+                      }}
+                    />
+                  )}
+                  {stoxView === 'retail-landing' && (
+                    <StoxRetailLanding
+                      onBack={() => setStoxView('landing')}
+                      onTileClick={(moduleId) => {
+                        console.log('STOX Retail tile clicked:', moduleId);
+                        setStoxView(moduleId);
                       }}
                     />
                   )}
@@ -815,6 +845,9 @@ function App() {
                   {stoxView === 'inventory-health-check' && (
                     <InventoryHealthCheck onBack={() => setStoxView('landing')} />
                   )}
+                  {stoxView === 'inventory-dashboard' && (
+                    <InventoryDashboard onBack={() => setStoxView('landing')} onTileClick={(tileId) => setStoxView(tileId)} />
+                  )}
                   {stoxView === 'working-capital-baseline' && (
                     <WorkingCapitalBaseline onBack={() => setStoxView('landing')} />
                   )}
@@ -841,6 +874,9 @@ function App() {
                   )}
                   {stoxView === 'mrp-parameter-tuner' && (
                     <MRPParameterTuner onBack={() => setStoxView('landing')} />
+                  )}
+                  {stoxView === 'mrp-optimizer' && (
+                    <MRPOptimizerDashboard onBack={() => setStoxView('landing')} />
                   )}
                   {stoxView === 'what-if-simulator' && (
                     <WhatIfSimulator onBack={() => setStoxView('landing')} />
@@ -980,6 +1016,7 @@ function App() {
                       }}
                     />
                   )}
+                  {/* TODO: Restore reveqai components
                   {reveqView === 'asset-tracking' && (
                     <AssetTracking onBack={() => setReveqView('landing')} />
                   )}
@@ -1001,6 +1038,7 @@ function App() {
                   {reveqView === 'financial-workbench' && (
                     <FinancialWorkbench onBack={() => setReveqView('landing')} />
                   )}
+                  */}
                 </Box>
               </Fade>
               <Fade in={coreAIView === 'process-mining'} timeout={300}>
@@ -1084,6 +1122,47 @@ function App() {
                   )}
                   {ordlyView === 'sap-commit' && (
                     <SapCommit onBack={() => setOrdlyView('landing')} />
+                  )}
+                </Box>
+              </Fade>
+              <Fade in={coreAIView === 'o2c'} timeout={300}>
+                <Box sx={{ display: coreAIView === 'o2c' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
+                  {o2cView === 'landing' && (
+                    <O2CAILanding
+                      onBack={() => setCoreAIView('landing')}
+                      onTileClick={(moduleId) => {
+                        console.log('O2C tile clicked:', moduleId);
+                        setO2cView(moduleId);
+                      }}
+                    />
+                  )}
+                </Box>
+              </Fade>
+              <Fade in={coreAIView === 'traxx'} timeout={300}>
+                <Box sx={{ display: coreAIView === 'traxx' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
+                  {traxxView === 'landing' && (
+                    <TraxxAILanding
+                      onBack={() => setCoreAIView('landing')}
+                      onTileClick={(moduleId) => {
+                        console.log('TraxxAI tile clicked:', moduleId);
+                        setTraxxView(moduleId);
+                      }}
+                    />
+                  )}
+                  {traxxView === 'kit-control-tower' && (
+                    <KitControlTower onBack={() => setTraxxView('landing')} />
+                  )}
+                  {traxxView === 'who-must-act-now' && (
+                    <WhoMustActNow onBack={() => setTraxxView('landing')} />
+                  )}
+                  {traxxView === 'logistics-economics' && (
+                    <LogisticsEconomics onBack={() => setTraxxView('landing')} />
+                  )}
+                  {traxxView === 'realized-margin-cash' && (
+                    <RealizedMarginCash onBack={() => setTraxxView('landing')} />
+                  )}
+                  {traxxView === 'surgery-readiness' && (
+                    <SurgeryReadiness onBack={() => setTraxxView('landing')} />
                   )}
                 </Box>
               </Fade>

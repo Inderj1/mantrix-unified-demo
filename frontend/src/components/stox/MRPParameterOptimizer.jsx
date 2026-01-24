@@ -103,7 +103,7 @@ const generateEOQCurveData = (annualDemand, orderingCost, unitCost, holdingRate)
   };
 };
 
-// Import Lam Research data
+// Import Arizona Beverages data
 import {
   LAM_MATERIALS,
   LAM_MATERIAL_PLANT_DATA,
@@ -112,7 +112,7 @@ import {
   getPlantName,
 } from '../../data/arizonaBeveragesMasterData';
 
-// Generate MRP parameter data from Lam Research materials
+// Generate MRP parameter data from Arizona Beverages materials
 const generateMRPData = () => {
   const lotSizes = ['EX', 'FX', 'WB', 'MB', 'TB', 'HB'];
 
@@ -179,7 +179,7 @@ const generateMRPData = () => {
       orderingCostPerPO,
       holdingRate,
       currentOrderQty,
-      // Additional Lam data
+      // Additional Arizona data
       turns: mpd.turns,
       dos: mpd.dos,
       excessStock: mpd.excessStock,

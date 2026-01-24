@@ -35,9 +35,9 @@ const formatCurrency = (value) => {
   return `$${value}`;
 };
 
-// Generate executive summary data using Lam Research data
+// Generate executive summary data using Arizona Beverages data
 const generateCFOData = () => {
-  // Calculate total excess from actual Lam Research data
+  // Calculate total excess from actual Arizona Beverages data
   const totalExcess = LAM_MATERIAL_PLANT_DATA.reduce((sum, d) => sum + (d.excessStock || 0), 0);
   const totalValue = LAM_MATERIAL_PLANT_DATA.reduce((sum, d) => {
     const mat = getMaterialById(d.materialId);
@@ -60,7 +60,7 @@ const generateCFOData = () => {
   // Risk-adjusted savings
   const riskAdjustedSavings = totalCashRelease * 0.72;
 
-  // Plant breakdown using Lam Research plants
+  // Plant breakdown using Arizona Beverages plants
   const plants = LAM_PLANTS.map(plant => {
     const summary = calculatePlantSummary(plant.id);
     return {

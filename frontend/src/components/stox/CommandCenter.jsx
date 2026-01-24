@@ -28,7 +28,7 @@ import { LAM_PLANTS, LAM_MATERIALS, LAM_MATERIAL_PLANT_DATA, LAM_VENDORS, calcul
  * - Alert feed from all layers
  */
 
-// Generate exceptions using Lam Research data
+// Generate exceptions using Arizona Beverages data
 const generateExceptions = () => {
   // Calculate total excess from actual data
   const totalExcess = LAM_MATERIAL_PLANT_DATA.reduce((sum, d) => sum + (d.excessStock || 0), 0);
@@ -43,8 +43,8 @@ const generateExceptions = () => {
     {
       id: 'EXC-001',
       type: 'critical',
-      title: 'Excess Stock Alert - Fremont',
-      description: `FG0001 Etch System AKARA at ${LAM_PLANTS[0].name} has $42.5M excess inventory (>180 days)`,
+      title: 'Excess Stock Alert - Keasbey',
+      description: `FG0001 Green Tea 24PK 20OZ TALLBOY at ${LAM_PLANTS[0].name} has $42.5M excess inventory (>180 days)`,
       impact: formatCurrency(42500000) + ' WC tied',
       action: 'Review excess stock',
       tile: 'inventory-dashboard',
@@ -53,7 +53,7 @@ const generateExceptions = () => {
       id: 'EXC-002',
       type: 'critical',
       title: 'Excess Stock Alert - Hwaseong',
-      description: `FG0002 ALTUS HAMMER at ${LAM_PLANTS[2].name} has $54M excess inventory`,
+      description: `FG0002 Arnold Palmer 4PK at ${LAM_PLANTS[2].name} has $54M excess inventory`,
       impact: formatCurrency(54000000) + ' WC tied',
       action: 'Review excess stock',
       tile: 'inventory-dashboard',
@@ -88,7 +88,7 @@ const generateExceptions = () => {
     {
       id: 'EXC-006',
       type: 'warning',
-      title: 'DIO Above Target - Tualatin',
+      title: 'DIO Above Target - Santa Clarita',
       description: `${LAM_PLANTS[1].name} DIO at 145 days vs 60 day target`,
       impact: formatCurrency(900000) + ' WC opportunity',
       action: 'Review inventory',
@@ -198,7 +198,7 @@ const CommandCenter = ({ onBack, onTileClick }) => {
     setTimeout(() => {
       setExceptions(generateExceptions());
 
-      // Calculate KPIs from Lam Research data
+      // Calculate KPIs from Arizona Beverages data
       const totalExcess = LAM_MATERIAL_PLANT_DATA.reduce((sum, d) => sum + (d.excessStock || 0), 0);
       const avgTurns = LAM_MATERIAL_PLANT_DATA.length > 0
         ? LAM_MATERIAL_PLANT_DATA.reduce((sum, d) => sum + d.turns, 0) / LAM_MATERIAL_PLANT_DATA.length

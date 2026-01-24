@@ -40,16 +40,16 @@ const TicketingSystem = ({ onBack }) => {
     searchTerm: searchTerm,
   });
 
-  // Generate demo data when API returns empty - Lam Research Supply Chain
+  // Generate demo data when API returns empty - Arizona Beverages Supply Chain
   const generateDemoTickets = () => {
     const demoData = [
       // Critical inventory alerts
-      { ticket_id: 1001, source_module: "STOX.AI", ticket_type: "SHORTAGE_ALERT", title: "Low Stock: Hwaseong Korea (65%)", description: "Samsung order at risk. Transfer from Taiwan initiated.", priority: "Critical", status: "In Progress", user_name: "Stox.AI", created_at: new Date(Date.now() - 1*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      { ticket_id: 1001, source_module: "STOX.AI", ticket_type: "SHORTAGE_ALERT", title: "Low Stock: Hwaseong Douglas (65%)", description: "Samsung order at risk. Transfer from Taiwan initiated.", priority: "Critical", status: "In Progress", user_name: "Stox.AI", created_at: new Date(Date.now() - 1*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
       { ticket_id: 1002, source_module: "STOX.AI", ticket_type: "DEMAND_SURGE", title: "TSMC N3 Expansion: +40% Demand", description: "Etch system demand surge. Taiwan plant capacity review needed.", priority: "Critical", status: "Open", user_name: "Forecast.AI", created_at: new Date(Date.now() - 2*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
-      { ticket_id: 1003, source_module: "STOX.AI", ticket_type: "SHIPMENT_DELAYED", title: "SHP-002 Oregon Delayed +6hrs", description: "MKS RF Power Supply delayed due to weather. Tualatin notified.", priority: "High", status: "In Progress", user_name: "Logistics.AI", created_at: new Date(Date.now() - 3*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
-      { ticket_id: 1004, source_module: "STOX.AI", ticket_type: "REALLOCATION_EXECUTED", title: "Transfer: Taiwan → Korea (3 units)", description: "Etch Systems transfer to prevent Samsung stockout. Savings: $850K.", priority: "High", status: "Completed", user_name: "System", created_at: new Date(Date.now() - 5*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
-      { ticket_id: 1005, source_module: "STOX.AI", ticket_type: "SAFETY_STOCK_ADJUSTED", title: "Fremont Safety Stock -15 units", description: "Released $675K working capital. MRP parameters updated.", priority: "Medium", status: "Completed", user_name: "WorkingCap.AI", created_at: new Date(Date.now() - 8*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
-      { ticket_id: 1006, source_module: "Enterprise Pulse", ticket_type: "PULSE_ALERT", title: "2 Plants Below 70% Threshold", description: "Korea (65%) and Austria (58%) require immediate attention.", priority: "Critical", status: "Open", user_name: "Stox.AI", created_at: new Date(Date.now() - 30*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      { ticket_id: 1003, source_module: "STOX.AI", ticket_type: "SHIPMENT_DELAYED", title: "SHP-002 Oregon Delayed +6hrs", description: "MKS RF Power Supply delayed due to weather. Santa Clarita notified.", priority: "High", status: "In Progress", user_name: "Logistics.AI", created_at: new Date(Date.now() - 3*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      { ticket_id: 1004, source_module: "STOX.AI", ticket_type: "REALLOCATION_EXECUTED", title: "Transfer: Taiwan → Douglas (3 units)", description: "Green Tea 24PKs transfer to prevent Samsung stockout. Savings: $850K.", priority: "High", status: "Completed", user_name: "System", created_at: new Date(Date.now() - 5*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      { ticket_id: 1005, source_module: "STOX.AI", ticket_type: "SAFETY_STOCK_ADJUSTED", title: "Keasbey Safety Stock -15 units", description: "Released $675K working capital. MRP parameters updated.", priority: "Medium", status: "Completed", user_name: "WorkingCap.AI", created_at: new Date(Date.now() - 8*60*60*1000).toISOString(), updated_at: new Date().toISOString() },
+      { ticket_id: 1006, source_module: "Enterprise Pulse", ticket_type: "PULSE_ALERT", title: "2 Plants Below 70% Threshold", description: "Douglas (65%) and Austria (58%) require immediate attention.", priority: "Critical", status: "Open", user_name: "Stox.AI", created_at: new Date(Date.now() - 30*60*1000).toISOString(), updated_at: new Date().toISOString() },
     ];
     return demoData;
   };
@@ -401,7 +401,7 @@ const TicketingSystem = ({ onBack }) => {
   return (
     <Box sx={{ p: 3, height: '100%', overflowY: 'auto' }}>
       {/* Header */}
-      <Box sx={{ mb: 3 }}>
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <TicketIcon sx={{ fontSize: 40, color: '#10b981' }} />
           <Box sx={{ flex: 1 }}>
@@ -416,7 +416,7 @@ const TicketingSystem = ({ onBack }) => {
             Back
           </Button>
         </Box>
-      </Box>
+      </Paper>
 
       {/* Metrics Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>

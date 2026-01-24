@@ -15,6 +15,7 @@ import {
   alpha,
   useTheme,
   Zoom,
+  Paper,
 } from '@mui/material';
 import {
   ArrowForward as ArrowForwardIcon,
@@ -116,7 +117,7 @@ const RouteAILanding = ({ onTileClick, onBack }) => {
   return (
     <Box sx={{ p: 3, height: '100%', overflowY: 'auto' }}>
       {/* Header */}
-      <Box sx={{ mb: 4 }}>
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
             <Link
@@ -159,7 +160,7 @@ const RouteAILanding = ({ onTileClick, onBack }) => {
             </Typography>
           </Box>
         </Box>
-      </Box>
+      </Paper>
 
       {/* Module Tiles */}
       <Grid container spacing={1.5}>

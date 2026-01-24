@@ -111,20 +111,9 @@ const PlatformSettings = () => {
             elevation={0}
             sx={{
               p: 3,
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: alpha(colors.primary, 0.1),
-              position: 'relative',
-              overflow: 'hidden',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 3,
-                background: `linear-gradient(90deg, ${colors.primary} 0%, ${alpha(colors.primary, 0.5)} 100%)`,
-              },
+              borderRadius: 3,
+              bgcolor: 'white',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
             }}
           >
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
@@ -218,20 +207,9 @@ const PlatformSettings = () => {
             elevation={0}
             sx={{
               p: 3,
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: alpha(colors.primary, 0.1),
-              position: 'relative',
-              overflow: 'hidden',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 3,
-                background: `linear-gradient(90deg, ${colors.secondary} 0%, ${alpha(colors.secondary, 0.5)} 100%)`,
-              },
+              borderRadius: 3,
+              bgcolor: 'white',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
             }}
           >
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
@@ -318,20 +296,9 @@ const PlatformSettings = () => {
             elevation={0}
             sx={{
               p: 3,
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: alpha(colors.primary, 0.1),
-              position: 'relative',
-              overflow: 'hidden',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 3,
-                background: `linear-gradient(90deg, ${colors.dark} 0%, ${alpha(colors.dark, 0.5)} 100%)`,
-              },
+              borderRadius: 3,
+              bgcolor: 'white',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
             }}
           >
             <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>

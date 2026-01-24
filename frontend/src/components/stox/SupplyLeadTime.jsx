@@ -49,7 +49,7 @@ import { LAM_PLANTS, LAM_VENDORS, LAM_MATERIALS, LAM_MATERIAL_PLANT_DATA, getMat
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, ChartTooltip, Legend, Filler);
 
-// Generate lead time data using Lam Research data
+// Generate lead time data using Arizona Beverages data
 const generateLeadTimeData = () => {
   // Build materials from LAM_MATERIAL_PLANT_DATA with vendor assignments
   const materials = LAM_MATERIAL_PLANT_DATA.slice(0, 12).map((plantData, idx) => {

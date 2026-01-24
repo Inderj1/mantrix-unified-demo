@@ -1,8 +1,8 @@
 /**
- * Working Capital Baseline Mock Data - Lam Research
+ * Working Capital Baseline Mock Data - Arizona Beverages
  * Provides comprehensive mock datasets for WC decomposition analysis
  *
- * Uses actual Lam Research plant and material data for consistency
+ * Uses actual Arizona Beverages plant and material data for consistency
  */
 
 import { LAM_PLANTS, LAM_MATERIALS, LAM_MATERIAL_PLANT_DATA, getMaterialById } from '../../../data/arizonaBeveragesMasterData';
@@ -216,7 +216,7 @@ export const generateSummaryMetrics = (data) => {
 
 /**
  * Weekly trend data for WC over 12 weeks
- * Based on actual Lam Research total inventory value
+ * Based on actual Arizona Beverages total inventory value
  */
 export const generateWCTrendData = () => {
   const weeks = [];

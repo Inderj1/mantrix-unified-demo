@@ -64,22 +64,22 @@ const formatCurrency = (value) => {
   return `$${value}`;
 };
 
-// Generate recommendations data using Lam Research data
+// Generate recommendations data using Arizona Beverages data
 const generateRecommendationsData = () => {
-  // Build recommendations based on actual Lam Research materials and data
+  // Build recommendations based on actual Arizona Beverages materials and data
   const recommendations = [
     { id: 'REC-001', title: `Reduce Safety Stock for ${getMaterialById('SFG0001')?.name || 'Vacuum Pump Module'}`, category: 'Inventory', priority: 'High', changeType: 'Safety Stock', currentValue: 50, recommendedValue: 35, plant: '1000' },
-    { id: 'REC-002', title: `Optimize MRP Type for ${getMaterialById('FG0001')?.name || 'Etch System AKARA'}`, category: 'MRP', priority: 'High', changeType: 'MRP Type', currentValue: 'PD', recommendedValue: 'PD', plant: '1000' },
+    { id: 'REC-002', title: `Optimize MRP Type for ${getMaterialById('FG0001')?.name || 'Green Tea 24PK 20OZ TALLBOY'}`, category: 'MRP', priority: 'High', changeType: 'MRP Type', currentValue: 'PD', recommendedValue: 'PD', plant: '1000' },
     { id: 'REC-003', title: `Reduce Excess Stock at ${getPlantName('3000')}`, category: 'Inventory', priority: 'High', changeType: 'Excess Stock', currentValue: 54000000, recommendedValue: 30000000, plant: '3000' },
     { id: 'REC-004', title: `Consolidate Suppliers for RF Components`, category: 'Supply', priority: 'High', changeType: 'Supplier', currentValue: 0, recommendedValue: 0, plant: 'All' },
     { id: 'REC-005', title: `Implement VMI for ${getMaterialById('RAW0001')?.name || 'Sapphire Windows'}`, category: 'Supply', priority: 'Medium', changeType: 'VMI', currentValue: 0, recommendedValue: 0, plant: '1000' },
     { id: 'REC-006', title: `Adjust Lot Size for ${getMaterialById('SFG0003')?.name || 'Gas Manifold'}`, category: 'MRP', priority: 'Medium', changeType: 'Lot Size', currentValue: 25, recommendedValue: 15, plant: '2000' },
-    { id: 'REC-007', title: `Negotiate Lead Time with ${LAM_VENDORS[2]?.name || 'Edwards Vacuum'}`, category: 'Supply', priority: 'High', changeType: 'Lead Time', currentValue: 65, recommendedValue: 45, plant: 'All' },
+    { id: 'REC-007', title: `Negotiate Lead Time with ${LAM_VENDORS[2]?.name || 'Niagara Bottling'}`, category: 'Supply', priority: 'High', changeType: 'Lead Time', currentValue: 65, recommendedValue: 45, plant: 'All' },
     { id: 'REC-008', title: `Review ABC Classification at ${getPlantName('2000')}`, category: 'Analytics', priority: 'Low', changeType: 'Classification', currentValue: 0, recommendedValue: 0, plant: '2000' },
     { id: 'REC-009', title: `Optimize Service Level for C-Class Items`, category: 'Service', priority: 'Medium', changeType: 'Service Level', currentValue: 99, recommendedValue: 95, plant: 'All' },
     { id: 'REC-010', title: `Liquidate Excess Stock at ${getPlantName('1000')}`, category: 'Inventory', priority: 'High', changeType: 'Excess Stock', currentValue: 42500000, recommendedValue: 15000000, plant: '1000' },
     { id: 'REC-011', title: `Improve Forecast for ${getMaterialById('SFG0002')?.name || 'RF Power Supply'}`, category: 'Analytics', priority: 'Medium', changeType: 'Forecast', currentValue: 0, recommendedValue: 0, plant: '1000' },
-    { id: 'REC-012', title: `Negotiate Payment Terms with ${LAM_VENDORS[0]?.name || 'Applied Materials'}`, category: 'Supply', priority: 'Medium', changeType: 'Payment Terms', currentValue: 30, recommendedValue: 60, plant: 'All' },
+    { id: 'REC-012', title: `Negotiate Payment Terms with ${LAM_VENDORS[0]?.name || 'US Beverage Packers'}`, category: 'Supply', priority: 'Medium', changeType: 'Payment Terms', currentValue: 30, recommendedValue: 60, plant: 'All' },
   ];
 
   const statuses = ['Pending', 'Approved', 'Rejected', 'Implemented'];

@@ -294,17 +294,35 @@ export const getCustomersByType = (type) => customers.filter(c => c.type === typ
 // These maintain backward compatibility with LAM Research data structure
 // ============================================================================
 
-export const LAM_MATERIALS = products.map(p => ({
+export const LAM_MATERIALS = products.map((p, idx) => ({
   id: p.id,
   name: p.name,
   sku: p.sku,
   category: p.category,
+  unitPrice: p.unitPrice,
+  casePrice: p.casePrice,
+  cogs: p.cogs,
+  materialGroup: p.category?.substring(0, 4) || 'MISC',
+  mrpType: ['PD', 'VB', 'V1'][idx % 3],
+  lotSize: [100, 250, 500, 1000][idx % 4],
+  leadTime: [7, 14, 21, 28][idx % 4],
+  safetyStock: Math.floor(500 + Math.random() * 2000),
+  reorderPoint: Math.floor(1000 + Math.random() * 3000),
 }));
 
-export const LAM_PLANTS = plants.map(p => ({
+export const LAM_PLANTS = plants.map((p, idx) => ({
   id: p.id,
   name: p.name,
   region: p.region,
+  country: p.state === 'MX' ? 'Mexico' : p.state === 'ON' ? 'Canada' : 'USA',
+  currency: p.state === 'MX' ? 'MXN' : p.state === 'ON' ? 'CAD' : 'USD',
+  city: p.city,
+  state: p.state,
+  type: p.type,
+  lat: p.lat,
+  lng: p.lng,
+  plantCode: `P${String(idx + 1).padStart(3, '0')}`,
+  sapClient: ['100', '200', '300'][idx % 3],
 }));
 
 export const LAM_MATERIAL_PLANT_DATA = products.slice(0, 12).flatMap((product, pIdx) =>

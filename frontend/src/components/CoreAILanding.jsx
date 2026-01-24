@@ -10,6 +10,7 @@ import {
   Avatar,
   Stack,
   Zoom,
+  Paper,
 } from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon,
@@ -19,10 +20,14 @@ import {
   LocalShipping as FleetIcon,
   Lightbulb as LightbulbIcon,
   AccountTree as ProcessMiningIcon,
-  Timeline as OrderlyIcon,
+  ShoppingCart as ShoppingCartIcon,
+  Receipt as ReceiptIcon,
+  Sensors as SensorsIcon,
 } from '@mui/icons-material';
 
-// All modules use blue color palette for consistency
+// Single consistent blue for all modules
+const MODULE_COLOR = '#0078d4';
+
 const aiModules = [
   {
     id: 'margen',
@@ -30,11 +35,9 @@ const aiModules = [
     subtitle: 'Margin Analytics & Revenue Intelligence',
     description: 'Advanced financial analytics, customer segmentation, and revenue optimization',
     icon: TrendingUpIcon,
-    color: '#0078d4',
-    bgColor: '#deecf9',
+    color: MODULE_COLOR,
     stats: { label: 'Models', value: '12' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #0078d4 0%, #106ebe 100%)',
   },
   {
     id: 'stox',
@@ -42,11 +45,9 @@ const aiModules = [
     subtitle: 'Smart Inventory Optimization',
     description: 'Inventory management, demand forecasting, and supply chain optimization',
     icon: InventoryIcon,
-    color: '#106ebe',
-    bgColor: '#deecf9',
+    color: MODULE_COLOR,
     stats: { label: 'SKUs', value: '2.5K' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #106ebe 0%, #2b88d8 100%)',
   },
   {
     id: 'route',
@@ -54,23 +55,29 @@ const aiModules = [
     subtitle: 'Fleet & Route Optimization',
     description: 'AI-powered fleet management, route optimization, and logistics intelligence',
     icon: FleetIcon,
-    color: '#106ebe',
-    bgColor: '#deecf9',
+    color: MODULE_COLOR,
     stats: { label: 'Vehicles', value: '45' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
   },
   {
     id: 'ordly',
     title: 'ORDLY.AI',
-    subtitle: 'Order Management Intelligence',
-    description: 'AI-powered sales order management from customer intent to SAP commitment',
-    icon: OrderlyIcon,
-    color: '#2b88d8',
-    bgColor: '#deecf9',
-    stats: { label: 'Orders', value: '156' },
+    subtitle: 'Order Intelligence Platform',
+    description: 'AI-powered order-to-cash automation with intent extraction, SKU optimization, and SAP integration',
+    icon: ShoppingCartIcon,
+    color: MODULE_COLOR,
+    stats: { label: 'Orders', value: '2.4K' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #2b88d8 0%, #106ebe 100%)',
+  },
+  {
+    id: 'o2c',
+    title: 'O2C.AI',
+    subtitle: 'Order-to-Cash Analysis',
+    description: 'End-to-end O2C process intelligence with document flow analysis, customer insights, and transaction drilldown',
+    icon: ReceiptIcon,
+    color: MODULE_COLOR,
+    stats: { label: 'Revenue', value: '$147M' },
+    status: 'active',
   },
   {
     id: 'process-mining',
@@ -78,11 +85,19 @@ const aiModules = [
     subtitle: 'Process Mining & Analytics',
     description: 'Discover, analyze, and optimize business processes with AI-powered insights',
     icon: ProcessMiningIcon,
-    color: '#005a9e',
-    bgColor: '#deecf9',
+    color: MODULE_COLOR,
     stats: { label: 'Processes', value: '3' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #005a9e 0%, #0078d4 100%)',
+  },
+  {
+    id: 'traxx',
+    title: 'TRAXX.AI',
+    subtitle: 'IoT Kit & Asset Tracking',
+    description: 'Real-time IoT tracking for surgical kits, loaners, and consignment assets',
+    icon: SensorsIcon,
+    color: MODULE_COLOR,
+    stats: { label: 'Trackers', value: '248' },
+    status: 'active',
   },
 ];
 
@@ -102,29 +117,29 @@ const CoreAILanding = ({ onTileClick }) => {
       background: 'linear-gradient(180deg, rgba(10, 110, 209, 0.05) 0%, rgba(255, 255, 255, 1) 50%)',
     }}>
       {/* Header */}
-      <Box sx={{ mb: 3 }}>
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
         {/* System Identity Badge */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Box sx={{
             width: 4,
             height: 60,
-            background: 'linear-gradient(180deg, #0078d4 0%, #005a9e 100%)',
+            bgcolor: MODULE_COLOR,
             borderRadius: 2
           }} />
           <Box>
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
-              <Avatar sx={{ width: 32, height: 32, bgcolor: '#0078d4' }}>
+              <Avatar sx={{ width: 32, height: 32, bgcolor: MODULE_COLOR }}>
                 <SpeedIcon sx={{ fontSize: 18 }} />
               </Avatar>
-              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: '#0078d4' }}>
+              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: MODULE_COLOR }}>
                 CORE.AI
               </Typography>
               <Chip
-                label="4 Modules"
+                label="7 Modules"
                 size="small"
                 sx={{
-                  bgcolor: alpha('#0078d4', 0.1),
-                  color: '#0078d4',
+                  bgcolor: alpha(MODULE_COLOR, 0.1),
+                  color: MODULE_COLOR,
                   fontWeight: 600,
                   fontSize: '0.7rem'
                 }}
@@ -135,9 +150,9 @@ const CoreAILanding = ({ onTileClick }) => {
             </Typography>
           </Box>
         </Box>
-      </Box>
+      </Paper>
 
-      {/* Module Tiles - Matching Stox.AI/Margen.AI styling */}
+      {/* Module Tiles */}
       <Grid container spacing={1.5}>
         {aiModules
           .filter((module) => module.id !== 'route')
@@ -149,28 +164,18 @@ const CoreAILanding = ({ onTileClick }) => {
                   height: 200,
                   cursor: module.status === 'active' ? 'pointer' : 'default',
                   opacity: module.status === 'coming-soon' ? 0.7 : 1,
-                  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                  border: '1px solid',
-                  borderColor: alpha(module.color, 0.15),
-                  borderRadius: 2,
+                  transition: 'all 0.3s ease',
+                  border: 'none',
+                  borderRadius: 3,
                   overflow: 'hidden',
                   position: 'relative',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: 3,
-                    background: module.gradient,
-                    opacity: 0.8,
-                  },
+                  bgcolor: 'white',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
                   '&:hover': module.status === 'active' ? {
-                    transform: 'translateY(-4px)',
-                    boxShadow: `0 12px 24px ${alpha(module.color, 0.15)}`,
-                    borderColor: module.color,
+                    transform: 'translateY(-6px)',
+                    boxShadow: `0 20px 40px ${alpha(module.color, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,
                     '& .module-icon': {
-                      transform: 'scale(1.15)',
+                      transform: 'scale(1.1)',
                       bgcolor: module.color,
                       color: 'white',
                     },

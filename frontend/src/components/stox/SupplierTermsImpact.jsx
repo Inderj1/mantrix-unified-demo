@@ -34,9 +34,9 @@ const formatCurrency = (value) => {
   return `$${value}`;
 };
 
-// Generate supplier terms data using Lam Research vendors
+// Generate supplier terms data using Arizona Beverages vendors
 const generateSupplierTermsData = () => {
-  // Map Lam Research vendors to supplier terms data
+  // Map Arizona Beverages vendors to supplier terms data
   const suppliers = LAM_VENDORS.slice(0, 10).map((vendor, idx) => {
     const termsOptions = ['Net 30', 'Net 45', 'Net 60'];
     const discountOptions = ['2/10', '1.5/15', '2.5/10', '1/10', null];

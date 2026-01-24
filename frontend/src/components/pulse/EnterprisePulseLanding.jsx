@@ -9,6 +9,7 @@ import {
   Avatar,
   alpha,
   Zoom,
+  Paper,
 } from '@mui/material';
 import {
   NotificationsActive as AlertsIcon,
@@ -17,14 +18,17 @@ import {
   ArrowForward as ArrowForwardIcon,
 } from '@mui/icons-material';
 
+// Single consistent blue for all modules
+const MODULE_COLOR = '#0078d4';
+
 // Blue color palette - theme aware
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
-  secondary: darkMode ? '#2d8ce6' : '#0854a0',
+  primary: MODULE_COLOR,
+  secondary: MODULE_COLOR,
   warning: darkMode ? '#f59e0b' : '#f59e0b',
   error: darkMode ? '#ff6b6b' : '#ef4444',
   text: darkMode ? '#e6edf3' : '#1e293b',
-  grey: darkMode ? '#8b949e' : '#3b82f6',
+  grey: darkMode ? '#8b949e' : '#64748b',
 });
 
 const EnterprisePulseLanding = ({ onTileClick, alertCount = 0, agentCount = 0, darkMode = false }) => {
@@ -55,30 +59,32 @@ const EnterprisePulseLanding = ({ onTileClick, alertCount = 0, agentCount = 0, d
   return (
     <Box>
       {/* Header */}
-      <Box display="flex" alignItems="center" gap={2} mb={3}>
-        <Box
-          sx={{
-            width: 48,
-            height: 48,
-            borderRadius: 2,
-            background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: `0 4px 14px ${alpha(colors.primary, 0.3)}`,
-          }}
-        >
-          <RadarIcon sx={{ fontSize: 24, color: '#fff' }} />
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+        <Box display="flex" alignItems="center" gap={2}>
+          <Box
+            sx={{
+              width: 48,
+              height: 48,
+              borderRadius: 2,
+              background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: `0 4px 14px ${alpha(colors.primary, 0.3)}`,
+            }}
+          >
+            <RadarIcon sx={{ fontSize: 24, color: '#fff' }} />
+          </Box>
+          <Box>
+            <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
+              Enterprise Pulse
+            </Typography>
+            <Typography variant="body2" sx={{ color: colors.grey }}>
+              Proactive monitoring and alerting for business operations
+            </Typography>
+          </Box>
         </Box>
-        <Box>
-          <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
-            Enterprise Pulse
-          </Typography>
-          <Typography variant="body2" sx={{ color: colors.grey }}>
-            Proactive monitoring and alerting for business operations
-          </Typography>
-        </Box>
-      </Box>
+      </Paper>
 
       {/* Tiles Grid - matching REVEQ style */}
       <Grid container spacing={1.5}>
@@ -92,28 +98,18 @@ const EnterprisePulseLanding = ({ onTileClick, alertCount = 0, agentCount = 0, d
                   sx={{
                     height: 200,
                     cursor: 'pointer',
-                    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                    border: '1px solid',
-                    borderColor: alpha(tile.color, 0.15),
-                    borderRadius: 2,
+                    transition: 'all 0.3s ease',
+                    border: 'none',
+                    borderRadius: 3,
                     overflow: 'hidden',
                     position: 'relative',
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      height: 3,
-                      background: tile.gradient,
-                      opacity: 0.8,
-                    },
+                    bgcolor: 'white',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
                     '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: `0 12px 24px ${alpha(tile.color, 0.15)}`,
-                      borderColor: tile.color,
+                      transform: 'translateY(-6px)',
+                      boxShadow: `0 20px 40px ${alpha(tile.color, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,
                       '& .module-icon': {
-                        transform: 'scale(1.15)',
+                        transform: 'scale(1.1)',
                         bgcolor: tile.color,
                         color: 'white',
                       },

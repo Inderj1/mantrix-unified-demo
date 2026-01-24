@@ -176,24 +176,13 @@ const DataSourcesConnections = () => {
         elevation={0}
         sx={{
           height: '100%',
-          border: '1px solid',
-          borderColor: alpha(colors.primary, 0.1),
-          borderRadius: 2,
-          position: 'relative',
-          overflow: 'hidden',
-          transition: 'all 0.2s ease',
+          borderRadius: 3,
+          bgcolor: 'white',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+          transition: 'all 0.3s ease',
           '&:hover': {
-            borderColor: colors.primary,
-            boxShadow: `0 4px 12px ${alpha(colors.primary, 0.15)}`,
-          },
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 3,
-            background: `linear-gradient(90deg, ${getStatusColor(db.status)} 0%, ${alpha(getStatusColor(db.status), 0.5)} 100%)`,
+            transform: 'translateY(-4px)',
+            boxShadow: '0 8px 20px rgba(0,0,0,0.1)',
           },
         }}
       >
@@ -308,24 +297,13 @@ const DataSourcesConnections = () => {
         elevation={0}
         sx={{
           height: '100%',
-          border: '1px solid',
-          borderColor: alpha(colors.primary, 0.1),
-          borderRadius: 2,
-          position: 'relative',
-          overflow: 'hidden',
-          transition: 'all 0.2s ease',
+          borderRadius: 3,
+          bgcolor: 'white',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+          transition: 'all 0.3s ease',
           '&:hover': {
-            borderColor: colors.primary,
-            boxShadow: `0 4px 12px ${alpha(colors.primary, 0.15)}`,
-          },
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 3,
-            background: `linear-gradient(90deg, ${getStatusColor(integration.status)} 0%, ${alpha(getStatusColor(integration.status), 0.5)} 100%)`,
+            transform: 'translateY(-4px)',
+            boxShadow: '0 8px 20px rgba(0,0,0,0.1)',
           },
         }}
       >
@@ -473,20 +451,9 @@ const DataSourcesConnections = () => {
             elevation={0}
             sx={{
               p: 2,
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: alpha(colors.primary, 0.1),
-              position: 'relative',
-              overflow: 'hidden',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 3,
-                background: `linear-gradient(90deg, ${colors.primary} 0%, ${alpha(colors.primary, 0.5)} 100%)`,
-              },
+              borderRadius: 3,
+              bgcolor: 'white',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -520,20 +487,9 @@ const DataSourcesConnections = () => {
             elevation={0}
             sx={{
               p: 2,
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: alpha(colors.primary, 0.1),
-              position: 'relative',
-              overflow: 'hidden',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 3,
-                background: `linear-gradient(90deg, ${colors.secondary} 0%, ${alpha(colors.secondary, 0.5)} 100%)`,
-              },
+              borderRadius: 3,
+              bgcolor: 'white',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -567,20 +523,9 @@ const DataSourcesConnections = () => {
             elevation={0}
             sx={{
               p: 2,
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: alpha(colors.primary, 0.1),
-              position: 'relative',
-              overflow: 'hidden',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 3,
-                background: `linear-gradient(90deg, ${colors.success} 0%, ${alpha(colors.success, 0.5)} 100%)`,
-              },
+              borderRadius: 3,
+              bgcolor: 'white',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -617,9 +562,9 @@ const DataSourcesConnections = () => {
         elevation={0}
         sx={{
           mb: 3,
-          borderRadius: 2,
-          border: '1px solid',
-          borderColor: alpha(colors.primary, 0.1),
+          borderRadius: 3,
+          bgcolor: 'white',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
         }}
       >
         <Tabs

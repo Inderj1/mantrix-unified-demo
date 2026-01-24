@@ -30,12 +30,12 @@ const formatCurrency = (value) => {
   return `$${value}`;
 };
 
-// Generate cash release timeline data using Lam Research context
+// Generate cash release timeline data using Arizona Beverages context
 const generateTimelineData = () => {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
 
-  // Initiative types with Lam Research context
+  // Initiative types with Arizona Beverages context
   const initiatives = [
     {
       id: 1,
@@ -78,7 +78,7 @@ const generateTimelineData = () => {
     },
     {
       id: 4,
-      name: `Lead Time Reduction - ${LAM_VENDORS[2]?.name || 'Edwards Vacuum'}`,
+      name: `Lead Time Reduction - ${LAM_VENDORS[2]?.name || 'Niagara Bottling'}`,
       category: 'Pipeline Stock',
       totalRelease: 3500000,
       confidence: 68,
@@ -91,7 +91,7 @@ const generateTimelineData = () => {
     },
     {
       id: 5,
-      name: `Consignment Program - ${LAM_VENDORS[0]?.name || 'Applied Materials'}`,
+      name: `Consignment Program - ${LAM_VENDORS[0]?.name || 'US Beverage Packers'}`,
       category: 'Terms',
       totalRelease: 1800000,
       confidence: 82,

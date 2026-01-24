@@ -3,10 +3,10 @@
  * Handles communication with the Excel AI Processor backend
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? '';
 
 /**
- * Start Financial Analysis CGS Generation
+ * Start Financial Analysis CGS Generation (legacy)
  */
 export const startFinancialAnalysis = async () => {
   const response = await fetch(`${API_BASE_URL}/api/v1/excel/process/financial-analysis`, {
@@ -18,6 +18,30 @@ export const startFinancialAnalysis = async () => {
 
   if (!response.ok) {
     throw new Error('Failed to start processing');
+  }
+
+  return await response.json();
+};
+
+/**
+ * Process with template - generic template-based processing
+ */
+export const processWithTemplate = async (templateKey, templateName, uploadedFiles = []) => {
+  const response = await fetch(`${API_BASE_URL}/api/v1/excel/process/template`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      template_key: templateKey,
+      template_name: templateName,
+      uploaded_files: uploadedFiles,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: 'Failed to process' }));
+    throw new Error(error.detail || 'Failed to start processing');
   }
 
   return await response.json();
@@ -140,6 +164,7 @@ export const listTemplates = async () => {
 
 export default {
   startFinancialAnalysis,
+  processWithTemplate,
   getProcessingStatus,
   pollProcessingStatus,
   downloadFile,

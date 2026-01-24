@@ -55,7 +55,7 @@ const formatCurrency = (value) => {
 
 const formatPercent = (value) => `${value.toFixed(1)}%`;
 
-// Generate cost policy data using Lam Research materials
+// Generate cost policy data using Arizona Beverages materials
 const generateCostData = () => {
   // Use LAM_MATERIALS to build cost policy data
   const materials = LAM_MATERIALS.slice(0, 12).map(mat => ({
@@ -70,7 +70,7 @@ const generateCostData = () => {
   const policyStatus = ['Active', 'Pending Review', 'Needs Update'];
 
   return materials.map((mat, idx) => {
-    // Use base price from Lam data, with fallback
+    // Use base price from Arizona data, with fallback
     const standardCost = mat.basePrice || Math.floor(100 + Math.random() * 900);
     const movingAvgCost = standardCost * (0.9 + Math.random() * 0.2);
     const lastPurchaseCost = standardCost * (0.85 + Math.random() * 0.3);

@@ -82,13 +82,13 @@ const KitAlertsView = ({ onBack, darkMode = false }) => {
   const [categoryFilter, setCategoryFilter] = useState('all');
 
   useEffect(() => {
-    setKitAlerts(generateKitAlerts(25));
+    setKitAlerts(generateKitAlerts(8));
   }, []);
 
   // Alert category mapping for filtering
   const alertCategories = {
-    ml_model_health: ['spec_low_confidence', 'material_match_gap', 'model_drift_detected'],
-    pricing_intelligence: ['price_below_optimal', 'margin_erosion', 'win_rate_anomaly', 'price_elasticity_shift'],
+    stox_inventory: ['stockout_risk', 'reorder_point_reached', 'excess_inventory', 'dc_rebalance_needed', 'seasonal_demand_shift'],
+    pricing_intelligence: ['price_below_optimal', 'margin_erosion'],
     customer_intelligence: ['order_gap_detected', 'churn_risk_high', 'reorder_opportunity'],
     operations_intelligence: ['lead_time_risk', 'upsell_opportunity'],
   };
@@ -314,7 +314,7 @@ const KitAlertsView = ({ onBack, darkMode = false }) => {
             AI-driven alerts from intelligent monitoring agents
           </Typography>
         </Box>
-        <IconButton onClick={() => setKitAlerts(generateKitAlerts(25))}>
+        <IconButton onClick={() => setKitAlerts(generateKitAlerts(8))}>
           <RefreshIcon />
         </IconButton>
       </Box>
@@ -405,7 +405,7 @@ const KitAlertsView = ({ onBack, darkMode = false }) => {
                 <InputLabel>Category</InputLabel>
                 <Select value={categoryFilter} label="Category" onChange={(e) => setCategoryFilter(e.target.value)}>
                   <MenuItem value="all">All Categories</MenuItem>
-                  <MenuItem value="ml_model_health">ML Model Health</MenuItem>
+                  <MenuItem value="stox_inventory">STOX.AI Inventory</MenuItem>
                   <MenuItem value="pricing_intelligence">Pricing Intelligence</MenuItem>
                   <MenuItem value="customer_intelligence">Customer Intelligence</MenuItem>
                   <MenuItem value="operations_intelligence">Operations</MenuItem>
@@ -417,15 +417,15 @@ const KitAlertsView = ({ onBack, darkMode = false }) => {
                 <InputLabel>Type</InputLabel>
                 <Select value={typeFilter} label="Type" onChange={(e) => setTypeFilter(e.target.value)}>
                   <MenuItem value="all">All Types</MenuItem>
-                  <MenuItem disabled sx={{ opacity: 0.7, fontWeight: 600, fontSize: '0.7rem', bgcolor: 'action.hover' }}>— ML Model Health —</MenuItem>
-                  <MenuItem value="spec_low_confidence">Low Extraction Confidence</MenuItem>
-                  <MenuItem value="material_match_gap">Material Match Gap</MenuItem>
-                  <MenuItem value="model_drift_detected">Model Drift</MenuItem>
+                  <MenuItem disabled sx={{ opacity: 0.7, fontWeight: 600, fontSize: '0.7rem', bgcolor: 'action.hover' }}>— STOX.AI Inventory —</MenuItem>
+                  <MenuItem value="stockout_risk">Stockout Risk</MenuItem>
+                  <MenuItem value="reorder_point_reached">Reorder Point Reached</MenuItem>
+                  <MenuItem value="excess_inventory">Excess Inventory</MenuItem>
+                  <MenuItem value="dc_rebalance_needed">DC Rebalance Needed</MenuItem>
+                  <MenuItem value="seasonal_demand_shift">Seasonal Demand Shift</MenuItem>
                   <MenuItem disabled sx={{ opacity: 0.7, fontWeight: 600, fontSize: '0.7rem', bgcolor: 'action.hover' }}>— Pricing Intelligence —</MenuItem>
                   <MenuItem value="price_below_optimal">Price Below Optimal</MenuItem>
                   <MenuItem value="margin_erosion">Margin Erosion</MenuItem>
-                  <MenuItem value="win_rate_anomaly">Win Rate Anomaly</MenuItem>
-                  <MenuItem value="price_elasticity_shift">Price Elasticity Shift</MenuItem>
                   <MenuItem disabled sx={{ opacity: 0.7, fontWeight: 600, fontSize: '0.7rem', bgcolor: 'action.hover' }}>— Customer Intelligence —</MenuItem>
                   <MenuItem value="order_gap_detected">Order Gap Detected</MenuItem>
                   <MenuItem value="churn_risk_high">High Churn Risk</MenuItem>

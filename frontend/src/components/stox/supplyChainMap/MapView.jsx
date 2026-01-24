@@ -245,6 +245,13 @@ const getOffsetPosition = (lat, lng, type, index = 0) => {
   return [lat + latOffset, lng + lngOffset];
 };
 
+// Helper to validate coordinates
+const isValidCoord = (lat, lng) => {
+  return typeof lat === 'number' && typeof lng === 'number' &&
+         !isNaN(lat) && !isNaN(lng) &&
+         lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+};
+
 export default function MapView({
   trucks = [],
   stores = [],
@@ -262,6 +269,11 @@ export default function MapView({
 }) {
   const [isMounted, setIsMounted] = useState(false);
   const tileUrl = MAP_STYLES[mapStyle] || MAP_STYLES['cartodb-light'];
+
+  // Filter out items with invalid coordinates
+  const validStores = stores.filter(s => isValidCoord(s.latitude, s.longitude));
+  const validTrucks = trucks.filter(t => isValidCoord(t.latitude, t.longitude));
+  const validAlerts = alerts.filter(a => isValidCoord(a.latitude, a.longitude));
 
   useEffect(() => {
     setIsMounted(true);
@@ -345,7 +357,7 @@ export default function MapView({
           showCoverageOnHover={false}
           zoomToBoundsOnClick={true}
         >
-          {stores.map((store) => (
+          {validStores.map((store) => (
             <Marker
               key={store.store_id}
               position={getOffsetPosition(store.latitude, store.longitude, 'store')}
@@ -421,7 +433,7 @@ export default function MapView({
       )}
 
       {/* Route polylines - clean curved arcs for global routes */}
-      {showRoutes && trucks.map((truck) => {
+      {showRoutes && validTrucks.map((truck) => {
         const route = getTruckRoute(truck.truck_id);
         if (route.length < 2) return null;
 
@@ -490,7 +502,7 @@ export default function MapView({
           showCoverageOnHover={false}
           zoomToBoundsOnClick={true}
         >
-          {trucks.map((truck) => (
+          {validTrucks.map((truck) => (
             <Marker key={truck.truck_id} position={getOffsetPosition(truck.latitude, truck.longitude, 'truck')} icon={createTruckIcon(truck.status, truck.type)}>
               <Popup minWidth={220} maxWidth={220}>
                 <div style={{ padding: '8px' }}>
@@ -558,7 +570,7 @@ export default function MapView({
           showCoverageOnHover={false}
           zoomToBoundsOnClick={true}
         >
-          {alerts.map((alert) => {
+          {validAlerts.map((alert) => {
             const severity = alert.severity || (alert.priority >= 9 ? 'critical' : alert.priority >= 6 ? 'high' : alert.priority >= 3 ? 'medium' : 'low');
 
             return (
@@ -598,7 +610,7 @@ export default function MapView({
       )}
 
       {/* Alert alternate routes (rendered outside cluster) */}
-      {showAlerts && alerts.map((alert) => (
+      {showAlerts && validAlerts.map((alert) => (
         alert.alternate_route && alert.alternate_route.length > 0 && (
           <Polyline key={`alt-route-${alert.id}`} positions={alert.alternate_route} pathOptions={{ color: '#ef4444', weight: 4, opacity: 0.7, dashArray: '10, 10' }} />
         )

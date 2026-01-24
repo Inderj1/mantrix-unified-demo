@@ -255,6 +255,7 @@ export default function LeftSidebar({
                       </Typography>
                       <Stack direction="row" spacing={0.5} sx={{ mt: 0.75 }}>
                         <Chip
+                          key="confidence"
                           label={`${action.confidence}%`}
                           size="small"
                           sx={{
@@ -269,6 +270,7 @@ export default function LeftSidebar({
                         />
                         {action.cost_saved && (
                           <Chip
+                            key="cost"
                             label={`$${action.cost_saved.toLocaleString()}`}
                             size="small"
                             sx={{

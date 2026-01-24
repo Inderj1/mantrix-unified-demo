@@ -296,40 +296,42 @@ const CommandTowerView = ({ onBack, onCreateTicket, darkMode = false }) => {
   return (
     <Box>
       {/* Header */}
-      <Box display="flex" alignItems="center" gap={2} mb={3}>
-        <IconButton onClick={onBack} sx={{ bgcolor: alpha(colors.primary, 0.1) }}>
-          <ArrowBackIcon />
-        </IconButton>
-        <Box
-          sx={{
-            width: 48,
-            height: 48,
-            borderRadius: 2,
-            bgcolor: alpha(colors.primary, 0.1),
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <FlagIcon sx={{ fontSize: 24, color: colors.primary }} />
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+        <Box display="flex" alignItems="center" gap={2}>
+          <IconButton onClick={onBack} sx={{ bgcolor: alpha(colors.primary, 0.1) }}>
+            <ArrowBackIcon />
+          </IconButton>
+          <Box
+            sx={{
+              width: 48,
+              height: 48,
+              borderRadius: 2,
+              bgcolor: alpha(colors.primary, 0.1),
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <FlagIcon sx={{ fontSize: 24, color: colors.primary }} />
+          </Box>
+          <Box flex={1}>
+            <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
+              Command Tower
+            </Typography>
+            <Typography variant="body2" sx={{ color: colors.grey }}>
+              Track all actions across agents and alerts
+            </Typography>
+          </Box>
+          <IconButton onClick={() => setTickets(generateSampleTickets(25))}>
+            <RefreshIcon />
+          </IconButton>
         </Box>
-        <Box flex={1}>
-          <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
-            Command Tower
-          </Typography>
-          <Typography variant="body2" sx={{ color: colors.grey }}>
-            Track all actions across agents and alerts
-          </Typography>
-        </Box>
-        <IconButton onClick={() => setTickets(generateSampleTickets(25))}>
-          <RefreshIcon />
-        </IconButton>
-      </Box>
+      </Paper>
 
       {/* KPI Cards */}
       <Grid container spacing={2} mb={3}>
         <Grid item xs={6} sm={2.4}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha(colors.error, 0.2), bgcolor: alpha(colors.error, 0.03) }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 3, bgcolor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
                 <Typography variant="caption" color="text.secondary">Open</Typography>
@@ -340,7 +342,7 @@ const CommandTowerView = ({ onBack, onCreateTicket, darkMode = false }) => {
           </Paper>
         </Grid>
         <Grid item xs={6} sm={2.4}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha(colors.info, 0.2), bgcolor: alpha(colors.info, 0.03) }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 3, bgcolor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
                 <Typography variant="caption" color="text.secondary">In Progress</Typography>
@@ -351,7 +353,7 @@ const CommandTowerView = ({ onBack, onCreateTicket, darkMode = false }) => {
           </Paper>
         </Grid>
         <Grid item xs={6} sm={2.4}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha(colors.success, 0.2), bgcolor: alpha(colors.success, 0.03) }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 3, bgcolor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
                 <Typography variant="caption" color="text.secondary">Completed Today</Typography>
@@ -362,7 +364,7 @@ const CommandTowerView = ({ onBack, onCreateTicket, darkMode = false }) => {
           </Paper>
         </Grid>
         <Grid item xs={6} sm={2.4}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha(colors.warning, 0.2), bgcolor: alpha(colors.warning, 0.03) }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 3, bgcolor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
                 <Typography variant="caption" color="text.secondary">From AI Modules</Typography>
@@ -375,7 +377,7 @@ const CommandTowerView = ({ onBack, onCreateTicket, darkMode = false }) => {
           </Paper>
         </Grid>
         <Grid item xs={6} sm={2.4}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha(colors.success, 0.2), bgcolor: alpha(colors.success, 0.03) }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 3, bgcolor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
                 <Typography variant="caption" color="text.secondary">Revenue Impact</Typography>
@@ -388,7 +390,7 @@ const CommandTowerView = ({ onBack, onCreateTicket, darkMode = false }) => {
       </Grid>
 
       {/* Filters and DataGrid */}
-      <Card variant="outlined">
+      <Card sx={{ border: 'none', borderRadius: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
         <CardContent>
           {/* Search and Filters */}
           <Grid container spacing={2} mb={2}>

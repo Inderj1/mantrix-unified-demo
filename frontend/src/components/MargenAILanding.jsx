@@ -13,6 +13,7 @@ import {
   Link,
   alpha,
   Zoom,
+  Paper,
 } from '@mui/material';
 import {
   ArrowForward as ArrowForwardIcon,
@@ -27,6 +28,9 @@ import {
   QuestionAnswer as ChatIcon,
 } from '@mui/icons-material';
 
+// Single consistent blue for all modules
+const MODULE_COLOR = '#0078d4';
+
 const margenModules = [
   {
     id: 'revenue-growth',
@@ -34,11 +38,9 @@ const margenModules = [
     subtitle: 'Tile 1',
     description: 'Product SKU profitability, customer segments, channel performance with gross margin and contribution analysis',
     icon: TrendingUpIcon,
-    color: '#005a9e',
-    bgColor: '#deecf9',
+    color: MODULE_COLOR,
     stats: { label: 'Products', value: '8' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #005a9e 0%, #0078d4 100%)',
   },
   {
     id: 'cost-cogs',
@@ -46,11 +48,9 @@ const margenModules = [
     subtitle: 'Tile 2',
     description: 'Distributor AR/AP analysis, DSO/DPO/DIO metrics, cash conversion cycle, and working capital optimization',
     icon: AccountBalanceIcon,
-    color: '#0078d4',
-    bgColor: '#deecf9',
+    color: MODULE_COLOR,
     stats: { label: 'Distributors', value: '12' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #0078d4 0%, #106ebe 100%)',
   },
   {
     id: 'margin-profitability',
@@ -58,11 +58,9 @@ const margenModules = [
     subtitle: 'Tile 3',
     description: 'Brand market share, regional performance, competitor analysis, and growth trajectory insights',
     icon: MoneyIcon,
-    color: '#106ebe',
-    bgColor: '#deecf9',
+    color: MODULE_COLOR,
     stats: { label: 'Brands', value: '8' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
   },
   {
     id: 'pl-gl-explorer',
@@ -70,11 +68,9 @@ const margenModules = [
     subtitle: 'Tile 4',
     description: 'COPA margin alerts, GL account summary, financial KPIs, and executive-level profitability overview',
     icon: AssessmentIcon,
-    color: '#106ebe',
-    bgColor: '#deecf9',
+    color: MODULE_COLOR,
     stats: { label: 'Alerts', value: '6' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
   },
   {
     id: 'drivers-whatif',
@@ -82,11 +78,9 @@ const margenModules = [
     subtitle: 'Tile 5',
     description: 'Initiative tracking, owner accountability, impact realization, milestones, and risk mitigation plans',
     icon: AnalyticsIcon,
-    color: '#2b88d8',
-    bgColor: '#e0f2fe',
+    color: MODULE_COLOR,
     stats: { label: 'Initiatives', value: '8' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #2b88d8 0%, #106ebe 100%)',
   },
   {
     id: 'ask-margen',
@@ -94,11 +88,9 @@ const margenModules = [
     subtitle: 'AI Chat Assistant',
     description: 'Conversational interface for margin analytics - ask questions about profitability, P&L, COGS in natural language',
     icon: ChatIcon,
-    color: '#1e3a5f',
-    bgColor: '#e2e8f0',
+    color: MODULE_COLOR,
     stats: { label: 'AI Assistant', value: 'Active' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%)',
   },
 ];
 
@@ -119,7 +111,7 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
       background: 'linear-gradient(180deg, rgba(10, 110, 209, 0.05) 0%, rgba(255, 255, 255, 1) 50%)',
     }}>
       {/* Header with Breadcrumbs */}
-      <Box sx={{ mb: 3 }}>
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
             <Link
@@ -151,27 +143,27 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
         </Stack>
 
         {/* System Identity Badge */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Box sx={{
             width: 4,
             height: 60,
-            background: 'linear-gradient(180deg, #0078d4 0%, #106ebe 100%)',
+            bgcolor: MODULE_COLOR,
             borderRadius: 2
           }} />
           <Box>
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
-              <Avatar sx={{ width: 32, height: 32, bgcolor: '#0078d4' }}>
+              <Avatar sx={{ width: 32, height: 32, bgcolor: MODULE_COLOR }}>
                 <AssessmentIcon sx={{ fontSize: 18 }} />
               </Avatar>
-              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: '#0078d4' }}>
+              <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: MODULE_COLOR }}>
                 MARGEN.AI
               </Typography>
               <Chip
                 label="6 Modules"
                 size="small"
                 sx={{
-                  bgcolor: alpha('#0078d4', 0.1),
-                  color: '#0078d4',
+                  bgcolor: alpha(MODULE_COLOR, 0.1),
+                  color: MODULE_COLOR,
                   fontWeight: 600,
                   fontSize: '0.7rem'
                 }}
@@ -182,7 +174,7 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
             </Typography>
           </Box>
         </Box>
-      </Box>
+      </Paper>
 
       {/* Module Tiles - Exact Stox.AI styling */}
       <Grid container spacing={1.5}>
@@ -194,28 +186,18 @@ const MargenAILanding = ({ onTileClick, onBack }) => {
                   height: 200,
                   cursor: module.status === 'active' ? 'pointer' : 'default',
                   opacity: module.status === 'coming-soon' ? 0.7 : 1,
-                  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                  border: '1px solid',
-                  borderColor: alpha(module.color, 0.15),
-                  borderRadius: 2,
+                  transition: 'all 0.3s ease',
+                  border: 'none',
+                  borderRadius: 3,
                   overflow: 'hidden',
                   position: 'relative',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: 3,
-                    background: module.gradient,
-                    opacity: 0.8,
-                  },
+                  bgcolor: 'white',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
                   '&:hover': module.status === 'active' ? {
-                    transform: 'translateY(-4px)',
-                    boxShadow: `0 12px 24px ${alpha(module.color, 0.15)}`,
-                    borderColor: module.color,
+                    transform: 'translateY(-6px)',
+                    boxShadow: `0 20px 40px ${alpha(module.color, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,
                     '& .module-icon': {
-                      transform: 'scale(1.15)',
+                      transform: 'scale(1.1)',
                       bgcolor: module.color,
                       color: 'white',
                     },

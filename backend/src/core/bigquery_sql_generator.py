@@ -324,6 +324,36 @@ class BigQuerySQLGenerator:
 
         original_sql = sql
 
+        # CRITICAL FIX: Replace EXTRACT(YEAR FROM CURRENT_DATE()) with 2025 (max year in data)
+        # This catches patterns like: WHERE EXTRACT(YEAR FROM col) = EXTRACT(YEAR FROM CURRENT_DATE())
+        sql = re.sub(
+            r"EXTRACT\s*\(\s*YEAR\s+FROM\s+CURRENT_DATE\s*\(\s*\)\s*\)",
+            '2025',
+            sql,
+            flags=re.IGNORECASE
+        )
+
+        # CRITICAL FIX: Replace date_column with Posting_Date (LLM sometimes hallucinates this column)
+        sql = re.sub(r'\bdate_column\b', 'Posting_Date', sql, flags=re.IGNORECASE)
+
+        # CRITICAL FIX: Replace Order_Date in WHERE clause date filtering with Posting_Date
+        # Order_Date may not exist or have different meaning - Posting_Date is the canonical date
+        sql = re.sub(
+            r"EXTRACT\s*\(\s*(YEAR|MONTH|DAY|QUARTER)\s+FROM\s+Order_Date\s*\)",
+            r'EXTRACT(\1 FROM Posting_Date)',
+            sql,
+            flags=re.IGNORECASE
+        )
+
+        # CRITICAL FIX: Replace Header_Creation_Date with Posting_Date (LLM hallucinates this column)
+        sql = re.sub(
+            r"PARSE_DATE\s*\(\s*'[^']+'\s*,\s*Header_Creation_Date\s*\)",
+            'Posting_Date',
+            sql,
+            flags=re.IGNORECASE
+        )
+        sql = re.sub(r'\bHeader_Creation_Date\b', 'Posting_Date', sql, flags=re.IGNORECASE)
+
         # Fix 1: Replace wrong date column parsing with Posting_Date
         # Pattern: PARSE_DATE('%Y%m%d', SUBSTRING(REFERENCESDDOCUMENT, ...)) -> Posting_Date
         sql = re.sub(
@@ -1135,12 +1165,23 @@ class BigQuerySQLGenerator:
             CORRECT PATTERNS:
             - "Last 6 months": ORDER BY month DESC LIMIT 6 (NOT: WHERE date >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH))
             - "Recent data": ORDER BY Posting_Date DESC LIMIT 1000 (NOT: WHERE Posting_Date >= CURRENT_DATE() - 30)
-            - "This year": WHERE EXTRACT(YEAR FROM Posting_Date) = 2024 (use actual year from data range)
+            - "This year" or "YTD" or "year to date": WHERE EXTRACT(YEAR FROM Posting_Date) = 2025
+            - "YTD revenue": SUM(Gross_Revenue) WHERE EXTRACT(YEAR FROM Posting_Date) = 2025
 
-            WRONG PATTERNS (WILL FAIL):
+            CRITICAL - YEAR TO DATE (YTD) QUERIES:
+            - For ANY "YTD", "year to date", "this year" query, use year = 2025 (the most recent complete year in data)
+            - Example: "What is revenue YTD?" -> WHERE EXTRACT(YEAR FROM Posting_Date) = 2025
+            - Example: "Show sales year to date" -> WHERE EXTRACT(YEAR FROM Posting_Date) = 2025
+            - NEVER use CURRENT_DATE() or EXTRACT(YEAR FROM CURRENT_DATE()) - use the literal year 2025
+            - The primary date column is Posting_Date - use this for all date filtering
+
+            WRONG PATTERNS (WILL FAIL - RETURN EMPTY RESULTS):
             - DATE_SUB(CURRENT_DATE(), INTERVAL N MONTH)
             - WHERE Posting_Date >= CURRENT_DATE() - INTERVAL '6 months'
             - CURRENT_DATE() anywhere in the query
+            - EXTRACT(YEAR FROM CURRENT_DATE())
+            - WHERE EXTRACT(YEAR FROM column) = EXTRACT(YEAR FROM CURRENT_DATE())
+            - Using Order_Date instead of Posting_Date for date filtering
 
             ROLLING AVERAGES AND WINDOW FUNCTIONS:
             - For rolling averages, use Posting_Date (the primary date column), NOT Sales_Order columns
@@ -1380,6 +1421,23 @@ class BigQuerySQLGenerator:
                             old_ref = match.group(0)
                             sql = sql.replace(old_ref, correct_ref)
                             logger.info(f"Fixed wrong dataset: {old_ref} -> {correct_ref}")
+
+                # CRITICAL: Validate all table names in SQL and replace invalid ones with default
+                def replace_invalid_tables(sql_str, project, dataset, valid_tables, default_table='dataset_25m_table'):
+                    """Replace any invalid table names with the default table"""
+                    pattern = rf'`{regex_module.escape(project)}\.{regex_module.escape(dataset)}\.([^`]+)`'
+                    matches = regex_module.findall(pattern, sql_str)
+
+                    for table_name in matches:
+                        if table_name not in valid_tables:
+                            old_ref = f"`{project}.{dataset}.{table_name}`"
+                            new_ref = f"`{project}.{dataset}.{default_table}`"
+                            logger.warning(f"Invalid table '{table_name}' not in valid tables, replacing with default: {old_ref} -> {new_ref}")
+                            sql_str = sql_str.replace(old_ref, new_ref)
+
+                    return sql_str
+
+                sql = replace_invalid_tables(sql, self.project_id, self.dataset_id, valid_table_names)
 
                 for schema in schemas:
                     table_name = schema['table_name']

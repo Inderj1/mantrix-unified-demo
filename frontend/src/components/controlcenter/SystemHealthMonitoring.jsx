@@ -244,20 +244,9 @@ const SystemHealthMonitoring = () => {
             elevation={0}
             sx={{
               p: 2,
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: alpha(colors.primary, 0.1),
-              position: 'relative',
-              overflow: 'hidden',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 3,
-                background: `linear-gradient(90deg, ${colors.success} 0%, ${alpha(colors.success, 0.5)} 100%)`,
-              },
+              borderRadius: 3,
+              bgcolor: 'white',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
@@ -291,20 +280,9 @@ const SystemHealthMonitoring = () => {
             elevation={0}
             sx={{
               p: 2,
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: alpha(colors.primary, 0.1),
-              position: 'relative',
-              overflow: 'hidden',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 3,
-                background: `linear-gradient(90deg, ${colors.primary} 0%, ${alpha(colors.primary, 0.5)} 100%)`,
-              },
+              borderRadius: 3,
+              bgcolor: 'white',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
@@ -336,20 +314,9 @@ const SystemHealthMonitoring = () => {
             elevation={0}
             sx={{
               p: 2,
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: alpha(colors.primary, 0.1),
-              position: 'relative',
-              overflow: 'hidden',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 3,
-                background: `linear-gradient(90deg, ${colors.secondary} 0%, ${alpha(colors.secondary, 0.5)} 100%)`,
-              },
+              borderRadius: 3,
+              bgcolor: 'white',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
@@ -372,20 +339,9 @@ const SystemHealthMonitoring = () => {
             elevation={0}
             sx={{
               p: 2,
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: alpha(colors.primary, 0.1),
-              position: 'relative',
-              overflow: 'hidden',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 3,
-                background: `linear-gradient(90deg, ${colors.dark} 0%, ${alpha(colors.dark, 0.5)} 100%)`,
-              },
+              borderRadius: 3,
+              bgcolor: 'white',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
@@ -410,9 +366,9 @@ const SystemHealthMonitoring = () => {
         sx={{
           p: 3,
           mb: 3,
-          borderRadius: 2,
-          border: '1px solid',
-          borderColor: alpha(colors.primary, 0.1),
+          borderRadius: 3,
+          bgcolor: 'white',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
         }}
       >
         <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text, mb: 2 }}>
@@ -424,26 +380,14 @@ const SystemHealthMonitoring = () => {
               <Card
                 elevation={0}
                 sx={{
-                  border: '1px solid',
-                  borderColor: alpha(getStatusColor(service.status), 0.2),
-                  bgcolor: alpha(getStatusColor(service.status), 0.02),
-                  borderRadius: 2,
+                  borderRadius: 3,
+                  bgcolor: 'white',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
                   cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  position: 'relative',
-                  overflow: 'hidden',
+                  transition: 'all 0.3s ease',
                   '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: `0 4px 12px ${alpha(colors.primary, 0.15)}`,
-                  },
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: 3,
-                    background: `linear-gradient(90deg, ${getStatusColor(service.status)} 0%, ${alpha(getStatusColor(service.status), 0.5)} 100%)`,
+                    transform: 'translateY(-4px)',
+                    boxShadow: '0 8px 20px rgba(0,0,0,0.1)',
                   },
                 }}
                 onClick={() => setSelectedService(service)}
@@ -573,9 +517,9 @@ const SystemHealthMonitoring = () => {
             elevation={0}
             sx={{
               p: 3,
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: alpha(colors.primary, 0.1),
+              borderRadius: 3,
+              bgcolor: 'white',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
             }}
           >
             <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text, mb: 2 }}>
@@ -621,9 +565,9 @@ const SystemHealthMonitoring = () => {
             elevation={0}
             sx={{
               p: 3,
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: alpha(colors.primary, 0.1),
+              borderRadius: 3,
+              bgcolor: 'white',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
             }}
           >
             <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text, mb: 2 }}>
@@ -671,9 +615,9 @@ const SystemHealthMonitoring = () => {
         sx={{
           p: 3,
           mt: 3,
-          borderRadius: 2,
-          border: '1px solid',
-          borderColor: alpha(colors.primary, 0.1),
+          borderRadius: 3,
+          bgcolor: 'white',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
         }}
       >
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>

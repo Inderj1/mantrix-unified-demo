@@ -124,7 +124,7 @@ const getStrategyDescription = (abc, xyz) => {
   return descriptions[abc + xyz] || 'Apply standard inventory management practices.';
 };
 
-// Generate material data using centralized Lam Research data
+// Generate material data using centralized Arizona Beverages data
 const generateMaterialData = () => {
   // Build base materials from centralized data, expanding for each plant where data exists
   const baseMaterials = [];
@@ -162,13 +162,13 @@ const generateMaterialData = () => {
 
   // Add additional materials not in plant data for variety
   const additionalMaterials = [
-    { id: 'FG0006-1000', materialId: 'FG0006', name: 'Electrochemical Deposition - Phoenix', type: 'FERT', category: 'Deposition', plant: '1000', plantName: 'Fremont HQ', price: 5500000 },
-    { id: 'FG0007-2000', materialId: 'FG0007', name: 'Coronus Bevel Etch Tool', type: 'FERT', category: 'Etch', plant: '2000', plantName: 'Tualatin OR', price: 6000000 },
-    { id: 'SFG0010-1000', materialId: 'SFG0010', name: 'Endpoint Detection Module', type: 'HALB', category: 'Sensors', plant: '1000', plantName: 'Fremont HQ', price: 48000 },
-    { id: 'SFG0011-2000', materialId: 'SFG0011', name: 'Electrostatic Chuck Assembly', type: 'HALB', category: 'Chamber', plant: '2000', plantName: 'Tualatin OR', price: 95000 },
-    { id: 'RAW0004-1000', materialId: 'RAW0004', name: 'Ceramic Insulator Ring', type: 'ROH', category: 'Ceramics', plant: '1000', plantName: 'Fremont HQ', price: 320 },
-    { id: 'RAW0005-2000', materialId: 'RAW0005', name: 'UHP O-Ring Kit Viton', type: 'ROH', category: 'Seals', plant: '2000', plantName: 'Tualatin OR', price: 85 },
-    { id: 'RAW0010-1000', materialId: 'RAW0010', name: 'Hastelloy Bellows Assembly', type: 'ROH', category: 'Motion', plant: '1000', plantName: 'Fremont HQ', price: 1250 },
+    { id: 'FG0006-1000', materialId: 'FG0006', name: 'Electrochemical Deposition - Phoenix', type: 'FERT', category: 'Deposition', plant: '1000', plantName: 'Keasbey NJ', price: 5500000 },
+    { id: 'FG0007-2000', materialId: 'FG0007', name: 'AZ Arnold Palmer Bevel Etch Tool', type: 'FERT', category: 'Etch', plant: '2000', plantName: 'Santa Clarita CA', price: 6000000 },
+    { id: 'SFG0010-1000', materialId: 'SFG0010', name: 'Endpoint Detection Module', type: 'HALB', category: 'Sensors', plant: '1000', plantName: 'Keasbey NJ', price: 48000 },
+    { id: 'SFG0011-2000', materialId: 'SFG0011', name: 'Electrostatic Chuck Assembly', type: 'HALB', category: 'Chamber', plant: '2000', plantName: 'Santa Clarita CA', price: 95000 },
+    { id: 'RAW0004-1000', materialId: 'RAW0004', name: 'Ceramic Insulator Ring', type: 'ROH', category: 'Ceramics', plant: '1000', plantName: 'Keasbey NJ', price: 320 },
+    { id: 'RAW0005-2000', materialId: 'RAW0005', name: 'UHP O-Ring Kit Viton', type: 'ROH', category: 'Seals', plant: '2000', plantName: 'Santa Clarita CA', price: 85 },
+    { id: 'RAW0010-1000', materialId: 'RAW0010', name: 'Hastelloy Bellows Assembly', type: 'ROH', category: 'Motion', plant: '1000', plantName: 'Keasbey NJ', price: 1250 },
   ];
 
   baseMaterials.push(...additionalMaterials);
@@ -1602,9 +1602,9 @@ const InventoryDashboard = ({ onBack, onTileClick }) => {
                         <InputLabel>Plant</InputLabel>
                         <Select value={filters.plant} label="Plant" onChange={(e) => setFilters(prev => ({ ...prev, plant: e.target.value }))}>
                           <MenuItem value="all">All Plants</MenuItem>
-                          <MenuItem value="1000">1000 - Fremont HQ</MenuItem>
-                          <MenuItem value="2000">2000 - Tualatin OR</MenuItem>
-                          <MenuItem value="3000">3000 - Hwaseong Korea</MenuItem>
+                          <MenuItem value="1000">1000 - Keasbey NJ</MenuItem>
+                          <MenuItem value="2000">2000 - Santa Clarita CA</MenuItem>
+                          <MenuItem value="3000">3000 - Hwaseong Douglas</MenuItem>
                         </Select>
                       </FormControl>
 

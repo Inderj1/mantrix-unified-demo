@@ -416,7 +416,7 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
 
     return (
       <Box sx={{ p: 3, height: '100%', overflowY: 'auto' }}>
-        <Box sx={{ mb: 4 }}>
+        <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <DocumentIcon sx={{ fontSize: 40, color: '#0078d4' }} />
@@ -460,7 +460,7 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
               },
             }}
           />
-        </Box>
+        </Paper>
 
         <Grid container spacing={1.5}>
           {filteredTypes.map((type, index) => {
@@ -468,30 +468,24 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
             return (
               <Grid item xs={12} sm={6} md={3} lg={3} key={type.id}>
                 <Card
-                  variant="outlined"
                   sx={{
-                    height: 180,
+                    height: 200,
                     cursor: 'pointer',
-                    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                    border: '1px solid',
-                    borderColor: alpha(type.color, 0.15),
-                    borderRadius: 2,
+                    transition: 'all 0.3s ease',
+                    border: 'none',
+                    borderRadius: 3,
                     overflow: 'hidden',
                     position: 'relative',
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      height: 3,
-                      background: `linear-gradient(135deg, ${type.color} 0%, ${alpha(type.color, 0.7)} 100%)`,
-                      opacity: 0.8,
-                    },
+                    bgcolor: 'white',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
                     '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: `0 8px 16px ${alpha(type.color, 0.15)}`,
-                      borderColor: alpha(type.color, 0.3),
+                      transform: 'translateY(-6px)',
+                      boxShadow: `0 20px 40px ${alpha(type.color, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,
+                      '& .module-icon': {
+                        transform: 'scale(1.1)',
+                        bgcolor: type.color,
+                        color: 'white',
+                      },
                       '& .module-arrow': {
                         opacity: 1,
                         transform: 'translateX(4px)',
@@ -502,7 +496,22 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
                 >
                   <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                      <IconComponent sx={{ fontSize: 40, color: type.color }} />
+                      <Box
+                        className="module-icon"
+                        sx={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 1.5,
+                          bgcolor: alpha(type.color, 0.1),
+                          color: type.color,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          transition: 'all 0.3s ease',
+                        }}
+                      >
+                        <IconComponent sx={{ fontSize: 22 }} />
+                      </Box>
                       {type.isCustom && (
                         <Box sx={{ display: 'flex', gap: 0.5 }}>
                           <IconButton
@@ -528,14 +537,14 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
                         </Box>
                       )}
                     </Box>
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: type.color, mb: 0.5, fontSize: '0.938rem' }}>
+                    <Typography variant="body1" sx={{ fontWeight: 700, color: type.color, mb: 0.5, fontSize: '0.9rem', lineHeight: 1.3 }}>
                       {type.display_name}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.5, fontSize: '0.813rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {type.description}
                     </Typography>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha(type.color, 0.1) }}>
-                      <Chip label={`${stats[type.name] || 0} Docs`} size="small" variant="outlined" sx={{ height: 20, fontSize: '0.65rem', borderColor: alpha(type.color, 0.3), color: type.color, fontWeight: 600 }} />
+                      <Chip label={`${stats[type.name] || 0} Docs`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha(type.color, 0.08), color: type.color, fontWeight: 600 }} />
                       <ArrowForwardIcon className="module-arrow" sx={{ color: type.color, fontSize: 16, opacity: 0.5, transition: 'all 0.3s ease' }} />
                     </Box>
                   </CardContent>
@@ -548,21 +557,21 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
           {!searchQuery && (
             <Grid item xs={12} sm={6} md={3} lg={3}>
               <Card
-                variant="outlined"
                 sx={{
-                  height: 180,
+                  height: 200,
                   cursor: 'pointer',
-                  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                  border: '1px dashed',
-                  borderColor: 'divider',
-                  borderRadius: 2,
+                  transition: 'all 0.3s ease',
+                  border: '2px dashed',
+                  borderColor: alpha('#0078d4', 0.3),
+                  borderRadius: 3,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  bgcolor: alpha('#0078d4', 0.02),
                   '&:hover': {
-                    transform: 'translateY(-4px)',
-                    borderColor: 'primary.main',
-                    bgcolor: alpha(theme.palette.primary.main, 0.02),
+                    transform: 'translateY(-6px)',
+                    borderColor: '#0078d4',
+                    bgcolor: alpha('#0078d4', 0.05),
                   },
                 }}
                 onClick={handleAddCustomType}
@@ -603,7 +612,7 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ mb: 4 }}>
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
             <Button startIcon={<ArrowBackIcon />} onClick={() => setSelectedType(null)} variant="text" sx={{ mb: 1 }}>
@@ -625,7 +634,7 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig }) => {
             </Button>
           </Stack>
         </Stack>
-      </Box>
+      </Paper>
 
       {/* Data Grid */}
       <Paper>

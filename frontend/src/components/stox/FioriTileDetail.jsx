@@ -113,7 +113,7 @@ const generateTileData = (tileId) => {
       { id: 3, sku: 'SKU_HC_006', on_hand: 2400, in_transit: 800, allocated_ch01: 800, allocated_ch02: 520, safety_stock: 400, available: 1480 },
     ],
     'working-capital': () => {
-      // Generate from actual Lam Research material-plant data
+      // Generate from actual Arizona Beverages material-plant data
       return LAM_MATERIAL_PLANT_DATA.slice(0, 12).map((mpd, idx) => {
         const material = getMaterialById(mpd.materialId);
         const plant = LAM_PLANTS.find(p => p.id === mpd.plant);
@@ -223,7 +223,7 @@ const generateTileData = (tileId) => {
       { id: 3, date: '2024-03-18', anomaly_type: 'Slow Sales', sku: 'SKU_HC_002', store: 'STORE_010', expected: 40, actual: 18, variance: '-55%', reason: 'Competitor Promo' },
     ],
     'working-capital-optimizer': () => {
-      // Generate optimization recommendations from Lam Research data
+      // Generate optimization recommendations from Arizona Beverages data
       return LAM_MATERIAL_PLANT_DATA.slice(0, 10).map((mpd, idx) => {
         const material = getMaterialById(mpd.materialId);
         const plant = LAM_PLANTS.find(p => p.id === mpd.plant);

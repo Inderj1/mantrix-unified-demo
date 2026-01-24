@@ -49,7 +49,7 @@ import { LAM_PLANTS, LAM_MATERIALS, LAM_MATERIAL_PLANT_DATA, MRP_TYPES, getPlant
 // Use MRP Types from centralized data
 const mrpTypes = MRP_TYPES;
 
-// Generate materials data from centralized Lam Research data
+// Generate materials data from centralized Arizona Beverages data
 const generateMaterials = () => {
   const materials = [];
 
@@ -105,10 +105,10 @@ const generateMaterials = () => {
 
   // Add a few additional materials for variety
   const additionalMaterials = [
-    { id: 'FG0006', name: 'Electrochemical Deposition Phoenix', type: 'FERT', plant: '1000', plantName: 'Fremont HQ',
+    { id: 'FG0006', name: 'Electrochemical Deposition Phoenix', type: 'FERT', plant: '1000', plantName: 'Keasbey NJ',
       currentMRP: 'PD', recommendedMRP: 'PD', stock: 3, safetyStock: 0, rop: 1, lotSize: 1, leadTime: 150, price: 5500000,
       abc: 'A', xyz: 'Z', reasoning: 'Premium system with MTO approach. PD is well-suited.' },
-    { id: 'FG0007', name: 'Coronus Bevel Etch Tool', type: 'FERT', plant: '2000', plantName: 'Tualatin OR',
+    { id: 'FG0007', name: 'AZ Arnold Palmer Bevel Etch Tool', type: 'FERT', plant: '2000', plantName: 'Santa Clarita CA',
       currentMRP: 'PD', recommendedMRP: 'VV', stock: 2, safetyStock: 1, rop: 2, lotSize: 1, leadTime: 120, price: 6000000,
       abc: 'A', xyz: 'Y', reasoning: 'Variable demand pattern suggests forecast-based VV would improve service.' },
   ];
@@ -794,8 +794,8 @@ const MRPOptimizerDashboard = ({ onBack, onTileClick }) => {
               <InputLabel>Plant</InputLabel>
               <Select value={filters.plant} label="Plant" onChange={(e) => setFilters(prev => ({ ...prev, plant: e.target.value }))}>
                 <MenuItem value="all">All Plants</MenuItem>
-                <MenuItem value="1000">1000 - Fremont</MenuItem>
-                <MenuItem value="2000">2000 - Tualatin</MenuItem>
+                <MenuItem value="1000">1000 - Keasbey</MenuItem>
+                <MenuItem value="2000">2000 - Santa Clarita</MenuItem>
                 <MenuItem value="3000">3000 - Hwaseong</MenuItem>
               </Select>
             </FormControl>

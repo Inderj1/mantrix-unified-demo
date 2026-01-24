@@ -1,0 +1,422 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Paper,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  Chip,
+  Button,
+  Breadcrumbs,
+  Link,
+  Stack,
+  IconButton,
+  Tooltip,
+  alpha,
+  LinearProgress,
+  CircularProgress,
+  Avatar,
+  Divider,
+} from '@mui/material';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import {
+  Assignment as AssignmentIcon,
+  Refresh,
+  NavigateNext as NavigateNextIcon,
+  ArrowBack as ArrowBackIcon,
+  Download,
+  CheckCircle,
+  Schedule,
+  LocalShipping,
+  Pending,
+  TrendingUp,
+} from '@mui/icons-material';
+import { Bar } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip as ChartTooltip,
+  Legend,
+  ArcElement,
+} from 'chart.js';
+import {
+  generateKitOrderData,
+  generateOrderDetail,
+  calculateKitOrderMetrics,
+} from '../shared/traxxMockData';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, ChartTooltip, Legend, ArcElement);
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { display: false },
+  },
+  scales: {
+    x: { grid: { display: false } },
+    y: { grid: { color: 'rgba(0,0,0,0.05)' }, beginAtZero: true },
+  },
+};
+
+const LoanerKitOrders = ({ onBack }) => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [metrics, setMetrics] = useState(null);
+  const [selectedRow, setSelectedRow] = useState(null);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = () => {
+    setLoading(true);
+    setTimeout(() => {
+      const orderData = generateKitOrderData('loaner', 25);
+      setData(orderData);
+      setMetrics(calculateKitOrderMetrics(orderData));
+      setLoading(false);
+    }, 600);
+  };
+
+  const handleRowClick = (params) => {
+    const detailData = generateOrderDetail(params.row);
+    setSelectedRow(detailData);
+  };
+
+  const handleBackToList = () => setSelectedRow(null);
+
+  const getStatusColor = (status) => {
+    const colors = {
+      'Requested': { bg: '#fef3c7', color: '#d97706', border: '#fcd34d' },
+      'Approved': { bg: '#dbeafe', color: '#2563eb', border: '#93c5fd' },
+      'Processing': { bg: '#e0e7ff', color: '#4f46e5', border: '#a5b4fc' },
+      'Ready': { bg: '#d1fae5', color: '#059669', border: '#6ee7b7' },
+      'Shipped': { bg: '#cffafe', color: '#0891b2', border: '#67e8f9' },
+      'Completed': { bg: '#dcfce7', color: '#16a34a', border: '#86efac' },
+    };
+    return colors[status] || { bg: '#f1f5f9', color: '#64748b', border: '#cbd5e1' };
+  };
+
+  const columns = [
+    {
+      field: 'order_id',
+      headerName: 'Order ID',
+      width: 120,
+      renderCell: (params) => (
+        <Chip
+          label={params.value}
+          size="small"
+          sx={{ fontWeight: 700, bgcolor: alpha('#0a6ed1', 0.1), color: '#0a6ed1' }}
+        />
+      ),
+    },
+    { field: 'kit_id', headerName: 'Kit ID', width: 110 },
+    { field: 'kit_name', headerName: 'Kit Name', width: 160, flex: 1 },
+    { field: 'hospital', headerName: 'Hospital', width: 180 },
+    { field: 'distributor', headerName: 'Distributor', width: 150 },
+    { field: 'request_date', headerName: 'Request Date', width: 120 },
+    { field: 'transfer_order', headerName: 'Transfer Order', width: 130 },
+    {
+      field: 'status',
+      headerName: 'Status',
+      width: 120,
+      renderCell: (params) => {
+        const style = getStatusColor(params.value);
+        return (
+          <Chip
+            label={params.value}
+            size="small"
+            sx={{ fontWeight: 600, bgcolor: style.bg, color: style.color, border: `1px solid ${style.border}` }}
+          />
+        );
+      },
+    },
+    {
+      field: 'priority',
+      headerName: 'Priority',
+      width: 100,
+      renderCell: (params) => {
+        const colors = { High: '#ef4444', Medium: '#f59e0b', Low: '#10b981' };
+        return (
+          <Chip
+            label={params.value}
+            size="small"
+            sx={{ fontWeight: 600, bgcolor: alpha(colors[params.value], 0.1), color: colors[params.value] }}
+          />
+        );
+      },
+    },
+  ];
+
+  // Detail View
+  const renderDetailView = () => {
+    if (!selectedRow) return null;
+
+    const statusColor = getStatusColor(selectedRow.status);
+
+    return (
+      <Box sx={{ flex: 1, overflow: 'auto' }}>
+        {/* Header */}
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+          <Button startIcon={<ArrowBackIcon />} onClick={handleBackToList} variant="outlined" size="small">
+            Back to List
+          </Button>
+          <Stack direction="row" spacing={1}>
+            <Chip label={selectedRow.order_id} size="small" sx={{ fontWeight: 700, bgcolor: alpha('#0a6ed1', 0.1), color: '#0a6ed1' }} />
+            <Chip label={selectedRow.status} size="small" sx={{ fontWeight: 600, bgcolor: statusColor.bg, color: statusColor.color }} />
+          </Stack>
+        </Stack>
+
+        {/* Title */}
+        <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>{selectedRow.kit_name}</Typography>
+        <Typography sx={{ color: '#64748b', mb: 3 }}>{selectedRow.hospital} • {selectedRow.distributor}</Typography>
+
+        {/* Key Metrics Row */}
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          {[
+            { label: 'Total Value', value: `$${selectedRow.total_value?.toLocaleString()}`, color: '#10b981', icon: <TrendingUp /> },
+            { label: 'Items', value: selectedRow.items?.length || 0, color: '#0a6ed1', icon: <AssignmentIcon /> },
+            { label: 'Processing Days', value: selectedRow.avgProcessingDays, color: '#f59e0b', icon: <Schedule /> },
+            { label: 'Priority', value: selectedRow.priority, color: selectedRow.priority === 'High' ? '#ef4444' : '#64748b', icon: <Pending /> },
+          ].map((metric, idx) => (
+            <Grid item xs={6} sm={3} key={idx}>
+              <Card sx={{ background: `linear-gradient(135deg, ${alpha(metric.color, 0.1)} 0%, ${alpha(metric.color, 0.05)} 100%)` }}>
+                <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                  <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
+                    <Box sx={{ color: metric.color }}>{metric.icon}</Box>
+                    <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase' }}>{metric.label}</Typography>
+                  </Stack>
+                  <Typography variant="h5" sx={{ fontWeight: 700, color: metric.color }}>{metric.value}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+
+        {/* 3 Cards Layout */}
+        <Grid container spacing={2}>
+          {/* Card 1: Kit Contents */}
+          <Grid item xs={12} md={4}>
+            <Card variant="outlined" sx={{ height: '100%' }}>
+              <CardContent sx={{ p: 2 }}>
+                <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 2 }}>
+                  Kit Contents
+                </Typography>
+                <Stack spacing={1} sx={{ maxHeight: 250, overflow: 'auto' }}>
+                  {selectedRow.items?.map((item, idx) => (
+                    <Box key={idx} sx={{ p: 1.5, bgcolor: alpha('#64748b', 0.04), borderRadius: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Box>
+                        <Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>{item.item_code}</Typography>
+                        <Typography sx={{ fontSize: '0.7rem', color: '#64748b' }}>{item.description}</Typography>
+                      </Box>
+                      <Box sx={{ textAlign: 'right' }}>
+                        <Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Qty: {item.quantity}</Typography>
+                        <Typography sx={{ fontSize: '0.7rem', color: '#10b981' }}>${item.unit_price}</Typography>
+                      </Box>
+                    </Box>
+                  ))}
+                </Stack>
+                <Divider sx={{ my: 2 }} />
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography sx={{ fontWeight: 600 }}>Total Value</Typography>
+                  <Typography sx={{ fontWeight: 700, color: '#10b981' }}>${selectedRow.total_value?.toLocaleString()}</Typography>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Card 2: Order Timeline */}
+          <Grid item xs={12} md={4}>
+            <Card variant="outlined" sx={{ height: '100%' }}>
+              <CardContent sx={{ p: 2 }}>
+                <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 2 }}>
+                  Order Timeline
+                </Typography>
+                <Stack spacing={0}>
+                  {selectedRow.timeline?.map((step, idx) => (
+                    <Box key={idx} sx={{ display: 'flex', gap: 2 }}>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <Avatar
+                          sx={{
+                            width: 28,
+                            height: 28,
+                            bgcolor: step.status === 'completed' ? '#10b981' : alpha('#64748b', 0.2),
+                            color: step.status === 'completed' ? 'white' : '#64748b',
+                          }}
+                        >
+                          {step.status === 'completed' ? <CheckCircle sx={{ fontSize: 16 }} /> : <Schedule sx={{ fontSize: 16 }} />}
+                        </Avatar>
+                        {idx < selectedRow.timeline.length - 1 && (
+                          <Box sx={{ width: 2, height: 30, bgcolor: step.status === 'completed' ? '#10b981' : alpha('#64748b', 0.2), my: 0.5 }} />
+                        )}
+                      </Box>
+                      <Box sx={{ pb: 2 }}>
+                        <Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>{step.step}</Typography>
+                        <Typography sx={{ fontSize: '0.7rem', color: '#64748b' }}>{step.date} • {step.user}</Typography>
+                      </Box>
+                    </Box>
+                  ))}
+                </Stack>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Card 3: Metrics & Chart */}
+          <Grid item xs={12} md={4}>
+            <Card variant="outlined" sx={{ height: '100%' }}>
+              <CardContent sx={{ p: 2 }}>
+                <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 2 }}>
+                  Order Trends
+                </Typography>
+
+                {/* Circular Gauge */}
+                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                  <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+                    <CircularProgress
+                      variant="determinate"
+                      value={100}
+                      size={80}
+                      thickness={5}
+                      sx={{ color: alpha('#64748b', 0.1) }}
+                    />
+                    <CircularProgress
+                      variant="determinate"
+                      value={Math.min(100, (selectedRow.avgProcessingDays / 7) * 100)}
+                      size={80}
+                      thickness={5}
+                      sx={{ color: selectedRow.avgProcessingDays <= 3 ? '#10b981' : selectedRow.avgProcessingDays <= 5 ? '#f59e0b' : '#ef4444', position: 'absolute', left: 0 }}
+                    />
+                    <Box sx={{ top: 0, left: 0, bottom: 0, right: 0, position: 'absolute', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                      <Typography variant="h6" sx={{ fontWeight: 700 }}>{selectedRow.avgProcessingDays}</Typography>
+                      <Typography sx={{ fontSize: '0.5rem', color: '#64748b' }}>DAYS</Typography>
+                    </Box>
+                  </Box>
+                </Box>
+
+                {/* Bar Chart */}
+                <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textAlign: 'center', mb: 1 }}>Similar Orders (6 months)</Typography>
+                <Box sx={{ height: 120 }}>
+                  <Bar
+                    data={{
+                      labels: ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                      datasets: [{
+                        data: selectedRow.orderTrend || [15, 22, 18, 25, 20, 28],
+                        backgroundColor: alpha('#0a6ed1', 0.6),
+                        borderColor: '#0a6ed1',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                      }],
+                    }}
+                    options={chartOptions}
+                  />
+                </Box>
+
+                {/* Contact Info */}
+                <Divider sx={{ my: 2 }} />
+                <Typography sx={{ fontSize: '0.7rem', color: '#64748b', mb: 0.5 }}>Contact</Typography>
+                <Typography sx={{ fontSize: '0.8rem' }}>{selectedRow.contact_email}</Typography>
+                <Typography sx={{ fontSize: '0.8rem' }}>{selectedRow.contact_phone}</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </Box>
+    );
+  };
+
+  return (
+    <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Header */}
+      <Box sx={{ mb: 3 }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>
+              TRAXX.AI
+            </Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>
+              Loaner Process
+            </Link>
+            <Typography color="primary" variant="body1" fontWeight={600}>
+              {selectedRow ? `Order ${selectedRow.order_id}` : 'Kit Orders'}
+            </Typography>
+          </Breadcrumbs>
+          {!selectedRow && (
+            <Stack direction="row" spacing={1}>
+              <Tooltip title="Refresh"><IconButton onClick={fetchData} color="primary"><Refresh /></IconButton></Tooltip>
+              <Tooltip title="Export"><IconButton color="primary"><Download /></IconButton></Tooltip>
+            </Stack>
+          )}
+        </Stack>
+
+        {!selectedRow && (
+          <>
+            <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
+              <AssignmentIcon sx={{ fontSize: 32, color: '#0a6ed1' }} />
+              <Typography variant="h4" fontWeight={700}>Kit Orders</Typography>
+            </Stack>
+            <Typography variant="body2" color="text.secondary">
+              Manage kit requests, transfer order creation, and order status tracking
+            </Typography>
+          </>
+        )}
+      </Box>
+
+      {selectedRow ? (
+        renderDetailView()
+      ) : (
+        <>
+          {/* KPI Cards */}
+          {metrics && (
+            <Grid container spacing={2} sx={{ mb: 3 }}>
+              {[
+                { label: 'Total Orders', value: metrics.totalOrders, color: '#0a6ed1', icon: <AssignmentIcon /> },
+                { label: 'Pending Approvals', value: metrics.pendingApprovals, color: '#f59e0b', icon: <Pending /> },
+                { label: 'In Process', value: metrics.inProcess, color: '#8b5cf6', icon: <Schedule /> },
+                { label: 'Avg Processing', value: `${metrics.avgProcessingDays} days`, color: '#10b981', icon: <LocalShipping /> },
+              ].map((kpi, idx) => (
+                <Grid item xs={12} sm={6} md={3} key={idx}>
+                  <Card sx={{ background: `linear-gradient(135deg, ${alpha(kpi.color, 0.1)} 0%, ${alpha(kpi.color, 0.05)} 100%)` }}>
+                    <CardContent sx={{ py: 2 }}>
+                      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
+                        <Box sx={{ color: kpi.color }}>{kpi.icon}</Box>
+                        <Typography variant="body2" color="text.secondary">{kpi.label}</Typography>
+                      </Stack>
+                      <Typography variant="h4" fontWeight={700} sx={{ color: kpi.color }}>{kpi.value}</Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          )}
+
+          {/* Data Grid */}
+          <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <DataGrid
+              rows={data}
+              columns={columns}
+              loading={loading}
+              density="compact"
+              slots={{ toolbar: GridToolbar }}
+              slotProps={{ toolbar: { showQuickFilter: true, quickFilterProps: { debounceMs: 500 } } }}
+              initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
+              pageSizeOptions={[10, 25, 50, 100]}
+              onRowClick={handleRowClick}
+              sx={{
+                flex: 1,
+                '& .MuiDataGrid-row': { cursor: 'pointer' },
+                '& .MuiDataGrid-row:hover': { bgcolor: alpha('#0a6ed1', 0.04) },
+              }}
+            />
+          </Paper>
+        </>
+      )}
+    </Box>
+  );
+};
+
+export default LoanerKitOrders;

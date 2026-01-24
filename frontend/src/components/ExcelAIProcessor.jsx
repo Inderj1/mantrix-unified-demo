@@ -6,7 +6,7 @@ import {
   StepLabel, Divider, List, ListItem, ListItemText, ListItemIcon,
   Checkbox, FormControlLabel, Switch, MenuItem, Select, FormControl,
   InputLabel, Accordion, AccordionSummary, AccordionDetails, Fade, Zoom,
-  InputAdornment,
+  InputAdornment, Tabs, Tab, Autocomplete, CircularProgress,
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import {
@@ -14,17 +14,29 @@ import {
   Close, TableChart, Download, Add, Edit, Delete, ExpandMore,
   Layers, DataObject, Chat, AccountTree, Speed, Settings,
   Description, Code, AutoAwesome, PlayArrow, Save, Check, Search,
-  Lightbulb as LightbulbIcon,
+  Lightbulb as LightbulbIcon, Schema,
 } from '@mui/icons-material';
 import excelProcessorApi from '../services/excelProcessorApi';
+import ExcelTemplatesManager from './ExcelTemplatesManager';
+import CreateExcelTemplateModal from './CreateExcelTemplateModal';
 
-const ExcelAIProcessor = ({ onBack }) => {
+const ExcelAIProcessor = ({ onBack, darkMode = false }) => {
+  // Tab state
+  const [activeTab, setActiveTab] = useState(0); // 0 = Excel AI Processor, 1 = Templates
+
   // Template management
   const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [loadingTemplates, setLoadingTemplates] = useState(true);
   const [view, setView] = useState('list'); // 'list', 'create', 'edit', 'execute'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFileView, setSelectedFileView] = useState(null); // For file drilldown
+
+  // Shared modal state for creating templates (accessible from both tabs)
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+
+  // Refresh key for ExcelTemplatesManager (increment to trigger refresh)
+  const [templatesRefreshKey, setTemplatesRefreshKey] = useState(0);
 
   // Template builder state
   const [templateBuilder, setTemplateBuilder] = useState({
@@ -154,25 +166,45 @@ const ExcelAIProcessor = ({ onBack }) => {
     }
   };
 
-  // Load templates from localStorage on mount
-  useEffect(() => {
-    const savedTemplates = localStorage.getItem('excelProcessorTemplates');
-    if (savedTemplates) {
-      try {
-        const parsedTemplates = JSON.parse(savedTemplates);
-        setTemplates(parsedTemplates);
-      } catch (error) {
-        console.error('Error loading templates from localStorage:', error);
+  // Load templates from database API
+  const loadTemplates = async () => {
+    setLoadingTemplates(true);
+    try {
+      const response = await fetch('/api/v1/excel-templates');
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          // Convert database templates to component format
+          const dbTemplates = result.data.map((t) => ({
+            id: t.id,
+            name: t.template_name,
+            description: t.description || `Template for ${t.template_name}`,
+            template_key: t.template_key,
+            category: t.category || 'General',
+            sheets: t.sheets_config || [],
+            sheetConfig: (t.sheets_config || []).reduce((acc, sheet) => ({
+              ...acc,
+              [sheet.sheet_name]: { enabled: true, columns: sheet.columns || [], fileName: sheet.source_file }
+            }), {}),
+            businessRules: (t.business_rules || []).map(r => r.rule_name || r.description || r),
+            aiInstructions: t.ai_instructions || '',
+            outputFormat: t.output_format || 'excel',
+            inputFolderPath: t.input_folder_path,
+            source: 'database',
+          }));
+          setTemplates(dbTemplates);
+        }
       }
+    } catch (error) {
+      console.error('Error loading templates:', error);
+    } finally {
+      setLoadingTemplates(false);
     }
-  }, []);
+  };
 
-  // Save templates to localStorage whenever they change
   useEffect(() => {
-    if (templates.length >= 0) {
-      localStorage.setItem('excelProcessorTemplates', JSON.stringify(templates));
-    }
-  }, [templates]);
+    loadTemplates();
+  }, []);
 
   const handleCreateTemplate = () => {
     setTemplateBuilder({
@@ -265,8 +297,23 @@ const ExcelAIProcessor = ({ onBack }) => {
       setIsProcessing(true);
       addToPipeline('start', `Starting AI processing with template: ${selectedTemplate.name}`);
 
-      // Start the processing job
-      const startResult = await excelProcessorApi.startFinancialAnalysis();
+      // Use template-based processing if it's a database template, otherwise use legacy CGS
+      const isLegacyFinancialTemplate = selectedTemplate.template_key === 'financial-analysis-cgs';
+
+      let startResult;
+      if (isLegacyFinancialTemplate) {
+        // Legacy CGS processing
+        startResult = await excelProcessorApi.startFinancialAnalysis();
+      } else {
+        // New template-based processing
+        const uploadedFilePaths = files.map(f => f.name);
+        startResult = await excelProcessorApi.processWithTemplate(
+          selectedTemplate.template_key,
+          selectedTemplate.name,
+          uploadedFilePaths
+        );
+      }
+
       const jobId = startResult.job_id;
 
       addToPipeline('queued', `Job ${jobId} queued for processing`);
@@ -290,13 +337,13 @@ const ExcelAIProcessor = ({ onBack }) => {
       const results = {
         timestamp: new Date().toISOString(),
         template: selectedTemplate.name,
-        filesProcessed: files.length,
-        sheetsProcessed: selectedTemplate.sheets.length,
+        filesProcessed: files.length || 1,
+        sheetsProcessed: selectedTemplate.sheets?.length || 1,
         rowCount: finalResult.row_count,
         insights: [
           `Total rows processed: ${finalResult.row_count?.toLocaleString() || 'N/A'}`,
-          'Financial metrics calculated',
-          'Distributor mapping completed'
+          `Template: ${selectedTemplate.template_key}`,
+          `Category: ${selectedTemplate.category || 'General'}`
         ],
         downloadUrl: finalResult.download_url,
         staticUrl: finalResult.static_url,
@@ -332,9 +379,21 @@ const ExcelAIProcessor = ({ onBack }) => {
     }]);
   };
 
-  const deleteTemplate = (templateId) => {
-    setTemplates(prev => prev.filter(t => t.id !== templateId));
-    addAIMessage('assistant', 'Template deleted successfully.');
+  const deleteTemplate = async (templateId) => {
+    try {
+      const response = await fetch(`/api/v1/excel-templates/${templateId}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        loadTemplates(); // Refresh the list
+        addAIMessage('assistant', 'Template deleted successfully.');
+      } else {
+        throw new Error('Failed to delete template');
+      }
+    } catch (error) {
+      console.error('Error deleting template:', error);
+      addAIMessage('assistant', 'Error deleting template.');
+    }
   };
 
   const handleDownload = () => {
@@ -353,7 +412,7 @@ const ExcelAIProcessor = ({ onBack }) => {
     const { active, completed, icon } = props;
 
     const icons = [
-      { icon: CloudUpload, color: '#2b88d8' },
+      { icon: CloudUpload, color: '#3b82f6' },
       { icon: Settings, color: '#06b6d4' },
       { icon: Code, color: '#8b5cf6' },
       { icon: AutoAwesome, color: '#f97316' },
@@ -384,284 +443,255 @@ const ExcelAIProcessor = ({ onBack }) => {
     );
   };
 
-  // Template List View
+  // Category icons and colors for dropdown
+  const getCategoryStyle = (category) => {
+    const styles = {
+      'SAP Master Data': { icon: <DataObject sx={{ fontSize: 18 }} />, color: '#3b82f6' },
+      'SAP Sales & Distribution': { icon: <Description sx={{ fontSize: 18 }} />, color: '#8b5cf6' },
+      'SAP BOM': { icon: <AccountTree sx={{ fontSize: 18 }} />, color: '#06b6d4' },
+      'SAP Finance': { icon: <TableChart sx={{ fontSize: 18 }} />, color: '#10b981' },
+      'SAP Pricing': { icon: <Speed sx={{ fontSize: 18 }} />, color: '#f59e0b' },
+      'SAP Classification': { icon: <Layers sx={{ fontSize: 18 }} />, color: '#ec4899' },
+      'CRM Data': { icon: <Chat sx={{ fontSize: 18 }} />, color: '#6366f1' },
+    };
+    return styles[category] || { icon: <TableChart sx={{ fontSize: 18 }} />, color: '#64748b' };
+  };
+
+  // Template List View - Dropdown selector like PDF Parser Studio
   const renderTemplateList = () => {
-    // Filter templates based on search query
-    const filteredTemplates = templates.filter(template =>
-      template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (template.description && template.description.toLowerCase().includes(searchQuery.toLowerCase()))
+    // Sort templates by category for better grouping
+    const sortedTemplates = [...templates].sort((a, b) =>
+      (a.category || 'General').localeCompare(b.category || 'General')
     );
 
     return (
-    <>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Box>
-          <Typography variant="h6" fontWeight={600}>Your Processing Templates</Typography>
-          <Typography variant="body2" color="text.secondary">
-            Create custom templates to process Excel files based on your business requirements
-          </Typography>
-        </Box>
-        <Button
-          startIcon={<Add />}
-          variant="contained"
-          onClick={handleCreateTemplate}
-          sx={{
-            background: 'linear-gradient(135deg, #2b88d8 0%, #106ebe 100%)',
-            boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
-            '&:hover': {
-              background: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
-              transform: 'scale(1.02)',
-              boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
-            }
-          }}
-        >
-          Create New Template
-        </Button>
-      </Box>
-
-      {/* Search Bar */}
-      {templates.length > 0 && (
-        <Fade in timeout={300}>
-          <Box sx={{ mb: 3 }}>
-            <TextField
-              fullWidth
-              placeholder="Search templates by name or description..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Search sx={{ color: '#2b88d8' }} />
-                  </InputAdornment>
-                ),
-                endAdornment: searchQuery && (
-                  <InputAdornment position="end">
-                    <IconButton
-                      size="small"
-                      onClick={() => setSearchQuery('')}
-                      sx={{ color: 'text.secondary' }}
-                    >
-                      <Close fontSize="small" />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  bgcolor: 'white',
-                  borderRadius: 2,
-                  '& fieldset': {
-                    borderColor: alpha('#2b88d8', 0.2),
-                    borderWidth: 2,
-                  },
-                  '&:hover fieldset': {
-                    borderColor: alpha('#2b88d8', 0.4),
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#2b88d8',
-                  },
-                },
-              }}
+      <Box>
+        {/* Template Selection */}
+        <Paper sx={{ p: 3, mb: 3 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+            <TableChart sx={{ fontSize: 20, color: '#3b82f6' }} />
+            <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#3b82f6' }}>
+              Select Template
+            </Typography>
+            <Chip
+              label={`${templates.length} available`}
+              size="small"
+              sx={{ ml: 'auto', bgcolor: alpha('#3b82f6', 0.1), color: '#3b82f6', fontWeight: 600, fontSize: '0.7rem' }}
             />
           </Box>
-        </Fade>
-      )}
-
-      <Grid container spacing={3}>
-        {templates.length === 0 && (
-          <Grid item xs={12}>
-            <Zoom in timeout={300}>
-              <Paper sx={{
-                p: 6,
-                textAlign: 'center',
-                bgcolor: 'linear-gradient(135deg, rgba(59, 130, 246, 0.02) 0%, rgba(255, 255, 255, 1) 100%)',
-                border: '2px dashed',
-                borderColor: alpha('#2b88d8', 0.3),
-                borderRadius: 2,
-                '&:hover': {
-                  borderColor: '#2b88d8',
-                  bgcolor: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(255, 255, 255, 1) 100%)',
-                }
-              }}>
-                <Layers sx={{ fontSize: 64, color: alpha('#2b88d8', 0.4), mb: 2 }} />
-                <Typography variant="h6" fontWeight={600} color="text.secondary" sx={{ mb: 1 }}>
-                  No Templates Created Yet
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                  Create your first template to start processing Excel files with AI
-                </Typography>
-                <Button
-                  startIcon={<Add />}
-                  variant="contained"
-                  onClick={handleCreateTemplate}
-                  sx={{
-                    background: 'linear-gradient(135deg, #2b88d8 0%, #106ebe 100%)',
-                    '&:hover': {
-                      background: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
-                      transform: 'scale(1.02)',
-                    }
-                  }}
-                >
-                  Create Your First Template
-                </Button>
-              </Paper>
-            </Zoom>
-          </Grid>
-        )}
-
-        {filteredTemplates.length === 0 && templates.length > 0 && (
-          <Grid item xs={12}>
-            <Zoom in timeout={300}>
-              <Paper sx={{
-                p: 6,
-                textAlign: 'center',
-                bgcolor: alpha('#64748b', 0.02),
-                border: '2px dashed',
-                borderColor: alpha('#64748b', 0.3),
-                borderRadius: 2,
-              }}>
-                <Search sx={{ fontSize: 64, color: alpha('#64748b', 0.4), mb: 2 }} />
-                <Typography variant="h6" fontWeight={600} color="text.secondary" sx={{ mb: 1 }}>
-                  No Templates Found
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                  No templates match your search "{searchQuery}". Try a different search term.
-                </Typography>
-                <Button
-                  variant="outlined"
-                  onClick={() => setSearchQuery('')}
-                  sx={{
-                    borderColor: alpha('#64748b', 0.3),
-                    color: '#64748b',
-                    '&:hover': {
-                      borderColor: '#64748b',
-                      bgcolor: alpha('#64748b', 0.05),
-                    }
-                  }}
-                >
-                  Clear Search
-                </Button>
-              </Paper>
-            </Zoom>
-          </Grid>
-        )}
-
-        {filteredTemplates.map((template, index) => {
-          // Corporate color palette - blue primary, slate secondary
-          const colors = [
-            { main: '#2b88d8', gradient: 'linear-gradient(90deg, #2b88d8 0%, #106ebe 100%)', bg: 'linear-gradient(135deg, rgba(248, 250, 252, 1) 0%, rgba(255, 255, 255, 1) 100%)', alpha: alpha('#2b88d8', 0.1) },
-            { main: '#64748b', gradient: 'linear-gradient(90deg, #64748b 0%, #475569 100%)', bg: 'linear-gradient(135deg, rgba(248, 250, 252, 1) 0%, rgba(255, 255, 255, 1) 100%)', alpha: alpha('#64748b', 0.1) },
-          ];
-          const colorScheme = colors[index % colors.length];
-
-          return (
-          <Grid item xs={12} md={6} key={template.id}>
-            <Zoom in timeout={400 + index * 100}>
-              <Card sx={{
-                height: 240,
-                cursor: 'pointer',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                border: '1px solid',
-                borderColor: alpha(colorScheme.main, 0.2),
-                borderRadius: 2,
-                overflow: 'hidden',
-                background: colorScheme.bg,
-                position: 'relative',
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: '3px',
-                  background: colorScheme.gradient,
-                },
-                '&:hover': {
-                  transform: 'translateY(-6px)',
-                  boxShadow: `0 12px 32px ${alpha(colorScheme.main, 0.2)}`,
-                  borderColor: colorScheme.main,
-                  '& .template-icon': {
-                    transform: 'scale(1.1)',
-                    bgcolor: colorScheme.main,
-                    color: 'white',
-                  },
-                  '& .access-button': {
-                    background: colorScheme.gradient,
-                    color: 'white',
-                    transform: 'translateX(4px)',
-                  },
-                },
-              }}>
-                <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                  {/* Icon and Badge */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                    <Avatar
-                      className="template-icon"
-                      sx={{
-                        width: 56,
-                        height: 56,
-                        bgcolor: colorScheme.alpha,
-                        color: colorScheme.main,
-                        transition: 'all 0.3s ease'
-                      }}
-                    >
-                      <Layers sx={{ fontSize: 32 }} />
-                    </Avatar>
-                    <Stack direction="row" spacing={0.5}>
-                      <Chip label={`${template.sheets.length} Sheets`} size="small" sx={{ bgcolor: colorScheme.alpha, color: colorScheme.main, fontWeight: 600, fontSize: '0.7rem', height: 24 }} />
-                      <Chip label={`${template.businessRules.length} Rules`} size="small" sx={{ bgcolor: colorScheme.alpha, color: colorScheme.main, fontWeight: 600, fontSize: '0.7rem', height: 24 }} />
-                    </Stack>
-                  </Box>
-
-                  {/* Title */}
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: colorScheme.main, mb: 1, fontSize: '1.1rem', letterSpacing: '-0.3px' }}>
-                    {template.name}
-                  </Typography>
-
-                  {/* Description */}
-                  <Typography variant="body2" sx={{ color: 'text.secondary', mb: 'auto', lineHeight: 1.5, fontSize: '0.85rem' }}>
-                    {template.description || 'Custom Excel processing template with AI-powered analysis'}
-                  </Typography>
-
-                  {/* Footer */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2, pt: 2, borderTop: '1px solid', borderColor: alpha(colorScheme.main, 0.1) }}>
-                    <Stack direction="row" spacing={1}>
-                      <IconButton size="small" onClick={() => { setSelectedTemplate(template); setView('edit'); }} sx={{ border: '1px solid', borderColor: 'divider' }}>
-                        <Edit fontSize="small" />
-                      </IconButton>
-                      <IconButton size="small" onClick={() => deleteTemplate(template.id)} sx={{ border: '1px solid', borderColor: 'divider', color: 'error.main' }}>
-                        <Delete fontSize="small" />
-                      </IconButton>
-                    </Stack>
-                    <Box
-                      className="access-button"
-                      onClick={() => { setSelectedTemplate(template); setView('execute'); }}
-                      sx={{
+          <Grid container spacing={2} alignItems="flex-start">
+            <Grid item xs={12} md={9}>
+              <Autocomplete
+                value={selectedTemplate}
+                onChange={(e, newValue) => {
+                  setSelectedTemplate(newValue);
+                  if (newValue) {
+                    setView('execute');
+                  }
+                }}
+                options={sortedTemplates}
+                getOptionLabel={(option) => option.name || ''}
+                loading={loadingTemplates}
+                groupBy={(option) => option.category || 'General'}
+                isOptionEqualToValue={(option, value) => option.id === value?.id}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Search and select a template..."
+                    size="small"
+                    InputProps={{
+                      ...params.InputProps,
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Search sx={{ color: '#3b82f6', fontSize: 20 }} />
+                        </InputAdornment>
+                      ),
+                      endAdornment: (
+                        <>
+                          {loadingTemplates ? <CircularProgress color="inherit" size={20} /> : null}
+                          {params.InputProps.endAdornment}
+                        </>
+                      ),
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        bgcolor: darkMode ? '#161b22' : 'white',
+                        '& fieldset': { borderColor: alpha('#3b82f6', 0.2) },
+                        '&:hover fieldset': { borderColor: alpha('#3b82f6', 0.4) },
+                        '&.Mui-focused fieldset': { borderColor: '#3b82f6' },
+                      },
+                    }}
+                  />
+                )}
+                renderGroup={(params) => {
+                  const style = getCategoryStyle(params.group);
+                  return (
+                    <li key={params.key}>
+                      <Box sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 0.5,
-                        bgcolor: colorScheme.alpha,
-                        color: colorScheme.main,
+                        gap: 1,
                         px: 2,
-                        py: 0.75,
-                        borderRadius: 1.5,
-                        fontWeight: 600,
-                        fontSize: '0.8rem',
-                        transition: 'all 0.3s ease'
+                        py: 1,
+                        bgcolor: alpha(style.color, 0.05),
+                        borderLeft: `3px solid ${style.color}`,
+                        position: 'sticky',
+                        top: 0,
+                        zIndex: 1,
+                      }}>
+                        <Box sx={{ color: style.color }}>{style.icon}</Box>
+                        <Typography variant="caption" fontWeight={700} sx={{ color: style.color, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                          {params.group}
+                        </Typography>
+                        <Chip
+                          label={params.children.length}
+                          size="small"
+                          sx={{
+                            ml: 'auto',
+                            height: 18,
+                            fontSize: '0.65rem',
+                            bgcolor: alpha(style.color, 0.15),
+                            color: style.color,
+                            fontWeight: 700,
+                          }}
+                        />
+                      </Box>
+                      <Box component="ul" sx={{ p: 0 }}>{params.children}</Box>
+                    </li>
+                  );
+                }}
+                renderOption={(props, option) => {
+                  const { key, ...otherProps } = props;
+                  const style = getCategoryStyle(option.category);
+                  return (
+                    <Box
+                      component="li"
+                      key={key}
+                      {...otherProps}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 1.5,
+                        py: 1.5,
+                        px: 2,
+                        borderBottom: '1px solid',
+                        borderColor: 'divider',
+                        '&:hover': { bgcolor: alpha(style.color, 0.05) },
+                        '&.Mui-focused': { bgcolor: alpha(style.color, 0.1) },
                       }}
                     >
-                      USE
-                      <ArrowForward sx={{ fontSize: 16 }} />
+                      <Avatar sx={{ width: 32, height: 32, bgcolor: alpha(style.color, 0.1), color: style.color }}>
+                        {style.icon}
+                      </Avatar>
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.25 }}>
+                          <Typography variant="body2" fontWeight={600} sx={{ color: 'text.primary' }}>
+                            {option.name}
+                          </Typography>
+                        </Box>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{
+                            display: 'block',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            mb: 0.5,
+                          }}
+                        >
+                          {option.description || 'No description'}
+                        </Typography>
+                        <Stack direction="row" spacing={0.5}>
+                          <Chip
+                            label={option.template_key}
+                            size="small"
+                            sx={{
+                              height: 18,
+                              fontSize: '0.6rem',
+                              bgcolor: alpha('#64748b', 0.1),
+                              color: '#64748b',
+                              fontFamily: 'monospace',
+                            }}
+                          />
+                          <Chip
+                            label={`${option.sheets?.length || 0} sheets`}
+                            size="small"
+                            sx={{
+                              height: 18,
+                              fontSize: '0.6rem',
+                              bgcolor: alpha(style.color, 0.1),
+                              color: style.color,
+                            }}
+                          />
+                        </Stack>
+                      </Box>
                     </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Zoom>
+                  );
+                }}
+                ListboxProps={{
+                  sx: { maxHeight: 400, p: 0 }
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Button
+                fullWidth
+                variant="contained"
+                startIcon={<Add />}
+                onClick={() => setCreateModalOpen(true)}
+                sx={{
+                  background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                  }
+                }}
+              >
+                New Template
+              </Button>
+            </Grid>
           </Grid>
+        </Paper>
+
+        {/* Prompt to select template */}
+        {!selectedTemplate && (
+          <Paper sx={{ p: 4, textAlign: 'center', border: '2px dashed', borderColor: alpha('#3b82f6', 0.2), borderRadius: 2 }}>
+            <Schema sx={{ fontSize: 48, color: alpha('#3b82f6', 0.3), mb: 2 }} />
+            <Typography variant="h6" color="text.secondary" fontWeight={600}>
+              Select a template to begin
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Choose a template from the dropdown above to start processing Excel files
+            </Typography>
+            {!loadingTemplates && templates.length > 0 && (
+              <Stack direction="row" spacing={1} justifyContent="center" flexWrap="wrap" sx={{ gap: 1 }}>
+                {[...new Set(templates.map(t => t.category))].slice(0, 5).map(cat => {
+                  const style = getCategoryStyle(cat);
+                  return (
+                    <Chip
+                      key={cat}
+                      icon={style.icon}
+                      label={cat}
+                      size="small"
+                      sx={{
+                        bgcolor: alpha(style.color, 0.1),
+                        color: style.color,
+                        '& .MuiChip-icon': { color: style.color }
+                      }}
+                    />
+                  );
+                })}
+              </Stack>
+            )}
+            {loadingTemplates && (
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mt: 2 }}>
+                <CircularProgress size={16} />
+                <Typography variant="caption" color="text.secondary">Loading templates...</Typography>
+              </Box>
+            )}
+          </Paper>
         )}
-        )}
-      </Grid>
-    </>
+      </Box>
     );
   };
 
@@ -677,7 +707,7 @@ const ExcelAIProcessor = ({ onBack }) => {
         </Typography>
       </Box>
 
-      <Paper sx={{ p: 3, mb: 3 }}>
+      <Paper sx={{ p: 3, mb: 3, bgcolor: darkMode ? '#161b22' : 'white' }}>
         <Stepper
           activeStep={templateBuilder.step}
           sx={{
@@ -690,7 +720,7 @@ const ExcelAIProcessor = ({ onBack }) => {
               borderColor: '#10b981',
             },
             '& .MuiStepConnector-root.Mui-active .MuiStepConnector-line': {
-              borderColor: '#2b88d8',
+              borderColor: '#3b82f6',
             },
           }}
         >
@@ -721,8 +751,8 @@ const ExcelAIProcessor = ({ onBack }) => {
                   p: 6,
                   textAlign: 'center',
                   cursor: 'pointer',
-                  bgcolor: '#fafafa',
-                  '&:hover': { bgcolor: '#f5f5f5', borderColor: 'text.secondary' }
+                  bgcolor: darkMode ? '#21262d' : '#fafafa',
+                  '&:hover': { bgcolor: darkMode ? '#30363d' : '#f5f5f5', borderColor: 'text.secondary' }
                 }}
               >
                 <CloudUpload sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
@@ -792,7 +822,7 @@ const ExcelAIProcessor = ({ onBack }) => {
 
                 <Stack spacing={1}>
                   {templateBuilder.files.map((fileInfo, index) => (
-                    <Paper key={index} sx={{ p: 2, bgcolor: '#f9fafb' }}>
+                    <Paper key={index} sx={{ p: 2, bgcolor: darkMode ? '#21262d' : '#f9fafb' }}>
                       <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                           <TableChart sx={{ color: 'text.secondary' }} />
@@ -908,7 +938,7 @@ const ExcelAIProcessor = ({ onBack }) => {
 
             <Stack spacing={2} sx={{ mb: 3 }}>
               {templateBuilder.businessRules.map((rule, index) => (
-                <Paper key={index} sx={{ p: 2, bgcolor: '#f9fafb' }}>
+                <Paper key={index} sx={{ p: 2, bgcolor: darkMode ? '#21262d' : '#f9fafb' }}>
                   <Stack direction="row" spacing={2} alignItems="flex-start">
                     <Code sx={{ color: 'text.secondary', mt: 0.5 }} />
                     <Box sx={{ flex: 1 }}>
@@ -1021,7 +1051,7 @@ const ExcelAIProcessor = ({ onBack }) => {
               </Grid>
             </Grid>
 
-            <Paper sx={{ p: 3, mt: 3, bgcolor: '#f9fafb', border: '1px solid', borderColor: 'divider' }}>
+            <Paper sx={{ p: 3, mt: 3, bgcolor: darkMode ? '#21262d' : '#f9fafb', border: '1px solid', borderColor: 'divider' }}>
               <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2 }}>Configuration Summary</Typography>
               <Stack spacing={1}>
                 <Box sx={{ display: 'flex', gap: 1 }}>
@@ -1067,7 +1097,7 @@ const ExcelAIProcessor = ({ onBack }) => {
               variant="contained"
               onClick={() => setTemplateBuilder(prev => ({ ...prev, step: prev.step + 1 }))}
               disabled={templateBuilder.step === 0 && templateBuilder.files.length === 0}
-              sx={{ background: 'linear-gradient(135deg, #2b88d8 0%, #106ebe 100%)' }}
+              sx={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}
             >
               Next
             </Button>
@@ -1179,19 +1209,19 @@ const ExcelAIProcessor = ({ onBack }) => {
                 <Card sx={{
                   height: 80,
                   border: '1px solid',
-                  borderColor: alpha('#2b88d8', 0.15),
+                  borderColor: alpha('#3b82f6', 0.15),
                   borderRadius: 2,
                   overflow: 'hidden',
                   transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                   '&:hover': {
                     transform: 'translateY(-2px)',
-                    boxShadow: `0 8px 16px ${alpha('#2b88d8', 0.1)}`,
-                    borderColor: '#2b88d8',
+                    boxShadow: `0 8px 16px ${alpha('#3b82f6', 0.1)}`,
+                    borderColor: '#3b82f6',
                   }
                 }}>
                   <CardContent sx={{ p: 1.5, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                    <TableChart sx={{ fontSize: 24, color: '#2b88d8', mb: 0.25 }} />
-                    <Typography variant="h6" fontWeight={700} color="#2b88d8" sx={{ fontSize: '1.2rem' }}>
+                    <TableChart sx={{ fontSize: 24, color: '#3b82f6', mb: 0.25 }} />
+                    <Typography variant="h6" fontWeight={700} color="#3b82f6" sx={{ fontSize: '1.2rem' }}>
                       {fileData.columns.length}
                     </Typography>
                     <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
@@ -1305,16 +1335,16 @@ const ExcelAIProcessor = ({ onBack }) => {
                 <Paper sx={{
                   p: 1.5,
                   mt: 2,
-                  bgcolor: alpha('#2b88d8', 0.05),
+                  bgcolor: alpha('#3b82f6', 0.05),
                   border: '1px solid',
-                  borderColor: alpha('#2b88d8', 0.1),
+                  borderColor: alpha('#3b82f6', 0.1),
                   borderRadius: 1,
-                  borderLeft: '3px solid #2b88d8'
+                  borderLeft: '3px solid #3b82f6'
                 }}>
                   <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
-                    <AutoAwesome sx={{ fontSize: 16, color: '#2b88d8', mt: 0.1 }} />
+                    <AutoAwesome sx={{ fontSize: 16, color: '#3b82f6', mt: 0.1 }} />
                     <Box>
-                      <Typography variant="caption" fontWeight={600} color="#2b88d8" sx={{ display: 'block', mb: 0.3, fontSize: '0.7rem' }}>
+                      <Typography variant="caption" fontWeight={600} color="#3b82f6" sx={{ display: 'block', mb: 0.3, fontSize: '0.7rem' }}>
                         Processing Context
                       </Typography>
                       <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', lineHeight: 1.4 }}>
@@ -1430,7 +1460,7 @@ const ExcelAIProcessor = ({ onBack }) => {
                 <Grid container spacing={2}>
                   {/* Date Filter Section */}
                   <Grid item xs={12}>
-                    <Typography variant="subtitle2" fontWeight={600} color="#2b88d8" sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="subtitle2" fontWeight={600} color="#3b82f6" sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
                       <TableChart sx={{ fontSize: 18 }} />
                       Date Filter
                     </Typography>
@@ -1526,7 +1556,7 @@ const ExcelAIProcessor = ({ onBack }) => {
 
                   {/* Invoice Range Section */}
                   <Grid item xs={12}>
-                    <Typography variant="subtitle2" fontWeight={600} color="#2b88d8" sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="subtitle2" fontWeight={600} color="#3b82f6" sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Description sx={{ fontSize: 18 }} />
                       Invoice Range (Optional)
                     </Typography>
@@ -1572,16 +1602,16 @@ const ExcelAIProcessor = ({ onBack }) => {
                     <Paper sx={{
                       p: 1.5,
                       mt: 1,
-                      bgcolor: alpha('#2b88d8', 0.05),
+                      bgcolor: alpha('#3b82f6', 0.05),
                       border: '1px solid',
-                      borderColor: alpha('#2b88d8', 0.1),
+                      borderColor: alpha('#3b82f6', 0.1),
                       borderRadius: 1,
-                      borderLeft: '3px solid #2b88d8'
+                      borderLeft: '3px solid #3b82f6'
                     }}>
                       <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
-                        <AutoAwesome sx={{ fontSize: 16, color: '#2b88d8', mt: 0.1 }} />
+                        <AutoAwesome sx={{ fontSize: 16, color: '#3b82f6', mt: 0.1 }} />
                         <Box sx={{ flex: 1 }}>
-                          <Typography variant="caption" fontWeight={600} color="#2b88d8" sx={{ display: 'block', mb: 0.5, fontSize: '0.7rem' }}>
+                          <Typography variant="caption" fontWeight={600} color="#3b82f6" sx={{ display: 'block', mb: 0.5, fontSize: '0.7rem' }}>
                             Active Filters
                           </Typography>
                           <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', lineHeight: 1.6 }}>
@@ -1610,7 +1640,7 @@ const ExcelAIProcessor = ({ onBack }) => {
               mb: 3,
               background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.02) 0%, rgba(255, 255, 255, 1) 100%)',
               border: '1px solid',
-              borderColor: alpha('#2b88d8', 0.1),
+              borderColor: alpha('#3b82f6', 0.1),
               borderRadius: 2,
             }}>
               {/* Header with gradient background */}
@@ -1621,13 +1651,13 @@ const ExcelAIProcessor = ({ onBack }) => {
                 mb: 3,
                 pb: 2,
                 borderBottom: '2px solid',
-                borderColor: alpha('#2b88d8', 0.1)
+                borderColor: alpha('#3b82f6', 0.1)
               }}>
-                <Avatar sx={{ bgcolor: alpha('#2b88d8', 0.1), width: 40, height: 40 }}>
-                  <CloudUpload sx={{ color: '#2b88d8', fontSize: 24 }} />
+                <Avatar sx={{ bgcolor: alpha('#3b82f6', 0.1), width: 40, height: 40 }}>
+                  <CloudUpload sx={{ color: '#3b82f6', fontSize: 24 }} />
                 </Avatar>
                 <Box>
-                  <Typography variant="h6" fontWeight={700} color="#2b88d8">
+                  <Typography variant="h6" fontWeight={700} color="#3b82f6">
                     Upload Files to Process
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
@@ -1641,18 +1671,18 @@ const ExcelAIProcessor = ({ onBack }) => {
                   onClick={() => fileInputRef.current?.click()}
                   sx={{
                     border: '2px dashed',
-                    borderColor: alpha('#2b88d8', 0.3),
+                    borderColor: alpha('#3b82f6', 0.3),
                     borderRadius: 2,
                     p: 6,
                     textAlign: 'center',
                     cursor: 'pointer',
-                    bgcolor: alpha('#2b88d8', 0.02),
+                    bgcolor: alpha('#3b82f6', 0.02),
                     position: 'relative',
                     overflow: 'hidden',
                     transition: 'all 0.3s ease',
                     '&:hover': {
-                      bgcolor: alpha('#2b88d8', 0.05),
-                      borderColor: '#2b88d8',
+                      bgcolor: alpha('#3b82f6', 0.05),
+                      borderColor: '#3b82f6',
                       transform: 'scale(1.01)',
                       '& .upload-icon': {
                         transform: 'scale(1.1) translateY(-4px)',
@@ -1664,12 +1694,12 @@ const ExcelAIProcessor = ({ onBack }) => {
                     className="upload-icon"
                     sx={{
                       fontSize: 64,
-                      color: alpha('#2b88d8', 0.4),
+                      color: alpha('#3b82f6', 0.4),
                       mb: 2,
                       transition: 'all 0.3s ease'
                     }}
                   />
-                  <Typography variant="body1" fontWeight={600} color="#2b88d8" sx={{ mb: 0.5 }}>
+                  <Typography variant="body1" fontWeight={600} color="#3b82f6" sx={{ mb: 0.5 }}>
                     Drop Excel files here or click to browse
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
@@ -1727,21 +1757,21 @@ const ExcelAIProcessor = ({ onBack }) => {
                           alignItems: 'center',
                           justifyContent: 'space-between',
                           p: 2,
-                          bgcolor: 'white',
+                          bgcolor: darkMode ? '#161b22' : 'white',
                           border: '1px solid',
-                          borderColor: alpha('#2b88d8', 0.1),
+                          borderColor: alpha('#3b82f6', 0.1),
                           borderRadius: 1.5,
                           transition: 'all 0.2s ease',
                           '&:hover': {
-                            borderColor: '#2b88d8',
-                            boxShadow: `0 4px 12px ${alpha('#2b88d8', 0.1)}`,
+                            borderColor: '#3b82f6',
+                            boxShadow: `0 4px 12px ${alpha('#3b82f6', 0.1)}`,
                             transform: 'translateX(4px)'
                           }
                         }}
                       >
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                          <Avatar sx={{ bgcolor: alpha('#2b88d8', 0.1), width: 36, height: 36 }}>
-                            <Description sx={{ color: '#2b88d8', fontSize: 20 }} />
+                          <Avatar sx={{ bgcolor: alpha('#3b82f6', 0.1), width: 36, height: 36 }}>
+                            <Description sx={{ color: '#3b82f6', fontSize: 20 }} />
                           </Avatar>
                           <Box>
                             <Typography variant="body2" fontWeight={600}>{file.name}</Typography>
@@ -1805,8 +1835,8 @@ const ExcelAIProcessor = ({ onBack }) => {
                 {/* Sheets Section */}
                 <Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                    <TableChart sx={{ fontSize: 18, color: '#2b88d8' }} />
-                    <Typography variant="subtitle2" fontWeight={600} color="#2b88d8">
+                    <TableChart sx={{ fontSize: 18, color: '#3b82f6' }} />
+                    <Typography variant="subtitle2" fontWeight={600} color="#3b82f6">
                       Sheets to Process
                     </Typography>
                   </Box>
@@ -1817,13 +1847,13 @@ const ExcelAIProcessor = ({ onBack }) => {
                           label={sheet.name}
                           size="small"
                           sx={{
-                            bgcolor: alpha('#2b88d8', 0.1),
-                            color: '#2b88d8',
+                            bgcolor: alpha('#3b82f6', 0.1),
+                            color: '#3b82f6',
                             fontWeight: 600,
                             border: '1px solid',
-                            borderColor: alpha('#2b88d8', 0.2),
+                            borderColor: alpha('#3b82f6', 0.2),
                             '&:hover': {
-                              bgcolor: alpha('#2b88d8', 0.2),
+                              bgcolor: alpha('#3b82f6', 0.2),
                               transform: 'scale(1.05)',
                             }
                           }}
@@ -1931,11 +1961,11 @@ const ExcelAIProcessor = ({ onBack }) => {
                   <Accordion
                     defaultExpanded
                     sx={{
-                      bgcolor: 'white',
+                      bgcolor: darkMode ? '#161b22' : 'white',
                       '&:before': { display: 'none' },
                       boxShadow: 'none',
                       border: '1px solid',
-                      borderColor: alpha('#2b88d8', 0.1),
+                      borderColor: alpha('#3b82f6', 0.1),
                       borderRadius: '8px !important',
                       '&.Mui-expanded': {
                         margin: '0 !important',
@@ -1951,8 +1981,8 @@ const ExcelAIProcessor = ({ onBack }) => {
                       }}
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Avatar sx={{ bgcolor: alpha('#2b88d8', 0.1), width: 32, height: 32 }}>
-                          <Description sx={{ color: '#2b88d8', fontSize: 18 }} />
+                        <Avatar sx={{ bgcolor: alpha('#3b82f6', 0.1), width: 32, height: 32 }}>
+                          <Description sx={{ color: '#3b82f6', fontSize: 18 }} />
                         </Avatar>
                         <Typography variant="subtitle1" fontWeight={600}>
                           Analysis Methodology
@@ -1960,7 +1990,7 @@ const ExcelAIProcessor = ({ onBack }) => {
                       </Box>
                     </AccordionSummary>
                     <AccordionDetails sx={{ pt: 0 }}>
-                      <Paper sx={{ p: 2, bgcolor: alpha('#2b88d8', 0.03), border: '1px solid', borderColor: alpha('#2b88d8', 0.1) }}>
+                      <Paper sx={{ p: 2, bgcolor: alpha('#3b82f6', 0.03), border: '1px solid', borderColor: alpha('#3b82f6', 0.1) }}>
                         <Typography variant="body2" sx={{ mb: 2, lineHeight: 1.8 }}>
                           This template processes financial data using a <strong>hybrid approach</strong> that combines multiple data sources:
                         </Typography>
@@ -2009,7 +2039,7 @@ const ExcelAIProcessor = ({ onBack }) => {
                   {/* Input Files Section */}
                   <Accordion
                     sx={{
-                      bgcolor: 'white',
+                      bgcolor: darkMode ? '#161b22' : 'white',
                       '&:before': { display: 'none' },
                       boxShadow: 'none',
                       border: '1px solid',
@@ -2124,7 +2154,7 @@ const ExcelAIProcessor = ({ onBack }) => {
                   {/* Processing Logic Section */}
                   <Accordion
                     sx={{
-                      bgcolor: 'white',
+                      bgcolor: darkMode ? '#161b22' : 'white',
                       '&:before': { display: 'none' },
                       boxShadow: 'none',
                       border: '1px solid',
@@ -2211,10 +2241,10 @@ const ExcelAIProcessor = ({ onBack }) => {
             sx={{
               py: 2,
               fontSize: '1.1rem',
-              background: 'linear-gradient(135deg, #2b88d8 0%, #106ebe 100%)',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
               boxShadow: '0 4px 14px rgba(59, 130, 246, 0.4)',
               '&:hover': {
-                background: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
+                background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
                 transform: 'scale(1.02)',
                 boxShadow: '0 6px 20px rgba(59, 130, 246, 0.5)',
               },
@@ -2280,12 +2310,12 @@ const ExcelAIProcessor = ({ onBack }) => {
                         textAlign: 'center',
                         background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(255, 255, 255, 1) 100%)',
                         border: '1px solid',
-                        borderColor: alpha('#2b88d8', 0.2),
+                        borderColor: alpha('#3b82f6', 0.2),
                         transition: 'all 0.3s ease',
                         '&:hover': { transform: 'translateY(-4px)', boxShadow: 3 }
                       }}>
-                        <Description sx={{ fontSize: 32, color: '#2b88d8', mb: 1 }} />
-                        <Typography variant="h4" fontWeight={700} color="#2b88d8">{processedResults.filesProcessed}</Typography>
+                        <Description sx={{ fontSize: 32, color: '#3b82f6', mb: 1 }} />
+                        <Typography variant="h4" fontWeight={700} color="#3b82f6">{processedResults.filesProcessed}</Typography>
                         <Typography variant="caption" color="text.secondary">Files Processed</Typography>
                       </Paper>
                     </Zoom>
@@ -2327,7 +2357,7 @@ const ExcelAIProcessor = ({ onBack }) => {
                 </Grid>
 
                 {/* Insights List */}
-                <Paper sx={{ p: 2, mb: 3, bgcolor: 'white', border: '1px solid', borderColor: 'divider' }}>
+                <Paper sx={{ p: 2, mb: 3, bgcolor: darkMode ? '#161b22' : 'white', border: '1px solid', borderColor: 'divider' }}>
                   <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2 }}>Key Insights</Typography>
                   <Stack spacing={1.5}>
                     {processedResults.insights.map((insight, i) => (
@@ -2408,7 +2438,7 @@ const ExcelAIProcessor = ({ onBack }) => {
                   </IconButton>
                 )}
               </Box>
-            <Box sx={{ height: 300, overflow: 'auto', bgcolor: '#f9fafb', borderRadius: 1, p: 2, mb: 2 }}>
+            <Box sx={{ height: 300, overflow: 'auto', bgcolor: darkMode ? '#21262d' : '#f9fafb', borderRadius: 1, p: 2, mb: 2 }}>
               {aiConversation.length === 0 ? (
                 <Typography variant="body2" color="text.secondary" textAlign="center">
                   AI assistant ready to help...
@@ -2420,7 +2450,7 @@ const ExcelAIProcessor = ({ onBack }) => {
                       key={msg.id}
                       sx={{
                         p: 1.5,
-                        bgcolor: msg.role === 'user' ? '#2b88d8' : '#f3f4f6',
+                        bgcolor: msg.role === 'user' ? '#3b82f6' : '#f3f4f6',
                         color: msg.role === 'user' ? 'white' : 'text.primary'
                       }}
                     >
@@ -2442,7 +2472,7 @@ const ExcelAIProcessor = ({ onBack }) => {
                 }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
-                    bgcolor: 'white',
+                    bgcolor: darkMode ? '#161b22' : 'white',
                     '&:hover': {
                       '& > fieldset': {
                         borderColor: '#8b5cf6',
@@ -2492,7 +2522,7 @@ const ExcelAIProcessor = ({ onBack }) => {
                       <Fade in timeout={300 + index * 50} key={entry.id}>
                         <Paper sx={{
                           p: 1.5,
-                          bgcolor: 'white',
+                          bgcolor: darkMode ? '#161b22' : 'white',
                           border: '1px solid',
                           borderColor: alpha('#06b6d4', 0.1),
                           borderRadius: 1,
@@ -2581,17 +2611,62 @@ const ExcelAIProcessor = ({ onBack }) => {
               Back
             </Button>
           </Box>
+
+          {/* Tabs */}
+          <Tabs
+            value={activeTab}
+            onChange={(e, v) => setActiveTab(v)}
+            sx={{
+              mt: 2,
+              '& .Mui-selected': { color: '#3b82f6' },
+              '& .MuiTabs-indicator': { backgroundColor: '#3b82f6' }
+            }}
+          >
+            <Tab icon={<Schema sx={{ fontSize: 18 }} />} iconPosition="start" label="Excel AI Processor" />
+            <Tab icon={<TableChart sx={{ fontSize: 18 }} />} iconPosition="start" label="Templates" />
+          </Tabs>
         </Box>
       </Paper>
 
       {/* Main Content */}
       <Box sx={{ flexGrow: 1, overflow: 'auto', p: 3 }}>
         <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
-          {view === 'list' && renderTemplateList()}
-          {view === 'create' && renderTemplateBuilder()}
-          {view === 'execute' && renderTemplateExecute()}
+          {/* Excel AI Processor Tab */}
+          {activeTab === 0 && (
+            <>
+              {view === 'list' && renderTemplateList()}
+              {view === 'create' && renderTemplateBuilder()}
+              {view === 'execute' && renderTemplateExecute()}
+            </>
+          )}
+
+          {/* Templates Tab */}
+          {activeTab === 1 && (
+            <ExcelTemplatesManager
+              key={templatesRefreshKey}
+              onBack={() => setActiveTab(0)}
+              darkMode={darkMode}
+              embedded={true}
+              onCreateTemplate={() => setCreateModalOpen(true)}
+              onTemplateCreated={() => {
+                setTemplatesRefreshKey(prev => prev + 1);
+              }}
+            />
+          )}
         </Box>
       </Box>
+
+      {/* Create Template Modal - shared between tabs */}
+      <CreateExcelTemplateModal
+        open={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onSuccess={() => {
+          setCreateModalOpen(false);
+          loadTemplates(); // Refresh dropdown list
+          setTemplatesRefreshKey(prev => prev + 1); // Refresh Templates tab
+        }}
+        darkMode={darkMode}
+      />
     </Box>
   );
 };

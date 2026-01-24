@@ -51,9 +51,9 @@ import { LAM_PLANTS } from '../../data/arizonaBeveragesMasterData';
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, ChartTooltip, Legend);
 
-// Generate SAP system data for Lam Research plants
+// Generate SAP system data for Arizona Beverages plants
 const generateSAPData = () => {
-  // Map Lam Research plants to SAP system data
+  // Map Arizona Beverages plants to SAP system data
   const systems = LAM_PLANTS.map(plant => ({
     id: plant.id,
     name: `${plant.name} (${plant.country})`,

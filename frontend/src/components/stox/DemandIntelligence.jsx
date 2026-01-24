@@ -50,7 +50,7 @@ import { LAM_MATERIALS, LAM_MATERIAL_PLANT_DATA, LAM_PLANTS, getMaterialById, ge
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, ChartTooltip, Legend);
 
-// SKU Icons mapping (semiconductor equipment)
+// SKU Icons mapping (beverage equipment)
 const skuIcons = ['⚙️', '🔧', '💻', '🔬', '⚡', '🛠️', '📡', '🔩'];
 
 // Derive pattern from XYZ classification and other factors
@@ -79,7 +79,7 @@ const getCVFromXYZ = (xyz) => {
   return 0.75 + Math.random() * 0.35;                   // 0.75-1.1
 };
 
-// Generate demand intelligence data using Lam Research data
+// Generate demand intelligence data using Arizona Beverages data
 const generateDemandData = () => {
   return LAM_MATERIAL_PLANT_DATA.map((plantData, idx) => {
     const material = getMaterialById(plantData.materialId);

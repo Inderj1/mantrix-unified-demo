@@ -95,8 +95,8 @@ class DocumentService:
                     return f.read()
                     
             elif ext in ['png', 'jpg', 'jpeg', 'gif']:
-                # For images, return a description
-                return f"[Image file: {os.path.basename(filepath)}]"
+                # For images, return placeholder - actual analysis uses vision API
+                return f"[IMAGE_REQUIRES_VISION_ANALYSIS:{os.path.basename(filepath)}]"
                 
             else:
                 return f"[Unsupported file type: {ext}]"
@@ -131,10 +131,13 @@ class DocumentService:
             
             # Extract file type
             file_extension = filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
-            
+
+            # Check if this is an image file
+            is_image = file_extension in ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp']
+
             # Extract text content for analysis
             extracted_text = self.extract_text_from_file(str(filepath), file_extension)
-            
+
             # Store document metadata
             doc_metadata = {
                 'document_id': document_id,
@@ -146,9 +149,16 @@ class DocumentService:
                 'mime_type': mimetypes.guess_type(filename)[0] or 'application/octet-stream',
                 'file_type': file_extension,
                 'extracted_text': extracted_text[:1000],  # Store preview
-                'full_text': extracted_text  # Store full text for analysis
+                'full_text': extracted_text,  # Store full text for analysis
+                'is_image': is_image
             }
-            
+
+            # Store raw image data for vision analysis
+            if is_image:
+                import base64
+                doc_metadata['image_data'] = base64.standard_b64encode(content).decode('utf-8')
+                doc_metadata['media_type'] = self._get_image_media_type(file_extension)
+
             self.documents[document_id] = doc_metadata
             
             logger.info(f"Document uploaded successfully: {document_id}")
@@ -195,13 +205,240 @@ class DocumentService:
         logger.info(f"Document deleted: {document_id}")
         return True
     
+    def _get_image_media_type(self, file_extension: str) -> str:
+        """Get MIME type for image extension."""
+        media_types = {
+            'png': 'image/png',
+            'jpg': 'image/jpeg',
+            'jpeg': 'image/jpeg',
+            'gif': 'image/gif',
+            'bmp': 'image/bmp',
+            'webp': 'image/webp'
+        }
+        return media_types.get(file_extension.lower(), 'image/png')
+
+    def _compress_image_for_vision(self, image_data_b64: str, media_type: str, max_size_bytes: int = 3_500_000) -> tuple:
+        """Compress image to fit within Claude's vision API limits.
+
+        Claude's limit is 5MB for base64 encoded data.
+        Base64 adds ~33% overhead, so 3.5MB raw = ~4.7MB base64 (safe margin).
+        """
+        import base64
+        from io import BytesIO
+
+        try:
+            # Decode base64 to bytes
+            image_bytes = base64.standard_b64decode(image_data_b64)
+
+            logger.info(f"Image size: {len(image_bytes)} bytes, max allowed: {max_size_bytes}")
+
+            # If already small enough, return as-is
+            if len(image_bytes) <= max_size_bytes:
+                logger.info("Image within size limit, no compression needed")
+                return image_data_b64, media_type
+
+            logger.info(f"Compressing image from {len(image_bytes)} bytes...")
+
+            # Open with PIL
+            img = Image.open(BytesIO(image_bytes))
+
+            # Convert to RGB if necessary (for JPEG compression)
+            if img.mode in ('RGBA', 'P'):
+                img = img.convert('RGB')
+
+            # Calculate resize ratio if image is very large
+            max_dimension = 2048  # Claude works well with images up to 2048px
+            if max(img.size) > max_dimension:
+                ratio = max_dimension / max(img.size)
+                new_size = (int(img.size[0] * ratio), int(img.size[1] * ratio))
+                img = img.resize(new_size, Image.Resampling.LANCZOS)
+                logger.info(f"Resized image to {new_size}")
+
+            # Compress as JPEG with decreasing quality until under limit
+            for quality in [85, 70, 55, 40, 25]:
+                buffer = BytesIO()
+                img.save(buffer, format='JPEG', quality=quality, optimize=True)
+                compressed_bytes = buffer.getvalue()
+
+                if len(compressed_bytes) <= max_size_bytes:
+                    logger.info(f"Compressed to {len(compressed_bytes)} bytes at quality {quality}")
+                    compressed_b64 = base64.standard_b64encode(compressed_bytes).decode('utf-8')
+                    return compressed_b64, 'image/jpeg'
+
+            # If still too large, resize more aggressively
+            for scale in [0.75, 0.5, 0.25]:
+                new_size = (int(img.size[0] * scale), int(img.size[1] * scale))
+                resized = img.resize(new_size, Image.Resampling.LANCZOS)
+                buffer = BytesIO()
+                resized.save(buffer, format='JPEG', quality=60, optimize=True)
+                compressed_bytes = buffer.getvalue()
+
+                if len(compressed_bytes) <= max_size_bytes:
+                    logger.info(f"Aggressively compressed to {len(compressed_bytes)} bytes at scale {scale}")
+                    compressed_b64 = base64.standard_b64encode(compressed_bytes).decode('utf-8')
+                    return compressed_b64, 'image/jpeg'
+
+            # Last resort - return heavily compressed
+            buffer = BytesIO()
+            img.resize((800, 600), Image.Resampling.LANCZOS).save(buffer, format='JPEG', quality=50)
+            compressed_b64 = base64.standard_b64encode(buffer.getvalue()).decode('utf-8')
+            return compressed_b64, 'image/jpeg'
+
+        except Exception as e:
+            logger.error(f"Image compression failed: {e}")
+            # Return original if compression fails
+            return image_data_b64, media_type
+
+    def _analyze_image_document(self, doc: Dict[str, Any], analysis_type: str) -> Dict[str, Any]:
+        """Analyze an image document using Claude's vision capabilities."""
+        import base64
+
+        try:
+            image_data = doc.get('image_data', '')
+            media_type = doc.get('media_type', 'image/png')
+
+            # Compress image if needed for Claude's 5MB limit
+            image_data, media_type = self._compress_image_for_vision(image_data, media_type)
+
+            # Build vision prompt based on analysis type
+            if analysis_type == "summary":
+                vision_prompt = """Analyze this image and provide:
+1. A concise summary describing what the image shows (2-3 paragraphs)
+2. 5-7 key points or findings from the image
+3. Any notable patterns, data, or insights visible
+
+Be specific about any text, numbers, charts, tables, or data visible in the image.
+
+Provide your response in JSON format:
+{
+    "summary": "detailed description of what the image shows",
+    "key_points": ["point 1", "point 2", ...],
+    "insights": "any notable patterns or insights"
+}"""
+            elif analysis_type == "quality":
+                vision_prompt = """Analyze the quality and content of this image:
+1. Image clarity and readability assessment (0-100%)
+2. Data completeness assessment (0-100%) - what information is present vs missing
+3. Data accuracy/consistency assessment (0-100%) - are there any inconsistencies visible
+4. Specific issues or concerns found
+5. Suggestions for improvement or additional context needed
+
+Focus on any data, text, charts, or information visible.
+
+Provide your response in JSON format:
+{
+    "completeness": 0-100,
+    "accuracy": 0-100,
+    "consistency": 0-100,
+    "issues": ["issue 1", "issue 2", ...],
+    "suggestions": ["suggestion 1", "suggestion 2", ...]
+}"""
+            elif analysis_type == "extract":
+                vision_prompt = """Extract all data and information from this image:
+1. Any text content (headers, labels, body text)
+2. Any tables or tabular data (extract as structured data)
+3. Any numerical values, statistics, or metrics
+4. Any dates, time periods, or timestamps
+5. Any entity names (people, companies, locations)
+6. Chart/graph data if present (describe trends, values)
+
+Provide the extracted data in JSON format:
+{
+    "text_content": "all text found",
+    "tables": [{"headers": [], "rows": []}],
+    "metrics": {"metric_name": "value"},
+    "entities": {"people": [], "companies": [], "locations": []},
+    "dates": [],
+    "chart_data": "description of any charts/graphs"
+}"""
+            else:  # comprehensive
+                vision_prompt = """Provide a comprehensive analysis of this image including:
+1. Executive summary - what is this image showing?
+2. Detailed content description
+3. Key findings and insights
+4. Any data, metrics, or statistics visible
+5. Quality assessment of the image content
+6. Recommendations or next steps based on what's shown
+7. Any concerns or areas needing clarification
+
+Be thorough and specific about all visible content.
+
+Provide your response in JSON format:
+{
+    "summary": "executive summary of the image",
+    "key_findings": ["finding 1", "finding 2", ...],
+    "data_quality": {"completeness": 0-100, "accuracy": 0-100, "consistency": 0-100},
+    "recommendations": ["recommendation 1", "recommendation 2", ...],
+    "risks": ["risk 1", "risk 2", ...]
+}"""
+
+            # Build the message with image
+            message_content = [
+                {
+                    "type": "image",
+                    "source": {
+                        "type": "base64",
+                        "media_type": media_type,
+                        "data": image_data
+                    }
+                },
+                {
+                    "type": "text",
+                    "text": vision_prompt
+                }
+            ]
+
+            # Call Claude with vision
+            response = self.llm_client.client.messages.create(
+                model=self.llm_client.model,
+                max_tokens=2000,
+                messages=[
+                    {"role": "user", "content": message_content}
+                ]
+            ).content[0].text
+
+            logger.info(f"Vision API response for {doc['document_id']}: {response[:200]}...")
+
+            # Parse the response
+            analysis_result = self._parse_analysis_response(response, analysis_type)
+
+            # Add metadata
+            analysis_result.update({
+                "document_id": doc['document_id'],
+                "analysis_type": analysis_type,
+                "status": "success",
+                "analyzed_with": "vision",
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            })
+
+            return analysis_result
+
+        except Exception as e:
+            logger.error(f"Image analysis failed: {e}")
+            return {
+                "document_id": doc['document_id'],
+                "analysis_type": analysis_type,
+                "status": "error",
+                "summary": f"Image analysis failed: {str(e)}",
+                "key_points": [],
+                "data_quality": {"completeness": 0, "accuracy": 0, "consistency": 0},
+                "suggestions": ["Please try again or upload a clearer image"],
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
+
     def analyze_document(self, document_id: str, analysis_type: str = 'comprehensive', options: Dict = None) -> Dict[str, Any]:
-        """Analyze a document using Claude AI."""
+        """Analyze a document using Claude AI (with vision support for images)."""
         doc = self.documents.get(document_id)
         if not doc:
             raise ValueError(f"Document {document_id} not found")
-        
-        # Get the full text content
+
+        is_image = doc.get('is_image', False)
+
+        # For images, use vision API
+        if is_image and doc.get('image_data'):
+            return self._analyze_image_document(doc, analysis_type)
+
+        # Get the full text content for non-image documents
         text_content = doc.get('full_text', '')
         if not text_content or len(text_content.strip()) < 10:
             return {
@@ -214,12 +451,12 @@ class DocumentService:
                 "suggestions": ["Please upload a document with more content"],
                 "timestamp": datetime.now(timezone.utc).isoformat()
             }
-        
+
         # Truncate content if too long (Claude has token limits)
         max_content_length = 8000
         if len(text_content) > max_content_length:
             text_content = text_content[:max_content_length] + "\n\n[Content truncated for analysis]"
-        
+
         try:
             # Prepare prompt based on analysis type
             if analysis_type == "summary":
@@ -317,27 +554,77 @@ Provide your response in JSON format:
             }
     
     def ask_document_question(self, document_ids: List[str], question: str) -> Dict[str, Any]:
-        """Answer questions about documents using Claude."""
+        """Answer questions about documents using Claude (with vision support for images)."""
         # Validate documents exist
         docs = []
+        image_docs = []
+        text_docs = []
+
         for doc_id in document_ids:
             doc = self.documents.get(doc_id)
             if doc:
                 docs.append(doc)
-        
+                if doc.get('is_image') and doc.get('image_data'):
+                    image_docs.append(doc)
+                else:
+                    text_docs.append(doc)
+
         if not docs:
             raise ValueError("No valid documents found")
-        
+
         try:
-            # Combine document contents
-            combined_content = ""
-            for doc in docs:
-                combined_content += f"\n\n--- Document: {doc['filename']} ---\n"
-                text_content = doc.get('full_text', '')[:4000]  # Limit per document
-                combined_content += text_content
-            
-            # Prepare prompt
-            prompt = f"""Answer the following question based on the provided documents. 
+            # If we have image documents, use vision API
+            if image_docs:
+                # Use vision for the first image document
+                img_doc = image_docs[0]
+                image_data = img_doc.get('image_data', '')
+                media_type = img_doc.get('media_type', 'image/png')
+
+                vision_prompt = f"""Look at this image and answer the following question.
+Be specific and reference what you can see in the image.
+If the answer cannot be determined from the image, say so clearly.
+
+Question: {question}
+
+Provide your answer in JSON format:
+{{
+    "answer": "your detailed answer based on what you see in the image",
+    "confidence": 0.0-1.0,
+    "sources": ["describe which parts of the image you referenced"],
+    "follow_up_questions": ["question1", "question2", "question3"]
+}}"""
+
+                message_content = [
+                    {
+                        "type": "image",
+                        "source": {
+                            "type": "base64",
+                            "media_type": media_type,
+                            "data": image_data
+                        }
+                    },
+                    {
+                        "type": "text",
+                        "text": vision_prompt
+                    }
+                ]
+
+                response = self.llm_client.client.messages.create(
+                    model=self.llm_client.model,
+                    max_tokens=1500,
+                    messages=[
+                        {"role": "user", "content": message_content}
+                    ]
+                ).content[0].text
+            else:
+                # Text-based Q&A for non-image documents
+                combined_content = ""
+                for doc in text_docs:
+                    combined_content += f"\n\n--- Document: {doc['filename']} ---\n"
+                    text_content = doc.get('full_text', '')[:4000]  # Limit per document
+                    combined_content += text_content
+
+                prompt = f"""Answer the following question based on the provided documents.
 If the answer cannot be found in the documents, say so clearly.
 Also suggest 2-3 relevant follow-up questions.
 
@@ -356,14 +643,13 @@ Provide your answer in JSON format:
     "follow_up_questions": ["question1", "question2", "question3"]
 }}"""
 
-            # Get answer from Claude using the client directly
-            response = self.llm_client.client.messages.create(
-                model=self.llm_client.model,
-                max_tokens=1500,
-                messages=[
-                    {"role": "user", "content": prompt}
-                ]
-            ).content[0].text
+                response = self.llm_client.client.messages.create(
+                    model=self.llm_client.model,
+                    max_tokens=1500,
+                    messages=[
+                        {"role": "user", "content": prompt}
+                    ]
+                ).content[0].text
             
             # Parse response
             try:

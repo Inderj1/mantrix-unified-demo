@@ -113,7 +113,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
   return (
     <Box sx={{ minHeight: '100%', bgcolor: '#f8fbfd' }}>
       {/* Header */}
-      <Box sx={{ mb: 4 }}>
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={2}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Box
@@ -121,11 +121,11 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
                 width: 56,
                 height: 56,
                 borderRadius: 2,
-                background: 'linear-gradient(135deg, #0078d4 0%, #106ebe 100%)',
+                bgcolor: '#0078d4',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 4px 14px rgba(10, 110, 209, 0.3)',
+                boxShadow: '0 4px 14px rgba(0, 120, 212, 0.3)',
               }}
             >
               <SettingsIcon sx={{ fontSize: 28, color: '#fff' }} />
@@ -177,7 +177,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
             </IconButton>
           </Stack>
         </Stack>
-      </Box>
+      </Paper>
 
       {/* Summary Stats */}
       <Grid container spacing={2} sx={{ mb: 4 }}>
@@ -187,21 +187,9 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
               elevation={0}
               sx={{
                 p: 2,
-                borderRadius: 2,
-                border: '1px solid',
-                borderColor: alpha('#0078d4', 0.1),
-                background: '#fff',
-                position: 'relative',
-                overflow: 'hidden',
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 3,
-                  background: `linear-gradient(90deg, ${stat.color} 0%, ${alpha(stat.color, 0.5)} 100%)`,
-                },
+                borderRadius: 3,
+                bgcolor: 'white',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
               }}
             >
               <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -242,32 +230,19 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
               onClick={() => !tab.disabled && setActiveTab(index)}
               sx={{
                 p: 2,
-                borderRadius: 2,
+                borderRadius: 3,
                 cursor: tab.disabled ? 'not-allowed' : 'pointer',
-                border: '2px solid',
-                borderColor: activeTab === index ? '#0078d4' : alpha('#0078d4', 0.1),
-                background: activeTab === index
-                  ? 'linear-gradient(135deg, rgba(10, 110, 209, 0.08) 0%, rgba(8, 84, 160, 0.04) 100%)'
-                  : '#fff',
+                bgcolor: activeTab === index ? alpha('#0078d4', 0.05) : 'white',
+                boxShadow: activeTab === index
+                  ? '0 4px 12px rgba(0,120,212,0.15)'
+                  : '0 1px 3px rgba(0,0,0,0.08)',
                 opacity: tab.disabled ? 0.5 : 1,
-                transition: 'all 0.2s ease',
+                transition: 'all 0.3s ease',
                 position: 'relative',
                 overflow: 'hidden',
                 '&:hover': !tab.disabled && {
-                  borderColor: '#0078d4',
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 4px 12px rgba(10, 110, 209, 0.15)',
-                },
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 3,
-                  background: activeTab === index
-                    ? `linear-gradient(90deg, ${tab.color} 0%, ${alpha(tab.color, 0.5)} 100%)`
-                    : 'transparent',
+                  transform: 'translateY(-4px)',
+                  boxShadow: '0 8px 20px rgba(0,0,0,0.1)',
                 },
               }}
             >
@@ -343,10 +318,9 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
         elevation={0}
         sx={{
           p: 3,
-          borderRadius: 2,
-          border: '1px solid',
-          borderColor: alpha('#0078d4', 0.1),
-          background: '#fff',
+          borderRadius: 3,
+          bgcolor: 'white',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
           minHeight: 400,
         }}
       >

@@ -3,16 +3,16 @@
 
 // Alert Types - Organized by Business Value Category
 export const ALERT_TYPES = {
-  // ML Model Health Alerts
-  SPEC_LOW_CONFIDENCE: 'spec_low_confidence',
-  MATERIAL_MATCH_GAP: 'material_match_gap',
-  MODEL_DRIFT_DETECTED: 'model_drift_detected',
+  // STOX.AI - Inventory Intelligence Alerts
+  STOCKOUT_RISK: 'stockout_risk',
+  REORDER_POINT_REACHED: 'reorder_point_reached',
+  EXCESS_INVENTORY: 'excess_inventory',
+  DC_REBALANCE_NEEDED: 'dc_rebalance_needed',
+  SEASONAL_DEMAND_SHIFT: 'seasonal_demand_shift',
 
   // Pricing Intelligence Alerts
   PRICE_BELOW_OPTIMAL: 'price_below_optimal',
   MARGIN_EROSION: 'margin_erosion',
-  WIN_RATE_ANOMALY: 'win_rate_anomaly',
-  PRICE_ELASTICITY_SHIFT: 'price_elasticity_shift',
 
   // Customer Intelligence Alerts
   ORDER_GAP_DETECTED: 'order_gap_detected',
@@ -26,16 +26,16 @@ export const ALERT_TYPES = {
 
 // Alert Type Labels
 export const ALERT_TYPE_LABELS = {
-  // ML Model Health
-  spec_low_confidence: 'Low Extraction Confidence',
-  material_match_gap: 'Material Match Gap',
-  model_drift_detected: 'Model Drift Detected',
+  // STOX.AI - Inventory Intelligence
+  stockout_risk: 'Stockout Risk',
+  reorder_point_reached: 'Reorder Point Reached',
+  excess_inventory: 'Excess Inventory',
+  dc_rebalance_needed: 'DC Rebalance Needed',
+  seasonal_demand_shift: 'Seasonal Demand Shift',
 
   // Pricing Intelligence
   price_below_optimal: 'Price Below Optimal',
   margin_erosion: 'Margin Erosion',
-  win_rate_anomaly: 'Win Rate Anomaly',
-  price_elasticity_shift: 'Price Elasticity Shift',
 
   // Customer Intelligence
   order_gap_detected: 'Order Gap Detected',
@@ -49,8 +49,8 @@ export const ALERT_TYPE_LABELS = {
 
 // Alert Category mapping
 export const ALERT_CATEGORIES = {
-  ml_model_health: ['spec_low_confidence', 'material_match_gap', 'model_drift_detected'],
-  pricing_intelligence: ['price_below_optimal', 'margin_erosion', 'win_rate_anomaly', 'price_elasticity_shift'],
+  stox_inventory: ['stockout_risk', 'reorder_point_reached', 'excess_inventory', 'dc_rebalance_needed', 'seasonal_demand_shift'],
+  pricing_intelligence: ['price_below_optimal', 'margin_erosion'],
   customer_intelligence: ['order_gap_detected', 'churn_risk_high', 'reorder_opportunity'],
   operations_intelligence: ['lead_time_risk', 'upsell_opportunity'],
 };
@@ -73,30 +73,30 @@ export const STATUS = {
   RESOLVED: 'resolved',
 };
 
-// Sample customers for Loparex context
+// Sample customers - Arizona Beverages retail partners
 const customers = [
-  { id: 'CUST-001', name: 'Avery Dennison', segment: 'STRATEGIC', avgOrderValue: 125000, region: 'North America' },
-  { id: 'CUST-002', name: '3M Corporation', segment: 'STRATEGIC', avgOrderValue: 180000, region: 'North America' },
-  { id: 'CUST-003', name: 'Berry Global', segment: 'KEY', avgOrderValue: 85000, region: 'North America' },
-  { id: 'CUST-004', name: 'Mondi Group', segment: 'KEY', avgOrderValue: 72000, region: 'Europe' },
-  { id: 'CUST-005', name: 'Constantia Flexibles', segment: 'KEY', avgOrderValue: 68000, region: 'Europe' },
-  { id: 'CUST-006', name: 'Jindal Films', segment: 'GROWTH', avgOrderValue: 45000, region: 'Asia' },
-  { id: 'CUST-007', name: 'Toray Industries', segment: 'GROWTH', avgOrderValue: 52000, region: 'Asia' },
-  { id: 'CUST-008', name: 'Futamura Chemical', segment: 'STANDARD', avgOrderValue: 32000, region: 'Asia' },
-  { id: 'CUST-009', name: 'Coveris Holdings', segment: 'STANDARD', avgOrderValue: 28000, region: 'Europe' },
-  { id: 'CUST-010', name: 'ProAmpac', segment: 'GROWTH', avgOrderValue: 55000, region: 'North America' },
+  { id: 'CUST-001', name: 'Walmart', segment: 'STRATEGIC', avgOrderValue: 850000, region: 'National' },
+  { id: 'CUST-002', name: 'Costco', segment: 'STRATEGIC', avgOrderValue: 720000, region: 'National' },
+  { id: 'CUST-003', name: 'Target', segment: 'KEY', avgOrderValue: 425000, region: 'National' },
+  { id: 'CUST-004', name: 'Kroger', segment: 'KEY', avgOrderValue: 380000, region: 'National' },
+  { id: 'CUST-005', name: '7-Eleven', segment: 'KEY', avgOrderValue: 285000, region: 'National' },
+  { id: 'CUST-006', name: 'Publix', segment: 'KEY', avgOrderValue: 195000, region: 'Southeast' },
+  { id: 'CUST-007', name: 'HEB', segment: 'GROWTH', avgOrderValue: 165000, region: 'Central' },
+  { id: 'CUST-008', name: 'CVS', segment: 'GROWTH', avgOrderValue: 125000, region: 'National' },
+  { id: 'CUST-009', name: 'Walgreens', segment: 'STANDARD', avgOrderValue: 95000, region: 'National' },
+  { id: 'CUST-010', name: 'Safeway', segment: 'GROWTH', avgOrderValue: 145000, region: 'West' },
 ];
 
-// Sample materials for Loparex context
+// Sample products - Arizona Beverages product catalog
 const materials = [
-  { id: 'MAT-PET-50', name: 'PET 50μm Silicone', category: 'Release Liner', margin: 0.42 },
-  { id: 'MAT-PET-75', name: 'PET 75μm Silicone', category: 'Release Liner', margin: 0.38 },
-  { id: 'MAT-BOPP-40', name: 'BOPP 40μm Matte', category: 'Release Liner', margin: 0.35 },
-  { id: 'MAT-PP-100', name: 'PP 100μm Clear', category: 'Release Liner', margin: 0.32 },
-  { id: 'MAT-HDPE-75', name: 'HDPE 75μm Natural', category: 'Release Liner', margin: 0.28 },
-  { id: 'MAT-GLN-90', name: 'Glassine 90gsm', category: 'Paper Liner', margin: 0.45 },
-  { id: 'MAT-SCK-80', name: 'SCK 80gsm', category: 'Paper Liner', margin: 0.40 },
-  { id: 'MAT-CCK-120', name: 'CCK 120gsm', category: 'Paper Liner', margin: 0.48 },
+  { id: 'AZ-GT-24', name: 'AZ Green Tea 24PK', category: 'Tea', margin: 0.42 },
+  { id: 'AZ-AP-24', name: 'AZ Arnold Palmer 24PK', category: 'Tea', margin: 0.45 },
+  { id: 'AZ-GT-4', name: 'AZ Green Tea 4PK', category: 'Tea', margin: 0.38 },
+  { id: 'AZ-AP-4', name: 'AZ Arnold Palmer 4PK', category: 'Tea', margin: 0.40 },
+  { id: 'AZ-MM-24', name: 'AZ Mucho Mango 24PK', category: 'Fruit Drink', margin: 0.35 },
+  { id: 'AZ-LT-24', name: 'AZ Lemon Tea 24PK', category: 'Tea', margin: 0.42 },
+  { id: 'AZ-WM-24', name: 'AZ Watermelon 24PK', category: 'Fruit Drink', margin: 0.36 },
+  { id: 'AZ-RX-12', name: 'AZ RX Energy 12PK', category: 'Energy', margin: 0.48 },
 ];
 
 // Sample sales reps
@@ -110,20 +110,31 @@ const salesReps = [
 
 // AI Suggestions by alert type
 const aiSuggestions = {
-  spec_low_confidence: [
-    { action: 'manual_review', reason: 'Low confidence on critical specs requires human verification', confidence: 0.94 },
-    { action: 'contact_customer', reason: 'Clarify ambiguous specifications with customer', confidence: 0.88 },
-    { action: 'use_template', reason: 'Similar past orders can guide interpretation', confidence: 0.82 },
+  // STOX.AI Inventory Suggestions
+  stockout_risk: [
+    { action: 'expedite_reorder', reason: 'Create urgent purchase order to prevent stockout', confidence: 0.96 },
+    { action: 'transfer_stock', reason: 'Transfer inventory from another DC with excess stock', confidence: 0.92 },
+    { action: 'notify_sales', reason: 'Alert sales team to manage customer expectations', confidence: 0.85 },
   ],
-  material_match_gap: [
-    { action: 'suggest_alternatives', reason: 'Present top 3 closest matching materials to customer', confidence: 0.91 },
-    { action: 'custom_quote', reason: 'Create custom specification for this request', confidence: 0.85 },
-    { action: 'notify_product', reason: 'Flag as potential new product opportunity', confidence: 0.78 },
+  reorder_point_reached: [
+    { action: 'create_po', reason: 'Generate purchase order based on optimal quantity', confidence: 0.94 },
+    { action: 'review_forecast', reason: 'Verify demand forecast before ordering', confidence: 0.88 },
+    { action: 'check_supplier', reason: 'Confirm supplier lead time and availability', confidence: 0.82 },
   ],
-  model_drift_detected: [
-    { action: 'retrain_model', reason: 'Model accuracy below threshold, retraining recommended', confidence: 0.96 },
-    { action: 'investigate_data', reason: 'Check for data quality issues in recent inputs', confidence: 0.89 },
-    { action: 'monitor_closely', reason: 'Increase monitoring frequency temporarily', confidence: 0.82 },
+  excess_inventory: [
+    { action: 'reduce_safety_stock', reason: 'Lower safety stock to release working capital', confidence: 0.91 },
+    { action: 'promote_sku', reason: 'Create promotional campaign to move excess inventory', confidence: 0.85 },
+    { action: 'transfer_to_dc', reason: 'Redistribute to DCs with higher demand', confidence: 0.80 },
+  ],
+  dc_rebalance_needed: [
+    { action: 'initiate_transfer', reason: 'Create inter-DC transfer to balance inventory', confidence: 0.93 },
+    { action: 'adjust_allocation', reason: 'Update allocation rules to prevent future imbalance', confidence: 0.87 },
+    { action: 'review_demand', reason: 'Analyze regional demand patterns', confidence: 0.81 },
+  ],
+  seasonal_demand_shift: [
+    { action: 'increase_safety_stock', reason: 'Build inventory ahead of seasonal surge', confidence: 0.92 },
+    { action: 'accelerate_production', reason: 'Schedule additional bottling runs', confidence: 0.88 },
+    { action: 'secure_capacity', reason: 'Reserve carrier capacity for peak season', confidence: 0.84 },
   ],
   price_below_optimal: [
     { action: 'reprice_quote', reason: 'Increase price to optimal while maintaining win probability', confidence: 0.92 },
@@ -196,19 +207,25 @@ const generateAlertId = () => `ALT-${new Date().toISOString().split('T')[0]}-${S
 // Severity calculation based on alert type and metrics
 const calculateSeverity = (type, metrics) => {
   switch (type) {
-    case ALERT_TYPES.SPEC_LOW_CONFIDENCE:
-      if (metrics.confidence < 0.60) return SEVERITY.CRITICAL;
-      if (metrics.confidence < 0.75) return SEVERITY.HIGH;
+    // STOX.AI Inventory Alerts
+    case ALERT_TYPES.STOCKOUT_RISK:
+      if (metrics.daysUntilStockout <= 3) return SEVERITY.CRITICAL;
+      if (metrics.daysUntilStockout <= 5) return SEVERITY.HIGH;
       return SEVERITY.WARNING;
 
-    case ALERT_TYPES.MATERIAL_MATCH_GAP:
-      if (metrics.bestMatchScore < 0.60) return SEVERITY.HIGH;
-      if (metrics.bestMatchScore < 0.75) return SEVERITY.WARNING;
+    case ALERT_TYPES.REORDER_POINT_REACHED:
+      return SEVERITY.HIGH;
+
+    case ALERT_TYPES.EXCESS_INVENTORY:
+      if (metrics.excessPercent > 100) return SEVERITY.HIGH;
+      if (metrics.excessPercent > 50) return SEVERITY.WARNING;
       return SEVERITY.INFO;
 
-    case ALERT_TYPES.MODEL_DRIFT_DETECTED:
-      if (metrics.accuracyDrop > 0.15) return SEVERITY.CRITICAL;
-      if (metrics.accuracyDrop > 0.10) return SEVERITY.HIGH;
+    case ALERT_TYPES.DC_REBALANCE_NEEDED:
+      return SEVERITY.HIGH;
+
+    case ALERT_TYPES.SEASONAL_DEMAND_SHIFT:
+      if (metrics.weeksUntilPeak <= 2) return SEVERITY.HIGH;
       return SEVERITY.WARNING;
 
     case ALERT_TYPES.PRICE_BELOW_OPTIMAL:
@@ -220,14 +237,6 @@ const calculateSeverity = (type, metrics) => {
       if (metrics.erosionPercent > 0.10) return SEVERITY.CRITICAL;
       if (metrics.erosionPercent > 0.05) return SEVERITY.HIGH;
       return SEVERITY.WARNING;
-
-    case ALERT_TYPES.WIN_RATE_ANOMALY:
-      if (metrics.anomalyPercent > 0.30) return SEVERITY.CRITICAL;
-      if (metrics.anomalyPercent > 0.20) return SEVERITY.HIGH;
-      return SEVERITY.WARNING;
-
-    case ALERT_TYPES.PRICE_ELASTICITY_SHIFT:
-      return SEVERITY.WARNING; // Usually informational
 
     case ALERT_TYPES.ORDER_GAP_DETECTED:
       if (metrics.gapMultiplier >= 4) return SEVERITY.CRITICAL;
@@ -268,39 +277,88 @@ const generateAlert = (type, overrides = {}) => {
   let revenueImpact = 0;
   let marginImpact = 0;
 
-  switch (type) {
-    case ALERT_TYPES.SPEC_LOW_CONFIDENCE:
-      metrics = {
-        confidence: randomFloat(0.55, 0.84),
-        unclearFields: randomItem([['coating_type', 'release_level'], ['thickness', 'width'], ['surface_finish'], ['substrate', 'coating_weight']]),
-        documentType: randomItem(['PO', 'RFQ', 'Email']),
-      };
-      title = `Low Extraction Confidence (${Math.round(metrics.confidence * 100)}%)`;
-      message = `${metrics.documentType} from ${customer.name} has unclear specs: ${metrics.unclearFields.join(', ')}. Manual review recommended.`;
-      revenueImpact = customer.avgOrderValue;
-      break;
+  // Arizona Beverages DC locations for STOX.AI alerts
+  const dcLocations = [
+    { id: 'DC-KEASBEY', name: 'Keasbey NJ', region: 'Northeast' },
+    { id: 'MFG-DRINKPAK', name: 'Santa Clarita CA', region: 'West' },
+    { id: 'MFG-POLAR', name: 'Douglas GA', region: 'Southeast' },
+    { id: 'MFG-TAMPICO', name: 'Wharton TX', region: 'Central' },
+    { id: 'MFG-MAXPAK', name: 'Lakeland FL', region: 'Southeast' },
+  ];
+  const dc = randomItem(dcLocations);
 
-    case ALERT_TYPES.MATERIAL_MATCH_GAP:
+  switch (type) {
+    // ============================================
+    // STOX.AI - Inventory Intelligence Alerts
+    // ============================================
+    case ALERT_TYPES.STOCKOUT_RISK:
       metrics = {
-        bestMatchScore: randomFloat(0.55, 0.79),
-        requestedSpecs: randomItem(['25μm PET thermal coating', 'Ultra-thin BOPP release', 'High-temp silicone liner', 'Food-grade paper liner']),
-        topAlternatives: 3,
+        currentStock: randomInt(500, 2000),
+        safetyStock: randomInt(2500, 4000),
+        daysUntilStockout: randomInt(2, 7),
+        demandVelocity: randomInt(300, 800),
+        dc: dc,
       };
-      title = `No Material Match Above 80%`;
-      message = `Request for "${metrics.requestedSpecs}" - best match is ${Math.round(metrics.bestMatchScore * 100)}%. ${metrics.topAlternatives} alternatives available.`;
+      title = `Stockout Risk: ${material.name} at ${dc.name}`;
+      message = `Current stock ${metrics.currentStock.toLocaleString()} cases, below safety stock of ${metrics.safetyStock.toLocaleString()}. Projected stockout in ${metrics.daysUntilStockout} days at current demand velocity.`;
       revenueImpact = randomInt(50000, 150000);
       break;
 
-    case ALERT_TYPES.MODEL_DRIFT_DETECTED:
+    case ALERT_TYPES.REORDER_POINT_REACHED:
       metrics = {
-        modelName: randomItem(['POSpecParser', 'MaterialMatcher', 'PriceOptimizer']),
-        currentAccuracy: randomFloat(0.78, 0.88),
-        baselineAccuracy: randomFloat(0.90, 0.95),
-        accuracyDrop: 0,
+        currentStock: randomInt(3000, 5000),
+        reorderPoint: randomInt(4000, 6000),
+        optimalOrderQty: randomInt(8000, 15000),
+        supplierLeadTime: randomInt(7, 21),
+        dc: dc,
       };
-      metrics.accuracyDrop = metrics.baselineAccuracy - metrics.currentAccuracy;
-      title = `Model Drift: ${metrics.modelName}`;
-      message = `Accuracy dropped from ${Math.round(metrics.baselineAccuracy * 100)}% to ${Math.round(metrics.currentAccuracy * 100)}% (-${Math.round(metrics.accuracyDrop * 100)}%). Consider retraining.`;
+      title = `Reorder Point: ${material.name} at ${dc.name}`;
+      message = `Inventory at ${metrics.currentStock.toLocaleString()} cases has reached reorder point of ${metrics.reorderPoint.toLocaleString()}. Recommended order: ${metrics.optimalOrderQty.toLocaleString()} cases. Supplier lead time: ${metrics.supplierLeadTime} days.`;
+      revenueImpact = randomInt(30000, 80000);
+      break;
+
+    case ALERT_TYPES.EXCESS_INVENTORY:
+      metrics = {
+        currentStock: randomInt(25000, 40000),
+        optimalStock: randomInt(12000, 18000),
+        excessPercent: 0,
+        workingCapitalTied: randomInt(50000, 120000),
+        turnoverDays: randomInt(45, 90),
+        dc: dc,
+      };
+      metrics.excessPercent = Math.round((metrics.currentStock - metrics.optimalStock) / metrics.optimalStock * 100);
+      title = `Excess Inventory: ${material.name} at ${dc.name}`;
+      message = `Stock at ${metrics.currentStock.toLocaleString()} cases is ${metrics.excessPercent}% above optimal level. $${metrics.workingCapitalTied.toLocaleString()} working capital tied up. Current turnover: ${metrics.turnoverDays} days.`;
+      revenueImpact = metrics.workingCapitalTied;
+      break;
+
+    case ALERT_TYPES.DC_REBALANCE_NEEDED:
+      const sourceDC = randomItem(dcLocations);
+      const destDC = randomItem(dcLocations.filter(d => d.id !== sourceDC.id));
+      metrics = {
+        sourceDC: sourceDC,
+        destDC: destDC,
+        sourceStock: randomInt(20000, 35000),
+        destStock: randomInt(1000, 3000),
+        transferQty: randomInt(5000, 15000),
+        freightCost: randomInt(2000, 8000),
+      };
+      title = `DC Rebalance: ${sourceDC.name} → ${destDC.name}`;
+      message = `${material.name}: ${sourceDC.name} has ${metrics.sourceStock.toLocaleString()} cases while ${destDC.name} has only ${metrics.destStock.toLocaleString()}. Recommend transfer of ${metrics.transferQty.toLocaleString()} cases. Est. freight: $${metrics.freightCost.toLocaleString()}.`;
+      revenueImpact = randomInt(40000, 100000);
+      break;
+
+    case ALERT_TYPES.SEASONAL_DEMAND_SHIFT:
+      metrics = {
+        season: randomItem(['Summer', 'Memorial Day', 'July 4th', 'Labor Day']),
+        demandIncrease: randomInt(15, 40),
+        weeksUntilPeak: randomInt(2, 6),
+        currentSafetyStock: randomInt(8000, 12000),
+        recommendedSafetyStock: randomInt(15000, 25000),
+      };
+      title = `Seasonal Alert: ${metrics.season} Demand Surge`;
+      message = `${metrics.season} peak in ${metrics.weeksUntilPeak} weeks. Historical demand increase: +${metrics.demandIncrease}%. Current safety stock: ${metrics.currentSafetyStock.toLocaleString()} cases. Recommended: ${metrics.recommendedSafetyStock.toLocaleString()} cases.`;
+      revenueImpact = randomInt(80000, 200000);
       break;
 
     case ALERT_TYPES.PRICE_BELOW_OPTIMAL:
@@ -332,31 +390,6 @@ const generateAlert = (type, overrides = {}) => {
       title = `Margin Erosion: ${customer.name}`;
       message = `Margin dropped from ${Math.round(metrics.historicalMargin * 100)}% to ${Math.round(metrics.currentMargin * 100)}% over ${metrics.periodsDecline} quarters. Cause: ${metrics.cause}.`;
       revenueImpact = marginImpact;
-      break;
-
-    case ALERT_TYPES.WIN_RATE_ANOMALY:
-      metrics = {
-        segment: randomItem(['Medical Grade', 'Industrial', 'Food & Beverage', 'Electronics']),
-        predictedWinRate: randomFloat(0.70, 0.85),
-        actualWinRate: randomFloat(0.35, 0.55),
-        anomalyPercent: 0,
-        quotesAnalyzed: randomInt(10, 25),
-      };
-      metrics.anomalyPercent = Math.abs(metrics.predictedWinRate - metrics.actualWinRate);
-      title = `Win Rate Anomaly: ${metrics.segment}`;
-      message = `Predicted ${Math.round(metrics.predictedWinRate * 100)}% win rate, actual ${Math.round(metrics.actualWinRate * 100)}% (${metrics.quotesAnalyzed} quotes). Model may have blind spot.`;
-      break;
-
-    case ALERT_TYPES.PRICE_ELASTICITY_SHIFT:
-      metrics = {
-        segment: randomItem(['STRATEGIC', 'KEY', 'GROWTH', 'STANDARD']),
-        previousElasticity: randomFloat(-1.5, -0.8),
-        currentElasticity: randomFloat(-2.2, -1.2),
-        shiftPercent: 0,
-      };
-      metrics.shiftPercent = Math.abs((metrics.currentElasticity - metrics.previousElasticity) / metrics.previousElasticity);
-      title = `Price Sensitivity Changed: ${metrics.segment} Segment`;
-      message = `Elasticity shifted from ${metrics.previousElasticity.toFixed(2)} to ${metrics.currentElasticity.toFixed(2)}. Customers ${Math.abs(metrics.currentElasticity) > Math.abs(metrics.previousElasticity) ? 'more' : 'less'} price sensitive.`;
       break;
 
     case ALERT_TYPES.ORDER_GAP_DETECTED:
@@ -393,10 +426,10 @@ const generateAlert = (type, overrides = {}) => {
         predictedReorderDate: daysAgo(-randomInt(3, 14)),
         typicalProduct: material.name,
         typicalQuantity: randomInt(5000, 25000),
-        suggestedQuoteValue: randomInt(15000, 60000),
+        suggestedQuoteValue: randomInt(50000, 200000),
       };
       title = `Reorder Opportunity: ${customer.name}`;
-      message = `Predicted reorder window opening. Typical order: ${metrics.typicalQuantity.toLocaleString()} M² of ${metrics.typicalProduct}. Suggest proactive quote.`;
+      message = `Predicted reorder window opening. Typical order: ${metrics.typicalQuantity.toLocaleString()} cases of ${metrics.typicalProduct}. Suggest proactive quote.`;
       revenueImpact = metrics.suggestedQuoteValue;
       break;
 
@@ -405,7 +438,7 @@ const generateAlert = (type, overrides = {}) => {
         promisedDate: daysAgo(-randomInt(5, 15)),
         realisticDate: daysAgo(-randomInt(8, 20)),
         bufferDays: 0,
-        reason: randomItem(['Production backlog', 'Material shortage', 'Shipping delays', 'Capacity constraint']),
+        reason: randomItem(['Bottling line backlog', 'Tea concentrate shortage', 'Carrier delays', 'DC capacity constraint']),
       };
       metrics.bufferDays = Math.round((new Date(metrics.promisedDate) - new Date(metrics.realisticDate)) / (1000 * 60 * 60 * 24));
       title = `Lead Time Risk: ${quoteId}`;
@@ -414,28 +447,28 @@ const generateAlert = (type, overrides = {}) => {
       break;
 
     case ALERT_TYPES.UPSELL_OPPORTUNITY:
-      const upsellType = randomItem(['volume_tier', 'alternative_material', 'cross_sell']);
+      const upsellType = randomItem(['volume_tier', 'alternative_product', 'cross_sell']);
       if (upsellType === 'volume_tier') {
         metrics = {
           type: 'volume_tier',
           currentQuantity: randomInt(8000, 9500),
           tierThreshold: 10000,
           tierDiscount: randomInt(5, 10),
-          customerSavings: randomInt(200, 500),
+          customerSavings: randomInt(5000, 15000),
           marginChange: randomInt(-100, -50),
         };
         title = `Volume Tier Opportunity: ${customer.name}`;
-        message = `Current order ${metrics.currentQuantity.toLocaleString()} M². At ${metrics.tierThreshold.toLocaleString()} M² customer saves ${metrics.tierDiscount}% ($${metrics.customerSavings}). Good upsell trigger.`;
-      } else if (upsellType === 'alternative_material') {
+        message = `Current order ${metrics.currentQuantity.toLocaleString()} cases. At ${metrics.tierThreshold.toLocaleString()} cases customer saves ${metrics.tierDiscount}% ($${metrics.customerSavings.toLocaleString()}). Good upsell trigger.`;
+      } else if (upsellType === 'alternative_product') {
         metrics = {
-          type: 'alternative_material',
-          currentMaterial: material.name,
-          alternativeMaterial: randomItem(materials).name,
+          type: 'alternative_product',
+          currentProduct: material.name,
+          alternativeProduct: randomItem(materials).name,
           marginLift: randomFloat(0.03, 0.08),
-          techFitScore: randomFloat(0.92, 0.99),
+          fitScore: randomFloat(0.92, 0.99),
         };
-        title = `Higher-Margin Alternative Available`;
-        message = `${customer.name} ordering ${metrics.currentMaterial}. Alternative "${metrics.alternativeMaterial}" has ${Math.round(metrics.marginLift * 100)}% better margin with ${Math.round(metrics.techFitScore * 100)}% tech fit.`;
+        title = `Higher-Margin Product Available`;
+        message = `${customer.name} ordering ${metrics.currentProduct}. Alternative "${metrics.alternativeProduct}" has ${Math.round(metrics.marginLift * 100)}% better margin with ${Math.round(metrics.fitScore * 100)}% customer fit.`;
         marginImpact = customer.avgOrderValue * metrics.marginLift;
       } else {
         metrics = {
@@ -443,7 +476,7 @@ const generateAlert = (type, overrides = {}) => {
           primaryProduct: material.name,
           suggestedProduct: randomItem(materials).name,
           crossSellProbability: randomFloat(0.65, 0.85),
-          additionalRevenue: randomInt(8000, 25000),
+          additionalRevenue: randomInt(25000, 75000),
         };
         title = `Cross-Sell Opportunity: ${customer.name}`;
         message = `${Math.round(metrics.crossSellProbability * 100)}% likelihood to buy ${metrics.suggestedProduct} with ${metrics.primaryProduct}. Potential: $${metrics.additionalRevenue.toLocaleString()}.`;
@@ -594,10 +627,10 @@ export const calculateAlertStats = (alerts) => {
   const totalRevenueImpact = activeAlerts.reduce((sum, a) => sum + (a.revenue_impact || 0), 0);
   const totalMarginImpact = activeAlerts.reduce((sum, a) => sum + (a.margin_impact || 0), 0);
 
-  // Calculate average model health (inverse of critical ML alerts ratio)
-  const mlAlerts = alerts.filter(a => ALERT_CATEGORIES.ml_model_health.includes(a.type));
-  const criticalMlAlerts = mlAlerts.filter(a => a.severity === SEVERITY.CRITICAL || a.severity === SEVERITY.HIGH);
-  const modelHealth = mlAlerts.length > 0 ? Math.round((1 - criticalMlAlerts.length / mlAlerts.length) * 100) : 98;
+  // Calculate inventory health (inverse of critical STOX alerts ratio)
+  const stoxAlerts = alerts.filter(a => ALERT_CATEGORIES.stox_inventory.includes(a.type));
+  const criticalStoxAlerts = stoxAlerts.filter(a => a.severity === SEVERITY.CRITICAL || a.severity === SEVERITY.HIGH);
+  const inventoryHealth = stoxAlerts.length > 0 ? Math.round((1 - criticalStoxAlerts.length / stoxAlerts.length) * 100) : 98;
 
   return {
     activeAlerts: activeAlerts.length,
@@ -605,7 +638,7 @@ export const calculateAlertStats = (alerts) => {
     opportunities: opportunities.length,
     revenueAtRisk: totalRevenueImpact,
     marginImpact: totalMarginImpact,
-    modelHealth: `${modelHealth}%`,
+    modelHealth: `${inventoryHealth}%`,
   };
 };
 

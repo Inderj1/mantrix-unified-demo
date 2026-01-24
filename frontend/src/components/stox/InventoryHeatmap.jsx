@@ -504,7 +504,7 @@ const InventoryHeatmap = ({ onBack }) => {
         <DataGrid
           autoHeight={false}
           sx={{
-            height: '100vh',
+            flex: 1,
             width: '100%',
             border: 'none',
             '& .MuiDataGrid-row:hover': {
@@ -553,13 +553,14 @@ const InventoryHeatmap = ({ onBack }) => {
 
       {/* Tab 2: Working Capital */}
       <TabPanel value={activeTab} index={1}>
-        <Paper sx={{ p: 3 }}>
+        <Paper sx={{ p: 3, height: 'calc(100vh - 520px)', minHeight: 400, display: 'flex', flexDirection: 'column' }}>
           {loading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
               <LinearProgress sx={{ width: '50%' }} />
             </Box>
           ) : (
             <DataGrid
+              autoHeight={false}
               rows={locationMetrics.map((item, idx) => ({ id: idx + 1, ...item }))}
               columns={[
                 {
@@ -686,6 +687,7 @@ const InventoryHeatmap = ({ onBack }) => {
               }}
               slots={{ toolbar: GridToolbar }}
               sx={{
+                flex: 1,
                 '& .MuiDataGrid-row:hover': {
                   backgroundColor: '#f5f5f5',
                 },
@@ -697,13 +699,14 @@ const InventoryHeatmap = ({ onBack }) => {
 
       {/* Tab 3: Performance Matrix */}
       <TabPanel value={activeTab} index={2}>
-        <Paper sx={{ p: 3 }}>
+        <Paper sx={{ p: 3, height: 'calc(100vh - 520px)', minHeight: 400, display: 'flex', flexDirection: 'column' }}>
           {loading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
               <LinearProgress sx={{ width: '50%' }} />
             </Box>
           ) : (
             <DataGrid
+              autoHeight={false}
               rows={plantPerformance.map((item, idx) => ({ id: idx + 1, ...item }))}
               columns={[
                 {
@@ -867,6 +870,7 @@ const InventoryHeatmap = ({ onBack }) => {
               }}
               slots={{ toolbar: GridToolbar }}
               sx={{
+                flex: 1,
                 '& .MuiDataGrid-row:hover': {
                   backgroundColor: '#f5f5f5',
                 },

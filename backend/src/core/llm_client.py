@@ -1483,3 +1483,92 @@ Return the corrected SQL in the same JSON format."""
                 table_info += f" ... and {len(schema['columns']) - 10} more"
             formatted.append(table_info)
         return "\n\n".join(formatted)
+
+    def generate_completion(self, prompt: str, max_tokens: int = 2000, system_prompt: str = None) -> str:
+        """Generate a text completion using Claude.
+
+        Args:
+            prompt: The user prompt/question
+            max_tokens: Maximum tokens in response
+            system_prompt: Optional system prompt
+
+        Returns:
+            The text response from Claude
+        """
+        try:
+            messages = [{"role": "user", "content": prompt}]
+
+            kwargs = {
+                "model": self.model,
+                "max_tokens": max_tokens,
+                "messages": messages
+            }
+
+            if system_prompt:
+                kwargs["system"] = system_prompt
+
+            response = self.client.messages.create(**kwargs)
+
+            if response.content and hasattr(response.content[0], 'text'):
+                return response.content[0].text
+            return ""
+
+        except Exception as e:
+            logger.error(f"Error generating completion: {e}")
+            raise
+
+    def analyze_image(
+        self,
+        image_data: bytes,
+        prompt: str,
+        media_type: str = "image/png",
+        max_tokens: int = 2000
+    ) -> str:
+        """Analyze an image using Claude's vision capabilities.
+
+        Args:
+            image_data: Raw bytes of the image
+            prompt: The analysis prompt/question about the image
+            media_type: MIME type of the image (image/png, image/jpeg, etc.)
+            max_tokens: Maximum tokens in response
+
+        Returns:
+            Claude's analysis of the image
+        """
+        import base64
+
+        try:
+            # Encode image to base64
+            image_base64 = base64.standard_b64encode(image_data).decode("utf-8")
+
+            # Build message with image
+            message_content = [
+                {
+                    "type": "image",
+                    "source": {
+                        "type": "base64",
+                        "media_type": media_type,
+                        "data": image_base64
+                    }
+                },
+                {
+                    "type": "text",
+                    "text": prompt
+                }
+            ]
+
+            response = self.client.messages.create(
+                model=self.model,
+                max_tokens=max_tokens,
+                messages=[
+                    {"role": "user", "content": message_content}
+                ]
+            )
+
+            if response.content and hasattr(response.content[0], 'text'):
+                return response.content[0].text
+            return ""
+
+        except Exception as e:
+            logger.error(f"Error analyzing image: {e}")
+            raise
