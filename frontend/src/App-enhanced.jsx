@@ -622,7 +622,7 @@ function App() {
 
             {/* Authentication Button */}
             <Box sx={{ ml: 2 }}>
-              <AuthButton />
+              <AuthButton onNavigateToProfile={() => setSelectedTab(4)} />
             </Box>
           </Toolbar>
         </AppBar>
@@ -1837,55 +1837,22 @@ function AuthenticatedApp() {
         <Box sx={{
           display: { xs: 'none', md: 'flex' },
           flexDirection: 'column',
+          justifyContent: 'center',
           width: '50%',
-          background: `linear-gradient(135deg, ${brandNavy} 0%, #001d42 50%, #002952 100%)`,
+          background: `linear-gradient(135deg, ${brandNavy} 0%, #001d42 100%)`,
           position: 'relative',
-          overflow: 'auto',
-          p: { md: 4, lg: 5, xl: 6 },
-          minHeight: '100vh',
+          overflow: 'hidden',
+          p: { md: 4, lg: 5 },
         }}>
-          {/* Floating decorations with brand orange */}
+          {/* Subtle gradient overlay */}
           <Box sx={{
             position: 'absolute',
-            top: '10%',
-            right: '10%',
-            width: 300,
-            height: 300,
+            top: '-20%',
+            right: '-10%',
+            width: '60%',
+            height: '60%',
             borderRadius: '50%',
-            background: `radial-gradient(circle, ${brandOrange}15 0%, transparent 70%)`,
-            animation: 'float 6s ease-in-out infinite',
-          }} />
-          <Box sx={{
-            position: 'absolute',
-            bottom: '15%',
-            left: '5%',
-            width: 200,
-            height: 200,
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%)',
-            animation: 'float 8s ease-in-out infinite 1s',
-          }} />
-          <Box sx={{
-            position: 'absolute',
-            top: '50%',
-            right: '25%',
-            width: 150,
-            height: 150,
-            borderRadius: '50%',
-            background: `radial-gradient(circle, ${brandOrange}10 0%, transparent 70%)`,
-            animation: 'float 7s ease-in-out infinite 0.5s',
-          }} />
-
-          {/* Diagonal accent line */}
-          <Box sx={{
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            width: '120%',
-            height: 4,
-            background: `linear-gradient(90deg, transparent 0%, ${brandOrange} 50%, transparent 100%)`,
-            transform: 'rotate(-5deg) translateY(100px)',
-            opacity: 0.6,
+            background: `radial-gradient(circle, ${brandOrange}12 0%, transparent 60%)`,
           }} />
 
           {/* Grid pattern overlay */}
@@ -1893,128 +1860,92 @@ function AuthenticatedApp() {
             position: 'absolute',
             inset: 0,
             backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)
+              linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)
             `,
-            backgroundSize: '50px 50px',
+            backgroundSize: '40px 40px',
           }} />
 
           {/* Content */}
-          <Box sx={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column' }}>
-            {/* Logo with light background */}
-            <Box sx={{
-              mb: 4,
-              animation: 'fadeInLeft 0.6s ease-out',
-              display: 'inline-block',
-            }}>
-              <Box sx={{
-                bgcolor: '#f0f4f8',
-                px: 2.5,
-                py: 1.5,
-                borderRadius: 2,
-                boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
-                border: `1px solid rgba(255,255,255,0.1)`,
-              }}>
-                <img
-                  src="/MANTRIX_AI.svg"
-                  alt="MANTRIX AI"
-                  style={{ height: 40, objectFit: 'contain', display: 'block' }}
-                />
-              </Box>
-            </Box>
-
+          <Box sx={{ position: 'relative', zIndex: 1, maxWidth: 420 }}>
             {/* Hero text */}
-            <Box sx={{ mb: 4, animation: 'fadeInLeft 0.6s ease-out 0.2s', animationFillMode: 'both' }}>
+            <Box sx={{ mb: 3, animation: 'fadeInLeft 0.6s ease-out 0.2s', animationFillMode: 'both' }}>
               <Typography sx={{
-                fontSize: { md: '1.8rem', lg: '2.2rem', xl: '2.5rem' },
+                fontSize: { md: '2rem', lg: '2.4rem' },
                 fontWeight: 700,
                 color: '#ffffff',
-                lineHeight: 1.2,
-                mb: 2,
+                lineHeight: 1.1,
+                mb: 1.5,
                 fontFamily: 'Poppins, sans-serif',
               }}>
-                Decision Intelligence
-                <br />
-                <Box component="span" sx={{ color: brandOrange }}>
-                  Platform
-                </Box>
+                Decision Intelligence{' '}
+                <Box component="span" sx={{ color: brandOrange }}>Platform</Box>
               </Typography>
               <Typography sx={{
-                fontSize: '1.1rem',
-                color: 'rgba(255,255,255,0.7)',
+                fontSize: '0.9rem',
+                color: 'rgba(255,255,255,0.65)',
                 fontFamily: 'Poppins, sans-serif',
                 fontWeight: 400,
-                maxWidth: 400,
+                lineHeight: 1.5,
               }}>
                 Transform enterprise data into actionable insights with AI-powered analytics
               </Typography>
             </Box>
 
-            {/* Features */}
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            {/* Features - 2x2 Grid */}
+            <Grid container spacing={1.5} sx={{ mb: 3 }}>
               {features.map((feature, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: 2,
-                    p: 2,
-                    borderRadius: 2,
-                    bgcolor: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    backdropFilter: 'blur(10px)',
-                    transition: 'all 0.3s ease',
-                    animation: `fadeInLeft 0.5s ease-out ${0.3 + index * 0.1}s`,
-                    animationFillMode: 'both',
-                    '&:hover': {
-                      bgcolor: 'rgba(255,255,255,0.08)',
-                      transform: 'translateX(8px)',
-                      borderColor: `${brandOrange}50`,
-                    },
-                  }}
-                >
-                  <Box sx={{
-                    p: 1,
-                    borderRadius: 1.5,
-                    bgcolor: `${brandOrange}25`,
-                    color: brandOrange,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                    {feature.icon}
-                  </Box>
-                  <Box>
+                <Grid item xs={6} key={index}>
+                  <Box
+                    sx={{
+                      p: 1.5,
+                      borderRadius: 2,
+                      bgcolor: 'rgba(255,255,255,0.06)',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      transition: 'all 0.2s ease',
+                      animation: `fadeInLeft 0.4s ease-out ${0.3 + index * 0.08}s`,
+                      animationFillMode: 'both',
+                      '&:hover': {
+                        bgcolor: 'rgba(255,255,255,0.1)',
+                        borderColor: `${brandOrange}40`,
+                      },
+                    }}
+                  >
+                    <Box sx={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 1,
+                      bgcolor: `${brandOrange}20`,
+                      color: brandOrange,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mb: 1,
+                      '& svg': { fontSize: 18 },
+                    }}>
+                      {feature.icon}
+                    </Box>
                     <Typography sx={{
-                      fontSize: '0.95rem',
+                      fontSize: '0.8rem',
                       fontWeight: 600,
                       color: '#ffffff',
                       fontFamily: 'Poppins, sans-serif',
-                      mb: 0.3,
+                      lineHeight: 1.3,
                     }}>
                       {feature.title}
                     </Typography>
-                    <Typography sx={{
-                      fontSize: '0.8rem',
-                      color: 'rgba(255,255,255,0.6)',
-                      fontFamily: 'Poppins, sans-serif',
-                    }}>
-                      {feature.desc}
-                    </Typography>
                   </Box>
-                </Box>
+                </Grid>
               ))}
-            </Box>
+            </Grid>
 
             {/* Bottom stats */}
             <Box sx={{
               display: 'flex',
               gap: 4,
-              mt: 3,
-              pt: 3,
+              pt: 2,
               borderTop: '1px solid rgba(255,255,255,0.1)',
-              animation: 'fadeInLeft 0.6s ease-out 0.8s',
+              animation: 'fadeInLeft 0.6s ease-out 0.7s',
               animationFillMode: 'both',
             }}>
               {[
@@ -2023,10 +1954,10 @@ function AuthenticatedApp() {
                 { value: 'Real-time', label: 'Analytics' },
               ].map((stat, i) => (
                 <Box key={i}>
-                  <Typography sx={{ fontSize: '1.25rem', fontWeight: 700, color: brandOrange, fontFamily: 'Poppins, sans-serif' }}>
+                  <Typography sx={{ fontSize: '1.1rem', fontWeight: 700, color: brandOrange, fontFamily: 'Poppins, sans-serif' }}>
                     {stat.value}
                   </Typography>
-                  <Typography sx={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', fontFamily: 'Poppins, sans-serif' }}>
+                  <Typography sx={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.5)', fontFamily: 'Poppins, sans-serif', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     {stat.label}
                   </Typography>
                 </Box>
@@ -2061,9 +1992,9 @@ function AuthenticatedApp() {
             zIndex: 1,
             animation: 'fadeInUp 0.6s ease-out',
           }}>
-            {/* Mobile logo */}
-            <Box sx={{ display: { xs: 'block', md: 'none' }, textAlign: 'center', mb: 4 }}>
-              <img src="/MANTRIX_AI.svg" alt="MANTRIX AI" style={{ height: 45 }} />
+            {/* Logo */}
+            <Box sx={{ textAlign: 'center', mb: 4 }}>
+              <img src="/MANTRIX_AI.svg" alt="MANTRIX AI" style={{ height: 56 }} />
             </Box>
 
             <Typography sx={{

@@ -19,7 +19,7 @@ import {
 import { clearCache } from '../config/queryClient';
 import { clearNavigationState } from '../hooks/usePersistedState';
 
-function AuthButton() {
+function AuthButton({ onNavigateToProfile }) {
   let clerkHooks = { openSignIn: null, signOut: null };
   let userHooks = { user: null, isSignedIn: false, isLoaded: false };
   
@@ -61,7 +61,9 @@ function AuthButton() {
 
   const handleProfile = () => {
     handleClose();
-    // Navigate to profile page or open profile modal
+    if (onNavigateToProfile) {
+      onNavigateToProfile();
+    }
   };
 
   if (!isLoaded) {
