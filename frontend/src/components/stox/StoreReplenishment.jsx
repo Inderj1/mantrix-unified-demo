@@ -13,7 +13,7 @@ import { getTileDataConfig } from './stoxDataConfig';
 
 const StoreReplenishment = ({ onBack, darkMode = false }) => {
   const getColors = (darkMode) => ({
-    primary: darkMode ? '#4da6ff' : '#0a6ed1',
+    primary: darkMode ? '#4d9eff' : '#00357a',
     text: darkMode ? '#e6edf3' : '#1e293b',
     textSecondary: darkMode ? '#8b949e' : '#64748b',
     background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -189,8 +189,8 @@ const StoreReplenishment = ({ onBack, darkMode = false }) => {
           size="small"
           sx={{
             fontWeight: 700,
-            bgcolor: params.value > 0 ? alpha('#2b88d8', 0.12) : alpha('#94a3b8', 0.12),
-            color: params.value > 0 ? '#106ebe' : '#64748b',
+            bgcolor: params.value > 0 ? alpha('#1a5a9e', 0.12) : alpha('#94a3b8', 0.12),
+            color: params.value > 0 ? '#1a5a9e' : '#64748b',
           }}
         />
       ),
@@ -225,8 +225,8 @@ const StoreReplenishment = ({ onBack, darkMode = false }) => {
           size="small"
           sx={{
             fontWeight: 600,
-            bgcolor: params.value === 'DC-East' ? alpha('#2b88d8', 0.12) : alpha('#0078d4', 0.12),
-            color: params.value === 'DC-East' ? '#106ebe' : '#005a9e',
+            bgcolor: params.value === 'DC-East' ? alpha('#1a5a9e', 0.12) : alpha('#00357a', 0.12),
+            color: params.value === 'DC-East' ? '#1a5a9e' : '#002352',
           }}
         />
       ),
@@ -401,7 +401,7 @@ const StoreReplenishment = ({ onBack, darkMode = false }) => {
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-              <LocalShipping sx={{ fontSize: 32, color: '#2b88d8' }} />
+              <LocalShipping sx={{ fontSize: 32, color: '#1a5a9e' }} />
               <Typography variant="h4" fontWeight={700} sx={{ color: colors.text }}>Tile 4: Stock Transfer Execution (DC → Store)</Typography>
               <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
@@ -419,13 +419,13 @@ const StoreReplenishment = ({ onBack, darkMode = false }) => {
       {metrics && (
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2b88d8', 0.1)} 0%, ${alpha('#2b88d8', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#1a5a9e', 0.1)} 0%, ${alpha('#1a5a9e', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <LocalShipping sx={{ color: '#2b88d8' }} />
+                  <LocalShipping sx={{ color: '#1a5a9e' }} />
                   <Typography variant="body2" sx={{ color: colors.textSecondary }}>Total Orders</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#2b88d8">{metrics.totalOrders}</Typography>
+                <Typography variant="h4" fontWeight={700} color="#1a5a9e">{metrics.totalOrders}</Typography>
               </CardContent>
             </Card>
           </Grid>

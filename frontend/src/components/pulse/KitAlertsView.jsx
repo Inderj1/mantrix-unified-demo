@@ -39,8 +39,8 @@ import {
 } from './kitAlertMockData';
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
-  secondary: darkMode ? '#2d8ce6' : '#0854a0',
+  primary: darkMode ? '#4d9eff' : '#00357a',
+  secondary: darkMode ? '#2d8ce6' : '#002352',
   success: darkMode ? '#36d068' : '#10b981',
   warning: darkMode ? '#f59e0b' : '#f59e0b',
   error: darkMode ? '#ff6b6b' : '#ef4444',

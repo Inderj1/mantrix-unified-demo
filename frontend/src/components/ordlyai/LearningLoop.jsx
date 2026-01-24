@@ -52,7 +52,7 @@ import InfoDialog from './InfoDialog';
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? '';
 
 // Primary blue color for ORDLY.AI
-const PRIMARY_BLUE = '#0854a0';
+const PRIMARY_BLUE = '#002352';
 const ACCENT_BLUE = '#1976d2';
 const SUCCESS_GREEN = '#059669';
 const WARNING_AMBER = '#d97706';

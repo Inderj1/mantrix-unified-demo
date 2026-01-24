@@ -40,7 +40,7 @@ import InfoDialog from './InfoDialog';
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? '';
 
 // Primary blue color for ORDLY.AI
-const PRIMARY_BLUE = '#0854a0';
+const PRIMARY_BLUE = '#002352';
 const ACCENT_BLUE = '#1976d2';
 
 // Detail view data
@@ -247,7 +247,7 @@ const SapCommitTrace = ({ onBack, darkMode = false, selectedOrder: initialOrder 
     { field: 'customer', headerName: 'Customer', flex: 1, minWidth: 180, renderCell: (params) => <Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>{params.value}</Typography> },
     { field: 'orderValue', headerName: 'Value', width: 100, align: 'right', headerAlign: 'right', renderCell: (params) => <Typography sx={{ fontSize: '0.85rem', fontWeight: 600 }}>{params.value}</Typography> },
     { field: 'committedAt', headerName: 'Committed', width: 160, renderCell: (params) => <Typography sx={{ fontSize: '0.75rem', color: '#64748b' }}>{params.value}</Typography> },
-    { field: 'user', headerName: 'User', width: 130, renderCell: (params) => <Chip label={params.value} size="small" sx={{ bgcolor: params.value === 'ORDLY_SYSTEM' ? alpha('#0854a0', 0.12) : alpha('#8b5cf6', 0.12), color: params.value === 'ORDLY_SYSTEM' ? '#1565c0' : '#7c3aed', fontWeight: 600, fontSize: '0.65rem' }} /> },
+    { field: 'user', headerName: 'User', width: 130, renderCell: (params) => <Chip label={params.value} size="small" sx={{ bgcolor: params.value === 'ORDLY_SYSTEM' ? alpha('#002352', 0.12) : alpha('#8b5cf6', 0.12), color: params.value === 'ORDLY_SYSTEM' ? '#1565c0' : '#7c3aed', fontWeight: 600, fontSize: '0.65rem' }} /> },
   ];
 
   const handleRowClick = (params) => setSelectedOrder(params.row);
@@ -267,7 +267,7 @@ const SapCommitTrace = ({ onBack, darkMode = false, selectedOrder: initialOrder 
             <Button startIcon={<ArrowBackIcon />} onClick={handleBackToList} variant="outlined" size="small">Back to List</Button>
           </Stack>
           <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-            <AccountTreeIcon sx={{ fontSize: 40, color: '#0854a0' }} />
+            <AccountTreeIcon sx={{ fontSize: 40, color: '#002352' }} />
             <Box>
               <Typography variant="h5" fontWeight={600}>{selectedOrder.customer}</Typography>
               <Typography variant="body2" color="text.secondary">{selectedOrder.id} - {selectedOrder.orderValue}</Typography>
@@ -303,10 +303,10 @@ const SapCommitTrace = ({ onBack, darkMode = false, selectedOrder: initialOrder 
             <Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Stack direction="row" alignItems="center" spacing={1}>
-                  <CheckCircleIcon sx={{ color: '#0854a0', fontSize: 18 }} />
+                  <CheckCircleIcon sx={{ color: '#002352', fontSize: 18 }} />
                   <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>Pre-Commit Validation</Typography>
                 </Stack>
-                <Chip label="SAP S/4HANA 2023" size="small" sx={{ bgcolor: alpha('#0854a0', 0.12), color: '#1565c0', fontWeight: 600, fontSize: '0.65rem' }} />
+                <Chip label="SAP S/4HANA 2023" size="small" sx={{ bgcolor: alpha('#002352', 0.12), color: '#1565c0', fontWeight: 600, fontSize: '0.65rem' }} />
               </Box>
               <Box sx={{ p: 2, overflow: 'auto', flex: 1 }}>
                 {validationItems.map((item, idx) => (
@@ -320,14 +320,14 @@ const SapCommitTrace = ({ onBack, darkMode = false, selectedOrder: initialOrder 
                 ))}
 
                 <Paper variant="outlined" sx={{ overflow: 'hidden', mt: 2 }}>
-                  <Box sx={{ p: 1.5, bgcolor: alpha('#0854a0', 0.08), borderBottom: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between' }}>
+                  <Box sx={{ p: 1.5, bgcolor: alpha('#002352', 0.08), borderBottom: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between' }}>
                     <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: '#1565c0', textTransform: 'uppercase', letterSpacing: 1 }}>SAP Order Preview</Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       {(selectedOrder?.lineCount || 1) > 1 && (
                         <Chip
                           label={`${selectedOrder?.lineCount || 1} Line Items`}
                           size="small"
-                          sx={{ bgcolor: alpha('#0854a0', 0.15), color: '#1565c0', fontWeight: 600, fontSize: '0.6rem' }}
+                          sx={{ bgcolor: alpha('#002352', 0.15), color: '#1565c0', fontWeight: 600, fontSize: '0.6rem' }}
                         />
                       )}
                       <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.7rem' }}>VA01 → VA03</Typography>
@@ -344,7 +344,7 @@ const SapCommitTrace = ({ onBack, darkMode = false, selectedOrder: initialOrder 
                           <Box key={field.label} sx={{ display: 'flex', justifyContent: 'space-between', py: 0.5 }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                               <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.75rem' }}>{field.label}</Typography>
-                              <Chip label={field.code} size="small" sx={{ bgcolor: alpha('#0854a0', 0.08), color: '#1565c0', fontSize: '0.55rem', height: 16, '& .MuiChip-label': { px: 0.5 } }} />
+                              <Chip label={field.code} size="small" sx={{ bgcolor: alpha('#002352', 0.08), color: '#1565c0', fontSize: '0.55rem', height: 16, '& .MuiChip-label': { px: 0.5 } }} />
                             </Box>
                             <Typography variant="caption" fontWeight={600} sx={{ fontSize: '0.75rem' }}>{field.value}</Typography>
                           </Box>
@@ -365,18 +365,18 @@ const SapCommitTrace = ({ onBack, darkMode = false, selectedOrder: initialOrder 
                             sx={{
                               mb: 1,
                               overflow: 'hidden',
-                              border: expandedLines[line.lineNumber] ? `1px solid ${alpha('#0854a0', 0.3)}` : undefined,
+                              border: expandedLines[line.lineNumber] ? `1px solid ${alpha('#002352', 0.3)}` : undefined,
                             }}
                           >
                             <Box
                               sx={{
                                 p: 1,
-                                bgcolor: expandedLines[line.lineNumber] ? alpha('#0854a0', 0.06) : alpha('#64748b', 0.04),
+                                bgcolor: expandedLines[line.lineNumber] ? alpha('#002352', 0.06) : alpha('#64748b', 0.04),
                                 cursor: 'pointer',
                                 display: 'flex',
                                 justifyContent: 'space-between',
                                 alignItems: 'center',
-                                '&:hover': { bgcolor: alpha('#0854a0', 0.08) },
+                                '&:hover': { bgcolor: alpha('#002352', 0.08) },
                               }}
                               onClick={() => setExpandedLines(prev => ({ ...prev, [line.lineNumber]: !prev[line.lineNumber] }))}
                             >
@@ -384,7 +384,7 @@ const SapCommitTrace = ({ onBack, darkMode = false, selectedOrder: initialOrder 
                                 <Chip
                                   label={`Line ${line.lineNumber}`}
                                   size="small"
-                                  sx={{ bgcolor: alpha('#0854a0', 0.15), color: '#0854a0', fontWeight: 700, fontSize: '0.6rem', height: 18 }}
+                                  sx={{ bgcolor: alpha('#002352', 0.15), color: '#002352', fontWeight: 700, fontSize: '0.6rem', height: 18 }}
                                 />
                                 <Typography sx={{ fontSize: '0.7rem', fontWeight: 500 }}>
                                   {line.selectedSku || line.materialId || 'N/A'}
@@ -405,7 +405,7 @@ const SapCommitTrace = ({ onBack, darkMode = false, selectedOrder: initialOrder 
                                   <Box key={field.label} sx={{ display: 'flex', justifyContent: 'space-between', py: 0.25 }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                       <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.7rem' }}>{field.label}</Typography>
-                                      <Chip label={field.code} size="small" sx={{ bgcolor: alpha('#0854a0', 0.08), color: '#1565c0', fontSize: '0.5rem', height: 14, '& .MuiChip-label': { px: 0.5 } }} />
+                                      <Chip label={field.code} size="small" sx={{ bgcolor: alpha('#002352', 0.08), color: '#1565c0', fontSize: '0.5rem', height: 14, '& .MuiChip-label': { px: 0.5 } }} />
                                     </Box>
                                     <Typography variant="caption" fontWeight={600} sx={{ fontSize: '0.7rem' }}>{field.value}</Typography>
                                   </Box>
@@ -424,7 +424,7 @@ const SapCommitTrace = ({ onBack, darkMode = false, selectedOrder: initialOrder 
                           <Box key={field.label} sx={{ display: 'flex', justifyContent: 'space-between', py: 0.5 }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                               <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.75rem' }}>{field.label}</Typography>
-                              <Chip label={field.code} size="small" sx={{ bgcolor: alpha('#0854a0', 0.08), color: '#1565c0', fontSize: '0.55rem', height: 16, '& .MuiChip-label': { px: 0.5 } }} />
+                              <Chip label={field.code} size="small" sx={{ bgcolor: alpha('#002352', 0.08), color: '#1565c0', fontSize: '0.55rem', height: 16, '& .MuiChip-label': { px: 0.5 } }} />
                             </Box>
                             <Typography variant="caption" fontWeight={600} sx={{ fontSize: '0.75rem' }}>{field.value}</Typography>
                           </Box>
@@ -436,24 +436,24 @@ const SapCommitTrace = ({ onBack, darkMode = false, selectedOrder: initialOrder 
               </Box>
               <Box sx={{ p: 2, borderTop: '1px solid', borderColor: 'divider', display: 'flex', gap: 1 }}>
                 <Button startIcon={<PrintIcon />} variant="outlined" size="small" onClick={handlePrintConfirmation} sx={{ flex: 1, fontSize: '0.75rem' }}>Print Confirmation</Button>
-                <Button startIcon={<LaunchIcon />} size="small" onClick={handleOpenInSap} sx={{ flex: 1, fontSize: '0.75rem', bgcolor: alpha('#0854a0', 0.12), border: '1px solid', borderColor: alpha('#0854a0', 0.3), color: '#1565c0' }}>Open in SAP</Button>
+                <Button startIcon={<LaunchIcon />} size="small" onClick={handleOpenInSap} sx={{ flex: 1, fontSize: '0.75rem', bgcolor: alpha('#002352', 0.12), border: '1px solid', borderColor: alpha('#002352', 0.3), color: '#1565c0' }}>Open in SAP</Button>
               </Box>
             </Card>
           </Grid>
           <Grid item xs={12} md={6}>
             <Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', gap: 1 }}>
-                <HistoryIcon sx={{ color: '#0854a0', fontSize: 18 }} />
+                <HistoryIcon sx={{ color: '#002352', fontSize: 18 }} />
                 <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>Decision Lineage & Audit</Typography>
               </Box>
               <Box sx={{ p: 2, overflow: 'auto', flex: 1 }}>
                 <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
                   <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1.5 }}>Full Decision Trace</Typography>
                   <Box sx={{ position: 'relative', pl: 3 }}>
-                    <Box sx={{ position: 'absolute', left: 8, top: 0, bottom: 0, width: 2, bgcolor: '#0854a0' }} />
+                    <Box sx={{ position: 'absolute', left: 8, top: 0, bottom: 0, width: 2, bgcolor: '#002352' }} />
                     {lineageSteps.map((step, idx) => (
                       <Box key={idx} sx={{ position: 'relative', pb: 2, mb: 2, borderBottom: idx < lineageSteps.length - 1 ? '1px dashed' : 'none', borderColor: 'divider' }}>
-                        <Box sx={{ position: 'absolute', left: -20, top: 4, width: 12, height: 12, borderRadius: '50%', bgcolor: '#0854a0', border: '2px solid white' }} />
+                        <Box sx={{ position: 'absolute', left: -20, top: 4, width: 12, height: 12, borderRadius: '50%', bgcolor: '#002352', border: '2px solid white' }} />
                         <Typography sx={{ fontSize: '0.7rem', color: '#1565c0', textTransform: 'uppercase', letterSpacing: 1, mb: 0.5 }}>{step.stage}</Typography>
                         <Typography variant="caption" sx={{ color: '#64748b', lineHeight: 1.5, display: 'block', fontSize: '0.75rem' }}>{step.detail}</Typography>
                         <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.65rem', mt: 0.5, display: 'block' }}>{step.meta}</Typography>
@@ -461,10 +461,10 @@ const SapCommitTrace = ({ onBack, darkMode = false, selectedOrder: initialOrder 
                     ))}
                   </Box>
                 </Paper>
-                <Paper variant="outlined" sx={{ p: 2, borderLeft: '3px solid #0854a0' }}>
+                <Paper variant="outlined" sx={{ p: 2, borderLeft: '3px solid #002352' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
                     <Stack direction="row" alignItems="center" spacing={1}>
-                      <DescriptionIcon sx={{ color: '#0854a0', fontSize: 14 }} />
+                      <DescriptionIcon sx={{ color: '#002352', fontSize: 14 }} />
                       <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>BAPI Execution Log</Typography>
                     </Stack>
                     <Chip label="RFC Active" size="small" sx={{ bgcolor: alpha('#10b981', 0.12), color: '#059669', fontWeight: 600, fontSize: '0.6rem', height: 20 }} />
@@ -482,7 +482,7 @@ const SapCommitTrace = ({ onBack, darkMode = false, selectedOrder: initialOrder 
               </Box>
               <Box sx={{ p: 2, borderTop: '1px solid', borderColor: 'divider', display: 'flex', gap: 1 }}>
                 <Button variant="outlined" size="small" onClick={handleProcessAnother} sx={{ flex: 1, fontSize: '0.75rem' }}>Process Another</Button>
-                <Button variant="contained" size="small" onClick={handleComplete} sx={{ flex: 1, fontSize: '0.75rem', bgcolor: '#0854a0', '&:hover': { bgcolor: '#1565c0' } }}>Complete - Return to Inbox</Button>
+                <Button variant="contained" size="small" onClick={handleComplete} sx={{ flex: 1, fontSize: '0.75rem', bgcolor: '#002352', '&:hover': { bgcolor: '#1565c0' } }}>Complete - Return to Inbox</Button>
               </Box>
             </Card>
           </Grid>
@@ -507,7 +507,7 @@ const SapCommitTrace = ({ onBack, darkMode = false, selectedOrder: initialOrder 
           </Stack>
         </Stack>
         <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-          <AccountTreeIcon sx={{ fontSize: 40, color: '#0854a0' }} />
+          <AccountTreeIcon sx={{ fontSize: 40, color: '#002352' }} />
           <Typography variant="h5" fontWeight={600}>SAP Commit & Trace</Typography>
         </Stack>
         <Typography variant="body2" color="text.secondary">Pre-commit validation, SAP integration, and full decision lineage - Click a row to view details</Typography>
@@ -516,7 +516,7 @@ const SapCommitTrace = ({ onBack, darkMode = false, selectedOrder: initialOrder 
       <Grid container spacing={2} sx={{ mb: 3 }}>
         {[
           { label: 'Success Rate', value: stats.rate, color: '#10b981' },
-          { label: 'Total Committed', value: stats.success, color: '#0854a0' },
+          { label: 'Total Committed', value: stats.success, color: '#002352' },
           { label: 'Pending', value: stats.pending, color: '#f59e0b' },
           { label: 'Failed', value: stats.failed, color: '#ef4444' },
           { label: 'Total Orders', value: stats.total, color: '#8b5cf6' },
@@ -535,10 +535,10 @@ const SapCommitTrace = ({ onBack, darkMode = false, selectedOrder: initialOrder 
       <Card variant="outlined" sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Stack direction="row" alignItems="center" spacing={1}>
-            <HistoryIcon sx={{ color: '#0854a0', fontSize: 18 }} />
+            <HistoryIcon sx={{ color: '#002352', fontSize: 18 }} />
             <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>Committed Orders</Typography>
           </Stack>
-          <Chip label={`${stats.total} orders`} size="small" sx={{ bgcolor: alpha('#0854a0', 0.12), color: '#1565c0', fontWeight: 600, fontSize: '0.7rem' }} />
+          <Chip label={`${stats.total} orders`} size="small" sx={{ bgcolor: alpha('#002352', 0.12), color: '#1565c0', fontWeight: 600, fontSize: '0.7rem' }} />
         </Box>
         <Box sx={{ flex: 1, overflow: 'hidden' }}>
           {loading ? (
@@ -565,7 +565,7 @@ const SapCommitTrace = ({ onBack, darkMode = false, selectedOrder: initialOrder 
                 border: '1px solid rgba(0,0,0,0.08)',
                 '& .MuiDataGrid-cell': { fontSize: '0.8rem' },
                 '& .MuiDataGrid-columnHeader': { bgcolor: darkMode ? '#1e293b' : '#f1f5f9', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' },
-                '& .MuiDataGrid-row:hover': { bgcolor: alpha('#0854a0', 0.08), cursor: 'pointer' },
+                '& .MuiDataGrid-row:hover': { bgcolor: alpha('#002352', 0.08), cursor: 'pointer' },
               }}
             />
           )}

@@ -37,7 +37,7 @@ import stoxTheme from '../stox/stoxTheme';
 const API_BASE = `${import.meta.env.VITE_API_URL || ''}/api/v1/margen/csg`;
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -139,7 +139,7 @@ const PLGLExplorerAnalytics = ({ onBack, darkMode = false }) => {
       title: 'Avg GM% Trend',
       value: formatPercent(avgGrossMargin),
       subtitle: 'Monthly average margin',
-      color: '#2b88d8',
+      color: '#1a5a9e',
       icon: CalendarIcon,
     },
   ] : [];
@@ -221,8 +221,8 @@ const PLGLExplorerAnalytics = ({ onBack, darkMode = false }) => {
           label={params.value}
           size="small"
           sx={{
-            bgcolor: alpha('#2b88d8', 0.1),
-            color: '#2b88d8',
+            bgcolor: alpha('#1a5a9e', 0.1),
+            color: '#1a5a9e',
             fontWeight: 600,
           }}
         />

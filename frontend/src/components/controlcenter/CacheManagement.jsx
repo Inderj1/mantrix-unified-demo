@@ -89,7 +89,7 @@ const cacheTypes = [
     costSavings: 3200,
     enabled: true,
     icon: <QueryIcon />,
-    color: '#2196f3',
+    color: '#00357a',
   },
   {
     id: 'schema',
@@ -253,7 +253,7 @@ const CacheManagement = () => {
 
   const getCacheColor = (id) => {
     const colors = {
-      sql_generation: '#2196f3',
+      sql_generation: '#00357a',
       schema: '#4caf50',
       embedding: '#9c27b0',
       validation: '#ff9800',

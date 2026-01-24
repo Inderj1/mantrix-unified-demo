@@ -536,32 +536,32 @@ const getTileMetrics = (tileId, data) => {
     'sell-through-bridge': [
       { label: 'Total Channels', value: '4', icon: ShowChart, color: '#06b6d4', trend: null },
       { label: 'Avg Confidence', value: '88%', icon: CheckCircle, color: '#10b981', trend: '+2%' },
-      { label: 'Forecast Accuracy', value: '92%', icon: TrendingUp, color: '#2b88d8', trend: '+1.5%' },
+      { label: 'Forecast Accuracy', value: '92%', icon: TrendingUp, color: '#1a5a9e', trend: '+1.5%' },
       { label: 'Total Units', value: data.reduce((sum, row) => sum + (row.sellThrough || 0), 0), icon: Inventory, color: '#f59e0b', trend: null },
     ],
     'partner-pos-monitor': [
       { label: 'Active Partners', value: data.filter(r => r.status === 'Active').length, icon: CheckCircle, color: '#10b981', trend: null },
-      { label: 'Avg Quality', value: '96%', icon: TrendingUp, color: '#2b88d8', trend: '+3%' },
+      { label: 'Avg Quality', value: '96%', icon: TrendingUp, color: '#1a5a9e', trend: '+3%' },
       { label: 'Error Feeds', value: data.filter(r => r.status === 'Error').length, icon: ErrorIcon, color: '#ef4444', trend: null },
-      { label: 'Total Records', value: data.reduce((sum, row) => sum + (row.records || 0), 0).toLocaleString(), icon: Assignment, color: '#0078d4', trend: null },
+      { label: 'Total Records', value: data.reduce((sum, row) => sum + (row.records || 0), 0).toLocaleString(), icon: Assignment, color: '#00357a', trend: null },
     ],
     'forecast-dashboard': [
       { label: 'Avg Accuracy', value: '95%', icon: CheckCircle, color: '#10b981', trend: '+2%' },
-      { label: 'Avg MAPE', value: '5.2%', icon: TrendingDown, color: '#2b88d8', trend: '-0.8%' },
+      { label: 'Avg MAPE', value: '5.2%', icon: TrendingDown, color: '#1a5a9e', trend: '-0.8%' },
       { label: 'Forecast Bias', value: '-1.2', icon: Warning, color: '#f59e0b', trend: 'Improving' },
-      { label: 'Total SKUs', value: new Set(data.map(r => r.sku)).size, icon: Inventory, color: '#0078d4', trend: null },
+      { label: 'Total SKUs', value: new Set(data.map(r => r.sku)).size, icon: Inventory, color: '#00357a', trend: null },
     ],
     'demand-analyzer': [
       { label: 'Total Demand', value: data.reduce((sum, row) => sum + (row.demand || 0), 0).toLocaleString(), icon: ShowChart, color: '#06b6d4', trend: '+12%' },
       { label: 'Dimensions', value: new Set(data.map(r => r.dimension)).size, icon: Assignment, color: '#10b981', trend: null },
-      { label: 'Growth Rate', value: '+15%', icon: TrendingUp, color: '#2b88d8', trend: 'YoY' },
+      { label: 'Growth Rate', value: '+15%', icon: TrendingUp, color: '#1a5a9e', trend: 'YoY' },
       { label: 'Regions', value: new Set(data.map(r => r.region)).size, icon: Inventory, color: '#f59e0b', trend: null },
     ],
     'forecast-workbench': [
       { label: 'Total Forecasts', value: data.length, icon: Assignment, color: '#06b6d4', trend: null },
       { label: 'Overridden', value: data.filter(r => r.override !== null).length, icon: Warning, color: '#f59e0b', trend: null },
       { label: 'Approved', value: data.filter(r => r.status === 'Approved').length, icon: CheckCircle, color: '#10b981', trend: null },
-      { label: 'With Promo', value: data.filter(r => r.promo === 'Y').length, icon: TrendingUp, color: '#0078d4', trend: null },
+      { label: 'With Promo', value: data.filter(r => r.promo === 'Y').length, icon: TrendingUp, color: '#00357a', trend: null },
     ],
     'demand-alerts': [
       { label: 'Total Alerts', value: data.length, icon: Warning, color: '#f59e0b', trend: null },
@@ -572,20 +572,20 @@ const getTileMetrics = (tileId, data) => {
     'store-replenishment': [
       { label: 'Stores', value: new Set(data.map(r => r.store)).size, icon: LocalShipping, color: '#06b6d4', trend: null },
       { label: 'Total Replenishment', value: data.reduce((sum, row) => sum + (row.replenishment || 0), 0).toLocaleString(), icon: Inventory, color: '#10b981', trend: null },
-      { label: 'In Transit', value: data.reduce((sum, row) => sum + (row.in_transit || 0), 0).toLocaleString(), icon: LocalShipping, color: '#2b88d8', trend: null },
+      { label: 'In Transit', value: data.reduce((sum, row) => sum + (row.in_transit || 0), 0).toLocaleString(), icon: LocalShipping, color: '#1a5a9e', trend: null },
       { label: 'On Hand', value: data.reduce((sum, row) => sum + (row.on_hand || 0), 0).toLocaleString(), icon: Inventory, color: '#f59e0b', trend: null },
     ],
     'route-optimizer': [
       { label: 'Total Routes', value: data.length, icon: LocalShipping, color: '#06b6d4', trend: null },
       { label: 'Avg Capacity', value: '85%', icon: TrendingUp, color: '#10b981', trend: 'Optimal' },
-      { label: 'Total Distance', value: data.reduce((sum, row) => sum + parseInt(row.distance), 0) + ' mi', icon: ShowChart, color: '#2b88d8', trend: null },
+      { label: 'Total Distance', value: data.reduce((sum, row) => sum + parseInt(row.distance), 0) + ' mi', icon: ShowChart, color: '#1a5a9e', trend: null },
       { label: 'Total Cost', value: '$' + data.reduce((sum, row) => sum + (row.cost || 0), 0).toLocaleString(), icon: AttachMoney, color: '#f59e0b', trend: '-5%' },
     ],
     'stockout-monitor': [
       { label: 'Critical Risks', value: data.filter(r => r.risk === 'Critical').length, icon: ErrorIcon, color: '#ef4444', trend: null },
       { label: 'High Risks', value: data.filter(r => r.risk === 'High').length, icon: Warning, color: '#f59e0b', trend: null },
-      { label: 'Avg Days to Stockout', value: Math.round(data.reduce((sum, row) => sum + (row.days_to_stockout || 0), 0) / data.length) + ' days', icon: ShowChart, color: '#2b88d8', trend: null },
-      { label: 'Total SKUs at Risk', value: data.length, icon: Inventory, color: '#0078d4', trend: null },
+      { label: 'Avg Days to Stockout', value: Math.round(data.reduce((sum, row) => sum + (row.days_to_stockout || 0), 0) / data.length) + ' days', icon: ShowChart, color: '#1a5a9e', trend: null },
+      { label: 'Total SKUs at Risk', value: data.length, icon: Inventory, color: '#00357a', trend: null },
     ],
     'channel-allocation': [
       { label: 'Total SKUs', value: data.length, icon: Inventory, color: '#06b6d4', trend: null },
@@ -596,13 +596,13 @@ const getTileMetrics = (tileId, data) => {
     'dc-cockpit': [
       { label: 'Total On Hand', value: data.reduce((sum, row) => sum + (row.on_hand || 0), 0).toLocaleString(), icon: Inventory, color: '#06b6d4', trend: null },
       { label: 'In Transit', value: data.reduce((sum, row) => sum + (row.in_transit || 0), 0).toLocaleString(), icon: LocalShipping, color: '#10b981', trend: null },
-      { label: 'Available ATP', value: data.reduce((sum, row) => sum + (row.available || 0), 0).toLocaleString(), icon: CheckCircle, color: '#2b88d8', trend: '+5%' },
+      { label: 'Available ATP', value: data.reduce((sum, row) => sum + (row.available || 0), 0).toLocaleString(), icon: CheckCircle, color: '#1a5a9e', trend: '+5%' },
       { label: 'Total Allocated', value: data.reduce((sum, row) => sum + (row.allocated_ch01 || 0) + (row.allocated_ch02 || 0), 0).toLocaleString(), icon: Assignment, color: '#f59e0b', trend: null },
     ],
     'working-capital': [
       { label: 'Total Inventory Value', value: '$' + data.reduce((sum, row) => sum + (row.inventory_value || 0), 0).toLocaleString(), icon: AttachMoney, color: '#06b6d4', trend: null },
       { label: 'Avg Turns', value: (data.reduce((sum, row) => sum + (row.turns || 0), 0) / data.length).toFixed(1) + 'x', icon: TrendingUp, color: '#10b981', trend: '+0.5x' },
-      { label: 'Avg DIO', value: Math.round(data.reduce((sum, row) => sum + (row.dio || 0), 0) / data.length) + ' days', icon: ShowChart, color: '#2b88d8', trend: '-4 days' },
+      { label: 'Avg DIO', value: Math.round(data.reduce((sum, row) => sum + (row.dio || 0), 0) / data.length) + ' days', icon: ShowChart, color: '#1a5a9e', trend: '-4 days' },
       { label: 'Optimal SKUs', value: data.filter(r => r.status === 'Optimal').length, icon: CheckCircle, color: '#10b981', trend: null },
     ],
     'excess-obsolete': [
@@ -614,38 +614,38 @@ const getTileMetrics = (tileId, data) => {
     'supply-dashboard': [
       { label: 'Total SKUs', value: data.length, icon: Inventory, color: '#06b6d4', trend: null },
       { label: 'Total Supply Req', value: data.reduce((sum, row) => sum + (row.plant_supply_req || 0), 0).toLocaleString(), icon: Assignment, color: '#10b981', trend: null },
-      { label: 'Weekly Demand', value: data.reduce((sum, row) => sum + (row.weekly_demand || 0), 0).toLocaleString(), icon: TrendingUp, color: '#2b88d8', trend: null },
+      { label: 'Weekly Demand', value: data.reduce((sum, row) => sum + (row.weekly_demand || 0), 0).toLocaleString(), icon: TrendingUp, color: '#1a5a9e', trend: null },
       { label: 'DC On Hand', value: data.reduce((sum, row) => sum + (row.dc_on_hand || 0), 0).toLocaleString(), icon: Inventory, color: '#f59e0b', trend: null },
     ],
     'production-optimizer': [
       { label: 'Total Campaigns', value: data.length, icon: Assignment, color: '#06b6d4', trend: null },
       { label: 'Avg Capacity', value: Math.round(data.reduce((sum, row) => sum + (row.capacity_util || 0), 0) / data.length) + '%', icon: TrendingUp, color: '#10b981', trend: 'Optimal' },
-      { label: 'Avg Efficiency', value: Math.round(data.reduce((sum, row) => sum + (row.efficiency || 0), 0) / data.length) + '%', icon: CheckCircle, color: '#2b88d8', trend: '+2%' },
+      { label: 'Avg Efficiency', value: Math.round(data.reduce((sum, row) => sum + (row.efficiency || 0), 0) / data.length) + '%', icon: CheckCircle, color: '#1a5a9e', trend: '+2%' },
       { label: 'Total Production Days', value: data.reduce((sum, row) => sum + (row.production_days || 0), 0), icon: ShowChart, color: '#f59e0b', trend: null },
     ],
     'mrp-accelerator': [
       { label: 'Planned Orders', value: data.length, icon: Assignment, color: '#06b6d4', trend: null },
       { label: 'Auto-Approved', value: data.filter(r => r.status === 'Auto-Approved').length, icon: CheckCircle, color: '#10b981', trend: 'AI-Driven' },
       { label: 'Expedited', value: data.filter(r => r.status === 'Expedited').length, icon: Warning, color: '#ef4444', trend: null },
-      { label: 'Total Quantity', value: data.reduce((sum, row) => sum + (row.quantity || 0), 0).toLocaleString(), icon: Inventory, color: '#2b88d8', trend: null },
+      { label: 'Total Quantity', value: data.reduce((sum, row) => sum + (row.quantity || 0), 0).toLocaleString(), icon: Inventory, color: '#1a5a9e', trend: null },
     ],
     'bom-analyzer': [
       { label: 'Total FGs', value: new Set(data.map(r => r.fg_sku)).size, icon: Inventory, color: '#06b6d4', trend: null },
       { label: 'Total Components', value: new Set(data.map(r => r.component)).size, icon: Assignment, color: '#10b981', trend: null },
-      { label: 'Component Req', value: data.reduce((sum, row) => sum + (row.component_req || 0), 0).toLocaleString(), icon: TrendingUp, color: '#2b88d8', trend: null },
+      { label: 'Component Req', value: data.reduce((sum, row) => sum + (row.component_req || 0), 0).toLocaleString(), icon: TrendingUp, color: '#1a5a9e', trend: null },
       { label: 'Suppliers', value: new Set(data.map(r => r.supplier)).size, icon: CheckCircle, color: '#f59e0b', trend: null },
     ],
     'component-tracker': [
       { label: 'Total Components', value: data.length, icon: Inventory, color: '#06b6d4', trend: null },
       { label: 'Total Demand', value: data.reduce((sum, row) => sum + (row.total_demand || 0), 0).toLocaleString(), icon: TrendingUp, color: '#10b981', trend: null },
-      { label: 'On Hand', value: data.reduce((sum, row) => sum + (row.on_hand || 0), 0).toLocaleString(), icon: CheckCircle, color: '#2b88d8', trend: null },
+      { label: 'On Hand', value: data.reduce((sum, row) => sum + (row.on_hand || 0), 0).toLocaleString(), icon: CheckCircle, color: '#1a5a9e', trend: null },
       { label: 'Used in FGs', value: data.reduce((sum, row) => sum + (row.total_fgs || 0), 0), icon: Assignment, color: '#f59e0b', trend: null },
     ],
     'bom-exceptions': [
       { label: 'Total Exceptions', value: data.length, icon: Warning, color: '#ef4444', trend: null },
       { label: 'High Severity', value: data.filter(r => r.severity === 'High').length, icon: ErrorIcon, color: '#ef4444', trend: 'Critical' },
       { label: 'Medium Severity', value: data.filter(r => r.severity === 'Medium').length, icon: Warning, color: '#f59e0b', trend: null },
-      { label: 'Low Severity', value: data.filter(r => r.severity === 'Low').length, icon: CheckCircle, color: '#2b88d8', trend: null },
+      { label: 'Low Severity', value: data.filter(r => r.severity === 'Low').length, icon: CheckCircle, color: '#1a5a9e', trend: null },
     ],
     'consolidation-engine': [
       { label: 'Components', value: data.length, icon: Inventory, color: '#06b6d4', trend: null },
@@ -656,38 +656,38 @@ const getTileMetrics = (tileId, data) => {
           return sum;
         }
       }, 0).toLocaleString(), icon: AttachMoney, color: '#10b981', trend: '+20%' },
-      { label: 'Purchase Qty', value: data.reduce((sum, row) => sum + (row.purchase_qty || 0), 0).toLocaleString(), icon: TrendingUp, color: '#2b88d8', trend: null },
+      { label: 'Purchase Qty', value: data.reduce((sum, row) => sum + (row.purchase_qty || 0), 0).toLocaleString(), icon: TrendingUp, color: '#1a5a9e', trend: null },
       { label: 'Suppliers', value: new Set(data.map(r => r.supplier)).size, icon: CheckCircle, color: '#f59e0b', trend: 'Consolidated' },
     ],
     'procurement-dashboard': [
       { label: 'Consolidated POs', value: data.length, icon: Assignment, color: '#06b6d4', trend: null },
       { label: 'Total Cost', value: '$' + data.reduce((sum, row) => sum + (row.total_cost || 0), 0).toLocaleString(), icon: AttachMoney, color: '#10b981', trend: null },
-      { label: 'Total Savings', value: '$' + data.reduce((sum, row) => sum + (row.savings || 0), 0).toLocaleString(), icon: TrendingUp, color: '#2b88d8', trend: '+18%' },
+      { label: 'Total Savings', value: '$' + data.reduce((sum, row) => sum + (row.savings || 0), 0).toLocaleString(), icon: TrendingUp, color: '#1a5a9e', trend: '+18%' },
       { label: 'Avg Discount', value: '18%', icon: CheckCircle, color: '#f59e0b', trend: 'Volume Discount' },
     ],
     'supplier-portal': [
       { label: 'Total Suppliers', value: data.length, icon: Assignment, color: '#06b6d4', trend: null },
       { label: 'Forecast Shared', value: data.filter(r => r.forecast_shared === 'Yes').length, icon: CheckCircle, color: '#10b981', trend: null },
-      { label: 'Avg Delivery', value: Math.round(data.reduce((sum, row) => sum + (row.delivery_performance || 0), 0) / data.length) + '%', icon: TrendingUp, color: '#2b88d8', trend: '+2%' },
+      { label: 'Avg Delivery', value: Math.round(data.reduce((sum, row) => sum + (row.delivery_performance || 0), 0) / data.length) + '%', icon: TrendingUp, color: '#1a5a9e', trend: '+2%' },
       { label: 'Avg Quality', value: Math.round(data.reduce((sum, row) => sum + (row.quality_score || 0), 0) / data.length) + '%', icon: CheckCircle, color: '#f59e0b', trend: '+1%' },
     ],
     'scenario-planner': [
       { label: 'Scenarios', value: new Set(data.map(r => r.scenario)).size, icon: Assignment, color: '#06b6d4', trend: null },
       { label: 'Best Case Demand', value: data.filter(r => r.scenario === 'Best Case').reduce((sum, row) => sum + (row.forecasted_demand || 0), 0), icon: TrendingUp, color: '#10b981', trend: '+75%' },
-      { label: 'Likely Demand', value: data.filter(r => r.scenario === 'Likely').reduce((sum, row) => sum + (row.forecasted_demand || 0), 0), icon: ShowChart, color: '#2b88d8', trend: 'Baseline' },
+      { label: 'Likely Demand', value: data.filter(r => r.scenario === 'Likely').reduce((sum, row) => sum + (row.forecasted_demand || 0), 0), icon: ShowChart, color: '#1a5a9e', trend: 'Baseline' },
       { label: 'Worst Case Demand', value: data.filter(r => r.scenario === 'Worst Case').reduce((sum, row) => sum + (row.forecasted_demand || 0), 0), icon: TrendingDown, color: '#f59e0b', trend: '-25%' },
     ],
     'kpi-dashboard': [
       { label: 'Total KPIs', value: data.length, icon: ShowChart, color: '#06b6d4', trend: null },
       { label: 'Exceeds Target', value: data.filter(r => r.status === 'Exceeds').length, icon: CheckCircle, color: '#10b981', trend: 'Excellent' },
-      { label: 'Meets Target', value: data.filter(r => r.status === 'Meets').length, icon: CheckCircle, color: '#2b88d8', trend: 'Good' },
+      { label: 'Meets Target', value: data.filter(r => r.status === 'Meets').length, icon: CheckCircle, color: '#1a5a9e', trend: 'Good' },
       { label: 'Below Target', value: data.filter(r => r.status === 'Below').length, icon: Warning, color: '#f59e0b', trend: 'Review' },
     ],
     'predictive-analytics': [
       { label: 'Total Anomalies', value: data.length, icon: Warning, color: '#ef4444', trend: null },
       { label: 'Demand Spikes', value: data.filter(r => r.anomaly_type === 'Demand Spike').length, icon: TrendingUp, color: '#10b981', trend: null },
       { label: 'Stockouts', value: data.filter(r => r.anomaly_type === 'Stockout').length, icon: ErrorIcon, color: '#ef4444', trend: null },
-      { label: 'Avg Variance', value: '55%', icon: ShowChart, color: '#2b88d8', trend: 'High' },
+      { label: 'Avg Variance', value: '55%', icon: ShowChart, color: '#1a5a9e', trend: 'High' },
     ],
     'working-capital-optimizer': [
       { label: 'Total Inventory Value', value: (() => {
@@ -699,7 +699,7 @@ const getTileMetrics = (tileId, data) => {
       { label: 'WC Release Potential', value: (() => {
         const total = data.reduce((sum, row) => sum + (row.cash_impact_value || 0), 0);
         return total >= 0 ? `+$${(total/1000000).toFixed(1)}M` : `-$${(Math.abs(total)/1000000).toFixed(1)}M`;
-      })(), icon: TrendingUp, color: '#2b88d8', trend: 'Optimization' },
+      })(), icon: TrendingUp, color: '#1a5a9e', trend: 'Optimization' },
     ],
   };
 
@@ -710,7 +710,7 @@ const getTileMetrics = (tileId, data) => {
 };
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',

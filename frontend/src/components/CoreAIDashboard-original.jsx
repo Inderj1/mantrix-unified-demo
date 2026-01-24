@@ -984,7 +984,7 @@ const CoreAIDashboard = () => {
                         <XAxis dataKey="month" />
                         <YAxis />
                         <RechartsTooltip />
-                        <Line type="monotone" dataKey="value" stroke="#2196f3" strokeWidth={2} name="Actual" />
+                        <Line type="monotone" dataKey="value" stroke="#00357a" strokeWidth={2} name="Actual" />
                         <Line type="monotone" dataKey="target" stroke="#4caf50" strokeDasharray="5 5" name="Target" />
                       </LineChart>
                     </ResponsiveContainer>

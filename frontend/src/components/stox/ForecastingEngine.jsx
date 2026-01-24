@@ -205,7 +205,7 @@ const generateDetailData = (skuId, mainData) => {
 };
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -320,8 +320,8 @@ const ForecastingEngine = ({ onBack, onTileClick, darkMode = false }) => {
           size="small"
           sx={{
             fontWeight: 600,
-            bgcolor: alpha('#0078d4', 0.12),
-            color: '#005a9e',
+            bgcolor: alpha('#00357a', 0.12),
+            color: '#002352',
           }}
         />
       ),
@@ -338,7 +338,7 @@ const ForecastingEngine = ({ onBack, onTileClick, darkMode = false }) => {
         <Chip
           label={params.value.toLocaleString()}
           size="small"
-          sx={{ fontWeight: 700, bgcolor: alpha('#2b88d8', 0.12), color: '#106ebe' }}
+          sx={{ fontWeight: 700, bgcolor: alpha('#1a5a9e', 0.12), color: '#1a5a9e' }}
         />
       ),
     },
@@ -416,7 +416,7 @@ const ForecastingEngine = ({ onBack, onTileClick, darkMode = false }) => {
           size="small"
           sx={{
             fontWeight: 700,
-            bgcolor: Math.abs(params.value) <= 5 ? alpha('#10b981', 0.12) : params.value > 5 ? alpha('#ef4444', 0.12) : alpha('#2b88d8', 0.12),
+            bgcolor: Math.abs(params.value) <= 5 ? alpha('#10b981', 0.12) : params.value > 5 ? alpha('#ef4444', 0.12) : alpha('#1a5a9e', 0.12),
             color: Math.abs(params.value) <= 5 ? '#059669' : params.value > 5 ? '#dc2626' : '#0284c7',
           }}
         />
@@ -458,7 +458,7 @@ const ForecastingEngine = ({ onBack, onTileClick, darkMode = false }) => {
     if (!selectedSku) return null;
 
     const mapeColor = selectedSku.mape < 10 ? '#10b981' : selectedSku.mape < 20 ? '#f59e0b' : '#ef4444';
-    const biasColor = Math.abs(selectedSku.bias) <= 5 ? '#10b981' : selectedSku.bias > 5 ? '#ef4444' : '#2b88d8';
+    const biasColor = Math.abs(selectedSku.bias) <= 5 ? '#10b981' : selectedSku.bias > 5 ? '#ef4444' : '#1a5a9e';
 
     return (
       <Box sx={{ flex: 1, overflow: 'auto' }}>
@@ -475,7 +475,7 @@ const ForecastingEngine = ({ onBack, onTileClick, darkMode = false }) => {
           <Stack direction="row" spacing={1}>
             <Chip label={selectedSku.id} size="small" sx={{ bgcolor: alpha('#64748b', 0.1) }} />
             <Chip label={selectedSku.pattern} size="small" color="info" />
-            <Chip label={selectedSku.model} size="small" sx={{ bgcolor: alpha('#0078d4', 0.12), color: '#005a9e', fontWeight: 600 }} />
+            <Chip label={selectedSku.model} size="small" sx={{ bgcolor: alpha('#00357a', 0.12), color: '#002352', fontWeight: 600 }} />
           </Stack>
         </Stack>
 
@@ -486,7 +486,7 @@ const ForecastingEngine = ({ onBack, onTileClick, darkMode = false }) => {
         {/* Key Metrics Row */}
         <Grid container spacing={2} sx={{ mb: 3 }}>
           {[
-            { label: 'Fcst 1M', value: selectedSku.fcst1m?.toLocaleString() || selectedSku.monthlyForecast?.[0]?.value?.toLocaleString(), color: '#2b88d8', icon: <ShowChartIcon /> },
+            { label: 'Fcst 1M', value: selectedSku.fcst1m?.toLocaleString() || selectedSku.monthlyForecast?.[0]?.value?.toLocaleString(), color: '#1a5a9e', icon: <ShowChartIcon /> },
             { label: 'MAPE', value: `${selectedSku.mape}%`, color: mapeColor, icon: <SpeedIcon /> },
             { label: 'Bias', value: `${selectedSku.bias > 0 ? '+' : ''}${selectedSku.bias}%`, color: biasColor, icon: <AnalyticsIcon /> },
             { label: 'Accuracy', value: selectedSku.accuracyRating, color: mapeColor, icon: <SpeedIcon /> },
@@ -519,9 +519,9 @@ const ForecastingEngine = ({ onBack, onTileClick, darkMode = false }) => {
                     data={{
                       labels: selectedSku.historicalData.labels,
                       datasets: [
-                        { label: 'Actual', data: selectedSku.historicalData.actuals, borderColor: '#2b88d8', backgroundColor: 'transparent', borderWidth: 2, pointBackgroundColor: '#2b88d8', pointRadius: 3, tension: 0.3 },
-                        { label: 'Forecast', data: selectedSku.historicalData.forecasts, borderColor: '#0078d4', backgroundColor: 'transparent', borderWidth: 2, borderDash: [5, 5], pointBackgroundColor: '#0078d4', pointRadius: 3, tension: 0.3 },
-                        { label: 'P90', data: selectedSku.historicalData.p90, borderColor: 'transparent', backgroundColor: alpha('#0078d4', 0.1), fill: '+1', pointRadius: 0, tension: 0.3 },
+                        { label: 'Actual', data: selectedSku.historicalData.actuals, borderColor: '#1a5a9e', backgroundColor: 'transparent', borderWidth: 2, pointBackgroundColor: '#1a5a9e', pointRadius: 3, tension: 0.3 },
+                        { label: 'Forecast', data: selectedSku.historicalData.forecasts, borderColor: '#00357a', backgroundColor: 'transparent', borderWidth: 2, borderDash: [5, 5], pointBackgroundColor: '#00357a', pointRadius: 3, tension: 0.3 },
+                        { label: 'P90', data: selectedSku.historicalData.p90, borderColor: 'transparent', backgroundColor: alpha('#00357a', 0.1), fill: '+1', pointRadius: 0, tension: 0.3 },
                         { label: 'P10', data: selectedSku.historicalData.p10, borderColor: 'transparent', backgroundColor: 'transparent', pointRadius: 0, tension: 0.3 },
                       ],
                     }}
@@ -545,7 +545,7 @@ const ForecastingEngine = ({ onBack, onTileClick, darkMode = false }) => {
                       labels: selectedSku.modelComparison.map(m => m.model),
                       datasets: [{
                         data: selectedSku.modelComparison.map(m => m.mape.toFixed(1)),
-                        backgroundColor: selectedSku.modelComparison.map(m => m.selected ? '#0078d4' : alpha('#64748b', 0.3)),
+                        backgroundColor: selectedSku.modelComparison.map(m => m.selected ? '#00357a' : alpha('#64748b', 0.3)),
                         borderRadius: 4,
                       }],
                     }}
@@ -558,11 +558,11 @@ const ForecastingEngine = ({ onBack, onTileClick, darkMode = false }) => {
                   </Typography>
                   <Stack spacing={1}>
                     {selectedSku.monthlyForecast.map((m, idx) => (
-                      <Box key={idx} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1, bgcolor: alpha('#0078d4', 0.03), borderRadius: 1 }}>
+                      <Box key={idx} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1, bgcolor: alpha('#00357a', 0.03), borderRadius: 1 }}>
                         <Typography sx={{ fontWeight: 600, fontSize: '0.8rem' }}>{m.month}</Typography>
                         <Stack direction="row" alignItems="center" spacing={1}>
                           <Typography sx={{ fontSize: '0.7rem', color: '#64748b' }}>{m.p10.toLocaleString()}</Typography>
-                          <Chip label={m.value.toLocaleString()} size="small" sx={{ bgcolor: alpha('#0078d4', 0.12), color: '#005a9e', fontWeight: 700, height: 22 }} />
+                          <Chip label={m.value.toLocaleString()} size="small" sx={{ bgcolor: alpha('#00357a', 0.12), color: '#002352', fontWeight: 700, height: 22 }} />
                           <Typography sx={{ fontSize: '0.7rem', color: '#64748b' }}>{m.p90.toLocaleString()}</Typography>
                         </Stack>
                       </Box>
@@ -575,7 +575,7 @@ const ForecastingEngine = ({ onBack, onTileClick, darkMode = false }) => {
 
           {/* Accuracy Metrics + Model Selection */}
           <Grid item xs={12} md={4} sx={{ display: 'flex' }}>
-            <Card variant="outlined" sx={{ flex: 1, display: 'flex', flexDirection: 'column', border: '2px solid', borderColor: alpha('#0078d4', 0.2) }}>
+            <Card variant="outlined" sx={{ flex: 1, display: 'flex', flexDirection: 'column', border: '2px solid', borderColor: alpha('#00357a', 0.2) }}>
               <CardContent sx={{ p: 2, flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 2 }}>
                   Accuracy Metrics
@@ -596,11 +596,11 @@ const ForecastingEngine = ({ onBack, onTileClick, darkMode = false }) => {
                   ))}
                 </Grid>
                 <Box sx={{ borderTop: '1px solid', borderColor: alpha('#64748b', 0.15), pt: 2, flex: 1 }}>
-                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#0078d4', textTransform: 'uppercase', letterSpacing: 1, mb: 1.5 }}>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#00357a', textTransform: 'uppercase', letterSpacing: 1, mb: 1.5 }}>
                     Selected Model
                   </Typography>
                   <Box sx={{ textAlign: 'center', mb: 1.5 }}>
-                    <Chip label={selectedSku.model} sx={{ bgcolor: '#0078d4', color: 'white', fontWeight: 700, fontSize: '0.9rem', height: 32, px: 1 }} />
+                    <Chip label={selectedSku.model} sx={{ bgcolor: '#00357a', color: 'white', fontWeight: 700, fontSize: '0.9rem', height: 32, px: 1 }} />
                   </Box>
                   <Typography sx={{ fontSize: '0.75rem', color: '#64748b', textAlign: 'center', lineHeight: 1.5, mb: 1.5 }}>
                     {selectedSku.modelReason}
@@ -609,7 +609,7 @@ const ForecastingEngine = ({ onBack, onTileClick, darkMode = false }) => {
                     {[
                       { label: 'Demand Type', value: selectedSku.pattern },
                       { label: 'Confidence', value: 'High', color: '#10b981' },
-                      { label: 'Auto-Selected', value: 'Yes', color: '#0078d4' },
+                      { label: 'Auto-Selected', value: 'Yes', color: '#00357a' },
                     ].map((row, idx) => (
                       <Box key={idx} sx={{ display: 'flex', justifyContent: 'space-between', py: 0.5 }}>
                         <Typography sx={{ fontSize: '0.75rem', color: '#64748b' }}>{row.label}</Typography>
@@ -617,7 +617,7 @@ const ForecastingEngine = ({ onBack, onTileClick, darkMode = false }) => {
                       </Box>
                     ))}
                   </Stack>
-                  <Button fullWidth variant="outlined" size="small" sx={{ mt: 1.5, borderColor: '#0078d4', color: '#0078d4' }}>
+                  <Button fullWidth variant="outlined" size="small" sx={{ mt: 1.5, borderColor: '#00357a', color: '#00357a' }}>
                     Override Model
                   </Button>
                 </Box>
@@ -718,7 +718,7 @@ const ForecastingEngine = ({ onBack, onTileClick, darkMode = false }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card variant="outlined" sx={{ borderLeft: `3px solid #2b88d8`, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #1a5a9e`, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                     <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Over-Fcst</Typography>
                     <Typography variant="h4" fontWeight={700} color="#0284c7">{metrics.overForecasting}</Typography>
@@ -727,10 +727,10 @@ const ForecastingEngine = ({ onBack, onTileClick, darkMode = false }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card variant="outlined" sx={{ borderLeft: `3px solid #0078d4`, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
+                <Card variant="outlined" sx={{ borderLeft: `3px solid #00357a`, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                     <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Under-Fcst</Typography>
-                    <Typography variant="h4" fontWeight={700} color="#005a9e">{metrics.underForecasting}</Typography>
+                    <Typography variant="h4" fontWeight={700} color="#002352">{metrics.underForecasting}</Typography>
                     <Typography sx={{ fontSize: '0.65rem', color: colors.textSecondary }}>Bias &lt; -5%</Typography>
                   </CardContent>
                 </Card>
@@ -851,7 +851,7 @@ const ForecastingEngine = ({ onBack, onTileClick, darkMode = false }) => {
                 '& .MuiDataGrid-row': {
                   bgcolor: colors.paper,
                   '&:hover': {
-                    bgcolor: darkMode ? alpha('#4da6ff', 0.08) : alpha('#0a6ed1', 0.04),
+                    bgcolor: darkMode ? alpha('#4d9eff', 0.08) : alpha('#00357a', 0.04),
                   },
                 },
                 '& .MuiDataGrid-footerContainer': {

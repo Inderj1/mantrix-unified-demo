@@ -35,8 +35,8 @@ import CustomerIntelligence from './o2cai/CustomerIntelligence';
 import DocumentFlowAnalysis from './o2cai/DocumentFlowAnalysis';
 import TransactionDrilldown from './o2cai/TransactionDrilldown';
 
-// Single consistent blue for all modules
-const MODULE_COLOR = '#0078d4';
+// Import centralized brand colors
+import { MODULE_COLOR } from '../config/brandColors';
 
 // O2C.AI Modules - 5 step workflow
 const o2cModules = [

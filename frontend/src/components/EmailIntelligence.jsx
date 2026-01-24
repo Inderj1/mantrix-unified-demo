@@ -417,7 +417,7 @@ const generateSampleData = (typeName, count = 10) => {
 };
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -462,7 +462,7 @@ const EmailIntelligence = ({ onNavigateToConfig, darkMode = false }) => {
         display_name: 'Vendor Communications',
         description: 'Track communications with suppliers and vendors including POs, invoices, and shipments',
         icon: 'Business',
-        color: '#0078d4',
+        color: '#00357a',
         tab_order: 1,
         is_active: true
       },
@@ -472,7 +472,7 @@ const EmailIntelligence = ({ onNavigateToConfig, darkMode = false }) => {
         display_name: 'Customer Inquiries',
         description: 'Monitor and respond to customer support requests and inquiries',
         icon: 'Person',
-        color: '#106ebe',
+        color: '#1a5a9e',
         tab_order: 2,
         is_active: true
       },
@@ -492,7 +492,7 @@ const EmailIntelligence = ({ onNavigateToConfig, darkMode = false }) => {
         display_name: 'Inventory Alerts',
         description: 'Monitor stock levels, reorder points, and inventory health alerts',
         icon: 'Inventory',
-        color: '#005a9e',
+        color: '#002352',
         tab_order: 4,
         is_active: true
       },
@@ -502,7 +502,7 @@ const EmailIntelligence = ({ onNavigateToConfig, darkMode = false }) => {
         display_name: 'Email Campaigns',
         description: 'Track email marketing performance, open rates, and conversions',
         icon: 'Email',
-        color: '#2b88d8',
+        color: '#1a5a9e',
         tab_order: 5,
         is_active: true
       }
@@ -960,7 +960,7 @@ const EmailIntelligence = ({ onNavigateToConfig, darkMode = false }) => {
         <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <EmailIcon sx={{ fontSize: 40, color: '#0078d4' }} />
+              <EmailIcon sx={{ fontSize: 40, color: '#00357a' }} />
               <Box>
                 <Typography variant="h5" fontWeight={600} sx={{ color: colors.text }}>
                   EMAIL INTEL
@@ -1014,7 +1014,7 @@ const EmailIntelligence = ({ onNavigateToConfig, darkMode = false }) => {
         <Grid container spacing={1.5}>
           {filteredTypes.map((type, index) => {
             const IconComponent = getIconComponent(type.icon);
-            const colors = ['#0078d4', '#106ebe', '#2b88d8', '#005a9e'];
+            const colors = ['#00357a', '#1a5a9e', '#1a5a9e', '#002352'];
             const color = type.color || colors[index % colors.length];
 
             return (
@@ -1114,16 +1114,16 @@ const EmailIntelligence = ({ onNavigateToConfig, darkMode = false }) => {
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
                   border: '2px dashed',
-                  borderColor: alpha('#0078d4', 0.3),
+                  borderColor: alpha('#00357a', 0.3),
                   borderRadius: 3,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  bgcolor: darkMode ? colors.cardBg : alpha('#0078d4', 0.02),
+                  bgcolor: darkMode ? colors.cardBg : alpha('#00357a', 0.02),
                   '&:hover': {
                     transform: 'translateY(-6px)',
-                    borderColor: '#0078d4',
-                    bgcolor: darkMode ? alpha('#0078d4', 0.15) : alpha('#0078d4', 0.05),
+                    borderColor: '#00357a',
+                    bgcolor: darkMode ? alpha('#00357a', 0.15) : alpha('#00357a', 0.05),
                   },
                 }}
                 onClick={handleAddCustomType}

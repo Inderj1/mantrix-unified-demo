@@ -25,8 +25,8 @@ import {
   TableChart as TableChartIcon,
 } from '@mui/icons-material';
 
-// Single consistent blue for all modules
-const MODULE_COLOR = '#0078d4';
+// Import centralized brand colors
+import { MODULE_COLOR } from '../../config/brandColors';
 
 // TRACK AI Module Tiles - Blue palette
 const nexxtTrackModules = [

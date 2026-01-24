@@ -38,7 +38,7 @@ import {
 import o2cTheme from './o2cTheme';
 
 // Primary blue color
-const PRIMARY_BLUE = '#0854a0';
+const PRIMARY_BLUE = '#002352';
 const ACCENT_BLUE = '#1976d2';
 
 // Data source types
@@ -56,7 +56,7 @@ const SourceIndicator = ({ source, sapTable, size = 'small' }) => {
   const config = {
     [DATA_SOURCES.SAP_SD]: {
       icon: <StorageIcon sx={{ fontSize: size === 'small' ? 10 : 12 }} />,
-      color: '#0854a0',
+      color: '#002352',
       label: `SAP SD${sapTable ? ` (${sapTable})` : ''}`
     },
     [DATA_SOURCES.SAP_MASTER]: {
@@ -745,7 +745,7 @@ const ExecutiveCommandCenter = ({ onBack, onNavigate, darkMode = false }) => {
             icon={<StorageIcon sx={{ fontSize: '0.7rem !important' }} />}
             label="VBAK/VBAP (Real)"
             size="small"
-            sx={{ fontSize: '0.55rem', height: 18, bgcolor: alpha('#0854a0', 0.1), color: '#0854a0' }}
+            sx={{ fontSize: '0.55rem', height: 18, bgcolor: alpha('#002352', 0.1), color: '#002352' }}
           />
           <Chip
             icon={<VerifiedUserIcon sx={{ fontSize: '0.7rem !important' }} />}

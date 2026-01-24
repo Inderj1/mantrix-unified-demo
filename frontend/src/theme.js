@@ -1,16 +1,17 @@
 import { createTheme } from '@mui/material/styles';
+import { BRAND, SEMANTIC, NEUTRAL, BRAND_ALPHA } from './config/brandColors';
 
-// SAP Fiori-inspired Corporate Theme
-// Based on SAP's design principles with professional blue and grey palette
+// MANTRIX AI Corporate Theme
+// Uses centralized brand colors from config/brandColors.js
 const theme = createTheme({
   palette: {
     mode: 'light',
-    // Primary: SAP Blue - used for primary actions and emphasis
+    // Primary: MANTRIX Navy Blue
     primary: {
-      main: '#0A6ED1',      // SAP Blue
-      light: '#3F8FDB',     // Lighter blue for hover states
-      dark: '#0854A0',      // Darker blue for active states
-      contrastText: '#ffffff',
+      main: BRAND.navy.main,
+      light: BRAND.navy.light,
+      dark: BRAND.navy.dark,
+      contrastText: BRAND.navy.contrast,
     },
     // Secondary: Professional Grey - used sparingly
     secondary: {
@@ -44,16 +45,16 @@ const theme = createTheme({
       contrastText: '#ffffff',
     },
     warning: {
-      main: '#F0AB00',      // SAP Gold (used sparingly)
-      light: '#FFCD00',
-      dark: '#C68700',
-      contrastText: '#32363A',
+      main: BRAND.orange.main,      // MANTRIX Orange (used sparingly)
+      light: BRAND.orange.light,
+      dark: BRAND.orange.dark,
+      contrastText: BRAND.orange.contrast,
     },
     info: {
-      main: '#0A6ED1',      // SAP Blue
-      light: '#3F8FDB',
-      dark: '#0854A0',
-      contrastText: '#ffffff',
+      main: BRAND.navy.main,
+      light: BRAND.navy.light,
+      dark: BRAND.navy.dark,
+      contrastText: BRAND.navy.contrast,
     },
     // Dividers and borders
     divider: '#D9D9D9',
@@ -182,7 +183,7 @@ const theme = createTheme({
           borderColor: '#D9D9D9',
           '&:hover': {
             borderWidth: '1px',
-            backgroundColor: 'rgba(10, 110, 209, 0.04)',
+            backgroundColor: BRAND_ALPHA.navy[5],
           },
         },
       },
@@ -226,7 +227,7 @@ const theme = createTheme({
               borderColor: '#6A6D70',
             },
             '&.Mui-focused fieldset': {
-              borderColor: '#0A6ED1',
+              borderColor: BRAND.navy.main,
               borderWidth: '1px',
             },
           },
@@ -275,7 +276,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '&:hover': {
-            backgroundColor: 'rgba(10, 110, 209, 0.04)',
+            backgroundColor: BRAND_ALPHA.navy[5],
           },
         },
       },

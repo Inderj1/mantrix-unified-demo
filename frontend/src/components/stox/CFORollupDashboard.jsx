@@ -117,7 +117,7 @@ const generateCFOData = () => {
 };
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -159,7 +159,7 @@ const CFORollupDashboard = ({ onBack, onTileClick, darkMode = false }) => {
     labels: ['Cycle Stock', 'Safety Stock', 'Pipeline Stock', 'Excess/Obsolete'],
     datasets: [{
       data: [data.summary.cycleStock, data.summary.safetyStock, data.summary.pipelineStock, data.summary.excessStock],
-      backgroundColor: ['#2b88d8', '#10b981', '#f59e0b', '#ef4444'],
+      backgroundColor: ['#1a5a9e', '#10b981', '#f59e0b', '#ef4444'],
       borderWidth: 0,
     }],
   };
@@ -181,7 +181,7 @@ const CFORollupDashboard = ({ onBack, onTileClick, darkMode = false }) => {
       {
         label: 'Actual WC',
         data: data.wcTrend.map(d => d.wc),
-        borderColor: '#106ebe',
+        borderColor: '#1a5a9e',
         backgroundColor: 'rgba(8, 84, 160, 0.1)',
         fill: true,
         tension: 0.4,
@@ -204,7 +204,7 @@ const CFORollupDashboard = ({ onBack, onTileClick, darkMode = false }) => {
       {
         label: 'Working Capital ($M)',
         data: data.plants.map(p => p.wc / 1000000),
-        backgroundColor: '#106ebe',
+        backgroundColor: '#1a5a9e',
         yAxisID: 'y',
       },
       {
@@ -231,9 +231,9 @@ const CFORollupDashboard = ({ onBack, onTileClick, darkMode = false }) => {
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-              <AccountBalanceIcon sx={{ fontSize: 32, color: '#106ebe' }} />
+              <AccountBalanceIcon sx={{ fontSize: 32, color: '#1a5a9e' }} />
               <Typography variant="h4" fontWeight={700}>CFO Rollup Dashboard</Typography>
-              <Chip label="Tile 6.3" size="small" sx={{ bgcolor: alpha('#106ebe', 0.1), color: '#106ebe', fontWeight: 600 }} />
+              <Chip label="Tile 6.3" size="small" sx={{ bgcolor: alpha('#1a5a9e', 0.1), color: '#1a5a9e', fontWeight: 600 }} />
               <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
             <Typography variant="body2" color="text.secondary">
@@ -252,16 +252,16 @@ const CFORollupDashboard = ({ onBack, onTileClick, darkMode = false }) => {
         {/* Top KPI Cards */}
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ borderLeft: '4px solid #106ebe', height: '100%', bgcolor: colors.cardBg, borderColor: colors.border }}>
+            <Card sx={{ borderLeft: '4px solid #1a5a9e', height: '100%', bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
                   <Box>
                     <Typography variant="caption" color="text.secondary">Total Working Capital</Typography>
-                    <Typography variant="h4" fontWeight={700} color="#106ebe">
+                    <Typography variant="h4" fontWeight={700} color="#1a5a9e">
                       {formatCurrency(data.summary.totalWorkingCapital)}
                     </Typography>
                   </Box>
-                  <AccountBalanceIcon sx={{ fontSize: 40, color: alpha('#106ebe', 0.2) }} />
+                  <AccountBalanceIcon sx={{ fontSize: 40, color: alpha('#1a5a9e', 0.2) }} />
                 </Stack>
               </CardContent>
             </Card>
@@ -306,7 +306,7 @@ const CFORollupDashboard = ({ onBack, onTileClick, darkMode = false }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ borderLeft: '4px solid #0078d4', height: '100%', bgcolor: colors.cardBg, borderColor: colors.border }}>
+            <Card sx={{ borderLeft: '4px solid #00357a', height: '100%', bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
                   <Box>
@@ -316,7 +316,7 @@ const CFORollupDashboard = ({ onBack, onTileClick, darkMode = false }) => {
                       SL: {data.summary.serviceLevel}%
                     </Typography>
                   </Box>
-                  <Speed sx={{ fontSize: 40, color: alpha('#0078d4', 0.2) }} />
+                  <Speed sx={{ fontSize: 40, color: alpha('#00357a', 0.2) }} />
                 </Stack>
               </CardContent>
             </Card>
@@ -526,7 +526,7 @@ const CFORollupDashboard = ({ onBack, onTileClick, darkMode = false }) => {
                                   width: 40,
                                   height: 4,
                                   borderRadius: 2,
-                                  bgcolor: alpha('#106ebe', 0.1),
+                                  bgcolor: alpha('#1a5a9e', 0.1),
                                   '& .MuiLinearProgress-bar': {
                                     bgcolor: rec.confidence >= 80 ? '#10b981' : rec.confidence >= 60 ? '#f59e0b' : '#ef4444',
                                   },
@@ -539,7 +539,7 @@ const CFORollupDashboard = ({ onBack, onTileClick, darkMode = false }) => {
                             <Chip
                               label={rec.timeline}
                               size="small"
-                              sx={{ height: 18, fontSize: '0.6rem', bgcolor: alpha('#106ebe', 0.1), color: '#106ebe' }}
+                              sx={{ height: 18, fontSize: '0.6rem', bgcolor: alpha('#1a5a9e', 0.1), color: '#1a5a9e' }}
                             />
                           </TableCell>
                         </TableRow>

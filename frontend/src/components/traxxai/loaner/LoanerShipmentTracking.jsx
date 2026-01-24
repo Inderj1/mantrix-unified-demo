@@ -111,7 +111,7 @@ const LoanerShipmentTracking = ({ onBack }) => {
       headerName: 'Shipment ID',
       width: 120,
       renderCell: (params) => (
-        <Chip label={params.value} size="small" sx={{ fontWeight: 700, bgcolor: alpha('#0a6ed1', 0.1), color: '#0a6ed1' }} />
+        <Chip label={params.value} size="small" sx={{ fontWeight: 700, bgcolor: alpha('#00357a', 0.1), color: '#00357a' }} />
       ),
     },
     { field: 'kit_id', headerName: 'Kit ID', width: 110 },
@@ -162,7 +162,7 @@ const LoanerShipmentTracking = ({ onBack }) => {
             Back to List
           </Button>
           <Stack direction="row" spacing={1}>
-            <Chip label={selectedRow.shipment_id} size="small" sx={{ fontWeight: 700, bgcolor: alpha('#0a6ed1', 0.1), color: '#0a6ed1' }} />
+            <Chip label={selectedRow.shipment_id} size="small" sx={{ fontWeight: 700, bgcolor: alpha('#00357a', 0.1), color: '#00357a' }} />
             <Chip label={selectedRow.direction} size="small" sx={{ fontWeight: 600, bgcolor: getDirectionColor(selectedRow.direction).bg, color: getDirectionColor(selectedRow.direction).color }} />
             <Chip label={selectedRow.status} size="small" sx={{ fontWeight: 600, bgcolor: statusColor.bg, color: statusColor.color }} />
           </Stack>
@@ -175,7 +175,7 @@ const LoanerShipmentTracking = ({ onBack }) => {
         {/* Key Metrics */}
         <Grid container spacing={2} sx={{ mb: 3 }}>
           {[
-            { label: 'Carrier', value: selectedRow.carrier, color: '#0a6ed1', icon: <LocalShipping /> },
+            { label: 'Carrier', value: selectedRow.carrier, color: '#00357a', icon: <LocalShipping /> },
             { label: 'Tracking #', value: selectedRow.tracking_number, color: '#64748b', icon: <ShippingIcon /> },
             { label: 'ETA', value: selectedRow.eta, color: '#f59e0b', icon: <Schedule /> },
             { label: 'On-Time Rate', value: `${selectedRow.onTimeRate}%`, color: onTimeColor, icon: <CheckCircle /> },
@@ -211,7 +211,7 @@ const LoanerShipmentTracking = ({ onBack }) => {
                           sx={{
                             width: 28,
                             height: 28,
-                            bgcolor: idx === selectedRow.trackingEvents.length - 1 ? '#0a6ed1' : '#10b981',
+                            bgcolor: idx === selectedRow.trackingEvents.length - 1 ? '#00357a' : '#10b981',
                             color: 'white',
                           }}
                         >
@@ -224,7 +224,7 @@ const LoanerShipmentTracking = ({ onBack }) => {
                       <Box sx={{ pb: 2 }}>
                         <Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>{event.event}</Typography>
                         <Typography sx={{ fontSize: '0.7rem', color: '#64748b' }}>{event.timestamp}</Typography>
-                        <Typography sx={{ fontSize: '0.7rem', color: '#0a6ed1' }}>{event.location}</Typography>
+                        <Typography sx={{ fontSize: '0.7rem', color: '#00357a' }}>{event.location}</Typography>
                       </Box>
                     </Box>
                   ))}
@@ -288,8 +288,8 @@ const LoanerShipmentTracking = ({ onBack }) => {
                       labels: ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'],
                       datasets: [{
                         data: selectedRow.transitHistory || Array.from({ length: 12 }, () => Math.floor(Math.random() * 4) + 1),
-                        borderColor: '#0a6ed1',
-                        backgroundColor: alpha('#0a6ed1', 0.1),
+                        borderColor: '#00357a',
+                        backgroundColor: alpha('#00357a', 0.1),
                         fill: true,
                         tension: 0.4,
                       }],
@@ -346,7 +346,7 @@ const LoanerShipmentTracking = ({ onBack }) => {
           {metrics && (
             <Grid container spacing={2} sx={{ mb: 3 }}>
               {[
-                { label: 'Active Shipments', value: metrics.activeShipments, color: '#0a6ed1', icon: <ShippingIcon /> },
+                { label: 'Active Shipments', value: metrics.activeShipments, color: '#00357a', icon: <ShippingIcon /> },
                 { label: 'In Transit', value: metrics.inTransit, color: '#2563eb', icon: <LocalShipping /> },
                 { label: 'Awaiting Pickup', value: metrics.awaitingPickup, color: '#f59e0b', icon: <Schedule /> },
                 { label: 'Avg Transit', value: `${metrics.avgTransitDays} days`, color: '#10b981', icon: <CheckCircle /> },
@@ -381,7 +381,7 @@ const LoanerShipmentTracking = ({ onBack }) => {
               sx={{
                 flex: 1,
                 '& .MuiDataGrid-row': { cursor: 'pointer' },
-                '& .MuiDataGrid-row:hover': { bgcolor: alpha('#0a6ed1', 0.04) },
+                '& .MuiDataGrid-row:hover': { bgcolor: alpha('#00357a', 0.04) },
               }}
             />
           </Paper>

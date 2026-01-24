@@ -61,7 +61,7 @@ import OrderTrackingBar from './OrderTrackingBar';
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? '';
 
 // Primary blue color for ORDLY.AI
-const PRIMARY_BLUE = '#0854a0';
+const PRIMARY_BLUE = '#002352';
 const ACCENT_BLUE = '#1976d2';
 
 // Data source types for visual indicators
@@ -204,7 +204,7 @@ const SourceIndicator = ({ source }) => {
     },
     [DATA_SOURCES.DATABASE]: {
       icon: <VerifiedUserIcon sx={{ fontSize: 10 }} />,
-      color: '#0854a0',
+      color: '#002352',
       label: 'From SAP/Database',
     },
     [DATA_SOURCES.CALCULATED]: {
@@ -522,13 +522,13 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
               label={existsInSap ? 'Existing' : 'New'}
               size="small"
               sx={{
-                bgcolor: existsInSap ? alpha('#0854a0', 0.12) : alpha('#8b5cf6', 0.12),
-                color: existsInSap ? '#0854a0' : '#7c3aed',
+                bgcolor: existsInSap ? alpha('#002352', 0.12) : alpha('#8b5cf6', 0.12),
+                color: existsInSap ? '#002352' : '#7c3aed',
                 fontWeight: 600,
                 fontSize: '0.65rem',
                 height: 22,
                 '& .MuiChip-icon': {
-                  color: existsInSap ? '#0854a0' : '#7c3aed',
+                  color: existsInSap ? '#002352' : '#7c3aed',
                 },
               }}
             />
@@ -650,7 +650,7 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
             </Button>
           </Stack>
           <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-            <EmailIcon sx={{ fontSize: 40, color: '#0854a0' }} />
+            <EmailIcon sx={{ fontSize: 40, color: '#002352' }} />
             <Box>
               <Typography variant="h5" fontWeight={600}>{selectedOrder.customer}</Typography>
               <Typography variant="body2" color="text.secondary">{selectedOrder.subject}</Typography>
@@ -677,9 +677,9 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
             px: 2,
             py: 1.5,
             mb: 2,
-            bgcolor: alpha('#0854a0', 0.04),
+            bgcolor: alpha('#002352', 0.04),
             borderRadius: 2,
-            border: `1px solid ${alpha('#0854a0', 0.1)}`,
+            border: `1px solid ${alpha('#002352', 0.1)}`,
           }}>
             <Stack direction="row" alignItems="center" spacing={1}>
               <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', mr: 1 }}>
@@ -694,13 +694,13 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
                     onClick={() => setActiveLineNumber(line.lineNumber)}
                     size="small"
                     sx={{
-                      bgcolor: isActive ? alpha('#0854a0', 0.15) : alpha('#64748b', 0.08),
-                      color: isActive ? '#0854a0' : '#64748b',
-                      border: isActive ? `2px solid #0854a0` : '1px solid transparent',
+                      bgcolor: isActive ? alpha('#002352', 0.15) : alpha('#64748b', 0.08),
+                      color: isActive ? '#002352' : '#64748b',
+                      border: isActive ? `2px solid #002352` : '1px solid transparent',
                       fontWeight: isActive ? 700 : 500,
                       fontSize: '0.7rem',
                       cursor: 'pointer',
-                      '&:hover': { bgcolor: alpha('#0854a0', 0.12) },
+                      '&:hover': { bgcolor: alpha('#002352', 0.12) },
                     }}
                   />
                 );
@@ -710,8 +710,8 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
               label={`${selectedOrder?.lineCount || 1} items in PO`}
               size="small"
               sx={{
-                bgcolor: alpha('#0854a0', 0.1),
-                color: '#0854a0',
+                bgcolor: alpha('#002352', 0.1),
+                color: '#002352',
                 fontWeight: 600,
                 fontSize: '0.65rem',
               }}
@@ -726,7 +726,7 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
             <Card variant="outlined" sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
               <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Stack direction="row" alignItems="center" spacing={1}>
-                  <DescriptionIcon sx={{ color: '#0854a0', fontSize: 18 }} />
+                  <DescriptionIcon sx={{ color: '#002352', fontSize: 18 }} />
                   <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
                     Document Extraction
                   </Typography>
@@ -739,7 +739,7 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
                       size="small"
                       onClick={() => setActiveTab(tab.toLowerCase())}
                       sx={{
-                        bgcolor: activeTab === tab.toLowerCase() ? alpha('#0854a0', 0.12) : alpha('#64748b', 0.08),
+                        bgcolor: activeTab === tab.toLowerCase() ? alpha('#002352', 0.12) : alpha('#64748b', 0.08),
                         color: activeTab === tab.toLowerCase() ? '#1565c0' : '#64748b',
                         fontWeight: 600,
                         fontSize: '0.7rem',
@@ -836,7 +836,7 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
                       p: 1.5,
                       borderBottom: '1px solid',
                       borderColor: 'divider',
-                      bgcolor: '#0854a0',
+                      bgcolor: '#002352',
                       color: 'white',
                     }}
                   >
@@ -901,7 +901,7 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
                     <Typography sx={{ fontSize: '0.6rem', color: '#64748b' }}>Extracted</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}>
-                    <VerifiedUserIcon sx={{ fontSize: 10, color: '#0854a0' }} />
+                    <VerifiedUserIcon sx={{ fontSize: 10, color: '#002352' }} />
                     <Typography sx={{ fontSize: '0.6rem', color: '#64748b' }}>Database</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}>
@@ -922,9 +922,9 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
                       Extracted (PO)
                     </Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, p: 0.75, bgcolor: alpha('#0854a0', 0.1), borderRadius: 1 }}>
-                    <BusinessIcon sx={{ fontSize: 12, color: '#0854a0' }} />
-                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: '#0854a0', textTransform: 'uppercase' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, p: 0.75, bgcolor: alpha('#002352', 0.1), borderRadius: 1 }}>
+                    <BusinessIcon sx={{ fontSize: 12, color: '#002352' }} />
+                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: '#002352', textTransform: 'uppercase' }}>
                       SAP Matched
                     </Typography>
                   </Box>
@@ -967,12 +967,12 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
                     };
 
                     const categories = {
-                      order: { label: 'Order Identification', icon: <AssignmentIcon sx={{ fontSize: 12, color: '#0854a0' }} /> },
+                      order: { label: 'Order Identification', icon: <AssignmentIcon sx={{ fontSize: 12, color: '#002352' }} /> },
                       buyer: { label: 'Buyer Information', icon: <PersonIcon sx={{ fontSize: 12, color: '#1976d2' }} /> },
                       shipto: { label: 'Ship-To Details', icon: <LocalShippingIcon sx={{ fontSize: 12, color: '#0d47a1' }} /> },
                       billto: { label: 'Bill-To Details', icon: <ReceiptIcon sx={{ fontSize: 12, color: '#5c6bc0' }} /> },
-                      lineitem: { label: 'Item Data (VBAP)', icon: <InventoryIcon sx={{ fontSize: 12, color: '#0a6ed1' }} /> },
-                      terms: { label: 'Delivery & Terms', icon: <EventNoteIcon sx={{ fontSize: 12, color: '#2196f3' }} /> },
+                      lineitem: { label: 'Item Data (VBAP)', icon: <InventoryIcon sx={{ fontSize: 12, color: '#00357a' }} /> },
+                      terms: { label: 'Delivery & Terms', icon: <EventNoteIcon sx={{ fontSize: 12, color: '#00357a' }} /> },
                       special: { label: 'Special Instructions', icon: <InfoIcon sx={{ fontSize: 12, color: '#f59e0b' }} /> },
                       value: { label: 'Order Value', icon: <AttachMoneyIcon sx={{ fontSize: 12, color: '#10b981' }} /> },
                     };
@@ -1005,11 +1005,11 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
                                     mb: 0.5,
                                     mt: 1,
                                     borderRadius: 1,
-                                    bgcolor: alpha('#0854a0', 0.1),
-                                    borderLeft: `3px solid #0854a0`,
+                                    bgcolor: alpha('#002352', 0.1),
+                                    borderLeft: `3px solid #002352`,
                                   }}
                                 >
-                                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: '#0854a0', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: '#002352', display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                     <InventoryIcon sx={{ fontSize: 14 }} />
                                     {field.label}
                                   </Typography>
@@ -1069,17 +1069,17 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
                                       variant="outlined"
                                       sx={{
                                         p: 1,
-                                        borderLeft: `3px solid ${sapMat?.a305Price ? '#0854a0' : '#e2e8f0'}`,
+                                        borderLeft: `3px solid ${sapMat?.a305Price ? '#002352' : '#e2e8f0'}`,
                                         display: 'flex',
                                         flexDirection: 'column',
-                                        bgcolor: sapMat?.a305Price ? alpha('#0854a0', 0.06) : alpha('#64748b', 0.02),
-                                        borderColor: sapMat?.a305Price ? alpha('#0854a0', 0.2) : 'divider',
+                                        bgcolor: sapMat?.a305Price ? alpha('#002352', 0.06) : alpha('#64748b', 0.02),
+                                        borderColor: sapMat?.a305Price ? alpha('#002352', 0.2) : 'divider',
                                       }}
                                     >
-                                      <Typography variant="caption" sx={{ color: '#0854a0', textTransform: 'uppercase', fontSize: '0.6rem' }}>
+                                      <Typography variant="caption" sx={{ color: '#002352', textTransform: 'uppercase', fontSize: '0.6rem' }}>
                                         A305 PRICE
                                       </Typography>
-                                      <Typography variant="body2" fontWeight={600} sx={{ fontSize: '0.7rem', mt: 0.25, color: '#0854a0' }}>
+                                      <Typography variant="body2" fontWeight={600} sx={{ fontSize: '0.7rem', mt: 0.25, color: '#002352' }}>
                                         {a305Converted ? `$${a305Converted.price?.toFixed(4)}/${a305Converted.uom}` : '—'}
                                       </Typography>
                                     </Paper>
@@ -1088,17 +1088,17 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
                                       variant="outlined"
                                       sx={{
                                         p: 1,
-                                        borderLeft: `3px solid ${sapMat?.avgPrice ? '#0854a0' : '#e2e8f0'}`,
+                                        borderLeft: `3px solid ${sapMat?.avgPrice ? '#002352' : '#e2e8f0'}`,
                                         display: 'flex',
                                         flexDirection: 'column',
-                                        bgcolor: sapMat?.avgPrice ? alpha('#0854a0', 0.06) : alpha('#64748b', 0.02),
-                                        borderColor: sapMat?.avgPrice ? alpha('#0854a0', 0.2) : 'divider',
+                                        bgcolor: sapMat?.avgPrice ? alpha('#002352', 0.06) : alpha('#64748b', 0.02),
+                                        borderColor: sapMat?.avgPrice ? alpha('#002352', 0.2) : 'divider',
                                       }}
                                     >
-                                      <Typography variant="caption" sx={{ color: '#0854a0', textTransform: 'uppercase', fontSize: '0.6rem' }}>
+                                      <Typography variant="caption" sx={{ color: '#002352', textTransform: 'uppercase', fontSize: '0.6rem' }}>
                                         AVG ({sapMat?.avgPrice?.orderCount || 0})
                                       </Typography>
-                                      <Typography variant="body2" fontWeight={600} sx={{ fontSize: '0.7rem', mt: 0.25, color: '#0854a0' }}>
+                                      <Typography variant="body2" fontWeight={600} sx={{ fontSize: '0.7rem', mt: 0.25, color: '#002352' }}>
                                         {avgConverted ? `$${avgConverted.price?.toFixed(4)}/${avgConverted.uom}` : '—'}
                                       </Typography>
                                     </Paper>
@@ -1145,19 +1145,19 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
                                     variant="outlined"
                                     sx={{
                                       p: 1,
-                                      borderLeft: `3px solid ${sapField ? '#0854a0' : '#e2e8f0'}`,
+                                      borderLeft: `3px solid ${sapField ? '#002352' : '#e2e8f0'}`,
                                       display: 'flex',
                                       flexDirection: 'column',
-                                      bgcolor: sapField ? alpha('#0854a0', 0.06) : alpha('#64748b', 0.02),
-                                      borderColor: sapField ? alpha('#0854a0', 0.2) : 'divider',
+                                      bgcolor: sapField ? alpha('#002352', 0.06) : alpha('#64748b', 0.02),
+                                      borderColor: sapField ? alpha('#002352', 0.2) : 'divider',
                                     }}
                                   >
                                     {sapField ? (
                                       <>
-                                        <Typography variant="caption" sx={{ color: '#0854a0', textTransform: 'uppercase', fontSize: '0.6rem' }}>
+                                        <Typography variant="caption" sx={{ color: '#002352', textTransform: 'uppercase', fontSize: '0.6rem' }}>
                                           {sapField.label}
                                         </Typography>
-                                        <Typography variant="body2" fontWeight={600} sx={{ fontSize: '0.7rem', mt: 0.25, color: '#0854a0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={sapField.value}>
+                                        <Typography variant="body2" fontWeight={600} sx={{ fontSize: '0.7rem', mt: 0.25, color: '#002352', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={sapField.value}>
                                           {sapField.value}
                                         </Typography>
                                       </>
@@ -1177,7 +1177,7 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
                         {sapData && sapData.kunnr && (
                           <Box sx={{ mb: 1.5 }}>
                             <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                              <BusinessIcon sx={{ fontSize: 12, color: '#0854a0' }} />
+                              <BusinessIcon sx={{ fontSize: 12, color: '#002352' }} />
                               SAP Customer Master (KNA1/KNVV)
                             </Typography>
                             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0.5 }}>
@@ -1196,11 +1196,11 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
                                   variant="outlined"
                                   sx={{
                                     p: 1,
-                                    borderLeft: `3px solid #0854a0`,
-                                    bgcolor: alpha('#0854a0', 0.03),
+                                    borderLeft: `3px solid #002352`,
+                                    bgcolor: alpha('#002352', 0.03),
                                   }}
                                 >
-                                  <Typography variant="caption" sx={{ color: '#0854a0', textTransform: 'uppercase', fontSize: '0.6rem' }}>
+                                  <Typography variant="caption" sx={{ color: '#002352', textTransform: 'uppercase', fontSize: '0.6rem' }}>
                                     {sapField.label}
                                   </Typography>
                                   <Typography variant="body2" fontWeight={600} sx={{ fontSize: '0.7rem', mt: 0.25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={sapField.value}>
@@ -1228,9 +1228,9 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
                   sx={{
                     flex: 1,
                     fontSize: '0.75rem',
-                    bgcolor: '#0854a0',
+                    bgcolor: '#002352',
                     '&:hover': { bgcolor: '#1565c0' },
-                    '&:disabled': { bgcolor: alpha('#0854a0', 0.3), color: 'rgba(255,255,255,0.5)' }
+                    '&:disabled': { bgcolor: alpha('#002352', 0.3), color: 'rgba(255,255,255,0.5)' }
                   }}
                 >
                   {isPromoting ? 'Promoting...' : selectedOrder?.stage > 0 ? 'Already Promoted' : 'Promote to Decisioning'}
@@ -1245,7 +1245,7 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
               {/* Axis Chat */}
               <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Stack direction="row" alignItems="center" spacing={1}>
-                  <SmartToyIcon sx={{ color: '#0854a0', fontSize: 18 }} />
+                  <SmartToyIcon sx={{ color: '#002352', fontSize: 18 }} />
                   <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
                     Axis Chat
                   </Typography>
@@ -1264,9 +1264,9 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
                         maxWidth: '90%',
                         p: 1.5,
                         borderRadius: 2,
-                        bgcolor: msg.role === 'user' ? '#0854a0' : alpha('#0854a0', 0.08),
+                        bgcolor: msg.role === 'user' ? '#002352' : alpha('#002352', 0.08),
                         border: msg.role === 'ai' ? '1px solid' : 'none',
-                        borderColor: alpha('#0854a0', 0.2),
+                        borderColor: alpha('#002352', 0.2),
                       }}
                     >
                       <Typography variant="caption" sx={{ color: msg.role === 'user' ? 'white' : '#64748b', whiteSpace: 'pre-line', fontSize: '0.75rem' }}>
@@ -1293,8 +1293,8 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
                           disabled={!chatInput.trim() || isSendingChat}
                           size="small"
                           sx={{
-                            color: chatInput.trim() ? '#0854a0' : '#9ca3af',
-                            '&:hover': { bgcolor: alpha('#0854a0', 0.1) },
+                            color: chatInput.trim() ? '#002352' : '#9ca3af',
+                            '&:hover': { bgcolor: alpha('#002352', 0.1) },
                           }}
                         >
                           {isSendingChat ? <CircularProgress size={18} /> : <SendIcon fontSize="small" />}
@@ -1316,7 +1316,7 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
                         color: '#64748b',
                         fontSize: '0.65rem',
                         cursor: 'pointer',
-                        '&:hover': { bgcolor: alpha('#0854a0', 0.12), color: '#1565c0' },
+                        '&:hover': { bgcolor: alpha('#002352', 0.12), color: '#1565c0' },
                       }}
                     />
                   ))}
@@ -1326,7 +1326,7 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
               {/* Similar Orders */}
               <Box sx={{ p: 2, borderTop: '1px solid', borderColor: 'divider' }}>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
-                  <HistoryIcon sx={{ color: '#0854a0', fontSize: 18 }} />
+                  <HistoryIcon sx={{ color: '#002352', fontSize: 18 }} />
                   <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
                     Similar Past Orders
                   </Typography>
@@ -1339,7 +1339,7 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
                       p: 1.5,
                       mb: 1,
                       cursor: 'pointer',
-                      '&:hover': { borderColor: '#0854a0', bgcolor: alpha('#0854a0', 0.05) },
+                      '&:hover': { borderColor: '#002352', bgcolor: alpha('#002352', 0.05) },
                     }}
                   >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
@@ -1402,7 +1402,7 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
           </Stack>
         </Stack>
         <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-          <EmailIcon sx={{ fontSize: 40, color: '#0854a0' }} />
+          <EmailIcon sx={{ fontSize: 40, color: '#002352' }} />
           <Typography variant="h5" fontWeight={600}>Customer Intent Cockpit</Typography>
         </Stack>
         <Typography variant="body2" color="text.secondary">
@@ -1414,7 +1414,7 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
       <Grid container spacing={2} sx={{ mb: 3 }}>
         {[
           { label: 'Inbox Queue', value: stats.total, color: PRIMARY_BLUE },
-          { label: 'Existing Customers', value: stats.sapMatched, color: '#0854a0', icon: <BusinessIcon sx={{ fontSize: 16 }} /> },
+          { label: 'Existing Customers', value: stats.sapMatched, color: '#002352', icon: <BusinessIcon sx={{ fontSize: 16 }} /> },
           { label: 'New Customers', value: stats.sapUnmatched, color: '#8b5cf6', icon: <PersonIcon sx={{ fontSize: 16 }} /> },
           { label: 'Rush Orders', value: stats.rush, color: '#ef4444' },
           { label: 'Avg. Confidence', value: `${stats.avgConf}%`, color: '#10b981' },

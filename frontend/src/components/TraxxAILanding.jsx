@@ -30,8 +30,8 @@ import LogisticsEconomics from './traxxai/LogisticsEconomics';
 import RealizedMarginCash from './traxxai/RealizedMarginCash';
 import SurgeryReadiness from './traxxai/SurgeryReadiness';
 
-// Single consistent blue for all modules
-const MODULE_COLOR = '#0078d4';
+// Import centralized brand colors
+import { MODULE_COLOR } from '../config/brandColors';
 
 // Main Tiles - Direct access from TRAXX.AI landing (5 tiles) - Consistent blue
 const mainTiles = [

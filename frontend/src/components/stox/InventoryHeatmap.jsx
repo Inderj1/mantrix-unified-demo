@@ -69,7 +69,7 @@ const formatCurrency = (value) => {
 };
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -443,7 +443,7 @@ const InventoryHeatmap = ({ onBack, darkMode = false }) => {
                       {avgStockLevel}%
                     </Typography>
                   </Box>
-                  <Avatar sx={{ bgcolor: darkMode ? 'rgba(43, 136, 216, 0.2)' : '#E3F2FD', color: '#2b88d8' }}>
+                  <Avatar sx={{ bgcolor: darkMode ? 'rgba(43, 136, 216, 0.2)' : '#E3F2FD', color: '#1a5a9e' }}>
                     <InventoryIcon />
                   </Avatar>
                 </Stack>
@@ -751,7 +751,7 @@ const InventoryHeatmap = ({ onBack, darkMode = false }) => {
                           borderRadius: 2,
                           backgroundColor: '#E1E4E8',
                           '& .MuiLinearProgress-bar': {
-                            backgroundColor: params.value >= 15 ? '#2E7D32' : params.value >= 10 ? '#E65100' : '#2b88d8',
+                            backgroundColor: params.value >= 15 ? '#2E7D32' : params.value >= 10 ? '#E65100' : '#1a5a9e',
                           },
                         }}
                       />

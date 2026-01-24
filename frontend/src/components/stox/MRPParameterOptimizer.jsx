@@ -57,7 +57,7 @@ const formatCurrency = (value) => {
 };
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -361,7 +361,7 @@ const MRPParameterOptimizer = ({ onBack, onTileClick, darkMode = false }) => {
         {
           label: 'Total Cost',
           data: eoquCurveData.totalCosts,
-          borderColor: '#106ebe',
+          borderColor: '#1a5a9e',
           backgroundColor: 'rgba(8, 84, 160, 0.1)',
           borderWidth: 3,
           fill: true,
@@ -522,7 +522,7 @@ const MRPParameterOptimizer = ({ onBack, onTileClick, darkMode = false }) => {
 
           {/* EOQ Cost Curve - Full Width */}
           <Grid item xs={12}>
-            <Card sx={{ borderTop: '3px solid #106ebe' }}>
+            <Card sx={{ borderTop: '3px solid #1a5a9e' }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
                   <Box>
@@ -535,7 +535,7 @@ const MRPParameterOptimizer = ({ onBack, onTileClick, darkMode = false }) => {
                     <Chip
                       label={`EOQ: ${eoquCurveData.eoq} units`}
                       size="small"
-                      sx={{ bgcolor: alpha('#106ebe', 0.1), color: '#106ebe', fontWeight: 700 }}
+                      sx={{ bgcolor: alpha('#1a5a9e', 0.1), color: '#1a5a9e', fontWeight: 700 }}
                     />
                     <Chip
                       label={`Current: ${selectedItem.currentOrderQty} units`}
@@ -698,10 +698,10 @@ const MRPParameterOptimizer = ({ onBack, onTileClick, darkMode = false }) => {
         </Stack>
 
         <Stack direction="row" alignItems="center" spacing={2}>
-          <TuneIcon sx={{ fontSize: 32, color: '#005a9e' }} />
+          <TuneIcon sx={{ fontSize: 32, color: '#002352' }} />
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5}>
-              <Typography variant="h5" fontWeight={700} color="#005a9e">
+              <Typography variant="h5" fontWeight={700} color="#002352">
                 MRP Parameter Optimizer
               </Typography>
               <DataSourceChip dataType={tileConfig.dataType} />
@@ -721,7 +721,7 @@ const MRPParameterOptimizer = ({ onBack, onTileClick, darkMode = false }) => {
           {metrics && (
             <Grid container spacing={2} sx={{ mb: 3 }}>
               <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #005a9e' }}>
+                <Card sx={{ borderLeft: '4px solid #002352' }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">Total Items</Typography>
                     <Typography variant="h5" fontWeight={700}>{metrics.totalItems}</Typography>

@@ -2,8 +2,14 @@ import { alpha } from '@mui/material';
 
 /**
  * Standardized STOX.AI Theme Configuration
- * Light, corporate-friendly color scheme for all DataGrid tables and components
+ * Uses MANTRIX brand colors: Navy Blue (#00357a) + Orange (#ff751f)
  */
+
+// Brand color constants
+const NAVY = '#00357a';
+const NAVY_LIGHT = '#1a5a9e';
+const NAVY_DARK = '#002352';
+const ORANGE = '#ff751f';
 
 export const stoxTheme = {
   // Color Palette
@@ -13,23 +19,23 @@ export const stoxTheme = {
       50: '#f8fafc',
       400: '#94a3b8',
       500: '#64748b',
-      600: '#0078d4',
+      600: NAVY,
       700: '#334155',
       900: '#1e293b',
     },
-    // Accent colors
+    // Accent colors - MANTRIX Navy palette
     sky: {
-      400: '#38bdf8',
-      500: '#0ea5e9',
-      600: '#0284c7',
+      400: NAVY_LIGHT,
+      500: NAVY,
+      600: NAVY_DARK,
     },
     orange: {
-      500: '#f97316',
-      600: '#ea580c',
+      500: ORANGE,
+      600: '#cc5c19',
     },
     purple: {
       500: '#a855f7',
-      600: '#0078d4',
+      600: NAVY,
     },
     cyan: {
       500: '#06b6d4',
@@ -73,10 +79,10 @@ export const stoxTheme = {
   chips: {
     // ID/Primary chips
     primary: {
-      bgcolor: alpha('#0078d4', 0.12),
-      color: '#0078d4',
+      bgcolor: alpha(NAVY, 0.12),
+      color: NAVY,
       border: '1px solid',
-      borderColor: alpha('#0078d4', 0.2),
+      borderColor: alpha(NAVY, 0.2),
       fontWeight: 700,
     },
     // Forecast/Metric chips
@@ -105,9 +111,9 @@ export const stoxTheme = {
       },
       wholesale: {
         bgcolor: alpha('#a855f7', 0.12),
-        color: '#0078d4',
+        color: NAVY,
         border: '1px solid',
-        borderColor: alpha('#0078d4', 0.2),
+        borderColor: alpha(NAVY, 0.2),
         fontWeight: 600,
       },
       d2c: {
@@ -171,7 +177,7 @@ export const stoxTheme = {
     },
     info: {
       bgcolor: alpha('#64748b', 0.05),
-      border: `1px solid ${alpha('#0078d4', 0.15)}`,
+      border: `1px solid ${alpha(NAVY, 0.15)}`,
     },
   },
 

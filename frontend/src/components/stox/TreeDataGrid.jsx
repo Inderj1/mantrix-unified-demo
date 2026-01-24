@@ -89,7 +89,7 @@ const TreeDataGrid = ({ rows, columns, ...gridProps }) => {
           sx={{ ml: row.level * 2 }}
         >
           {isExpanded ? (
-            <ExpandMore sx={{ fontSize: 20, color: '#2b88d8' }} />
+            <ExpandMore sx={{ fontSize: 20, color: '#1a5a9e' }} />
           ) : (
             <ChevronRight sx={{ fontSize: 20, color: '#64748b' }} />
           )}

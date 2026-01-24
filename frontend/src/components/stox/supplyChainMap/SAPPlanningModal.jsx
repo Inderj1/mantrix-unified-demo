@@ -101,7 +101,7 @@ export default function SAPPlanningModal({ open, action, onClose, onSaveToSAP })
                   Operation Planning
                 </Typography>
                 <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
-                  <SmartToyIcon sx={{ fontSize: 14, color: '#005a9e' }} />
+                  <SmartToyIcon sx={{ fontSize: 14, color: '#002352' }} />
                   <Typography sx={{ fontSize: '0.75rem', color: '#64748b' }}>
                     {action.label} • AI Confidence: {action.confidence}%
                   </Typography>
@@ -146,8 +146,8 @@ export default function SAPPlanningModal({ open, action, onClose, onSaveToSAP })
                         height: 20,
                         fontSize: '0.65rem',
                         fontWeight: 600,
-                        bgcolor: action.impact === 'High' ? alpha('#005a9e', 0.12) : alpha('#0ea5e9', 0.12),
-                        color: action.impact === 'High' ? '#005a9e' : '#0284c7',
+                        bgcolor: action.impact === 'High' ? alpha('#002352', 0.12) : alpha('#0ea5e9', 0.12),
+                        color: action.impact === 'High' ? '#002352' : '#0284c7',
                       }}
                     />
                   </Stack>
@@ -261,25 +261,25 @@ export default function SAPPlanningModal({ open, action, onClose, onSaveToSAP })
                 <Stack spacing={1}>
                   <Stack direction="row" spacing={1} alignItems="flex-start">
                     <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#0284c7', mt: 0.75 }} />
-                    <Typography sx={{ fontSize: '0.75rem', color: '#0078d4' }}>
+                    <Typography sx={{ fontSize: '0.75rem', color: '#00357a' }}>
                       This will create a new work order in SAP MM module
                     </Typography>
                   </Stack>
                   <Stack direction="row" spacing={1} alignItems="flex-start">
                     <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#0284c7', mt: 0.75 }} />
-                    <Typography sx={{ fontSize: '0.75rem', color: '#0078d4' }}>
+                    <Typography sx={{ fontSize: '0.75rem', color: '#00357a' }}>
                       Inventory movements will be tracked in real-time
                     </Typography>
                   </Stack>
                   <Stack direction="row" spacing={1} alignItems="flex-start">
                     <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#0284c7', mt: 0.75 }} />
-                    <Typography sx={{ fontSize: '0.75rem', color: '#0078d4' }}>
+                    <Typography sx={{ fontSize: '0.75rem', color: '#00357a' }}>
                       Automatic notification to warehouse team via SAP Fiori
                     </Typography>
                   </Stack>
                   <Stack direction="row" spacing={1} alignItems="flex-start">
                     <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#0284c7', mt: 0.75 }} />
-                    <Typography sx={{ fontSize: '0.75rem', color: '#0078d4' }}>
+                    <Typography sx={{ fontSize: '0.75rem', color: '#00357a' }}>
                       Cost center: <strong>{getCostCenter()}</strong>
                     </Typography>
                   </Stack>
@@ -289,7 +289,7 @@ export default function SAPPlanningModal({ open, action, onClose, onSaveToSAP })
               {/* Execution Timeline */}
               <Box sx={{ bgcolor: '#f8fafc', borderRadius: 1.5, p: 2, border: '1px solid', borderColor: alpha('#64748b', 0.15) }}>
                 <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1.5 }}>
-                  <ScheduleIcon sx={{ fontSize: 16, color: '#0078d4' }} />
+                  <ScheduleIcon sx={{ fontSize: 16, color: '#00357a' }} />
                   <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#1e293b' }}>
                     Execution Timeline
                   </Typography>
@@ -353,7 +353,7 @@ export default function SAPPlanningModal({ open, action, onClose, onSaveToSAP })
                 disabled={saving}
                 sx={{
                   borderColor: alpha('#64748b', 0.3),
-                  color: '#0078d4',
+                  color: '#00357a',
                   fontWeight: 600,
                   textTransform: 'none',
                   py: 1.25,

@@ -54,7 +54,7 @@ const formatCurrency = (value) => {
 };
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -224,7 +224,7 @@ const InventoryHealthCheck = ({ onBack, darkMode = false }) => {
         <Chip
           label={params.value}
           size="small"
-          sx={{ fontWeight: 700, bgcolor: alpha('#0078d4', 0.12), color: '#005a9e' }}
+          sx={{ fontWeight: 700, bgcolor: alpha('#00357a', 0.12), color: '#002352' }}
         />
       ),
     },

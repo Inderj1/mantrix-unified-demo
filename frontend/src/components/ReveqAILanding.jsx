@@ -39,8 +39,8 @@ const categories = [
     subtitle: 'Asset Management & Operations',
     description: 'Comprehensive loaner equipment management including tracking, utilization, maintenance scheduling, and operational efficiency optimization',
     icon: LoanerIcon,
-    color: '#0078d4',
-    gradient: 'linear-gradient(135deg, #0078d4 0%, #106ebe 100%)',
+    color: '#00357a',
+    gradient: 'linear-gradient(135deg, #00357a 0%, #1a5a9e 100%)',
     stats: { label: 'Active Loaners', value: '86' },
   },
   {
@@ -49,8 +49,8 @@ const categories = [
     subtitle: 'Revenue & Performance Analytics',
     description: 'End-to-end consignment analytics with revenue tracking, performance dashboards, and comprehensive financial workbench capabilities',
     icon: ConsignmentIcon,
-    color: '#2b88d8',
-    gradient: 'linear-gradient(135deg, #2b88d8 0%, #0078d4 100%)',
+    color: '#1a5a9e',
+    gradient: 'linear-gradient(135deg, #1a5a9e 0%, #00357a 100%)',
     stats: { label: 'Consignment Items', value: '42' },
   },
 ];
@@ -63,11 +63,11 @@ const loanerModules = [
     subtitle: 'Real-Time Monitoring',
     description: 'Live equipment location, status tracking, and operational visibility across all assets',
     icon: EquipmentIcon,
-    color: '#0078d4',
+    color: '#00357a',
     bgColor: '#deecf9',
     stats: { label: 'Assets Tracked', value: '128' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #0078d4 0%, #106ebe 100%)',
+    gradient: 'linear-gradient(135deg, #00357a 0%, #1a5a9e 100%)',
   },
   {
     id: 'utilization-metrics',
@@ -75,11 +75,11 @@ const loanerModules = [
     subtitle: 'Asset Optimization',
     description: 'Equipment utilization rates, idle time analysis, and deployment optimization',
     icon: UtilizationIcon,
-    color: '#2b88d8',
+    color: '#1a5a9e',
     bgColor: '#deecf9',
     stats: { label: 'Avg Utilization', value: '87%' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #2b88d8 0%, #0078d4 100%)',
+    gradient: 'linear-gradient(135deg, #1a5a9e 0%, #00357a 100%)',
   },
   {
     id: 'maintenance-scheduler',
@@ -87,11 +87,11 @@ const loanerModules = [
     subtitle: 'Preventive Care',
     description: 'Automated maintenance scheduling, service alerts, and equipment health monitoring',
     icon: MaintenanceIcon,
-    color: '#0078d4',
+    color: '#00357a',
     bgColor: '#deecf9',
     stats: { label: 'Services Due', value: '12' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #0078d4 0%, #106ebe 100%)',
+    gradient: 'linear-gradient(135deg, #00357a 0%, #1a5a9e 100%)',
   },
   {
     id: 'efficiency-optimizer',
@@ -99,11 +99,11 @@ const loanerModules = [
     subtitle: 'Cost Reduction',
     description: 'Cost optimization recommendations, efficiency improvements, and resource allocation',
     icon: EfficiencyIcon,
-    color: '#106ebe',
+    color: '#1a5a9e',
     bgColor: '#deecf9',
     stats: { label: 'Cost Saved', value: '$18.2K' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
+    gradient: 'linear-gradient(135deg, #1a5a9e 0%, #00357a 100%)',
   },
 ];
 
@@ -115,11 +115,11 @@ const consignmentModules = [
     subtitle: 'Financial Performance',
     description: 'Equipment revenue tracking, profitability analysis, and ROI optimization insights',
     icon: RevenueIcon,
-    color: '#0078d4',
+    color: '#00357a',
     bgColor: '#deecf9',
     stats: { label: 'Monthly Revenue', value: '$2.4M' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #0078d4 0%, #106ebe 100%)',
+    gradient: 'linear-gradient(135deg, #00357a 0%, #1a5a9e 100%)',
   },
   {
     id: 'performance-dashboard',
@@ -127,11 +127,11 @@ const consignmentModules = [
     subtitle: 'KPIs & Metrics',
     description: 'Comprehensive performance metrics, efficiency scores, and operational KPIs',
     icon: PerformanceIcon,
-    color: '#005a9e',
+    color: '#002352',
     bgColor: '#deecf9',
     stats: { label: 'Performance Score', value: '92/100' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #005a9e 0%, #0078d4 100%)',
+    gradient: 'linear-gradient(135deg, #002352 0%, #00357a 100%)',
   },
   {
     id: 'financial-workbench',
@@ -139,11 +139,11 @@ const consignmentModules = [
     subtitle: 'Financial Analysis',
     description: 'Comprehensive financial analytics, P&L tracking, budget management, and forecasting',
     icon: FinancialIcon,
-    color: '#0078d4',
+    color: '#00357a',
     bgColor: '#deecf9',
     stats: { label: 'Active Reports', value: '24' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #0078d4 0%, #106ebe 100%)',
+    gradient: 'linear-gradient(135deg, #00357a 0%, #1a5a9e 100%)',
   },
 ];
 
@@ -191,7 +191,7 @@ const ReveqAILanding = ({ onTileClick, onBack }) => {
                     sx={{
                       width: 48,
                       height: 48,
-                      bgcolor: '#106ebe',
+                      bgcolor: '#1a5a9e',
                     }}
                   >
                     <EquipmentIcon sx={{ fontSize: 28 }} />
@@ -385,7 +385,7 @@ const ReveqAILanding = ({ onTileClick, onBack }) => {
             sx={{
               width: 64,
               height: 64,
-              bgcolor: alpha(currentCategory?.color || '#0078d4', 0.1),
+              bgcolor: alpha(currentCategory?.color || '#00357a', 0.1),
             }}
           >
             {currentCategory && <currentCategory.icon sx={{ fontSize: 36, color: currentCategory.color }} />}

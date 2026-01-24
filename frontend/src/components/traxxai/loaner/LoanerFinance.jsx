@@ -105,7 +105,7 @@ const LoanerFinance = ({ onBack }) => {
       headerName: 'Invoice ID',
       width: 130,
       renderCell: (params) => (
-        <Chip label={params.value} size="small" sx={{ fontWeight: 700, bgcolor: alpha('#0a6ed1', 0.1), color: '#0a6ed1' }} />
+        <Chip label={params.value} size="small" sx={{ fontWeight: 700, bgcolor: alpha('#00357a', 0.1), color: '#00357a' }} />
       ),
     },
     { field: 'kit_id', headerName: 'Kit ID', width: 110 },
@@ -154,7 +154,7 @@ const LoanerFinance = ({ onBack }) => {
             Back to List
           </Button>
           <Stack direction="row" spacing={1}>
-            <Chip label={selectedRow.invoice_id} size="small" sx={{ fontWeight: 700, bgcolor: alpha('#0a6ed1', 0.1), color: '#0a6ed1' }} />
+            <Chip label={selectedRow.invoice_id} size="small" sx={{ fontWeight: 700, bgcolor: alpha('#00357a', 0.1), color: '#00357a' }} />
             <Chip label={selectedRow.status} size="small" sx={{ fontWeight: 600, bgcolor: statusColor.bg, color: statusColor.color }} />
           </Stack>
         </Stack>
@@ -368,7 +368,7 @@ const LoanerFinance = ({ onBack }) => {
                 { label: 'Total Revenue', value: `$${(metrics.totalRevenue / 1000).toFixed(0)}K`, color: '#10b981', icon: <TrendingUp /> },
                 { label: 'Outstanding', value: `$${(metrics.outstanding / 1000).toFixed(0)}K`, color: '#f59e0b', icon: <Receipt /> },
                 { label: 'Commissions Due', value: `$${(metrics.commissionsDue / 1000).toFixed(0)}K`, color: '#8b5cf6', icon: <MonetizationOn /> },
-                { label: 'Avg DSO', value: `${metrics.avgDSO} days`, color: '#0a6ed1', icon: <Schedule /> },
+                { label: 'Avg DSO', value: `${metrics.avgDSO} days`, color: '#00357a', icon: <Schedule /> },
               ].map((kpi, idx) => (
                 <Grid item xs={12} sm={6} md={3} key={idx}>
                   <Card sx={{ background: `linear-gradient(135deg, ${alpha(kpi.color, 0.1)} 0%, ${alpha(kpi.color, 0.05)} 100%)` }}>
@@ -400,7 +400,7 @@ const LoanerFinance = ({ onBack }) => {
               sx={{
                 flex: 1,
                 '& .MuiDataGrid-row': { cursor: 'pointer' },
-                '& .MuiDataGrid-row:hover': { bgcolor: alpha('#0a6ed1', 0.04) },
+                '& .MuiDataGrid-row:hover': { bgcolor: alpha('#00357a', 0.04) },
               }}
             />
           </Paper>

@@ -12,7 +12,7 @@ import stoxTheme from './stoxTheme';
 
 // Dark Mode Color Helper
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -113,7 +113,7 @@ const CostConfiguration = ({ onBack, onSave, onTileClick, darkMode = false }) =>
         <Chip
           label={`${config[field]}${unit}`}
           size="small"
-          sx={{ bgcolor: alpha('#106ebe', 0.1), color: '#106ebe', fontWeight: 700 }}
+          sx={{ bgcolor: alpha('#1a5a9e', 0.1), color: '#1a5a9e', fontWeight: 700 }}
         />
       </Stack>
       <Slider
@@ -126,7 +126,7 @@ const CostConfiguration = ({ onBack, onSave, onTileClick, darkMode = false }) =>
           { value: min, label: `${min}${unit}` },
           { value: max, label: `${max}${unit}` },
         ]}
-        sx={{ color: '#106ebe' }}
+        sx={{ color: '#1a5a9e' }}
       />
       {description && (
         <Typography variant="caption" color="text.secondary">{description}</Typography>
@@ -155,9 +155,9 @@ const CostConfiguration = ({ onBack, onSave, onTileClick, darkMode = false }) =>
           </Stack>
         </Stack>
         <Stack direction="row" alignItems="center" spacing={1.5}>
-          <SettingsIcon sx={{ fontSize: 32, color: '#106ebe' }} />
+          <SettingsIcon sx={{ fontSize: 32, color: '#1a5a9e' }} />
           <Box>
-            <Typography variant="h5" fontWeight={700} color="#106ebe">Cost Configuration</Typography>
+            <Typography variant="h5" fontWeight={700} color="#1a5a9e">Cost Configuration</Typography>
             <Typography variant="body2" color="text.secondary">Configure customer-specific cost economics for WC optimization</Typography>
           </Box>
         </Stack>
@@ -172,13 +172,13 @@ const CostConfiguration = ({ onBack, onSave, onTileClick, darkMode = false }) =>
       {/* Summary Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} md={4}>
-          <Card sx={{ borderLeft: '4px solid #106ebe', bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
+          <Card sx={{ borderLeft: '4px solid #1a5a9e', bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
             <CardContent>
               <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                <AccountBalance sx={{ color: '#106ebe' }} />
+                <AccountBalance sx={{ color: '#1a5a9e' }} />
                 <Typography variant="body2" color="text.secondary">Total Holding Rate</Typography>
               </Stack>
-              <Typography variant="h4" fontWeight={700} color="#106ebe">{totalHoldingRate.toFixed(1)}%</Typography>
+              <Typography variant="h4" fontWeight={700} color="#1a5a9e">{totalHoldingRate.toFixed(1)}%</Typography>
               <Typography variant="caption" color="text.secondary">Annual carrying cost % of inventory value</Typography>
             </CardContent>
           </Card>
@@ -213,16 +213,16 @@ const CostConfiguration = ({ onBack, onSave, onTileClick, darkMode = false }) =>
       <Box sx={{ flex: 1, overflow: 'auto' }}>
         {/* Holding Cost */}
         <Accordion expanded={expanded.includes('holding')} onChange={handleAccordionChange('holding')} sx={{ mb: 1 }}>
-          <AccordionSummary expandIcon={<ExpandMore />} sx={{ bgcolor: alpha('#106ebe', 0.05) }}>
+          <AccordionSummary expandIcon={<ExpandMore />} sx={{ bgcolor: alpha('#1a5a9e', 0.05) }}>
             <Stack direction="row" alignItems="center" spacing={2}>
-              <AccountBalance sx={{ color: '#106ebe' }} />
+              <AccountBalance sx={{ color: '#1a5a9e' }} />
               <Box>
                 <Typography fontWeight={700}>Holding Cost (Carrying Cost)</Typography>
                 <Typography variant="caption" color="text.secondary">
                   Annual cost of holding inventory as % of inventory value
                 </Typography>
               </Box>
-              <Chip label={`${totalHoldingRate.toFixed(1)}%`} sx={{ bgcolor: '#106ebe', color: 'white', fontWeight: 700 }} />
+              <Chip label={`${totalHoldingRate.toFixed(1)}%`} sx={{ bgcolor: '#1a5a9e', color: 'white', fontWeight: 700 }} />
             </Stack>
           </AccordionSummary>
           <AccordionDetails>

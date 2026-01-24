@@ -86,7 +86,7 @@ export default function BottomPanel({
       blue: { bg: alpha('#0ea5e9', 0.08), border: alpha('#0ea5e9', 0.2), text: '#0284c7', iconBg: alpha('#0ea5e9', 0.12) },
       orange: { bg: alpha('#f97316', 0.08), border: alpha('#f97316', 0.2), text: '#ea580c', iconBg: alpha('#f97316', 0.12) },
       emerald: { bg: alpha('#10b981', 0.08), border: alpha('#10b981', 0.2), text: '#059669', iconBg: alpha('#10b981', 0.12) },
-      purple: { bg: alpha('#0078d4', 0.08), border: alpha('#0078d4', 0.2), text: '#005a9e', iconBg: alpha('#0078d4', 0.12) },
+      purple: { bg: alpha('#00357a', 0.08), border: alpha('#00357a', 0.2), text: '#002352', iconBg: alpha('#00357a', 0.12) },
       cyan: { bg: alpha('#06b6d4', 0.08), border: alpha('#06b6d4', 0.2), text: '#0891b2', iconBg: alpha('#06b6d4', 0.12) },
       amber: { bg: alpha('#f59e0b', 0.08), border: alpha('#f59e0b', 0.2), text: '#d97706', iconBg: alpha('#f59e0b', 0.12) },
     };
@@ -218,7 +218,7 @@ export default function BottomPanel({
                     {insight.confidence}%
                   </Typography>
                 </Stack>
-                <Typography sx={{ fontSize: '0.6rem', color: '#0078d4', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                <Typography sx={{ fontSize: '0.6rem', color: '#00357a', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                   {insight.description}
                 </Typography>
               </Box>

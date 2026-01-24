@@ -38,7 +38,7 @@ const financeModules = [
     subtitle: 'Intelligent Budget Planning',
     description: 'Smart budget allocation, variance analysis, and rolling forecasts with GL account integration',
     icon: BudgetIcon,
-    color: '#2b88d8',
+    color: '#1a5a9e',
     bgColor: '#deecf9',
     path: '/financeai/budget',
     stats: { label: 'Budget Lines', value: '156' },
@@ -50,7 +50,7 @@ const financeModules = [
     subtitle: 'Driver-Based Planning',
     description: 'Identify key business drivers, perform sensitivity analysis, and create driver-based forecasts',
     icon: DriverIcon,
-    color: '#106ebe',
+    color: '#1a5a9e',
     bgColor: '#deecf9',
     path: '/financeai/driver',
     stats: { label: 'Key Drivers', value: '24' },
@@ -62,7 +62,7 @@ const financeModules = [
     subtitle: 'Scenario Planning & What-If',
     description: 'Interactive scenario modeling, Monte Carlo simulations, and multi-scenario comparison',
     icon: ScenarioIcon,
-    color: '#0078d4',
+    color: '#00357a',
     bgColor: '#F3E5F5',
     path: '/financeai/scenario',
     stats: { label: 'Active Scenarios', value: '12' },
@@ -100,7 +100,7 @@ const FinanceAILanding = ({ onTileClick }) => {
           fontWeight="bold" 
           sx={{ 
             mb: 1,
-            background: 'linear-gradient(45deg, #0078d4 30%, #2b88d8 90%)',
+            background: 'linear-gradient(45deg, #00357a 30%, #1a5a9e 90%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
           }}

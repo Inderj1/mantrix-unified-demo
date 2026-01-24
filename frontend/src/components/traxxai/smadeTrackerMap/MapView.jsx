@@ -8,7 +8,7 @@ import 'leaflet/dist/leaflet.css';
 const createClusterIcon = (cluster, type) => {
   const count = cluster.getChildCount();
   const colors = {
-    kits: { bg: '#0a6ed1', border: '#0854a0' },
+    kits: { bg: '#00357a', border: '#002352' },
     facilities: { bg: '#8b5cf6', border: '#7c3aed' },
     alerts: { bg: '#f97316', border: '#ea580c' },
   };
@@ -54,7 +54,7 @@ const createKitIcon = (status, processType) => {
     'awaiting-return': '#f97316',
     'at-dc': '#64748b',
   };
-  const color = colors[status] || '#0a6ed1';
+  const color = colors[status] || '#00357a';
   const shouldPulse = status === 'in-surgery' || status === 'awaiting-return';
   const isLoaner = processType === 'loaner';
 
@@ -91,7 +91,7 @@ const createKitIcon = (status, processType) => {
 };
 
 const createFacilityIcon = (kitsOnSite, status) => {
-  const color = status === 'needs-attention' ? '#f97316' : kitsOnSite > 3 ? '#10b981' : '#0a6ed1';
+  const color = status === 'needs-attention' ? '#f97316' : kitsOnSite > 3 ? '#10b981' : '#00357a';
   const shouldPulse = status === 'needs-attention';
 
   return L.divIcon({
@@ -106,7 +106,7 @@ const createFacilityIcon = (kitsOnSite, status) => {
           </svg>
           ${kitsOnSite > 0 ? `
             <div style="position: absolute; top: -5px; right: -5px; min-width: 14px; height: 14px;
-                        background: #0a6ed1; border-radius: 50%; border: 1.5px solid white;
+                        background: #00357a; border-radius: 50%; border: 1.5px solid white;
                         display: flex; align-items: center; justify-content: center;
                         font-size: 8px; font-weight: bold; color: white;
                         box-shadow: 0 1px 4px rgba(0,0,0,0.3);">${kitsOnSite}</div>
@@ -282,7 +282,7 @@ export default function MapView({
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                         <span style={{ color: '#64748b' }}>Kits On-Site:</span>
-                        <span style={{ fontWeight: 700, color: '#0a6ed1' }}>{facility.kits_on_site}</span>
+                        <span style={{ fontWeight: 700, color: '#00357a' }}>{facility.kits_on_site}</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span style={{ color: '#64748b' }}>Pending Cases:</span>
@@ -291,7 +291,7 @@ export default function MapView({
                     </div>
                     <button
                       onClick={(e) => { e.stopPropagation(); onFacilityClick?.(facility); }}
-                      style={{ width: '100%', padding: '6px', background: '#0a6ed1', color: 'white', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                      style={{ width: '100%', padding: '6px', background: '#00357a', color: 'white', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
                     >
                       View Details
                     </button>
@@ -346,7 +346,7 @@ export default function MapView({
                     </div>
                     <button
                       onClick={(e) => { e.stopPropagation(); onKitClick?.(kit); }}
-                      style={{ width: '100%', padding: '6px', background: '#0a6ed1', color: 'white', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                      style={{ width: '100%', padding: '6px', background: '#00357a', color: 'white', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
                     >
                       View Kit Details
                     </button>

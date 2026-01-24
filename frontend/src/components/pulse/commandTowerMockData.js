@@ -494,7 +494,7 @@ export const getCategoryColor = (category) => {
     case TICKET_CATEGORIES.CUSTOMER: return '#0ea5e9';
     case TICKET_CATEGORIES.ML_MODEL: return '#8b5cf6';
     case TICKET_CATEGORIES.OPERATIONS: return '#f59e0b';
-    case TICKET_CATEGORIES.QUOTE: return '#0a6ed1';
+    case TICKET_CATEGORIES.QUOTE: return '#00357a';
     // New categories
     case TICKET_CATEGORIES.INVENTORY: return '#059669';     // STOX.AI green
     case TICKET_CATEGORIES.FINANCIAL: return '#7c3aed';     // MargenAI purple
@@ -532,7 +532,7 @@ export const getSourceColor = (source) => {
     case TICKET_SOURCES.AXIS_AI: return '#f59e0b';      // Amber
     case TICKET_SOURCES.PROCESS_AI: return '#ec4899';   // Pink
     case TICKET_SOURCES.EMAIL_INTEL: return '#6366f1';  // Indigo
-    case TICKET_SOURCES.AGENT_AUTOMATED: return '#0a6ed1';
+    case TICKET_SOURCES.AGENT_AUTOMATED: return '#00357a';
     case TICKET_SOURCES.ALERT_ACTION: return '#ef4444';
     default: return '#64748b';
   }

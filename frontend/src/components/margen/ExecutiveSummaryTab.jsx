@@ -376,7 +376,7 @@ export default function ExecutiveSummaryTab() {
         <Grid container spacing={2} sx={{ mb: 3 }}>
           {[
             { label: 'Impact', value: `${selectedAlert.impactAmount >= 0 ? '+' : ''}$${Math.abs(selectedAlert.impactAmount).toFixed(1)}M`, color: impactColor, icon: <MoneyIcon /> },
-            { label: 'Product Line', value: selectedAlert.productLine, color: '#2b88d8', icon: <StoreIcon /> },
+            { label: 'Product Line', value: selectedAlert.productLine, color: '#1a5a9e', icon: <StoreIcon /> },
             { label: 'Channel', value: selectedAlert.channel, color: '#8b5cf6', icon: <ShippingIcon /> },
             { label: 'Days Open', value: selectedAlert.daysOpen, color: selectedAlert.daysOpen > 10 ? '#f59e0b' : '#10b981', icon: <AssessmentIcon /> },
           ].map((metric, idx) => (
@@ -449,7 +449,7 @@ export default function ExecutiveSummaryTab() {
                 </Typography>
                 <Stack spacing={1}>
                   {selectedAlert.relatedProducts.slice(0, 4).map((product, idx) => (
-                    <Box key={idx} sx={{ p: 1.5, borderRadius: 1, bgcolor: alpha('#2b88d8', 0.05), border: '1px solid', borderColor: alpha('#2b88d8', 0.15) }}>
+                    <Box key={idx} sx={{ p: 1.5, borderRadius: 1, bgcolor: alpha('#1a5a9e', 0.05), border: '1px solid', borderColor: alpha('#1a5a9e', 0.15) }}>
                       <Stack direction="row" justifyContent="space-between" alignItems="center">
                         <Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>{product.product}</Typography>
                         <Chip

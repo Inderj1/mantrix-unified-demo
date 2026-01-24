@@ -28,23 +28,8 @@ import {
   QuestionAnswer as ChatIcon,
 } from '@mui/icons-material';
 
-// Single consistent blue for all modules
-const MODULE_COLOR = '#0078d4';
-
-const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
-  secondary: darkMode ? '#2d8ce6' : '#0854a0',
-  success: darkMode ? '#36d068' : '#10b981',
-  warning: darkMode ? '#f59e0b' : '#f59e0b',
-  error: darkMode ? '#ff6b6b' : '#ef4444',
-  text: darkMode ? '#e6edf3' : '#1e293b',
-  textSecondary: darkMode ? '#8b949e' : '#64748b',
-  grey: darkMode ? '#8b949e' : '#64748b',
-  background: darkMode ? '#0d1117' : '#f8fbfd',
-  paper: darkMode ? '#161b22' : '#ffffff',
-  cardBg: darkMode ? '#21262d' : '#ffffff',
-  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
-});
+// Import centralized brand colors
+import { MODULE_COLOR, getColors } from '../config/brandColors';
 
 const margenModules = [
   {

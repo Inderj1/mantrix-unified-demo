@@ -180,7 +180,7 @@ const isInventoryQuestion = (query) => {
 };
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -306,7 +306,7 @@ const CommandCenter = ({ onBack, onTileClick, darkMode = false }) => {
     switch (type) {
       case 'critical': return <ErrorIcon sx={{ color: '#ef4444' }} />;
       case 'warning': return <Warning sx={{ color: '#f59e0b' }} />;
-      case 'info': return <InfoIcon sx={{ color: '#0078d4' }} />;
+      case 'info': return <InfoIcon sx={{ color: '#00357a' }} />;
       default: return <InfoIcon sx={{ color: '#64748b' }} />;
     }
   };
@@ -315,7 +315,7 @@ const CommandCenter = ({ onBack, onTileClick, darkMode = false }) => {
     switch (type) {
       case 'critical': return '#ef4444';
       case 'warning': return '#f59e0b';
-      case 'info': return '#0078d4';
+      case 'info': return '#00357a';
       default: return '#64748b';
     }
   };
@@ -334,9 +334,9 @@ const CommandCenter = ({ onBack, onTileClick, darkMode = false }) => {
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-              <DashboardIcon sx={{ fontSize: 32, color: '#0078d4' }} />
+              <DashboardIcon sx={{ fontSize: 32, color: '#00357a' }} />
               <Typography variant="h4" fontWeight={700}>Command Center</Typography>
-              <Chip label="Tile 0" size="small" sx={{ bgcolor: alpha('#0078d4', 0.1), color: '#0078d4', fontWeight: 600 }} />
+              <Chip label="Tile 0" size="small" sx={{ bgcolor: alpha('#00357a', 0.1), color: '#00357a', fontWeight: 600 }} />
               <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
             <Typography variant="body2" color="text.secondary">
@@ -353,9 +353,9 @@ const CommandCenter = ({ onBack, onTileClick, darkMode = false }) => {
       <Box sx={{ flex: 1, display: 'flex', gap: 2, overflow: 'hidden', minHeight: 0 }}>
         {/* Left Panel - AI Chat */}
         <Paper sx={{ width: 420, display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
-          <Box sx={{ p: 1, borderBottom: '1px solid', borderColor: 'divider', bgcolor: alpha('#0078d4', 0.05), flexShrink: 0 }}>
+          <Box sx={{ p: 1, borderBottom: '1px solid', borderColor: 'divider', bgcolor: alpha('#00357a', 0.05), flexShrink: 0 }}>
             <Stack direction="row" alignItems="center" spacing={1}>
-              <Avatar sx={{ width: 28, height: 28, bgcolor: '#0078d4' }}>
+              <Avatar sx={{ width: 28, height: 28, bgcolor: '#00357a' }}>
                 <SmartToy sx={{ fontSize: 16 }} />
               </Avatar>
               <Typography variant="subtitle2" fontWeight={700}>STOX AI Assistant</Typography>
@@ -378,7 +378,7 @@ const CommandCenter = ({ onBack, onTileClick, darkMode = false }) => {
                     maxWidth: '90%',
                     p: 1,
                     borderRadius: 1.5,
-                    bgcolor: msg.type === 'user' ? '#0078d4' : alpha('#0078d4', 0.08),
+                    bgcolor: msg.type === 'user' ? '#00357a' : alpha('#00357a', 0.08),
                     color: msg.type === 'user' ? 'white' : colors.text,
                   }}
                 >
@@ -419,10 +419,10 @@ const CommandCenter = ({ onBack, onTileClick, darkMode = false }) => {
           {kpis && (
             <Grid container spacing={1} sx={{ mb: 2, flexShrink: 0 }}>
               <Grid item xs={3}>
-                <Card sx={{ borderLeft: '3px solid #0078d4' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
+                <Card sx={{ borderLeft: '3px solid #00357a' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ py: 1, px: 1.5, '&:last-child': { pb: 1 } }}>
                     <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>WC Tied Up</Typography>
-                    <Typography variant="h6" fontWeight={700} color="#0078d4">${(kpis.totalWCTied / 1000000).toFixed(2)}M</Typography>
+                    <Typography variant="h6" fontWeight={700} color="#00357a">${(kpis.totalWCTied / 1000000).toFixed(2)}M</Typography>
                   </CardContent>
                 </Card>
               </Grid>
@@ -445,10 +445,10 @@ const CommandCenter = ({ onBack, onTileClick, darkMode = false }) => {
                 </Card>
               </Grid>
               <Grid item xs={3}>
-                <Card sx={{ borderLeft: '3px solid #005a9e' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
+                <Card sx={{ borderLeft: '3px solid #002352' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ py: 1, px: 1.5, '&:last-child': { pb: 1 } }}>
                     <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>Inv. Turns</Typography>
-                    <Typography variant="h6" fontWeight={700} color="#005a9e">{kpis.inventoryTurns}x</Typography>
+                    <Typography variant="h6" fontWeight={700} color="#002352">{kpis.inventoryTurns}x</Typography>
                   </CardContent>
                 </Card>
               </Grid>
@@ -476,10 +476,10 @@ const CommandCenter = ({ onBack, onTileClick, darkMode = false }) => {
                     height: 22,
                     fontSize: '0.7rem',
                     cursor: 'pointer',
-                    bgcolor: alpha('#0078d4', 0.08),
-                    color: '#0078d4',
+                    bgcolor: alpha('#00357a', 0.08),
+                    color: '#00357a',
                     fontWeight: 600,
-                    '&:hover': { bgcolor: alpha('#0078d4', 0.15) },
+                    '&:hover': { bgcolor: alpha('#00357a', 0.15) },
                   }}
                 />
               ))}
@@ -488,7 +488,7 @@ const CommandCenter = ({ onBack, onTileClick, darkMode = false }) => {
 
           {/* Exceptions Panel */}
           <Paper sx={{ flexShrink: 0, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
-            <Box sx={{ p: 1, borderBottom: '1px solid', borderColor: 'divider', bgcolor: alpha('#0078d4', 0.03), flexShrink: 0 }}>
+            <Box sx={{ p: 1, borderBottom: '1px solid', borderColor: 'divider', bgcolor: alpha('#00357a', 0.03), flexShrink: 0 }}>
               <Stack direction="row" alignItems="center" justifyContent="space-between">
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <Warning sx={{ color: '#ef4444', fontSize: 18 }} />
@@ -499,7 +499,7 @@ const CommandCenter = ({ onBack, onTileClick, darkMode = false }) => {
                     sx={{ height: 20, bgcolor: alpha('#ef4444', 0.1), color: '#ef4444', fontWeight: 600, fontSize: '0.65rem' }}
                   />
                 </Stack>
-                <Chip label={`${exceptions.length} Total`} size="small" sx={{ height: 20, bgcolor: alpha('#0078d4', 0.1), color: '#0078d4', fontWeight: 600, fontSize: '0.65rem' }} />
+                <Chip label={`${exceptions.length} Total`} size="small" sx={{ height: 20, bgcolor: alpha('#00357a', 0.1), color: '#00357a', fontWeight: 600, fontSize: '0.65rem' }} />
               </Stack>
             </Box>
 

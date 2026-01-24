@@ -27,7 +27,7 @@ import {
 
 // Dark Mode Color Helper
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -81,7 +81,7 @@ const ConsignmentKitProcess = ({ onBack, darkMode = false }) => {
       duration: '2-4 hrs',
       status: 'Active',
       icon: <HospitalIcon />,
-      color: '#2b88d8',
+      color: '#1a5a9e',
     },
     {
       step: 2,
@@ -178,7 +178,7 @@ const ConsignmentKitProcess = ({ onBack, darkMode = false }) => {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'Active':
-        return <Schedule fontSize="small" sx={{ color: '#2b88d8' }} />;
+        return <Schedule fontSize="small" sx={{ color: '#1a5a9e' }} />;
       case 'Transit':
         return <ShippingIcon fontSize="small" sx={{ color: '#f59e0b' }} />;
       case 'Complete':
@@ -231,12 +231,12 @@ const ConsignmentKitProcess = ({ onBack, darkMode = false }) => {
       {/* Stats Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: alpha('#2b88d8', 0.05), borderLeft: `4px solid #2b88d8` }}>
+          <Card sx={{ bgcolor: alpha('#1a5a9e', 0.05), borderLeft: `4px solid #1a5a9e` }}>
             <CardContent sx={{ py: 1.5, px: 2 }}>
               <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
                 Total Kits
               </Typography>
-              <Typography variant="h5" fontWeight={700} sx={{ color: '#2b88d8' }}>
+              <Typography variant="h5" fontWeight={700} sx={{ color: '#1a5a9e' }}>
                 {stats.totalKits}
               </Typography>
             </CardContent>
@@ -267,12 +267,12 @@ const ConsignmentKitProcess = ({ onBack, darkMode = false }) => {
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: alpha('#0078d4', 0.05), borderLeft: `4px solid #0078d4` }}>
+          <Card sx={{ bgcolor: alpha('#00357a', 0.05), borderLeft: `4px solid #00357a` }}>
             <CardContent sx={{ py: 1.5, px: 2 }}>
               <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
                 Completed Today
               </Typography>
-              <Typography variant="h5" fontWeight={700} sx={{ color: '#0078d4' }}>
+              <Typography variant="h5" fontWeight={700} sx={{ color: '#00357a' }}>
                 {stats.completedToday}
               </Typography>
             </CardContent>

@@ -54,7 +54,7 @@ import InfoDialog from './InfoDialog';
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? '';
 
 // Primary blue color for ORDLY.AI
-const PRIMARY_BLUE = '#0854a0';
+const PRIMARY_BLUE = '#002352';
 const ACCENT_BLUE = '#1976d2';
 
 // Helper function to build CLV metrics from order data
@@ -415,10 +415,10 @@ const OrderValueControlTower = ({ onBack, darkMode = false, selectedOrder: initi
     },
     { field: 'id', headerName: 'Order', width: 140, renderCell: (params) => <Typography sx={{ fontWeight: 700, color: '#1565c0', fontSize: '0.8rem' }}>{params.value}</Typography> },
     { field: 'customer', headerName: 'Customer', flex: 1, minWidth: 180, renderCell: (params) => <Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>{params.value}</Typography> },
-    { field: 'sku', headerName: 'SKU', width: 160, renderCell: (params) => <Chip label={params.value} size="small" sx={{ bgcolor: alpha('#0854a0', 0.12), color: '#1565c0', fontWeight: 600, fontSize: '0.65rem', maxWidth: '100%' }} /> },
+    { field: 'sku', headerName: 'SKU', width: 160, renderCell: (params) => <Chip label={params.value} size="small" sx={{ bgcolor: alpha('#002352', 0.12), color: '#1565c0', fontWeight: 600, fontSize: '0.65rem', maxWidth: '100%' }} /> },
     { field: 'orderValue', headerName: 'Value', width: 100, align: 'right', headerAlign: 'right', renderCell: (params) => <Typography sx={{ fontSize: '0.85rem', fontWeight: 600 }}>{params.value}</Typography> },
     { field: 'margin', headerName: 'Margin', width: 90, align: 'center', headerAlign: 'center', renderCell: (params) => { const color = params.value >= 30 ? '#059669' : params.value >= 25 ? '#d97706' : '#dc2626'; return <Typography sx={{ fontWeight: 700, fontSize: '0.85rem', color }}>{params.value}%</Typography>; } },
-    { field: 'segment', headerName: 'CLV Segment', width: 120, align: 'center', headerAlign: 'center', renderCell: (params) => { const colors = { 'INVEST': '#10b981', 'MAINTAIN': '#0854a0', 'WATCH': '#f59e0b', 'GROW': '#8b5cf6' }; const color = colors[params.value] || '#64748b'; return <Chip label={params.value || 'N/A'} size="small" sx={{ bgcolor: alpha(color, 0.12), color: color, fontWeight: 600, fontSize: '0.65rem' }} />; } },
+    { field: 'segment', headerName: 'CLV Segment', width: 120, align: 'center', headerAlign: 'center', renderCell: (params) => { const colors = { 'INVEST': '#10b981', 'MAINTAIN': '#002352', 'WATCH': '#f59e0b', 'GROW': '#8b5cf6' }; const color = colors[params.value] || '#64748b'; return <Chip label={params.value || 'N/A'} size="small" sx={{ bgcolor: alpha(color, 0.12), color: color, fontWeight: 600, fontSize: '0.65rem' }} />; } },
     { field: 'creditStatus', headerName: 'Credit', width: 80, align: 'center', headerAlign: 'center', renderCell: (params) => { const value = params.value || 'B'; const color = value.includes('A') ? '#059669' : '#d97706'; return <Typography sx={{ fontWeight: 700, fontSize: '0.85rem', color }}>{value}</Typography>; } },
   ];
 
@@ -445,7 +445,7 @@ const OrderValueControlTower = ({ onBack, darkMode = false, selectedOrder: initi
             <Button startIcon={<ArrowBackIcon />} onClick={handleBackToList} variant="outlined" size="small">Back to List</Button>
           </Stack>
           <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-            <AccountBalanceIcon sx={{ fontSize: 40, color: '#0854a0' }} />
+            <AccountBalanceIcon sx={{ fontSize: 40, color: '#002352' }} />
             <Box>
               <Typography variant="h5" fontWeight={600}>{selectedOrder.customer}</Typography>
               <Typography variant="body2" color="text.secondary">{selectedOrder.sku} - {selectedOrder.orderValue}</Typography>
@@ -457,7 +457,7 @@ const OrderValueControlTower = ({ onBack, darkMode = false, selectedOrder: initi
           <Grid item xs={12} md={6}>
             <Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', gap: 1 }}>
-                <TrendingUpIcon sx={{ color: '#0854a0', fontSize: 18 }} />
+                <TrendingUpIcon sx={{ color: '#002352', fontSize: 18 }} />
                 <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>Customer Economics & Risk</Typography>
               </Box>
               <Box sx={{ p: 2, overflow: 'auto', flex: 1 }}>
@@ -473,7 +473,7 @@ const OrderValueControlTower = ({ onBack, darkMode = false, selectedOrder: initi
                 <Box sx={{ mb: 2 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                     <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>Customer Lifetime Value</Typography>
-                    <Chip label={`${selectedOrder.segment} Segment`} size="small" icon={<SpeedIcon sx={{ fontSize: 14 }} />} sx={{ bgcolor: alpha(selectedOrder.segment === 'INVEST' ? '#10b981' : selectedOrder.segment === 'WATCH' ? '#f59e0b' : '#0854a0', 0.12), color: selectedOrder.segment === 'INVEST' ? '#059669' : selectedOrder.segment === 'WATCH' ? '#d97706' : '#1565c0', fontWeight: 600, fontSize: '0.65rem' }} />
+                    <Chip label={`${selectedOrder.segment} Segment`} size="small" icon={<SpeedIcon sx={{ fontSize: 14 }} />} sx={{ bgcolor: alpha(selectedOrder.segment === 'INVEST' ? '#10b981' : selectedOrder.segment === 'WATCH' ? '#f59e0b' : '#002352', 0.12), color: selectedOrder.segment === 'INVEST' ? '#059669' : selectedOrder.segment === 'WATCH' ? '#d97706' : '#1565c0', fontWeight: 600, fontSize: '0.65rem' }} />
                   </Box>
                   <Grid container spacing={1}>
                     {getClvMetrics(selectedOrder).map((metric) => (
@@ -501,7 +501,7 @@ const OrderValueControlTower = ({ onBack, darkMode = false, selectedOrder: initi
           <Grid item xs={12} md={6}>
             <Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', gap: 1 }}>
-                <GavelIcon sx={{ color: '#0854a0', fontSize: 18 }} />
+                <GavelIcon sx={{ color: '#002352', fontSize: 18 }} />
                 <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>Policy Engine & Approvals</Typography>
               </Box>
               <Box sx={{ p: 2, overflow: 'auto', flex: 1 }}>
@@ -563,8 +563,8 @@ const OrderValueControlTower = ({ onBack, darkMode = false, selectedOrder: initi
                                   label={line.lineNumber}
                                   size="small"
                                   sx={{
-                                    bgcolor: alpha('#0854a0', 0.1),
-                                    color: '#0854a0',
+                                    bgcolor: alpha('#002352', 0.1),
+                                    color: '#002352',
                                     fontWeight: 700,
                                     fontSize: '0.65rem',
                                     height: 20,
@@ -692,9 +692,9 @@ const OrderValueControlTower = ({ onBack, darkMode = false, selectedOrder: initi
                       startIcon={processingOrder ? <CircularProgress size={14} color="inherit" /> : null}
                       sx={{
                         fontSize: '0.75rem',
-                        bgcolor: '#0854a0',
+                        bgcolor: '#002352',
                         '&:hover': { bgcolor: '#1565c0' },
-                        '&:disabled': { bgcolor: alpha('#0854a0', 0.3) },
+                        '&:disabled': { bgcolor: alpha('#002352', 0.3) },
                       }}
                     >
                       {processingOrder ? 'Committing...' : (selectedOrder?.lineCount || 1) > 1 ? 'Commit All to SAP' : 'Approve & Commit'}
@@ -735,7 +735,7 @@ const OrderValueControlTower = ({ onBack, darkMode = false, selectedOrder: initi
           </Stack>
         </Stack>
         <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-          <AccountBalanceIcon sx={{ fontSize: 40, color: '#0854a0' }} />
+          <AccountBalanceIcon sx={{ fontSize: 40, color: '#002352' }} />
           <Typography variant="h5" fontWeight={600}>Order Value Control Tower</Typography>
         </Stack>
         <Typography variant="body2" color="text.secondary">Customer economics, credit analysis, and approval workflow - Click a row to view details</Typography>
@@ -746,7 +746,7 @@ const OrderValueControlTower = ({ onBack, darkMode = false, selectedOrder: initi
           { label: 'Pending Approval', value: stats.pending, color: '#f59e0b' },
           { label: 'Auto-Approved', value: stats.autoApproved, color: '#10b981' },
           { label: 'Escalated', value: stats.escalated, color: '#ef4444' },
-          { label: 'Avg. CLV', value: stats.avgClv, color: '#0854a0' },
+          { label: 'Avg. CLV', value: stats.avgClv, color: '#002352' },
           { label: 'Approval Rate', value: '94%', color: '#10b981' },
         ].map((card) => (
           <Grid item xs={12} sm={6} md={2.4} key={card.label}>
@@ -763,7 +763,7 @@ const OrderValueControlTower = ({ onBack, darkMode = false, selectedOrder: initi
       <Card variant="outlined" sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Stack direction="row" alignItems="center" spacing={1}>
-            <AssessmentIcon sx={{ color: '#0854a0', fontSize: 18 }} />
+            <AssessmentIcon sx={{ color: '#002352', fontSize: 18 }} />
             <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>Orders Pending Approval</Typography>
           </Stack>
           <Chip label={`${stats.pending} pending`} size="small" sx={{ bgcolor: alpha('#f59e0b', 0.12), color: '#d97706', fontWeight: 600, fontSize: '0.7rem' }} />
@@ -793,7 +793,7 @@ const OrderValueControlTower = ({ onBack, darkMode = false, selectedOrder: initi
                 border: '1px solid rgba(0,0,0,0.08)',
                 '& .MuiDataGrid-cell': { fontSize: '0.8rem' },
                 '& .MuiDataGrid-columnHeader': { bgcolor: darkMode ? '#1e293b' : '#f1f5f9', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' },
-                '& .MuiDataGrid-row:hover': { bgcolor: alpha('#0854a0', 0.08), cursor: 'pointer' },
+                '& .MuiDataGrid-row:hover': { bgcolor: alpha('#002352', 0.08), cursor: 'pointer' },
               }}
             />
           )}

@@ -45,7 +45,7 @@ import InfoDialog from './InfoDialog';
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? '';
 
 // Primary blue color for ORDLY.AI
-const PRIMARY_BLUE = '#0854a0';
+const PRIMARY_BLUE = '#002352';
 const ACCENT_BLUE = '#1976d2';
 
 // Fallback SKU options (used when API fails)
@@ -291,7 +291,7 @@ const SkuBomOptimizer = ({ onBack, darkMode = false, selectedOrder: initialOrder
       headerName: 'Rec. SKU',
       width: 140,
       renderCell: (params) => (
-        <Chip label={params.value} size="small" sx={{ bgcolor: alpha('#0854a0', 0.12), color: '#1565c0', fontWeight: 600, fontSize: '0.65rem' }} />
+        <Chip label={params.value} size="small" sx={{ bgcolor: alpha('#002352', 0.12), color: '#1565c0', fontWeight: 600, fontSize: '0.65rem' }} />
       ),
     },
     {
@@ -392,7 +392,7 @@ const SkuBomOptimizer = ({ onBack, darkMode = false, selectedOrder: initialOrder
             <Button startIcon={<ArrowBackIcon />} onClick={handleBackToList} variant="outlined" size="small">Back to List</Button>
           </Stack>
           <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-            <SettingsIcon sx={{ fontSize: 40, color: '#0854a0' }} />
+            <SettingsIcon sx={{ fontSize: 40, color: '#002352' }} />
             <Box>
               <Typography variant="h5" fontWeight={600}>{selectedOrder.customer}</Typography>
               <Typography variant="body2" color="text.secondary">{selectedOrder.requestedSpec} - {selectedOrder.quantity}</Typography>
@@ -425,11 +425,11 @@ const SkuBomOptimizer = ({ onBack, darkMode = false, selectedOrder: initialOrder
             <Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Stack direction="row" alignItems="center" spacing={1}>
-                  <TrendingUpIcon sx={{ color: '#0854a0', fontSize: 18 }} />
+                  <TrendingUpIcon sx={{ color: '#002352', fontSize: 18 }} />
                   <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>SKU Recommendation Ladder</Typography>
                   {skuOptionsLoading && <CircularProgress size={14} />}
                 </Stack>
-                <Chip label={`${skuOptions.length} options`} size="small" sx={{ bgcolor: alpha('#0854a0', 0.12), color: '#1565c0', fontWeight: 600, fontSize: '0.7rem' }} />
+                <Chip label={`${skuOptions.length} options`} size="small" sx={{ bgcolor: alpha('#002352', 0.12), color: '#1565c0', fontWeight: 600, fontSize: '0.7rem' }} />
               </Box>
               <Box sx={{ p: 2, flex: 1, overflow: 'auto' }}>
                 {skuOptionsLoading ? (
@@ -443,7 +443,7 @@ const SkuBomOptimizer = ({ onBack, darkMode = false, selectedOrder: initialOrder
                     key={option.id}
                     variant="outlined"
                     onClick={() => setSelectedSku(option.id)}
-                    sx={{ p: 2, mb: 2, borderLeft: selectedSku === option.id ? '3px solid #0854a0' : option.recommended ? '3px solid #10b981' : '3px solid transparent', cursor: 'pointer', position: 'relative', transition: 'all 0.2s', bgcolor: selectedSku === option.id ? alpha('#0854a0', 0.05) : 'transparent', '&:hover': { borderColor: '#0854a0', bgcolor: alpha('#0854a0', 0.03) } }}
+                    sx={{ p: 2, mb: 2, borderLeft: selectedSku === option.id ? '3px solid #002352' : option.recommended ? '3px solid #10b981' : '3px solid transparent', cursor: 'pointer', position: 'relative', transition: 'all 0.2s', bgcolor: selectedSku === option.id ? alpha('#002352', 0.05) : 'transparent', '&:hover': { borderColor: '#002352', bgcolor: alpha('#002352', 0.03) } }}
                   >
                     <Chip label={option.recommended ? 'Recommended' : `#${idx + 1}`} size="small" icon={option.recommended ? <StarIcon sx={{ fontSize: 14 }} /> : undefined} sx={{ position: 'absolute', top: -10, left: 20, bgcolor: option.recommended ? '#10b981' : alpha('#64748b', 0.1), color: option.recommended ? 'white' : '#64748b', fontWeight: 600, fontSize: '0.65rem' }} />
                     <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -466,7 +466,7 @@ const SkuBomOptimizer = ({ onBack, darkMode = false, selectedOrder: initialOrder
                     </Grid>
                     <Box sx={{ display: 'flex', gap: 0.5, mt: 1.5, flexWrap: 'wrap' }}>
                       {(option.tags || []).map((tag) => (
-                        <Chip key={tag} label={tag} size="small" sx={{ bgcolor: tag.includes('Exact') || tag.includes('Match') ? alpha('#10b981', 0.12) : tag.includes('Alternate') || tag.includes('Thickness') ? alpha('#f59e0b', 0.12) : tag.includes('Stock') || tag.includes('ATP') || tag.includes('Fast') ? alpha('#0854a0', 0.12) : alpha('#8b5cf6', 0.12), color: tag.includes('Exact') || tag.includes('Match') ? '#059669' : tag.includes('Alternate') || tag.includes('Thickness') ? '#d97706' : tag.includes('Stock') || tag.includes('ATP') || tag.includes('Fast') ? '#1565c0' : '#7c3aed', fontSize: '0.6rem', fontWeight: 600, height: 20 }} />
+                        <Chip key={tag} label={tag} size="small" sx={{ bgcolor: tag.includes('Exact') || tag.includes('Match') ? alpha('#10b981', 0.12) : tag.includes('Alternate') || tag.includes('Thickness') ? alpha('#f59e0b', 0.12) : tag.includes('Stock') || tag.includes('ATP') || tag.includes('Fast') ? alpha('#002352', 0.12) : alpha('#8b5cf6', 0.12), color: tag.includes('Exact') || tag.includes('Match') ? '#059669' : tag.includes('Alternate') || tag.includes('Thickness') ? '#d97706' : tag.includes('Stock') || tag.includes('ATP') || tag.includes('Fast') ? '#1565c0' : '#7c3aed', fontSize: '0.6rem', fontWeight: 600, height: 20 }} />
                       ))}
                     </Box>
                   </Paper>
@@ -483,7 +483,7 @@ const SkuBomOptimizer = ({ onBack, darkMode = false, selectedOrder: initialOrder
                 >
                   Compare All
                 </Button>
-                <Button variant="contained" size="small" onClick={handleSelectAndContinue} sx={{ flex: 1, fontSize: '0.75rem', bgcolor: '#0854a0', '&:hover': { bgcolor: '#1565c0' } }}>Select & Continue</Button>
+                <Button variant="contained" size="small" onClick={handleSelectAndContinue} sx={{ flex: 1, fontSize: '0.75rem', bgcolor: '#002352', '&:hover': { bgcolor: '#1565c0' } }}>Select & Continue</Button>
               </Box>
             </Card>
           </Grid>
@@ -492,7 +492,7 @@ const SkuBomOptimizer = ({ onBack, darkMode = false, selectedOrder: initialOrder
           <Grid item xs={12} md={5}>
             <Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', gap: 1 }}>
-                <LightbulbIcon sx={{ color: '#0854a0', fontSize: 18 }} />
+                <LightbulbIcon sx={{ color: '#002352', fontSize: 18 }} />
                 <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>Decision Explainability</Typography>
               </Box>
               <Box sx={{ p: 2, overflow: 'auto', flex: 1 }}>
@@ -533,7 +533,7 @@ const SkuBomOptimizer = ({ onBack, darkMode = false, selectedOrder: initialOrder
                           <Box key={item.label} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                             <Typography sx={{ width: 90, color: '#64748b', textTransform: 'uppercase', fontSize: '0.65rem' }}>{item.label}</Typography>
                             <Box sx={{ flex: 1, height: 20, bgcolor: alpha('#64748b', 0.08), borderRadius: 1, overflow: 'hidden' }}>
-                              <Box sx={{ width: `${item.percentage}%`, height: '100%', bgcolor: item.type === 'positive' ? '#0854a0' : '#ef4444', borderRadius: 1 }} />
+                              <Box sx={{ width: `${item.percentage}%`, height: '100%', bgcolor: item.type === 'positive' ? '#002352' : '#ef4444', borderRadius: 1 }} />
                             </Box>
                             <Typography sx={{ width: 80, textAlign: 'right', color: item.label === 'Landed Margin' ? '#059669' : 'text.primary', fontWeight: 600, fontSize: '0.75rem' }}>{item.value}</Typography>
                           </Box>
@@ -557,7 +557,7 @@ const SkuBomOptimizer = ({ onBack, darkMode = false, selectedOrder: initialOrder
                       </TableHead>
                       <TableBody>
                         {comparisonData.map((row) => (
-                          <TableRow key={row.factor} sx={{ '&:hover': { bgcolor: alpha('#0854a0', 0.05) } }}>
+                          <TableRow key={row.factor} sx={{ '&:hover': { bgcolor: alpha('#002352', 0.05) } }}>
                             <TableCell sx={{ color: '#64748b', fontSize: '0.75rem' }}>{row.factor}</TableCell>
                             <TableCell sx={{ color: row.winner === 'opt1' ? '#059669' : '#64748b', fontWeight: row.winner === 'opt1' ? 600 : 400, fontSize: '0.75rem' }}>{row.opt1}</TableCell>
                             <TableCell sx={{ color: row.winner === 'opt2' ? '#059669' : '#64748b', fontWeight: row.winner === 'opt2' ? 600 : 400, fontSize: '0.75rem' }}>{row.opt2}</TableCell>
@@ -576,14 +576,14 @@ const SkuBomOptimizer = ({ onBack, darkMode = false, selectedOrder: initialOrder
                       <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.75rem' }}>Ship from Plant</Typography>
                       <Typography variant="caption" fontWeight={600} sx={{ fontSize: '0.75rem' }}>{['2100 (Chicago)', '2500 (Ohio)', '3000 (Texas)'][plantValue - 1]}</Typography>
                     </Box>
-                    <Slider size="small" value={plantValue} min={1} max={3} onChange={(e, v) => setPlantValue(v)} sx={{ color: '#0854a0' }} />
+                    <Slider size="small" value={plantValue} min={1} max={3} onChange={(e, v) => setPlantValue(v)} sx={{ color: '#002352' }} />
                   </Box>
                   <Box sx={{ mb: 1.5 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                       <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.75rem' }}>Expedite Premium</Typography>
                       <Typography variant="caption" fontWeight={600} sx={{ fontSize: '0.75rem' }}>{expediteValue}%</Typography>
                     </Box>
-                    <Slider size="small" value={expediteValue} min={0} max={25} onChange={(e, v) => setExpediteValue(v)} sx={{ color: '#0854a0' }} />
+                    <Slider size="small" value={expediteValue} min={0} max={25} onChange={(e, v) => setExpediteValue(v)} sx={{ color: '#002352' }} />
                   </Box>
                 </Paper>
               </Box>
@@ -611,7 +611,7 @@ const SkuBomOptimizer = ({ onBack, darkMode = false, selectedOrder: initialOrder
           </Stack>
         </Stack>
         <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-          <SettingsIcon sx={{ fontSize: 40, color: '#0854a0' }} />
+          <SettingsIcon sx={{ fontSize: 40, color: '#002352' }} />
           <Typography variant="h5" fontWeight={600}>Margin Based Recommendation</Typography>
         </Stack>
         <Typography variant="body2" color="text.secondary">AI-powered margin-based product recommendation - Click a row to view details</Typography>
@@ -622,7 +622,7 @@ const SkuBomOptimizer = ({ onBack, darkMode = false, selectedOrder: initialOrder
         {[
           { label: 'Pending Decision', value: stats.pending, color: '#f59e0b' },
           { label: 'Avg. Margin', value: `${stats.avgMargin}%`, color: '#10b981' },
-          { label: 'Alt. SKU Rate', value: stats.altRate, color: '#0854a0' },
+          { label: 'Alt. SKU Rate', value: stats.altRate, color: '#002352' },
           { label: 'Total Savings', value: stats.totalSavings, color: '#10b981' },
           { label: 'Avg. Lead Time', value: '5.2 days', color: '#8b5cf6' },
         ].map((card) => (
@@ -641,7 +641,7 @@ const SkuBomOptimizer = ({ onBack, darkMode = false, selectedOrder: initialOrder
       <Card variant="outlined" sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Stack direction="row" alignItems="center" spacing={1}>
-            <InventoryIcon sx={{ color: '#0854a0', fontSize: 18 }} />
+            <InventoryIcon sx={{ color: '#002352', fontSize: 18 }} />
             <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>Orders Pending SKU Decision</Typography>
           </Stack>
           <Chip label={`${stats.pending} pending`} size="small" sx={{ bgcolor: alpha('#f59e0b', 0.12), color: '#d97706', fontWeight: 600, fontSize: '0.7rem' }} />
@@ -671,7 +671,7 @@ const SkuBomOptimizer = ({ onBack, darkMode = false, selectedOrder: initialOrder
                 border: '1px solid rgba(0,0,0,0.08)',
                 '& .MuiDataGrid-cell': { fontSize: '0.8rem' },
                 '& .MuiDataGrid-columnHeader': { bgcolor: darkMode ? '#1e293b' : '#f1f5f9', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' },
-                '& .MuiDataGrid-row:hover': { bgcolor: alpha('#0854a0', 0.08), cursor: 'pointer' },
+                '& .MuiDataGrid-row:hover': { bgcolor: alpha('#002352', 0.08), cursor: 'pointer' },
               }}
             />
           )}

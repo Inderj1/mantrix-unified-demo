@@ -58,12 +58,12 @@ import { SEVERITY, STATUS, ALERT_TYPE_LABELS } from './kitAlertMockData';
 
 // Colors - theme aware
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
-  secondary: darkMode ? '#2d8ce6' : '#0854a0',
+  primary: darkMode ? '#4d9eff' : '#00357a',
+  secondary: darkMode ? '#2d8ce6' : '#002352',
   success: darkMode ? '#36d068' : '#10b981',
   warning: darkMode ? '#f59e0b' : '#f59e0b',
   error: darkMode ? '#ff6b6b' : '#ef4444',
-  info: darkMode ? '#4da6ff' : '#3b82f6',
+  info: darkMode ? '#4d9eff' : '#3b82f6',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   grey: darkMode ? '#8b949e' : '#64748b',

@@ -11,7 +11,7 @@ import DataSourceChip from './DataSourceChip';
 import { getTileDataConfig } from './stoxDataConfig';
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -130,8 +130,8 @@ const DCOptimization = ({ onBack, darkMode = false }) => {
           size="small"
           sx={{
             fontWeight: 700,
-            bgcolor: alpha('#2b88d8', 0.12),
-            color: '#106ebe',
+            bgcolor: alpha('#1a5a9e', 0.12),
+            color: '#1a5a9e',
           }}
         />
       ),
@@ -189,13 +189,13 @@ const DCOptimization = ({ onBack, darkMode = false }) => {
       {metrics && (
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={4}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#0078d4', 0.1)} 0%, ${alpha('#0078d4', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#00357a', 0.1)} 0%, ${alpha('#00357a', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <Inventory sx={{ color: '#0078d4' }} />
+                  <Inventory sx={{ color: '#00357a' }} />
                   <Typography variant="body2" sx={{ color: colors.textSecondary }}>Total Records</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#0078d4">{metrics.totalRecords}</Typography>
+                <Typography variant="h4" fontWeight={700} color="#00357a">{metrics.totalRecords}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -211,13 +211,13 @@ const DCOptimization = ({ onBack, darkMode = false }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={4}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2b88d8', 0.1)} 0%, ${alpha('#2b88d8', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#1a5a9e', 0.1)} 0%, ${alpha('#1a5a9e', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <Analytics sx={{ color: '#2b88d8' }} />
+                  <Analytics sx={{ color: '#1a5a9e' }} />
                   <Typography variant="body2" sx={{ color: colors.textSecondary }}>Total Savings</Typography>
                 </Stack>
-                <Typography variant="h5" fontWeight={700} color="#2b88d8">${(metrics.totalSavings / 1000).toFixed(1)}K</Typography>
+                <Typography variant="h5" fontWeight={700} color="#1a5a9e">${(metrics.totalSavings / 1000).toFixed(1)}K</Typography>
               </CardContent>
             </Card>
           </Grid>

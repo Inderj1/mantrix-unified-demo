@@ -128,8 +128,8 @@ export default function GrowthMarketTab() {
           size="small"
           sx={{
             fontWeight: 600,
-            bgcolor: params.value === 'RTD Tea' ? alpha('#10b981', 0.12) : params.value === 'Energy' ? alpha('#f97316', 0.12) : alpha('#2b88d8', 0.12),
-            color: params.value === 'RTD Tea' ? '#059669' : params.value === 'Energy' ? '#ea580c' : '#106ebe',
+            bgcolor: params.value === 'RTD Tea' ? alpha('#10b981', 0.12) : params.value === 'Energy' ? alpha('#f97316', 0.12) : alpha('#1a5a9e', 0.12),
+            color: params.value === 'RTD Tea' ? '#059669' : params.value === 'Energy' ? '#ea580c' : '#1a5a9e',
           }}
         />
       ),
@@ -143,7 +143,7 @@ export default function GrowthMarketTab() {
         <Chip
           label={`${params.value.toFixed(1)}%`}
           size="small"
-          sx={{ fontWeight: 700, bgcolor: alpha('#2b88d8', 0.12), color: '#106ebe' }}
+          sx={{ fontWeight: 700, bgcolor: alpha('#1a5a9e', 0.12), color: '#1a5a9e' }}
         />
       ),
     },
@@ -352,7 +352,7 @@ export default function GrowthMarketTab() {
         {/* Key Metrics */}
         <Grid container spacing={2} sx={{ mb: 3 }}>
           {[
-            { label: 'Market Share', value: `${selectedRow.marketShare.toFixed(1)}%`, color: '#2b88d8', icon: <TrophyIcon /> },
+            { label: 'Market Share', value: `${selectedRow.marketShare.toFixed(1)}%`, color: '#1a5a9e', icon: <TrophyIcon /> },
             { label: 'Revenue', value: `$${selectedRow.revenue.toFixed(1)}M`, color: '#10b981', icon: <ChartIcon /> },
             { label: 'Velocity Index', value: selectedRow.velocityIndex, color: selectedRow.velocityIndex >= 100 ? '#10b981' : '#f59e0b', icon: <SpeedIcon /> },
             { label: 'Distribution', value: `${selectedRow.distribution}%`, color: '#8b5cf6', icon: <GroupsIcon /> },
@@ -384,7 +384,7 @@ export default function GrowthMarketTab() {
                     data={{
                       labels: selectedRow.monthlyTrend.map(t => t.month),
                       datasets: [
-                        { label: 'Revenue ($M)', data: selectedRow.monthlyTrend.map(t => t.revenue), borderColor: '#2b88d8', yAxisID: 'y' },
+                        { label: 'Revenue ($M)', data: selectedRow.monthlyTrend.map(t => t.revenue), borderColor: '#1a5a9e', yAxisID: 'y' },
                         { label: 'Share (%)', data: selectedRow.monthlyTrend.map(t => t.share), borderColor: '#10b981', yAxisID: 'y1' },
                       ],
                     }}
@@ -415,7 +415,7 @@ export default function GrowthMarketTab() {
                       labels: selectedRow.channelBreakdown.map(c => c.channel),
                       datasets: [{
                         data: selectedRow.channelBreakdown.map(c => c.share),
-                        backgroundColor: [alpha('#2b88d8', 0.8), alpha('#10b981', 0.8), alpha('#f59e0b', 0.8), alpha('#8b5cf6', 0.8), alpha('#ef4444', 0.8)],
+                        backgroundColor: [alpha('#1a5a9e', 0.8), alpha('#10b981', 0.8), alpha('#f59e0b', 0.8), alpha('#8b5cf6', 0.8), alpha('#ef4444', 0.8)],
                       }],
                     }}
                     options={{
@@ -474,7 +474,7 @@ export default function GrowthMarketTab() {
               <Card sx={{ background: 'linear-gradient(135deg, #eff6ff 0%, #ffffff 100%)' }}>
                 <CardContent sx={{ py: 2 }}>
                   <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>Total Market Share</Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 700, color: '#106ebe' }}>{kpis?.totalMarketShare.toFixed(1)}%</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a5a9e' }}>{kpis?.totalMarketShare.toFixed(1)}%</Typography>
                 </CardContent>
               </Card>
             </Grid>

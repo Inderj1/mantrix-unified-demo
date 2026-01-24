@@ -57,12 +57,12 @@ export default function BottomPanel({
           borderBottom: collapsed ? 'none' : '1px solid',
           borderColor: alpha('#64748b', 0.1),
           cursor: 'pointer',
-          bgcolor: alpha('#0a6ed1', 0.02),
+          bgcolor: alpha('#00357a', 0.02),
         }}
         onClick={() => onToggleCollapsed?.(!collapsed)}
       >
         <Stack direction="row" alignItems="center" spacing={1}>
-          <AutoAwesomeIcon sx={{ fontSize: 16, color: '#0a6ed1' }} />
+          <AutoAwesomeIcon sx={{ fontSize: 16, color: '#00357a' }} />
           <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#1e293b' }}>
             AI Recommendations
           </Typography>

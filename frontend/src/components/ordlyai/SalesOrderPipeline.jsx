@@ -104,7 +104,7 @@ const LineItemsTable = ({ lineItems, onLineClick, darkMode }) => {
                   }}
                   sx={{
                     cursor: 'pointer',
-                    '&:hover': { bgcolor: alpha('#0854a0', 0.06) },
+                    '&:hover': { bgcolor: alpha('#002352', 0.06) },
                   }}
                 >
                   <TableCell>
@@ -112,8 +112,8 @@ const LineItemsTable = ({ lineItems, onLineClick, darkMode }) => {
                       label={line.lineNumber}
                       size="small"
                       sx={{
-                        bgcolor: alpha('#0854a0', 0.1),
-                        color: '#0854a0',
+                        bgcolor: alpha('#002352', 0.1),
+                        color: '#002352',
                         fontWeight: 700,
                         fontSize: '0.65rem',
                         height: 20,
@@ -149,7 +149,7 @@ const LineItemsTable = ({ lineItems, onLineClick, darkMode }) => {
                     />
                   </TableCell>
                   <TableCell>
-                    <Typography sx={{ fontSize: '0.7rem', fontFamily: 'monospace', color: line.selectedSku ? '#0854a0' : '#94a3b8' }}>
+                    <Typography sx={{ fontSize: '0.7rem', fontFamily: 'monospace', color: line.selectedSku ? '#002352' : '#94a3b8' }}>
                       {line.selectedSku || '---'}
                     </Typography>
                   </TableCell>
@@ -220,7 +220,7 @@ const generateTilesForOrder = (order) => {
       highlight: {
         label: mappedStage === 1 ? 'Optimizing SKU' : mappedStage > 1 ? 'SKU Selected' : 'Awaiting Intent',
         value: mappedStage >= 1 ? (order.margin ? `${order.margin.toFixed(1)}% margin` : 'Analyzing...') : '--',
-        color: mappedStage === 1 ? '#0a6ed1' : mappedStage > 1 ? '#10b981' : '#64748b',
+        color: mappedStage === 1 ? '#00357a' : mappedStage > 1 ? '#10b981' : '#64748b',
       },
     },
     {
@@ -254,7 +254,7 @@ const ExpandableRow = ({ row, isOpen, onToggle, darkMode, onTileClick, onLineCli
     const styles = {
       rush: { bgcolor: alpha('#ef4444', 0.12), color: '#dc2626' },
       new: { bgcolor: alpha('#1976d2', 0.12), color: '#1565c0' },
-      processing: { bgcolor: alpha('#2b88d8', 0.12), color: '#0078d4' },
+      processing: { bgcolor: alpha('#1a5a9e', 0.12), color: '#00357a' },
       escalated: { bgcolor: alpha('#ef4444', 0.12), color: '#dc2626' },
       review: { bgcolor: alpha('#f59e0b', 0.12), color: '#d97706' },
       approved: { bgcolor: alpha('#10b981', 0.12), color: '#059669' },
@@ -276,7 +276,7 @@ const ExpandableRow = ({ row, isOpen, onToggle, darkMode, onTileClick, onLineCli
 
   const getTileLabelColor = (stage) => {
     // 3-stage flow colors: Intent (dark blue), SKU Decisioning (blue), Arbitration (amber)
-    const colors = ['#0d47a1', '#0a6ed1', '#f59e0b'];
+    const colors = ['#0d47a1', '#00357a', '#f59e0b'];
     return colors[stage] || '#64748b';
   };
 
@@ -288,8 +288,8 @@ const ExpandableRow = ({ row, isOpen, onToggle, darkMode, onTileClick, onLineCli
         onClick={onToggle}
         sx={{
           cursor: 'pointer',
-          bgcolor: isOpen ? alpha('#0854a0', 0.04) : 'inherit',
-          '&:hover': { bgcolor: alpha('#0854a0', 0.06) },
+          bgcolor: isOpen ? alpha('#002352', 0.04) : 'inherit',
+          '&:hover': { bgcolor: alpha('#002352', 0.06) },
         }}
       >
         <TableCell sx={{ width: 40, p: 1 }}>
@@ -318,8 +318,8 @@ const ExpandableRow = ({ row, isOpen, onToggle, darkMode, onTileClick, onLineCli
             sx={{
               minWidth: 24,
               height: 22,
-              bgcolor: (row.lineCount || 1) > 1 ? alpha('#0854a0', 0.12) : alpha('#64748b', 0.1),
-              color: (row.lineCount || 1) > 1 ? '#0854a0' : '#64748b',
+              bgcolor: (row.lineCount || 1) > 1 ? alpha('#002352', 0.12) : alpha('#64748b', 0.1),
+              color: (row.lineCount || 1) > 1 ? '#002352' : '#64748b',
               fontWeight: 700,
               fontSize: '0.75rem',
             }}
@@ -385,7 +385,7 @@ const ExpandableRow = ({ row, isOpen, onToggle, darkMode, onTileClick, onLineCli
       <TableRow>
         <TableCell colSpan={9} sx={{ p: 0, borderBottom: isOpen ? '1px solid' : 'none', borderColor: 'divider' }}>
           <Collapse in={isOpen} timeout="auto" unmountOnExit>
-            <Box sx={{ p: 2, bgcolor: darkMode ? alpha('#0854a0', 0.05) : alpha('#0854a0', 0.02) }}>
+            <Box sx={{ p: 2, bgcolor: darkMode ? alpha('#002352', 0.05) : alpha('#002352', 0.02) }}>
               <Grid container spacing={1.5}>
                 {row.tiles.map((tile, idx) => {
                   const labelColor = getTileLabelColor(tile.stage);
@@ -755,7 +755,7 @@ const SalesOrderPipeline = ({ onBack, darkMode = false, onNavigate }) => {
           </Stack>
         </Stack>
         <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-          <ViewListIcon sx={{ fontSize: 40, color: '#0854a0' }} />
+          <ViewListIcon sx={{ fontSize: 40, color: '#002352' }} />
           <Typography variant="h5" fontWeight={600}>Sales Order Pipeline</Typography>
         </Stack>
         <Typography variant="body2" color="text.secondary">
@@ -766,11 +766,11 @@ const SalesOrderPipeline = ({ onBack, darkMode = false, onNavigate }) => {
       {/* Summary Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         {[
-          { label: 'Total Orders', value: stats.total, color: '#0854a0' },
+          { label: 'Total Orders', value: stats.total, color: '#002352' },
           { label: 'In Progress', value: stats.inProgress, color: '#f59e0b' },
           { label: 'Pipeline Value', value: stats.pipelineValue >= 1000000 ? `$${(stats.pipelineValue / 1000000).toFixed(1)}M` : `$${(stats.pipelineValue / 1000).toFixed(1)}K`, color: '#10b981' },
           { label: 'Avg Margin', value: `${stats.avgMargin}%`, color: '#10b981' },
-          { label: 'Committed', value: stats.committed, color: '#2b88d8' },
+          { label: 'Committed', value: stats.committed, color: '#1a5a9e' },
           { label: 'Escalated', value: stats.escalated, color: '#ef4444' },
         ].map((card) => (
           <Grid item xs={6} sm={4} md={2} key={card.label}>
@@ -792,11 +792,11 @@ const SalesOrderPipeline = ({ onBack, darkMode = false, onNavigate }) => {
         <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: filterPanelOpen ? 2 : 0 }}>
             <Stack direction="row" alignItems="center" spacing={1}>
-              <ViewListIcon sx={{ color: '#0854a0', fontSize: 18 }} />
+              <ViewListIcon sx={{ color: '#002352', fontSize: 18 }} />
               <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
                 Order Pipeline
               </Typography>
-              <Chip label={`${filteredData.length} orders`} size="small" sx={{ bgcolor: alpha('#0854a0', 0.12), color: '#0854a0', fontWeight: 600, fontSize: '0.7rem' }} />
+              <Chip label={`${filteredData.length} orders`} size="small" sx={{ bgcolor: alpha('#002352', 0.12), color: '#002352', fontWeight: 600, fontSize: '0.7rem' }} />
             </Stack>
 
             <Stack direction="row" alignItems="center" spacing={1}>
@@ -830,7 +830,7 @@ const SalesOrderPipeline = ({ onBack, darkMode = false, onNavigate }) => {
                         width: 16,
                         height: 16,
                         borderRadius: '50%',
-                        bgcolor: '#0854a0',
+                        bgcolor: '#002352',
                         color: 'white',
                         fontSize: '0.6rem',
                         display: 'flex',

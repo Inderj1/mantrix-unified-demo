@@ -112,7 +112,7 @@ const MaterialPlantDrawer = ({ open, onClose, matnr, quantity = 15000, sellingPr
       <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', bgcolor: '#f8fafc' }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Stack direction="row" alignItems="center" spacing={1.5}>
-            <InventoryIcon sx={{ color: '#0854a0', fontSize: 28 }} />
+            <InventoryIcon sx={{ color: '#002352', fontSize: 28 }} />
             <Box>
               <Typography variant="h6" fontWeight={600}>{matnr}</Typography>
               <Typography variant="caption" color="text.secondary">{data?.description}</Typography>
@@ -137,7 +137,7 @@ const MaterialPlantDrawer = ({ open, onClose, matnr, quantity = 15000, sellingPr
               <CardContent sx={{ pb: 2 }}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
                   <Stack direction="row" alignItems="center" spacing={1}>
-                    <FactoryIcon sx={{ color: '#0854a0', fontSize: 18 }} />
+                    <FactoryIcon sx={{ color: '#002352', fontSize: 18 }} />
                     <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
                       Plant Comparison
                     </Typography>
@@ -145,7 +145,7 @@ const MaterialPlantDrawer = ({ open, onClose, matnr, quantity = 15000, sellingPr
                   <Chip
                     label={`Qty Needed: ${quantity.toLocaleString()} LM`}
                     size="small"
-                    sx={{ bgcolor: alpha('#0854a0', 0.12), color: '#1565c0', fontWeight: 600, fontSize: '0.65rem' }}
+                    sx={{ bgcolor: alpha('#002352', 0.12), color: '#1565c0', fontWeight: 600, fontSize: '0.65rem' }}
                   />
                 </Stack>
                 <Table size="small">
@@ -164,7 +164,7 @@ const MaterialPlantDrawer = ({ open, onClose, matnr, quantity = 15000, sellingPr
                         key={plant.plant}
                         sx={{
                           bgcolor: plant.plant === data.best_cost_plant ? alpha('#10b981', 0.08) : 'transparent',
-                          '&:hover': { bgcolor: alpha('#0854a0', 0.05) }
+                          '&:hover': { bgcolor: alpha('#002352', 0.05) }
                         }}
                       >
                         <TableCell>
@@ -177,7 +177,7 @@ const MaterialPlantDrawer = ({ open, onClose, matnr, quantity = 15000, sellingPr
                               <Chip label="LOWEST" size="small" sx={{ bgcolor: '#10b981', color: 'white', fontWeight: 600, fontSize: '0.55rem', height: 18 }} />
                             )}
                             {plant.plant === data.best_lead_time_plant && plant.plant !== data.best_cost_plant && (
-                              <Chip label="FASTEST" size="small" sx={{ bgcolor: '#0854a0', color: 'white', fontWeight: 600, fontSize: '0.55rem', height: 18 }} />
+                              <Chip label="FASTEST" size="small" sx={{ bgcolor: '#002352', color: 'white', fontWeight: 600, fontSize: '0.55rem', height: 18 }} />
                             )}
                           </Stack>
                         </TableCell>
@@ -220,7 +220,7 @@ const MaterialPlantDrawer = ({ open, onClose, matnr, quantity = 15000, sellingPr
               <Card variant="outlined">
                 <CardContent sx={{ pb: 2 }}>
                   <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-                    <MoneyIcon sx={{ color: '#0854a0', fontSize: 18 }} />
+                    <MoneyIcon sx={{ color: '#002352', fontSize: 18 }} />
                     <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
                       Cost Breakdown (Plant {selectedPlant.plant} - {getPlantName(selectedPlant.plant)})
                     </Typography>
@@ -249,14 +249,14 @@ const MaterialPlantDrawer = ({ open, onClose, matnr, quantity = 15000, sellingPr
                               <LinearProgress
                                 variant="determinate"
                                 value={row.pct}
-                                sx={{ width: 60, height: 8, borderRadius: 1, bgcolor: alpha('#0854a0', 0.1), '& .MuiLinearProgress-bar': { bgcolor: '#0854a0' } }}
+                                sx={{ width: 60, height: 8, borderRadius: 1, bgcolor: alpha('#002352', 0.1), '& .MuiLinearProgress-bar': { bgcolor: '#002352' } }}
                               />
                               <Typography sx={{ fontSize: '0.75rem', fontWeight: 600 }}>{row.pct}%</Typography>
                             </Stack>
                           </TableCell>
                         </TableRow>
                       ))}
-                      <TableRow sx={{ bgcolor: alpha('#0854a0', 0.05) }}>
+                      <TableRow sx={{ bgcolor: alpha('#002352', 0.05) }}>
                         <TableCell sx={{ fontSize: '0.85rem', fontWeight: 700 }}>TOTAL LANDED</TableCell>
                         <TableCell sx={{ fontSize: '0.85rem', fontWeight: 700 }} align="right">{formatCurrency(selectedPlant.unit_cost)}</TableCell>
                         <TableCell sx={{ fontSize: '0.85rem', fontWeight: 700 }} align="right">{formatCurrency(selectedPlant.total_cost)}</TableCell>
@@ -290,7 +290,7 @@ const MaterialPlantDrawer = ({ open, onClose, matnr, quantity = 15000, sellingPr
               <Card variant="outlined">
                 <CardContent sx={{ pb: 2 }}>
                   <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-                    <ScheduleIcon sx={{ color: '#0854a0', fontSize: 18 }} />
+                    <ScheduleIcon sx={{ color: '#002352', fontSize: 18 }} />
                     <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
                       Lead Time Breakdown
                     </Typography>
@@ -377,7 +377,7 @@ const MaterialPlantDrawer = ({ open, onClose, matnr, quantity = 15000, sellingPr
                     {[
                       { label: 'Unrestricted', value: selectedPlant.qty_on_hand, color: '#10b981' },
                       { label: 'In QC', value: selectedPlant.qty_in_qc, color: '#d97706' },
-                      { label: 'In Transfer', value: selectedPlant.qty_in_transfer, color: '#0854a0' },
+                      { label: 'In Transfer', value: selectedPlant.qty_in_transfer, color: '#002352' },
                       { label: 'Blocked', value: selectedPlant.qty_blocked, color: '#ef4444' },
                     ].map((item) => (
                       <Grid item xs={3} key={item.label}>

@@ -27,7 +27,7 @@ import {
 import o2cTheme from './o2cTheme';
 
 // Primary blue color
-const PRIMARY_BLUE = '#0854a0';
+const PRIMARY_BLUE = '#002352';
 const ACCENT_BLUE = '#1976d2';
 
 // Flow navigation steps

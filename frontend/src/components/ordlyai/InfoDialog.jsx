@@ -31,13 +31,13 @@ const InfoDialog = ({
     text: darkMode ? '#e2e8f0' : '#1e293b',
     textSecondary: darkMode ? '#94a3b8' : '#64748b',
     border: darkMode ? 'rgba(8, 84, 160, 0.3)' : 'rgba(8, 84, 160, 0.15)',
-    primary: '#0854a0',
+    primary: '#002352',
     primaryLight: '#1976d2',
   };
 
   const typeConfig = {
     info: {
-      color: '#0854a0',
+      color: '#002352',
       bgColor: darkMode ? 'rgba(8, 84, 160, 0.15)' : 'rgba(8, 84, 160, 0.1)',
       Icon: InfoIcon,
     },

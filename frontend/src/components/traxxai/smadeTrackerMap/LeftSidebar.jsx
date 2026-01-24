@@ -63,7 +63,7 @@ export default function LeftSidebar({ kits = [], facilities = [], alerts = [], o
       {/* Header */}
       <Box sx={{ p: 1.5, borderBottom: '1px solid', borderColor: alpha('#64748b', 0.1) }}>
         <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-          <SensorsIcon sx={{ fontSize: 18, color: '#0a6ed1' }} />
+          <SensorsIcon sx={{ fontSize: 18, color: '#00357a' }} />
           <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: '#1e293b' }}>SMADE.IO Tracking</Typography>
         </Stack>
 
@@ -159,8 +159,8 @@ export default function LeftSidebar({ kits = [], facilities = [], alerts = [], o
                   cursor: 'pointer',
                   transition: 'all 0.2s',
                   '&:hover': {
-                    bgcolor: alpha('#0a6ed1', 0.05),
-                    borderColor: alpha('#0a6ed1', 0.2),
+                    bgcolor: alpha('#00357a', 0.05),
+                    borderColor: alpha('#00357a', 0.2),
                   },
                 }}
               >

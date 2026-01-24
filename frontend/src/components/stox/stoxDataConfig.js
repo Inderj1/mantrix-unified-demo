@@ -29,7 +29,7 @@ export const DATA_SOURCE_CONFIG = {
   },
   mixed: {
     label: 'Mixed Data',
-    color: '#0078d4', // Azure Blue
+    color: '#00357a', // Azure Blue
     bgColor: 'rgba(0, 120, 212, 0.1)',
     icon: 'Sync',
     description: 'Combination of live and demo data',

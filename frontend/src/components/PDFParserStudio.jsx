@@ -17,7 +17,7 @@ import PDFTemplatesManager from './PDFTemplatesManager';
 import CreateTemplateModal from './CreateTemplateModal';
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -67,8 +67,8 @@ const PDFParserStudio = ({ onBack, darkMode = false }) => {
         </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
-          <Avatar sx={{ width: 48, height: 48, bgcolor: alpha('#0854a0', 0.1) }}>
-            <TableChart sx={{ fontSize: 28, color: '#0854a0' }} />
+          <Avatar sx={{ width: 48, height: 48, bgcolor: alpha('#002352', 0.1) }}>
+            <TableChart sx={{ fontSize: 28, color: '#002352' }} />
           </Avatar>
           <Box sx={{ flex: 1 }}>
             <Typography variant="h6" fontWeight={700} sx={{ color: colors.text }}>Customer Templates</Typography>

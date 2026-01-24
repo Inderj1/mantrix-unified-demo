@@ -111,7 +111,7 @@ const LoanerKitOrders = ({ onBack }) => {
         <Chip
           label={params.value}
           size="small"
-          sx={{ fontWeight: 700, bgcolor: alpha('#0a6ed1', 0.1), color: '#0a6ed1' }}
+          sx={{ fontWeight: 700, bgcolor: alpha('#00357a', 0.1), color: '#00357a' }}
         />
       ),
     },
@@ -167,7 +167,7 @@ const LoanerKitOrders = ({ onBack }) => {
             Back to List
           </Button>
           <Stack direction="row" spacing={1}>
-            <Chip label={selectedRow.order_id} size="small" sx={{ fontWeight: 700, bgcolor: alpha('#0a6ed1', 0.1), color: '#0a6ed1' }} />
+            <Chip label={selectedRow.order_id} size="small" sx={{ fontWeight: 700, bgcolor: alpha('#00357a', 0.1), color: '#00357a' }} />
             <Chip label={selectedRow.status} size="small" sx={{ fontWeight: 600, bgcolor: statusColor.bg, color: statusColor.color }} />
           </Stack>
         </Stack>
@@ -180,7 +180,7 @@ const LoanerKitOrders = ({ onBack }) => {
         <Grid container spacing={2} sx={{ mb: 3 }}>
           {[
             { label: 'Total Value', value: `$${selectedRow.total_value?.toLocaleString()}`, color: '#10b981', icon: <TrendingUp /> },
-            { label: 'Items', value: selectedRow.items?.length || 0, color: '#0a6ed1', icon: <AssignmentIcon /> },
+            { label: 'Items', value: selectedRow.items?.length || 0, color: '#00357a', icon: <AssignmentIcon /> },
             { label: 'Processing Days', value: selectedRow.avgProcessingDays, color: '#f59e0b', icon: <Schedule /> },
             { label: 'Priority', value: selectedRow.priority, color: selectedRow.priority === 'High' ? '#ef4444' : '#64748b', icon: <Pending /> },
           ].map((metric, idx) => (
@@ -306,8 +306,8 @@ const LoanerKitOrders = ({ onBack }) => {
                       labels: ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                       datasets: [{
                         data: selectedRow.orderTrend || [15, 22, 18, 25, 20, 28],
-                        backgroundColor: alpha('#0a6ed1', 0.6),
-                        borderColor: '#0a6ed1',
+                        backgroundColor: alpha('#00357a', 0.6),
+                        borderColor: '#00357a',
                         borderWidth: 1,
                         borderRadius: 4,
                       }],
@@ -356,7 +356,7 @@ const LoanerKitOrders = ({ onBack }) => {
         {!selectedRow && (
           <>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-              <AssignmentIcon sx={{ fontSize: 32, color: '#0a6ed1' }} />
+              <AssignmentIcon sx={{ fontSize: 32, color: '#00357a' }} />
               <Typography variant="h4" fontWeight={700}>Kit Orders</Typography>
             </Stack>
             <Typography variant="body2" color="text.secondary">
@@ -374,7 +374,7 @@ const LoanerKitOrders = ({ onBack }) => {
           {metrics && (
             <Grid container spacing={2} sx={{ mb: 3 }}>
               {[
-                { label: 'Total Orders', value: metrics.totalOrders, color: '#0a6ed1', icon: <AssignmentIcon /> },
+                { label: 'Total Orders', value: metrics.totalOrders, color: '#00357a', icon: <AssignmentIcon /> },
                 { label: 'Pending Approvals', value: metrics.pendingApprovals, color: '#f59e0b', icon: <Pending /> },
                 { label: 'In Process', value: metrics.inProcess, color: '#8b5cf6', icon: <Schedule /> },
                 { label: 'Avg Processing', value: `${metrics.avgProcessingDays} days`, color: '#10b981', icon: <LocalShipping /> },
@@ -409,7 +409,7 @@ const LoanerKitOrders = ({ onBack }) => {
               sx={{
                 flex: 1,
                 '& .MuiDataGrid-row': { cursor: 'pointer' },
-                '& .MuiDataGrid-row:hover': { bgcolor: alpha('#0a6ed1', 0.04) },
+                '& .MuiDataGrid-row:hover': { bgcolor: alpha('#00357a', 0.04) },
               }}
             />
           </Paper>

@@ -35,7 +35,7 @@ const formatCurrency = (value) => {
 };
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -195,7 +195,7 @@ const SupplierTermsImpact = ({ onBack, onTileClick, darkMode = false }) => {
     labels: Object.keys(data.termsCounts),
     datasets: [{
       data: Object.values(data.termsSpend),
-      backgroundColor: ['#2b88d8', '#10b981', '#f59e0b'],
+      backgroundColor: ['#1a5a9e', '#10b981', '#f59e0b'],
       borderWidth: 0,
     }],
   };
@@ -207,7 +207,7 @@ const SupplierTermsImpact = ({ onBack, onTileClick, darkMode = false }) => {
       {
         label: 'WC Tied',
         data: data.categoryData.map(c => c.wcTied),
-        backgroundColor: '#106ebe',
+        backgroundColor: '#1a5a9e',
       },
     ],
   };
@@ -218,7 +218,7 @@ const SupplierTermsImpact = ({ onBack, onTileClick, darkMode = false }) => {
     datasets: [{
       label: 'Potential Value',
       data: [data.summary.totalConsignmentPotential, data.summary.totalTermsExtension, data.summary.totalDiscountAvailable],
-      backgroundColor: ['#10b981', '#2b88d8', '#f59e0b'],
+      backgroundColor: ['#10b981', '#1a5a9e', '#f59e0b'],
     }],
   };
 
@@ -326,9 +326,9 @@ const SupplierTermsImpact = ({ onBack, onTileClick, darkMode = false }) => {
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-              <HandshakeIcon sx={{ fontSize: 32, color: '#106ebe' }} />
+              <HandshakeIcon sx={{ fontSize: 32, color: '#1a5a9e' }} />
               <Typography variant="h4" fontWeight={700}>Supplier Terms Impact</Typography>
-              <Chip label="Tile 4.4" size="small" sx={{ bgcolor: alpha('#106ebe', 0.1), color: '#106ebe', fontWeight: 600 }} />
+              <Chip label="Tile 4.4" size="small" sx={{ bgcolor: alpha('#1a5a9e', 0.1), color: '#1a5a9e', fontWeight: 600 }} />
               <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
             <Typography variant="body2" color="text.secondary">
@@ -347,7 +347,7 @@ const SupplierTermsImpact = ({ onBack, onTileClick, darkMode = false }) => {
         {/* Summary Cards */}
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={6} sm={4} md={2}>
-            <Card sx={{ borderLeft: '4px solid #106ebe' }}>
+            <Card sx={{ borderLeft: '4px solid #1a5a9e' }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Typography variant="caption" color="text.secondary">Total Spend</Typography>
                 <Typography variant="h5" fontWeight={700}>{formatCurrency(data.summary.totalSpend)}</Typography>
@@ -371,10 +371,10 @@ const SupplierTermsImpact = ({ onBack, onTileClick, darkMode = false }) => {
             </Card>
           </Grid>
           <Grid item xs={6} sm={4} md={2}>
-            <Card sx={{ borderLeft: '4px solid #2b88d8' }}>
+            <Card sx={{ borderLeft: '4px solid #1a5a9e' }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Typography variant="caption" color="text.secondary">Terms Extension</Typography>
-                <Typography variant="h5" fontWeight={700} color="#2b88d8">{formatCurrency(data.summary.totalTermsExtension)}</Typography>
+                <Typography variant="h5" fontWeight={700} color="#1a5a9e">{formatCurrency(data.summary.totalTermsExtension)}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -387,7 +387,7 @@ const SupplierTermsImpact = ({ onBack, onTileClick, darkMode = false }) => {
             </Card>
           </Grid>
           <Grid item xs={6} sm={4} md={2}>
-            <Card sx={{ borderLeft: '4px solid #0078d4' }}>
+            <Card sx={{ borderLeft: '4px solid #00357a' }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Typography variant="caption" color="text.secondary">Avg DPO</Typography>
                 <Typography variant="h5" fontWeight={700}>{data.summary.avgDPO} days</Typography>
@@ -528,10 +528,10 @@ const SupplierTermsImpact = ({ onBack, onTileClick, darkMode = false }) => {
         </Paper>
 
         {/* Insights Card */}
-        <Card sx={{ bgcolor: alpha('#106ebe', 0.03) }}>
+        <Card sx={{ bgcolor: alpha('#1a5a9e', 0.03) }}>
           <CardContent sx={{ py: 1.5 }}>
             <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-              <InfoIcon sx={{ color: '#106ebe', fontSize: 18 }} />
+              <InfoIcon sx={{ color: '#1a5a9e', fontSize: 18 }} />
               <Typography variant="subtitle2" fontWeight={700}>Key Insights</Typography>
             </Stack>
             <Grid container spacing={2}>

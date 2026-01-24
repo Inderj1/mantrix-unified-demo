@@ -248,8 +248,8 @@ export default function CashWorkingCapitalTab() {
           size="small"
           sx={{
             fontWeight: 600,
-            bgcolor: params.value === 'Plant' ? alpha('#2b88d8', 0.12) : alpha('#8b5cf6', 0.12),
-            color: params.value === 'Plant' ? '#106ebe' : '#7c3aed',
+            bgcolor: params.value === 'Plant' ? alpha('#1a5a9e', 0.12) : alpha('#8b5cf6', 0.12),
+            color: params.value === 'Plant' ? '#1a5a9e' : '#7c3aed',
           }}
         />
       ),
@@ -378,7 +378,7 @@ export default function CashWorkingCapitalTab() {
         <Grid container spacing={2} sx={{ mb: 3 }}>
           {[
             { label: 'DSO', value: `${selectedRow.dso} days`, target: selectedRow.dsoTarget, color: selectedRow.dso <= selectedRow.dsoTarget ? '#10b981' : '#ef4444', icon: <ScheduleIcon /> },
-            { label: 'A/R Balance', value: `$${selectedRow.arBalance.toFixed(1)}M`, color: '#2b88d8', icon: <AccountBalanceIcon /> },
+            { label: 'A/R Balance', value: `$${selectedRow.arBalance.toFixed(1)}M`, color: '#1a5a9e', icon: <AccountBalanceIcon /> },
             { label: 'Cash Conversion', value: `${selectedRow.ccc} days`, color: selectedRow.ccc <= 50 ? '#10b981' : '#f59e0b', icon: <ShippingIcon /> },
             { label: 'Cash Impact', value: `${selectedRow.cashImpact >= 0 ? '+' : ''}$${selectedRow.cashImpact.toFixed(1)}M`, color: selectedRow.cashImpact >= 0 ? '#10b981' : '#ef4444', icon: <InventoryIcon /> },
           ].map((metric, idx) => (
@@ -460,12 +460,12 @@ export default function CashWorkingCapitalTab() {
                 <Stack spacing={1.5}>
                   {selectedRow.recommendations.map((rec, idx) => (
                     <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, p: 1, bgcolor: alpha('#64748b', 0.05), borderRadius: 1 }}>
-                      <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: '#2b88d8', minWidth: 20 }}>{idx + 1}.</Typography>
+                      <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: '#1a5a9e', minWidth: 20 }}>{idx + 1}.</Typography>
                       <Typography sx={{ fontSize: '0.8rem' }}>{rec}</Typography>
                     </Box>
                   ))}
                 </Stack>
-                <Button fullWidth variant="contained" sx={{ mt: 2, bgcolor: '#2b88d8' }}>
+                <Button fullWidth variant="contained" sx={{ mt: 2, bgcolor: '#1a5a9e' }}>
                   Generate Action Plan
                 </Button>
               </CardContent>
@@ -496,7 +496,7 @@ export default function CashWorkingCapitalTab() {
               <Card sx={{ background: 'linear-gradient(135deg, #eff6ff 0%, #ffffff 100%)' }}>
                 <CardContent sx={{ py: 2 }}>
                   <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>Total A/R</Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 700, color: '#106ebe' }}>${kpis?.totalAR.toFixed(1)}M</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a5a9e' }}>${kpis?.totalAR.toFixed(1)}M</Typography>
                 </CardContent>
               </Card>
             </Grid>

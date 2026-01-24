@@ -36,11 +36,11 @@ const routeModules = [
     subtitle: 'Vehicle Operations',
     description: 'Real-time vehicle tracking, driver management, and fleet utilization analytics',
     icon: FleetIcon,
-    color: '#106ebe',
+    color: '#1a5a9e',
     bgColor: '#deecf9',
     stats: { label: 'Active Vehicles', value: '45' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #106ebe 0%, #2b88d8 100%)',
+    gradient: 'linear-gradient(135deg, #1a5a9e 0%, #1a5a9e 100%)',
   },
   {
     id: 'route-optimization',
@@ -48,11 +48,11 @@ const routeModules = [
     subtitle: 'Smart Routing',
     description: 'AI-powered route planning, traffic-aware optimization, and dynamic re-routing',
     icon: RouteIcon,
-    color: '#2b88d8',
+    color: '#1a5a9e',
     bgColor: '#deecf9',
     stats: { label: 'Routes Optimized', value: '1,245' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #2b88d8 0%, #0078d4 100%)',
+    gradient: 'linear-gradient(135deg, #1a5a9e 0%, #00357a 100%)',
   },
   {
     id: 'delivery-tracking',
@@ -72,11 +72,11 @@ const routeModules = [
     subtitle: 'Insights & Metrics',
     description: 'Fleet efficiency metrics, driver performance, and operational KPIs',
     icon: AnalyticsIcon,
-    color: '#0078d4',
+    color: '#00357a',
     bgColor: '#f3e5f5',
     stats: { label: 'Fleet Efficiency', value: '91%' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #0078d4 0%, #106ebe 100%)',
+    gradient: 'linear-gradient(135deg, #00357a 0%, #1a5a9e 100%)',
   },
   {
     id: 'fuel-management',
@@ -84,11 +84,11 @@ const routeModules = [
     subtitle: 'Cost Optimization',
     description: 'Fuel consumption tracking, cost analysis, and efficiency recommendations',
     icon: FuelIcon,
-    color: '#106ebe',
+    color: '#1a5a9e',
     bgColor: '#deecf9',
     stats: { label: 'Cost Saved', value: '$12.5K' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
+    gradient: 'linear-gradient(135deg, #1a5a9e 0%, #00357a 100%)',
   },
   {
     id: 'maintenance-scheduler',
@@ -96,11 +96,11 @@ const routeModules = [
     subtitle: 'Predictive Maintenance',
     description: 'Preventive maintenance scheduling, service alerts, and vehicle health monitoring',
     icon: MaintenanceIcon,
-    color: '#005a9e',
+    color: '#002352',
     bgColor: '#deecf9',
     stats: { label: 'Upcoming Services', value: '8' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #005a9e 0%, #0078d4 100%)',
+    gradient: 'linear-gradient(135deg, #002352 0%, #00357a 100%)',
   },
 ];
 
@@ -146,10 +146,10 @@ const RouteAILanding = ({ onTileClick, onBack }) => {
             sx={{
               width: 64,
               height: 64,
-              bgcolor: alpha('#106ebe', 0.1),
+              bgcolor: alpha('#1a5a9e', 0.1),
             }}
           >
-            <FleetIcon sx={{ fontSize: 36, color: '#106ebe' }} />
+            <FleetIcon sx={{ fontSize: 36, color: '#1a5a9e' }} />
           </Avatar>
           <Box>
             <Typography variant="h4" fontWeight={700}>

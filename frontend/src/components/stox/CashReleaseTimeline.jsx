@@ -25,7 +25,7 @@ import { LAM_PLANTS, LAM_VENDORS, getPlantName } from '../../data/arizonaBeverag
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, ChartTooltip, Legend);
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -258,7 +258,7 @@ const CashReleaseTimeline = ({ onBack, onTileClick, darkMode = false }) => {
       {
         label: 'Monthly Cash Release',
         data: data.monthlyTotals,
-        backgroundColor: '#106ebe',
+        backgroundColor: '#1a5a9e',
         borderRadius: 4,
       },
     ] : [
@@ -278,7 +278,7 @@ const CashReleaseTimeline = ({ onBack, onTileClick, darkMode = false }) => {
       {
         label: 'Total Release',
         data: data.categoryBreakdown.map(c => c.totalRelease),
-        backgroundColor: '#106ebe',
+        backgroundColor: '#1a5a9e',
       },
       {
         label: 'Risk-Adjusted',
@@ -291,7 +291,7 @@ const CashReleaseTimeline = ({ onBack, onTileClick, darkMode = false }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'In Progress': return '#10b981';
-      case 'Planned': return '#2b88d8';
+      case 'Planned': return '#1a5a9e';
       case 'Completed': return '#64748b';
       default: return '#64748b';
     }
@@ -321,9 +321,9 @@ const CashReleaseTimeline = ({ onBack, onTileClick, darkMode = false }) => {
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-              <TimelineIcon sx={{ fontSize: 32, color: '#106ebe' }} />
+              <TimelineIcon sx={{ fontSize: 32, color: '#1a5a9e' }} />
               <Typography variant="h4" fontWeight={700}>Cash Release Timeline</Typography>
-              <Chip label="Tile 6.2" size="small" sx={{ bgcolor: alpha('#106ebe', 0.1), color: '#106ebe', fontWeight: 600 }} />
+              <Chip label="Tile 6.2" size="small" sx={{ bgcolor: alpha('#1a5a9e', 0.1), color: '#1a5a9e', fontWeight: 600 }} />
               <DataSourceChip dataType={tileConfig.dataType} />
             </Stack>
             <Typography variant="body2" color="text.secondary">
@@ -342,10 +342,10 @@ const CashReleaseTimeline = ({ onBack, onTileClick, darkMode = false }) => {
         {/* Summary Cards */}
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={6} sm={3}>
-            <Card sx={{ borderLeft: '4px solid #106ebe', bgcolor: colors.cardBg, borderColor: colors.border }}>
+            <Card sx={{ borderLeft: '4px solid #1a5a9e', bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Typography variant="caption" color="text.secondary">Total Cash Release</Typography>
-                <Typography variant="h5" fontWeight={700} color="#106ebe">{formatCurrency(data.totals.totalRelease)}</Typography>
+                <Typography variant="h5" fontWeight={700} color="#1a5a9e">{formatCurrency(data.totals.totalRelease)}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -358,7 +358,7 @@ const CashReleaseTimeline = ({ onBack, onTileClick, darkMode = false }) => {
             </Card>
           </Grid>
           <Grid item xs={6} sm={3}>
-            <Card sx={{ borderLeft: '4px solid #2b88d8', bgcolor: colors.cardBg, borderColor: colors.border }}>
+            <Card sx={{ borderLeft: '4px solid #1a5a9e', bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent sx={{ py: 1.5 }}>
                 <Typography variant="caption" color="text.secondary">Avg Confidence</Typography>
                 <Typography variant="h5" fontWeight={700}>{data.totals.avgConfidence}%</Typography>
@@ -468,9 +468,9 @@ const CashReleaseTimeline = ({ onBack, onTileClick, darkMode = false }) => {
         <Grid container spacing={2} sx={{ mb: 2 }}>
           {data.quarterlyData.map((q) => (
             <Grid item xs={6} sm={3} key={q.quarter}>
-              <Card sx={{ bgcolor: alpha('#106ebe', darkMode ? 0.15 : 0.03), borderColor: colors.border }}>
+              <Card sx={{ bgcolor: alpha('#1a5a9e', darkMode ? 0.15 : 0.03), borderColor: colors.border }}>
                 <CardContent sx={{ py: 1.5 }}>
-                  <Typography variant="subtitle2" fontWeight={700} color="#106ebe">{q.quarter} 2025</Typography>
+                  <Typography variant="subtitle2" fontWeight={700} color="#1a5a9e">{q.quarter} 2025</Typography>
                   <Typography variant="h6" fontWeight={700}>{formatCurrency(q.totalRelease)}</Typography>
                   <Stack direction="row" spacing={1}>
                     <Chip label={`${q.initiatives} initiatives`} size="small" sx={{ height: 18, fontSize: '0.6rem' }} />

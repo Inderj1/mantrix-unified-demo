@@ -389,7 +389,7 @@ const ABCXYZMatrix = ({ data, filters, onCellClick, theme, colors }) => {
 };
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -436,8 +436,8 @@ const InventoryDashboard = ({ onBack, onTileClick, darkMode = false }) => {
     return [
       { label: 'Total SKUs', value: data.length, subtext: 'Across 3 plants', icon: InventoryIcon, color: theme.palette.primary.main },
       { label: 'Total Inventory', value: formatCurrency(totalInventoryValue), subtext: 'Current valuation', icon: AttachMoneyIcon, color: theme.palette.primary.main, trend: -3.2 },
-      { label: 'Total WC Tied', value: formatCurrency(totalWC), subtext: `DIO: ${avgDIO} days`, icon: AccountBalanceIcon, color: '#106ebe' },
-      { label: 'Avg WCP', value: avgWCP + 'x', subtext: 'Working Capital Productivity', icon: SpeedIcon, color: '#0078d4' },
+      { label: 'Total WC Tied', value: formatCurrency(totalWC), subtext: `DIO: ${avgDIO} days`, icon: AccountBalanceIcon, color: '#1a5a9e' },
+      { label: 'Avg WCP', value: avgWCP + 'x', subtext: 'Working Capital Productivity', icon: SpeedIcon, color: '#00357a' },
       { label: 'Avg Turns', value: avgTurns + 'x', subtext: 'Annual turnover', icon: LoopIcon, color: theme.palette.success.main, trend: 5.1 },
       { label: 'Avg Fill Rate', value: avgFillRate + '%', subtext: 'Service level', icon: TrackChangesIcon, color: theme.palette.success.main },
       { label: 'At Risk Items', value: atRiskItems, subtext: `${criticalItems} critical`, icon: WarningIcon, color: theme.palette.warning.main },
@@ -643,8 +643,8 @@ const InventoryDashboard = ({ onBack, onTileClick, darkMode = false }) => {
           size="small"
           sx={{
             fontWeight: 700,
-            bgcolor: alpha('#106ebe', 0.12),
-            color: '#106ebe',
+            bgcolor: alpha('#1a5a9e', 0.12),
+            color: '#1a5a9e',
             fontSize: '0.7rem',
           }}
         />
@@ -663,7 +663,7 @@ const InventoryDashboard = ({ onBack, onTileClick, darkMode = false }) => {
           fontWeight={600}
           sx={{
             color: params.value >= 4 ? theme.palette.success.main :
-              params.value >= 2 ? '#0078d4' : theme.palette.warning.main
+              params.value >= 2 ? '#00357a' : theme.palette.warning.main
           }}
         >
           {params.value.toFixed(1)}x
@@ -879,8 +879,8 @@ const InventoryDashboard = ({ onBack, onTileClick, darkMode = false }) => {
             {/* WC Summary Cards */}
             <Grid container spacing={2} sx={{ mb: 3 }}>
               {[
-                { label: 'Total WC Tied', value: formatCurrency(mat.total_wc_value), icon: AccountBalanceIcon, color: '#106ebe' },
-                { label: 'WCP (Productivity)', value: mat.wcp.toFixed(2) + 'x', icon: SpeedIcon, color: mat.wcp >= 4 ? theme.palette.success.main : mat.wcp >= 2 ? '#0078d4' : theme.palette.warning.main },
+                { label: 'Total WC Tied', value: formatCurrency(mat.total_wc_value), icon: AccountBalanceIcon, color: '#1a5a9e' },
+                { label: 'WCP (Productivity)', value: mat.wcp.toFixed(2) + 'x', icon: SpeedIcon, color: mat.wcp >= 4 ? theme.palette.success.main : mat.wcp >= 2 ? '#00357a' : theme.palette.warning.main },
                 { label: 'DIO (Days)', value: mat.dio + ' days', icon: TimelineIcon, color: mat.dio > 60 ? theme.palette.error.main : mat.dio > 30 ? theme.palette.warning.main : theme.palette.success.main },
                 { label: 'WC Savings', value: formatCurrency(mat.wc_savings_opportunity), icon: SavingsIcon, color: theme.palette.success.main },
               ].map((item, i) => (
@@ -904,8 +904,8 @@ const InventoryDashboard = ({ onBack, onTileClick, darkMode = false }) => {
               </Stack>
               <Box sx={{ display: 'flex', height: 32, borderRadius: 1, overflow: 'hidden', mb: 2 }}>
                 {[
-                  { label: 'Cycle Stock', value: mat.cycle_stock_value, pct: mat.cycle_pct, color: '#2b88d8' },
-                  { label: 'Safety Stock', value: mat.safety_stock_value, pct: mat.safety_pct, color: '#0078d4' },
+                  { label: 'Cycle Stock', value: mat.cycle_stock_value, pct: mat.cycle_pct, color: '#1a5a9e' },
+                  { label: 'Safety Stock', value: mat.safety_stock_value, pct: mat.safety_pct, color: '#00357a' },
                   { label: 'Pipeline Stock', value: mat.pipeline_stock_value, pct: mat.pipeline_pct, color: '#06b6d4' },
                   { label: 'Excess Stock', value: mat.excess_stock_value, pct: mat.excess_pct, color: '#ef4444' },
                 ].map((seg, idx) => (
@@ -924,8 +924,8 @@ const InventoryDashboard = ({ onBack, onTileClick, darkMode = false }) => {
               </Box>
               <Stack direction="row" spacing={4} justifyContent="center" flexWrap="wrap">
                 {[
-                  { label: 'Cycle Stock', value: mat.cycle_stock_value, pct: mat.cycle_pct, color: '#2b88d8' },
-                  { label: 'Safety Stock', value: mat.safety_stock_value, pct: mat.safety_pct, color: '#0078d4' },
+                  { label: 'Cycle Stock', value: mat.cycle_stock_value, pct: mat.cycle_pct, color: '#1a5a9e' },
+                  { label: 'Safety Stock', value: mat.safety_stock_value, pct: mat.safety_pct, color: '#00357a' },
                   { label: 'Pipeline', value: mat.pipeline_stock_value, pct: mat.pipeline_pct, color: '#06b6d4' },
                   { label: 'Excess', value: mat.excess_stock_value, pct: mat.excess_pct, color: '#ef4444' },
                 ].map((seg, idx) => (
@@ -942,7 +942,7 @@ const InventoryDashboard = ({ onBack, onTileClick, darkMode = false }) => {
             {/* Current vs Optimal WC */}
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
-                <Card sx={{ p: 2.5, bgcolor: alpha('#106ebe', 0.05) }}>
+                <Card sx={{ p: 2.5, bgcolor: alpha('#1a5a9e', 0.05) }}>
                   <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>Current State</Typography>
                   <Stack spacing={1.5}>
                     {[

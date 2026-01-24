@@ -42,7 +42,7 @@ import {
 } from '@mui/icons-material';
 
 // Theme colors
-const PRIMARY_BLUE = '#0854a0';
+const PRIMARY_BLUE = '#002352';
 const ACCENT_BLUE = '#1976d2';
 const SUCCESS_GREEN = '#34d399';
 const WARNING_AMBER = '#fbbf24';
@@ -532,7 +532,7 @@ const NetworkOptimizer = ({ onBack }) => {
           { label: 'Pending Optimization', value: listStats.totalOrders, color: ACCENT_BLUE },
           { label: 'Avg. P(On-Time)', value: `${listStats.avgPOnTime}%`, color: CYAN },
           { label: 'Split Shipments', value: listStats.splitShip, color: PRIMARY_BLUE },
-          { label: 'Avg. Margin', value: `${listStats.avgMargin}%`, color: '#2b88d8' },
+          { label: 'Avg. Margin', value: `${listStats.avgMargin}%`, color: '#1a5a9e' },
         ].map((card) => (
           <Grid item xs={6} sm={4} md={3} key={card.label}>
             <Card variant="outlined" sx={{ borderLeft: `3px solid ${card.color}` }}>

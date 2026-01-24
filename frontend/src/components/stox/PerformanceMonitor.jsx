@@ -134,7 +134,7 @@ const generateKPIData = () => {
 };
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -331,7 +331,7 @@ const PerformanceMonitor = ({ onBack, darkMode = false }) => {
       labels: ['Service', 'Financial', 'Efficiency', 'Planning', 'Supply'],
       datasets: [{
         data: [5, 3, 3, 2, 2],
-        backgroundColor: ['#0891b2', '#10b981', '#f59e0b', '#0078d4', '#ec4899'],
+        backgroundColor: ['#0891b2', '#10b981', '#f59e0b', '#00357a', '#ec4899'],
       }],
     };
 
@@ -384,7 +384,7 @@ const PerformanceMonitor = ({ onBack, darkMode = false }) => {
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: '4px solid #0078d4' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
+            <Card sx={{ borderLeft: '4px solid #00357a' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Typography variant="caption" color="text.secondary">Achievement</Typography>
                 <Typography variant="h5" fontWeight={700}>{selectedKPI.achievement}%</Typography>
@@ -562,7 +562,7 @@ const PerformanceMonitor = ({ onBack, darkMode = false }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #0078d4' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
+                <Card sx={{ borderLeft: '4px solid #00357a' , bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">Avg Achievement</Typography>
                     <Typography variant="h5" fontWeight={700}>{metrics.avgAchievement}%</Typography>

@@ -52,7 +52,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineEleme
 
 // Dark Mode Color Helper
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -608,7 +608,7 @@ const MRPParameterTuner = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #2b88d8' }}>
+                <Card sx={{ borderLeft: '4px solid #1a5a9e' }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">Modified</Typography>
                     <Typography variant="h5" fontWeight={700} color="info.main">{metrics.modifiedCount}</Typography>
@@ -624,7 +624,7 @@ const MRPParameterTuner = ({ onBack }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #0078d4' }}>
+                <Card sx={{ borderLeft: '4px solid #00357a' }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">Avg Service Level</Typography>
                     <Typography variant="h5" fontWeight={700}>{metrics.avgServiceLevel}%</Typography>

@@ -153,7 +153,7 @@ const generateSAPData = () => {
 };
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -287,7 +287,7 @@ const SAPDataHub = ({ onBack, onTileClick, darkMode = false }) => {
         <Chip
           label={params.value}
           size="small"
-          sx={{ fontWeight: 700, bgcolor: alpha('#2b88d8', 0.12), color: '#106ebe' }}
+          sx={{ fontWeight: 700, bgcolor: alpha('#1a5a9e', 0.12), color: '#1a5a9e' }}
         />
       ),
     },
@@ -802,7 +802,7 @@ const SAPDataHub = ({ onBack, onTileClick, darkMode = false }) => {
                 '& .MuiDataGrid-row': {
                   bgcolor: colors.paper,
                   '&:hover': {
-                    bgcolor: darkMode ? alpha('#4da6ff', 0.08) : alpha('#0a6ed1', 0.04),
+                    bgcolor: darkMode ? alpha('#4d9eff', 0.08) : alpha('#00357a', 0.04),
                   },
                 },
                 '& .MuiDataGrid-footerContainer': {

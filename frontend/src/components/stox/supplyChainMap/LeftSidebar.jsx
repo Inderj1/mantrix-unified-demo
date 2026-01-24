@@ -133,7 +133,7 @@ export default function LeftSidebar({
           <Box sx={{ mb: 3 }}>
             <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
               <WarningAmberIcon sx={{ fontSize: 14, color: '#d97706' }} />
-              <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: '#0078d4', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: '#00357a', textTransform: 'uppercase', letterSpacing: 0.5 }}>
                 Critical Alerts ({criticalAlerts.length})
               </Typography>
             </Stack>
@@ -207,7 +207,7 @@ export default function LeftSidebar({
           >
             <Stack direction="row" alignItems="center" spacing={1}>
               <BoltIcon sx={{ fontSize: 14, color: '#0284c7' }} />
-              <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: '#0078d4', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: '#00357a', textTransform: 'uppercase', letterSpacing: 0.5 }}>
                 AI Actions ({pendingActions.length})
               </Typography>
             </Stack>
@@ -330,7 +330,7 @@ function HealthMetric({ label, value, color }) {
   return (
     <Box>
       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.5 }}>
-        <Typography sx={{ fontSize: '0.75rem', fontWeight: 500, color: '#0078d4' }}>{label}</Typography>
+        <Typography sx={{ fontSize: '0.75rem', fontWeight: 500, color: '#00357a' }}>{label}</Typography>
         <Chip
           label={`${value}%`}
           size="small"

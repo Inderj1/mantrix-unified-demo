@@ -25,23 +25,8 @@ import {
   Sensors as SensorsIcon,
 } from '@mui/icons-material';
 
-// Single consistent blue for all modules
-const MODULE_COLOR = '#0078d4';
-
-const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
-  secondary: darkMode ? '#2d8ce6' : '#0854a0',
-  success: darkMode ? '#36d068' : '#10b981',
-  warning: darkMode ? '#f59e0b' : '#f59e0b',
-  error: darkMode ? '#ff6b6b' : '#ef4444',
-  text: darkMode ? '#e6edf3' : '#1e293b',
-  textSecondary: darkMode ? '#8b949e' : '#64748b',
-  grey: darkMode ? '#8b949e' : '#64748b',
-  background: darkMode ? '#0d1117' : '#f8fbfd',
-  paper: darkMode ? '#161b22' : '#ffffff',
-  cardBg: darkMode ? '#21262d' : '#ffffff',
-  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
-});
+// Import centralized brand colors
+import { MODULE_COLOR, getColors } from '../config/brandColors';
 
 const aiModules = [
   {
@@ -137,17 +122,9 @@ const CoreAILanding = ({ onTileClick, darkMode = false }) => {
       <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.1)', bgcolor: colors.paper }}>
         {/* System Identity Badge */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Box sx={{
-            width: 4,
-            height: 60,
-            bgcolor: MODULE_COLOR,
-            borderRadius: 2
-          }} />
+          <SpeedIcon sx={{ fontSize: 40, color: MODULE_COLOR }} />
           <Box>
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
-              <Avatar sx={{ width: 32, height: 32, bgcolor: MODULE_COLOR }}>
-                <SpeedIcon sx={{ fontSize: 18 }} />
-              </Avatar>
               <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.5px', color: colors.text }}>
                 CORE.AI
               </Typography>

@@ -206,7 +206,7 @@ const ComparisonModal = ({ open, onClose, intentId, onSelect }) => {
       <DialogTitle sx={{ borderBottom: '1px solid', borderColor: 'divider', pb: 2 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Stack direction="row" alignItems="center" spacing={1.5}>
-            <CompareIcon sx={{ color: '#0854a0', fontSize: 28 }} />
+            <CompareIcon sx={{ color: '#002352', fontSize: 28 }} />
             <Box>
               <Typography variant="h6" fontWeight={600}>Material Comparison</Typography>
               <Typography variant="caption" color="text.secondary">
@@ -268,7 +268,7 @@ const ComparisonModal = ({ open, onClose, intentId, onSelect }) => {
                                 icon={<SpeedIcon sx={{ fontSize: 12 }} />}
                                 label="LEAD TIME REC"
                                 size="small"
-                                sx={{ bgcolor: '#0854a0', color: 'white', fontWeight: 600, fontSize: '0.55rem', height: 20 }}
+                                sx={{ bgcolor: '#002352', color: 'white', fontWeight: 600, fontSize: '0.55rem', height: 20 }}
                               />
                             )}
                           </Stack>
@@ -333,10 +333,10 @@ const ComparisonModal = ({ open, onClose, intentId, onSelect }) => {
             </Card>
 
             {/* Trade-off Analysis */}
-            <Card variant="outlined" sx={{ bgcolor: alpha('#0854a0', 0.03) }}>
+            <Card variant="outlined" sx={{ bgcolor: alpha('#002352', 0.03) }}>
               <CardContent>
                 <Stack direction="row" alignItems="flex-start" spacing={1} sx={{ mb: 2 }}>
-                  <LightbulbIcon sx={{ color: '#0854a0', fontSize: 20, mt: 0.5 }} />
+                  <LightbulbIcon sx={{ color: '#002352', fontSize: 20, mt: 0.5 }} />
                   <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
                     Trade-off Analysis
                   </Typography>
@@ -384,7 +384,7 @@ const ComparisonModal = ({ open, onClose, intentId, onSelect }) => {
                   onClick={() => onSelect && onSelect(mat)}
                   sx={{
                     minWidth: 180,
-                    bgcolor: mat.is_margin_rec && viewMode === 'margin' ? '#10b981' : mat.is_leadtime_rec && viewMode === 'leadtime' ? '#0854a0' : undefined,
+                    bgcolor: mat.is_margin_rec && viewMode === 'margin' ? '#10b981' : mat.is_leadtime_rec && viewMode === 'leadtime' ? '#002352' : undefined,
                     '&:hover': {
                       bgcolor: mat.is_margin_rec && viewMode === 'margin' ? '#059669' : mat.is_leadtime_rec && viewMode === 'leadtime' ? '#1565c0' : undefined,
                     }

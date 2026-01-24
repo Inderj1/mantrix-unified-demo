@@ -23,7 +23,7 @@ import { getSeverityLevel } from './CategoryIcons';
 
 // Dark mode color helper
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -213,12 +213,12 @@ const MarketCategoryDetail = ({
           <Grid item xs={12} sm={6} md={3}>
             <Card sx={{
               height: '100%',
-              bgcolor: darkMode ? colors.cardBg : '#e3f2fd',
+              bgcolor: darkMode ? colors.cardBg : '#f0f4f8',
               border: `1px solid ${colors.border}`
             }}>
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                  <PeopleIcon sx={{ fontSize: 20, color: '#2196f3' }} />
+                  <PeopleIcon sx={{ fontSize: 20, color: '#00357a' }} />
                   <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                     Affected Partners
                   </Typography>

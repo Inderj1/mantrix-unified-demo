@@ -11,12 +11,12 @@ export const o2cTheme = {
   colors: {
     // Primary blues - O2C.AI specific
     blue: {
-      50: '#e3f2fd',
+      50: '#f0f4f8',
       100: '#bbdefb',
       200: '#90caf9',
       300: '#64b5f6',
       400: '#42a5f5',
-      500: '#2196f3',
+      500: '#00357a',
       600: '#1e88e5',
       700: '#1976d2',
       800: '#1565c0',
@@ -25,7 +25,7 @@ export const o2cTheme = {
     // Primary accent - SAP-like blue
     primary: {
       light: '#42a5f5',
-      main: '#0854a0',
+      main: '#002352',
       dark: '#074080',
     },
     // Secondary accent
@@ -73,7 +73,7 @@ export const o2cTheme = {
   // DataGrid Styles
   dataGrid: {
     header: {
-      backgroundColor: '#e3f2fd',
+      backgroundColor: '#f0f4f8',
       color: '#0d47a1',
       fontSize: '0.85rem',
       fontWeight: 700,
@@ -97,10 +97,10 @@ export const o2cTheme = {
   chips: {
     // ID/Primary chips
     primary: {
-      bgcolor: alpha('#0854a0', 0.12),
-      color: '#0854a0',
+      bgcolor: alpha('#002352', 0.12),
+      color: '#002352',
       border: '1px solid',
-      borderColor: alpha('#0854a0', 0.2),
+      borderColor: alpha('#002352', 0.2),
       fontWeight: 700,
     },
     // Status chips
@@ -177,8 +177,8 @@ export const o2cTheme = {
       border: `1px solid ${alpha('#1565c0', 0.2)}`,
     },
     info: {
-      bgcolor: alpha('#0854a0', 0.05),
-      border: `1px solid ${alpha('#0854a0', 0.15)}`,
+      bgcolor: alpha('#002352', 0.05),
+      border: `1px solid ${alpha('#002352', 0.15)}`,
     },
     success: {
       bgcolor: alpha('#10b981', 0.08),
@@ -195,7 +195,7 @@ export const o2cTheme = {
   },
 
   // Header gradient
-  headerGradient: 'linear-gradient(135deg, #0854a0 0%, #1976d2 100%)',
+  headerGradient: 'linear-gradient(135deg, #002352 0%, #1976d2 100%)',
   bannerGradient: 'linear-gradient(135deg, rgba(8, 84, 160, 0.08) 0%, rgba(25, 118, 210, 0.08) 100%)',
 
   // Helper function to get DataGrid sx props
@@ -208,7 +208,7 @@ export const o2cTheme = {
         color: darkMode ? '#e6edf3' : undefined,
       },
       '& .MuiDataGrid-columnHeaders': {
-        backgroundColor: darkMode ? '#21262d' : '#e3f2fd',
+        backgroundColor: darkMode ? '#21262d' : '#f0f4f8',
         color: darkMode ? '#e6edf3' : '#0d47a1',
         fontSize: '0.85rem',
         fontWeight: 700,

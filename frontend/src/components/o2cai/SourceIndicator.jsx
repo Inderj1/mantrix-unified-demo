@@ -26,7 +26,7 @@ const SourceIndicator = ({ source, sapTable, size = 'small' }) => {
   const config = {
     [DATA_SOURCES.SAP_SD]: {
       icon: <StorageIcon sx={{ fontSize: size === 'small' ? 10 : 12 }} />,
-      color: '#0854a0',
+      color: '#002352',
       label: `SAP SD${sapTable ? ` (${sapTable})` : ''}`
     },
     [DATA_SOURCES.SAP_MASTER]: {

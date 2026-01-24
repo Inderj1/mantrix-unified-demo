@@ -24,18 +24,8 @@ import ExcelAIProcessor from './ExcelAIProcessor';
 import PDFParserStudio from './PDFParserStudio';
 import { apiService } from '../services/api';
 
-// Single consistent blue for all modules
-const MODULE_COLOR = '#0078d4';
-
-const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
-  text: darkMode ? '#e6edf3' : '#1e293b',
-  textSecondary: darkMode ? '#8b949e' : '#64748b',
-  background: darkMode ? '#0d1117' : '#f8fbfd',
-  paper: darkMode ? '#161b22' : '#ffffff',
-  cardBg: darkMode ? '#21262d' : '#ffffff',
-  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
-});
+// Import centralized brand colors
+import { MODULE_COLOR, getColors } from '../config/brandColors';
 
 const DocumentIntelligenceLanding = ({ onBack, darkMode = false }) => {
   const primaryBlue = MODULE_COLOR;
@@ -134,20 +124,7 @@ const DocumentIntelligenceLanding = ({ onBack, darkMode = false }) => {
       >
         <Box sx={{ maxWidth: 1400, mx: 'auto', px: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            {/* Icon in rounded square */}
-            <Box
-              sx={{
-                width: 56,
-                height: 56,
-                borderRadius: 2,
-                bgcolor: alpha(primaryBlue, 0.1),
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <HubIcon sx={{ fontSize: 28, color: primaryBlue }} />
-            </Box>
+            <HubIcon sx={{ fontSize: 40, color: primaryBlue }} />
             <Box>
               <Typography variant="h5" fontWeight={600} sx={{ color: colors.text }}>
                 Document Intelligence

@@ -68,7 +68,7 @@ import DataSourceChip from './DataSourceChip';
 import { getTileDataConfig } from './stoxDataConfig';
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -546,7 +546,7 @@ const ScenarioPlanner = ({ onBack, darkMode = false }) => {
           <Grid container spacing={2}>
             {/* Total POS */}
             <Grid item xs={12} sm={6} md={3}>
-              <Card sx={{ borderLeft: '4px solid #2196f3', bgcolor: colors.cardBg, borderColor: colors.border }}>
+              <Card sx={{ borderLeft: '4px solid #00357a', bgcolor: colors.cardBg, borderColor: colors.border }}>
                 <CardContent>
                   <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                     <Box>

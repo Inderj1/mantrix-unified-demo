@@ -70,7 +70,7 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack, darkMode 
   const [configDialog, setConfigDialog] = useState(false);
 
   const getColors = (darkMode) => ({
-    primary: darkMode ? '#4da6ff' : '#0a6ed1',
+    primary: darkMode ? '#4d9eff' : '#00357a',
     text: darkMode ? '#e6edf3' : '#1e293b',
     textSecondary: darkMode ? '#8b949e' : '#64748b',
     background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -364,7 +364,7 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack, darkMode 
         const CategoryIcon = categoryInfo[params.value]?.icon || SettingsIcon;
         return (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <CategoryIcon sx={{ fontSize: 16, color: '#0a6ed1' }} />
+            <CategoryIcon sx={{ fontSize: 16, color: '#00357a' }} />
             <Typography variant="body2">{categoryInfo[params.value]?.name || params.value || 'General'}</Typography>
           </Box>
         );
@@ -448,7 +448,7 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, onBack, darkMode 
 
   // Additional theme colors
   const themeColors = {
-    secondary: darkMode ? '#0854a0' : '#0854a0',
+    secondary: darkMode ? '#002352' : '#002352',
     dark: darkMode ? '#d1d9e0' : '#354a5f',
     slate: darkMode ? '#cbd5e0' : '#475569',
     grey: darkMode ? '#8b949e' : '#64748b',

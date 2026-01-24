@@ -136,8 +136,8 @@ export default function ActionAccountabilityTab() {
           size="small"
           sx={{
             fontWeight: 600,
-            bgcolor: params.value.includes('COGS') ? alpha('#ef4444', 0.12) : params.value.includes('Revenue') ? alpha('#10b981', 0.12) : alpha('#2b88d8', 0.12),
-            color: params.value.includes('COGS') ? '#dc2626' : params.value.includes('Revenue') ? '#059669' : '#106ebe',
+            bgcolor: params.value.includes('COGS') ? alpha('#ef4444', 0.12) : params.value.includes('Revenue') ? alpha('#10b981', 0.12) : alpha('#1a5a9e', 0.12),
+            color: params.value.includes('COGS') ? '#dc2626' : params.value.includes('Revenue') ? '#059669' : '#1a5a9e',
           }}
         />
       ),
@@ -201,7 +201,7 @@ export default function ActionAccountabilityTab() {
           'on-track': { label: 'On Track', color: '#059669', bg: alpha('#10b981', 0.12) },
           'at-risk': { label: 'At Risk', color: '#d97706', bg: alpha('#f59e0b', 0.12) },
           'delayed': { label: 'Delayed', color: '#dc2626', bg: alpha('#ef4444', 0.12) },
-          'completed': { label: 'Completed', color: '#106ebe', bg: alpha('#2b88d8', 0.12) },
+          'completed': { label: 'Completed', color: '#1a5a9e', bg: alpha('#1a5a9e', 0.12) },
         };
         const config = statusConfig[params.value];
         return (
@@ -284,7 +284,7 @@ export default function ActionAccountabilityTab() {
   const renderDetailView = () => {
     if (!selectedRow) return null;
 
-    const statusColor = selectedRow.status === 'on-track' ? '#10b981' : selectedRow.status === 'at-risk' ? '#f59e0b' : selectedRow.status === 'completed' ? '#2b88d8' : '#ef4444';
+    const statusColor = selectedRow.status === 'on-track' ? '#10b981' : selectedRow.status === 'at-risk' ? '#f59e0b' : selectedRow.status === 'completed' ? '#1a5a9e' : '#ef4444';
 
     return (
       <Box sx={{ flex: 1, overflow: 'auto' }}>
@@ -309,7 +309,7 @@ export default function ActionAccountabilityTab() {
         {/* Key Metrics */}
         <Grid container spacing={2} sx={{ mb: 3 }}>
           {[
-            { label: 'Target Impact', value: `$${selectedRow.targetImpact.toFixed(1)}M`, color: '#2b88d8', icon: <FlagIcon /> },
+            { label: 'Target Impact', value: `$${selectedRow.targetImpact.toFixed(1)}M`, color: '#1a5a9e', icon: <FlagIcon /> },
             { label: 'Realized', value: `$${selectedRow.currentImpact.toFixed(1)}M`, color: '#10b981', icon: <MoneyIcon /> },
             { label: 'Progress', value: `${selectedRow.progress}%`, color: statusColor, icon: <PlayArrowIcon /> },
             { label: 'Timeline', value: selectedRow.timeline, color: '#8b5cf6', icon: <ScheduleIcon /> },
@@ -369,7 +369,7 @@ export default function ActionAccountabilityTab() {
                       {milestone.status === 'completed' ? (
                         <CheckCircleIcon sx={{ fontSize: 20, color: '#10b981' }} />
                       ) : milestone.status === 'in-progress' ? (
-                        <PlayArrowIcon sx={{ fontSize: 20, color: '#2b88d8' }} />
+                        <PlayArrowIcon sx={{ fontSize: 20, color: '#1a5a9e' }} />
                       ) : (
                         <Box sx={{ width: 20, height: 20, borderRadius: '50%', border: '2px solid', borderColor: '#cbd5e1' }} />
                       )}
@@ -429,7 +429,7 @@ export default function ActionAccountabilityTab() {
               <Card sx={{ background: 'linear-gradient(135deg, #eff6ff 0%, #ffffff 100%)' }}>
                 <CardContent sx={{ py: 2 }}>
                   <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>Target Impact</Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 700, color: '#106ebe' }}>${kpis?.totalTarget.toFixed(1)}M</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a5a9e' }}>${kpis?.totalTarget.toFixed(1)}M</Typography>
                 </CardContent>
               </Card>
             </Grid>

@@ -115,15 +115,15 @@ import { apiService } from '../services/api';
 
 // Theme colors
 const COLORS = {
-  primary: '#2b88d8',
+  primary: '#1a5a9e',
   secondary: '#dc004e',
   success: '#4caf50',
   warning: '#ff9800',
   error: '#f44336',
-  info: '#2196f3',
+  info: '#00357a',
   revenue: '#4caf50',
   segmentColors: {
-    'Champions': '#2b88d8',
+    'Champions': '#1a5a9e',
     'Loyal Customers': '#2e7d32',
     'Potential Loyalists': '#0288d1',
     'New Customers': '#7b1fa2',
@@ -141,7 +141,7 @@ const chartColors = COLORS;
 
 // Dark mode color helper
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -1497,7 +1497,7 @@ const CoreAIDashboard = ({ darkMode = false }) => {
             scrollButtons="auto"
             sx={{
               '& .MuiTabs-indicator': {
-                backgroundColor: '#2b88d8',
+                backgroundColor: '#1a5a9e',
                 height: 3
               },
               '& .MuiTab-root': {

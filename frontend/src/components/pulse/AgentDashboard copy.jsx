@@ -469,7 +469,7 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, darkMode = false 
         const CategoryIcon = categoryInfo[params.value]?.icon || SettingsIcon;
         return (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <CategoryIcon sx={{ fontSize: 16, color: '#0a6ed1' }} />
+            <CategoryIcon sx={{ fontSize: 16, color: '#00357a' }} />
             <Typography variant="body2">{categoryInfo[params.value]?.name || params.value || 'General'}</Typography>
           </Box>
         );
@@ -553,8 +553,8 @@ const AgentDashboard = ({ userId = 'demo_user', onCreateAgent, darkMode = false 
 
   // Blue/grey color palette
   const colors = {
-    primary: '#0a6ed1',
-    secondary: '#0854a0',
+    primary: '#00357a',
+    secondary: '#002352',
     dark: '#354a5f',
     slate: '#475569',
     grey: '#64748b',

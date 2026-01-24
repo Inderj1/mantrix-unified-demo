@@ -540,7 +540,7 @@ const ForecastAIDashboard = ({ onBack }) => {
                 sx={{ 
                   '& .MuiOutlinedInput-notchedOutline': { borderColor: '#e5e7eb' },
                   '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#d1d5db' },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#2b88d8' }
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#1a5a9e' }
                 }}
               >
                 <MenuItem value="month">Monthly</MenuItem>

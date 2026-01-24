@@ -50,8 +50,8 @@ import {
 import { kitMonitoringAgents, reveqCategoryInfo } from './kitAgentsMockData';
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
-  secondary: darkMode ? '#2d8ce6' : '#0854a0',
+  primary: darkMode ? '#4d9eff' : '#00357a',
+  secondary: darkMode ? '#2d8ce6' : '#002352',
   success: darkMode ? '#36d068' : '#10b981',
   warning: darkMode ? '#f59e0b' : '#f59e0b',
   error: darkMode ? '#ff6b6b' : '#ef4444',
@@ -274,7 +274,7 @@ const AgentsManagementView = ({ userId = 'persona', onBack, onCreateAgent, darkM
         const CategoryIcon = categoryInfo[params.value]?.icon || SettingsIcon;
         return (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <CategoryIcon sx={{ fontSize: 16, color: '#0a6ed1' }} />
+            <CategoryIcon sx={{ fontSize: 16, color: '#00357a' }} />
             <Typography variant="body2">{categoryInfo[params.value]?.name || params.value || 'General'}</Typography>
           </Box>
         );

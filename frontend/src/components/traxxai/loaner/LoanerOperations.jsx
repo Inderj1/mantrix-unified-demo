@@ -110,7 +110,7 @@ const LoanerOperations = ({ onBack }) => {
       headerName: 'Kit ID',
       width: 110,
       renderCell: (params) => (
-        <Chip label={params.value} size="small" sx={{ fontWeight: 700, bgcolor: alpha('#0a6ed1', 0.1), color: '#0a6ed1' }} />
+        <Chip label={params.value} size="small" sx={{ fontWeight: 700, bgcolor: alpha('#00357a', 0.1), color: '#00357a' }} />
       ),
     },
     { field: 'kit_name', headerName: 'Kit Name', width: 150 },
@@ -160,7 +160,7 @@ const LoanerOperations = ({ onBack }) => {
             Back to List
           </Button>
           <Stack direction="row" spacing={1}>
-            <Chip label={selectedRow.kit_id} size="small" sx={{ fontWeight: 700, bgcolor: alpha('#0a6ed1', 0.1), color: '#0a6ed1' }} />
+            <Chip label={selectedRow.kit_id} size="small" sx={{ fontWeight: 700, bgcolor: alpha('#00357a', 0.1), color: '#00357a' }} />
             <Chip label={selectedRow.qc_status} size="small" sx={{ fontWeight: 600, bgcolor: getStatusColor(selectedRow.qc_status).bg, color: getStatusColor(selectedRow.qc_status).color }} />
           </Stack>
         </Stack>
@@ -172,7 +172,7 @@ const LoanerOperations = ({ onBack }) => {
         {/* Key Metrics */}
         <Grid container spacing={2} sx={{ mb: 3 }}>
           {[
-            { label: 'Items Used', value: selectedRow.items_used, color: '#0a6ed1', icon: <Assignment /> },
+            { label: 'Items Used', value: selectedRow.items_used, color: '#00357a', icon: <Assignment /> },
             { label: 'Surgeon', value: selectedRow.surgeon, color: '#8b5cf6', icon: <LocalHospital /> },
             { label: 'Duration', value: selectedRow.procedure_duration, color: '#f59e0b', icon: <Schedule /> },
             { label: 'Kit Health', value: `${selectedRow.kit_health_score}%`, color: healthColor, icon: <Verified /> },
@@ -208,7 +208,7 @@ const LoanerOperations = ({ onBack }) => {
                           <Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>{item.item_code}</Typography>
                           <Typography sx={{ fontSize: '0.7rem', color: '#64748b' }}>{item.description}</Typography>
                         </Box>
-                        <Chip label={`Qty: ${item.quantity_used}`} size="small" sx={{ fontWeight: 600, bgcolor: alpha('#0a6ed1', 0.1), color: '#0a6ed1' }} />
+                        <Chip label={`Qty: ${item.quantity_used}`} size="small" sx={{ fontWeight: 600, bgcolor: alpha('#00357a', 0.1), color: '#00357a' }} />
                       </Box>
                       <Typography sx={{ fontSize: '0.65rem', color: '#64748b', mt: 0.5 }}>Lot: {item.lot_number}</Typography>
                     </Box>
@@ -285,8 +285,8 @@ const LoanerOperations = ({ onBack }) => {
                       labels: selectedRow.usageHistory?.map(h => h.month) || ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                       datasets: [{
                         data: selectedRow.usageHistory?.map(h => h.procedures) || [8, 12, 10, 15, 11, 14],
-                        backgroundColor: alpha('#0a6ed1', 0.6),
-                        borderColor: '#0a6ed1',
+                        backgroundColor: alpha('#00357a', 0.6),
+                        borderColor: '#00357a',
                         borderWidth: 1,
                         borderRadius: 4,
                       }],
@@ -342,7 +342,7 @@ const LoanerOperations = ({ onBack }) => {
         {!selectedRow && (
           <>
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-              <OperationsIcon sx={{ fontSize: 32, color: '#0a6ed1' }} />
+              <OperationsIcon sx={{ fontSize: 32, color: '#00357a' }} />
               <Typography variant="h4" fontWeight={700}>Operations</Typography>
             </Stack>
             <Typography variant="body2" color="text.secondary">
@@ -360,7 +360,7 @@ const LoanerOperations = ({ onBack }) => {
           {metrics && (
             <Grid container spacing={2} sx={{ mb: 3 }}>
               {[
-                { label: 'Kits in Use', value: metrics.kitsInUse, color: '#0a6ed1', icon: <OperationsIcon /> },
+                { label: 'Kits in Use', value: metrics.kitsInUse, color: '#00357a', icon: <OperationsIcon /> },
                 { label: 'Pending Returns', value: metrics.pendingReturns, color: '#f59e0b', icon: <Schedule /> },
                 { label: 'In QC', value: metrics.inQC, color: '#8b5cf6', icon: <Verified /> },
                 { label: 'Ready for Restock', value: metrics.readyForRestock, color: '#10b981', icon: <Inventory /> },
@@ -395,7 +395,7 @@ const LoanerOperations = ({ onBack }) => {
               sx={{
                 flex: 1,
                 '& .MuiDataGrid-row': { cursor: 'pointer' },
-                '& .MuiDataGrid-row:hover': { bgcolor: alpha('#0a6ed1', 0.04) },
+                '& .MuiDataGrid-row:hover': { bgcolor: alpha('#00357a', 0.04) },
               }}
             />
           </Paper>

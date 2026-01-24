@@ -189,7 +189,7 @@ export default function SupplyChainMap({ onBack }) {
     return (
       <Box sx={{ width: '100%', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#f8fafc' }}>
         <Stack alignItems="center" spacing={2}>
-          <CircularProgress size={40} sx={{ color: '#2b88d8' }} />
+          <CircularProgress size={40} sx={{ color: '#1a5a9e' }} />
           <Typography sx={{ color: '#64748b', fontSize: '0.9rem' }}>Loading Supply Chain Map...</Typography>
         </Stack>
       </Box>
@@ -464,13 +464,13 @@ function FilterToggle({ icon, label, active, onClick }) {
         height: 32,
         fontSize: '0.75rem',
         fontWeight: 600,
-        bgcolor: active ? alpha('#2b88d8', 0.15) : alpha('#64748b', 0.08),
-        color: active ? '#0078d4' : '#64748b',
+        bgcolor: active ? alpha('#1a5a9e', 0.15) : alpha('#64748b', 0.08),
+        color: active ? '#00357a' : '#64748b',
         border: '1px solid',
-        borderColor: active ? alpha('#2b88d8', 0.3) : 'transparent',
+        borderColor: active ? alpha('#1a5a9e', 0.3) : 'transparent',
         borderRadius: 2,
         cursor: 'pointer',
-        '&:hover': { bgcolor: active ? alpha('#2b88d8', 0.2) : alpha('#64748b', 0.12) },
+        '&:hover': { bgcolor: active ? alpha('#1a5a9e', 0.2) : alpha('#64748b', 0.12) },
         '& .MuiChip-icon': { color: 'inherit', ml: 1 },
         '& .MuiChip-label': { px: 1.5 },
       }}

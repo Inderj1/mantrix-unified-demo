@@ -153,7 +153,7 @@ const getDisplayQuantity = (quantityM2, unit) => {
 
 // Theme colors from ordlyTheme
 const COLORS = {
-  primary: '#0854a0',
+  primary: '#002352',
   secondary: '#1976d2',
   emerald: '#34d399',
   emeraldDark: '#059669',

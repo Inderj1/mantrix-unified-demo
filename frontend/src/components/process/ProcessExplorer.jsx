@@ -82,9 +82,9 @@ const ProcessExplorer = ({ processModel, bottlenecks = [], summary = {} }) => {
           ),
         },
         style: {
-          background: isStart ? '#e8f5e9' : isEnd ? '#e3f2fd' : '#ffffff',
+          background: isStart ? '#e8f5e9' : isEnd ? '#f0f4f8' : '#ffffff',
           border: isStart || isEnd ? '2px solid' : '1px solid #ccc',
-          borderColor: isStart ? '#4caf50' : isEnd ? '#2196f3' : '#ccc',
+          borderColor: isStart ? '#4caf50' : isEnd ? '#00357a' : '#ccc',
           borderRadius: 8,
           padding: 10,
           minWidth: 180,
@@ -212,7 +212,7 @@ const ProcessExplorer = ({ processModel, bottlenecks = [], summary = {} }) => {
               <Typography variant="caption">Start Activity</Typography>
             </Stack>
             <Stack direction="row" spacing={1} alignItems="center">
-              <Box sx={{ width: 12, height: 12, bgcolor: '#e3f2fd', border: '2px solid #2196f3', borderRadius: 1 }} />
+              <Box sx={{ width: 12, height: 12, bgcolor: '#f0f4f8', border: '2px solid #00357a', borderRadius: 1 }} />
               <Typography variant="caption">End Activity</Typography>
             </Stack>
             <Stack direction="row" spacing={1} alignItems="center">

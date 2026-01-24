@@ -621,12 +621,12 @@ const CreateTemplateModal = ({ open, onClose, onSuccess, darkMode = false }) => 
             p: 2,
             mb: 3,
             borderStyle: 'dashed',
-            borderColor: alpha('#0854a0', 0.4),
-            bgcolor: alpha('#0854a0', 0.02),
+            borderColor: alpha('#002352', 0.4),
+            bgcolor: alpha('#002352', 0.02),
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <CloudUploadIcon sx={{ fontSize: 40, color: '#0854a0' }} />
+            <CloudUploadIcon sx={{ fontSize: 40, color: '#002352' }} />
             <Box flex={1}>
               <Typography variant="subtitle1" fontWeight={600}>
                 Import Sample PDF (Optional)
@@ -648,7 +648,7 @@ const CreateTemplateModal = ({ open, onClose, onSuccess, darkMode = false }) => 
               onClick={() => fileInputRef.current?.click()}
               disabled={isAnalyzing}
               sx={{
-                background: 'linear-gradient(135deg, #0854a0 0%, #0a6ed1 100%)',
+                background: 'linear-gradient(135deg, #002352 0%, #00357a 100%)',
               }}
             >
               {isAnalyzing ? 'Analyzing...' : 'Upload PDF'}
@@ -690,7 +690,7 @@ const CreateTemplateModal = ({ open, onClose, onSuccess, darkMode = false }) => 
         {activeTab === 0 && (
           <Box>
             {/* Basic Information */}
-            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2, color: '#0854a0' }}>
+            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2, color: '#002352' }}>
               Template Information
             </Typography>
 
@@ -750,7 +750,7 @@ const CreateTemplateModal = ({ open, onClose, onSuccess, darkMode = false }) => 
 
             {/* Header Fields Selection */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="subtitle2" fontWeight={600} sx={{ color: '#0854a0' }}>
+              <Typography variant="subtitle2" fontWeight={600} sx={{ color: '#002352' }}>
                 Header Fields ({totalSelectedColumns} selected)
               </Typography>
               {detectedFields.length > 0 && (
@@ -795,11 +795,11 @@ const CreateTemplateModal = ({ open, onClose, onSuccess, darkMode = false }) => 
                           sx={{
                             p: 1,
                             cursor: 'pointer',
-                            borderColor: selectedColumns[field.key] ? '#0854a0' : 'divider',
-                            bgcolor: selectedColumns[field.key] ? alpha('#0854a0', 0.05) : 'transparent',
+                            borderColor: selectedColumns[field.key] ? '#002352' : 'divider',
+                            bgcolor: selectedColumns[field.key] ? alpha('#002352', 0.05) : 'transparent',
                             '&:hover': {
-                              borderColor: '#0854a0',
-                              bgcolor: alpha('#0854a0', 0.02),
+                              borderColor: '#002352',
+                              bgcolor: alpha('#002352', 0.02),
                             },
                           }}
                           onClick={() => !field.required && toggleColumn(field.key)}
@@ -831,7 +831,7 @@ const CreateTemplateModal = ({ open, onClose, onSuccess, darkMode = false }) => 
             <Divider sx={{ my: 3 }} />
 
             {/* Line Item Fields */}
-            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2, color: '#0854a0' }}>
+            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2, color: '#002352' }}>
               Line Item Fields ({totalSelectedLineItems} selected)
             </Typography>
 
@@ -1162,9 +1162,9 @@ const CreateTemplateModal = ({ open, onClose, onSuccess, darkMode = false }) => 
           disabled={!templateName.trim() || !templateKey.trim() || isSaving}
           startIcon={isSaving ? <CircularProgress size={16} color="inherit" /> : <AddIcon />}
           sx={{
-            background: 'linear-gradient(135deg, #0854a0 0%, #0a6ed1 100%)',
+            background: 'linear-gradient(135deg, #002352 0%, #00357a 100%)',
             '&:hover': {
-              background: 'linear-gradient(135deg, #0a6ed1 0%, #1d4ed8 100%)',
+              background: 'linear-gradient(135deg, #00357a 0%, #1d4ed8 100%)',
             },
           }}
         >

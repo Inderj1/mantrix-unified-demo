@@ -345,7 +345,7 @@ const EditTemplateModal = ({ open, onClose, onSuccess, templateId, darkMode = fa
             {activeTab === 0 && (
               <Box>
                 {/* Template Information */}
-                <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2, color: '#0854a0' }}>
+                <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2, color: '#002352' }}>
                   Template Information
                 </Typography>
 
@@ -434,7 +434,7 @@ const EditTemplateModal = ({ open, onClose, onSuccess, templateId, darkMode = fa
 
                 {/* Column Definitions */}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                  <Typography variant="subtitle2" fontWeight={600} sx={{ color: '#0854a0' }}>
+                  <Typography variant="subtitle2" fontWeight={600} sx={{ color: '#002352' }}>
                     Column Definitions ({columns.length})
                   </Typography>
                   <Button
@@ -442,7 +442,7 @@ const EditTemplateModal = ({ open, onClose, onSuccess, templateId, darkMode = fa
                     variant="outlined"
                     startIcon={<AddIcon />}
                     onClick={addColumn}
-                    sx={{ borderColor: alpha('#0854a0', 0.3), color: '#0854a0' }}
+                    sx={{ borderColor: alpha('#002352', 0.3), color: '#002352' }}
                   >
                     Add Column
                   </Button>
@@ -455,7 +455,7 @@ const EditTemplateModal = ({ open, onClose, onSuccess, templateId, darkMode = fa
                       p: 3,
                       textAlign: 'center',
                       borderStyle: 'dashed',
-                      borderColor: alpha('#0854a0', 0.3),
+                      borderColor: alpha('#002352', 0.3),
                     }}
                   >
                     <Typography variant="body2" color="text.secondary">
@@ -561,7 +561,7 @@ const EditTemplateModal = ({ open, onClose, onSuccess, templateId, darkMode = fa
                   <Button
                     variant="outlined"
                     onClick={applyJsonChanges}
-                    sx={{ borderColor: '#0854a0', color: '#0854a0' }}
+                    sx={{ borderColor: '#002352', color: '#002352' }}
                   >
                     Apply JSON Changes
                   </Button>
@@ -581,9 +581,9 @@ const EditTemplateModal = ({ open, onClose, onSuccess, templateId, darkMode = fa
           onClick={saveTemplate}
           disabled={!templateName.trim() || isSaving || loading}
           sx={{
-            background: 'linear-gradient(135deg, #0854a0 0%, #0a6ed1 100%)',
+            background: 'linear-gradient(135deg, #002352 0%, #00357a 100%)',
             '&:hover': {
-              background: 'linear-gradient(135deg, #0a6ed1 0%, #1d4ed8 100%)',
+              background: 'linear-gradient(135deg, #00357a 0%, #1d4ed8 100%)',
             },
           }}
         >

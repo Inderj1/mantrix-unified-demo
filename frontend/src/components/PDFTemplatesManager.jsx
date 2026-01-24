@@ -56,8 +56,8 @@ import {
 import EditTemplateModal from './EditTemplateModal';
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
-  secondary: darkMode ? '#2d8ce6' : '#0854a0',
+  primary: darkMode ? '#4d9eff' : '#00357a',
+  secondary: darkMode ? '#2d8ce6' : '#002352',
   success: darkMode ? '#36d068' : '#10b981',
   warning: darkMode ? '#f59e0b' : '#f59e0b',
   error: darkMode ? '#ff6b6b' : '#ef4444',
@@ -426,7 +426,7 @@ const PDFTemplatesManager = ({ onBack, darkMode = false, embedded = false, onCre
               startIcon={<AddIcon />}
               onClick={onCreateTemplate}
               sx={{
-                background: 'linear-gradient(135deg, #0854a0 0%, #0a6ed1 100%)',
+                background: 'linear-gradient(135deg, #002352 0%, #00357a 100%)',
               }}
             >
               Create Template
@@ -449,9 +449,9 @@ const PDFTemplatesManager = ({ onBack, darkMode = false, embedded = false, onCre
             startIcon={<AddIcon />}
             onClick={onCreateTemplate}
             sx={{
-              background: 'linear-gradient(135deg, #0854a0 0%, #0a6ed1 100%)',
+              background: 'linear-gradient(135deg, #002352 0%, #00357a 100%)',
               '&:hover': {
-                background: 'linear-gradient(135deg, #0a6ed1 0%, #1d4ed8 100%)',
+                background: 'linear-gradient(135deg, #00357a 0%, #1d4ed8 100%)',
               },
             }}
           >

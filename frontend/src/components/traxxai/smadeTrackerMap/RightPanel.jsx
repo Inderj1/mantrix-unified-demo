@@ -33,7 +33,7 @@ export default function RightPanel({ agents = [], actionsToday = 0, costSavedWee
       {/* Header */}
       <Box sx={{ p: 1.5, borderBottom: '1px solid', borderColor: alpha('#64748b', 0.1) }}>
         <Stack direction="row" alignItems="center" spacing={1}>
-          <SmartToyIcon sx={{ fontSize: 18, color: '#0a6ed1' }} />
+          <SmartToyIcon sx={{ fontSize: 18, color: '#00357a' }} />
           <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: '#1e293b' }}>AI Autopilot</Typography>
           <Chip
             label="Active"
@@ -54,7 +54,7 @@ export default function RightPanel({ agents = [], actionsToday = 0, costSavedWee
         <Stack spacing={1}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Stack direction="row" alignItems="center" spacing={0.75}>
-              <TrendingUpIcon sx={{ fontSize: 14, color: '#0a6ed1' }} />
+              <TrendingUpIcon sx={{ fontSize: 14, color: '#00357a' }} />
               <Typography sx={{ fontSize: '0.7rem', color: '#64748b' }}>Actions Today</Typography>
             </Stack>
             <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: '#1e293b' }}>{actionsToday}</Typography>
@@ -148,7 +148,7 @@ export default function RightPanel({ agents = [], actionsToday = 0, costSavedWee
       </Box>
 
       {/* Footer */}
-      <Box sx={{ p: 1.5, borderTop: '1px solid', borderColor: alpha('#64748b', 0.1), bgcolor: alpha('#0a6ed1', 0.03) }}>
+      <Box sx={{ p: 1.5, borderTop: '1px solid', borderColor: alpha('#64748b', 0.1), bgcolor: alpha('#00357a', 0.03) }}>
         <Typography sx={{ fontSize: '0.65rem', color: '#64748b', textAlign: 'center' }}>
           Powered by SMADE.IO IoT Platform
         </Typography>

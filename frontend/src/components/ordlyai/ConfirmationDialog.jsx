@@ -31,7 +31,7 @@ const ConfirmationDialog = ({
     text: darkMode ? '#e2e8f0' : '#1e293b',
     textSecondary: darkMode ? '#94a3b8' : '#64748b',
     border: darkMode ? 'rgba(8, 84, 160, 0.3)' : 'rgba(8, 84, 160, 0.15)',
-    primary: '#0854a0',
+    primary: '#002352',
     primaryLight: '#1976d2',
     success: '#059669',
     successBg: darkMode ? 'rgba(16, 185, 129, 0.15)' : 'rgba(16, 185, 129, 0.1)',

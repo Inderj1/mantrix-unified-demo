@@ -59,7 +59,7 @@ import { getTileDataConfig } from './stoxDataConfig';
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, ChartTooltip, Legend, Filler);
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -384,7 +384,7 @@ const WhatIfSimulator = ({ onBack, darkMode = false }) => {
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: '4px solid #0078d4', bgcolor: colors.cardBg, borderColor: colors.border }}>
+            <Card sx={{ borderLeft: '4px solid #00357a', bgcolor: colors.cardBg, borderColor: colors.border }}>
               <CardContent>
                 <Typography variant="caption" color="text.secondary">Simulated SL</Typography>
                 <Typography variant="h5" fontWeight={700}>{selectedScenario.simulatedServiceLevel}%</Typography>
@@ -549,10 +549,10 @@ const WhatIfSimulator = ({ onBack, darkMode = false }) => {
         </Stack>
 
         <Stack direction="row" alignItems="center" spacing={2}>
-          <PlayCircleIcon sx={{ fontSize: 32, color: '#0078d4' }} />
+          <PlayCircleIcon sx={{ fontSize: 32, color: '#00357a' }} />
           <Box>
             <Stack direction="row" alignItems="center" spacing={1.5}>
-              <Typography variant="h5" fontWeight={700} color="#0078d4">
+              <Typography variant="h5" fontWeight={700} color="#00357a">
                 What-If Simulator
               </Typography>
               <DataSourceChip dataType={tileConfig.dataType} />
@@ -572,7 +572,7 @@ const WhatIfSimulator = ({ onBack, darkMode = false }) => {
           {metrics && (
             <Grid container spacing={2} sx={{ mb: 3 }}>
               <Grid item xs={12} sm={6} md={2.4}>
-                <Card sx={{ borderLeft: '4px solid #0078d4', bgcolor: colors.cardBg, borderColor: colors.border }}>
+                <Card sx={{ borderLeft: '4px solid #00357a', bgcolor: colors.cardBg, borderColor: colors.border }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">Total Scenarios</Typography>
                     <Typography variant="h5" fontWeight={700}>{metrics.totalScenarios}</Typography>

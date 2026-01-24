@@ -165,7 +165,7 @@ const generateDocumentData = (docType, count = 15) => {
 };
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -198,7 +198,7 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig, darkMode = false }) =>
       display_name: 'Invoices',
       description: 'AI-extracted invoice data with automatic PO matching',
       icon: InvoiceIcon,
-      color: '#0078d4',
+      color: '#00357a',
     },
     {
       id: 2,
@@ -206,7 +206,7 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig, darkMode = false }) =>
       display_name: 'Receipts',
       description: 'Expense receipt scanning and categorization',
       icon: ReceiptIcon,
-      color: '#106ebe',
+      color: '#1a5a9e',
     },
     {
       id: 3,
@@ -214,7 +214,7 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig, darkMode = false }) =>
       display_name: 'Shipping Documents',
       description: 'Shipping label and tracking document extraction',
       icon: ShippingIcon,
-      color: '#2b88d8',
+      color: '#1a5a9e',
     },
     {
       id: 4,
@@ -222,7 +222,7 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig, darkMode = false }) =>
       display_name: 'Inventory Labels',
       description: 'Barcode, QR code, and label data extraction',
       icon: InventoryIcon,
-      color: '#005a9e',
+      color: '#002352',
     },
   ];
 
@@ -430,7 +430,7 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig, darkMode = false }) =>
         <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <DocumentIcon sx={{ fontSize: 40, color: '#0078d4' }} />
+              <DocumentIcon sx={{ fontSize: 40, color: '#00357a' }} />
               <Box>
                 <Typography variant="h5" fontWeight={600} sx={{ color: colors.text }}>
                   VISION STUDIO
@@ -575,16 +575,16 @@ const DocumentVisionIntelligence = ({ onNavigateToConfig, darkMode = false }) =>
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
                   border: '2px dashed',
-                  borderColor: alpha('#0078d4', 0.3),
+                  borderColor: alpha('#00357a', 0.3),
                   borderRadius: 3,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  bgcolor: alpha('#0078d4', 0.02),
+                  bgcolor: alpha('#00357a', 0.02),
                   '&:hover': {
                     transform: 'translateY(-6px)',
-                    borderColor: '#0078d4',
-                    bgcolor: alpha('#0078d4', 0.05),
+                    borderColor: '#00357a',
+                    bgcolor: alpha('#00357a', 0.05),
                   },
                 }}
                 onClick={handleAddCustomType}

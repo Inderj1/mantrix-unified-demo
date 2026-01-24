@@ -36,8 +36,8 @@ import {
   Speed as SpeedIcon,
 } from '@mui/icons-material';
 
-// Single consistent blue for all modules
-const MODULE_COLOR = '#0078d4';
+// Import centralized brand colors
+import { BRAND, MODULE_COLOR, getColors, BRAND_ALPHA } from '../config/brandColors';
 
 // Main category tiles: Store System and DC System
 const categoryTiles = [
@@ -72,7 +72,7 @@ const storeTiles = [
     color: MODULE_COLOR,
     stats: { label: 'Scenarios', value: '12' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #0078d4 0%, #106ebe 100%)',
+    gradient: `linear-gradient(135deg, ${BRAND.navy.main} 0%, ${BRAND.navy.light} 100%)`,
   },
   {
     id: 'store-forecasting',
@@ -83,7 +83,7 @@ const storeTiles = [
     color: MODULE_COLOR,
     stats: { label: 'Stores', value: '156' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
+    gradient: `linear-gradient(135deg, ${BRAND.navy.light} 0%, ${BRAND.navy.main} 100%)`,
   },
   {
     id: 'store-health-monitor',
@@ -94,7 +94,7 @@ const storeTiles = [
     color: MODULE_COLOR,
     stats: { label: 'SKUs', value: '2.4K' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #0078d4 0%, #106ebe 100%)',
+    gradient: `linear-gradient(135deg, ${BRAND.navy.main} 0%, ${BRAND.navy.light} 100%)`,
   },
   {
     id: 'store-financial-impact',
@@ -105,7 +105,7 @@ const storeTiles = [
     color: MODULE_COLOR,
     stats: { label: 'Savings', value: '$1.2M' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #005a9e 0%, #0078d4 100%)',
+    gradient: `linear-gradient(135deg, ${BRAND.navy.dark} 0%, ${BRAND.navy.main} 100%)`,
   },
   {
     id: 'store-replenishment',
@@ -116,7 +116,7 @@ const storeTiles = [
     color: MODULE_COLOR,
     stats: { label: 'Transfers', value: '89' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
+    gradient: `linear-gradient(135deg, ${BRAND.navy.light} 0%, ${BRAND.navy.main} 100%)`,
   },
 ];
 
@@ -131,7 +131,7 @@ const dcTiles = [
     color: MODULE_COLOR,
     stats: { label: 'Channels', value: '8' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #0078d4 0%, #106ebe 100%)',
+    gradient: `linear-gradient(135deg, ${BRAND.navy.main} 0%, ${BRAND.navy.light} 100%)`,
   },
   {
     id: 'dc-health-monitor',
@@ -142,7 +142,7 @@ const dcTiles = [
     color: MODULE_COLOR,
     stats: { label: 'DCs', value: '4' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #005a9e 0%, #0078d4 100%)',
+    gradient: `linear-gradient(135deg, ${BRAND.navy.dark} 0%, ${BRAND.navy.main} 100%)`,
   },
   {
     id: 'dc-optimization',
@@ -153,7 +153,7 @@ const dcTiles = [
     color: MODULE_COLOR,
     stats: { label: 'Optimized', value: '94%' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
+    gradient: `linear-gradient(135deg, ${BRAND.navy.light} 0%, ${BRAND.navy.main} 100%)`,
   },
   {
     id: 'dc-bom',
@@ -164,7 +164,7 @@ const dcTiles = [
     color: MODULE_COLOR,
     stats: { label: 'BOMs', value: '245' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #0078d4 0%, #106ebe 100%)',
+    gradient: `linear-gradient(135deg, ${BRAND.navy.main} 0%, ${BRAND.navy.light} 100%)`,
   },
   {
     id: 'dc-lot-size',
@@ -175,7 +175,7 @@ const dcTiles = [
     color: MODULE_COLOR,
     stats: { label: 'Savings', value: '12%' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #005a9e 0%, #0078d4 100%)',
+    gradient: `linear-gradient(135deg, ${BRAND.navy.dark} 0%, ${BRAND.navy.main} 100%)`,
   },
   {
     id: 'dc-supplier-exec',
@@ -186,7 +186,7 @@ const dcTiles = [
     color: MODULE_COLOR,
     stats: { label: 'Suppliers', value: '32' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #106ebe 0%, #0078d4 100%)',
+    gradient: `linear-gradient(135deg, ${BRAND.navy.light} 0%, ${BRAND.navy.main} 100%)`,
   },
   {
     id: 'dc-financial-impact',
@@ -197,7 +197,7 @@ const dcTiles = [
     color: MODULE_COLOR,
     stats: { label: 'Savings', value: '$2.8M' },
     status: 'active',
-    gradient: 'linear-gradient(135deg, #0078d4 0%, #005a9e 100%)',
+    gradient: `linear-gradient(135deg, ${BRAND.navy.main} 0%, ${BRAND.navy.dark} 100%)`,
   },
 ];
 
@@ -205,7 +205,7 @@ const StoxRetailLanding = ({ onBack, onTileClick, darkMode = false }) => {
   const [view, setView] = useState('categories'); // 'categories', 'store', or 'dc'
 
   const getColors = (darkMode) => ({
-    primary: darkMode ? '#4da6ff' : '#0a6ed1',
+    primary: darkMode ? '#4d9eff' : '#00357a',
     text: darkMode ? '#e6edf3' : '#1e293b',
     textSecondary: darkMode ? '#8b949e' : '#64748b',
     background: darkMode ? '#0d1117' : '#f8fbfd',

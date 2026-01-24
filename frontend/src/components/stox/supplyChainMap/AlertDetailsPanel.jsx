@@ -15,8 +15,8 @@ export default function AlertDetailsPanel({ alert, onClose }) {
   // Map agent types to AI agent info
   const getAIAgentInfo = (agentId) => {
     const agentMap = {
-      'route-optimizer': { name: 'Route.AI', icon: LocalShippingIcon, specialty: 'Route Optimization', color: '#2b88d8' },
-      'inventory-manager': { name: 'Stox.AI', icon: InventoryIcon, specialty: 'Inventory Management', color: '#0078d4' },
+      'route-optimizer': { name: 'Route.AI', icon: LocalShippingIcon, specialty: 'Route Optimization', color: '#1a5a9e' },
+      'inventory-manager': { name: 'Stox.AI', icon: InventoryIcon, specialty: 'Inventory Management', color: '#00357a' },
       'demand-forecaster': { name: 'Markets.AI', icon: CloudIcon, specialty: 'External Factors - Weather, Tariffs, Events', color: '#06b6d4' },
       'cost-optimizer': { name: 'Cost.AI', icon: TrendingUpIcon, specialty: 'Cost Optimization', color: '#10b981' },
     };
@@ -266,7 +266,7 @@ export default function AlertDetailsPanel({ alert, onClose }) {
                 {alert.suggested_actions.map((action, idx) => (
                   <Stack key={idx} direction="row" spacing={1} alignItems="flex-start">
                     <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: '#0891b2', mt: 0.75 }} />
-                    <Typography sx={{ fontSize: '0.75rem', color: '#0078d4' }}>{action}</Typography>
+                    <Typography sx={{ fontSize: '0.75rem', color: '#00357a' }}>{action}</Typography>
                   </Stack>
                 ))}
               </Stack>
@@ -277,7 +277,7 @@ export default function AlertDetailsPanel({ alert, onClose }) {
           <Box sx={{ bgcolor: '#f8fafc', borderRadius: 1.5, p: 2 }}>
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
               <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#1e293b' }}>Priority Level</Typography>
-              <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: '#0078d4' }}>{alert.priority}/10</Typography>
+              <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: '#00357a' }}>{alert.priority}/10</Typography>
             </Stack>
             <Stack direction="row" spacing={0.5}>
               {[...Array(10)].map((_, i) => (

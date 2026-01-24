@@ -14,7 +14,7 @@ import DataSourceChip from './DataSourceChip';
 import { getTileDataConfig } from './stoxDataConfig';
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -83,8 +83,8 @@ const DCDemandAggregation = ({ onBack, darkMode = false }) => {
           label={params.value}
           size="small"
           sx={{
-            bgcolor: alpha('#0078d4', 0.12),
-            color: '#0078d4',
+            bgcolor: alpha('#00357a', 0.12),
+            color: '#00357a',
             fontWeight: 700,
             fontSize: '0.75rem',
           }}
@@ -147,7 +147,7 @@ const DCDemandAggregation = ({ onBack, darkMode = false }) => {
         <Chip
           label={params.value?.toLocaleString()}
           size="small"
-          sx={{ fontWeight: 700, bgcolor: alpha('#2b88d8', 0.12), color: '#0284c7', border: '1px solid', borderColor: alpha('#0284c7', 0.2) }}
+          sx={{ fontWeight: 700, bgcolor: alpha('#1a5a9e', 0.12), color: '#0284c7', border: '1px solid', borderColor: alpha('#0284c7', 0.2) }}
         />
       ),
     },
@@ -237,24 +237,24 @@ const DCDemandAggregation = ({ onBack, darkMode = false }) => {
       {metrics && (
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2b88d8', 0.1)} 0%, ${alpha('#2b88d8', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#1a5a9e', 0.1)} 0%, ${alpha('#1a5a9e', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <Warehouse sx={{ color: '#2b88d8' }} />
+                  <Warehouse sx={{ color: '#1a5a9e' }} />
                   <Typography variant="body2" sx={{ color: colors.textSecondary }}>Total DCs</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#2b88d8">{metrics.totalDCs}</Typography>
+                <Typography variant="h4" fontWeight={700} color="#1a5a9e">{metrics.totalDCs}</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#106ebe', 0.1)} 0%, ${alpha('#106ebe', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#1a5a9e', 0.1)} 0%, ${alpha('#1a5a9e', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <TrendingUp sx={{ color: '#106ebe' }} />
+                  <TrendingUp sx={{ color: '#1a5a9e' }} />
                   <Typography variant="body2" sx={{ color: colors.textSecondary }}>Total Demand</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#106ebe">{(metrics.totalDemand / 1000).toFixed(1)}K</Typography>
+                <Typography variant="h4" fontWeight={700} color="#1a5a9e">{(metrics.totalDemand / 1000).toFixed(1)}K</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -396,7 +396,7 @@ const DCDemandAggregation = ({ onBack, darkMode = false }) => {
               <Divider sx={{ my: 2 }} />
 
               <Typography variant="subtitle1" fontWeight={600} gutterBottom>Aggregation Formula (DC Level)</Typography>
-              <Paper sx={{ p: 2, bgcolor: alpha('#2b88d8', 0.05), mb: 2 }}>
+              <Paper sx={{ p: 2, bgcolor: alpha('#1a5a9e', 0.05), mb: 2 }}>
                 <Typography variant="body2" fontFamily="monospace" gutterBottom>
                   <strong>μ_DC(t) = Σ μ_c(t)</strong>
                 </Typography>

@@ -52,7 +52,7 @@ const RevenueSalesAnalytics = ({ revenueData, growthData, summaryData, onDrillDo
   const [drillDownData, setDrillDownData] = useState(null);
 
   const getColors = (darkMode) => ({
-    primary: darkMode ? '#4da6ff' : '#0a6ed1',
+    primary: darkMode ? '#4d9eff' : '#00357a',
     text: darkMode ? '#e6edf3' : '#1e293b',
     textSecondary: darkMode ? '#8b949e' : '#64748b',
     background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -271,7 +271,7 @@ const RevenueSalesAnalytics = ({ revenueData, growthData, summaryData, onDrillDo
                       (pipeline_metrics.total_pipeline || 0) - (pipeline_metrics.qualified_pipeline || 0),
                       pipeline_metrics.weighted_pipeline || 0
                     ],
-                    backgroundColor: ['#4caf50', '#ff9800', '#2196f3']
+                    backgroundColor: ['#4caf50', '#ff9800', '#00357a']
                   }]
                 }}
                 options={{

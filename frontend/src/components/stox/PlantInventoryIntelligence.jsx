@@ -70,7 +70,7 @@ const formatLocalCurrency = (value, currency) => {
 };
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -368,7 +368,7 @@ const PlantInventoryIntelligence = ({ onBack, onTileClick, darkMode = false }) =
         <Chip
           label={formatCurrency(params.value)}
           size="small"
-          sx={{ fontWeight: 700, bgcolor: alpha('#2b88d8', 0.12), color: '#106ebe' }}
+          sx={{ fontWeight: 700, bgcolor: alpha('#1a5a9e', 0.12), color: '#1a5a9e' }}
         />
       ),
     },
@@ -929,7 +929,7 @@ const PlantInventoryIntelligence = ({ onBack, onTileClick, darkMode = false }) =
         <Paper elevation={0} variant="outlined" sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: colors.border, background: darkMode ? `linear-gradient(90deg, ${alpha('#0284c7', 0.15)}, ${alpha('#64748b', 0.08)})` : `linear-gradient(90deg, ${alpha('#0284c7', 0.05)}, ${alpha('#64748b', 0.02)})` }}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: '#0078d4' }}>
+              <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: '#00357a' }}>
                 Plant Inventory Summary — <Typography component="span" sx={{ color: '#0891b2' }}>Click to Drill Down</Typography>
               </Typography>
               <Chip label="MARC / MARD / MBEW / MSEG / EKBE / MVER" size="small" sx={{ fontSize: '0.6rem', bgcolor: alpha('#06b6d4', 0.1), color: '#0891b2' }} />

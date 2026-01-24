@@ -283,12 +283,12 @@ const GlobalSearch = ({ onNavigate }) => {
           transition: 'all 0.2s ease',
           '&:hover': {
             bgcolor: alpha('#000', 0.06),
-            borderColor: alpha('#0a6ed1', 0.2),
+            borderColor: alpha('#00357a', 0.2),
           },
           '&:focus-within': {
             bgcolor: 'background.paper',
             borderColor: 'primary.main',
-            boxShadow: `0 0 0 3px ${alpha('#0a6ed1', 0.1)}`,
+            boxShadow: `0 0 0 3px ${alpha('#00357a', 0.1)}`,
           },
         }}
       >
@@ -374,7 +374,7 @@ const GlobalSearch = ({ onNavigate }) => {
               ml: 1,
               height: 20,
               fontSize: '0.7rem',
-              bgcolor: alpha('#0a6ed1', 0.1),
+              bgcolor: alpha('#00357a', 0.1),
               color: 'primary.main',
               fontWeight: 600,
             }}
@@ -399,7 +399,7 @@ const GlobalSearch = ({ onNavigate }) => {
                 overflow: 'hidden',
                 borderRadius: 2,
                 border: '1px solid',
-                borderColor: alpha('#0a6ed1', 0.15),
+                borderColor: alpha('#00357a', 0.15),
                 boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
               }}
             >
@@ -411,7 +411,7 @@ const GlobalSearch = ({ onNavigate }) => {
                     py: 1,
                     borderBottom: '1px solid',
                     borderColor: 'divider',
-                    bgcolor: alpha('#0a6ed1', 0.02),
+                    bgcolor: alpha('#00357a', 0.02),
                   }}>
                     <Typography variant="caption" sx={{ 
                       color: 'text.secondary',

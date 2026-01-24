@@ -22,7 +22,7 @@ import { useTickets, cancelTicket } from '../../hooks/useTickets';
 import stoxTheme from './stoxTheme';
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -130,11 +130,11 @@ const TicketingSystem = ({ onBack, darkMode = false }) => {
           variant="body2"
           sx={{
             fontWeight: 600,
-            color: '#2b88d8',
+            color: '#1a5a9e',
             fontSize: '0.8rem',
             cursor: 'pointer',
             '&:hover': {
-              color: '#005a9e',
+              color: '#002352',
               textDecoration: 'underline',
             }
           }}
@@ -343,7 +343,7 @@ const TicketingSystem = ({ onBack, darkMode = false }) => {
       renderCell: (params) => {
         const priorityColors = {
           'High': '#ef4444',
-          'Normal': '#2b88d8',
+          'Normal': '#1a5a9e',
           'Low': '#64748b',
         };
         return (
@@ -388,7 +388,7 @@ const TicketingSystem = ({ onBack, darkMode = false }) => {
             <IconButton
               size="small"
               onClick={() => handleViewDetails(params.row)}
-              sx={{ color: '#2b88d8' }}
+              sx={{ color: '#1a5a9e' }}
             >
               <VisibilityIcon fontSize="small" />
             </IconButton>
@@ -429,7 +429,7 @@ const TicketingSystem = ({ onBack, darkMode = false }) => {
       {/* Header */}
       <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <TicketIcon sx={{ fontSize: 40, color: '#10b981' }} />
+          <TicketIcon sx={{ fontSize: 40, color: '#00357a' }} />
           <Box sx={{ flex: 1 }}>
             <Typography variant="h5" fontWeight={600} sx={{ color: colors.text }}>
               COMMAND TOWER
@@ -447,18 +447,18 @@ const TicketingSystem = ({ onBack, darkMode = false }) => {
       {/* Metrics Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ bgcolor: darkMode ? alpha('#2b88d8', 0.15) : alpha('#2b88d8', 0.05), borderLeft: `4px solid #2b88d8`, border: `1px solid ${colors.border}` }}>
+          <Card sx={{ bgcolor: darkMode ? alpha('#1a5a9e', 0.15) : alpha('#1a5a9e', 0.05), borderLeft: `4px solid #1a5a9e`, border: `1px solid ${colors.border}` }}>
             <CardContent sx={{ py: 1.5, px: 2 }}>
               <Typography variant="caption" sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>Total Tickets</Typography>
-              <Typography variant="h5" fontWeight={700} sx={{ color: '#2b88d8' }}>{metrics.total}</Typography>
+              <Typography variant="h5" fontWeight={700} sx={{ color: '#1a5a9e' }}>{metrics.total}</Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ bgcolor: darkMode ? alpha('#2b88d8', 0.15) : alpha('#2b88d8', 0.05), borderLeft: `4px solid #2b88d8`, border: `1px solid ${colors.border}` }}>
+          <Card sx={{ bgcolor: darkMode ? alpha('#1a5a9e', 0.15) : alpha('#1a5a9e', 0.05), borderLeft: `4px solid #1a5a9e`, border: `1px solid ${colors.border}` }}>
             <CardContent sx={{ py: 1.5, px: 2 }}>
               <Typography variant="caption" sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>Open</Typography>
-              <Typography variant="h5" fontWeight={700} sx={{ color: '#2b88d8' }}>{metrics.open}</Typography>
+              <Typography variant="h5" fontWeight={700} sx={{ color: '#1a5a9e' }}>{metrics.open}</Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -655,7 +655,7 @@ const TicketingSystem = ({ onBack, darkMode = false }) => {
       <Dialog open={detailsOpen} onClose={() => setDetailsOpen(false)} maxWidth="md" fullWidth PaperProps={{ sx: { bgcolor: colors.paper, color: colors.text } }}>
         <DialogTitle sx={{ bgcolor: colors.cardBg, borderBottom: `1px solid ${colors.border}` }}>
           <Stack direction="row" alignItems="center" spacing={2}>
-            <TicketIcon sx={{ color: '#2b88d8' }} />
+            <TicketIcon sx={{ color: '#1a5a9e' }} />
             <Box>
               <Typography variant="h6" fontWeight={700} sx={{ color: colors.text }}>
                 Operation Details
@@ -680,7 +680,7 @@ const TicketingSystem = ({ onBack, darkMode = false }) => {
                 <Box>
                   <Typography variant="caption" sx={{ color: colors.textSecondary }}>Priority</Typography>
                   <Box sx={{ mt: 0.5 }}>
-                    <Chip label={selectedTicket.priority} size="small" sx={{ bgcolor: alpha(selectedTicket.priority === 'High' ? '#ef4444' : '#2b88d8', 0.1), color: selectedTicket.priority === 'High' ? '#ef4444' : '#2b88d8' }} />
+                    <Chip label={selectedTicket.priority} size="small" sx={{ bgcolor: alpha(selectedTicket.priority === 'High' ? '#ef4444' : '#1a5a9e', 0.1), color: selectedTicket.priority === 'High' ? '#ef4444' : '#1a5a9e' }} />
                   </Box>
                 </Box>
                 <Box>
@@ -739,7 +739,7 @@ const TicketingSystem = ({ onBack, darkMode = false }) => {
               <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1, color: colors.text }}>
                 Operational Details
               </Typography>
-              <Box sx={{ bgcolor: darkMode ? alpha('#2b88d8', 0.15) : alpha('#2b88d8', 0.05), p: 2, borderRadius: 1, border: `1px solid ${darkMode ? alpha('#2b88d8', 0.3) : alpha('#2b88d8', 0.2)}` }}>
+              <Box sx={{ bgcolor: darkMode ? alpha('#1a5a9e', 0.15) : alpha('#1a5a9e', 0.05), p: 2, borderRadius: 1, border: `1px solid ${darkMode ? alpha('#1a5a9e', 0.3) : alpha('#1a5a9e', 0.2)}` }}>
                 {selectedTicket.metadata && Object.keys(selectedTicket.metadata).length > 0 ? (
                   <Table size="small">
                     <TableBody>

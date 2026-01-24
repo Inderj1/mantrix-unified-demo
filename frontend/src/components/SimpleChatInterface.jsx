@@ -64,6 +64,7 @@ import {
   Dashboard as DashboardIcon,
   AutoGraph as AutoGraphIcon,
   InfoOutlined as InfoIcon,
+  Forum as ForumIcon,
 } from '@mui/icons-material';
 import { DataGrid } from '@mui/x-data-grid';
 import { apiService } from '../services/api';
@@ -90,7 +91,7 @@ import {
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7c7c', '#8dd1e1', '#d084d0', '#ffb347', '#67b7dc'];
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -971,7 +972,7 @@ const SimpleChatInterface = ({ darkMode = false }) => {
         <Alert
           severity="info"
           sx={{
-            bgcolor: darkMode ? alpha('#2196f3', 0.15) : undefined,
+            bgcolor: darkMode ? alpha('#00357a', 0.15) : undefined,
             color: colors.text,
             '& .MuiAlert-icon': { color: darkMode ? '#64b5f6' : undefined },
           }}
@@ -1048,7 +1049,7 @@ const SimpleChatInterface = ({ darkMode = false }) => {
             severity="info"
             sx={{
               mb: 2,
-              bgcolor: darkMode ? alpha('#2196f3', 0.15) : undefined,
+              bgcolor: darkMode ? alpha('#00357a', 0.15) : undefined,
               color: colors.text,
               '& .MuiAlert-icon': { color: darkMode ? '#64b5f6' : undefined },
             }}
@@ -1385,16 +1386,8 @@ const SimpleChatInterface = ({ darkMode = false }) => {
     return (
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" spacing={2} alignItems="flex-start">
-          <img
-            src="/axis-ai4.png"
-            alt="AXIS.AI"
-            style={{
-              width: 72,
-              height: 72,
-              objectFit: 'contain'
-            }}
-          />
-          <Box sx={{ flex: 1, maxWidth: 'calc(100% - 88px)' }}>
+          <ForumIcon sx={{ fontSize: 36, color: '#00357a', mt: 1 }} />
+          <Box sx={{ flex: 1, maxWidth: 'calc(100% - 52px)' }}>
             {/* Main message - Enhanced Summary */}
             <Card
               elevation={2}
@@ -2362,21 +2355,12 @@ const SimpleChatInterface = ({ darkMode = false }) => {
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             {/* Left section */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <img
-                src="/axis-ai4.png"
-                alt="AXIS.AI Logo"
-                style={{
-                  width: 80,
-                  height: 80,
-                  objectFit: 'contain'
-                }}
-              />
+              <ForumIcon sx={{ fontSize: 40, color: '#00357a' }} />
               <Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
                     AXIS.AI
                   </Typography>
-                  <Chip label="v2.0 Research" size="small" color="success" sx={{ height: 20 }} />
                 </Box>
                 <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                   {mode === 'chat'
@@ -2610,16 +2594,8 @@ const SimpleChatInterface = ({ darkMode = false }) => {
             
             {loading && (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
-                <img
-                  src="/axis-ai4.png"
-                  alt="AXIS.AI"
-                  style={{
-                    width: 72,
-                    height: 72,
-                    objectFit: 'contain'
-                  }}
-                />
-                <Box>
+                <ForumIcon sx={{ fontSize: 36, color: '#00357a' }} />
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   <CircularProgress size={20} sx={{ color: colors.primary }} />
                   <Typography variant="body2" sx={{ color: colors.textSecondary, ml: 2 }}>
                     Processing your query...

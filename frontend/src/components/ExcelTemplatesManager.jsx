@@ -55,7 +55,7 @@ import {
 
 const getColors = (darkMode) => ({
   primary: darkMode ? '#36d068' : '#10b981',
-  secondary: darkMode ? '#2d8ce6' : '#0854a0',
+  secondary: darkMode ? '#2d8ce6' : '#002352',
   success: darkMode ? '#36d068' : '#10b981',
   warning: darkMode ? '#f59e0b' : '#f59e0b',
   error: darkMode ? '#ff6b6b' : '#ef4444',

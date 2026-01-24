@@ -33,7 +33,7 @@ import UserProfileManager from './UserProfileManager';
 import CommsConfig from './CommsConfig';
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -54,7 +54,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus, darkMode = false }) => {
       component: <DataSourcesConnections />,
       status: 'healthy',
       badge: '9 Active',
-      color: '#0078d4',
+      color: '#00357a',
     },
     {
       label: 'System Health',
@@ -63,7 +63,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus, darkMode = false }) => {
       component: <SystemHealthMonitoring />,
       status: 'healthy',
       badge: '99.9%',
-      color: '#106ebe',
+      color: '#1a5a9e',
     },
     {
       label: 'Settings',
@@ -116,8 +116,8 @@ const ControlCenter = ({ apiHealth, onRefreshStatus, darkMode = false }) => {
   // Summary stats
   const summaryStats = [
     { label: 'Services Online', value: '12', icon: <CloudIcon />, color: '#10b981' },
-    { label: 'API Latency', value: '45ms', icon: <SpeedIcon />, color: '#0078d4' },
-    { label: 'Uptime', value: '99.9%', icon: <MonitorIcon />, color: '#106ebe' },
+    { label: 'API Latency', value: '45ms', icon: <SpeedIcon />, color: '#00357a' },
+    { label: 'Uptime', value: '99.9%', icon: <MonitorIcon />, color: '#1a5a9e' },
     { label: 'Security', value: 'Secure', icon: <SecurityIcon />, color: '#354a5f' },
   ];
 
@@ -132,7 +132,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus, darkMode = false }) => {
                 width: 56,
                 height: 56,
                 borderRadius: 2,
-                bgcolor: '#0078d4',
+                bgcolor: '#00357a',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -179,9 +179,9 @@ const ControlCenter = ({ apiHealth, onRefreshStatus, darkMode = false }) => {
               onClick={onRefreshStatus}
               size="small"
               sx={{
-                bgcolor: alpha('#0078d4', 0.1),
-                color: '#0078d4',
-                '&:hover': { bgcolor: alpha('#0078d4', 0.2) },
+                bgcolor: alpha('#00357a', 0.1),
+                color: '#00357a',
+                '&:hover': { bgcolor: alpha('#00357a', 0.2) },
               }}
             >
               <RefreshIcon fontSize="small" />
@@ -243,7 +243,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus, darkMode = false }) => {
                 p: 2,
                 borderRadius: 3,
                 cursor: tab.disabled ? 'not-allowed' : 'pointer',
-                bgcolor: activeTab === index ? alpha('#0078d4', 0.05) : colors.paper,
+                bgcolor: activeTab === index ? alpha('#00357a', 0.05) : colors.paper,
                 boxShadow: activeTab === index
                   ? '0 4px 12px rgba(0,120,212,0.15)'
                   : '0 1px 3px rgba(0,0,0,0.08)',

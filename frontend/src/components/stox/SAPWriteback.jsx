@@ -53,7 +53,7 @@ import stoxTheme from './stoxTheme';
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, ChartTooltip, Legend);
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -350,7 +350,7 @@ const SAPWriteback = ({ onBack, darkMode = false }) => {
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card sx={{ borderLeft: '4px solid #0078d4' }}>
+            <Card sx={{ borderLeft: '4px solid #00357a' }}>
               <CardContent>
                 <Typography variant="caption" color="text.secondary">Success Rate</Typography>
                 <Typography variant="h5" fontWeight={700}>{selectedJob.successRate}%</Typography>
@@ -516,7 +516,7 @@ const SAPWriteback = ({ onBack, darkMode = false }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #2b88d8' }}>
+                <Card sx={{ borderLeft: '4px solid #1a5a9e' }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">In Progress</Typography>
                     <Typography variant="h5" fontWeight={700} color="info.main">{metrics.inProgressCount}</Typography>
@@ -540,7 +540,7 @@ const SAPWriteback = ({ onBack, darkMode = false }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
-                <Card sx={{ borderLeft: '4px solid #0078d4' }}>
+                <Card sx={{ borderLeft: '4px solid #00357a' }}>
                   <CardContent sx={{ py: 1.5 }}>
                     <Typography variant="caption" color="text.secondary">Avg Success</Typography>
                     <Typography variant="h5" fontWeight={700}>{metrics.avgSuccessRate}%</Typography>

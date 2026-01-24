@@ -151,8 +151,8 @@ export default function AlertDetailsPanel({ alert, onClose }) {
             <Box sx={{ mb: 2 }}>
               <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: '#64748b', mb: 1 }}>ASSIGNED TO</Typography>
               <Stack direction="row" alignItems="center" spacing={1}>
-                <Avatar sx={{ width: 24, height: 24, bgcolor: alpha('#0a6ed1', 0.15) }}>
-                  <PersonIcon sx={{ fontSize: 14, color: '#0a6ed1' }} />
+                <Avatar sx={{ width: 24, height: 24, bgcolor: alpha('#00357a', 0.15) }}>
+                  <PersonIcon sx={{ fontSize: 14, color: '#00357a' }} />
                 </Avatar>
                 <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#1e293b' }}>{alert.assigned_to}</Typography>
               </Stack>

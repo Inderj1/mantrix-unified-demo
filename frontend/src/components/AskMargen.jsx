@@ -190,7 +190,7 @@ const SAMPLE_QUERIES = [
 
 // Dark mode color helper
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -1360,7 +1360,7 @@ const AskMargen = ({ onBack, darkMode = false }) => {
                 bgcolor: '#1873b4',
                 color: 'white',
                 borderRadius: 2,
-                border: '1.5px solid #0a6ed1'
+                border: '1.5px solid #00357a'
               }}
             >
               <Typography variant="body2">{message.content}</Typography>
@@ -2288,7 +2288,7 @@ const AskMargen = ({ onBack, darkMode = false }) => {
                   borderColor: '#1873b4',
                   color: '#1873b4',
                   '&:hover': {
-                    borderColor: '#0a6ed1',
+                    borderColor: '#00357a',
                     bgcolor: alpha('#1873b4', 0.05)
                   }
                 }}

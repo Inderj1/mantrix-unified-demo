@@ -35,7 +35,7 @@ const stages = [
     label: 'Decisioning',
     fullLabel: 'SKU Decisioning',
     icon: SettingsIcon,
-    color: '#0a6ed1',
+    color: '#00357a',
   },
   {
     id: 2,
@@ -43,7 +43,7 @@ const stages = [
     label: 'Arbitration',
     fullLabel: 'Order Arbitration',
     icon: AccountBalanceIcon,
-    color: '#2196f3',
+    color: '#00357a',
   },
 ];
 
@@ -92,9 +92,9 @@ const OrderTrackingBar = ({ order, currentStage, onNavigate, darkMode = false })
         gap: 1,
         px: 2,
         py: 1,
-        bgcolor: darkMode ? alpha('#0854a0', 0.08) : alpha('#0854a0', 0.04),
+        bgcolor: darkMode ? alpha('#002352', 0.08) : alpha('#002352', 0.04),
         borderRadius: 1,
-        border: `1px solid ${darkMode ? alpha('#0854a0', 0.2) : alpha('#0854a0', 0.1)}`,
+        border: `1px solid ${darkMode ? alpha('#002352', 0.2) : alpha('#002352', 0.1)}`,
       }}
     >
       {/* Order ID Badge */}
@@ -102,8 +102,8 @@ const OrderTrackingBar = ({ order, currentStage, onNavigate, darkMode = false })
         label={order.id}
         size="small"
         sx={{
-          bgcolor: alpha('#0854a0', 0.12),
-          color: '#0854a0',
+          bgcolor: alpha('#002352', 0.12),
+          color: '#002352',
           fontWeight: 700,
           fontSize: '0.7rem',
           height: 24,
@@ -236,8 +236,8 @@ const OrderTrackingBar = ({ order, currentStage, onNavigate, darkMode = false })
                 height: 18,
                 fontSize: '0.65rem',
                 fontWeight: 700,
-                bgcolor: alpha('#0854a0', 0.12),
-                color: '#0854a0',
+                bgcolor: alpha('#002352', 0.12),
+                color: '#002352',
               }}
             />
           </Box>

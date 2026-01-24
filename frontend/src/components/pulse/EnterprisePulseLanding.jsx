@@ -18,24 +18,14 @@ import {
   ArrowForward as ArrowForwardIcon,
 } from '@mui/icons-material';
 
-// Single consistent blue for all modules
-const MODULE_COLOR = '#0078d4';
+// Import centralized brand colors
+import { MODULE_COLOR, getColors as getBrandColors, BRAND_ALPHA } from '../../config/brandColors';
 
-// Blue color palette - theme aware
+// Blue color palette - theme aware (extends centralized colors)
 const getColors = (darkMode) => ({
-  primary: MODULE_COLOR,
-  secondary: MODULE_COLOR,
-  warning: darkMode ? '#f59e0b' : '#f59e0b',
-  error: darkMode ? '#ff6b6b' : '#ef4444',
-  text: darkMode ? '#e6edf3' : '#1e293b',
-  textSecondary: darkMode ? '#8b949e' : '#64748b',
-  grey: darkMode ? '#8b949e' : '#64748b',
-  background: darkMode ? '#0d1117' : '#f8fbfd',
-  paper: darkMode ? '#161b22' : '#ffffff',
-  cardBg: darkMode ? '#21262d' : '#ffffff',
-  border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+  ...getBrandColors(darkMode),
   shadow: darkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.1)',
-  hoverShadow: darkMode ? '0 20px 40px rgba(0,0,0,0.5)' : '0 20px 40px rgba(0,120,212,0.12), 0 8px 16px rgba(0,0,0,0.06)',
+  hoverShadow: darkMode ? '0 20px 40px rgba(0,0,0,0.5)' : `0 20px 40px ${BRAND_ALPHA.navy[12]}, 0 8px 16px rgba(0,0,0,0.06)`,
 });
 
 const EnterprisePulseLanding = ({ onTileClick, alertCount = 0, agentCount = 0, darkMode = false }) => {

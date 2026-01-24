@@ -37,7 +37,7 @@ import { getTileDataConfig } from './stoxDataConfig';
 
 const StoreHealthMonitor = ({ onBack, darkMode = false }) => {
   const getColors = (darkMode) => ({
-    primary: darkMode ? '#4da6ff' : '#0a6ed1',
+    primary: darkMode ? '#4d9eff' : '#00357a',
     text: darkMode ? '#e6edf3' : '#1e293b',
     textSecondary: darkMode ? '#8b949e' : '#64748b',
     background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -330,8 +330,8 @@ const StoreHealthMonitor = ({ onBack, darkMode = false }) => {
           size="small"
           sx={{
             fontWeight: 700,
-            bgcolor: alpha('#0078d4', 0.12),
-            color: '#005a9e',
+            bgcolor: alpha('#00357a', 0.12),
+            color: '#002352',
           }}
         />
       ),
@@ -442,13 +442,13 @@ const StoreHealthMonitor = ({ onBack, darkMode = false }) => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#2b88d8', 0.1)} 0%, ${alpha('#2b88d8', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
+            <Card sx={{ background: `linear-gradient(135deg, ${alpha('#1a5a9e', 0.1)} 0%, ${alpha('#1a5a9e', 0.05)} 100%)`, bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <Inventory sx={{ color: '#2b88d8' }} />
+                  <Inventory sx={{ color: '#1a5a9e' }} />
                   <Typography variant="body2" sx={{ color: colors.textSecondary }}>Avg Health</Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={700} color="#2b88d8">{metrics.avgHealthScore}%</Typography>
+                <Typography variant="h4" fontWeight={700} color="#1a5a9e">{metrics.avgHealthScore}%</Typography>
               </CardContent>
             </Card>
           </Grid>

@@ -268,7 +268,7 @@ export default function TruckDetailsPanel({ truck, alerts = [], onClose }) {
               p: 2,
             }}>
               <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#9a3412', mb: 1 }}>Delay Information</Typography>
-              <Typography sx={{ fontSize: '0.7rem', color: '#0078d4' }}>
+              <Typography sx={{ fontSize: '0.7rem', color: '#00357a' }}>
                 This truck is currently experiencing delays. Route optimization AI is analyzing alternative paths.
               </Typography>
             </Box>
@@ -283,7 +283,7 @@ export default function TruckDetailsPanel({ truck, alerts = [], onClose }) {
               p: 2,
             }}>
               <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#dc2626', mb: 1 }}>Maintenance Required</Typography>
-              <Typography sx={{ fontSize: '0.7rem', color: '#0078d4' }}>
+              <Typography sx={{ fontSize: '0.7rem', color: '#00357a' }}>
                 This truck requires maintenance and is currently out of service.
               </Typography>
             </Box>
@@ -305,7 +305,7 @@ export default function TruckDetailsPanel({ truck, alerts = [], onClose }) {
               </Box>
               <Box sx={{ width: 8, height: 8, bgcolor: '#0284c7', borderRadius: '50%', animation: 'pulse 2s infinite' }} />
             </Stack>
-            <Typography sx={{ fontSize: '0.7rem', color: '#0078d4' }}>
+            <Typography sx={{ fontSize: '0.7rem', color: '#00357a' }}>
               {truck.status === 'in-transit' && 'Monitoring route efficiency and traffic conditions. All systems operating normally.'}
               {truck.status === 'delayed' && 'Analyzing traffic patterns and alternative routes. Solution proposal in progress.'}
               {truck.status === 'idle' && 'Truck is idle. Evaluating optimal next assignment based on current network demand.'}

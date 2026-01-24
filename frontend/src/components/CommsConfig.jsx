@@ -35,8 +35,8 @@ import {
 } from '@mui/icons-material';
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
-  secondary: darkMode ? '#5cb3ff' : '#0854a0',
+  primary: darkMode ? '#4d9eff' : '#00357a',
+  secondary: darkMode ? '#5cb3ff' : '#002352',
   dark: darkMode ? '#8b949e' : '#354a5f',
   slate: darkMode ? '#8b949e' : '#475569',
   grey: darkMode ? '#8b949e' : '#64748b',
@@ -70,7 +70,7 @@ const CommsConfig = ({ darkMode = false }) => {
     display_name: '',
     description: '',
     icon: 'Email',
-    color: '#0a6ed1',
+    color: '#00357a',
     tab_order: 0,
     is_active: true,
   });
@@ -225,7 +225,7 @@ const CommsConfig = ({ darkMode = false }) => {
       display_name: '',
       description: '',
       icon: 'Email',
-      color: '#0a6ed1',
+      color: '#00357a',
       tab_order: 0,
       is_active: true,
     });

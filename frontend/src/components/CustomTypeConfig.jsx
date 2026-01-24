@@ -46,8 +46,8 @@ const availableIcons = [
 ];
 
 const availableColors = [
-  { name: 'Blue', value: '#0a6ed1' },
-  { name: 'Dark Blue', value: '#0854a0' },
+  { name: 'Blue', value: '#00357a' },
+  { name: 'Dark Blue', value: '#002352' },
   { name: 'Slate', value: '#64748b' },
   { name: 'Blue Grey', value: '#354a5f' },
   { name: 'Light Blue', value: '#0ea5e9' },
@@ -63,7 +63,7 @@ const CustomTypeConfig = ({ open, onClose, onSave, editType = null, moduleType =
     display_name: '',
     description: '',
     icon: 'Email',
-    color: '#0a6ed1',
+    color: '#00357a',
   });
 
   useEffect(() => {
@@ -72,14 +72,14 @@ const CustomTypeConfig = ({ open, onClose, onSave, editType = null, moduleType =
         display_name: editType.display_name || '',
         description: editType.description || '',
         icon: editType.icon || 'Email',
-        color: editType.color || '#0a6ed1',
+        color: editType.color || '#00357a',
       });
     } else {
       setFormData({
         display_name: '',
         description: '',
         icon: 'Email',
-        color: '#0a6ed1',
+        color: '#00357a',
       });
     }
   }, [editType, open]);

@@ -53,7 +53,7 @@ const RevenueGrowthAnalytics = ({ onBack, darkMode = false }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const getColors = (darkMode) => ({
-    primary: darkMode ? '#4da6ff' : '#0a6ed1',
+    primary: darkMode ? '#4d9eff' : '#00357a',
     text: darkMode ? '#e6edf3' : '#1e293b',
     textSecondary: darkMode ? '#8b949e' : '#64748b',
     background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -132,7 +132,7 @@ const RevenueGrowthAnalytics = ({ onBack, darkMode = false }) => {
       title: 'Avg Transaction Value',
       value: formatCurrency(avgTransactionValue),
       subtitle: 'Average per transaction',
-      color: '#2b88d8',
+      color: '#1a5a9e',
       icon: BusinessIcon,
     },
     {

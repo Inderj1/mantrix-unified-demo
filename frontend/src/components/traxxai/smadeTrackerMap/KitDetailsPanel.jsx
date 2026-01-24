@@ -49,7 +49,7 @@ export default function KitDetailsPanel({ kit, alerts = [], onClose }) {
       <Box
         sx={{
           p: 1.5,
-          background: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
+          background: 'linear-gradient(135deg, #00357a 0%, #002352 100%)',
           color: 'white',
         }}
       >
@@ -124,7 +124,7 @@ export default function KitDetailsPanel({ kit, alerts = [], onClose }) {
         <Box sx={{ mb: 2 }}>
           <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: '#64748b', mb: 1 }}>LOCATION</Typography>
           <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-            <LocalHospitalIcon sx={{ fontSize: 16, color: '#0a6ed1' }} />
+            <LocalHospitalIcon sx={{ fontSize: 16, color: '#00357a' }} />
             <Box>
               <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#1e293b' }}>{kit.facility_name}</Typography>
               <Typography sx={{ fontSize: '0.65rem', color: '#64748b' }}>{kit.region} - {kit.state}</Typography>

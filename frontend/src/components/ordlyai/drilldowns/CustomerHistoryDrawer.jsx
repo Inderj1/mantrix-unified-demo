@@ -91,7 +91,7 @@ const CustomerHistoryDrawer = ({ open, onClose, kunnr, customerName }) => {
       <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', bgcolor: '#f8fafc' }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Stack direction="row" alignItems="center" spacing={1.5}>
-            <BusinessIcon sx={{ color: '#0854a0', fontSize: 28 }} />
+            <BusinessIcon sx={{ color: '#002352', fontSize: 28 }} />
             <Box>
               <Typography variant="h6" fontWeight={600}>{customerName || 'Customer'}</Typography>
               <Typography variant="caption" color="text.secondary">KUNNR: {kunnr}</Typography>
@@ -155,12 +155,12 @@ const CustomerHistoryDrawer = ({ open, onClose, kunnr, customerName }) => {
               <CardContent sx={{ pb: 2 }}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
                   <Stack direction="row" alignItems="center" spacing={1}>
-                    <ShoppingCartIcon sx={{ color: '#0854a0', fontSize: 18 }} />
+                    <ShoppingCartIcon sx={{ color: '#002352', fontSize: 18 }} />
                     <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
                       Order History (Last 12 months)
                     </Typography>
                   </Stack>
-                  <Chip label={`${data.order_count} orders`} size="small" sx={{ bgcolor: alpha('#0854a0', 0.12), color: '#1565c0', fontWeight: 600, fontSize: '0.65rem' }} />
+                  <Chip label={`${data.order_count} orders`} size="small" sx={{ bgcolor: alpha('#002352', 0.12), color: '#1565c0', fontWeight: 600, fontSize: '0.65rem' }} />
                 </Stack>
                 <Table size="small">
                   <TableHead>
@@ -216,7 +216,7 @@ const CustomerHistoryDrawer = ({ open, onClose, kunnr, customerName }) => {
             <Card variant="outlined">
               <CardContent sx={{ pb: 2 }}>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-                  <InventoryIcon sx={{ color: '#0854a0', fontSize: 18 }} />
+                  <InventoryIcon sx={{ color: '#002352', fontSize: 18 }} />
                   <Typography sx={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1 }}>
                     Frequently Ordered Materials
                   </Typography>

@@ -53,12 +53,12 @@ import {
 } from './commandTowerMockData';
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
-  secondary: darkMode ? '#2d8ce6' : '#0854a0',
+  primary: darkMode ? '#4d9eff' : '#00357a',
+  secondary: darkMode ? '#2d8ce6' : '#002352',
   success: darkMode ? '#36d068' : '#10b981',
   warning: darkMode ? '#f59e0b' : '#f59e0b',
   error: darkMode ? '#ff6b6b' : '#ef4444',
-  info: darkMode ? '#4da6ff' : '#0ea5e9',
+  info: darkMode ? '#4d9eff' : '#0ea5e9',
   text: darkMode ? '#e6edf3' : '#1e293b',
   grey: darkMode ? '#8b949e' : '#64748b',
 });

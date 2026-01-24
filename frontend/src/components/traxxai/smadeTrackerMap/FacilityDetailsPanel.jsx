@@ -77,8 +77,8 @@ export default function FacilityDetailsPanel({ facility, alerts = [], kits = [],
               height: 24,
               fontSize: '0.7rem',
               fontWeight: 600,
-              bgcolor: alpha('#0a6ed1', 0.1),
-              color: '#0a6ed1',
+              bgcolor: alpha('#00357a', 0.1),
+              color: '#00357a',
             }}
           />
         </Stack>
@@ -89,10 +89,10 @@ export default function FacilityDetailsPanel({ facility, alerts = [], kits = [],
           <Stack spacing={1}>
             <Stack direction="row" justifyContent="space-between">
               <Stack direction="row" alignItems="center" spacing={0.5}>
-                <MedicalServicesIcon sx={{ fontSize: 14, color: '#0a6ed1' }} />
+                <MedicalServicesIcon sx={{ fontSize: 14, color: '#00357a' }} />
                 <Typography sx={{ fontSize: '0.75rem', color: '#64748b' }}>Kits On-Site</Typography>
               </Stack>
-              <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#0a6ed1' }}>{facility.kits_on_site}</Typography>
+              <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#00357a' }}>{facility.kits_on_site}</Typography>
             </Stack>
             <Stack direction="row" justifyContent="space-between">
               <Stack direction="row" alignItems="center" spacing={0.5}>
@@ -144,8 +144,8 @@ export default function FacilityDetailsPanel({ facility, alerts = [], kits = [],
                         height: 16,
                         fontSize: '0.55rem',
                         fontWeight: 700,
-                        bgcolor: alpha('#0a6ed1', 0.1),
-                        color: '#0a6ed1',
+                        bgcolor: alpha('#00357a', 0.1),
+                        color: '#00357a',
                         textTransform: 'capitalize',
                       }}
                     />

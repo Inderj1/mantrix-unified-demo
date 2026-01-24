@@ -1,41 +1,41 @@
 import { createTheme } from '@mui/material/styles';
 
-// SAP Fiori 3 Color Palette
+// MANTRIX AI Color Palette
 const sapColors = {
-  // Primary Blues
-  sapBlue: '#0a6ed1',
-  sapDarkBlue: '#0854a0',
-  sapLightBlue: '#1873b4',
-  
+  // Primary Blues - MANTRIX Navy
+  sapBlue: '#00357a',
+  sapDarkBlue: '#002352',
+  sapLightBlue: '#1a5a9e',
+
   // Semantic Colors
   sapPositive: '#107e3e',
-  sapCritical: '#df6e0c',
+  sapCritical: '#ff751f',  // MANTRIX Orange
   sapNegative: '#bb0000',
-  sapInformation: '#0a6ed1',
+  sapInformation: '#00357a',
   sapNeutral: '#6a6d70',
   
   // Shell Colors
-  sapShellHeader: '#354a5f',
+  sapShellHeader: '#00357a',  // MANTRIX Navy
   sapShellNavigation: '#fff',
-  
+
   // Background Colors
   sapBackgroundLight: '#f7f7f7',
   sapBackgroundMedium: '#eff1f2',
   sapBackgroundDark: '#edeff0',
-  
+
   // Text Colors
   sapTextColor: '#32363a',
   sapTextColorLight: '#6a6d70',
   sapTextColorInverted: '#fff',
-  
-  // Chart Colors (Corporate Blue/Grey palette only)
-  sapChart1: '#0a6ed1', // Primary blue
-  sapChart2: '#354a5f', // Dark grey-blue
-  sapChart3: '#6a6d70', // Medium grey
-  sapChart4: '#1873b4', // Light blue
-  sapChart5: '#0854a0', // Dark blue
-  sapChart6: '#89919a', // Light grey
-  sapChart7: '#4d7ba8', // Blue-grey
+
+  // Chart Colors - MANTRIX Navy palette
+  sapChart1: '#00357a', // Primary navy
+  sapChart2: '#1a5a9e', // Light navy
+  sapChart3: '#ff751f', // Orange accent
+  sapChart4: '#002352', // Dark navy
+  sapChart5: '#4d7ba8', // Blue-grey
+  sapChart6: '#6a6d70', // Medium grey
+  sapChart7: '#89919a', // Light grey
   sapChart8: '#32363a', // Charcoal
   sapChart9: '#a9aeb3', // Silver grey
   sapChart10: '#5f7d99', // Slate blue
@@ -259,13 +259,13 @@ export const sapFioriTheme = createTheme({
       styleOverrides: {
         root: {
           '&:hover': {
-            backgroundColor: 'rgba(10, 110, 209, 0.08)',
+            backgroundColor: 'rgba(0, 53, 122, 0.08)',
           },
           '&.Mui-selected': {
-            backgroundColor: 'rgba(10, 110, 209, 0.12)',
+            backgroundColor: 'rgba(0, 53, 122, 0.12)',
             borderLeft: `3px solid ${sapColors.sapBlue}`,
             '&:hover': {
-              backgroundColor: 'rgba(10, 110, 209, 0.16)',
+              backgroundColor: 'rgba(0, 53, 122, 0.16)',
             },
           },
         },
@@ -339,7 +339,7 @@ export const sapFioriTheme = createTheme({
           color: sapColors.sapCritical,
         },
         standardInfo: {
-          backgroundColor: 'rgba(10, 110, 209, 0.1)',
+          backgroundColor: 'rgba(0, 53, 122, 0.1)',
           color: sapColors.sapInformation,
         },
       },

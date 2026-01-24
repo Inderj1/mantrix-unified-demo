@@ -37,7 +37,7 @@ import {
 } from '@mui/icons-material';
 
 // Theme colors
-const PRIMARY_BLUE = '#0854a0';
+const PRIMARY_BLUE = '#002352';
 const ACCENT_BLUE = '#1976d2';
 const SUCCESS_GREEN = '#059669';
 const WARNING_AMBER = '#d97706';
@@ -679,7 +679,7 @@ const DemandSignal = ({ onBack }) => {
           { label: 'Active Signals', value: stats.totalSignals, color: ACCENT_BLUE },
           { label: 'Avg. Confidence', value: `${stats.avgConfidence}%`, color: CYAN },
           { label: 'High Priority', value: stats.highPriority, color: PRIMARY_BLUE },
-          { label: 'Total Value', value: `$${(stats.totalValue / 1000).toFixed(0)}K`, color: '#2b88d8' },
+          { label: 'Total Value', value: `$${(stats.totalValue / 1000).toFixed(0)}K`, color: '#1a5a9e' },
         ].map((card) => (
           <Grid item xs={6} sm={4} md={3} key={card.label}>
             <Card variant="outlined" sx={{ borderLeft: `3px solid ${card.color}` }}>

@@ -575,7 +575,7 @@ ${kitsData.kits?.slice(0, 5).map(k => `- ${k.name}: ${k.status} at ${k.location}
     if (item.severity === 'critical' || item.status === 'critical') return '#ef4444';
     if (item.severity === 'warning' || item.status === 'warning') return '#f97316';
     if (item.status === 'in-transit') return '#3b82f6';
-    return '#0a6ed1';
+    return '#00357a';
   };
 
   // Simple markdown-like rendering
@@ -599,7 +599,7 @@ ${kitsData.kits?.slice(0, 5).map(k => `- ${k.name}: ${k.status} at ${k.location}
             color: '#1e293b',
             lineHeight: 1.6,
             mb: line.trim() === '' ? 0.5 : 0,
-            '& strong': { fontWeight: 600, color: '#0a6ed1' }
+            '& strong': { fontWeight: 600, color: '#00357a' }
           }}
           dangerouslySetInnerHTML={{ __html: processedLine }}
         />
@@ -620,7 +620,7 @@ ${kitsData.kits?.slice(0, 5).map(k => `- ${k.name}: ${k.status} at ${k.location}
       }}
     >
       {/* Header */}
-      <Box sx={{ p: 1.5, borderBottom: '1px solid', borderColor: alpha('#64748b', 0.1), background: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)' }}>
+      <Box sx={{ p: 1.5, borderBottom: '1px solid', borderColor: alpha('#64748b', 0.1), background: 'linear-gradient(135deg, #00357a 0%, #002352 100%)' }}>
         <Stack direction="row" alignItems="center" spacing={1}>
           <Avatar sx={{ width: 28, height: 28, bgcolor: alpha('#fff', 0.2) }}>
             <AutoAwesomeIcon sx={{ fontSize: 16, color: 'white' }} />
@@ -658,11 +658,11 @@ ${kitsData.kits?.slice(0, 5).map(k => `- ${k.name}: ${k.status} at ${k.location}
                 height: 24,
                 fontSize: '0.65rem',
                 fontWeight: 600,
-                bgcolor: alpha('#0a6ed1', 0.08),
-                color: '#0a6ed1',
+                bgcolor: alpha('#00357a', 0.08),
+                color: '#00357a',
                 cursor: 'pointer',
-                '&:hover': { bgcolor: alpha('#0a6ed1', 0.15) },
-                '& .MuiChip-icon': { color: '#0a6ed1', ml: 0.5 },
+                '&:hover': { bgcolor: alpha('#00357a', 0.15) },
+                '& .MuiChip-icon': { color: '#00357a', ml: 0.5 },
               }}
             />
           ))}
@@ -685,13 +685,13 @@ ${kitsData.kits?.slice(0, 5).map(k => `- ${k.name}: ${k.status} at ${k.location}
                   sx={{
                     width: 28,
                     height: 28,
-                    bgcolor: message.type === 'user' ? alpha('#64748b', 0.15) : alpha('#0a6ed1', 0.15),
+                    bgcolor: message.type === 'user' ? alpha('#64748b', 0.15) : alpha('#00357a', 0.15),
                   }}
                 >
                   {message.type === 'user' ? (
                     <PersonIcon sx={{ fontSize: 16, color: '#64748b' }} />
                   ) : (
-                    <AutoAwesomeIcon sx={{ fontSize: 16, color: '#0a6ed1' }} />
+                    <AutoAwesomeIcon sx={{ fontSize: 16, color: '#00357a' }} />
                   )}
                 </Avatar>
                 <Box
@@ -699,7 +699,7 @@ ${kitsData.kits?.slice(0, 5).map(k => `- ${k.name}: ${k.status} at ${k.location}
                     maxWidth: '85%',
                     p: 1.25,
                     borderRadius: 2,
-                    bgcolor: message.type === 'user' ? alpha('#0a6ed1', 0.1) : alpha('#64748b', 0.05),
+                    bgcolor: message.type === 'user' ? alpha('#00357a', 0.1) : alpha('#64748b', 0.05),
                     borderTopRightRadius: message.type === 'user' ? 4 : 16,
                     borderTopLeftRadius: message.type === 'user' ? 16 : 4,
                   }}
@@ -781,12 +781,12 @@ ${kitsData.kits?.slice(0, 5).map(k => `- ${k.name}: ${k.status} at ${k.location}
           {/* Typing Indicator */}
           {isTyping && (
             <Stack direction="row" spacing={1} alignItems="flex-end">
-              <Avatar sx={{ width: 28, height: 28, bgcolor: alpha('#0a6ed1', 0.15) }}>
-                <AutoAwesomeIcon sx={{ fontSize: 16, color: '#0a6ed1' }} />
+              <Avatar sx={{ width: 28, height: 28, bgcolor: alpha('#00357a', 0.15) }}>
+                <AutoAwesomeIcon sx={{ fontSize: 16, color: '#00357a' }} />
               </Avatar>
               <Box sx={{ p: 1.25, borderRadius: 2, borderTopLeftRadius: 4, bgcolor: alpha('#64748b', 0.05) }}>
                 <Stack direction="row" spacing={0.5} alignItems="center">
-                  <CircularProgress size={12} sx={{ color: '#0a6ed1' }} />
+                  <CircularProgress size={12} sx={{ color: '#00357a' }} />
                   <Typography sx={{ fontSize: '0.7rem', color: '#64748b', ml: 1 }}>
                     Analyzing data...
                   </Typography>
@@ -816,8 +816,8 @@ ${kitsData.kits?.slice(0, 5).map(k => `- ${k.name}: ${k.status} at ${k.location}
               bgcolor: 'white',
               fontSize: '0.8rem',
               '& fieldset': { borderColor: alpha('#64748b', 0.2) },
-              '&:hover fieldset': { borderColor: alpha('#0a6ed1', 0.3) },
-              '&.Mui-focused fieldset': { borderColor: '#0a6ed1', borderWidth: 1 },
+              '&:hover fieldset': { borderColor: alpha('#00357a', 0.3) },
+              '&.Mui-focused fieldset': { borderColor: '#00357a', borderWidth: 1 },
             },
             '& .MuiInputBase-input': {
               py: 1.25,
@@ -836,9 +836,9 @@ ${kitsData.kits?.slice(0, 5).map(k => `- ${k.name}: ${k.status} at ${k.location}
                     onClick={handleSend}
                     disabled={!inputValue.trim() || isTyping}
                     sx={{
-                      color: inputValue.trim() && !isTyping ? '#0a6ed1' : '#94a3b8',
-                      bgcolor: inputValue.trim() && !isTyping ? alpha('#0a6ed1', 0.1) : 'transparent',
-                      '&:hover': { bgcolor: alpha('#0a6ed1', 0.2) },
+                      color: inputValue.trim() && !isTyping ? '#00357a' : '#94a3b8',
+                      bgcolor: inputValue.trim() && !isTyping ? alpha('#00357a', 0.1) : 'transparent',
+                      '&:hover': { bgcolor: alpha('#00357a', 0.2) },
                     }}
                   >
                     <SendIcon sx={{ fontSize: 18 }} />

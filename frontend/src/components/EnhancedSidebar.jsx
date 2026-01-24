@@ -48,7 +48,7 @@ const EnhancedSidebar = ({
           icon: <SpeedIcon />,
           primary: 'ENTERPRISE PULSE',
           secondary: 'Real-time Business Metrics',
-          color: '#00ACC1',
+          color: '#00357a',
         },
       ],
     },
@@ -60,22 +60,21 @@ const EnhancedSidebar = ({
           icon: <ForumIcon />,
           primary: 'AXIS.AI',
           secondary: 'Platform-Wide Q&A',
-          color: '#2196F3',
+          color: '#00357a',
         },
         {
           id: 1,
           icon: <AnalyticsIcon />,
           primary: 'CORE.AI',
           secondary: 'Operational Intelligence',
-          color: '#4285F4',
-          status: 'active',
+          color: '#00357a',
         },
         {
           id: 3,
           icon: <BarChartIcon />,
           primary: 'MARKETS.AI',
           secondary: 'Market Intelligence',
-          color: '#FF5722',
+          color: '#00357a',
         },
       ],
     },
@@ -87,21 +86,21 @@ const EnhancedSidebar = ({
           icon: <DescriptionIcon />,
           primary: 'DOCUMENT HUB',
           secondary: 'Upload & Analyze Documents',
-          color: '#2b88d8',
+          color: '#00357a',
         },
         {
           id: 13,
           icon: <EmailIcon />,
           primary: 'EMAIL INTEL',
           secondary: 'Email & Communication Analysis',
-          color: '#2b88d8',
+          color: '#00357a',
         },
         {
           id: 9,
           icon: <VisionIcon />,
           primary: 'VISION STUDIO',
           secondary: 'Document OCR & Image Intelligence',
-          color: '#2b88d8',
+          color: '#00357a',
         },
       ],
     },
@@ -113,7 +112,7 @@ const EnhancedSidebar = ({
           icon: <ExecutionIcon />,
           primary: 'COMMAND TOWER',
           secondary: 'Action Tracking & Audit Trail',
-          color: '#2b88d8',
+          color: '#00357a',
         },
       ],
     },
@@ -282,7 +281,7 @@ const EnhancedSidebar = ({
                       '&.Mui-selected': {
                         bgcolor: useSapTheme
                           ? 'primary.main'
-                          : '#1e3a5f',
+                          : '#00357a',
                         color: useSapTheme ? 'white' : 'white',
                         '&::before': {
                           opacity: 1,
@@ -290,7 +289,7 @@ const EnhancedSidebar = ({
                         '&:hover': {
                           bgcolor: useSapTheme
                             ? 'primary.dark'
-                            : '#264a73',
+                            : '#004494',
                         },
                         '& .MuiListItemIcon-root': {
                           color: useSapTheme ? 'white' : item.color,
@@ -313,15 +312,17 @@ const EnhancedSidebar = ({
                             selectedTab === item.id
                               ? 'transparent'
                               : darkMode
-                              ? `${item.color}35`
+                              ? `${item.color}40`
                               : useSapTheme
-                              ? `${item.color}15`
-                              : `${item.color}20`,
+                              ? `${item.color}20`
+                              : `${item.color}25`,
+                          color: selectedTab === item.id ? 'white' : item.color,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           transition: 'all 0.2s',
                           position: 'relative',
+                          '& svg': { fontSize: 20 },
                         }}
                       >
                         {item.badge && !drawerOpen ? (

@@ -242,7 +242,7 @@ export default function SmadeTrackerMap({ onBack, kitData }) {
     return (
       <Box sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#f8fafc' }}>
         <Stack alignItems="center" spacing={2}>
-          <CircularProgress size={40} sx={{ color: '#0a6ed1' }} />
+          <CircularProgress size={40} sx={{ color: '#00357a' }} />
           <Typography sx={{ color: '#64748b', fontSize: '0.9rem' }}>Loading TRACK AI...</Typography>
         </Stack>
       </Box>
@@ -278,7 +278,7 @@ export default function SmadeTrackerMap({ onBack, kitData }) {
             <Box sx={{
               p: 0.75,
               borderRadius: 1,
-              background: 'linear-gradient(135deg, #0a6ed1 0%, #0854a0 100%)',
+              background: 'linear-gradient(135deg, #00357a 0%, #002352 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -287,7 +287,7 @@ export default function SmadeTrackerMap({ onBack, kitData }) {
               <SensorsIcon sx={{ fontSize: 18, color: 'white' }} />
             </Box>
             <Typography sx={{ fontSize: '0.95rem', fontWeight: 700, color: '#1e293b' }}>TRACK AI</Typography>
-            <Chip label="TRAXX.AI" size="small" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700, bgcolor: alpha('#0a6ed1', 0.15), color: '#0854a0' }} />
+            <Chip label="TRAXX.AI" size="small" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700, bgcolor: alpha('#00357a', 0.15), color: '#002352' }} />
             <Chip label="IoT" size="small" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700, bgcolor: alpha('#10b981', 0.15), color: '#059669' }} />
           </Stack>
 
@@ -502,13 +502,13 @@ function FilterToggle({ icon, label, active, onClick }) {
         height: 32,
         fontSize: '0.75rem',
         fontWeight: 600,
-        bgcolor: active ? alpha('#0a6ed1', 0.15) : alpha('#64748b', 0.08),
-        color: active ? '#0854a0' : '#64748b',
+        bgcolor: active ? alpha('#00357a', 0.15) : alpha('#64748b', 0.08),
+        color: active ? '#002352' : '#64748b',
         border: '1px solid',
-        borderColor: active ? alpha('#0a6ed1', 0.3) : 'transparent',
+        borderColor: active ? alpha('#00357a', 0.3) : 'transparent',
         borderRadius: 2,
         cursor: 'pointer',
-        '&:hover': { bgcolor: active ? alpha('#0a6ed1', 0.2) : alpha('#64748b', 0.12) },
+        '&:hover': { bgcolor: active ? alpha('#00357a', 0.2) : alpha('#64748b', 0.12) },
         '& .MuiChip-icon': { color: 'inherit', ml: 1 },
         '& .MuiChip-label': { px: 1.5 },
       }}

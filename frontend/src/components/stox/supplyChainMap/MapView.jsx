@@ -9,8 +9,8 @@ import { mockRoutes } from './mockData';
 const createClusterIcon = (cluster, type) => {
   const count = cluster.getChildCount();
   const colors = {
-    trucks: { bg: '#2b88d8', border: '#0078d4' },
-    stores: { bg: '#0078d4', border: '#005a9e' },
+    trucks: { bg: '#1a5a9e', border: '#00357a' },
+    stores: { bg: '#00357a', border: '#002352' },
     alerts: { bg: '#f97316', border: '#ea580c' },
   };
   const { bg, border } = colors[type] || colors.trucks;
@@ -52,12 +52,12 @@ const MAP_STYLES = {
 // Custom marker icons - supports ground, air, sea shipments
 const createTruckIcon = (status, shipmentType = 'ground') => {
   const colors = {
-    'in-transit': '#2b88d8',
+    'in-transit': '#1a5a9e',
     'delayed': '#f97316',
     'idle': '#94a3b8',
     'delivered': '#10b981',
   };
-  const color = colors[status] || '#2b88d8';
+  const color = colors[status] || '#1a5a9e';
   const shouldPulse = status === 'delayed';
 
   // Different icons for different shipment types
@@ -102,7 +102,7 @@ const createStoreIcon = (stockLevel, facilityType) => {
   if (isVendor) {
     color = '#10b981'; // Green for vendors
   } else {
-    color = stockLevel < 60 ? '#ef4444' : stockLevel < 75 ? '#f59e0b' : '#0078d4';
+    color = stockLevel < 60 ? '#ef4444' : stockLevel < 75 ? '#f59e0b' : '#00357a';
   }
 
   const shouldPulse = isPlant && stockLevel < 70;
@@ -373,7 +373,7 @@ export default function MapView({
                     <span style={{
                       padding: '2px 8px', borderRadius: '4px', fontSize: '0.625rem', fontWeight: 700,
                       background: store.facility_type === 'plant' ? '#deecf9' : '#d1fae5',
-                      color: store.facility_type === 'plant' ? '#0078d4' : '#059669',
+                      color: store.facility_type === 'plant' ? '#00357a' : '#059669',
                     }}>
                       {store.facility_type === 'plant' ? 'PLANT' : 'VENDOR'}
                     </span>
@@ -388,7 +388,7 @@ export default function MapView({
                         {store.inventory_value && (
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                             <span style={{ color: '#64748b' }}>Inventory:</span>
-                            <span style={{ color: '#0078d4', fontWeight: 600 }}>${(store.inventory_value / 1000000).toFixed(0)}M</span>
+                            <span style={{ color: '#00357a', fontWeight: 600 }}>${(store.inventory_value / 1000000).toFixed(0)}M</span>
                           </div>
                         )}
                         {store.customers && (
@@ -421,7 +421,7 @@ export default function MapView({
                   )}
                   <button
                     onClick={(e) => { e.stopPropagation(); onStoreClick?.(store); }}
-                    style={{ width: '100%', padding: '6px', background: store.facility_type === 'plant' ? '#0078d4' : '#10b981', color: 'white', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                    style={{ width: '100%', padding: '6px', background: store.facility_type === 'plant' ? '#00357a' : '#10b981', color: 'white', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
                   >
                     {store.facility_type === 'plant' ? 'View Plant Details' : 'View Vendor Profile'}
                   </button>
@@ -438,7 +438,7 @@ export default function MapView({
         if (route.length < 2) return null;
 
         const routeColor = truck.status === 'delayed' ? '#f97316' :
-                          truck.status === 'in-transit' ? '#0078d4' :
+                          truck.status === 'in-transit' ? '#00357a' :
                           truck.status === 'delivered' ? '#10b981' : '#94a3b8';
 
         // Generate curved arc points for smoother routes
@@ -511,7 +511,7 @@ export default function MapView({
                     <span style={{
                       padding: '2px 8px', borderRadius: '4px', fontSize: '0.625rem', fontWeight: 700,
                       background: truck.status === 'delayed' ? '#ffedd5' : truck.status === 'in-transit' ? '#deecf9' : truck.status === 'delivered' ? '#dcfce7' : '#f1f5f9',
-                      color: truck.status === 'delayed' ? '#c2410c' : truck.status === 'in-transit' ? '#106ebe' : truck.status === 'delivered' ? '#15803d' : '#64748b',
+                      color: truck.status === 'delayed' ? '#c2410c' : truck.status === 'in-transit' ? '#1a5a9e' : truck.status === 'delivered' ? '#15803d' : '#64748b',
                     }}>
                       {(truck.type || 'ground').toUpperCase()} • {truck.status.toUpperCase()}
                     </span>
@@ -543,13 +543,13 @@ export default function MapView({
                     {truck.value && (
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span style={{ color: '#64748b' }}>Value:</span>
-                        <span style={{ color: '#0078d4', fontWeight: 600 }}>${(truck.value / 1000000).toFixed(2)}M</span>
+                        <span style={{ color: '#00357a', fontWeight: 600 }}>${(truck.value / 1000000).toFixed(2)}M</span>
                       </div>
                     )}
                   </div>
                   <button
                     onClick={(e) => { e.stopPropagation(); onTruckClick?.(truck); }}
-                    style={{ width: '100%', padding: '6px', background: '#0078d4', color: 'white', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                    style={{ width: '100%', padding: '6px', background: '#00357a', color: 'white', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
                   >
                     Track Shipment
                   </button>
@@ -588,13 +588,13 @@ export default function MapView({
                         <span style={{
                           padding: '2px 8px', borderRadius: '4px', fontSize: '0.625rem', fontWeight: 700, textTransform: 'uppercase',
                           background: severity === 'critical' ? '#fef2f2' : severity === 'high' ? '#fff7ed' : severity === 'medium' ? '#fefce8' : '#eff6ff',
-                          color: severity === 'critical' ? '#b91c1c' : severity === 'high' ? '#c2410c' : severity === 'medium' ? '#a16207' : '#106ebe',
+                          color: severity === 'critical' ? '#b91c1c' : severity === 'high' ? '#c2410c' : severity === 'medium' ? '#a16207' : '#1a5a9e',
                         }}>
                           {severity}
                         </span>
                       </div>
                     </div>
-                    <p style={{ fontSize: '0.75rem', color: '#0078d4', margin: '0 0 12px 0', lineHeight: 1.4 }}>{alert.message}</p>
+                    <p style={{ fontSize: '0.75rem', color: '#00357a', margin: '0 0 12px 0', lineHeight: 1.4 }}>{alert.message}</p>
                     <button
                       onClick={(e) => { e.stopPropagation(); onAlertClick?.(alert); }}
                       style={{ width: '100%', padding: '6px', background: '#ea580c', color: 'white', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}

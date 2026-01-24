@@ -143,7 +143,7 @@ const MarketsAIDashboard = () => {
       timeframe: '24-48 hours',
       confidence: '94%',
       status: automationLevel === 'autonomous' ? 'auto-approved' : 'pending',
-      color: '#2196f3',
+      color: '#00357a',
       actions: [
         { 
           id: 'ACT-001',
@@ -221,7 +221,7 @@ const MarketsAIDashboard = () => {
       label: 'Supervised AI', 
       icon: <SupervisorIcon />,
       description: 'AI executes pre-approved actions with oversight',
-      color: '#2196f3',
+      color: '#00357a',
     },
     { 
       value: 'autonomous', 
@@ -1067,7 +1067,7 @@ const MarketsAIDashboard = () => {
                     <YAxis />
                     <RechartsTooltip />
                     <Bar dataKey="congestion" fill="#ff5252" name="Congestion %" />
-                    <Bar dataKey="avgDelay" fill="#2196f3" name="Avg Delay (days)" />
+                    <Bar dataKey="avgDelay" fill="#00357a" name="Avg Delay (days)" />
                   </BarChart>
                 </ResponsiveContainer>
               </Paper>
@@ -1284,7 +1284,7 @@ const MarketsAIDashboard = () => {
                         <XAxis dataKey="phase" />
                         <YAxis />
                         <RechartsTooltip />
-                        <Line type="monotone" dataKey="progress" stroke="#2196f3" strokeWidth={2} />
+                        <Line type="monotone" dataKey="progress" stroke="#00357a" strokeWidth={2} />
                       </LineChart>
                     </ResponsiveContainer>
                   </Paper>

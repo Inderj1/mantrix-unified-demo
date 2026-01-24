@@ -40,7 +40,7 @@ const TimeGranularitySelector = ({ value, onChange, sx }) => {
                 borderColor: 'primary.main',
                 bgcolor: value === option.value
                   ? 'primary.main'
-                  : alpha('#0a6ed1', 0.04),
+                  : alpha('#00357a', 0.04),
               },
             }}
           >

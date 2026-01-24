@@ -48,10 +48,10 @@ import stoxTheme from '../stox/stoxTheme';
 
 const API_BASE = `${import.meta.env.VITE_API_URL || ''}/api/v1/margen/csg`;
 
-const COLORS = ['#10b981', '#2b88d8', '#f59e0b', '#ef4444', '#8b5cf6'];
+const COLORS = ['#10b981', '#1a5a9e', '#f59e0b', '#ef4444', '#8b5cf6'];
 
 const getColors = (darkMode) => ({
-  primary: darkMode ? '#4da6ff' : '#0a6ed1',
+  primary: darkMode ? '#4d9eff' : '#00357a',
   text: darkMode ? '#e6edf3' : '#1e293b',
   textSecondary: darkMode ? '#8b949e' : '#64748b',
   background: darkMode ? '#0d1117' : '#f8fbfd',
@@ -117,7 +117,7 @@ const MarginProfitabilityAnalytics = ({ onBack, darkMode = false }) => {
 
   const getMarginColor = (gmPercent) => {
     if (gmPercent >= 90) return '#10b981';
-    if (gmPercent >= 85) return '#2b88d8';
+    if (gmPercent >= 85) return '#1a5a9e';
     if (gmPercent >= 80) return '#f59e0b';
     return '#ef4444';
   };
@@ -379,10 +379,10 @@ const MarginProfitabilityAnalytics = ({ onBack, darkMode = false }) => {
             </Card>
           </Grid>
           <Grid item xs={12} md={6}>
-            <Card sx={{ height: '100%', border: `2px solid ${alpha('#2b88d8', 0.3)}`, bgcolor: darkMode ? colors.cardBg : alpha('#2b88d8', 0.02) }}>
+            <Card sx={{ height: '100%', border: `2px solid ${alpha('#1a5a9e', 0.3)}`, bgcolor: darkMode ? colors.cardBg : alpha('#1a5a9e', 0.02) }}>
               <CardContent>
                 <Stack direction="row" spacing={2} alignItems="center">
-                  <StarIcon sx={{ fontSize: 40, color: '#2b88d8' }} />
+                  <StarIcon sx={{ fontSize: 40, color: '#1a5a9e' }} />
                   <Box>
                     <Typography variant="caption" color="text.secondary">
                       Top Distributor by GM%

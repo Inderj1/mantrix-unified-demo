@@ -34,8 +34,8 @@ import {
   CloudSync as CloudSyncIcon,
 } from '@mui/icons-material';
 
-// Single consistent blue for all modules
-const MODULE_COLOR = '#0078d4';
+// Import centralized brand colors
+import { MODULE_COLOR } from '../config/brandColors';
 
 // Category tiles
 const categoryTiles = [
@@ -206,9 +206,9 @@ const OrdlyAILanding = ({ onTileClick, onBack }) => {
             <Box sx={{ width: 4, height: 60, bgcolor: MODULE_COLOR, borderRadius: 2 }} />
             <Box>
               <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
-                <Avatar sx={{ width: 32, height: 32, bgcolor: '#0078d4' }}><InventoryIcon sx={{ fontSize: 18 }} /></Avatar>
-                <Typography variant="h5" fontWeight={700} sx={{ color: '#0078d4' }}>ORDLY AI (MADE TO STOCK)</Typography>
-                <Chip label="5 Tiles" size="small" sx={{ bgcolor: alpha('#0078d4', 0.1), color: '#0078d4', fontWeight: 600, fontSize: '0.7rem' }} />
+                <Avatar sx={{ width: 32, height: 32, bgcolor: MODULE_COLOR }}><InventoryIcon sx={{ fontSize: 18 }} /></Avatar>
+                <Typography variant="h5" fontWeight={700} sx={{ color: MODULE_COLOR }}>ORDLY AI (MADE TO STOCK)</Typography>
+                <Chip label="5 Tiles" size="small" sx={{ bgcolor: alpha(MODULE_COLOR, 0.1), color: MODULE_COLOR, fontWeight: 600, fontSize: '0.7rem' }} />
               </Stack>
               <Typography variant="body2" color="text.secondary">End-to-end Make-to-Stock order intelligence from demand signal to SAP commitment</Typography>
             </Box>
