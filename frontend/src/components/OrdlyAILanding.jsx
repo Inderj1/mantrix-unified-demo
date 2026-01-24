@@ -281,7 +281,7 @@ const OrdlyAILanding = ({ onTileClick, onBack }) => {
               <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
                 <Avatar sx={{ width: 32, height: 32, bgcolor: MODULE_COLOR }}><ShoppingCartIcon sx={{ fontSize: 18 }} /></Avatar>
                 <Typography variant="h5" fontWeight={700} sx={{ color: MODULE_COLOR }}>ORDLY AI (MADE TO ORDER)</Typography>
-                <Chip label="6 Tiles" size="small" sx={{ bgcolor: alpha(MODULE_COLOR, 0.1), color: MODULE_COLOR, fontWeight: 600, fontSize: '0.7rem' }} />
+                <Chip label="5 Tiles" size="small" sx={{ bgcolor: alpha(MODULE_COLOR, 0.1), color: MODULE_COLOR, fontWeight: 600, fontSize: '0.7rem' }} />
               </Stack>
               <Typography variant="body2" color="text.secondary">Configure-to-Order and Make-to-Order intelligence from intent to SAP commitment</Typography>
             </Box>

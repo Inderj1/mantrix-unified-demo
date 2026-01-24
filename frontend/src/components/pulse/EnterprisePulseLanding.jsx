@@ -14,7 +14,7 @@ import {
 import {
   NotificationsActive as AlertsIcon,
   SmartToy as AgentsIcon,
-  Radar as RadarIcon,
+  MonitorHeart as PulseIcon,
   ArrowForward as ArrowForwardIcon,
 } from '@mui/icons-material';
 
@@ -58,20 +58,9 @@ const EnterprisePulseLanding = ({ onTileClick, alertCount = 0, agentCount = 0, d
       {/* Header */}
       <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: colors.shadow, bgcolor: colors.paper }}>
         <Box display="flex" alignItems="center" gap={2}>
-          <Box
-            sx={{
-              width: 48,
-              height: 48,
-              borderRadius: 2,
-              background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: `0 4px 14px ${alpha(colors.primary, 0.3)}`,
-            }}
-          >
-            <RadarIcon sx={{ fontSize: 24, color: '#fff' }} />
-          </Box>
+          <Avatar sx={{ width: 32, height: 32, bgcolor: colors.primary }}>
+            <PulseIcon sx={{ fontSize: 18 }} />
+          </Avatar>
           <Box>
             <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
               Enterprise Pulse

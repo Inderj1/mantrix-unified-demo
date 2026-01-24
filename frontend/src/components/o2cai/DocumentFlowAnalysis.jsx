@@ -8,10 +8,14 @@ import {
   Chip,
   IconButton,
   alpha,
+  Stack,
+  Breadcrumbs,
+  Link,
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import {
   ArrowBack as ArrowBackIcon,
+  NavigateNext as NavigateNextIcon,
   ArrowForward as ArrowForwardIcon,
   AccountTree as AccountTreeIcon,
   Speed as SpeedIcon,
@@ -170,6 +174,21 @@ const DocumentFlowAnalysis = ({ onBack, darkMode = false, onNavigate }) => {
 
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: darkMode ? '#0d1117' : '#f8fafc' }}>
+      {/* Breadcrumb Navigation */}
+      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ px: 2, py: 1, bgcolor: darkMode ? '#161b22' : '#ffffff', borderBottom: `1px solid ${darkMode ? '#21262d' : '#e2e8f0'}` }}>
+        <Breadcrumbs separator={<NavigateNextIcon fontSize="small" sx={{ color: darkMode ? '#8b949e' : '#64748b' }} />}>
+          <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: darkMode ? '#e6edf3' : '#1e293b', '&:hover': { textDecoration: 'underline' } }}>
+            O2C.AI
+          </Link>
+          <Typography variant="body1" fontWeight={600} sx={{ color: darkMode ? '#4d9eff' : '#00357a' }}>
+            Document Flow Analysis
+          </Typography>
+        </Breadcrumbs>
+        <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ color: darkMode ? '#4d9eff' : '#00357a', borderColor: darkMode ? '#4d9eff' : '#00357a' }}>
+          Back
+        </Button>
+      </Stack>
+
       {/* Header */}
       <Paper
         elevation={0}
@@ -183,8 +202,8 @@ const DocumentFlowAnalysis = ({ onBack, darkMode = false, onNavigate }) => {
       >
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <IconButton onClick={onBack} size="small" sx={{ color: darkMode ? '#e2e8f0' : PRIMARY_BLUE }}>
-              <ArrowBackIcon />
+            <IconButton sx={{ bgcolor: alpha(PRIMARY_BLUE, 0.1) }}>
+              <AccountTreeIcon sx={{ color: darkMode ? '#4d9eff' : PRIMARY_BLUE }} />
             </IconButton>
             <Box>
               <Typography variant="h6" sx={{ fontWeight: 700, color: darkMode ? '#e2e8f0' : PRIMARY_BLUE }}>

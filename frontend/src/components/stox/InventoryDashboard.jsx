@@ -772,10 +772,6 @@ const InventoryDashboard = ({ onBack, onTileClick, darkMode = false }) => {
 
     return (
       <Box sx={{ flex: 1, overflow: 'auto' }}>
-        <Button startIcon={<ArrowBackIcon />} onClick={handleBackToList} variant="outlined" size="small" sx={{ mb: 2 }}>
-          Back to List
-        </Button>
-
         {/* Header */}
         <Paper sx={{ p: 3, mb: 3, bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
           <Stack direction="row" justifyContent="space-between" alignItems="flex-start">

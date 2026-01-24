@@ -382,11 +382,8 @@ const NexxtTrackOperations = ({ onBack }) => {
 
     return (
       <Box sx={{ flex: 1, overflow: 'auto' }}>
-        {/* Header */}
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Button startIcon={<ArrowBackIcon />} onClick={handleBackToList} variant="outlined" size="small">
-            Back to List
-          </Button>
+        {/* Header Chips */}
+        <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ mb: 2 }}>
           <Stack direction="row" spacing={1}>
             <Chip
               label={selectedRow.tracker_id}
@@ -593,17 +590,35 @@ const NexxtTrackOperations = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>TRACK AI</Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
-              {selectedRow ? `Tracker ${selectedRow.tracker_id}` : 'Operations'}
-            </Typography>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+              TRAXX.AI
+            </Link>
+            {selectedRow ? (
+              <>
+                <Link component="button" variant="body1" onClick={() => setSelectedRow(null)} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+                  Operations
+                </Link>
+                <Typography color="primary" variant="body1" fontWeight={600}>
+                  Tracker {selectedRow.tracker_id}
+                </Typography>
+              </>
+            ) : (
+              <Typography color="primary" variant="body1" fontWeight={600}>
+                Operations
+              </Typography>
+            )}
           </Breadcrumbs>
-          {!selectedRow && (
-            <Stack direction="row" spacing={1}>
-              <Tooltip title="Refresh"><IconButton onClick={fetchData} color="primary"><Refresh /></IconButton></Tooltip>
-              <Tooltip title="Export"><IconButton color="primary"><Download /></IconButton></Tooltip>
-            </Stack>
-          )}
+          <Stack direction="row" spacing={1}>
+            {!selectedRow && (
+              <>
+                <Tooltip title="Refresh"><IconButton onClick={fetchData} color="primary"><Refresh /></IconButton></Tooltip>
+                <Tooltip title="Export"><IconButton color="primary"><Download /></IconButton></Tooltip>
+              </>
+            )}
+            <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ color: '#00357a', borderColor: '#00357a' }}>
+              Back
+            </Button>
+          </Stack>
         </Stack>
 
         {!selectedRow && (

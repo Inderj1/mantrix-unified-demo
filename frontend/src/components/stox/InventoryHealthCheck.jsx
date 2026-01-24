@@ -343,10 +343,6 @@ const InventoryHealthCheck = ({ onBack, darkMode = false }) => {
 
     return (
       <Box sx={{ flex: 1, overflow: 'auto' }}>
-        <Button startIcon={<ArrowBackIcon />} onClick={handleBackToList} variant="outlined" size="small" sx={{ mb: 2 }}>
-          Back to List
-        </Button>
-
         <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
           <HealthIcon sx={{ fontSize: 40, color: '#06b6d4' }} />
           <Box>

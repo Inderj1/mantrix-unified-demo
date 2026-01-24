@@ -610,25 +610,37 @@ const LogisticsEconomics = ({ onBack }) => {
 
     return (
       <Box sx={{ flex: 1, overflow: 'auto' }}>
-        {/* Header with Back Button */}
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Button startIcon={<ArrowBackIcon />} onClick={handleBackToList} variant="outlined" size="small">
-            Back to Movement List
-          </Button>
-          <Stack direction="row" spacing={1}>
-            <Chip label={m.id} size="small" sx={{ bgcolor: alpha('#10b981', 0.12), color: '#059669', fontWeight: 700, border: '1px solid', borderColor: alpha('#059669', 0.2) }} />
-            <Chip label={m.movementType} size="small" sx={getTypeChipProps(m.movementType)} />
-          </Stack>
-        </Stack>
-
-        {/* Movement Title */}
-        <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5, color: '#059669' }}>{m.id}</Typography>
-        <Typography sx={{ color: '#64748b', mb: 1 }}>{m.movementType} — {m.origin} → {m.destination}</Typography>
-        <Stack direction="row" spacing={1} sx={{ mb: 3 }}>
-          <Chip label={m.carrier} size="small" sx={getCarrierChipProps(m.carrier)} />
-          <Chip label={m.serviceClass} size="small" sx={getServiceChipProps(m.serviceClass)} />
-          <Chip label={m.optimizationSignal} size="small" sx={getOptimizationChipProps(m.optimizationType)} />
-        </Stack>
+        {/* Movement Header */}
+        <Paper
+          elevation={0}
+          sx={{
+            p: 2,
+            mb: 3,
+            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(6, 182, 212, 0.05) 100%)',
+            borderBottom: '2px solid',
+            borderColor: alpha('#10b981', 0.2),
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <IconButton sx={{ bgcolor: alpha('#10b981', 0.1) }}>
+                <ShippingIcon sx={{ color: '#059669' }} />
+              </IconButton>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: '#059669' }}>
+                  {m.id}
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#64748b' }}>
+                  {m.movementType} • {m.origin} → {m.destination}
+                </Typography>
+              </Box>
+            </Box>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Chip label={m.carrier} size="small" sx={getCarrierChipProps(m.carrier)} />
+              <Chip label={m.serviceClass} size="small" sx={getServiceChipProps(m.serviceClass)} />
+            </Stack>
+          </Box>
+        </Paper>
 
         {/* Cost Variance Banner */}
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2, mb: 3, borderRadius: 2, bgcolor: alpha(varianceColor, 0.08), border: `1px solid ${alpha(varianceColor, 0.2)}` }}>
@@ -869,23 +881,39 @@ const LogisticsEconomics = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
               TRAXX.AI
             </Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
-              {selectedMovement ? selectedMovement.id : 'Logistics Economics'}
-            </Typography>
+            {selectedMovement ? (
+              <>
+                <Link component="button" variant="body1" onClick={() => setSelectedMovement(null)} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+                  Logistics Economics
+                </Link>
+                <Typography color="primary" variant="body1" fontWeight={600}>
+                  {selectedMovement.id}
+                </Typography>
+              </>
+            ) : (
+              <Typography color="primary" variant="body1" fontWeight={600}>
+                Logistics Economics
+              </Typography>
+            )}
           </Breadcrumbs>
-          {!selectedMovement && (
-            <Stack direction="row" spacing={1}>
-              <Tooltip title="Refresh">
-                <IconButton onClick={fetchData} color="primary"><Refresh /></IconButton>
-              </Tooltip>
-              <Tooltip title="Export">
-                <IconButton color="primary"><Download /></IconButton>
-              </Tooltip>
-            </Stack>
-          )}
+          <Stack direction="row" spacing={1}>
+            {!selectedMovement && (
+              <>
+                <Tooltip title="Refresh">
+                  <IconButton onClick={fetchData} color="primary"><Refresh /></IconButton>
+                </Tooltip>
+                <Tooltip title="Export">
+                  <IconButton color="primary"><Download /></IconButton>
+                </Tooltip>
+              </>
+            )}
+            <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ color: '#00357a', borderColor: '#00357a' }}>
+              Back
+            </Button>
+          </Stack>
         </Stack>
 
         {/* Optimization Banner - Only show in list view */}

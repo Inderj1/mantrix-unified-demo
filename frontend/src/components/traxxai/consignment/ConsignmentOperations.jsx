@@ -173,11 +173,8 @@ const ConsignmentOperations = ({ onBack }) => {
 
     return (
       <Box sx={{ flex: 1, overflow: 'auto' }}>
-        {/* Header */}
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Button startIcon={<ArrowBackIcon />} onClick={handleBackToList} variant="outlined" size="small">
-            Back to List
-          </Button>
+        {/* Header Chips */}
+        <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ mb: 2 }}>
           <Stack direction="row" spacing={1}>
             <Chip label={selectedRow.kit_id} size="small" sx={{ fontWeight: 700, bgcolor: alpha('#64748b', 0.1), color: '#64748b' }} />
             <Chip icon={<SwapHoriz sx={{ fontSize: 14 }} />} label="Consignment" size="small" sx={{ fontWeight: 600, bgcolor: alpha('#8b5cf6', 0.1), color: '#8b5cf6' }} />
@@ -358,11 +355,22 @@ const ConsignmentOperations = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>TRAXX.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Consignment Process</Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
-              {selectedRow ? `Kit ${selectedRow.kit_id}` : 'Operations'}
-            </Typography>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>TRAXX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>Consignment Process</Link>
+            {selectedRow ? (
+              <>
+                <Link component="button" variant="body1" onClick={handleBackToList} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+                  Operations
+                </Link>
+                <Typography color="primary" variant="body1" fontWeight={600}>
+                  Kit {selectedRow.kit_id}
+                </Typography>
+              </>
+            ) : (
+              <Typography color="primary" variant="body1" fontWeight={600}>
+                Operations
+              </Typography>
+            )}
           </Breadcrumbs>
           {!selectedRow && (
             <Stack direction="row" spacing={1}>

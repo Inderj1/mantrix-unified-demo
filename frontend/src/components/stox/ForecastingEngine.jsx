@@ -462,16 +462,8 @@ const ForecastingEngine = ({ onBack, onTileClick, darkMode = false }) => {
 
     return (
       <Box sx={{ flex: 1, overflow: 'auto' }}>
-        {/* Header with Back Button */}
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Button
-            startIcon={<ArrowBackIcon />}
-            onClick={handleBackToList}
-            variant="outlined"
-            size="small"
-          >
-            Back to List
-          </Button>
+        {/* Header with chips */}
+        <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ mb: 2 }}>
           <Stack direction="row" spacing={1}>
             <Chip label={selectedSku.id} size="small" sx={{ bgcolor: alpha('#64748b', 0.1) }} />
             <Chip label={selectedSku.pattern} size="small" color="info" />

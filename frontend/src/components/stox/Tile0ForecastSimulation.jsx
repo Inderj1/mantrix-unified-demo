@@ -586,15 +586,6 @@ const Tile0ForecastSimulation = ({ onBack, darkMode = false }) => {
 
     return (
       <Box sx={{ flex: 1, overflow: 'auto' }}>
-        {/* Back Button */}
-        <Button
-          startIcon={<ArrowBackIcon />}
-          onClick={handleBackToList}
-          sx={{ mb: 3, color: '#64748b', '&:hover': { bgcolor: alpha('#1a5a9e', 0.1), color: '#1a5a9e' } }}
-        >
-          Back to Overview
-        </Button>
-
         {/* Detail Header */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
           <Box sx={{
@@ -1020,12 +1011,15 @@ const Tile0ForecastSimulation = ({ onBack, darkMode = false }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 2: Diagnostics</Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
-              {selectedSku ? `${selectedSku.material} Detail` : 'Inventory Health Dashboard'}
-            </Typography>
+            {selectedSku ? (
+              <>
+                <Link component="button" variant="body1" onClick={() => setSelectedSku(null)} sx={{ textDecoration: 'none', color: 'text.primary' }}>Inventory Health Dashboard</Link>
+                <Typography color="primary" variant="body1" fontWeight={600}>{selectedSku.material}</Typography>
+              </>
+            ) : (
+              <Typography color="primary" variant="body1" fontWeight={600}>Inventory Health Dashboard</Typography>
+            )}
           </Breadcrumbs>
           {!selectedSku && (
             <Stack direction="row" spacing={1}>

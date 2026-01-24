@@ -560,25 +560,37 @@ const RealizedMarginCash = ({ onBack }) => {
 
     return (
       <Box sx={{ flex: 1, overflow: 'auto' }}>
-        {/* Header with Back Button */}
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Button startIcon={<ArrowBackIcon />} onClick={handleBackToList} variant="outlined" size="small">
-            Back to Case List
-          </Button>
-          <Stack direction="row" spacing={1}>
-            <Chip label={c.id} size="small" sx={{ bgcolor: alpha('#ec4899', 0.12), color: '#db2777', fontWeight: 700, border: '1px solid', borderColor: alpha('#db2777', 0.2) }} />
-            <Chip label={c.procedureType} size="small" sx={{ bgcolor: alpha('#06b6d4', 0.12), color: '#0891b2', border: '1px solid', borderColor: alpha('#0891b2', 0.2) }} />
-          </Stack>
-        </Stack>
-
-        {/* Case Title */}
-        <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5, color: '#ec4899' }}>{c.id}</Typography>
-        <Typography sx={{ color: '#64748b', mb: 1 }}>{c.procedureType} Procedure — {c.hospital} — {new Date(c.surgeryDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</Typography>
-        <Stack direction="row" spacing={1} sx={{ mb: 3 }}>
-          <Chip label={c.kitId} size="small" sx={{ bgcolor: alpha('#06b6d4', 0.12), color: '#0891b2', fontWeight: 600 }} />
-          <Chip label={c.hospitalShort} size="small" sx={{ bgcolor: alpha('#10b981', 0.12), color: '#059669', fontWeight: 600 }} />
-          <Chip label={c.distributorShort} size="small" sx={{ bgcolor: alpha('#a855f7', 0.12), color: '#9333ea', fontWeight: 600 }} />
-        </Stack>
+        {/* Case Header */}
+        <Paper
+          elevation={0}
+          sx={{
+            p: 2,
+            mb: 3,
+            background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.08) 0%, rgba(168, 85, 247, 0.05) 100%)',
+            borderBottom: '2px solid',
+            borderColor: alpha('#ec4899', 0.2),
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <IconButton sx={{ bgcolor: alpha('#ec4899', 0.1) }}>
+                <AssessmentIcon sx={{ color: '#ec4899' }} />
+              </IconButton>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: '#ec4899' }}>
+                  {c.id}
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#64748b' }}>
+                  {c.procedureType} Procedure • {c.hospital} • {new Date(c.surgeryDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                </Typography>
+              </Box>
+            </Box>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Chip label={c.kitId} size="small" sx={{ bgcolor: alpha('#06b6d4', 0.12), color: '#0891b2', fontWeight: 600 }} />
+              <Chip label={c.hospitalShort} size="small" sx={{ bgcolor: alpha('#10b981', 0.12), color: '#059669', fontWeight: 600 }} />
+            </Stack>
+          </Box>
+        </Paper>
 
         {/* EBITDA Banner */}
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2, mb: 3, borderRadius: 2, bgcolor: alpha('#84cc16', 0.08), border: `1px solid ${alpha('#84cc16', 0.3)}` }}>
@@ -778,23 +790,39 @@ const RealizedMarginCash = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
               TRAXX.AI
             </Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
-              {selectedCase ? selectedCase.id : 'Realized Margin & Cash'}
-            </Typography>
+            {selectedCase ? (
+              <>
+                <Link component="button" variant="body1" onClick={() => setSelectedCase(null)} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+                  Realized Margin & Cash
+                </Link>
+                <Typography color="primary" variant="body1" fontWeight={600}>
+                  {selectedCase.id}
+                </Typography>
+              </>
+            ) : (
+              <Typography color="primary" variant="body1" fontWeight={600}>
+                Realized Margin & Cash
+              </Typography>
+            )}
           </Breadcrumbs>
-          {!selectedCase && (
-            <Stack direction="row" spacing={1}>
-              <Tooltip title="Refresh">
-                <IconButton onClick={fetchData} color="primary"><Refresh /></IconButton>
-              </Tooltip>
-              <Tooltip title="Export">
-                <IconButton color="primary"><Download /></IconButton>
-              </Tooltip>
-            </Stack>
-          )}
+          <Stack direction="row" spacing={1}>
+            {!selectedCase && (
+              <>
+                <Tooltip title="Refresh">
+                  <IconButton onClick={fetchData} color="primary"><Refresh /></IconButton>
+                </Tooltip>
+                <Tooltip title="Export">
+                  <IconButton color="primary"><Download /></IconButton>
+                </Tooltip>
+              </>
+            )}
+            <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ color: '#00357a', borderColor: '#00357a' }}>
+              Back
+            </Button>
+          </Stack>
         </Stack>
 
         {/* Performance Banner - Only show in list view */}

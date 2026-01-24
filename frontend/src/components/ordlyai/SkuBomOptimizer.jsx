@@ -389,7 +389,6 @@ const SkuBomOptimizer = ({ onBack, darkMode = false, selectedOrder: initialOrder
               <Link component="button" variant="body1" onClick={handleBackToList} sx={{ textDecoration: 'none', color: 'text.primary' }}>Margin Based Recommendation</Link>
               <Typography color="primary" variant="body1" fontWeight={600}>{selectedOrder.id}</Typography>
             </Breadcrumbs>
-            <Button startIcon={<ArrowBackIcon />} onClick={handleBackToList} variant="outlined" size="small">Back to List</Button>
           </Stack>
           <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
             <SettingsIcon sx={{ fontSize: 40, color: '#002352' }} />
@@ -473,7 +472,6 @@ const SkuBomOptimizer = ({ onBack, darkMode = false, selectedOrder: initialOrder
                 ))}
               </Box>
               <Box sx={{ p: 2, borderTop: '1px solid', borderColor: 'divider', display: 'flex', gap: 1 }}>
-                <Button variant="outlined" size="small" onClick={handleBackToList} sx={{ flex: 1, fontSize: '0.75rem' }}>Back to Intent</Button>
                 <Button
                   variant="outlined"
                   size="small"

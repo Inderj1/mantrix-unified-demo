@@ -321,14 +321,6 @@ const WhatIfSimulator = ({ onBack, darkMode = false }) => {
     return (
       <Box>
         <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Button
-            startIcon={<ArrowBackIcon />}
-            onClick={() => setSelectedScenario(null)}
-            variant="outlined"
-            size="small"
-          >
-            Back to List
-          </Button>
           <Typography variant="h6" fontWeight={700}>
             {selectedScenario.name}
           </Typography>
@@ -538,10 +530,15 @@ const WhatIfSimulator = ({ onBack, darkMode = false }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>CORE.AI</Link>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>STOX.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Layer 5: Sandbox</Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>What-If Simulator</Typography>
+            {selectedScenario ? (
+              <>
+                <Link component="button" variant="body1" onClick={() => setSelectedScenario(null)} sx={{ textDecoration: 'none', color: 'text.primary' }}>What-If Simulator</Link>
+                <Typography color="primary" variant="body1" fontWeight={600}>{selectedScenario.name}</Typography>
+              </>
+            ) : (
+              <Typography color="primary" variant="body1" fontWeight={600}>What-If Simulator</Typography>
+            )}
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ borderColor: 'divider' }}>
             Back

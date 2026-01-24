@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import {
   Box, Paper, Typography, Grid, Card, CardContent, Chip, Button, Stack,
   IconButton, Tooltip, alpha, Select, MenuItem, FormControl, InputLabel, TextField, InputAdornment,
-  Dialog, DialogTitle, DialogContent, DialogActions, Divider, Table, TableBody, TableCell, TableRow
+  Dialog, DialogTitle, DialogContent, DialogActions, Divider, Table, TableBody, TableCell, TableRow,
+  Breadcrumbs, Link, Avatar
 } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import {
-  ConfirmationNumber as TicketIcon,
+  Flag as CommandTowerIcon,
   Refresh,
   ArrowBack as ArrowBackIcon,
+  NavigateNext as NavigateNextIcon,
   Download,
   CheckCircle,
   Schedule,
@@ -44,12 +46,17 @@ const TicketingSystem = ({ onBack, darkMode = false }) => {
   const [cancelReason, setCancelReason] = useState('');
 
   // Filter tickets by module on frontend
-  const { tickets: apiTickets, loading, refresh } = useTickets({
+  const { tickets: apiTickets, loading, error, refresh } = useTickets({
     status: statusFilter,
     type: typeFilter,
     priority: priorityFilter,
     searchTerm: searchTerm,
   });
+
+  // Log any errors for debugging
+  if (error) {
+    console.log('Command Tower - API error (using demo data):', error);
+  }
 
   // Generate demo data when API returns empty - Arizona Beverages Supply Chain
   const generateDemoTickets = () => {
@@ -427,10 +434,33 @@ const TicketingSystem = ({ onBack, darkMode = false }) => {
   return (
     <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: colors.background }}>
       {/* Header */}
+      {/* Breadcrumb Navigation */}
+      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+        <Breadcrumbs separator={<NavigateNextIcon fontSize="small" sx={{ color: colors.textSecondary }} />}>
+          <Link
+            component="button"
+            variant="body1"
+            onClick={onBack}
+            sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}
+          >
+            STOX.AI
+          </Link>
+          <Typography variant="body1" fontWeight={600} sx={{ color: colors.primary }}>
+            Command Tower
+          </Typography>
+        </Breadcrumbs>
+        <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ color: colors.primary, borderColor: colors.primary }}>
+          Back
+        </Button>
+      </Stack>
+
+      {/* Title Section */}
       <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', bgcolor: colors.paper, border: `1px solid ${colors.border}` }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <TicketIcon sx={{ fontSize: 40, color: '#00357a' }} />
-          <Box sx={{ flex: 1 }}>
+          <Avatar sx={{ width: 32, height: 32, bgcolor: colors.primary }}>
+            <CommandTowerIcon sx={{ fontSize: 18 }} />
+          </Avatar>
+          <Box>
             <Typography variant="h5" fontWeight={600} sx={{ color: colors.text }}>
               COMMAND TOWER
             </Typography>
@@ -438,9 +468,6 @@ const TicketingSystem = ({ onBack, darkMode = false }) => {
               Action tracking & audit trail for all execution operations
             </Typography>
           </Box>
-          <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ color: colors.primary, borderColor: colors.primary }}>
-            Back
-          </Button>
         </Box>
       </Paper>
 
@@ -655,7 +682,7 @@ const TicketingSystem = ({ onBack, darkMode = false }) => {
       <Dialog open={detailsOpen} onClose={() => setDetailsOpen(false)} maxWidth="md" fullWidth PaperProps={{ sx: { bgcolor: colors.paper, color: colors.text } }}>
         <DialogTitle sx={{ bgcolor: colors.cardBg, borderBottom: `1px solid ${colors.border}` }}>
           <Stack direction="row" alignItems="center" spacing={2}>
-            <TicketIcon sx={{ color: '#1a5a9e' }} />
+            <CommandTowerIcon sx={{ color: '#1a5a9e' }} />
             <Box>
               <Typography variant="h6" fontWeight={700} sx={{ color: colors.text }}>
                 Operation Details

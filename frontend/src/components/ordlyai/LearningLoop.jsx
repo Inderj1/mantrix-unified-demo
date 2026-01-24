@@ -410,8 +410,12 @@ const LearningLoop = ({ onBack, darkMode = false }) => {
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
             <Link component="button" variant="body1" onClick={onBack}
-              sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline' } }}>
+              sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
               ORDLY.AI
+            </Link>
+            <Link component="button" variant="body1" onClick={onBack}
+              sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+              Made to Order
             </Link>
             <Typography color="primary" variant="body1" fontWeight={600}>
               Learning Loop
@@ -627,6 +631,24 @@ const LearningLoop = ({ onBack, darkMode = false }) => {
 
     return (
       <Box sx={{ height: '100%', overflow: 'auto', bgcolor: darkMode ? '#0d1117' : '#f8fafc' }}>
+        {/* Breadcrumb Header */}
+        <Box sx={{ px: 3, py: 1.5, borderBottom: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}` }}>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+              ORDLY.AI
+            </Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+              Made to Order
+            </Link>
+            <Link component="button" variant="body1" onClick={() => setSelectedOrder(null)} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+              Learning Loop
+            </Link>
+            <Typography color="primary" variant="body1" fontWeight={600}>
+              {order.orderPo}
+            </Typography>
+          </Breadcrumbs>
+        </Box>
+
         {/* Order Context Bar */}
         <Box sx={{
           display: 'flex',
@@ -638,15 +660,6 @@ const LearningLoop = ({ onBack, darkMode = false }) => {
           borderBottom: `1px solid ${alpha(PRIMARY_BLUE, 0.2)}`,
         }}>
           <Stack direction="row" alignItems="center" spacing={3}>
-            <Button
-              startIcon={<ArrowBackIcon />}
-              onClick={() => setSelectedOrder(null)}
-              size="small"
-              variant="outlined"
-              sx={{ borderColor: 'divider' }}
-            >
-              Back to Queue
-            </Button>
             <Box>
               <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: PRIMARY_BLUE }}>{order.orderPo}</Typography>
               <Stack direction="row" spacing={2} alignItems="center">

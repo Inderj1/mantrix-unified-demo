@@ -484,29 +484,37 @@ const KitControlTower = ({ onBack }) => {
 
     return (
       <Box sx={{ flex: 1, overflow: 'auto' }}>
-        {/* Header with Back Button */}
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Button startIcon={<ArrowBackIcon />} onClick={handleBackToList} variant="outlined" size="small">
-            Back to Kit List
-          </Button>
-          <Stack direction="row" spacing={1}>
-            <Chip label={selectedKit.id} size="small" sx={{ ...traxxTheme.chips.kitId, fontWeight: 700 }} />
-            <Chip
-              label={selectedKit.priority.toUpperCase()}
-              size="small"
-              sx={{ ...getPriorityChipProps(selectedKit.priority), fontWeight: 700 }}
-            />
-          </Stack>
-        </Stack>
-
-        {/* Kit Title */}
-        <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5, color: '#0891b2' }}>{selectedKit.id}</Typography>
-        <Typography sx={{ color: '#64748b', mb: 1 }}>{selectedKit.kitSerial} | {selectedKit.kitCategory} | {selectedKit.hospitalName}</Typography>
-        <Stack direction="row" spacing={1} sx={{ mb: 3 }}>
-          <Chip label={selectedKit.kitType} size="small" sx={getTypeChipProps(selectedKit.kitType)} />
-          <Chip label={selectedKit.currentStatus} size="small" sx={getStatusChipProps(selectedKit.currentStatus)} />
-          <Chip label={selectedKit.kitCategory} size="small" sx={getCategoryChipProps(selectedKit.kitCategory)} />
-        </Stack>
+        {/* Kit Header */}
+        <Paper
+          elevation={0}
+          sx={{
+            p: 2,
+            mb: 3,
+            background: 'linear-gradient(135deg, rgba(8, 145, 178, 0.08) 0%, rgba(6, 182, 212, 0.05) 100%)',
+            borderBottom: '2px solid',
+            borderColor: alpha('#0891b2', 0.2),
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <IconButton sx={{ bgcolor: alpha('#0891b2', 0.1) }}>
+                <InventoryIcon sx={{ color: '#0891b2' }} />
+              </IconButton>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: '#0891b2' }}>
+                  {selectedKit.id}
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#64748b' }}>
+                  {selectedKit.kitSerial} • {selectedKit.kitCategory} • {selectedKit.hospitalName}
+                </Typography>
+              </Box>
+            </Box>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Chip label={selectedKit.kitType} size="small" sx={getTypeChipProps(selectedKit.kitType)} />
+              <Chip label={selectedKit.currentStatus} size="small" sx={getStatusChipProps(selectedKit.currentStatus)} />
+            </Stack>
+          </Box>
+        </Paper>
 
         {/* Info Cards Row */}
         <Grid container spacing={2} sx={{ mb: 3 }}>
@@ -659,68 +667,84 @@ const KitControlTower = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
               TRAXX.AI
             </Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
-              {selectedKit ? selectedKit.id : 'Kit Control Tower'}
-            </Typography>
+            {selectedKit ? (
+              <>
+                <Link component="button" variant="body1" onClick={() => setSelectedKit(null)} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+                  Kit Control Tower
+                </Link>
+                <Typography color="primary" variant="body1" fontWeight={600}>
+                  {selectedKit.id}
+                </Typography>
+              </>
+            ) : (
+              <Typography color="primary" variant="body1" fontWeight={600}>
+                Kit Control Tower
+              </Typography>
+            )}
           </Breadcrumbs>
-          {!selectedKit && (
-            <Stack direction="row" spacing={1} alignItems="center">
-              {/* View Tabs */}
-              <Tabs
-                value={activeTab}
-                onChange={handleTabChange}
-                sx={{
-                  minHeight: 32,
-                  '& .MuiTabs-indicator': {
-                    height: 2,
-                    borderRadius: '2px 2px 0 0',
-                    backgroundColor: '#0891b2',
-                  },
-                }}
-              >
-                <Tab
-                  icon={<ListIcon sx={{ fontSize: 16 }} />}
-                  iconPosition="start"
-                  label="List"
+          <Stack direction="row" spacing={1} alignItems="center">
+            {!selectedKit && (
+              <>
+                {/* View Tabs */}
+                <Tabs
+                  value={activeTab}
+                  onChange={handleTabChange}
                   sx={{
                     minHeight: 32,
-                    py: 0.25,
-                    px: 1.5,
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    textTransform: 'none',
-                    color: '#64748b',
-                    '&.Mui-selected': { color: '#0891b2' },
+                    '& .MuiTabs-indicator': {
+                      height: 2,
+                      borderRadius: '2px 2px 0 0',
+                      backgroundColor: '#0891b2',
+                    },
                   }}
-                />
-                <Tab
-                  icon={<MapIcon sx={{ fontSize: 16 }} />}
-                  iconPosition="start"
-                  label="Map"
-                  sx={{
-                    minHeight: 32,
-                    py: 0.25,
-                    px: 1.5,
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    textTransform: 'none',
-                    color: '#64748b',
-                    '&.Mui-selected': { color: '#0891b2' },
-                  }}
-                />
-              </Tabs>
-              <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-              <Tooltip title="Refresh">
-                <IconButton onClick={fetchData} color="primary" size="small"><Refresh /></IconButton>
-              </Tooltip>
-              <Tooltip title="Export">
-                <IconButton color="primary" size="small"><Download /></IconButton>
-              </Tooltip>
-            </Stack>
-          )}
+                >
+                  <Tab
+                    icon={<ListIcon sx={{ fontSize: 16 }} />}
+                    iconPosition="start"
+                    label="List"
+                    sx={{
+                      minHeight: 32,
+                      py: 0.25,
+                      px: 1.5,
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      textTransform: 'none',
+                      color: '#64748b',
+                      '&.Mui-selected': { color: '#0891b2' },
+                    }}
+                  />
+                  <Tab
+                    icon={<MapIcon sx={{ fontSize: 16 }} />}
+                    iconPosition="start"
+                    label="Map"
+                    sx={{
+                      minHeight: 32,
+                      py: 0.25,
+                      px: 1.5,
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      textTransform: 'none',
+                      color: '#64748b',
+                      '&.Mui-selected': { color: '#0891b2' },
+                    }}
+                  />
+                </Tabs>
+                <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+                <Tooltip title="Refresh">
+                  <IconButton onClick={fetchData} color="primary" size="small"><Refresh /></IconButton>
+                </Tooltip>
+                <Tooltip title="Export">
+                  <IconButton color="primary" size="small"><Download /></IconButton>
+                </Tooltip>
+              </>
+            )}
+            <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ color: '#00357a', borderColor: '#00357a' }}>
+              Back
+            </Button>
+          </Stack>
         </Stack>
 
         {/* Summary Cards - Only show in list view */}

@@ -453,43 +453,45 @@ const WhoMustActNow = ({ onBack }) => {
 
     return (
       <Box sx={{ flex: 1, overflow: 'auto' }}>
-        {/* Header with Back Button */}
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Button startIcon={<ArrowBackIcon />} onClick={handleBackToList} variant="outlined" size="small">
-            Back to Action Queue
-          </Button>
-          <Stack direction="row" spacing={1}>
-            <Chip label={selectedAction.kitId} size="small" sx={{ ...traxxTheme.chips.kitId, fontWeight: 700 }} />
-            <Chip
-              label={`+${selectedAction.daysOverdue} DAYS`}
-              size="small"
-              sx={{
-                bgcolor: selectedAction.daysOverdue > 7 ? alpha('#ef4444', 0.12) : selectedAction.daysOverdue > 3 ? alpha('#f59e0b', 0.12) : alpha('#10b981', 0.12),
-                color: selectedAction.daysOverdue > 7 ? '#dc2626' : selectedAction.daysOverdue > 3 ? '#d97706' : '#059669',
-                fontWeight: 700,
-              }}
-            />
-          </Stack>
-        </Stack>
-
-        {/* Action Title */}
-        <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5, color: '#f97316' }}>{selectedAction.kitId}</Typography>
-        <Typography sx={{ color: '#64748b', mb: 1 }}>{selectedAction.requiredAction} — {selectedAction.organization}</Typography>
-        <Stack direction="row" spacing={1} sx={{ mb: 3 }}>
-          <Chip label={selectedAction.kitType} size="small" sx={traxxTheme.chips.kitTypes[selectedAction.kitType.toLowerCase()] || traxxTheme.chips.primary} />
-          <Chip label={selectedAction.currentStatus} size="small" sx={traxxTheme.chips.kitStatus[selectedAction.currentStatus.toLowerCase().replace(' ', '-')] || traxxTheme.chips.status.info} />
-          <Chip
-            label={selectedAction.requiredAction}
-            size="small"
-            sx={{
-              bgcolor: alpha(getActionTypeColor(selectedAction.actionType), 0.12),
-              color: getActionTypeColor(selectedAction.actionType),
-              border: '1px solid',
-              borderColor: alpha(getActionTypeColor(selectedAction.actionType), 0.3),
-              fontWeight: 600,
-            }}
-          />
-        </Stack>
+        {/* Action Header */}
+        <Paper
+          elevation={0}
+          sx={{
+            p: 2,
+            mb: 3,
+            background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.08) 0%, rgba(239, 68, 68, 0.05) 100%)',
+            borderBottom: '2px solid',
+            borderColor: alpha('#f97316', 0.2),
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <IconButton sx={{ bgcolor: alpha('#f97316', 0.1) }}>
+                <AssignmentIcon sx={{ color: '#f97316' }} />
+              </IconButton>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: '#f97316' }}>
+                  {selectedAction.kitId}
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#64748b' }}>
+                  {selectedAction.requiredAction} • {selectedAction.organization}
+                </Typography>
+              </Box>
+            </Box>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Chip label={selectedAction.kitType} size="small" sx={traxxTheme.chips.kitTypes[selectedAction.kitType.toLowerCase()] || traxxTheme.chips.primary} />
+              <Chip
+                label={`+${selectedAction.daysOverdue} DAYS`}
+                size="small"
+                sx={{
+                  bgcolor: selectedAction.daysOverdue > 7 ? alpha('#ef4444', 0.12) : selectedAction.daysOverdue > 3 ? alpha('#f59e0b', 0.12) : alpha('#10b981', 0.12),
+                  color: selectedAction.daysOverdue > 7 ? '#dc2626' : selectedAction.daysOverdue > 3 ? '#d97706' : '#059669',
+                  fontWeight: 700,
+                }}
+              />
+            </Stack>
+          </Box>
+        </Paper>
 
         {/* Detail Sections */}
         <Grid container spacing={2} sx={{ mb: 3 }}>
@@ -655,28 +657,44 @@ const WhoMustActNow = ({ onBack }) => {
 
   // Main render
   return (
-    <Box sx={{ p: 3, height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
+    <Box sx={{ p: 3, height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', overflow: 'auto', bgcolor: '#f8fafc' }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
               TRAXX.AI
             </Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
-              {selectedAction ? selectedAction.kitId : 'Who Must Act Now'}
-            </Typography>
+            {selectedAction ? (
+              <>
+                <Link component="button" variant="body1" onClick={() => setSelectedAction(null)} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+                  Who Must Act Now
+                </Link>
+                <Typography color="primary" variant="body1" fontWeight={600}>
+                  {selectedAction.kitId}
+                </Typography>
+              </>
+            ) : (
+              <Typography color="primary" variant="body1" fontWeight={600}>
+                Who Must Act Now
+              </Typography>
+            )}
           </Breadcrumbs>
-          {!selectedAction && (
-            <Stack direction="row" spacing={1}>
-              <Tooltip title="Refresh">
-                <IconButton onClick={fetchData} color="primary"><Refresh /></IconButton>
-              </Tooltip>
-              <Tooltip title="Export">
-                <IconButton color="primary"><Download /></IconButton>
-              </Tooltip>
-            </Stack>
-          )}
+          <Stack direction="row" spacing={1}>
+            {!selectedAction && (
+              <>
+                <Tooltip title="Refresh">
+                  <IconButton onClick={fetchData} color="primary"><Refresh /></IconButton>
+                </Tooltip>
+                <Tooltip title="Export">
+                  <IconButton color="primary"><Download /></IconButton>
+                </Tooltip>
+              </>
+            )}
+            <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ color: '#00357a', borderColor: '#00357a' }}>
+              Back
+            </Button>
+          </Stack>
         </Stack>
 
         {/* Urgency Banner - Only show in list view */}

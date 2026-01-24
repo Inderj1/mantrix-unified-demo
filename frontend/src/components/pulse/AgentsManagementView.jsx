@@ -23,6 +23,9 @@ import {
   InputLabel,
   Select,
   alpha,
+  Breadcrumbs,
+  Link,
+  Stack,
 } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import AgentConfigForm from './AgentConfigForm';
@@ -46,6 +49,7 @@ import {
   Psychology as PsychologyIcon,
   People as PeopleIcon,
   AttachMoney as AttachMoneyIcon,
+  NavigateNext as NavigateNextIcon,
 } from '@mui/icons-material';
 import { kitMonitoringAgents, reveqCategoryInfo } from './kitAgentsMockData';
 
@@ -359,17 +363,33 @@ const AgentsManagementView = ({ userId = 'persona', onBack, onCreateAgent, darkM
     <Box sx={{ bgcolor: colors.background, minHeight: '100%' }}>
       {/* Header */}
       <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.1)', bgcolor: colors.paper }}>
-        <Box display="flex" alignItems="center" gap={2}>
-          <IconButton
+        {/* Breadcrumb Navigation */}
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" sx={{ color: colors.textSecondary }} />}>
+            <Link
+              component="button"
+              variant="body1"
+              onClick={onBack}
+              sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}
+            >
+              ENTERPRISE PULSE
+            </Link>
+            <Typography variant="body1" fontWeight={600} sx={{ color: colors.primary }}>
+              Agents Management
+            </Typography>
+          </Breadcrumbs>
+          <Button
+            startIcon={<ArrowBackIcon />}
             onClick={onBack}
-            sx={{
-              bgcolor: alpha(colors.primary, darkMode ? 0.2 : 0.1),
-              color: colors.primary,
-              '&:hover': { bgcolor: alpha(colors.primary, darkMode ? 0.3 : 0.2) }
-            }}
+            variant="outlined"
+            size="small"
+            sx={{ color: colors.primary, borderColor: colors.primary }}
           >
-            <ArrowBackIcon />
-          </IconButton>
+            Back
+          </Button>
+        </Stack>
+        {/* Title Section */}
+        <Box display="flex" alignItems="center" gap={2}>
           <Box
             sx={{
               width: 48,

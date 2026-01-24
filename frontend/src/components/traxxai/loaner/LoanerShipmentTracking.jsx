@@ -156,11 +156,8 @@ const LoanerShipmentTracking = ({ onBack }) => {
 
     return (
       <Box sx={{ flex: 1, overflow: 'auto' }}>
-        {/* Header */}
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Button startIcon={<ArrowBackIcon />} onClick={handleBackToList} variant="outlined" size="small">
-            Back to List
-          </Button>
+        {/* Header Chips */}
+        <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ mb: 2 }}>
           <Stack direction="row" spacing={1}>
             <Chip label={selectedRow.shipment_id} size="small" sx={{ fontWeight: 700, bgcolor: alpha('#00357a', 0.1), color: '#00357a' }} />
             <Chip label={selectedRow.direction} size="small" sx={{ fontWeight: 600, bgcolor: getDirectionColor(selectedRow.direction).bg, color: getDirectionColor(selectedRow.direction).color }} />
@@ -311,11 +308,22 @@ const LoanerShipmentTracking = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>TRAXX.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>Loaner Process</Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
-              {selectedRow ? `Shipment ${selectedRow.shipment_id}` : 'Shipment Tracking'}
-            </Typography>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>TRAXX.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>Loaner Process</Link>
+            {selectedRow ? (
+              <>
+                <Link component="button" variant="body1" onClick={handleBackToList} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+                  Shipment Tracking
+                </Link>
+                <Typography color="primary" variant="body1" fontWeight={600}>
+                  Shipment {selectedRow.shipment_id}
+                </Typography>
+              </>
+            ) : (
+              <Typography color="primary" variant="body1" fontWeight={600}>
+                Shipment Tracking
+              </Typography>
+            )}
           </Breadcrumbs>
           {!selectedRow && (
             <Stack direction="row" spacing={1}>

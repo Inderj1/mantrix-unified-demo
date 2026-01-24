@@ -1728,19 +1728,19 @@ const SkuDecisioning = ({ onBack, darkMode = false, selectedOrder: initialOrder 
         }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between">
             <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-              <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: theme.textSecondary, '&:hover': { color: COLORS.primary } }}>
+              <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: theme.textSecondary, '&:hover': { color: COLORS.primary }, cursor: 'pointer' }}>
                 ORDLY.AI
               </Link>
-              <Link component="button" variant="body1" onClick={handleBackToList} sx={{ textDecoration: 'none', color: theme.textSecondary, '&:hover': { color: COLORS.primary } }}>
+              <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: theme.textSecondary, '&:hover': { color: COLORS.primary }, cursor: 'pointer' }}>
+                Made to Stock
+              </Link>
+              <Link component="button" variant="body1" onClick={handleBackToList} sx={{ textDecoration: 'none', color: theme.textSecondary, '&:hover': { color: COLORS.primary }, cursor: 'pointer' }}>
                 SKU Decisioning
               </Link>
               <Typography color="primary" variant="body1" fontWeight={600}>
                 {selectedOrder.id}
               </Typography>
             </Breadcrumbs>
-            <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ borderColor: theme.panelBorder, color: theme.textSecondary }}>
-              Back to ORDLY.AI
-            </Button>
           </Stack>
         </Box>
 
@@ -1767,20 +1767,6 @@ const SkuDecisioning = ({ onBack, darkMode = false, selectedOrder: initialOrder 
           borderBottom: `1px solid ${theme.headerBorder}`,
         }}>
           <Stack direction="row" alignItems="center" spacing={3}>
-            <Button
-              startIcon={<ArrowBackIcon />}
-              onClick={handleBackToList}
-              size="small"
-              sx={{
-                color: theme.textSecondary,
-                bgcolor: darkMode ? 'rgba(0,0,0,0.3)' : alpha(COLORS.slate[100], 0.8),
-                border: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : COLORS.slate[200]}`,
-                fontSize: '0.75rem',
-                '&:hover': { bgcolor: darkMode ? 'rgba(0,0,0,0.5)' : COLORS.slate[100] },
-              }}
-            >
-              Back to Pipeline
-            </Button>
             <Stack direction="row" alignItems="center" spacing={2}>
               <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: COLORS.secondary }}>
                 {selectedOrder.id}
@@ -3478,19 +3464,6 @@ const SkuDecisioning = ({ onBack, darkMode = false, selectedOrder: initialOrder 
             <Button
               variant="outlined"
               size="small"
-              onClick={handleBackToIntent}
-              sx={{
-                color: theme.textSecondary,
-                borderColor: darkMode ? 'rgba(255,255,255,0.2)' : COLORS.slate[300],
-                fontSize: '0.75rem',
-                '&:hover': { borderColor: theme.textSecondary },
-              }}
-            >
-              ← Back to Intent
-            </Button>
-            <Button
-              variant="outlined"
-              size="small"
               startIcon={<CompareArrowsIcon sx={{ fontSize: 16 }} />}
               onClick={() => setComparisonDrawerOpen(true)}
               sx={{
@@ -3988,8 +3961,11 @@ const SkuDecisioning = ({ onBack, darkMode = false, selectedOrder: initialOrder 
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: theme.textSecondary }}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: theme.textSecondary, '&:hover': { color: 'primary.main' }, cursor: 'pointer' }}>
               ORDLY.AI
+            </Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: theme.textSecondary, '&:hover': { color: 'primary.main' }, cursor: 'pointer' }}>
+              Made to Stock
             </Link>
             <Typography color="primary" variant="body1" fontWeight={600}>
               SKU Decisioning

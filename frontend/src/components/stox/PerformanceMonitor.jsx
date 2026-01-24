@@ -338,14 +338,6 @@ const PerformanceMonitor = ({ onBack, darkMode = false }) => {
     return (
       <Box>
         <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Button
-            startIcon={<ArrowBackIcon />}
-            onClick={() => setSelectedKPI(null)}
-            variant="outlined"
-            size="small"
-          >
-            Back to List
-          </Button>
           <Typography variant="h6" fontWeight={700}>
             {selectedKPI.name}
           </Typography>
@@ -497,9 +489,20 @@ const PerformanceMonitor = ({ onBack, darkMode = false }) => {
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}>
               STOX.AI
             </Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
-              Performance Monitor
-            </Typography>
+            {selectedKPI ? (
+              <>
+                <Link component="button" variant="body1" onClick={() => setSelectedKPI(null)} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}>
+                  Performance Monitor
+                </Link>
+                <Typography color="primary" variant="body1" fontWeight={600}>
+                  {selectedKPI.name}
+                </Typography>
+              </>
+            ) : (
+              <Typography color="primary" variant="body1" fontWeight={600}>
+                Performance Monitor
+              </Typography>
+            )}
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ borderColor: 'divider' }}>
             Back

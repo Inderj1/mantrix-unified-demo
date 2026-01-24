@@ -478,14 +478,6 @@ const RecommendationsHub = ({ onBack, onTileClick, darkMode = false }) => {
     return (
       <Box>
         <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Button
-            startIcon={<ArrowBackIcon />}
-            onClick={() => setSelectedRec(null)}
-            variant="outlined"
-            size="small"
-          >
-            Back to List
-          </Button>
           <Typography variant="h6" fontWeight={700}>
             {selectedRec.title}
           </Typography>
@@ -682,12 +674,20 @@ const RecommendationsHub = ({ onBack, onTileClick, darkMode = false }) => {
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
               STOX.AI
             </Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
-              Layer 6: Execution
-            </Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
-              Recommendations Hub
-            </Typography>
+            {selectedRec ? (
+              <>
+                <Link component="button" variant="body1" onClick={() => setSelectedRec(null)} sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+                  Recommendations Hub
+                </Link>
+                <Typography color="primary" variant="body1" fontWeight={600}>
+                  {selectedRec.title}
+                </Typography>
+              </>
+            ) : (
+              <Typography color="primary" variant="body1" fontWeight={600}>
+                Recommendations Hub
+              </Typography>
+            )}
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ borderColor: 'divider' }}>
             Back

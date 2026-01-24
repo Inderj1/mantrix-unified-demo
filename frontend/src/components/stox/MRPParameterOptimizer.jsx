@@ -427,14 +427,6 @@ const MRPParameterOptimizer = ({ onBack, onTileClick, darkMode = false }) => {
     return (
       <Box>
         <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Button
-            startIcon={<ArrowBackIcon />}
-            onClick={() => setSelectedItem(null)}
-            variant="outlined"
-            size="small"
-          >
-            Back to List
-          </Button>
           <Typography variant="h6" fontWeight={700}>
             {selectedItem.material} - MRP Optimization
           </Typography>
@@ -689,8 +681,14 @@ const MRPParameterOptimizer = ({ onBack, onTileClick, darkMode = false }) => {
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>STOX.AI</Link>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>Layer 4: Optimization</Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>MRP Parameter Optimizer</Typography>
+            {selectedItem ? (
+              <>
+                <Link component="button" variant="body1" onClick={() => setSelectedItem(null)} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>MRP Parameter Optimizer</Link>
+                <Typography color="primary" variant="body1" fontWeight={600}>{selectedItem.material}</Typography>
+              </>
+            ) : (
+              <Typography color="primary" variant="body1" fontWeight={600}>MRP Parameter Optimizer</Typography>
+            )}
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ borderColor: 'divider' }}>
             Back

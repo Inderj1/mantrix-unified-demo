@@ -288,14 +288,6 @@ const SAPWriteback = ({ onBack, darkMode = false }) => {
     return (
       <Box>
         <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Button
-            startIcon={<ArrowBackIcon />}
-            onClick={() => setSelectedJob(null)}
-            variant="outlined"
-            size="small"
-          >
-            Back to List
-          </Button>
           <Typography variant="h6" fontWeight={700}>
             {selectedJob.name}
           </Typography>
@@ -470,9 +462,20 @@ const SAPWriteback = ({ onBack, darkMode = false }) => {
             <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline' } }}>
               STOX.AI
             </Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
-              SAP Writeback
-            </Typography>
+            {selectedJob ? (
+              <>
+                <Link component="button" variant="body1" onClick={() => setSelectedJob(null)} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline' } }}>
+                  SAP Writeback
+                </Link>
+                <Typography color="primary" variant="body1" fontWeight={600}>
+                  {selectedJob.name}
+                </Typography>
+              </>
+            ) : (
+              <Typography color="primary" variant="body1" fontWeight={600}>
+                SAP Writeback
+              </Typography>
+            )}
           </Breadcrumbs>
           <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ borderColor: 'divider' }}>
             Back

@@ -22,9 +22,13 @@ import {
   Avatar,
   LinearProgress,
   alpha,
+  Breadcrumbs,
+  Link,
+  Stack,
 } from '@mui/material';
 import {
   ArrowBack as ArrowBackIcon,
+  NavigateNext as NavigateNextIcon,
   CheckCircle as CheckCircleIcon,
   TrendingUp as TrendingUpIcon,
   Warning as WarningIcon,
@@ -257,40 +261,72 @@ const KitAlertDetail = ({ alert, onBack, onAction, darkMode = false }) => {
 
   return (
     <Box>
+      {/* Breadcrumb Navigation */}
+      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+        <Breadcrumbs separator={<NavigateNextIcon fontSize="small" sx={{ color: colors.textSecondary }} />}>
+          <Link
+            component="button"
+            variant="body1"
+            onClick={onBack}
+            sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}
+          >
+            ENTERPRISE PULSE
+          </Link>
+          <Link
+            component="button"
+            variant="body1"
+            onClick={onBack}
+            sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}
+          >
+            Proactive Alerts
+          </Link>
+          <Typography variant="body1" fontWeight={600} sx={{ color: colors.primary }}>
+            Alert Detail
+          </Typography>
+        </Breadcrumbs>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={onBack}
+          variant="outlined"
+          size="small"
+          sx={{ color: colors.primary, borderColor: colors.primary }}
+        >
+          Back
+        </Button>
+      </Stack>
+
       {/* Header */}
       <Box sx={{ mb: 3 }}>
-        <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-          <Box display="flex" alignItems="center" gap={2}>
-            <IconButton onClick={onBack} sx={{ bgcolor: alpha(colors.primary, 0.1) }}>
-              <ArrowBackIcon />
-            </IconButton>
-            <Box>
-              <Box display="flex" alignItems="center" gap={1} mb={0.5}>
-                <Chip
-                  icon={getSeverityIcon(alert.severity)}
-                  label={alert.severity === 'opportunity' ? 'OPPORTUNITY' : alert.severity.toUpperCase()}
-                  size="small"
-                  color={getSeverityColor(alert.severity)}
-                />
-                <Chip
-                  label={ALERT_TYPE_LABELS[alert.type] || alert.type}
-                  size="small"
-                  variant="outlined"
-                />
-                <Chip
-                  label={alert.status.replace('_', ' ').toUpperCase()}
-                  size="small"
-                  color={getStatusColor(alert.status)}
-                  variant="outlined"
-                />
-              </Box>
-              <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
-                {alert.title}
-              </Typography>
-              <Typography variant="body2" sx={{ color: colors.textSecondary }}>
-                {alert.message}
-              </Typography>
+        <Box display="flex" alignItems="center" gap={2}>
+          <IconButton sx={{ bgcolor: alpha(colors.primary, 0.1) }}>
+            <WarningIcon sx={{ color: colors.primary }} />
+          </IconButton>
+          <Box>
+            <Box display="flex" alignItems="center" gap={1} mb={0.5}>
+              <Chip
+                icon={getSeverityIcon(alert.severity)}
+                label={alert.severity === 'opportunity' ? 'OPPORTUNITY' : alert.severity.toUpperCase()}
+                size="small"
+                color={getSeverityColor(alert.severity)}
+              />
+              <Chip
+                label={ALERT_TYPE_LABELS[alert.type] || alert.type}
+                size="small"
+                variant="outlined"
+              />
+              <Chip
+                label={alert.status.replace('_', ' ').toUpperCase()}
+                size="small"
+                color={getStatusColor(alert.status)}
+                variant="outlined"
+              />
             </Box>
+            <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
+              {alert.title}
+            </Typography>
+            <Typography variant="body2" sx={{ color: colors.textSecondary }}>
+              {alert.message}
+            </Typography>
           </Box>
         </Box>
       </Box>

@@ -65,8 +65,24 @@ import {
   AutoGraph as AutoGraphIcon,
   InfoOutlined as InfoIcon,
   Forum as ForumIcon,
+  Tag as TagIcon,
+  AttachMoney as MoneyIcon,
+  Numbers as NumbersIcon,
+  CalendarToday as CalendarIcon,
+  Business as BusinessIcon,
+  LocalShipping as ShippingIcon,
+  Inventory as InventoryIcon,
+  Receipt as ReceiptIcon,
+  Category as CategoryIcon,
+  LocationOn as LocationIcon,
+  Email as EmailIcon,
+  Phone as PhoneIcon,
+  Percent as PercentIcon,
+  AccountCircle as AccountIcon,
+  Store as StoreIcon,
+  Description as DescriptionIcon,
 } from '@mui/icons-material';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { apiService } from '../services/api';
 import ResultAnalysis from './ResultAnalysis';
 import DeepResearchInterface from './DeepResearchInterface';
@@ -1830,38 +1846,146 @@ const SimpleChatInterface = ({ darkMode = false }) => {
 
                         const isAmount = !isQuantity && (hasCurrencyKeyword || looksLikeCurrency);
                         const isFirstColumn = index === 0;
-                        
+
+                        // Determine the appropriate icon for this column
+                        const getColumnIcon = () => {
+                          // Customer/Account related
+                          if (lowerKey.includes('customer') || lowerKey.includes('sold_to') || lowerKey.includes('bill_to') || lowerKey.includes('payer')) {
+                            return <AccountIcon sx={{ fontSize: 16, color: darkMode ? '#4d9eff' : '#00357a' }} />;
+                          }
+                          // Ship to / Location
+                          if (lowerKey.includes('ship_to') || lowerKey.includes('location') || lowerKey.includes('address') || lowerKey.includes('city') || lowerKey.includes('region')) {
+                            return <LocationIcon sx={{ fontSize: 16, color: '#059669' }} />;
+                          }
+                          // Order/Document IDs
+                          if (lowerKey.includes('order') || lowerKey.includes('document') || lowerKey.includes('invoice') || lowerKey.includes('po_')) {
+                            return <ReceiptIcon sx={{ fontSize: 16, color: '#f59e0b' }} />;
+                          }
+                          // Material/Product/SKU
+                          if (lowerKey.includes('material') || lowerKey.includes('product') || lowerKey.includes('sku') || lowerKey.includes('item')) {
+                            return <InventoryIcon sx={{ fontSize: 16, color: '#8b5cf6' }} />;
+                          }
+                          // Category/Type
+                          if (lowerKey.includes('category') || lowerKey.includes('type') || lowerKey.includes('group') || lowerKey.includes('class')) {
+                            return <CategoryIcon sx={{ fontSize: 16, color: '#ec4899' }} />;
+                          }
+                          // Date columns
+                          if (lowerKey.includes('date') || lowerKey.includes('time') || lowerKey.includes('created') || lowerKey.includes('updated')) {
+                            return <CalendarIcon sx={{ fontSize: 16, color: '#06b6d4' }} />;
+                          }
+                          // Currency/Amount columns
+                          if (isAmount) {
+                            return <MoneyIcon sx={{ fontSize: 16, color: '#10b981' }} />;
+                          }
+                          // Quantity columns
+                          if (isQuantity) {
+                            return <NumbersIcon sx={{ fontSize: 16, color: '#6366f1' }} />;
+                          }
+                          // Percentage columns
+                          if (lowerKey.includes('percent') || lowerKey.includes('rate') || lowerKey.includes('ratio')) {
+                            return <PercentIcon sx={{ fontSize: 16, color: '#f97316' }} />;
+                          }
+                          // Name columns
+                          if (lowerKey.includes('name') && !lowerKey.includes('customer')) {
+                            return <DescriptionIcon sx={{ fontSize: 16, color: '#64748b' }} />;
+                          }
+                          // Company/Business
+                          if (lowerKey.includes('company') || lowerKey.includes('business') || lowerKey.includes('org')) {
+                            return <BusinessIcon sx={{ fontSize: 16, color: '#0891b2' }} />;
+                          }
+                          // Store/Channel
+                          if (lowerKey.includes('store') || lowerKey.includes('channel') || lowerKey.includes('plant')) {
+                            return <StoreIcon sx={{ fontSize: 16, color: '#a855f7' }} />;
+                          }
+                          // ID columns (generic)
+                          if (isIdColumn) {
+                            return <TagIcon sx={{ fontSize: 16, color: darkMode ? '#4d9eff' : '#00357a' }} />;
+                          }
+                          // Numeric columns (generic)
+                          if (isNumeric) {
+                            return <NumbersIcon sx={{ fontSize: 16, color: '#64748b' }} />;
+                          }
+                          // Default - no icon
+                          return null;
+                        };
+
+                        const columnIcon = getColumnIcon();
+                        const headerLabel = key
+                          .split('_')
+                          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                          .join(' ');
+
                         return {
                           field: key,
-                          headerName: key
-                            .split('_')
-                            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-                            .join(' '),
+                          headerName: headerLabel,
                           flex: 1,
                           minWidth: 150,
                           type: isNumeric ? 'number' : 'string',
                           align: isFirstColumn ? 'left' : (isNumeric ? 'right' : 'left'),
                           headerAlign: isFirstColumn ? 'left' : (isNumeric ? 'right' : 'left'),
+                          renderHeader: () => (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                              {columnIcon}
+                              <span style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '0.75rem' }}>
+                                {headerLabel}
+                              </span>
+                            </Box>
+                          ),
                           renderCell: (params) => {
                             try {
                               // Handle null/undefined values
                               if (params.value === null || params.value === undefined) {
-                                return <span style={{ color: '#999', fontStyle: 'italic' }}>null</span>;
+                                return <span style={{ color: darkMode ? '#6b7280' : '#9ca3af', fontStyle: 'italic' }}>—</span>;
                               }
-                              
+
                               // Convert to number if it's a numeric string
                               const numValue = typeof params.value === 'number' ? params.value : parseFloat(params.value);
                               const isValidNumber = !isNaN(numValue) && isFinite(numValue);
 
+                              // Style ID columns with primary color and monospace font
+                              if (isIdColumn) {
+                                return (
+                                  <span style={{
+                                    fontWeight: 600,
+                                    color: darkMode ? '#4d9eff' : '#00357a',
+                                    fontFamily: 'monospace',
+                                    fontSize: '0.8rem'
+                                  }}>
+                                    {String(params.value)}
+                                  </span>
+                                );
+                              }
+
+                              // Style currency amounts with color coding for positive/negative
                               if (isNumeric && isAmount && isValidNumber) {
-                                return `$${numValue.toLocaleString('en-US', {
+                                const formattedValue = `$${Math.abs(numValue).toLocaleString('en-US', {
                                   minimumFractionDigits: 2,
                                   maximumFractionDigits: 2
                                 })}`;
+                                // Color code: green for positive, red for negative, neutral for zero
+                                let amountColor = darkMode ? '#e6edf3' : '#1e293b';
+                                if (numValue > 0) amountColor = '#059669';
+                                if (numValue < 0) amountColor = '#dc2626';
+                                return (
+                                  <span style={{
+                                    fontWeight: 600,
+                                    color: amountColor,
+                                    fontFamily: 'monospace'
+                                  }}>
+                                    {numValue < 0 ? '-' : ''}{formattedValue}
+                                  </span>
+                                );
                               }
+
+                              // Style other numeric values
                               if (isNumeric && isValidNumber) {
-                                return numValue.toLocaleString('en-US');
+                                return (
+                                  <span style={{ fontFamily: 'monospace' }}>
+                                    {numValue.toLocaleString('en-US')}
+                                  </span>
+                                );
                               }
+
                               return String(params.value);
                             } catch (err) {
                               console.error('Error rendering cell:', err);
@@ -1883,24 +2007,48 @@ const SimpleChatInterface = ({ darkMode = false }) => {
                           pageSizeOptions={[10, 25, 50]}
                           density="compact"
                           disableRowSelectionOnClick
+                          slots={{ toolbar: GridToolbar }}
+                          slotProps={{
+                            toolbar: {
+                              showQuickFilter: true,
+                              quickFilterProps: { debounceMs: 500 },
+                            },
+                          }}
                           sx={{
                             bgcolor: colors.cardBg,
-                            border: `1px solid ${colors.border}`,
+                            border: 'none',
+                            borderRadius: 2,
                             color: colors.text,
                             '& .MuiDataGrid-main': {
                               bgcolor: colors.cardBg,
                             },
+                            '& .MuiDataGrid-toolbarContainer': {
+                              p: 1.5,
+                              gap: 1,
+                              borderBottom: `1px solid ${colors.border}`,
+                              bgcolor: darkMode ? '#21262d' : '#f8fafc',
+                              '& .MuiButton-root': {
+                                color: colors.primary,
+                                fontSize: '0.75rem',
+                              },
+                              '& .MuiInputBase-root': {
+                                bgcolor: darkMode ? '#0d1117' : '#ffffff',
+                                borderRadius: 1,
+                                fontSize: '0.8rem',
+                              },
+                            },
                             '& .MuiDataGrid-cell': {
-                              fontSize: '0.875rem',
+                              fontSize: '0.8rem',
                               color: colors.text,
                               borderColor: colors.border,
+                              py: 1,
                             },
                             '& .MuiDataGrid-columnHeaders': {
                               bgcolor: darkMode ? '#21262d' : '#f8fafc',
-                              fontSize: '0.875rem',
-                              fontWeight: 600,
+                              fontSize: '0.85rem',
+                              fontWeight: 700,
                               color: colors.text,
-                              borderColor: colors.border,
+                              borderBottom: `2px solid ${darkMode ? '#4d9eff' : '#00357a'}`,
                             },
                             '& .MuiDataGrid-columnHeader': {
                               bgcolor: darkMode ? '#21262d' : '#f8fafc',
@@ -1908,17 +2056,23 @@ const SimpleChatInterface = ({ darkMode = false }) => {
                             },
                             '& .MuiDataGrid-columnHeaderTitle': {
                               color: colors.text,
-                              fontWeight: 600,
+                              fontWeight: 700,
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.5px',
                             },
                             '& .MuiDataGrid-row': {
                               bgcolor: colors.cardBg,
                               '&:hover': {
-                                bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                                bgcolor: darkMode ? 'rgba(77, 158, 255, 0.08)' : 'rgba(0, 53, 122, 0.04)',
+                              },
+                              '&:nth-of-type(even)': {
+                                bgcolor: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)',
                               },
                             },
                             '& .MuiDataGrid-footerContainer': {
                               bgcolor: darkMode ? '#21262d' : '#f8fafc',
                               borderColor: colors.border,
+                              borderTop: `1px solid ${colors.border}`,
                               color: colors.text,
                             },
                             '& .MuiTablePagination-root': {
@@ -1926,6 +2080,7 @@ const SimpleChatInterface = ({ darkMode = false }) => {
                             },
                             '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
                               color: colors.textSecondary,
+                              fontSize: '0.75rem',
                             },
                             '& .MuiIconButton-root': {
                               color: colors.textSecondary,
@@ -1933,6 +2088,8 @@ const SimpleChatInterface = ({ darkMode = false }) => {
                             '& .MuiDataGrid-virtualScroller': {
                               bgcolor: colors.cardBg,
                             },
+                            '& .MuiDataGrid-cell:focus': { outline: 'none' },
+                            '& .MuiDataGrid-row:focus': { outline: 'none' },
                           }}
                         />
                       );

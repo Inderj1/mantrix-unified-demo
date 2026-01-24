@@ -17,17 +17,17 @@ import {
 } from '@mui/material';
 import {
   ForumOutlined as ForumIcon,
-  Analytics as AnalyticsIcon,
-  BarChart as BarChartIcon,
+  Speed as CoreAIIcon,
+  Radar as MarketsIcon,
   Hub as HubIcon,
-  Description as DescriptionIcon,
   Menu as MenuIcon,
   MenuOpen as MenuOpenIcon,
   FiberManualRecord as DotIcon,
-  Speed as SpeedIcon,
-  RemoveRedEye as VisionIcon,
-  RocketLaunch as ExecutionIcon,
+  MonitorHeart as PulseIcon,
+  Visibility as VisionIcon,
+  Flag as CommandTowerIcon,
   Email as EmailIcon,
+  Settings as SettingsIcon,
 } from '@mui/icons-material';
 
 const EnhancedSidebar = ({
@@ -45,7 +45,7 @@ const EnhancedSidebar = ({
       items: [
         {
           id: 8,
-          icon: <SpeedIcon />,
+          icon: <PulseIcon />,
           primary: 'ENTERPRISE PULSE',
           secondary: 'Real-time Business Metrics',
           color: '#00357a',
@@ -64,14 +64,14 @@ const EnhancedSidebar = ({
         },
         {
           id: 1,
-          icon: <AnalyticsIcon />,
+          icon: <CoreAIIcon />,
           primary: 'CORE.AI',
           secondary: 'Operational Intelligence',
           color: '#00357a',
         },
         {
           id: 3,
-          icon: <BarChartIcon />,
+          icon: <MarketsIcon />,
           primary: 'MARKETS.AI',
           secondary: 'Market Intelligence',
           color: '#00357a',
@@ -83,7 +83,7 @@ const EnhancedSidebar = ({
       items: [
         {
           id: 6,
-          icon: <DescriptionIcon />,
+          icon: <HubIcon />,
           primary: 'DOCUMENT HUB',
           secondary: 'Upload & Analyze Documents',
           color: '#00357a',
@@ -109,7 +109,7 @@ const EnhancedSidebar = ({
       items: [
         {
           id: 10,
-          icon: <ExecutionIcon />,
+          icon: <CommandTowerIcon />,
           primary: 'COMMAND TOWER',
           secondary: 'Action Tracking & Audit Trail',
           color: '#00357a',
@@ -466,7 +466,7 @@ const EnhancedSidebar = ({
           }}
         >
           <ListItemIcon sx={{ minWidth: drawerOpen ? 36 : 'auto' }}>
-            <HubIcon sx={{ color: '#FF9800' }} />
+            <SettingsIcon sx={{ color: '#FF9800' }} />
           </ListItemIcon>
           {drawerOpen && (
             <ListItemText

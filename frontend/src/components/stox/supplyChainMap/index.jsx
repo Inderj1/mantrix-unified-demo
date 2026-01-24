@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Box, Typography, IconButton, Stack, Chip, Button, ToggleButton, ToggleButtonGroup, Tooltip, CircularProgress } from '@mui/material';
+import { Box, Typography, IconButton, Stack, Chip, Button, ToggleButton, ToggleButtonGroup, Tooltip, CircularProgress, Breadcrumbs, Link } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
@@ -218,22 +219,31 @@ export default function SupplyChainMap({ onBack }) {
             px: 2,
           }}
         >
-          <IconButton onClick={onBack} size="small" sx={{ mr: 1 }}>
-            <ArrowBackIcon sx={{ fontSize: 20 }} />
-          </IconButton>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" sx={{ color: '#64748b', fontSize: 16 }} />} sx={{ mr: 2 }}>
+            <Link
+              component="button"
+              variant="body2"
+              onClick={onBack}
+              sx={{ textDecoration: 'none', color: '#1e293b', fontWeight: 500, '&:hover': { textDecoration: 'underline' } }}
+            >
+              STOX.AI
+            </Link>
+            <Typography variant="body2" fontWeight={600} sx={{ color: '#00357a' }}>
+              Supply Chain Map
+            </Typography>
+          </Breadcrumbs>
           <Stack direction="row" alignItems="center" spacing={1.5}>
             <Box sx={{
               p: 0.75,
               borderRadius: 1,
-              background: 'linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%)',
+              background: 'linear-gradient(135deg, #00357a 0%, #1a5a9e 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 2px 6px rgba(14, 165, 233, 0.3)',
+              boxShadow: '0 2px 6px rgba(0, 53, 122, 0.3)',
             }}>
               <MapIcon sx={{ fontSize: 18, color: 'white' }} />
             </Box>
-            <Typography sx={{ fontSize: '0.95rem', fontWeight: 700, color: '#1e293b' }}>Supply Chain Map</Typography>
             {USE_MOCK && (
               <Chip label="DEMO" size="small" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700, bgcolor: alpha('#f59e0b', 0.15), color: '#d97706' }} />
             )}
@@ -335,6 +345,15 @@ export default function SupplyChainMap({ onBack }) {
               <RefreshIcon sx={{ fontSize: 20 }} />
             </IconButton>
           </Tooltip>
+          <Button
+            startIcon={<ArrowBackIcon sx={{ fontSize: 16 }} />}
+            onClick={onBack}
+            variant="outlined"
+            size="small"
+            sx={{ ml: 1, color: '#00357a', borderColor: '#00357a', fontSize: '0.75rem', py: 0.5 }}
+          >
+            Back
+          </Button>
         </Box>
       )}
 

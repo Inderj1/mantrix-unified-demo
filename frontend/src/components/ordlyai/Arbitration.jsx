@@ -273,18 +273,28 @@ const Arbitration = ({ onBack }) => {
   if (selectedRow) {
     return (
       <Box sx={{ p: 2, height: '100%', overflowY: 'auto' }}>
+        {/* Breadcrumb Header */}
+        <Box sx={{ mb: 2 }}>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+              ORDLY.AI
+            </Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+              Made to Order
+            </Link>
+            <Link component="button" variant="body1" onClick={handleBackToList} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+              Economic Arbitration
+            </Link>
+            <Typography color="primary" variant="body1" fontWeight={600}>
+              {selectedRow.orderPo}
+            </Typography>
+          </Breadcrumbs>
+        </Box>
+
         {/* Header Bar */}
         <Paper variant="outlined" sx={{ mb: 2, p: 1.5 }}>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Stack direction="row" alignItems="center" spacing={2}>
-              <Button
-                startIcon={<ArrowBackIcon />}
-                onClick={handleBackToList}
-                size="small"
-                sx={{ color: 'text.secondary' }}
-              >
-                Back
-              </Button>
               <Typography variant="subtitle1" sx={{ fontWeight: 700, color: CYAN }}>
                 {selectedRow.orderPo}
               </Typography>
@@ -620,7 +630,6 @@ const Arbitration = ({ onBack }) => {
               <span>SLA: <span style={{ color: WARNING_AMBER }}>1h 12m remaining</span></span>
             </Stack>
             <Stack direction="row" spacing={1}>
-              <Button variant="outlined" size="small" onClick={handleBackToList}>← Back to Optimizer</Button>
               <Button variant="outlined" size="small" sx={{ borderColor: WARNING_AMBER, color: WARNING_AMBER }}>Apply Option A</Button>
               <Button variant="outlined" size="small">Request Date Extension</Button>
               <Button variant="contained" size="small" sx={{ bgcolor: WARNING_AMBER, '&:hover': { bgcolor: alpha(WARNING_AMBER, 0.8) } }}>
@@ -648,8 +657,11 @@ const Arbitration = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.secondary' }}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.secondary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
               ORDLY.AI
+            </Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.secondary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+              Made to Order
             </Link>
             <Typography color="primary" variant="body1" fontWeight={600}>Economic Arbitration</Typography>
           </Breadcrumbs>

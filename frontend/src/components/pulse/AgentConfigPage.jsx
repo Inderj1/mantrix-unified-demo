@@ -21,8 +21,12 @@ import {
   CircularProgress,
   Card,
   CardContent,
+  Breadcrumbs,
+  Link,
+  Stack,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -179,9 +183,44 @@ const AgentConfigPage = ({ darkMode = false }) => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4, bgcolor: colors.background, minHeight: '100vh' }}>
+      {/* Breadcrumb Navigation */}
+      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+        <Breadcrumbs separator={<NavigateNextIcon fontSize="small" sx={{ color: colors.textSecondary }} />}>
+          <Link
+            component="button"
+            variant="body1"
+            onClick={() => navigate('/pulse')}
+            sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}
+          >
+            ENTERPRISE PULSE
+          </Link>
+          <Link
+            component="button"
+            variant="body1"
+            onClick={() => navigate('/pulse')}
+            sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}
+          >
+            Agents Management
+          </Link>
+          <Typography variant="body1" fontWeight={600} sx={{ color: colors.primary }}>
+            Agent Configuration
+          </Typography>
+        </Breadcrumbs>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={() => navigate('/pulse')}
+          variant="outlined"
+          size="small"
+          sx={{ color: colors.primary, borderColor: colors.primary }}
+        >
+          Back
+        </Button>
+      </Stack>
+
+      {/* Title Section */}
       <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-        <IconButton onClick={() => navigate('/pulse')} sx={{ color: colors.text }}>
-          <ArrowBackIcon />
+        <IconButton sx={{ bgcolor: `${colors.primary}15` }}>
+          <NotificationsIcon sx={{ color: colors.primary }} />
         </IconButton>
         <Typography variant="h4" component="h1" sx={{ color: colors.text }}>
           Agent Configuration

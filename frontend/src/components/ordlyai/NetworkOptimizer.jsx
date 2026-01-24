@@ -251,6 +251,24 @@ const NetworkOptimizer = ({ onBack }) => {
 
     return (
       <Box sx={{ height: '100%', overflow: 'auto', bgcolor: '#f8fafc' }}>
+        {/* Breadcrumb Header */}
+        <Box sx={{ px: 3, py: 1.5, borderBottom: '1px solid #e2e8f0' }}>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+              ORDLY.AI
+            </Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+              Made to Order
+            </Link>
+            <Link component="button" variant="body1" onClick={() => setSelectedOrder(null)} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+              Network Optimizer
+            </Link>
+            <Typography color="primary" variant="body1" fontWeight={600}>
+              {order.id}
+            </Typography>
+          </Breadcrumbs>
+        </Box>
+
         {/* Order Context Bar */}
         <Box sx={{
           display: 'flex',
@@ -262,9 +280,6 @@ const NetworkOptimizer = ({ onBack }) => {
           borderBottom: `1px solid ${alpha(SUCCESS_GREEN, 0.2)}`,
         }}>
           <Stack direction="row" alignItems="center" spacing={3}>
-            <Button startIcon={<ArrowBackIcon />} onClick={() => setSelectedOrder(null)} size="small" variant="outlined" sx={{ borderColor: 'divider' }}>
-              Back to Demand Signal
-            </Button>
             <Box>
               <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: CYAN }}>{order.id}</Typography>
               <Typography sx={{ fontSize: '0.85rem', color: 'text.primary' }}>{order.customer}</Typography>
@@ -479,7 +494,6 @@ const NetworkOptimizer = ({ onBack }) => {
             <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>Expected Margin: <Typography component="span" sx={{ color: SUCCESS_GREEN, fontWeight: 600 }}>$70,230</Typography></Typography>
           </Stack>
           <Stack direction="row" spacing={1.5}>
-            <Button variant="outlined" size="small" sx={{ fontSize: '0.75rem', borderColor: 'divider' }}>← Back to Demand</Button>
             <Button variant="outlined" size="small" sx={{ fontSize: '0.75rem', borderColor: 'divider' }}>Override Selection</Button>
             <Button variant="contained" size="small" sx={{ bgcolor: SUCCESS_GREEN, '&:hover': { bgcolor: alpha(SUCCESS_GREEN, 0.8) }, fontWeight: 600, fontSize: '0.75rem' }}>
               Accept & Send to Arbitration →
@@ -503,8 +517,11 @@ const NetworkOptimizer = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.secondary' }}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.secondary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
               ORDLY.AI
+            </Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.secondary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+              Made to Order
             </Link>
             <Typography color="primary" variant="body1" fontWeight={600}>Network Optimizer</Typography>
           </Breadcrumbs>

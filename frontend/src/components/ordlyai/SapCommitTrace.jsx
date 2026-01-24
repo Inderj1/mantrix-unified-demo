@@ -260,11 +260,11 @@ const SapCommitTrace = ({ onBack, darkMode = false, selectedOrder: initialOrder 
         <Box sx={{ mb: 3 }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
             <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-              <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>ORDLY.AI</Link>
-              <Link component="button" variant="body1" onClick={handleBackToList} sx={{ textDecoration: 'none', color: 'text.primary' }}>SAP Commit</Link>
+              <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>ORDLY.AI</Link>
+              <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>Made to Stock</Link>
+              <Link component="button" variant="body1" onClick={handleBackToList} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>SAP Commit</Link>
               <Typography color="primary" variant="body1" fontWeight={600}>{selectedOrder.id}</Typography>
             </Breadcrumbs>
-            <Button startIcon={<ArrowBackIcon />} onClick={handleBackToList} variant="outlined" size="small">Back to List</Button>
           </Stack>
           <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
             <AccountTreeIcon sx={{ fontSize: 40, color: '#002352' }} />
@@ -497,7 +497,8 @@ const SapCommitTrace = ({ onBack, darkMode = false, selectedOrder: initialOrder 
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>ORDLY.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>ORDLY.AI</Link>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>Made to Stock</Link>
             <Typography color="primary" variant="body1" fontWeight={600}>SAP Commit & Trace</Typography>
           </Breadcrumbs>
           <Stack direction="row" spacing={1} alignItems="center">

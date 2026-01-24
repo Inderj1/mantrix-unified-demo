@@ -127,20 +127,9 @@ const ControlCenter = ({ apiHealth, onRefreshStatus, darkMode = false }) => {
       <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, bgcolor: colors.paper, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={2}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box
-              sx={{
-                width: 56,
-                height: 56,
-                borderRadius: 2,
-                bgcolor: '#00357a',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 4px 14px rgba(0, 120, 212, 0.3)',
-              }}
-            >
-              <SettingsIcon sx={{ fontSize: 28, color: '#fff' }} />
-            </Box>
+            <Avatar sx={{ width: 32, height: 32, bgcolor: '#00357a' }}>
+              <SettingsIcon sx={{ fontSize: 18 }} />
+            </Avatar>
             <Box>
               <Typography variant="h4" fontWeight={700} sx={{ color: colors.text }}>
                 Control Center

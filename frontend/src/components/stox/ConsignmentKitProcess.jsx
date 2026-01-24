@@ -13,9 +13,12 @@ import {
   Tooltip,
   alpha,
   LinearProgress,
+  Breadcrumbs,
+  Link,
 } from '@mui/material';
 import {
   ArrowBack as ArrowBackIcon,
+  NavigateNext as NavigateNextIcon,
   Refresh,
   LocalShipping as ShippingIcon,
   Inventory as InventoryIcon,
@@ -207,24 +210,45 @@ const ConsignmentKitProcess = ({ onBack, darkMode = false }) => {
 
   return (
     <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: colors.background }}>
-      {/* Header */}
+      {/* Breadcrumb Navigation */}
+      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+        <Breadcrumbs separator={<NavigateNextIcon fontSize="small" sx={{ color: colors.textSecondary }} />}>
+          <Link
+            component="button"
+            variant="body1"
+            onClick={onBack}
+            sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}
+          >
+            STOX.AI
+          </Link>
+          <Typography variant="body1" fontWeight={600} sx={{ color: colors.primary }}>
+            Consignment Kit Management
+          </Typography>
+        </Breadcrumbs>
+        <Stack direction="row" spacing={1}>
+          <Button startIcon={<Refresh />} onClick={fetchProcessData} variant="outlined" size="small" sx={{ color: colors.primary, borderColor: colors.primary }}>
+            Refresh
+          </Button>
+          <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ color: colors.primary, borderColor: colors.primary }}>
+            Back
+          </Button>
+        </Stack>
+      </Stack>
+
+      {/* Title Section */}
       <Box sx={{ mb: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <InventoryIcon sx={{ fontSize: 40, color: '#10b981' }} />
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="h4" fontWeight={700}>
+          <IconButton sx={{ bgcolor: alpha(colors.primary, 0.1) }}>
+            <InventoryIcon sx={{ fontSize: 32, color: colors.primary }} />
+          </IconButton>
+          <Box>
+            <Typography variant="h4" fontWeight={700} sx={{ color: colors.text }}>
               Consignment Kit Management
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: colors.textSecondary }}>
               End-to-end consignment kit lifecycle tracking
             </Typography>
           </Box>
-          <Button startIcon={<Refresh />} onClick={fetchProcessData} variant="outlined" size="small">
-            Refresh
-          </Button>
-          <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small">
-            Back
-          </Button>
         </Box>
       </Box>
 

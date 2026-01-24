@@ -561,31 +561,39 @@ const SurgeryReadiness = ({ onBack }) => {
 
     return (
       <Box sx={{ flex: 1, overflow: 'auto' }}>
-        {/* Header with Back Button */}
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Button startIcon={<ArrowBackIcon />} onClick={handleBackToList} variant="outlined" size="small">
-            Back to Readiness Board
-          </Button>
-          <Stack direction="row" spacing={1}>
-            <Chip label={s.kitType} size="small" sx={s.kitType === 'Loaner' ? { bgcolor: alpha('#a855f7', 0.12), color: '#9333ea', fontWeight: 600 } : { bgcolor: alpha('#06b6d4', 0.12), color: '#0891b2', fontWeight: 600 }} />
-            <Chip label={statusLabel} size="small" sx={{ ...getStatusStyle(s.readinessStatus), fontWeight: 600 }} />
-          </Stack>
-        </Stack>
-
-        {/* Title and Score */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
-          <Box>
-            <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5, color: '#a855f7' }}>{s.id}</Typography>
-            <Typography sx={{ color: '#64748b', mb: 1 }}>{s.procedureType} Procedure — {s.hospital} — {new Date(s.surgeryDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</Typography>
-          </Box>
-          <Box sx={{ textAlign: 'center' }}>
-            <Box sx={{ width: 100, height: 100, borderRadius: '50%', border: `4px solid ${scoreStyle.borderColor}`, bgcolor: scoreStyle.bgcolor, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
-              <Typography sx={{ fontSize: '2rem', fontWeight: 700, color: scoreStyle.color }}>{s.readinessScore}</Typography>
-              <Typography sx={{ fontSize: '0.6rem', color: '#64748b', textTransform: 'uppercase' }}>Score</Typography>
+        {/* Surgery Header */}
+        <Paper
+          elevation={0}
+          sx={{
+            p: 2,
+            mb: 3,
+            background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(99, 102, 241, 0.05) 100%)',
+            borderBottom: '2px solid',
+            borderColor: alpha('#a855f7', 0.2),
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <IconButton sx={{ bgcolor: alpha('#a855f7', 0.1) }}>
+                <HospitalIcon sx={{ color: '#a855f7' }} />
+              </IconButton>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: '#a855f7' }}>
+                  {s.id}
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#64748b' }}>
+                  {s.procedureType} Procedure • {s.hospital} • {new Date(s.surgeryDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                </Typography>
+              </Box>
             </Box>
-            <Typography sx={{ fontWeight: 600, color: scoreStyle.color }}>{statusLabel}</Typography>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Chip label={s.kitType} size="small" sx={s.kitType === 'Loaner' ? { bgcolor: alpha('#a855f7', 0.12), color: '#9333ea', fontWeight: 600 } : { bgcolor: alpha('#06b6d4', 0.12), color: '#0891b2', fontWeight: 600 }} />
+              <Box sx={{ width: 60, height: 60, borderRadius: '50%', border: `3px solid ${scoreStyle.borderColor}`, bgcolor: scoreStyle.bgcolor, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <Typography sx={{ fontSize: '1.25rem', fontWeight: 700, color: scoreStyle.color }}>{s.readinessScore}</Typography>
+              </Box>
+            </Stack>
           </Box>
-        </Box>
+        </Paper>
 
         {/* Detail Sections */}
         <Grid container spacing={2} sx={{ mb: 3 }}>
@@ -781,24 +789,40 @@ const SurgeryReadiness = ({ onBack }) => {
       <Box sx={{ mb: 3 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary' }}>
+            <Link component="button" variant="body1" onClick={onBack} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
               TRAXX.AI
             </Link>
-            <Typography color="primary" variant="body1" fontWeight={600}>
-              {selectedSurgery ? selectedSurgery.id : 'Surgery Readiness'}
-            </Typography>
+            {selectedSurgery ? (
+              <>
+                <Link component="button" variant="body1" onClick={() => setSelectedSurgery(null)} sx={{ textDecoration: 'none', color: 'text.primary', '&:hover': { textDecoration: 'underline', color: 'primary.main' }, cursor: 'pointer' }}>
+                  Surgery Readiness
+                </Link>
+                <Typography color="primary" variant="body1" fontWeight={600}>
+                  {selectedSurgery.id}
+                </Typography>
+              </>
+            ) : (
+              <Typography color="primary" variant="body1" fontWeight={600}>
+                Surgery Readiness
+              </Typography>
+            )}
           </Breadcrumbs>
-          {!selectedSurgery && (
-            <Stack direction="row" spacing={1}>
-              <Chip label="PREDICTIVE" size="small" sx={{ bgcolor: alpha('#a855f7', 0.12), color: '#9333ea', fontWeight: 600 }} />
-              <Tooltip title="Refresh">
-                <IconButton onClick={fetchData} color="primary"><Refresh /></IconButton>
-              </Tooltip>
-              <Tooltip title="Export">
-                <IconButton color="primary"><Download /></IconButton>
-              </Tooltip>
-            </Stack>
-          )}
+          <Stack direction="row" spacing={1}>
+            {!selectedSurgery && (
+              <>
+                <Chip label="PREDICTIVE" size="small" sx={{ bgcolor: alpha('#a855f7', 0.12), color: '#9333ea', fontWeight: 600 }} />
+                <Tooltip title="Refresh">
+                  <IconButton onClick={fetchData} color="primary"><Refresh /></IconButton>
+                </Tooltip>
+                <Tooltip title="Export">
+                  <IconButton color="primary"><Download /></IconButton>
+                </Tooltip>
+              </>
+            )}
+            <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="outlined" size="small" sx={{ color: '#00357a', borderColor: '#00357a' }}>
+              Back
+            </Button>
+          </Stack>
         </Stack>
 
         {/* Readiness Banner - Only show in list view */}
