@@ -146,7 +146,7 @@ const MarketsAIDashboard = () => {
       background: 'linear-gradient(180deg, rgba(10, 110, 209, 0.05) 0%, rgba(255, 255, 255, 1) 50%)',
     }}>
       {/* Header */}
-      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
         {/* System Identity Badge */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Box sx={{
@@ -213,10 +213,10 @@ const MarketsAIDashboard = () => {
           <Card
             sx={{
               height: '100%',
-              border: 'none',
+              border: '1px solid rgba(0,0,0,0.08)',
               borderRadius: 3,
               bgcolor: 'white',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               position: 'relative',
               overflow: 'hidden',
             }}
@@ -239,10 +239,10 @@ const MarketsAIDashboard = () => {
           <Card
             sx={{
               height: '100%',
-              border: 'none',
+              border: '1px solid rgba(0,0,0,0.08)',
               borderRadius: 3,
               bgcolor: 'white',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               position: 'relative',
               overflow: 'hidden',
             }}
@@ -265,10 +265,10 @@ const MarketsAIDashboard = () => {
           <Card
             sx={{
               height: '100%',
-              border: 'none',
+              border: '1px solid rgba(0,0,0,0.08)',
               borderRadius: 3,
               bgcolor: 'white',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               position: 'relative',
               overflow: 'hidden',
             }}
@@ -295,10 +295,10 @@ const MarketsAIDashboard = () => {
           <Card
             sx={{
               height: '100%',
-              border: 'none',
+              border: '1px solid rgba(0,0,0,0.08)',
               borderRadius: 3,
               bgcolor: 'white',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               position: 'relative',
               overflow: 'hidden',
             }}

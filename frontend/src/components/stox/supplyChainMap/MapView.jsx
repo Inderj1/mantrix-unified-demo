@@ -421,7 +421,7 @@ export default function MapView({
                   )}
                   <button
                     onClick={(e) => { e.stopPropagation(); onStoreClick?.(store); }}
-                    style={{ width: '100%', padding: '6px', background: store.facility_type === 'plant' ? '#0078d4' : '#10b981', color: 'white', border: 'none', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                    style={{ width: '100%', padding: '6px', background: store.facility_type === 'plant' ? '#0078d4' : '#10b981', color: 'white', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
                   >
                     {store.facility_type === 'plant' ? 'View Plant Details' : 'View Vendor Profile'}
                   </button>
@@ -549,7 +549,7 @@ export default function MapView({
                   </div>
                   <button
                     onClick={(e) => { e.stopPropagation(); onTruckClick?.(truck); }}
-                    style={{ width: '100%', padding: '6px', background: '#0078d4', color: 'white', border: 'none', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                    style={{ width: '100%', padding: '6px', background: '#0078d4', color: 'white', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
                   >
                     Track Shipment
                   </button>
@@ -597,7 +597,7 @@ export default function MapView({
                     <p style={{ fontSize: '0.75rem', color: '#0078d4', margin: '0 0 12px 0', lineHeight: 1.4 }}>{alert.message}</p>
                     <button
                       onClick={(e) => { e.stopPropagation(); onAlertClick?.(alert); }}
-                      style={{ width: '100%', padding: '6px', background: '#ea580c', color: 'white', border: 'none', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                      style={{ width: '100%', padding: '6px', background: '#ea580c', color: 'white', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
                     >
                       View Analysis
                     </button>

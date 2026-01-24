@@ -489,7 +489,7 @@ const EmailIntelligence = () => {
               loading={loading}
               disableSelectionOnClick
               sx={{
-                border: 'none',
+                border: '1px solid rgba(0,0,0,0.08)',
                 '& .MuiDataGrid-cell:focus': {
                   outline: 'none',
                 },
@@ -518,7 +518,7 @@ const EmailIntelligence = () => {
               loading={loading}
               disableSelectionOnClick
               sx={{
-                border: 'none',
+                border: '1px solid rgba(0,0,0,0.08)',
                 '& .MuiDataGrid-cell:focus': {
                   outline: 'none',
                 },
@@ -547,7 +547,7 @@ const EmailIntelligence = () => {
               loading={loading}
               disableSelectionOnClick
               sx={{
-                border: 'none',
+                border: '1px solid rgba(0,0,0,0.08)',
                 '& .MuiDataGrid-cell:focus': {
                   outline: 'none',
                 },
@@ -579,7 +579,7 @@ const EmailIntelligence = () => {
                 params.row.severity === 'critical' ? 'critical-row' : ''
               }
               sx={{
-                border: 'none',
+                border: '1px solid rgba(0,0,0,0.08)',
                 '& .MuiDataGrid-cell:focus': {
                   outline: 'none',
                 },

@@ -643,7 +643,7 @@ const AgingStockIntelligence = ({ onBack }) => {
               },
             }}
             sx={{
-              border: 'none',
+              border: '1px solid rgba(0,0,0,0.08)',
               '& .MuiDataGrid-row:hover': {
                 backgroundColor: '#f5f5f5',
               },
@@ -670,7 +670,7 @@ const AgingStockIntelligence = ({ onBack }) => {
               },
             }}
             sx={{
-              border: 'none',
+              border: '1px solid rgba(0,0,0,0.08)',
               '& .MuiDataGrid-row:hover': {
                 backgroundColor: '#f5f5f5',
               },
@@ -697,7 +697,7 @@ const AgingStockIntelligence = ({ onBack }) => {
               },
             }}
             sx={{
-              border: 'none',
+              border: '1px solid rgba(0,0,0,0.08)',
               '& .MuiDataGrid-row:hover': {
                 backgroundColor: '#f5f5f5',
               },

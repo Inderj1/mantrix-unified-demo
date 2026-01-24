@@ -841,7 +841,7 @@ const SurgeryReadiness = ({ onBack }) => {
               { label: 'Total Revenue', value: formatCurrency(summaryStats.totalRevenue), sub: 'At stake next 14 days', color: '#ec4899', icon: <TrendingUpIcon /> },
             ].map((stat, idx) => (
               <Grid item xs={6} sm={4} md={2.4} key={idx}>
-                <Card sx={{ borderRadius: 3, bgcolor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.08)', borderLeft: `3px solid ${stat.color}` }}>
+                <Card sx={{ borderRadius: 3, bgcolor: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', borderLeft: `3px solid ${stat.color}` }}>
                   <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
                     <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
                       <Box sx={{ color: stat.color, display: 'flex' }}>{stat.icon}</Box>
@@ -861,7 +861,7 @@ const SurgeryReadiness = ({ onBack }) => {
       {selectedSurgery ? (
         renderDetailView()
       ) : (
-        <Paper elevation={0} sx={{ borderRadius: 3, bgcolor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.08)', flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <Paper elevation={0} sx={{ borderRadius: 3, bgcolor: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: alpha('#64748b', 0.2), background: `linear-gradient(90deg, ${alpha('#a855f7', 0.05)}, ${alpha('#64748b', 0.02)})` }}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
               <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569' }}>

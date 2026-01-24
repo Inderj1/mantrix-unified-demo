@@ -723,7 +723,7 @@ const Arbitration = ({ onBack }) => {
               },
             }}
             sx={{
-              border: 'none',
+              border: '1px solid rgba(0,0,0,0.08)',
               height: '100%',
               '& .MuiDataGrid-cell': { fontSize: '0.8rem', borderColor: alpha('#000', 0.08) },
               '& .MuiDataGrid-columnHeader': { bgcolor: '#f1f5f9', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' },

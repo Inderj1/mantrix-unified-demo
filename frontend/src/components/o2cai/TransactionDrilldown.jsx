@@ -398,7 +398,7 @@ const TransactionDrilldown = ({ onBack, darkMode = false, onNavigate }) => {
                 borderRadius: 1,
               },
               '& .MuiInputBase-input': { py: 1, px: 1.5 },
-              '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+              '& .MuiOutlinedInput-notchedOutline': { border: '1px solid rgba(0,0,0,0.08)' },
               width: 250,
             }}
           />

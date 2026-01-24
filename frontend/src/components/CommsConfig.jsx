@@ -524,7 +524,7 @@ const CommsConfig = () => {
               pageSize={10}
               onRowClick={(params) => setSelectedType(params.row)}
               sx={{
-                border: 'none',
+                border: '1px solid rgba(0,0,0,0.08)',
                 '& .MuiDataGrid-columnHeaders': {
                   bgcolor: alpha(colors.primary, 0.03),
                   borderBottom: `1px solid ${alpha(colors.primary, 0.1)}`,
@@ -571,7 +571,7 @@ const CommsConfig = () => {
               columns={fieldColumns}
               pageSize={10}
               sx={{
-                border: 'none',
+                border: '1px solid rgba(0,0,0,0.08)',
                 '& .MuiDataGrid-columnHeaders': {
                   bgcolor: alpha(colors.primary, 0.03),
                   borderBottom: `1px solid ${alpha(colors.primary, 0.1)}`,

@@ -1294,7 +1294,7 @@ const ExcelAIProcessor = ({ onBack, darkMode = false }) => {
                     disableSelectionOnClick
                     density="compact"
                     sx={{
-                      border: 'none',
+                      border: '1px solid rgba(0,0,0,0.08)',
                       fontSize: '0.7rem',
                       '& .MuiDataGrid-cell': {
                         borderColor: alpha('#64748b', 0.08),

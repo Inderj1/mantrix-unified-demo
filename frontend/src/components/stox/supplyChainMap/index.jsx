@@ -259,7 +259,7 @@ export default function SupplyChainMap({ onBack }) {
               borderRadius: 1.5,
               p: 0.5,
               '& .MuiToggleButtonGroup-grouped': {
-                border: 'none',
+                border: '1px solid rgba(0,0,0,0.08)',
                 borderRadius: '8px !important',
                 mx: 0.5,
               },

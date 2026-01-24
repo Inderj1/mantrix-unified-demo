@@ -178,7 +178,7 @@ const DataSourcesConnections = () => {
           height: '100%',
           borderRadius: 3,
           bgcolor: 'white',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
           transition: 'all 0.3s ease',
           '&:hover': {
             transform: 'translateY(-4px)',
@@ -299,7 +299,7 @@ const DataSourcesConnections = () => {
           height: '100%',
           borderRadius: 3,
           bgcolor: 'white',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
           transition: 'all 0.3s ease',
           '&:hover': {
             transform: 'translateY(-4px)',
@@ -453,7 +453,7 @@ const DataSourcesConnections = () => {
               p: 2,
               borderRadius: 3,
               bgcolor: 'white',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -489,7 +489,7 @@ const DataSourcesConnections = () => {
               p: 2,
               borderRadius: 3,
               bgcolor: 'white',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -525,7 +525,7 @@ const DataSourcesConnections = () => {
               p: 2,
               borderRadius: 3,
               bgcolor: 'white',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -564,7 +564,7 @@ const DataSourcesConnections = () => {
           mb: 3,
           borderRadius: 3,
           bgcolor: 'white',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         }}
       >
         <Tabs

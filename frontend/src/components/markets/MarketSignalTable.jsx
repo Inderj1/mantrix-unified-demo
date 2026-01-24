@@ -253,7 +253,7 @@ const MarketSignalTable = ({
           },
         }}
         sx={{
-          border: 'none',
+          border: '1px solid rgba(0,0,0,0.08)',
           '& .MuiDataGrid-row:hover': {
             backgroundColor: '#f9f9f9',
             cursor: 'pointer',

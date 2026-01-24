@@ -117,7 +117,7 @@ const DocumentIntelligenceLanding = ({ onBack, darkMode = false }) => {
           borderRadius: 0,
           flexShrink: 0,
           bgcolor: darkMode ? '#161b22' : '#fff',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         }}
       >
         <Box sx={{ maxWidth: 1400, mx: 'auto', px: 2 }}>
@@ -162,12 +162,12 @@ const DocumentIntelligenceLanding = ({ onBack, darkMode = false }) => {
                         height: 200,
                         cursor: 'pointer',
                         transition: 'all 0.3s ease',
-                        border: 'none',
+                        border: '1px solid rgba(0,0,0,0.08)',
                         borderRadius: 3,
                         overflow: 'hidden',
                         position: 'relative',
                         bgcolor: 'white',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                         '&:hover': {
                           transform: 'translateY(-6px)',
                           boxShadow: `0 20px 40px ${alpha(primaryBlue, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,

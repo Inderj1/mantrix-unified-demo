@@ -113,7 +113,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
   return (
     <Box sx={{ minHeight: '100%', bgcolor: '#f8fbfd' }}>
       {/* Header */}
-      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={2}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Box
@@ -189,7 +189,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
                 p: 2,
                 borderRadius: 3,
                 bgcolor: 'white',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               }}
             >
               <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -304,7 +304,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
                     fontWeight: 600,
                     bgcolor: activeTab === index ? alpha(tab.color, 0.12) : alpha('#64748b', 0.08),
                     color: activeTab === index ? tab.color : '#64748b',
-                    border: 'none',
+                    border: '1px solid rgba(0,0,0,0.08)',
                   }}
                 />
               </Box>
@@ -320,7 +320,7 @@ const ControlCenter = ({ apiHealth, onRefreshStatus }) => {
           p: 3,
           borderRadius: 3,
           bgcolor: 'white',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
           minHeight: 400,
         }}
       >

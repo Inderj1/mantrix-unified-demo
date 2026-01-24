@@ -790,7 +790,7 @@ const OrderValueControlTower = ({ onBack, darkMode = false, selectedOrder: initi
               onRowClick={handleRowClick}
               disableRowSelectionOnClick
               sx={{
-                border: 'none',
+                border: '1px solid rgba(0,0,0,0.08)',
                 '& .MuiDataGrid-cell': { fontSize: '0.8rem' },
                 '& .MuiDataGrid-columnHeader': { bgcolor: darkMode ? '#1e293b' : '#f1f5f9', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' },
                 '& .MuiDataGrid-row:hover': { bgcolor: alpha('#0854a0', 0.08), cursor: 'pointer' },

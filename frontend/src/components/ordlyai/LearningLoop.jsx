@@ -574,7 +574,7 @@ const LearningLoop = ({ onBack, darkMode = false }) => {
             onRowClick={(params) => setSelectedOrder(params.row)}
             disableRowSelectionOnClick
             sx={{
-              border: 'none',
+              border: '1px solid rgba(0,0,0,0.08)',
               height: 'calc(100% - 56px)',
               '& .MuiDataGrid-cell': {
                 fontSize: '0.8rem',

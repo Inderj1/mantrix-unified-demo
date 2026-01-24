@@ -113,7 +113,7 @@ const PlatformSettings = () => {
               p: 3,
               borderRadius: 3,
               bgcolor: 'white',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}
           >
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
@@ -209,7 +209,7 @@ const PlatformSettings = () => {
               p: 3,
               borderRadius: 3,
               bgcolor: 'white',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}
           >
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
@@ -298,7 +298,7 @@ const PlatformSettings = () => {
               p: 3,
               borderRadius: 3,
               bgcolor: 'white',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}
           >
             <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>

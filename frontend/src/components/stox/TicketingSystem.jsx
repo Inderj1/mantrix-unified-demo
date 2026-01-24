@@ -401,7 +401,7 @@ const TicketingSystem = ({ onBack }) => {
   return (
     <Box sx={{ p: 3, height: '100%', overflowY: 'auto' }}>
       {/* Header */}
-      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <TicketIcon sx={{ fontSize: 40, color: '#10b981' }} />
           <Box sx={{ flex: 1 }}>
@@ -675,10 +675,10 @@ const TicketingSystem = ({ onBack }) => {
                     <TableBody>
                       {Object.entries(selectedTicket.metadata).map(([key, value]) => (
                         <TableRow key={key}>
-                          <TableCell sx={{ fontWeight: 600, width: '40%', border: 'none', py: 0.5 }}>
+                          <TableCell sx={{ fontWeight: 600, width: '40%', border: '1px solid rgba(0,0,0,0.08)', py: 0.5 }}>
                             {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                           </TableCell>
-                          <TableCell sx={{ border: 'none', py: 0.5, fontFamily: typeof value === 'number' ? 'monospace' : 'inherit' }}>
+                          <TableCell sx={{ border: '1px solid rgba(0,0,0,0.08)', py: 0.5, fontFamily: typeof value === 'number' ? 'monospace' : 'inherit' }}>
                             {typeof value === 'number' ? value.toLocaleString() : String(value)}
                           </TableCell>
                         </TableRow>

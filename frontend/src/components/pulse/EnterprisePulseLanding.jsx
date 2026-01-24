@@ -59,7 +59,7 @@ const EnterprisePulseLanding = ({ onTileClick, alertCount = 0, agentCount = 0, d
   return (
     <Box>
       {/* Header */}
-      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
         <Box display="flex" alignItems="center" gap={2}>
           <Box
             sx={{
@@ -99,12 +99,12 @@ const EnterprisePulseLanding = ({ onTileClick, alertCount = 0, agentCount = 0, d
                     height: 200,
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
-                    border: 'none',
+                    border: '1px solid rgba(0,0,0,0.08)',
                     borderRadius: 3,
                     overflow: 'hidden',
                     position: 'relative',
                     bgcolor: 'white',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                     '&:hover': {
                       transform: 'translateY(-6px)',
                       boxShadow: `0 20px 40px ${alpha(tile.color, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,

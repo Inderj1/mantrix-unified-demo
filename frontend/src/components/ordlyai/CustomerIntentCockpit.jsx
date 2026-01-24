@@ -806,7 +806,7 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
                       src={getPdfUrl(selectedOrder)}
                       width="100%"
                       height="100%"
-                      style={{ border: 'none' }}
+                      style={{ border: '1px solid rgba(0,0,0,0.08)' }}
                       title={`PO Document - ${selectedOrder.poNumber || selectedOrder.id}`}
                     />
                   </Box>
@@ -866,7 +866,7 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
                       src={getPdfUrl(selectedOrder)}
                       width="100%"
                       height="100%"
-                      style={{ border: 'none' }}
+                      style={{ border: '1px solid rgba(0,0,0,0.08)' }}
                       title={`PO Document - ${selectedOrder.poNumber || selectedOrder.id}`}
                     />
                   </DialogContent>
@@ -1477,7 +1477,7 @@ const CustomerIntentCockpit = ({ onBack, darkMode = false, selectedOrder: initia
               onRowClick={handleRowClick}
               disableRowSelectionOnClick
               sx={{
-                border: 'none',
+                border: '1px solid rgba(0,0,0,0.08)',
                 '& .MuiDataGrid-cell': { fontSize: '0.8rem' },
                 '& .MuiDataGrid-columnHeader': {
                   bgcolor: darkMode ? '#1e293b' : '#f1f5f9',

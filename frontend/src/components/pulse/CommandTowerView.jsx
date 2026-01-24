@@ -296,7 +296,7 @@ const CommandTowerView = ({ onBack, onCreateTicket, darkMode = false }) => {
   return (
     <Box>
       {/* Header */}
-      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+      <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
         <Box display="flex" alignItems="center" gap={2}>
           <IconButton onClick={onBack} sx={{ bgcolor: alpha(colors.primary, 0.1) }}>
             <ArrowBackIcon />
@@ -331,7 +331,7 @@ const CommandTowerView = ({ onBack, onCreateTicket, darkMode = false }) => {
       {/* KPI Cards */}
       <Grid container spacing={2} mb={3}>
         <Grid item xs={6} sm={2.4}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 3, bgcolor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 3, bgcolor: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
                 <Typography variant="caption" color="text.secondary">Open</Typography>
@@ -342,7 +342,7 @@ const CommandTowerView = ({ onBack, onCreateTicket, darkMode = false }) => {
           </Paper>
         </Grid>
         <Grid item xs={6} sm={2.4}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 3, bgcolor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 3, bgcolor: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
                 <Typography variant="caption" color="text.secondary">In Progress</Typography>
@@ -353,7 +353,7 @@ const CommandTowerView = ({ onBack, onCreateTicket, darkMode = false }) => {
           </Paper>
         </Grid>
         <Grid item xs={6} sm={2.4}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 3, bgcolor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 3, bgcolor: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
                 <Typography variant="caption" color="text.secondary">Completed Today</Typography>
@@ -364,7 +364,7 @@ const CommandTowerView = ({ onBack, onCreateTicket, darkMode = false }) => {
           </Paper>
         </Grid>
         <Grid item xs={6} sm={2.4}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 3, bgcolor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 3, bgcolor: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
                 <Typography variant="caption" color="text.secondary">From AI Modules</Typography>
@@ -377,7 +377,7 @@ const CommandTowerView = ({ onBack, onCreateTicket, darkMode = false }) => {
           </Paper>
         </Grid>
         <Grid item xs={6} sm={2.4}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 3, bgcolor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 3, bgcolor: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
                 <Typography variant="caption" color="text.secondary">Revenue Impact</Typography>
@@ -390,7 +390,7 @@ const CommandTowerView = ({ onBack, onCreateTicket, darkMode = false }) => {
       </Grid>
 
       {/* Filters and DataGrid */}
-      <Card sx={{ border: 'none', borderRadius: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+      <Card sx={{ border: '1px solid rgba(0,0,0,0.08)', borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
         <CardContent>
           {/* Search and Filters */}
           <Grid container spacing={2} mb={2}>

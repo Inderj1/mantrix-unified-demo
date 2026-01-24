@@ -506,7 +506,7 @@ const InventoryHeatmap = ({ onBack }) => {
           sx={{
             flex: 1,
             width: '100%',
-            border: 'none',
+            border: '1px solid rgba(0,0,0,0.08)',
             '& .MuiDataGrid-row:hover': {
               backgroundColor: '#f5f5f5',
             },

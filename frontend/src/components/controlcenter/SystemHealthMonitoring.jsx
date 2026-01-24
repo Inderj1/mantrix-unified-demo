@@ -246,7 +246,7 @@ const SystemHealthMonitoring = () => {
               p: 2,
               borderRadius: 3,
               bgcolor: 'white',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
@@ -282,7 +282,7 @@ const SystemHealthMonitoring = () => {
               p: 2,
               borderRadius: 3,
               bgcolor: 'white',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
@@ -316,7 +316,7 @@ const SystemHealthMonitoring = () => {
               p: 2,
               borderRadius: 3,
               bgcolor: 'white',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
@@ -341,7 +341,7 @@ const SystemHealthMonitoring = () => {
               p: 2,
               borderRadius: 3,
               bgcolor: 'white',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
@@ -368,7 +368,7 @@ const SystemHealthMonitoring = () => {
           mb: 3,
           borderRadius: 3,
           bgcolor: 'white',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         }}
       >
         <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text, mb: 2 }}>
@@ -382,7 +382,7 @@ const SystemHealthMonitoring = () => {
                 sx={{
                   borderRadius: 3,
                   bgcolor: 'white',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
                   '&:hover': {
@@ -519,7 +519,7 @@ const SystemHealthMonitoring = () => {
               p: 3,
               borderRadius: 3,
               bgcolor: 'white',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}
           >
             <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text, mb: 2 }}>
@@ -567,7 +567,7 @@ const SystemHealthMonitoring = () => {
               p: 3,
               borderRadius: 3,
               bgcolor: 'white',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}
           >
             <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text, mb: 2 }}>
@@ -617,7 +617,7 @@ const SystemHealthMonitoring = () => {
           mt: 3,
           borderRadius: 3,
           bgcolor: 'white',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         }}
       >
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
