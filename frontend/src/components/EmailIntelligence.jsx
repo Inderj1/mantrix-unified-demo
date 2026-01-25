@@ -33,6 +33,8 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  Breadcrumbs,
+  Link,
 } from '@mui/material';
 import {
   DataGrid,
@@ -74,9 +76,17 @@ import {
   Add as AddIcon,
   Delete as DeleteIcon,
   Edit as EditIcon,
+  Hub as HubIcon,
+  NavigateNext as NavigateNextIcon,
+  ArrowBack as ArrowBackIcon,
+  ArrowForward as ArrowForwardIcon,
 } from '@mui/icons-material';
 import { useCustomTypes } from '../hooks/useCustomTypes';
 import CustomTypeConfig from './CustomTypeConfig';
+
+// Import HUB Modules
+import VendorHUBModule from './emailIntel/VendorHUBModule';
+import CustomerHUBModule from './emailIntel/CustomerHUBModule';
 
 // Custom Toolbar for DataGrid
 function CustomToolbar({ onExport }) {
@@ -426,10 +436,35 @@ const getColors = (darkMode) => ({
   border: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
 });
 
+// HUB Module definitions
+const hubModules = [
+  {
+    id: 'vendor-hub',
+    title: 'VENDOR HUB',
+    subtitle: 'Vendor Communication Intelligence',
+    description: 'AI-powered intent classification, action queue, and SAP integration for vendor emails including payment inquiries, invoice disputes, and PO confirmations',
+    icon: BusinessIcon,
+    color: '#00357a',
+    stats: { label: 'Active Intents', value: '24' },
+    status: 'active',
+  },
+  {
+    id: 'customer-hub',
+    title: 'CUSTOMER HUB',
+    subtitle: 'Customer Inquiry Intelligence',
+    description: 'Smart classification of customer inquiries with automated SAP lookups for order status, invoice disputes, and account statements',
+    icon: PersonIcon,
+    color: '#1a5a9e',
+    stats: { label: 'Active Intents', value: '18' },
+    status: 'active',
+  },
+];
+
 const EmailIntelligence = ({ onNavigateToConfig, darkMode = false }) => {
   const theme = useTheme();
   const colors = getColors(darkMode);
   const [selectedType, setSelectedType] = useState(null);
+  const [selectedHub, setSelectedHub] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -454,28 +489,9 @@ const EmailIntelligence = ({ onNavigateToConfig, darkMode = false }) => {
   });
 
   // Sample configuration data (Blue/Grey theme)
+  // Note: Vendor Communications and Customer Inquiries are now handled by the VENDOR HUB and CUSTOMER HUB modules
   const sampleConfig = {
     types: [
-      {
-        id: 1,
-        name: 'vendor_communications',
-        display_name: 'Vendor Communications',
-        description: 'Track communications with suppliers and vendors including POs, invoices, and shipments',
-        icon: 'Business',
-        color: '#00357a',
-        tab_order: 1,
-        is_active: true
-      },
-      {
-        id: 2,
-        name: 'customer_inquiries',
-        display_name: 'Customer Inquiries',
-        description: 'Monitor and respond to customer support requests and inquiries',
-        icon: 'Person',
-        color: '#1a5a9e',
-        tab_order: 2,
-        is_active: true
-      },
       {
         id: 3,
         name: 'escalations',
@@ -483,7 +499,7 @@ const EmailIntelligence = ({ onNavigateToConfig, darkMode = false }) => {
         description: 'Track critical issues requiring immediate attention and SLA management',
         icon: 'Notifications',
         color: '#dc2626',
-        tab_order: 3,
+        tab_order: 1,
         is_active: true
       },
       {
@@ -493,7 +509,7 @@ const EmailIntelligence = ({ onNavigateToConfig, darkMode = false }) => {
         description: 'Monitor stock levels, reorder points, and inventory health alerts',
         icon: 'Inventory',
         color: '#002352',
-        tab_order: 4,
+        tab_order: 2,
         is_active: true
       },
       {
@@ -503,33 +519,11 @@ const EmailIntelligence = ({ onNavigateToConfig, darkMode = false }) => {
         description: 'Track email marketing performance, open rates, and conversions',
         icon: 'Email',
         color: '#1a5a9e',
-        tab_order: 5,
+        tab_order: 3,
         is_active: true
       }
     ],
     fields: {
-      // Type 1: Vendor Communications
-      1: [
-        { id: 1, communication_type_id: 1, field_name: 'vendor_name', display_name: 'Vendor Name', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 1, column_width: 200 },
-        { id: 2, communication_type_id: 1, field_name: 'vendor_email', display_name: 'Email', field_type: 'email', is_sortable: true, is_filterable: true, column_order: 2, column_width: 200 },
-        { id: 3, communication_type_id: 1, field_name: 'subject', display_name: 'Subject', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 3, column_width: 250 },
-        { id: 4, communication_type_id: 1, field_name: 'communication_type', display_name: 'Type', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 4, column_width: 150 },
-        { id: 5, communication_type_id: 1, field_name: 'status', display_name: 'Status', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 5, column_width: 130 },
-        { id: 6, communication_type_id: 1, field_name: 'amount', display_name: 'Amount', field_type: 'currency', is_sortable: true, is_filterable: true, column_order: 6, column_width: 130 },
-        { id: 7, communication_type_id: 1, field_name: 'urgency', display_name: 'Urgency', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 7, column_width: 120 },
-        { id: 8, communication_type_id: 1, field_name: 'date', display_name: 'Date', field_type: 'date', is_sortable: true, is_filterable: true, column_order: 8, column_width: 130 }
-      ],
-      // Type 2: Customer Inquiries
-      2: [
-        { id: 9, communication_type_id: 2, field_name: 'customer_name', display_name: 'Customer Name', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 1, column_width: 180 },
-        { id: 10, communication_type_id: 2, field_name: 'customer_email', display_name: 'Email', field_type: 'email', is_sortable: true, is_filterable: true, column_order: 2, column_width: 200 },
-        { id: 11, communication_type_id: 2, field_name: 'subject', display_name: 'Subject', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 3, column_width: 250 },
-        { id: 12, communication_type_id: 2, field_name: 'inquiry_type', display_name: 'Type', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 4, column_width: 120 },
-        { id: 13, communication_type_id: 2, field_name: 'status', display_name: 'Status', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 5, column_width: 130 },
-        { id: 14, communication_type_id: 2, field_name: 'priority', display_name: 'Priority', field_type: 'dropdown', is_sortable: true, is_filterable: true, column_order: 6, column_width: 120 },
-        { id: 15, communication_type_id: 2, field_name: 'sentiment', display_name: 'Sentiment', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 7, column_width: 120 },
-        { id: 16, communication_type_id: 2, field_name: 'received_date', display_name: 'Received', field_type: 'date', is_sortable: true, is_filterable: true, column_order: 8, column_width: 130 }
-      ],
       // Type 3: Escalations
       3: [
         { id: 17, communication_type_id: 3, field_name: 'ticket_id', display_name: 'Ticket ID', field_type: 'text', is_sortable: true, is_filterable: true, column_order: 1, column_width: 130 },
@@ -947,12 +941,31 @@ const EmailIntelligence = ({ onNavigateToConfig, darkMode = false }) => {
     }
   };
 
+  // Handle back from HUB modules
+  const handleBackFromHub = () => {
+    setSelectedHub(null);
+  };
+
+  // Render HUB Module Components
+  if (selectedHub === 'vendor-hub') {
+    return <VendorHUBModule onBack={handleBackFromHub} darkMode={darkMode} />;
+  }
+  if (selectedHub === 'customer-hub') {
+    return <CustomerHUBModule onBack={handleBackFromHub} darkMode={darkMode} />;
+  }
+
   // Tile Landing View
   if (!selectedType) {
     // Filter tiles based on search query
     const filteredTypes = config.types.filter((type) =>
       type.display_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       type.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    // Filter HUB modules based on search
+    const filteredHubs = hubModules.filter((hub) =>
+      hub.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      hub.description.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
@@ -979,36 +992,115 @@ const EmailIntelligence = ({ onNavigateToConfig, darkMode = false }) => {
               </Button>
             </Stack>
           </Stack>
-
-          {/* Search Bar */}
-          <TextField
-            fullWidth
-            placeholder="Search communication types..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            InputProps={{
-              startAdornment: <SearchIcon sx={{ color: 'text.secondary', mr: 1 }} />,
-              endAdornment: searchQuery && (
-                <IconButton size="small" onClick={() => setSearchQuery('')}>
-                  <ClearIcon fontSize="small" />
-                </IconButton>
-              ),
-            }}
-            sx={{
-              mt: 2,
-              '& .MuiOutlinedInput-root': {
-                bgcolor: darkMode ? colors.paper : alpha(theme.palette.primary.main, 0.02),
-                color: colors.text,
-                '& fieldset': { borderColor: colors.border },
-              },
-            }}
-          />
         </Paper>
 
         {error && (
           <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
             {error}
           </Alert>
+        )}
+
+        {/* HUB Modules Section */}
+        {filteredHubs.length > 0 && (
+          <>
+            <Typography variant="subtitle2" sx={{
+              mb: 1.5,
+              color: colors.textSecondary,
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: 1,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1
+            }}>
+              <HubIcon sx={{ fontSize: 18 }} />
+              Intelligence Hubs
+            </Typography>
+            <Grid container spacing={1.5} sx={{ mb: 3 }}>
+              {filteredHubs.map((hub, index) => {
+                const HubIconComponent = hub.icon;
+                return (
+                  <Grid item xs={12} sm={6} md={3} lg={3} key={hub.id}>
+                    <Card
+                      sx={{
+                        height: 200,
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        border: `1px solid ${colors.border}`,
+                        borderRadius: 3,
+                        overflow: 'hidden',
+                        position: 'relative',
+                        bgcolor: colors.cardBg,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                        '&:hover': {
+                          transform: 'translateY(-6px)',
+                          boxShadow: `0 20px 40px ${alpha(hub.color, 0.12)}, 0 8px 16px rgba(0,0,0,0.06)`,
+                          '& .hub-icon': {
+                            transform: 'scale(1.1)',
+                            bgcolor: hub.color,
+                            color: 'white',
+                          },
+                          '& .hub-arrow': {
+                            opacity: 1,
+                            transform: 'translateX(4px)',
+                          },
+                        },
+                      }}
+                      onClick={() => setSelectedHub(hub.id)}
+                    >
+                      <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
+                          <Box
+                            className="hub-icon"
+                            sx={{
+                              width: 40,
+                              height: 40,
+                              borderRadius: 1.5,
+                              bgcolor: alpha(hub.color, 0.1),
+                              color: hub.color,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              transition: 'all 0.3s ease',
+                            }}
+                          >
+                            <HubIconComponent sx={{ fontSize: 22 }} />
+                          </Box>
+                        </Box>
+                        <Typography variant="body1" sx={{ fontWeight: 700, color: hub.color, mb: 0.5, fontSize: '0.9rem', lineHeight: 1.3 }}>
+                          {hub.title}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: colors.textSecondary, mb: 'auto', lineHeight: 1.4, fontSize: '0.7rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                          {hub.description}
+                        </Typography>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid', borderColor: alpha(hub.color, 0.1) }}>
+                          <Chip label={`${hub.stats.value} ${hub.stats.label}`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha(hub.color, 0.08), color: hub.color, fontWeight: 600 }} />
+                          <OpenInNewIcon className="hub-arrow" sx={{ color: hub.color, fontSize: 16, opacity: 0.5, transition: 'all 0.3s ease' }} />
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </>
+        )}
+
+        {/* Communication Types Section */}
+        {filteredTypes.length > 0 && (
+          <Typography variant="subtitle2" sx={{
+            mb: 1.5,
+            color: colors.textSecondary,
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: 1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1
+          }}>
+            <EmailIcon sx={{ fontSize: 18 }} />
+            Communication Types
+          </Typography>
         )}
 
         <Grid container spacing={1.5}>

@@ -173,6 +173,7 @@ import PerformanceAnalytics from './components/routeai/PerformanceAnalytics';
 import FuelManagement from './components/routeai/FuelManagement';
 import MaintenanceScheduler from './components/routeai/MaintenanceScheduler';
 import TraxxAILanding from './components/TraxxAILanding';
+import MasterDataLanding from './components/masterdata/MasterDataLanding';
 import KitControlTower from './components/traxxai/KitControlTower';
 import WhoMustActNow from './components/traxxai/WhoMustActNow';
 import LogisticsEconomics from './components/traxxai/LogisticsEconomics';
@@ -674,6 +675,8 @@ function App() {
                     } else if (moduleId === 'traxx') {
                       setCoreAIView('traxx');
                       setTraxxView('landing');
+                    } else if (moduleId === 'masterdata') {
+                      setCoreAIView('masterdata');
                     }
                   }} />
                 </Box>
@@ -1209,6 +1212,14 @@ function App() {
                   {traxxView === 'surgery-readiness' && (
                     <SurgeryReadiness darkMode={darkMode} onBack={() => setTraxxView('landing')} />
                   )}
+                </Box>
+              </Fade>
+              <Fade in={coreAIView === 'masterdata'} timeout={300}>
+                <Box sx={{ display: coreAIView === 'masterdata' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
+                  <MasterDataLanding
+                    darkMode={darkMode}
+                    onBack={() => setCoreAIView('landing')}
+                  />
                 </Box>
               </Fade>
             </Box>

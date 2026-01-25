@@ -23,6 +23,7 @@ import {
   ShoppingCart as ShoppingCartIcon,
   Receipt as ReceiptIcon,
   Sensors as SensorsIcon,
+  Hub as MasterDataIcon,
 } from '@mui/icons-material';
 
 // Import centralized brand colors
@@ -99,6 +100,16 @@ const aiModules = [
     stats: { label: 'Trackers', value: '248' },
     status: 'active',
   },
+  {
+    id: 'masterdata',
+    title: 'MASTER.AI',
+    subtitle: 'Master Data Intelligence Engine',
+    description: 'AI-powered master data management, quality scoring, and governance automation',
+    icon: MasterDataIcon,
+    color: MODULE_COLOR,
+    stats: { label: 'Records', value: '15K' },
+    status: 'active',
+  },
 ];
 
 const CoreAILanding = ({ onTileClick, darkMode = false }) => {
@@ -129,7 +140,7 @@ const CoreAILanding = ({ onTileClick, darkMode = false }) => {
                 CORE.AI
               </Typography>
               <Chip
-                label="7 Modules"
+                label="8 Modules"
                 size="small"
                 sx={{
                   bgcolor: alpha(MODULE_COLOR, darkMode ? 0.2 : 0.1),

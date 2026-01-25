@@ -1,0 +1,2346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BP.AI | Mantrix.AI Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-darkest: #05080f;
+            --bg-primary: #0a1019;
+            --bg-secondary: #0f1724;
+            --bg-tertiary: #151f30;
+            --bg-card: #121c2b;
+            --bg-card-hover: #182436;
+            --bg-elevated: #1a2538;
+            --border-subtle: #1e2d42;
+            --border-default: #263548;
+            --border-highlight: #3a4d66;
+            --text-primary: #f4f7fb;
+            --text-secondary: #a0afc4;
+            --text-muted: #5d7290;
+            --text-dim: #3d5068;
+            
+            /* Mantrix Brand Colors */
+            --mantrix-blue: #2d7aff;
+            --mantrix-cyan: #00d4ff;
+            --mantrix-gradient: linear-gradient(135deg, #2d7aff 0%, #00d4ff 100%);
+            --mantrix-glow: 0 0 60px rgba(45, 122, 255, 0.2);
+            
+            /* BP.AI Accent - Emerald/Teal */
+            --bp-emerald: #10b981;
+            --bp-teal: #14b8a6;
+            --bp-gradient: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
+            --bp-glow: 0 0 60px rgba(16, 185, 129, 0.2);
+            
+            /* Status Colors */
+            --success: #00e599;
+            --success-bg: rgba(0, 229, 153, 0.12);
+            --warning: #ffb020;
+            --warning-bg: rgba(255, 176, 32, 0.12);
+            --danger: #ff4757;
+            --danger-bg: rgba(255, 71, 87, 0.12);
+            --info: #00d4ff;
+            --info-bg: rgba(0, 212, 255, 0.12);
+            --purple: #a855f7;
+            --purple-bg: rgba(168, 85, 247, 0.12);
+            --blue: #3b82f6;
+            --blue-bg: rgba(59, 130, 246, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-darkest);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Ambient Background */
+        .ambient-bg {
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse 80% 50% at 20% 100%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 80% 0%, rgba(20, 184, 166, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse 100% 100% at 50% 50%, rgba(45, 122, 255, 0.03) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .noise-overlay {
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 260px;
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-mark {
+            width: 40px;
+            height: 40px;
+            background: var(--mantrix-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+            color: white;
+            box-shadow: var(--mantrix-glow);
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-brand {
+            font-size: 18px;
+            font-weight: 800;
+            background: var(--mantrix-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-product {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* Module Navigation */
+        .module-nav {
+            padding: 16px 12px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .module-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 8px;
+            margin-bottom: 8px;
+        }
+
+        .module-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+            border: 1px solid transparent;
+        }
+
+        .module-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .module-item.active {
+            background: var(--bg-card);
+            border-color: var(--bp-emerald);
+            box-shadow: var(--bp-glow);
+        }
+
+        .module-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .module-item.active .module-icon {
+            background: var(--bp-gradient);
+        }
+
+        .module-info h4 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .module-info p {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Sidebar Nav */
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            margin-bottom: 20px;
+        }
+
+        .nav-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 8px;
+            margin-bottom: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--bp-emerald);
+        }
+
+        .nav-item .icon {
+            width: 18px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .nav-item .badge {
+            margin-left: auto;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .nav-item .badge.danger {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .nav-item .badge.warning {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+
+        .nav-item .badge.success {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        /* Sidebar Footer */
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .status-text strong {
+            color: var(--text-primary);
+            display: block;
+            font-size: 11px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 64px;
+            background: rgba(10, 16, 25, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .breadcrumb span {
+            color: var(--text-muted);
+        }
+
+        .breadcrumb .current {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid transparent;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border-color: var(--border-default);
+            color: var(--text-secondary);
+        }
+
+        .btn-ghost:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--border-highlight);
+            color: var(--text-primary);
+        }
+
+        .btn-primary {
+            background: var(--bp-gradient);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(16, 185, 129, 0.35);
+        }
+
+        .btn-success {
+            background: var(--success);
+            border: none;
+            color: var(--bg-darkest);
+        }
+
+        /* Page Container */
+        .page-container {
+            padding: 28px;
+        }
+
+        /* Screen Visibility */
+        .screen {
+            display: none;
+            animation: fadeSlide 0.4s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 28px;
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-header p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* Step Indicator */
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 32px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .step.active {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--bp-emerald);
+        }
+
+        .step.completed {
+            color: var(--success);
+        }
+
+        .step.pending {
+            color: var(--text-muted);
+        }
+
+        .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .step.active .step-dot {
+            animation: pulse 1.5s infinite;
+        }
+
+        .step-connector {
+            width: 32px;
+            height: 2px;
+            background: var(--border-default);
+            border-radius: 1px;
+        }
+
+        .step-connector.completed {
+            background: var(--success);
+        }
+
+        /* Dashboard Metrics */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .metric-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--bp-gradient);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .metric-card:hover::before {
+            opacity: 1;
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .metric-icon.blue { background: var(--blue-bg); }
+        .metric-icon.purple { background: var(--purple-bg); }
+        .metric-icon.green { background: var(--success-bg); }
+        .metric-icon.yellow { background: var(--warning-bg); }
+        .metric-icon.red { background: var(--danger-bg); }
+        .metric-icon.emerald { background: rgba(16, 185, 129, 0.15); }
+
+        .metric-value {
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .metric-value.blue { color: var(--blue); }
+        .metric-value.purple { color: var(--purple); }
+        .metric-value.green { color: var(--success); }
+        .metric-value.yellow { color: var(--warning); }
+        .metric-value.red { color: var(--danger); }
+        .metric-value.emerald { color: var(--bp-emerald); }
+
+        .metric-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .metric-trend {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+            margin-top: 12px;
+        }
+
+        .metric-trend.up {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        /* Section Cards */
+        .section-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-content {
+            padding: 20px 24px;
+        }
+
+        /* Upload Cards */
+        .upload-section {
+            margin-bottom: 24px;
+        }
+
+        .upload-section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .upload-section-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .upload-section-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .upload-section-icon.customer { background: var(--blue-bg); }
+        .upload-section-icon.vendor { background: var(--purple-bg); }
+        .upload-section-icon.transaction { background: var(--warning-bg); }
+
+        .upload-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .upload-card {
+            background: var(--bg-secondary);
+            border: 2px dashed var(--border-default);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .upload-card:hover {
+            border-color: var(--bp-emerald);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .upload-card.uploaded {
+            border-style: solid;
+            border-color: var(--success);
+            background: rgba(0, 229, 153, 0.05);
+        }
+
+        .upload-card-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .upload-card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .upload-card.uploaded .upload-card-icon {
+            background: var(--success-bg);
+        }
+
+        .upload-card-info h4 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .upload-card-info p {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .required-badge {
+            font-size: 9px;
+            padding: 2px 6px;
+            background: var(--warning-bg);
+            color: var(--warning);
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .upload-success {
+            display: none;
+            margin-top: 12px;
+            padding: 8px 12px;
+            background: var(--success-bg);
+            border-radius: 6px;
+            font-size: 11px;
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        .upload-card.uploaded .upload-success {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Config Panel */
+        .config-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .config-panel h3 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .config-field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .config-field select,
+        .config-field input {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        .config-field select:focus,
+        .config-field input:focus {
+            outline: none;
+            border-color: var(--bp-emerald);
+        }
+
+        .config-field select[multiple] {
+            height: 100px;
+        }
+
+        /* Checkbox Group */
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-item input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--bp-emerald);
+        }
+
+        .checkbox-item span {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Data Table */
+        .data-table-wrapper {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .data-table-scroll {
+            overflow-x: auto;
+            max-height: 500px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1400px;
+        }
+
+        .data-table th {
+            background: var(--bg-tertiary);
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-subtle);
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .data-table tr:hover td {
+            background: var(--bg-card-hover);
+        }
+
+        .data-table .sticky-col {
+            position: sticky;
+            left: 0;
+            background: var(--bg-card);
+            z-index: 5;
+        }
+
+        .data-table tr:hover .sticky-col {
+            background: var(--bg-card-hover);
+        }
+
+        .data-table th.sticky-col {
+            background: var(--bg-tertiary);
+            z-index: 15;
+        }
+
+        /* BP Cluster Cell */
+        .bp-cluster-id {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            font-size: 12px;
+            color: var(--bp-emerald);
+        }
+
+        .bp-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .bp-search-term {
+            font-size: 11px;
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--text-muted);
+        }
+
+        /* Source Tags */
+        .source-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .source-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .source-tag.customer {
+            background: var(--blue-bg);
+            color: var(--blue);
+        }
+
+        .source-tag.vendor {
+            background: var(--purple-bg);
+            color: var(--purple);
+        }
+
+        /* Role Indicators */
+        .role-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .role-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .role-dot.cust-fi { background: var(--blue); }
+        .role-dot.cust-sales { background: var(--info); }
+        .role-dot.vend-fi { background: var(--purple); }
+        .role-dot.vend-purch { background: #ec4899; }
+
+        /* Confidence Badge */
+        .confidence-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .confidence-badge.high {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .confidence-badge.medium {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+
+        .confidence-badge.low {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        /* Review Status */
+        .review-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .review-status.auto {
+            color: var(--success);
+        }
+
+        .review-status.needs-review {
+            color: var(--warning);
+        }
+
+        .review-status.must-review {
+            color: var(--danger);
+        }
+
+        /* Action Buttons */
+        .action-btns {
+            display: flex;
+            gap: 4px;
+        }
+
+        .action-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            border: 1px solid var(--border-default);
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .action-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .action-btn.danger:hover {
+            background: var(--danger-bg);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        /* Expanded Row */
+        .expanded-row {
+            background: var(--bg-secondary);
+        }
+
+        .expanded-content {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .expanded-section h5 {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .source-record {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+
+        .source-record-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .source-record-name {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .match-signal {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            padding: 6px 0;
+        }
+
+        .match-signal-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .match-signal-dot.strong { background: var(--success); }
+        .match-signal-dot.medium { background: var(--warning); }
+        .match-signal-dot.weak { background: var(--text-muted); }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 10px 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        .search-input {
+            position: relative;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .search-input input {
+            width: 100%;
+            padding: 10px 14px 10px 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        .search-input::before {
+            content: '🔍';
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            opacity: 0.5;
+        }
+
+        /* Insights Panel */
+        .insights-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .insight-section h4 {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .insight-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        /* Footer Bar */
+        .footer-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-subtle);
+            margin-top: 24px;
+        }
+
+        /* Export Panel */
+        .export-panel {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(calc(-50% + 130px));
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: 16px;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+        }
+
+        .export-info {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .export-info strong {
+            color: var(--bp-emerald);
+        }
+
+        .export-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 8, 15, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 64px;
+            height: 64px;
+            border: 3px solid var(--bg-tertiary);
+            border-top-color: var(--bp-emerald);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 24px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-content h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .loading-content p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--bg-tertiary);
+            border-radius: 2px;
+            overflow: hidden;
+            width: 300px;
+            margin: 20px auto 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--bp-gradient);
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+
+        /* Responsive Grids */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-bg"></div>
+    <div class="noise-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-mark">M</div>
+                <div class="logo-text">
+                    <span class="logo-brand">Mantrix.AI</span>
+                    <span class="logo-product">Enterprise Intelligence</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Module -->
+        <div class="module-nav">
+            <div class="module-label">Active Module</div>
+            <div class="module-item active">
+                <div class="module-icon">👥</div>
+                <div class="module-info">
+                    <h4>BP.AI</h4>
+                    <p>Business Partner Intelligence</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-label">Workflow</div>
+                <div class="nav-item active" data-screen="upload" onclick="showScreen('upload')">
+                    <span class="icon">📥</span>
+                    Data Upload & Scope
+                </div>
+                <div class="nav-item" data-screen="preview" onclick="showScreen('preview')">
+                    <span class="icon">👁️</span>
+                    Preview & Review
+                    <span class="badge warning">47</span>
+                </div>
+                <div class="nav-item" data-screen="create" onclick="showScreen('create')">
+                    <span class="icon">🚀</span>
+                    Create BPs
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-label">Analysis</div>
+                <div class="nav-item">
+                    <span class="icon">🔗</span>
+                    Entity Resolution
+                </div>
+                <div class="nav-item">
+                    <span class="icon">📊</span>
+                    Duplicate Clusters
+                    <span class="badge success">23</span>
+                </div>
+                <div class="nav-item">
+                    <span class="icon">⚠️</span>
+                    Data Quality Issues
+                    <span class="badge danger">12</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-label">Tools</div>
+                <div class="nav-item">
+                    <span class="icon">🔍</span>
+                    Partner Lookup
+                </div>
+                <div class="nav-item">
+                    <span class="icon">📋</span>
+                    Reports
+                </div>
+                <div class="nav-item">
+                    <span class="icon">⚙️</span>
+                    Settings
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar Footer -->
+        <div class="sidebar-footer">
+            <div class="system-status">
+                <div class="status-indicator"></div>
+                <div class="status-text">
+                    <strong>Ready</strong>
+                    <span>S/4HANA Migration Mode</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <div class="breadcrumb">
+                <span>BP.AI</span>
+                <span>/</span>
+                <span class="current" id="breadcrumb-current">Data Upload & Scope</span>
+            </div>
+            <div class="top-actions">
+                <button class="btn btn-ghost">📄 Documentation</button>
+                <button class="btn btn-ghost">💬 Support</button>
+                <button class="btn btn-primary" onclick="runEntityResolution()">⚡ Run Analysis</button>
+            </div>
+        </header>
+
+        <div class="page-container">
+
+            <!-- ============================================
+                 SCREEN 1: DATA UPLOAD & SCOPE
+            ============================================ -->
+            <section class="screen active" id="screen-upload">
+                <div class="page-header">
+                    <h1>📥 Data Upload & Scope Configuration</h1>
+                    <p>Upload customer, vendor, and transaction data to begin Business Partner consolidation analysis.</p>
+                </div>
+
+                <!-- Step Indicator -->
+                <div class="step-indicator">
+                    <div class="step active">
+                        <div class="step-dot"></div>
+                        Step 1: Data Upload & Scope
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step pending">
+                        <div class="step-dot"></div>
+                        Step 2: Preview & Review
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step pending">
+                        <div class="step-dot"></div>
+                        Step 3: Create BPs
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div>
+                        <!-- Customer Master Data -->
+                        <div class="upload-section">
+                            <div class="upload-section-header">
+                                <div class="upload-section-icon customer">👤</div>
+                                <h3>Customer Master Data</h3>
+                            </div>
+                            <div class="upload-grid">
+                                <div class="upload-card uploaded" onclick="toggleUpload(this)">
+                                    <div class="upload-card-content">
+                                        <div class="upload-card-icon">📋</div>
+                                        <div class="upload-card-info">
+                                            <h4>Customer General (KNA1) <span class="required-badge">Required</span></h4>
+                                            <p>Name, address, tax ID, phone</p>
+                                        </div>
+                                    </div>
+                                    <div class="upload-success">✓ kna1_export.xlsx (2,847 records)</div>
+                                </div>
+                                <div class="upload-card uploaded" onclick="toggleUpload(this)">
+                                    <div class="upload-card-content">
+                                        <div class="upload-card-icon">🏢</div>
+                                        <div class="upload-card-info">
+                                            <h4>Customer Company Code (KNB1)</h4>
+                                            <p>Payment terms, recon account</p>
+                                        </div>
+                                    </div>
+                                    <div class="upload-success">✓ knb1_export.xlsx (3,124 records)</div>
+                                </div>
+                                <div class="upload-card uploaded" onclick="toggleUpload(this)">
+                                    <div class="upload-card-content">
+                                        <div class="upload-card-icon">🚚</div>
+                                        <div class="upload-card-info">
+                                            <h4>Customer Sales Area (KNVV)</h4>
+                                            <p>Sales org, incoterms, currency</p>
+                                        </div>
+                                    </div>
+                                    <div class="upload-success">✓ knvv_export.xlsx (4,521 records)</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Vendor Master Data -->
+                        <div class="upload-section">
+                            <div class="upload-section-header">
+                                <div class="upload-section-icon vendor">🏭</div>
+                                <h3>Vendor Master Data</h3>
+                            </div>
+                            <div class="upload-grid">
+                                <div class="upload-card uploaded" onclick="toggleUpload(this)">
+                                    <div class="upload-card-content">
+                                        <div class="upload-card-icon">📋</div>
+                                        <div class="upload-card-info">
+                                            <h4>Vendor General (LFA1) <span class="required-badge">Required</span></h4>
+                                            <p>Name, address, tax ID, phone</p>
+                                        </div>
+                                    </div>
+                                    <div class="upload-success">✓ lfa1_export.xlsx (1,523 records)</div>
+                                </div>
+                                <div class="upload-card uploaded" onclick="toggleUpload(this)">
+                                    <div class="upload-card-content">
+                                        <div class="upload-card-icon">🏢</div>
+                                        <div class="upload-card-info">
+                                            <h4>Vendor Company Code (LFB1)</h4>
+                                            <p>Payment terms, recon account</p>
+                                        </div>
+                                    </div>
+                                    <div class="upload-success">✓ lfb1_export.xlsx (1,847 records)</div>
+                                </div>
+                                <div class="upload-card" onclick="toggleUpload(this)">
+                                    <div class="upload-card-content">
+                                        <div class="upload-card-icon">💳</div>
+                                        <div class="upload-card-info">
+                                            <h4>Vendor Purchasing (LFM1)</h4>
+                                            <p>Purch org, currency</p>
+                                        </div>
+                                    </div>
+                                    <div class="upload-success">✓ Uploaded</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Transaction Data -->
+                        <div class="upload-section">
+                            <div class="upload-section-header">
+                                <div class="upload-section-icon transaction">📊</div>
+                                <h3>Transaction History (12 Months)</h3>
+                            </div>
+                            <div class="upload-grid">
+                                <div class="upload-card uploaded" onclick="toggleUpload(this)">
+                                    <div class="upload-card-content">
+                                        <div class="upload-card-icon">💾</div>
+                                        <div class="upload-card-info">
+                                            <h4>FI Line Items (BSEG/BSID/BSIK) <span class="required-badge">Required</span></h4>
+                                            <p>AR/AP documents, amounts</p>
+                                        </div>
+                                    </div>
+                                    <div class="upload-success">✓ fi_line_items.xlsx (847,293 records)</div>
+                                </div>
+                                <div class="upload-card" onclick="toggleUpload(this)">
+                                    <div class="upload-card-content">
+                                        <div class="upload-card-icon">💳</div>
+                                        <div class="upload-card-info">
+                                            <h4>Payments (REGUH)</h4>
+                                            <p>Payment runs, bank details</p>
+                                        </div>
+                                    </div>
+                                    <div class="upload-success">✓ Uploaded</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <!-- Target Scope -->
+                        <div class="config-panel">
+                            <h3>🌐 Target Scope</h3>
+                            <div style="display: flex; flex-direction: column; gap: 16px;">
+                                <div class="config-field">
+                                    <label>Company Codes</label>
+                                    <select multiple>
+                                        <option selected>1000 - US Operations</option>
+                                        <option selected>2000 - EU Operations</option>
+                                        <option>3000 - APAC Operations</option>
+                                    </select>
+                                </div>
+                                <div class="config-field">
+                                    <label>Sales Organizations</label>
+                                    <select multiple>
+                                        <option selected>1000 - Domestic Sales</option>
+                                        <option>2000 - International Sales</option>
+                                    </select>
+                                </div>
+                                <div class="config-field">
+                                    <label>Purchasing Organizations</label>
+                                    <select multiple>
+                                        <option selected>1000 - Central Purchasing</option>
+                                        <option>2000 - Regional Purchasing</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Migration Rules -->
+                        <div class="config-panel">
+                            <h3>⚙️ Migration Rules</h3>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="checkbox">
+                                    <span>Include dormant partners (no activity)</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" checked>
+                                    <span>Exclude one-time partners</span>
+                                </label>
+                                <div style="margin-left: 26px; margin-top: -4px;">
+                                    <label style="font-size: 11px; color: var(--text-muted);">Threshold (documents)</label>
+                                    <input type="number" value="2" min="1" max="10" style="width: 80px; padding: 6px 10px; margin-top: 4px;">
+                                </div>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" checked>
+                                    <span>Auto-approve high confidence matches (≥90%)</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" checked>
+                                    <span>Merge customer/vendor with same Tax ID</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Run Button -->
+                        <button class="btn btn-primary" style="width: 100%; padding: 16px; font-size: 15px;" onclick="runEntityResolution()">
+                            ⚡ Generate BP Preview
+                        </button>
+                        <p style="text-align: center; font-size: 12px; color: var(--success); margin-top: 12px;">
+                            ✓ All required files uploaded • Ready for analysis
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================
+                 SCREEN 2: PREVIEW & REVIEW
+            ============================================ -->
+            <section class="screen" id="screen-preview">
+                <div class="page-header">
+                    <h1>👁️ BP Migration Preview</h1>
+                    <p>Review proposed Business Partners before creation • Entity resolution complete</p>
+                </div>
+
+                <!-- Step Indicator -->
+                <div class="step-indicator">
+                    <div class="step completed">
+                        <div class="step-dot"></div>
+                        Step 1: Data Upload
+                    </div>
+                    <div class="step-connector completed"></div>
+                    <div class="step active">
+                        <div class="step-dot"></div>
+                        Step 2: Preview & Review
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step pending">
+                        <div class="step-dot"></div>
+                        Step 3: Create BPs
+                    </div>
+                </div>
+
+                <!-- Stats Row -->
+                <div class="dashboard-grid" style="grid-template-columns: repeat(7, 1fr);">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-label">Legacy Customers</div>
+                            <div class="metric-icon blue">👤</div>
+                        </div>
+                        <div class="metric-value blue">2,847</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-label">Legacy Vendors</div>
+                            <div class="metric-icon purple">🏭</div>
+                        </div>
+                        <div class="metric-value purple">1,523</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-label">Proposed BPs</div>
+                            <div class="metric-icon emerald">👥</div>
+                        </div>
+                        <div class="metric-value emerald">3,847</div>
+                        <div class="metric-sub">12% reduction</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-label">Merges Proposed</div>
+                            <div class="metric-icon yellow">🔗</div>
+                        </div>
+                        <div class="metric-value yellow">523</div>
+                        <div class="metric-sub">89 cust+vendor</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-label">Auto Approved</div>
+                            <div class="metric-icon green">✓</div>
+                        </div>
+                        <div class="metric-value green">3,412</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-label">Needs Review</div>
+                            <div class="metric-icon yellow">⚠️</div>
+                        </div>
+                        <div class="metric-value yellow">318</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-label">Must Review</div>
+                            <div class="metric-icon red">❌</div>
+                        </div>
+                        <div class="metric-value red">117</div>
+                    </div>
+                </div>
+
+                <!-- Insights Panel -->
+                <div class="insights-panel">
+                    <div class="section-title" style="margin-bottom: 20px;">
+                        <span>💡</span> Migration Insights
+                    </div>
+                    <div class="insights-grid">
+                        <div class="insight-section">
+                            <h4>Confidence Distribution</h4>
+                            <div class="insight-item">
+                                <div class="insight-dot" style="background: var(--success);"></div>
+                                <span>High (≥90%): 3,124</span>
+                            </div>
+                            <div class="insight-item">
+                                <div class="insight-dot" style="background: var(--warning);"></div>
+                                <span>Medium (70-89%): 576</span>
+                            </div>
+                            <div class="insight-item">
+                                <div class="insight-dot" style="background: var(--danger);"></div>
+                                <span>Low (&lt;70%): 147</span>
+                            </div>
+                        </div>
+                        <div class="insight-section">
+                            <h4>Exclusion Candidates</h4>
+                            <div class="insight-item">
+                                <span style="font-size: 14px;">🚫</span>
+                                <span>Dormant: 423</span>
+                            </div>
+                            <div class="insight-item">
+                                <span style="font-size: 14px;">⚠️</span>
+                                <span>One-time: 847</span>
+                            </div>
+                        </div>
+                        <div class="insight-section">
+                            <h4>Match Signals Used</h4>
+                            <div class="insight-item">
+                                <div class="insight-dot" style="background: var(--success);"></div>
+                                <span>Tax ID Match: 312</span>
+                            </div>
+                            <div class="insight-item">
+                                <div class="insight-dot" style="background: var(--info);"></div>
+                                <span>Name Match: 187</span>
+                            </div>
+                            <div class="insight-item">
+                                <div class="insight-dot" style="background: var(--purple);"></div>
+                                <span>Address Match: 124</span>
+                            </div>
+                        </div>
+                        <div class="insight-section">
+                            <h4>Transaction Volume</h4>
+                            <div class="insight-item">
+                                <span style="font-size: 14px;">📄</span>
+                                <span>Total Docs: 847,293</span>
+                            </div>
+                            <div class="insight-item">
+                                <span style="font-size: 14px;">💰</span>
+                                <span>Total Value: $142.7M</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="filter-bar">
+                    <select class="filter-select">
+                        <option>All Confidence</option>
+                        <option>High (≥90%)</option>
+                        <option>Medium (70-89%)</option>
+                        <option>Low (&lt;70%)</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>All Status</option>
+                        <option>Auto Approved</option>
+                        <option>Needs Review</option>
+                        <option>Must Review</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>All Types</option>
+                        <option>Customer Only</option>
+                        <option>Vendor Only</option>
+                        <option>Customer + Vendor</option>
+                    </select>
+                    <div class="search-input">
+                        <input type="text" placeholder="Search name, ID, or tax number...">
+                    </div>
+                    <button class="btn btn-ghost" style="margin-left: auto;">📥 Export CSV</button>
+                </div>
+
+                <!-- Data Table -->
+                <div class="data-table-wrapper">
+                    <div class="data-table-scroll">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;"><input type="checkbox"></th>
+                                    <th>BP Cluster ID</th>
+                                    <th>Recommended BP Name</th>
+                                    <th>Sources</th>
+                                    <th>Roles</th>
+                                    <th>Location</th>
+                                    <th>Tax ID</th>
+                                    <th>Confidence</th>
+                                    <th>Status</th>
+                                    <th>Activity</th>
+                                    <th style="width: 100px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Row 1 - High Confidence Customer+Vendor Merge -->
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td><span class="bp-cluster-id">BP-0001</span></td>
+                                    <td>
+                                        <div class="bp-name">Acme Industries Inc</div>
+                                        <div class="bp-search-term">ACMEINDUSTR</div>
+                                    </td>
+                                    <td>
+                                        <div class="source-tags">
+                                            <span class="source-tag customer">👤 2 Cust</span>
+                                            <span class="source-tag vendor">🏭 1 Vend</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="role-dots">
+                                            <div class="role-dot cust-fi" title="Customer FI"></div>
+                                            <div class="role-dot cust-sales" title="Customer Sales"></div>
+                                            <div class="role-dot vend-fi" title="Vendor FI"></div>
+                                            <div class="role-dot vend-purch" title="Vendor Purch"></div>
+                                        </div>
+                                    </td>
+                                    <td style="font-size: 12px;">New York, NY</td>
+                                    <td style="font-family: 'IBM Plex Mono', monospace; font-size: 11px;">12-3456789</td>
+                                    <td><span class="confidence-badge high">98%</span></td>
+                                    <td>
+                                        <span class="review-status auto">✓ Auto</span>
+                                    </td>
+                                    <td style="font-size: 12px;">
+                                        <div>247 docs</div>
+                                        <div style="color: var(--text-muted);">$1.2M</div>
+                                    </td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="action-btn" title="View Details">👁️</button>
+                                            <button class="action-btn" title="Split">✂️</button>
+                                            <button class="action-btn danger" title="Do Not Migrate">🚫</button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Row 2 - Medium Confidence Needs Review -->
+                                <tr style="background: rgba(255, 176, 32, 0.03);">
+                                    <td><input type="checkbox"></td>
+                                    <td><span class="bp-cluster-id">BP-0002</span></td>
+                                    <td>
+                                        <div class="bp-name">Global Manufacturing Corp</div>
+                                        <div class="bp-search-term">GLOBALMFG</div>
+                                    </td>
+                                    <td>
+                                        <div class="source-tags">
+                                            <span class="source-tag customer">👤 3 Cust</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="role-dots">
+                                            <div class="role-dot cust-fi" title="Customer FI"></div>
+                                            <div class="role-dot cust-sales" title="Customer Sales"></div>
+                                        </div>
+                                    </td>
+                                    <td style="font-size: 12px;">Chicago, IL</td>
+                                    <td style="font-family: 'IBM Plex Mono', monospace; font-size: 11px;">—</td>
+                                    <td><span class="confidence-badge medium">78%</span></td>
+                                    <td>
+                                        <span class="review-status needs-review">⚠️ Review</span>
+                                    </td>
+                                    <td style="font-size: 12px;">
+                                        <div>89 docs</div>
+                                        <div style="color: var(--text-muted);">$456k</div>
+                                    </td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="action-btn" title="View Details">👁️</button>
+                                            <button class="action-btn" title="Split">✂️</button>
+                                            <button class="action-btn danger" title="Do Not Migrate">🚫</button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Row 3 - Vendor Only -->
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td><span class="bp-cluster-id">BP-0003</span></td>
+                                    <td>
+                                        <div class="bp-name">Premier Supplies LLC</div>
+                                        <div class="bp-search-term">PREMIERSUP</div>
+                                    </td>
+                                    <td>
+                                        <div class="source-tags">
+                                            <span class="source-tag vendor">🏭 1 Vend</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="role-dots">
+                                            <div class="role-dot vend-fi" title="Vendor FI"></div>
+                                            <div class="role-dot vend-purch" title="Vendor Purch"></div>
+                                        </div>
+                                    </td>
+                                    <td style="font-size: 12px;">Dallas, TX</td>
+                                    <td style="font-family: 'IBM Plex Mono', monospace; font-size: 11px;">45-9876543</td>
+                                    <td><span class="confidence-badge high">95%</span></td>
+                                    <td>
+                                        <span class="review-status auto">✓ Auto</span>
+                                    </td>
+                                    <td style="font-size: 12px;">
+                                        <div>156 docs</div>
+                                        <div style="color: var(--text-muted);">$892k</div>
+                                    </td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="action-btn" title="View Details">👁️</button>
+                                            <button class="action-btn" title="Split">✂️</button>
+                                            <button class="action-btn danger" title="Do Not Migrate">🚫</button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Row 4 - Low Confidence Must Review -->
+                                <tr style="background: rgba(255, 71, 87, 0.03);">
+                                    <td><input type="checkbox"></td>
+                                    <td><span class="bp-cluster-id">BP-0004</span></td>
+                                    <td>
+                                        <div class="bp-name">Atlantic Solutions Group</div>
+                                        <div class="bp-search-term">ATLANTICSOL</div>
+                                    </td>
+                                    <td>
+                                        <div class="source-tags">
+                                            <span class="source-tag customer">👤 2 Cust</span>
+                                            <span class="source-tag vendor">🏭 2 Vend</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="role-dots">
+                                            <div class="role-dot cust-fi" title="Customer FI"></div>
+                                            <div class="role-dot vend-fi" title="Vendor FI"></div>
+                                        </div>
+                                    </td>
+                                    <td style="font-size: 12px;">Boston, MA</td>
+                                    <td style="font-family: 'IBM Plex Mono', monospace; font-size: 11px;">—</td>
+                                    <td><span class="confidence-badge low">62%</span></td>
+                                    <td>
+                                        <span class="review-status must-review">❌ Required</span>
+                                    </td>
+                                    <td style="font-size: 12px;">
+                                        <div>34 docs</div>
+                                        <div style="color: var(--text-muted);">$127k</div>
+                                    </td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="action-btn" title="View Details">👁️</button>
+                                            <button class="action-btn" title="Split">✂️</button>
+                                            <button class="action-btn danger" title="Do Not Migrate">🚫</button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Expanded Row Example -->
+                                <tr class="expanded-row">
+                                    <td colspan="11">
+                                        <div class="expanded-content">
+                                            <div class="expanded-section">
+                                                <h5>Source Records</h5>
+                                                <div class="source-record">
+                                                    <div class="source-record-header">
+                                                        <span style="color: var(--blue);">👤</span>
+                                                        <span style="font-family: 'IBM Plex Mono', monospace;">C000123</span>
+                                                    </div>
+                                                    <div class="source-record-name">Atlantic Solutions Inc</div>
+                                                </div>
+                                                <div class="source-record">
+                                                    <div class="source-record-header">
+                                                        <span style="color: var(--blue);">👤</span>
+                                                        <span style="font-family: 'IBM Plex Mono', monospace;">C000456</span>
+                                                    </div>
+                                                    <div class="source-record-name">Atlantic Solutions Group</div>
+                                                </div>
+                                                <div class="source-record">
+                                                    <div class="source-record-header">
+                                                        <span style="color: var(--purple);">🏭</span>
+                                                        <span style="font-family: 'IBM Plex Mono', monospace;">V000789</span>
+                                                    </div>
+                                                    <div class="source-record-name">Atlantic Solutions LLC</div>
+                                                </div>
+                                            </div>
+                                            <div class="expanded-section">
+                                                <h5>Match Signals</h5>
+                                                <div class="match-signal">
+                                                    <div class="match-signal-dot medium"></div>
+                                                    <span>Name Match (76%)</span>
+                                                </div>
+                                                <div class="match-signal">
+                                                    <div class="match-signal-dot medium"></div>
+                                                    <span>Address Match (68%)</span>
+                                                </div>
+                                                <div class="match-signal">
+                                                    <div class="match-signal-dot weak"></div>
+                                                    <span>Phone Match</span>
+                                                </div>
+                                            </div>
+                                            <div class="expanded-section">
+                                                <h5>Full Address</h5>
+                                                <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                                                    <div>123 Enterprise Way</div>
+                                                    <div>Boston, MA 02101</div>
+                                                    <div>United States</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Row 5 -->
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td><span class="bp-cluster-id">BP-0005</span></td>
+                                    <td>
+                                        <div class="bp-name">Continental Services</div>
+                                        <div class="bp-search-term">CONTINENTALSVC</div>
+                                    </td>
+                                    <td>
+                                        <div class="source-tags">
+                                            <span class="source-tag customer">👤 1 Cust</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="role-dots">
+                                            <div class="role-dot cust-fi" title="Customer FI"></div>
+                                            <div class="role-dot cust-sales" title="Customer Sales"></div>
+                                        </div>
+                                    </td>
+                                    <td style="font-size: 12px;">Seattle, WA</td>
+                                    <td style="font-family: 'IBM Plex Mono', monospace; font-size: 11px;">91-7654321</td>
+                                    <td><span class="confidence-badge high">92%</span></td>
+                                    <td>
+                                        <span class="review-status auto">✓ Auto</span>
+                                    </td>
+                                    <td style="font-size: 12px;">
+                                        <div>423 docs</div>
+                                        <div style="color: var(--text-muted);">$2.1M</div>
+                                    </td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="action-btn" title="View Details">👁️</button>
+                                            <button class="action-btn" title="Split">✂️</button>
+                                            <button class="action-btn danger" title="Do Not Migrate">🚫</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 13px; border-top: 1px solid var(--border-subtle);">
+                    Showing 50 of 3,847 results • Export to CSV for full data
+                </div>
+
+                <div class="footer-bar">
+                    <div style="font-size: 13px; color: var(--text-muted);">
+                        <strong style="color: var(--success);">3,412</strong> auto-approved • 
+                        <strong style="color: var(--warning);">318</strong> needs review • 
+                        <strong style="color: var(--danger);">117</strong> must review
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-ghost" onclick="showScreen('upload')">← Back</button>
+                        <button class="btn btn-primary" onclick="showScreen('create')">🚀 Create Business Partners</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================
+                 SCREEN 3: CREATE BPS
+            ============================================ -->
+            <section class="screen" id="screen-create">
+                <div class="page-header">
+                    <h1>🚀 Create Business Partners</h1>
+                    <p>Final review and execution • Ready to create 3,847 Business Partners in S/4HANA</p>
+                </div>
+
+                <!-- Step Indicator -->
+                <div class="step-indicator">
+                    <div class="step completed">
+                        <div class="step-dot"></div>
+                        Step 1: Data Upload
+                    </div>
+                    <div class="step-connector completed"></div>
+                    <div class="step completed">
+                        <div class="step-dot"></div>
+                        Step 2: Preview & Review
+                    </div>
+                    <div class="step-connector completed"></div>
+                    <div class="step active">
+                        <div class="step-dot"></div>
+                        Step 3: Create BPs
+                    </div>
+                </div>
+
+                <!-- Summary Stats -->
+                <div class="dashboard-grid" style="grid-template-columns: repeat(5, 1fr);">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-label">BPs to Create</div>
+                            <div class="metric-icon emerald">👥</div>
+                        </div>
+                        <div class="metric-value emerald">3,730</div>
+                        <div class="metric-sub">After exclusions</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-label">Customer Roles</div>
+                            <div class="metric-icon blue">👤</div>
+                        </div>
+                        <div class="metric-value blue">2,712</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-label">Vendor Roles</div>
+                            <div class="metric-icon purple">🏭</div>
+                        </div>
+                        <div class="metric-value purple">1,456</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-label">Dual Role (Cust+Vend)</div>
+                            <div class="metric-icon yellow">🔗</div>
+                        </div>
+                        <div class="metric-value yellow">438</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-label">Excluded</div>
+                            <div class="metric-icon red">🚫</div>
+                        </div>
+                        <div class="metric-value red">117</div>
+                        <div class="metric-sub">Dormant + One-time</div>
+                    </div>
+                </div>
+
+                <!-- Execution Options -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <span>⚙️</span> Execution Options
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div class="config-grid">
+                            <div class="config-field">
+                                <label>Execution Mode</label>
+                                <select>
+                                    <option>Simulation (Test Run)</option>
+                                    <option>Create in Development</option>
+                                    <option>Create in Quality</option>
+                                    <option>Create in Production</option>
+                                </select>
+                            </div>
+                            <div class="config-field">
+                                <label>BP Number Range</label>
+                                <select>
+                                    <option>01 - Internal (Auto-assigned)</option>
+                                    <option>02 - External (Keep Legacy ID)</option>
+                                </select>
+                            </div>
+                            <div class="config-field">
+                                <label>Batch Size</label>
+                                <select>
+                                    <option>100 per batch</option>
+                                    <option>500 per batch</option>
+                                    <option>1000 per batch</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <div class="checkbox-group" style="display: flex; gap: 24px; flex-wrap: wrap;">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" checked>
+                                    <span>Generate ID mapping table</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" checked>
+                                    <span>Create change documents</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox">
+                                    <span>Send notification on completion</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Role Assignment Summary -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <span>🎭</span> Role Assignment Summary
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+                            <div style="background: var(--bg-secondary); border-radius: 12px; padding: 16px; border: 1px solid var(--border-subtle);">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                    <div class="role-dot cust-fi"></div>
+                                    <span style="font-size: 13px; font-weight: 600;">Customer FI</span>
+                                </div>
+                                <div style="font-size: 24px; font-weight: 700; color: var(--blue);">2,712</div>
+                                <div style="font-size: 11px; color: var(--text-muted);">FLCU01 Role</div>
+                            </div>
+                            <div style="background: var(--bg-secondary); border-radius: 12px; padding: 16px; border: 1px solid var(--border-subtle);">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                    <div class="role-dot cust-sales"></div>
+                                    <span style="font-size: 13px; font-weight: 600;">Customer Sales</span>
+                                </div>
+                                <div style="font-size: 24px; font-weight: 700; color: var(--info);">2,456</div>
+                                <div style="font-size: 11px; color: var(--text-muted);">FLCU00 Role</div>
+                            </div>
+                            <div style="background: var(--bg-secondary); border-radius: 12px; padding: 16px; border: 1px solid var(--border-subtle);">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                    <div class="role-dot vend-fi"></div>
+                                    <span style="font-size: 13px; font-weight: 600;">Vendor FI</span>
+                                </div>
+                                <div style="font-size: 24px; font-weight: 700; color: var(--purple);">1,456</div>
+                                <div style="font-size: 11px; color: var(--text-muted);">FLVN01 Role</div>
+                            </div>
+                            <div style="background: var(--bg-secondary); border-radius: 12px; padding: 16px; border: 1px solid var(--border-subtle);">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                    <div class="role-dot vend-purch"></div>
+                                    <span style="font-size: 13px; font-weight: 600;">Vendor Purchasing</span>
+                                </div>
+                                <div style="font-size: 24px; font-weight: 700; color: #ec4899;">1,234</div>
+                                <div style="font-size: 11px; color: var(--text-muted);">FLVN00 Role</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer-bar">
+                    <div style="font-size: 13px; color: var(--text-muted);">
+                        Ready to create <strong style="color: var(--bp-emerald);">3,730</strong> Business Partners
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-ghost" onclick="showScreen('preview')">← Back to Preview</button>
+                        <button class="btn btn-ghost">📥 Export LSMW File</button>
+                        <button class="btn btn-primary" style="padding: 12px 24px;">
+                            🚀 Execute BP Creation
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Export Panel -->
+    <div class="export-panel" id="export-panel" style="display: none;">
+        <div class="export-info">
+            <strong>3,730</strong> BPs ready • <strong>117</strong> excluded
+        </div>
+        <div class="export-btns">
+            <button class="btn btn-ghost" style="padding: 8px 14px;">📄 CSV</button>
+            <button class="btn btn-ghost" style="padding: 8px 14px;">📊 Excel</button>
+            <button class="btn btn-primary" style="padding: 8px 14px;">🚀 Execute</button>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h3 id="loading-title">Running Entity Resolution...</h3>
+            <p id="loading-subtitle">Analyzing customer and vendor records for matches</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
+            </div>
+            <p style="margin-top: 12px; font-size: 12px; color: var(--text-muted);" id="progress-text">Initializing...</p>
+        </div>
+    </div>
+
+    <script>
+        // Screen Navigation
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-' + screenId).classList.add('active');
+            
+            document.querySelectorAll('.nav-item[data-screen]').forEach(item => {
+                item.classList.toggle('active', item.dataset.screen === screenId);
+            });
+            
+            const titles = {
+                'upload': 'Data Upload & Scope',
+                'preview': 'Preview & Review',
+                'create': 'Create BPs'
+            };
+            document.getElementById('breadcrumb-current').textContent = titles[screenId] || screenId;
+            
+            // Show export panel on preview and create screens
+            document.getElementById('export-panel').style.display = 
+                (screenId === 'preview' || screenId === 'create') ? 'flex' : 'none';
+        }
+
+        // Toggle Upload Card
+        function toggleUpload(el) {
+            el.classList.toggle('uploaded');
+        }
+
+        // Run Entity Resolution
+        function runEntityResolution() {
+            const loading = document.getElementById('loading');
+            const progressFill = document.getElementById('progress-fill');
+            const progressText = document.getElementById('progress-text');
+            
+            loading.classList.add('active');
+            
+            const steps = [
+                { progress: 10, text: 'Loading customer master data...' },
+                { progress: 25, text: 'Loading vendor master data...' },
+                { progress: 40, text: 'Parsing transaction history...' },
+                { progress: 55, text: 'Running fuzzy name matching...' },
+                { progress: 70, text: 'Matching Tax IDs and addresses...' },
+                { progress: 85, text: 'Building BP clusters...' },
+                { progress: 95, text: 'Calculating confidence scores...' },
+                { progress: 100, text: 'Complete!' }
+            ];
+            
+            let stepIndex = 0;
+            const interval = setInterval(() => {
+                if (stepIndex < steps.length) {
+                    progressFill.style.width = steps[stepIndex].progress + '%';
+                    progressText.textContent = steps[stepIndex].text;
+                    stepIndex++;
+                } else {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        loading.classList.remove('active');
+                        showScreen('preview');
+                    }, 500);
+                }
+            }, 500);
+        }
+    </script>
+</body>
+</html>
