@@ -231,8 +231,16 @@ class BigQuerySQLGenerator:
             query_lower = query.lower()
             relevant_columns = []
 
+            # Banned columns - never show these to the LLM
+            banned_columns = {'customer', 'gross_revenue'}
+
             for col in all_columns:
                 col_name = col['name'].lower()
+
+                # Skip banned columns entirely
+                if col_name in banned_columns:
+                    continue
+
                 col_score = 0
 
                 # Direct match with query terms
@@ -245,8 +253,8 @@ class BigQuerySQLGenerator:
                     if any(x in col_name for x in ['sales', 'revenue', 'amount', 'value']):
                         col_score += 5
 
-                if 'margin' in query_lower or 'profit' in query_lower:
-                    if any(x in col_name for x in ['margin', 'gm', 'profit', 'cost']):
+                if 'margin' in query_lower or 'profit' in query_lower or 'p&l' in query_lower or 'p & l' in query_lower or 'income' in query_lower or 'financial' in query_lower:
+                    if any(x in col_name for x in ['margin', 'gm', 'profit', 'cost', 'revenue', 'gl_account', 'gl_amount', 'gross', 'net', 'cogs', 'pallet', 'freight', 'delivery', 'fiscal', 'posting']):
                         col_score += 5
 
                 if 'customer' in query_lower:
@@ -289,7 +297,7 @@ class BigQuerySQLGenerator:
 
         # Define keyword mappings - only for allowed tables
         table_keywords = {
-            "dataset_25m_table": ["customer", "client", "buyer", "sold", "name", "sales", "revenue", "margin", "product", "material", "brand", "gross", "net", "profit", "transaction"],
+            "dataset_25m_table": ["customer", "client", "buyer", "sold", "name", "sales", "revenue", "margin", "product", "material", "brand", "gross", "net", "profit", "transaction", "p&l", "p & l", "profit and loss", "income statement", "income", "gl", "account", "cogs", "cost of goods", "operating", "ebit", "ebitda", "quarter", "fiscal", "financial"],
             "sales_order_cockpit_export": ["sales order", "order", "delivery", "shipment", "ship"],
         }
 
@@ -1207,6 +1215,107 @@ class BigQuerySQLGenerator:
             - For sales orders and delivery info: Use `sales_order_cockpit_export`
             - ONLY use tables listed in AVAILABLE TABLES below - do not reference any other tables
 
+            CRITICAL - REVENUE AND FINANCIAL COLUMN GUIDANCE:
+            The dataset_25m_table has TWO types of financial columns:
+
+            A) PRE-AGGREGATED METRIC COLUMNS (use these for revenue/cost/margin queries):
+               - `Gross_Sales` - Total gross sales (use for revenue queries, always positive)
+               - `Net_Sales` - Net sales after discounts
+               - `Net_Sales_Invoice` - Net invoice sales
+               - `Pallet_Revenue_Net` - Net pallet revenue
+               - `Total_COGS` - Total cost of goods sold
+               - `Total_COS` - Total cost of sales
+               - `Total_COGM` - Total cost of goods manufactured
+               - `Cogs` - Direct COGS
+               - `Ingredients` - Ingredient costs
+               - `Co_Packer_Ingredients` - Co-packer ingredient costs
+               - `Co_Packer_Packaging` - Co-packer packaging costs
+               - `Co_Packer_Tolling` - Co-packer tolling fees
+               - `Incoming_Freight` - Inbound freight costs (FREIGHT IN)
+               - `Incoming_Freight_Var` - Incoming freight variance
+               - `Outgoing_Freight` - Outbound freight/delivery costs (FREIGHT OUT)
+               - `TL_Delivery_Costs` - Total delivery/transportation costs
+               - `Freight_Allowance` - Freight allowances
+               - `Sales_Discounts` - Sales discounts
+               - `Sales_Margin_of_Net_Sales` - Margin on net sales
+               - `Sales_Margin_of_Gross_Sales` - Margin on gross sales
+               - `Management_Fee` - Management fees
+               These columns can be summed directly WITHOUT any GL_Account_Description filter.
+               Example: SELECT SUM(Gross_Sales) as revenue FROM dataset_25m_table -- this works correctly
+
+            B) GL-LEVEL COLUMNS (use for P&L breakdown by category):
+               - `GL_Account_Description` - Description of the GL account (e.g., 'Revenue', 'Packaging', 'Copacker Tolling')
+               - `GL_Account_Type` - Type code ('P' for P&L accounts, 'N' for balance sheet)
+               - `GL_Amount_in_CC` - Raw GL posting amount per line item
+               Use these ONLY when the user wants a P&L breakdown by category.
+               For P&L: SELECT GL_Account_Description, SUM(GL_Amount_in_CC) as amount FROM dataset_25m_table WHERE GL_Account_Type = 'P' GROUP BY GL_Account_Description
+
+            IMPORTANT RULES FOR REVENUE QUERIES:
+            - For simple revenue: SUM(Gross_Sales) or SUM(Net_Sales) -- NO GL filter needed
+            - For gross profit: SUM(Gross_Sales) - SUM(Total_COGS) or use SUM(Sales_Margin_of_Gross_Sales)
+            - For net margin: SUM(Sales_Margin_of_Net_Sales)
+            - For P&L statement: Use GL_Account_Description with SUM(GL_Amount_in_CC), filter GL_Account_Type = 'P'
+            - NEVER use Gross_Revenue column at all - use Gross_Sales instead (Gross_Revenue produces WRONG negative values)
+            - For "top-down P&L": Show Revenue (SUM(Gross_Sales)), COGS (SUM(Total_COGS)), Gross Profit, then detail cost categories using GL_Account_Description
+
+            FREIGHT QUERIES:
+            - Freight In: Use `Incoming_Freight` column (SUM(Incoming_Freight))
+            - Freight Out: Use `Outgoing_Freight` column or `TL_Delivery_Costs` column
+            - For freight breakdown by GL category: Filter GL_Account_Description LIKE '%Freight%' or LIKE '%freight%'
+            - Actual GL descriptions include: 'Freight-in', 'Outgoing Freight', 'Incoming Freight - Fuel surcharge', 'Freight – Can Supplier', etc.
+
+            INGREDIENT/COST QUERIES:
+            - Ingredients: Use `Ingredients` column
+            - Co-packer ingredients: Use `Co_Packer_Ingredients` column
+            - Packaging: Use `Co_Packer_Packaging` column
+            - For detailed ingredient breakdown by GL: Filter GL_Account_Description LIKE '%Ingredient%'
+
+            ⚠️⚠️⚠️ ABSOLUTELY BANNED COLUMNS - YOU MUST NEVER USE THESE IN ANY QUERY ⚠️⚠️⚠️
+            1. `Customer` column: COMPLETELY BANNED. It only has numeric IDs. Use `Sold_to_Number` and `Sold_to_Name` instead.
+            2. `Gross_Revenue` column: COMPLETELY BANNED. It contains values across ALL GL types and produces WRONG negative totals.
+               - Instead of `Gross_Revenue`, ALWAYS use `Gross_Sales` (for gross revenue) or `Net_Sales` (for net revenue).
+               - This applies to ALL queries: revenue, customer ranking, top customers, MoM, YoY, etc.
+               - WRONG: SUM(Gross_Revenue) -- produces negative/wrong values
+               - CORRECT: SUM(Gross_Sales) -- always positive, correct revenue
+            If your SQL contains `Gross_Revenue` or `Customer`, STOP and replace them before proceeding.
+
+            BIGQUERY SQL BEST PRACTICES (to avoid errors):
+            - Every expression in SELECT must appear EXACTLY the same in GROUP BY (or be an aggregate)
+            - Do NOT add CAST() or FORMAT() around a column in SELECT if the GROUP BY uses the raw column
+            - WRONG: SELECT CAST(DATE_TRUNC(col, MONTH) AS STRING) ... GROUP BY DATE_TRUNC(col, MONTH) -- BigQuery error!
+            - CORRECT: SELECT DATE_TRUNC(col, MONTH) as month ... GROUP BY DATE_TRUNC(col, MONTH) -- works
+            - For month/year grouping, prefer: SELECT EXTRACT(YEAR FROM Posting_Date) as year, EXTRACT(MONTH FROM Posting_Date) as month ... GROUP BY 1, 2
+            - Use GROUP BY ordinal (1, 2, 3) to avoid expression mismatches
+            - NEVER use SELECT aliases in GROUP BY - use ordinals or repeat the expression
+            - WRONG: SELECT EXTRACT(YEAR FROM Posting_Date) as year ... GROUP BY year -- ERROR in subqueries/CTEs!
+            - CORRECT: SELECT EXTRACT(YEAR FROM Posting_Date) as year ... GROUP BY 1 -- works everywhere
+            - NEVER name a CTE the same as a column it contains (causes ambiguity errors)
+            - WRONG: WITH monthly_revenue AS (SELECT ... SUM(x) as monthly_revenue ...) -- CTE and column same name!
+            - CORRECT: WITH monthly_rev AS (SELECT ... SUM(x) as monthly_revenue ...) -- different names
+
+            CRITICAL - COLUMN DATA TYPES:
+            - `Fiscal_Year` is STRING type (values: '2023', '2024', '2025') - do NOT CAST to DATE
+              - WRONG: EXTRACT(YEAR FROM CAST(Fiscal_Year AS DATE)) -- ERROR, not a date
+              - CORRECT: Fiscal_Year = '2024' or CAST(Fiscal_Year AS INT64) = 2024
+              - For YoY: WHERE Fiscal_Year IN ('2024', '2025')
+            - `Posting_Date` is a proper DATE column - use EXTRACT() on it for month/year
+            - `Plant` column exists in dataset_25m_table - do NOT join with sales_order_cockpit_export for plant data
+              - CORRECT: SELECT Plant, SUM(Gross_Sales) FROM dataset_25m_table GROUP BY Plant
+              - WRONG: JOIN sales_order_cockpit_export for Plant_WERKS -- unnecessary, Plant is already in dataset_25m_table
+
+            CRITICAL - CUSTOMER IDENTIFICATION:
+            - ALWAYS use `Sold_to_Number` (customer ID) and `Sold_to_Name` (customer name) for ANY customer query
+            - The `Customer` column only has numeric IDs with NO names - NEVER use it
+            - Customer names are stored in UPPERCASE with suffixes (e.g., 'WALMART #7016', 'WALMART DC #2364', 'COSTCO #1234')
+            - When searching for a specific customer by name, ALWAYS use LIKE with wildcards:
+              CORRECT: WHERE LOWER(Sold_to_Name) LIKE '%walmart%'
+              WRONG: WHERE Sold_to_Name = 'Walmart' -- will return 0 rows because names have suffixes!
+            - For CUSTOMER REVENUE: SELECT Sold_to_Number, Sold_to_Name, SUM(Gross_Sales) as revenue FROM dataset_25m_table WHERE Sold_to_Name IS NOT NULL GROUP BY Sold_to_Number, Sold_to_Name ORDER BY revenue DESC
+            - When user asks "revenue by customer", "top customers", or similar: Always include Sold_to_Number AND Sold_to_Name, GROUP BY both
+            - NEVER return customer data without Sold_to_Name - always include the customer name
+            - For "top N customers by revenue": Use SUM(Gross_Sales) with ORDER BY DESC LIMIT N
+            - For month-over-month by customer: First identify top customers using SUM(Gross_Sales), then get their monthly Gross_Sales data
+
             CRITICAL - TEXT CASE PRESERVATION:
             - NEVER use LOWER() on columns in SELECT statements - this converts "WALMART" to "walmart" which is wrong
             - Keep original case for all display columns: Sold_to_Name, Payer_Name, Material_Description, Brand, etc.
@@ -1230,9 +1339,9 @@ class BigQuerySQLGenerator:
             DERIVED METRICS - ALWAYS TRY TO CALCULATE:
             Before saying data is "not available", check if you can DERIVE the metric from available columns:
 
-            1. Operating Income / EBIT = Net_Sales - Total_COGS (or Gross_Revenue - Total_COS)
-            2. Gross Profit = Gross_Revenue - Cogs (or Net_Sales - Total_COGS)
-            3. Gross Margin % = (Gross_Revenue - Cogs) / Gross_Revenue * 100
+            1. Operating Income / EBIT = Net_Sales - Total_COGS (or Gross_Sales - Total_COS)
+            2. Gross Profit = Gross_Sales - Cogs (or Net_Sales - Total_COGS)
+            3. Gross Margin % = (Gross_Sales - Cogs) / NULLIF(Gross_Sales, 0) * 100
             4. Net Margin % = Sales_Margin_of_Net_Sales / Net_Sales * 100
             5. EBITDA = Operating Income + Depreciation (if available, else just use Operating Income proxy)
             6. Contribution Margin = Net_Sales - Variable Costs (Ingredients + Packaging + Incoming_Freight)

@@ -43,6 +43,7 @@ import {
   Layers as LayersIcon,
   AccountBalance as AccountBalanceIcon,
   Storefront as StorefrontIcon,
+  LocalShipping as LocalShippingIcon,
 } from '@mui/icons-material';
 
 // Import centralized brand colors
@@ -67,6 +68,15 @@ const categoryTiles = [
     icon: FactoryIcon,
     color: MODULE_COLOR,
     stats: { label: 'Layers', value: '6' },
+  },
+  {
+    id: 'distribution',
+    title: 'STOX.AI (DISTRIBUTION)',
+    subtitle: 'Warehouse & Logistics',
+    description: 'Distribution center inventory optimization with health checks, demand analysis, and MRP tuning',
+    icon: LocalShippingIcon,
+    color: MODULE_COLOR,
+    stats: { label: 'Modules', value: '5' },
   },
 ];
 
@@ -383,6 +393,10 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView, dar
       }
     } else if (categoryId === 'manufacturing') {
       setView('manufacturing');
+    } else if (categoryId === 'distribution') {
+      if (onCategorySelect) {
+        onCategorySelect('distribution');
+      }
     }
   };
 

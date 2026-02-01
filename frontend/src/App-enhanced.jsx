@@ -143,6 +143,12 @@ import DCBOM from './components/stox/DCBOM.jsx';
 import DCLotSize from './components/stox/DCLotSize.jsx';
 import DCSupplierExecution from './components/stox/DCSupplierExecution.jsx';
 import DCFinancialImpact from './components/stox/DCFinancialImpact.jsx';
+import DistributionDashboard from './components/stox/distribution/DistributionDashboard';
+import { default as DistInventoryHealthCheck } from './components/stox/distribution/InventoryHealthCheck';
+import DemandVariabilityIntelligence from './components/stox/distribution/DemandVariabilityIntelligence';
+import SupplySignalAnalyzer from './components/stox/distribution/SupplySignalAnalyzer';
+import MRPParameterAdvisor from './components/stox/distribution/MRPParameterAdvisor';
+import { default as DistWhatIfSimulator } from './components/stox/distribution/WhatIfSimulator';
 import ModuleTilesView from './components/stox/ModuleTilesView.jsx';
 import FioriTileDetail from './components/stox/FioriTileDetail.jsx';
 import TicketingSystem from './components/stox/TicketingSystem.jsx';
@@ -355,7 +361,7 @@ function App() {
   // API Functions
   const checkApiHealth = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/health`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL ?? ''}/api/v1/health`);
       if (response.ok) {
         const health = await response.json();
         setApiHealth(health);
@@ -383,7 +389,7 @@ function App() {
   const loadSchemaData = async () => {
     setLoadingSchema(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/schemas`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL ?? ''}/api/v1/schemas`);
       if (response.ok) {
         const data = await response.json();
         // Transform backend response to match frontend structure
@@ -739,6 +745,8 @@ function App() {
                           setStoxView('store-modules');
                         } else if (category === 'dc') {
                           setStoxView('dc-modules');
+                        } else if (category === 'distribution') {
+                          setStoxView('distribution-landing');
                         }
                       }}
                       initialView={stoxView === 'store-modules' ? 'store' : stoxView === 'dc-modules' ? 'dc' : null}
@@ -800,6 +808,31 @@ function App() {
                         setStoxView(moduleId);
                       }}
                     />
+                  )}
+                  {stoxView === 'distribution-landing' && (
+                    <DistributionDashboard
+                      darkMode={darkMode}
+                      onBack={() => setStoxView('landing')}
+                      onTileClick={(moduleId) => {
+                        console.log('Distribution tile clicked:', moduleId);
+                        setStoxView(moduleId);
+                      }}
+                    />
+                  )}
+                  {stoxView === 'dist-inventory-health-check' && (
+                    <DistInventoryHealthCheck darkMode={darkMode} onBack={() => setStoxView('distribution-landing')} />
+                  )}
+                  {stoxView === 'dist-demand-variability' && (
+                    <DemandVariabilityIntelligence darkMode={darkMode} onBack={() => setStoxView('distribution-landing')} />
+                  )}
+                  {stoxView === 'dist-supply-signal' && (
+                    <SupplySignalAnalyzer darkMode={darkMode} onBack={() => setStoxView('distribution-landing')} />
+                  )}
+                  {stoxView === 'dist-mrp-parameter' && (
+                    <MRPParameterAdvisor darkMode={darkMode} onBack={() => setStoxView('distribution-landing')} />
+                  )}
+                  {stoxView === 'dist-whatif-simulator' && (
+                    <DistWhatIfSimulator darkMode={darkMode} onBack={() => setStoxView('distribution-landing')} />
                   )}
                   {/* {stoxView === 'stoxshift' && (
                     <StoxShiftAI onBack={() => setStoxView('landing')} />
@@ -1824,7 +1857,6 @@ function AuthenticatedApp() {
       }}>
         <style>
           {`
-            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
             @keyframes fadeInUp {
               from { opacity: 0; transform: translateY(30px); }
               to { opacity: 1; transform: translateY(0); }

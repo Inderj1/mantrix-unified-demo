@@ -607,7 +607,7 @@ const VisionAIDashboard = ({ onBack }) => {
   const loadFromGCS = async () => {
     setLoadingGcs(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/vision/gcs/list`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL ?? ''}/api/v1/vision/gcs/list`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ path: gcsPath }),
@@ -665,7 +665,7 @@ const VisionAIDashboard = ({ onBack }) => {
     
     setProcessing(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/vision/auto-label`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL ?? ''}/api/v1/vision/auto-label`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

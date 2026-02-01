@@ -20,14 +20,14 @@ import {
   Speed as CoreAIIcon,
   Radar as MarketsIcon,
   Hub as HubIcon,
-  Menu as MenuIcon,
-  MenuOpen as MenuOpenIcon,
   FiberManualRecord as DotIcon,
   MonitorHeart as PulseIcon,
   Visibility as VisionIcon,
   Flag as CommandTowerIcon,
   Email as EmailIcon,
   Settings as SettingsIcon,
+  KeyboardDoubleArrowLeft as CollapseIcon,
+  KeyboardDoubleArrowRight as ExpandIcon,
 } from '@mui/icons-material';
 
 const EnhancedSidebar = ({
@@ -41,7 +41,7 @@ const EnhancedSidebar = ({
 }) => {
   const menuItems = [
     {
-      section: 'Mantra AI',
+      section: 'MANTRIX AI',
       items: [
         {
           id: 8,
@@ -155,62 +155,40 @@ const EnhancedSidebar = ({
           borderBottom: '1px solid',
           borderColor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
           position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: drawerOpen ? 'flex-start' : 'center',
         }}
       >
         {drawerOpen ? (
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            {/* Logo */}
-            <Box
-              component="img"
-              src="/MANTRIX_AI.svg"
-              alt="MANTRIX AI"
-              sx={{
-                height: 40,
-                width: 'auto',
-                objectFit: 'contain',
-                filter: darkMode
-                  ? 'invert(1) hue-rotate(180deg)'
-                  : 'none',
-                transition: 'all 0.2s ease',
-              }}
-            />
-
-            {/* Hamburger Menu Button */}
-            <IconButton
-              onClick={() => setDrawerOpen(!drawerOpen)}
-              size="small"
-              sx={{
-                color: darkMode ? '#8b949e' : '#64748b',
-                bgcolor: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
-                borderRadius: 1.5,
-                '&:hover': {
-                  bgcolor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
-                  color: darkMode ? '#e6edf3' : '#0f172a',
-                },
-              }}
-            >
-              <MenuOpenIcon fontSize="small" />
-            </IconButton>
-          </Box>
+          /* Full Logo when expanded */
+          <Box
+            component="img"
+            src="/MANTRIX_AI.svg"
+            alt="MANTRIX AI"
+            sx={{
+              height: 44,
+              width: 'auto',
+              objectFit: 'contain',
+              filter: darkMode
+                ? 'invert(1) hue-rotate(180deg)'
+                : 'none',
+              transition: 'all 0.2s ease',
+            }}
+          />
         ) : (
-          /* Centered Menu Button when collapsed */
-          <Box sx={{ display: 'flex', justifyContent: 'center', pt: 0.5 }}>
-            <IconButton
-              onClick={() => setDrawerOpen(!drawerOpen)}
-              size="small"
-              sx={{
-                color: darkMode ? '#8b949e' : '#64748b',
-                bgcolor: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
-                borderRadius: 1.5,
-                '&:hover': {
-                  bgcolor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
-                  color: darkMode ? '#e6edf3' : '#0f172a',
-                },
-              }}
-            >
-              <MenuIcon fontSize="small" />
-            </IconButton>
-          </Box>
+          /* Icon Logo when collapsed */
+          <Box
+            component="img"
+            src="/3.png"
+            alt="MANTRIX"
+            sx={{
+              height: 42,
+              width: 42,
+              objectFit: 'contain',
+              transition: 'all 0.2s ease',
+            }}
+          />
         )}
       </Box>
 
@@ -443,7 +421,42 @@ const EnhancedSidebar = ({
         ))}
       </Box>
 
-      {/* Footer */}
+      {/* Collapse/Expand Toggle */}
+      <Box
+        sx={{
+          px: 1,
+          py: 1,
+          borderTop: 1,
+          borderColor: borderColor,
+        }}
+      >
+        <Box
+          onClick={() => setDrawerOpen(!drawerOpen)}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            py: 0.75,
+            borderRadius: 1.5,
+            cursor: 'pointer',
+            color: darkMode ? '#58a6ff' : '#00357a',
+            bgcolor: darkMode ? 'rgba(88,166,255,0.08)' : 'rgba(0,53,122,0.06)',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              bgcolor: darkMode ? 'rgba(88,166,255,0.15)' : 'rgba(0,53,122,0.12)',
+              transform: 'scale(1.02)',
+            },
+          }}
+        >
+          {drawerOpen ? (
+            <CollapseIcon sx={{ fontSize: 20 }} />
+          ) : (
+            <ExpandIcon sx={{ fontSize: 20 }} />
+          )}
+        </Box>
+      </Box>
+
+      {/* Footer - Control Center */}
       <Box
         sx={{
           p: 1,
