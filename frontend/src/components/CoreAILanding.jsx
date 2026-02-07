@@ -110,6 +110,16 @@ const aiModules = [
     stats: { label: 'Records', value: '15K' },
     status: 'active',
   },
+  {
+    id: 'mantrixap',
+    title: 'AP.AI',
+    subtitle: 'Accounts Payable Intelligence',
+    description: 'AI-assisted invoice processing with human-in-the-loop workflow — from entry to posting',
+    icon: ReceiptIcon,
+    color: MODULE_COLOR,
+    stats: { label: 'Tiles', value: '5' },
+    status: 'active',
+  },
 ];
 
 const CoreAILanding = ({ onTileClick, darkMode = false }) => {
@@ -140,7 +150,7 @@ const CoreAILanding = ({ onTileClick, darkMode = false }) => {
                 CORE.AI
               </Typography>
               <Chip
-                label="8 Modules"
+                label="9 Modules"
                 size="small"
                 sx={{
                   bgcolor: alpha(MODULE_COLOR, darkMode ? 0.2 : 0.1),

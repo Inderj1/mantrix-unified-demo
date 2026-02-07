@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANTRIX AP — Operational Tile 1: Invoice Entry</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'JetBrains Mono', monospace; background: linear-gradient(135deg, #0a0f1a 0%, #0a1a1f 100%); min-height: 100vh; color: #e2e8f0; padding: 40px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        /* Header */
+        .header { margin-bottom: 36px; padding-bottom: 20px; border-bottom: 2px solid rgba(34, 211, 238, 0.4); }
+        .tile-badge { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .tile-num { background: linear-gradient(135deg, #22d3ee, #06b6d4); padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; color: #0a0f1a; }
+        .tile-type { font-size: 10px; color: #22d3ee; text-transform: uppercase; letter-spacing: 1px; }
+        .tile-title { font-size: 30px; font-weight: 700; background: linear-gradient(135deg, #22d3ee, #67e8f9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+        .tile-subtitle { font-size: 13px; color: #94a3b8; }
+
+        /* Philosophy */
+        .philosophy { background: linear-gradient(135deg, rgba(34, 211, 238, 0.12), rgba(34, 211, 238, 0.04)); border: 1px solid rgba(34, 211, 238, 0.25); border-radius: 14px; padding: 24px; margin-bottom: 36px; }
+        .philosophy-title { font-size: 12px; font-weight: 700; color: #22d3ee; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .philosophy-text { font-size: 12px; color: #cbd5e1; line-height: 1.9; }
+        .philosophy-text strong { color: #fbbf24; }
+        .human-badge { display: inline-block; background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.3); color: #fbbf24; font-size: 9px; font-weight: 700; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; margin-top: 12px; }
+
+        /* Section */
+        .section { margin-bottom: 36px; }
+        .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+        .section-icon { width: 36px; height: 36px; background: rgba(34, 211, 238, 0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .section-title { font-size: 16px; font-weight: 600; color: #e2e8f0; }
+
+        /* Workflow Steps */
+        .workflow { display: flex; gap: 0; margin-bottom: 28px; }
+        .wf-step { flex: 1; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.06); padding: 22px 18px; position: relative; }
+        .wf-step:first-child { border-radius: 12px 0 0 12px; }
+        .wf-step:last-child { border-radius: 0 12px 12px 0; }
+        .wf-step::after { content: '→'; position: absolute; right: -10px; top: 50%; transform: translateY(-50%); color: #475569; font-size: 14px; z-index: 1; background: #0d1320; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+        .wf-step:last-child::after { display: none; }
+        .wf-num { font-size: 8px; color: #475569; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 8px; }
+        .wf-name { font-size: 12px; font-weight: 700; color: #e2e8f0; margin-bottom: 6px; }
+        .wf-who { font-size: 9px; padding: 3px 8px; border-radius: 4px; display: inline-block; margin-bottom: 8px; }
+        .wf-who.ai { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+        .wf-who.human { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+        .wf-who.both { background: rgba(34, 211, 238, 0.15); color: #22d3ee; }
+        .wf-desc { font-size: 10px; color: #94a3b8; line-height: 1.6; }
+
+        /* Screen Layout */
+        .screen-mockup { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; margin-bottom: 28px; }
+        .screen-bar { display: flex; align-items: center; gap: 10px; padding: 12px 20px; background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .screen-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .screen-dot.r { background: #f87171; }
+        .screen-dot.y { background: #fbbf24; }
+        .screen-dot.g { background: #34d399; }
+        .screen-bar-title { font-size: 10px; color: #64748b; margin-left: 8px; }
+        .screen-body { padding: 24px; }
+        .screen-grid { display: grid; grid-template-columns: 320px 1fr 340px; gap: 20px; }
+        .screen-col { min-height: 200px; }
+
+        /* Invoice Panel Mock */
+        .mock-panel { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 18px; }
+        .mock-panel-title { font-size: 9px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; font-weight: 600; }
+        .mock-field { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .mock-field:last-child { border-bottom: none; }
+        .mock-field-label { font-size: 10px; color: #64748b; }
+        .mock-field-val { font-size: 10px; color: #e2e8f0; font-weight: 600; }
+        .mock-field-val.ai-filled { color: #8b5cf6; border-bottom: 1px dashed rgba(139, 92, 246, 0.3); }
+        .mock-field-val.editable { color: #22d3ee; cursor: pointer; }
+        .ai-tag { font-size: 7px; background: rgba(139, 92, 246, 0.2); color: #8b5cf6; padding: 2px 5px; border-radius: 2px; margin-left: 6px; font-weight: 600; }
+
+        /* Confidence Display */
+        .conf-display { text-align: center; padding: 20px; background: rgba(0,0,0,0.2); border-radius: 12px; margin-bottom: 16px; }
+        .conf-ring { width: 100px; height: 100px; border-radius: 50%; background: conic-gradient(#34d399 0deg, #34d399 calc(var(--c) * 3.6deg), rgba(255,255,255,0.06) calc(var(--c) * 3.6deg)); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
+        .conf-inner { width: 78px; height: 78px; border-radius: 50%; background: #0c1220; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .conf-num { font-size: 22px; font-weight: 700; color: #34d399; }
+        .conf-label { font-size: 7px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+        .conf-sub { font-size: 9px; color: #64748b; }
+
+        /* AI Recommendation Box */
+        .ai-rec { background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.2); border-radius: 12px; padding: 18px; margin-bottom: 16px; }
+        .ai-rec-header { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+        .ai-rec-dot { width: 6px; height: 6px; background: #8b5cf6; border-radius: 50%; box-shadow: 0 0 8px rgba(139, 92, 246, 0.5); }
+        .ai-rec-label { font-size: 8px; color: #8b5cf6; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .ai-rec-text { font-size: 11px; color: #cbd5e1; line-height: 1.8; }
+        .ai-rec-text strong { color: #e2e8f0; }
+
+        /* Human Action Buttons */
+        .human-actions { margin-top: 16px; }
+        .human-actions-title { font-size: 8px; color: #fbbf24; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .human-btn { width: 100%; padding: 12px 16px; border: none; border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; cursor: pointer; margin-bottom: 6px; transition: all 0.2s; text-align: left; display: flex; align-items: center; gap: 10px; }
+        .human-btn.post { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+        .human-btn.park { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.2); }
+        .human-btn.reject { background: rgba(248, 113, 113, 0.1); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.2); }
+        .human-btn.route { background: rgba(100, 116, 139, 0.1); color: #94a3b8; border: 1px solid rgba(100, 116, 139, 0.2); }
+        .btn-sub { font-size: 8px; color: #475569; font-weight: 400; }
+
+        /* Feature Cards */
+        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+        .feat-card { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; }
+        .feat-icon { font-size: 20px; margin-bottom: 10px; }
+        .feat-name { font-size: 12px; font-weight: 700; color: #e2e8f0; margin-bottom: 6px; }
+        .feat-desc { font-size: 10px; color: #94a3b8; line-height: 1.7; }
+        .feat-who { font-size: 8px; margin-top: 10px; padding: 3px 8px; border-radius: 4px; display: inline-block; }
+        .feat-who.ai { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+        .feat-who.human { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+
+        /* Data Tables */
+        .data-table { width: 100%; border-collapse: collapse; font-size: 10px; background: rgba(15, 23, 42, 0.8); border-radius: 12px; overflow: hidden; margin-bottom: 28px; }
+        .data-table th { text-align: left; padding: 12px; background: rgba(0,0,0,0.4); color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 8px; letter-spacing: 0.5px; }
+        .data-table td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table code { background: rgba(34, 211, 238, 0.1); padding: 1px 5px; border-radius: 3px; color: #22d3ee; font-size: 9px; }
+
+        /* KPIs */
+        .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+        .kpi-card { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(34, 211, 238, 0.2); border-radius: 12px; padding: 18px; }
+        .kpi-name { font-size: 11px; font-weight: 600; color: #e2e8f0; margin-bottom: 6px; }
+        .kpi-val { font-size: 20px; font-weight: 700; color: #22d3ee; margin-bottom: 4px; }
+        .kpi-desc { font-size: 9px; color: #64748b; line-height: 1.5; }
+
+        /* Differentiator */
+        .diff-card { background: linear-gradient(135deg, rgba(34, 211, 238, 0.08), rgba(139, 92, 246, 0.06)); border: 1px solid rgba(34, 211, 238, 0.2); border-radius: 14px; padding: 24px; }
+        .diff-title { font-size: 13px; font-weight: 700; color: #22d3ee; margin-bottom: 16px; }
+        .diff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .diff-col-title { font-size: 10px; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; }
+        .diff-col-title.them { color: #f87171; }
+        .diff-col-title.us { color: #34d399; }
+        .diff-item { font-size: 10px; color: #94a3b8; padding: 5px 0; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="tile-badge">
+                <span class="tile-num">TILE 1</span>
+                <span class="tile-type">Operational • Invoice Entry Workbench</span>
+            </div>
+            <div class="tile-title">Invoice Entry & AI-Assisted Matching</div>
+            <div class="tile-subtitle">The AP Clerk's Daily Workspace — AI Assists, Human Decides</div>
+        </div>
+
+        <!-- Philosophy -->
+        <div class="philosophy">
+            <div class="philosophy-title">👤 Human-in-the-Loop Philosophy</div>
+            <div class="philosophy-text">
+                The AP clerk enters invoices. That doesn't change. What changes is <strong>how much the clerk already knows before they touch a field</strong>.
+                Mantrix AI pre-reads the invoice, pre-fills fields, pre-matches to POs, and surfaces confidence scores — but <strong>the human reviews, confirms, and posts</strong>.
+                Every AI suggestion is clearly labeled. Every field is editable. The clerk is faster, not replaced.
+            </div>
+            <div class="human-badge">👤 Human Decides · AI Recommends</div>
+        </div>
+
+        <!-- Workflow -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">📋</div>
+                <div class="section-title">Invoice Entry Workflow</div>
+            </div>
+            <div class="workflow">
+                <div class="wf-step">
+                    <div class="wf-num">Step 1</div>
+                    <div class="wf-name">Scan / Upload</div>
+                    <div class="wf-who ai">AI Does This</div>
+                    <div class="wf-desc">Invoice arrives (email, scan, EDI). AI extracts all fields via OCR. Structures the data.</div>
+                </div>
+                <div class="wf-step">
+                    <div class="wf-num">Step 2</div>
+                    <div class="wf-name">Pre-Fill & Classify</div>
+                    <div class="wf-who ai">AI Does This</div>
+                    <div class="wf-desc">AI pre-fills SAP fields, classifies invoice type (PO-backed, Non-PO, Service, Credit), identifies PO candidates.</div>
+                </div>
+                <div class="wf-step">
+                    <div class="wf-num">Step 3</div>
+                    <div class="wf-name">Review & Verify</div>
+                    <div class="wf-who human">Human Does This</div>
+                    <div class="wf-desc">Clerk reviews AI pre-fill, corrects any fields, confirms PO match. Every field is editable inline.</div>
+                </div>
+                <div class="wf-step">
+                    <div class="wf-num">Step 4</div>
+                    <div class="wf-name">AI Match Analysis</div>
+                    <div class="wf-who ai">AI Does This</div>
+                    <div class="wf-desc">AI compares against PO/GR/SES, calculates variance, checks for duplicates, surfaces confidence score.</div>
+                </div>
+                <div class="wf-step">
+                    <div class="wf-num">Step 5</div>
+                    <div class="wf-name">Decide & Post</div>
+                    <div class="wf-who human">Human Does This</div>
+                    <div class="wf-desc">Clerk sees AI recommendation + confidence. Clerk decides: Post, Park, Route to buyer, or Reject. Human clicks the button.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen Layout -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">🖥️</div>
+                <div class="section-title">Screen Layout — Three-Panel Workbench</div>
+            </div>
+            <div class="screen-mockup">
+                <div class="screen-bar">
+                    <div class="screen-dot r"></div>
+                    <div class="screen-dot y"></div>
+                    <div class="screen-dot g"></div>
+                    <div class="screen-bar-title">Invoice Entry — INV-2026-045231 · Thales Defense</div>
+                </div>
+                <div class="screen-body">
+                    <div class="screen-grid">
+                        <!-- Left: Invoice -->
+                        <div class="screen-col">
+                            <div class="mock-panel" style="margin-bottom: 14px;">
+                                <div class="mock-panel-title">📄 Invoice Document (OCR Complete)</div>
+                                <div style="background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 8px; padding: 30px; text-align: center; margin-bottom: 14px;">
+                                    <div style="font-size: 32px; opacity: 0.3; margin-bottom: 8px;">📄</div>
+                                    <div style="font-size: 9px; color: #475569;">INV-2026-045231.pdf</div>
+                                </div>
+                            </div>
+                            <div class="mock-panel">
+                                <div class="mock-panel-title">Extracted Fields <span class="ai-tag">AI Pre-Filled</span></div>
+                                <div class="mock-field"><span class="mock-field-label">Invoice #</span><span class="mock-field-val ai-filled">INV-2026-045231</span></div>
+                                <div class="mock-field"><span class="mock-field-label">Vendor</span><span class="mock-field-val ai-filled">Thales Defense</span></div>
+                                <div class="mock-field"><span class="mock-field-label">Date</span><span class="mock-field-val ai-filled">02/04/2026</span></div>
+                                <div class="mock-field"><span class="mock-field-label">Amount</span><span class="mock-field-val ai-filled">$45,200.00</span></div>
+                                <div class="mock-field"><span class="mock-field-label">PO Ref</span><span class="mock-field-val ai-filled">4500098765</span></div>
+                                <div class="mock-field"><span class="mock-field-label">Terms</span><span class="mock-field-val editable">Net 30 ✎</span></div>
+                                <div style="font-size: 8px; color: #8b5cf6; margin-top: 10px;">✎ All fields editable — click any value to override AI</div>
+                            </div>
+                        </div>
+
+                        <!-- Center: Match Analysis -->
+                        <div class="screen-col">
+                            <div class="conf-display" style="--c: 97;">
+                                <div class="conf-ring" style="--c: 97;">
+                                    <div class="conf-inner">
+                                        <div class="conf-num">97.4</div>
+                                        <div class="conf-label">Match Score</div>
+                                    </div>
+                                </div>
+                                <div class="conf-sub">AI recommends: Post within tolerance</div>
+                            </div>
+                            <div class="mock-panel" style="margin-bottom: 14px;">
+                                <div class="mock-panel-title">Match Details <span class="ai-tag">AI Analysis</span></div>
+                                <div class="mock-field"><span class="mock-field-label">Price</span><span class="mock-field-val" style="color: #34d399;">✓ $45,200 vs PO $45,065 (Δ 0.3%)</span></div>
+                                <div class="mock-field"><span class="mock-field-label">Quantity</span><span class="mock-field-val" style="color: #34d399;">✓ 100 EA = 100 EA (exact)</span></div>
+                                <div class="mock-field"><span class="mock-field-label">GR Status</span><span class="mock-field-val" style="color: #34d399;">✓ GR 5000045678 posted 02/03</span></div>
+                                <div class="mock-field"><span class="mock-field-label">Duplicates</span><span class="mock-field-val" style="color: #34d399;">✓ None found (checked 2,340)</span></div>
+                                <div class="mock-field"><span class="mock-field-label">Vendor Score</span><span class="mock-field-val" style="color: #34d399;">96.8 reliability</span></div>
+                            </div>
+                            <div class="mock-panel">
+                                <div class="mock-panel-title">PO Schedule vs GR Check <span class="ai-tag">AI</span></div>
+                                <div class="mock-field"><span class="mock-field-label">PO Delivery Date</span><span class="mock-field-val"><code>EKET</code> 02/01/2026</span></div>
+                                <div class="mock-field"><span class="mock-field-label">GR Posted</span><span class="mock-field-val"><code>MATDOC</code> 02/03/2026</span></div>
+                                <div class="mock-field"><span class="mock-field-label">Vendor Avg Lag</span><span class="mock-field-val">+1.2 days typical</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Right: AI Recommendation + Human Actions -->
+                        <div class="screen-col">
+                            <div class="ai-rec">
+                                <div class="ai-rec-header">
+                                    <div class="ai-rec-dot"></div>
+                                    <div class="ai-rec-label">AI Recommendation</div>
+                                </div>
+                                <div class="ai-rec-text">
+                                    <strong>Recommend: Post this invoice.</strong> Price within 0.3% tolerance. Quantity exact. GR confirmed. Vendor reliability 96.8 across 247 invoices. No duplicates. No anomalies detected.
+                                </div>
+                            </div>
+                            <div class="human-actions">
+                                <div class="human-actions-title">👤 Your Decision</div>
+                                <button class="human-btn post">✓ Post Invoice (MIRO)<div class="btn-sub">Posts to SAP with AI-verified data</div></button>
+                                <button class="human-btn park">⏸ Park for Later (MIR7)<div class="btn-sub">Saves with all context for review</div></button>
+                                <button class="human-btn route">↗ Route to Buyer<div class="btn-sub">Sends to buyer with PO discrepancy</div></button>
+                                <button class="human-btn reject">✕ Reject Invoice<div class="btn-sub">Returns to vendor with reason</div></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Capabilities -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">🤖</div>
+                <div class="section-title">What AI Does for the Clerk (Behind the Scenes)</div>
+            </div>
+            <div class="features-grid">
+                <div class="feat-card">
+                    <div class="feat-icon">📸</div>
+                    <div class="feat-name">Intelligent OCR</div>
+                    <div class="feat-desc">Reads invoice image/PDF, extracts vendor name, invoice #, amounts, line items, PO references. Pre-fills every SAP field.</div>
+                    <div class="feat-who ai">AI Pre-Fills → Human Verifies</div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-icon">🔍</div>
+                    <div class="feat-name">PO Candidate Ranking</div>
+                    <div class="feat-desc">Searches EKKO/EKPO for matching POs. Ranks candidates by probability. Shows top 3 with confidence scores.</div>
+                    <div class="feat-who ai">AI Suggests → Human Selects</div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-icon">📊</div>
+                    <div class="feat-name">3-Way Match Analysis</div>
+                    <div class="feat-desc">Compares invoice vs PO vs GR. Calculates price/qty variances. Checks EKET delivery dates vs MATDOC for GR status.</div>
+                    <div class="feat-who ai">AI Analyzes → Human Reviews</div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-icon">🔄</div>
+                    <div class="feat-name">Duplicate Detection</div>
+                    <div class="feat-desc">Multi-dimensional check: invoice #, amount, vendor, date, PO combo. Flags potential duplicates with similarity score.</div>
+                    <div class="feat-who ai">AI Flags → Human Confirms</div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-icon">🏷️</div>
+                    <div class="feat-name">GL Auto-Coding (Non-PO)</div>
+                    <div class="feat-desc">For Non-PO invoices, AI suggests GL account and cost center based on vendor history and invoice description.</div>
+                    <div class="feat-who ai">AI Suggests → Human Approves</div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-icon">⚡</div>
+                    <div class="feat-name">Variance Explanation</div>
+                    <div class="feat-desc">When variance exists, AI explains why — contract escalation? PO error? Freight surcharge? Shows historical precedent.</div>
+                    <div class="feat-who ai">AI Explains → Human Decides</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SAP Data -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">💾</div>
+                <div class="section-title">SAP Data Model — What AI Reads</div>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr><th>Data Domain</th><th>SAP Tables</th><th>Purpose</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td style="font-weight: 600; color: #e2e8f0;">Purchase Orders</td><td><code>EKKO</code> <code>EKPO</code></td><td>Header + line item match</td></tr>
+                    <tr><td style="font-weight: 600; color: #e2e8f0;">PO Schedule Lines</td><td><code>EKET</code></td><td>Delivery dates, quantities expected</td></tr>
+                    <tr><td style="font-weight: 600; color: #e2e8f0;">Goods Receipts</td><td><code>MATDOC</code> / <code>MSEG</code></td><td>101 movements, qty received, GR dates</td></tr>
+                    <tr><td style="font-weight: 600; color: #e2e8f0;">PO History</td><td><code>EKBE</code></td><td>Prior invoices, GR history per PO line</td></tr>
+                    <tr><td style="font-weight: 600; color: #e2e8f0;">Invoice Docs</td><td><code>RBKP</code> <code>RSEG</code></td><td>Invoice header + items for duplicate check</td></tr>
+                    <tr><td style="font-weight: 600; color: #e2e8f0;">Vendor Master</td><td><code>LFA1</code> <code>LFB1</code></td><td>Vendor data, payment terms, bank details</td></tr>
+                    <tr><td style="font-weight: 600; color: #e2e8f0;">Pricing</td><td><code>KONV</code></td><td>Contract conditions, escalation clauses</td></tr>
+                    <tr><td style="font-weight: 600; color: #e2e8f0;">GR/IR Accruals</td><td><code>WRX</code></td><td>Expected invoice amounts from GR</td></tr>
+                    <tr><td style="font-weight: 600; color: #e2e8f0;">Tolerances</td><td><code>T169</code> / <code>OMR6</code></td><td>SAP tolerance groups and limits</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- KPIs -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">📊</div>
+                <div class="section-title">Clerk Productivity KPIs</div>
+            </div>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-name">Invoice Processing Time</div>
+                    <div class="kpi-val">< 90 sec</div>
+                    <div class="kpi-desc">From invoice open to post decision. Pre-Mantrix avg: 8-12 minutes.</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-name">AI Pre-Fill Accuracy</div>
+                    <div class="kpi-val">> 95%</div>
+                    <div class="kpi-desc">% of fields correctly pre-filled. Clerk override rate < 5%.</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-name">First-Pass Post Rate</div>
+                    <div class="kpi-val">> 85%</div>
+                    <div class="kpi-desc">% of invoices posted on first review without rework or parking.</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-name">Duplicate Catch Rate</div>
+                    <div class="kpi-val">> 99%</div>
+                    <div class="kpi-desc">% of duplicate invoices flagged before clerk posts.</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-name">PO Match Suggestion Accuracy</div>
+                    <div class="kpi-val">> 92%</div>
+                    <div class="kpi-desc">% of time top PO candidate is correct match.</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-name">Clerk Satisfaction</div>
+                    <div class="kpi-val">> 4.2/5</div>
+                    <div class="kpi-desc">Monthly pulse survey. Does AI make your job easier?</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Differentiator -->
+        <div class="diff-card">
+            <div class="diff-title">⚡ What Makes This Different</div>
+            <div class="diff-grid">
+                <div>
+                    <div class="diff-col-title them">Fiori / SAP Native</div>
+                    <div class="diff-item">Clerk manually types every field</div>
+                    <div class="diff-item">PO search is manual — enter PO # or search</div>
+                    <div class="diff-item">No confidence score — match or error message</div>
+                    <div class="diff-item">Variance = cryptic error code</div>
+                    <div class="diff-item">GR check = open another T-code (MB03)</div>
+                    <div class="diff-item">Duplicate check = run report separately</div>
+                </div>
+                <div>
+                    <div class="diff-col-title us">Mantrix Tile 1</div>
+                    <div class="diff-item">✓ AI pre-fills every field — clerk verifies</div>
+                    <div class="diff-item">✓ AI ranks PO candidates with confidence scores</div>
+                    <div class="diff-item">✓ Confidence dial shows match quality 0-100</div>
+                    <div class="diff-item">✓ AI explains variance in plain English</div>
+                    <div class="diff-item">✓ GR status inline — EKET date vs MATDOC check</div>
+                    <div class="diff-item">✓ Duplicate detection runs automatically on entry</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

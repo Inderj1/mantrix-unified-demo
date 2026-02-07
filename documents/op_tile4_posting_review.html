@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANTRIX AP — Operational Tile 4: Posting Review</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'JetBrains Mono', monospace; background: linear-gradient(135deg, #0a0f1a 0%, #0a0f1f 100%); min-height: 100vh; color: #e2e8f0; padding: 40px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        .header { margin-bottom: 36px; padding-bottom: 20px; border-bottom: 2px solid rgba(59, 130, 246, 0.4); }
+        .tile-badge { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .tile-num { background: linear-gradient(135deg, #3b82f6, #2563eb); padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; color: #fff; }
+        .tile-type { font-size: 10px; color: #3b82f6; text-transform: uppercase; letter-spacing: 1px; }
+        .tile-title { font-size: 30px; font-weight: 700; background: linear-gradient(135deg, #3b82f6, #93c5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+        .tile-subtitle { font-size: 13px; color: #94a3b8; }
+
+        .philosophy { background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(59, 130, 246, 0.04)); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 14px; padding: 24px; margin-bottom: 36px; }
+        .philosophy-title { font-size: 12px; font-weight: 700; color: #3b82f6; margin-bottom: 10px; }
+        .philosophy-text { font-size: 12px; color: #cbd5e1; line-height: 1.9; }
+        .philosophy-text strong { color: #fbbf24; }
+        .human-badge { display: inline-block; background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.3); color: #fbbf24; font-size: 9px; font-weight: 700; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; margin-top: 12px; }
+
+        .section { margin-bottom: 36px; }
+        .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+        .section-icon { width: 36px; height: 36px; background: rgba(59, 130, 246, 0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .section-title { font-size: 16px; font-weight: 600; color: #e2e8f0; }
+
+        /* Batch Review Screen */
+        .screen-mockup { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; margin-bottom: 28px; }
+        .screen-bar { display: flex; align-items: center; gap: 10px; padding: 12px 20px; background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .screen-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .screen-dot.r { background: #f87171; }
+        .screen-dot.y { background: #fbbf24; }
+        .screen-dot.g { background: #34d399; }
+        .screen-bar-title { font-size: 10px; color: #64748b; margin-left: 8px; }
+        .screen-body { padding: 24px; }
+
+        /* Batch Summary */
+        .batch-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+        .bs-card { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 18px; text-align: center; }
+        .bs-val { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+        .bs-label { font-size: 8px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Posting Queue */
+        .post-header { display: grid; grid-template-columns: 40px 1fr 120px 100px 80px 120px 100px; gap: 12px; padding: 0 16px 10px; font-size: 8px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+        .post-list { display: flex; flex-direction: column; gap: 6px; }
+        .post-item { display: grid; grid-template-columns: 40px 1fr 120px 100px 80px 120px 100px; gap: 12px; align-items: center; background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.04); border-radius: 10px; padding: 14px 16px; }
+        .post-check { width: 18px; height: 18px; border: 2px solid rgba(59, 130, 246, 0.4); border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .post-check.checked { background: rgba(52, 211, 153, 0.2); border-color: #34d399; }
+        .post-check.checked::after { content: '✓'; color: #34d399; font-size: 11px; font-weight: 700; }
+        .post-vendor { font-size: 11px; font-weight: 600; color: #e2e8f0; }
+        .post-vendor-sub { font-size: 9px; color: #475569; }
+        .post-amount { font-size: 12px; font-weight: 700; color: #e2e8f0; text-align: right; }
+        .post-type { font-size: 9px; color: #94a3b8; text-align: center; }
+        .post-conf { font-size: 12px; font-weight: 700; text-align: center; }
+        .post-conf.high { color: #34d399; }
+        .post-reason { font-size: 9px; color: #8b5cf6; }
+        .post-action { font-size: 9px; text-align: center; }
+        .post-action-badge { padding: 4px 10px; border-radius: 4px; font-weight: 600; }
+        .post-action-badge.miro { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+        .post-action-badge.fb60 { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+
+        /* Batch Actions */
+        .batch-actions { display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); }
+        .batch-btn { padding: 12px 24px; border: none; border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; cursor: pointer; }
+        .batch-btn.confirm { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+        .batch-btn.review { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.2); }
+        .batch-btn.deselect { background: rgba(100, 116, 139, 0.1); color: #94a3b8; border: 1px solid rgba(100, 116, 139, 0.2); }
+
+        /* Post-Confirm Screen */
+        .confirm-card { background: rgba(52, 211, 153, 0.06); border: 1px solid rgba(52, 211, 153, 0.25); border-radius: 14px; padding: 24px; margin-bottom: 28px; }
+        .confirm-title { font-size: 14px; font-weight: 700; color: #34d399; margin-bottom: 12px; }
+        .confirm-text { font-size: 12px; color: #cbd5e1; line-height: 1.8; }
+        .confirm-text strong { color: #e2e8f0; }
+        .confirm-detail { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(52, 211, 153, 0.15); }
+        .confirm-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 10px; }
+        .confirm-row-label { color: #64748b; }
+        .confirm-row-val { color: #e2e8f0; font-weight: 600; }
+
+        /* Features */
+        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+        .feat-card { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; }
+        .feat-icon { font-size: 20px; margin-bottom: 10px; }
+        .feat-name { font-size: 12px; font-weight: 700; color: #e2e8f0; margin-bottom: 6px; }
+        .feat-desc { font-size: 10px; color: #94a3b8; line-height: 1.7; }
+        .feat-who { font-size: 8px; margin-top: 10px; padding: 3px 8px; border-radius: 4px; display: inline-block; }
+        .feat-who.ai { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+        .feat-who.human { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+
+        /* KPIs */
+        .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .kpi-card { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 12px; padding: 18px; }
+        .kpi-name { font-size: 11px; font-weight: 600; color: #e2e8f0; margin-bottom: 6px; }
+        .kpi-val { font-size: 20px; font-weight: 700; color: #3b82f6; margin-bottom: 4px; }
+        .kpi-desc { font-size: 9px; color: #64748b; line-height: 1.5; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="tile-badge">
+                <span class="tile-num">TILE 4</span>
+                <span class="tile-type">Operational • Posting Review & Confirmation</span>
+            </div>
+            <div class="tile-title">Posting Review & Confirmation</div>
+            <div class="tile-subtitle">AI Prepares the Posting — You Confirm with One Click</div>
+        </div>
+
+        <div class="philosophy">
+            <div class="philosophy-title">👤 Human-in-the-Loop Philosophy</div>
+            <div class="philosophy-text">
+                AI has done the work: matched the invoices, checked tolerances, verified GRs, run duplicate detection.
+                Now the clerk sees a <strong>batch of AI-prepared postings</strong> with confidence scores and AI reasoning for each.
+                The clerk reviews, selects, and confirms. <strong>Nothing posts to SAP without the clerk clicking "Confirm."</strong>
+                This is the final checkpoint — the human gatekeeper before the general ledger.
+            </div>
+            <div class="human-badge">👤 Human Confirms · AI Prepares</div>
+        </div>
+
+        <!-- Batch Review Screen -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">🖥️</div>
+                <div class="section-title">Batch Posting Review Screen</div>
+            </div>
+            <div class="screen-mockup">
+                <div class="screen-bar">
+                    <div class="screen-dot r"></div>
+                    <div class="screen-dot y"></div>
+                    <div class="screen-dot g"></div>
+                    <div class="screen-bar-title">Posting Review — 31 invoices AI-prepared · Total: $842,340 · Awaiting your confirmation</div>
+                </div>
+                <div class="screen-body">
+                    <div class="batch-summary">
+                        <div class="bs-card">
+                            <div class="bs-val" style="color: #34d399;">31</div>
+                            <div class="bs-label">AI-Prepared for Posting</div>
+                        </div>
+                        <div class="bs-card">
+                            <div class="bs-val" style="color: #e2e8f0;">$842,340</div>
+                            <div class="bs-label">Total Value</div>
+                        </div>
+                        <div class="bs-card">
+                            <div class="bs-val" style="color: #3b82f6;">94.2</div>
+                            <div class="bs-label">Avg AI Confidence</div>
+                        </div>
+                        <div class="bs-card">
+                            <div class="bs-val" style="color: #34d399;">0</div>
+                            <div class="bs-label">Anomalies Detected</div>
+                        </div>
+                    </div>
+
+                    <div class="post-header">
+                        <div>☐</div>
+                        <div>Vendor / Invoice</div>
+                        <div style="text-align: right;">Amount</div>
+                        <div style="text-align: center;">Match Type</div>
+                        <div style="text-align: center;">AI Score</div>
+                        <div>AI Reason</div>
+                        <div style="text-align: center;">SAP Action</div>
+                    </div>
+
+                    <div class="post-list">
+                        <div class="post-item">
+                            <div class="post-check checked"></div>
+                            <div><div class="post-vendor">Thales Defense</div><div class="post-vendor-sub">INV-2026-045231 · PO 4500098765</div></div>
+                            <div class="post-amount">$45,200</div>
+                            <div class="post-type">3-Way Match</div>
+                            <div class="post-conf high">97.4</div>
+                            <div class="post-reason">Full match · 0.3% variance</div>
+                            <div class="post-action"><span class="post-action-badge miro">MIRO</span></div>
+                        </div>
+                        <div class="post-item">
+                            <div class="post-check checked"></div>
+                            <div><div class="post-vendor">Northrop Grumman</div><div class="post-vendor-sub">INV-NG-7781 · PO 4500098234</div></div>
+                            <div class="post-amount">$234,000</div>
+                            <div class="post-type">3-Way Match</div>
+                            <div class="post-conf high">95.8</div>
+                            <div class="post-reason">Exact match · vendor 94 reliability</div>
+                            <div class="post-action"><span class="post-action-badge miro">MIRO</span></div>
+                        </div>
+                        <div class="post-item">
+                            <div class="post-check checked"></div>
+                            <div><div class="post-vendor">Fastenal Company</div><div class="post-vendor-sub">INV-FS-9918 · SES 1000023456</div></div>
+                            <div class="post-amount">$8,750</div>
+                            <div class="post-type">Service Entry</div>
+                            <div class="post-conf high">94.8</div>
+                            <div class="post-reason">ESKN/ESLH confirmed</div>
+                            <div class="post-action"><span class="post-action-badge miro">MIRO</span></div>
+                        </div>
+                        <div class="post-item">
+                            <div class="post-check checked"></div>
+                            <div><div class="post-vendor">Grainger Inc</div><div class="post-vendor-sub">INV-GR-44120 · Non-PO</div></div>
+                            <div class="post-amount">$1,840</div>
+                            <div class="post-type">Non-PO</div>
+                            <div class="post-conf high">96.1</div>
+                            <div class="post-reason">GL 54200/CC1000 · matches 14 prior</div>
+                            <div class="post-action"><span class="post-action-badge fb60">FB60</span></div>
+                        </div>
+                        <div class="post-item">
+                            <div class="post-check checked"></div>
+                            <div><div class="post-vendor">Office Depot</div><div class="post-vendor-sub">INV-OD-22104 · Non-PO</div></div>
+                            <div class="post-amount">$342</div>
+                            <div class="post-type">Non-PO</div>
+                            <div class="post-conf high">98.2</div>
+                            <div class="post-reason">Recurring vendor · exact GL pattern</div>
+                            <div class="post-action"><span class="post-action-badge fb60">FB60</span></div>
+                        </div>
+                    </div>
+
+                    <div class="batch-actions">
+                        <button class="batch-btn confirm">✓ Confirm Selected (31) — Post to SAP</button>
+                        <button class="batch-btn review">⏸ Review Individual</button>
+                        <button class="batch-btn deselect">☐ Deselect All</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Post-Confirmation -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">✅</div>
+                <div class="section-title">After Confirmation — What the Clerk Sees</div>
+            </div>
+            <div class="confirm-card">
+                <div class="confirm-title">✓ 31 Invoices Posted Successfully</div>
+                <div class="confirm-text">
+                    All 31 invoices have been posted to SAP. Each posting includes the <strong>AI analysis</strong> as document long text
+                    for audit trail. The clerk's confirmation is logged as the authorizing action. Any future audit inquiry can trace
+                    back to: AI recommendation → clerk review → clerk confirmation → SAP document.
+                </div>
+                <div class="confirm-detail">
+                    <div class="confirm-row"><span class="confirm-row-label">MIRO Documents Created</span><span class="confirm-row-val">27</span></div>
+                    <div class="confirm-row"><span class="confirm-row-label">FB60 Documents Created</span><span class="confirm-row-val">4</span></div>
+                    <div class="confirm-row"><span class="confirm-row-label">Total Value Posted</span><span class="confirm-row-val">$842,340.00</span></div>
+                    <div class="confirm-row"><span class="confirm-row-label">Processing Time</span><span class="confirm-row-val">12 min 34 sec (batch review)</span></div>
+                    <div class="confirm-row"><span class="confirm-row-label">Posted By</span><span class="confirm-row-val">Sarah Chen · AP Clerk</span></div>
+                    <div class="confirm-row"><span class="confirm-row-label">AI Audit Log</span><span class="confirm-row-val">Stored for all 31 documents</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">⚡</div>
+                <div class="section-title">Posting Review Features</div>
+            </div>
+            <div class="features-grid">
+                <div class="feat-card">
+                    <div class="feat-icon">📦</div>
+                    <div class="feat-name">Batch Confirmation</div>
+                    <div class="feat-desc">Review 31 invoices in 12 minutes instead of opening each one individually in MIRO. Select all or pick individual items.</div>
+                    <div class="feat-who human">Human Confirms Batch</div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-icon">🔍</div>
+                    <div class="feat-name">Drill-Down on Any Item</div>
+                    <div class="feat-desc">Click any row to expand full AI analysis — match details, SAP fields checked, variance explanation, historical precedent.</div>
+                    <div class="feat-who human">Human Reviews Detail</div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-icon">📝</div>
+                    <div class="feat-name">Audit Trail Built-In</div>
+                    <div class="feat-desc">Every posting logs: AI recommendation, confidence score, clerk who confirmed, timestamp. Stored in SAP doc text + Mantrix log.</div>
+                    <div class="feat-who ai">AI Documents Automatically</div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-icon">🚫</div>
+                    <div class="feat-name">Deselect & Remove</div>
+                    <div class="feat-desc">Not comfortable with an AI recommendation? Uncheck it. It goes back to the work queue for individual review. No pressure.</div>
+                    <div class="feat-who human">Human Controls Everything</div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-icon">⚠️</div>
+                    <div class="feat-name">Anomaly Highlighting</div>
+                    <div class="feat-desc">If any item in the batch has unusual characteristics (first-time vendor-material, amount outlier), it's visually flagged.</div>
+                    <div class="feat-who ai">AI Flags → Human Decides</div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-icon">📊</div>
+                    <div class="feat-name">My Posting History</div>
+                    <div class="feat-desc">Clerk can see their own posting stats: accuracy, volume, exceptions resolved. Professional development, not surveillance.</div>
+                    <div class="feat-who ai">AI Tracks → Human Grows</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">📊</div>
+                <div class="section-title">Posting Review KPIs</div>
+            </div>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-name">Batch Review Time</div>
+                    <div class="kpi-val">< 15 min</div>
+                    <div class="kpi-desc">For 30+ invoices. Pre-Mantrix: 4-6 hours (opening each in MIRO).</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-name">Posting Accuracy</div>
+                    <div class="kpi-val">> 99.5%</div>
+                    <div class="kpi-desc">% of postings not reversed. AI + Human = better than either alone.</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-name">Clerk Deselect Rate</div>
+                    <div class="kpi-val">< 5%</div>
+                    <div class="kpi-desc">% of AI-prepared items clerk removes from batch. Lower = better AI.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

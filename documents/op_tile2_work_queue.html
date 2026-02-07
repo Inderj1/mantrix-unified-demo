@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANTRIX AP — Operational Tile 2: My Work Queue</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'JetBrains Mono', monospace; background: linear-gradient(135deg, #0a0f1a 0%, #0f1a0a 100%); min-height: 100vh; color: #e2e8f0; padding: 40px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        .header { margin-bottom: 36px; padding-bottom: 20px; border-bottom: 2px solid rgba(52, 211, 153, 0.4); }
+        .tile-badge { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .tile-num { background: linear-gradient(135deg, #34d399, #10b981); padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; color: #0a0f1a; }
+        .tile-type { font-size: 10px; color: #34d399; text-transform: uppercase; letter-spacing: 1px; }
+        .tile-title { font-size: 30px; font-weight: 700; background: linear-gradient(135deg, #34d399, #6ee7b7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+        .tile-subtitle { font-size: 13px; color: #94a3b8; }
+
+        .philosophy { background: linear-gradient(135deg, rgba(52, 211, 153, 0.12), rgba(52, 211, 153, 0.04)); border: 1px solid rgba(52, 211, 153, 0.25); border-radius: 14px; padding: 24px; margin-bottom: 36px; }
+        .philosophy-title { font-size: 12px; font-weight: 700; color: #34d399; margin-bottom: 10px; }
+        .philosophy-text { font-size: 12px; color: #cbd5e1; line-height: 1.9; }
+        .philosophy-text strong { color: #fbbf24; }
+        .human-badge { display: inline-block; background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.3); color: #fbbf24; font-size: 9px; font-weight: 700; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; margin-top: 12px; }
+
+        .section { margin-bottom: 36px; }
+        .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+        .section-icon { width: 36px; height: 36px; background: rgba(52, 211, 153, 0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .section-title { font-size: 16px; font-weight: 600; color: #e2e8f0; }
+
+        /* Queue Stats */
+        .queue-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+        .qs-card { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; text-align: center; }
+        .qs-val { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .qs-label { font-size: 9px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+        .qs-sub { font-size: 9px; color: #475569; margin-top: 4px; }
+
+        /* Queue Screen Mockup */
+        .screen-mockup { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; margin-bottom: 28px; }
+        .screen-bar { display: flex; align-items: center; gap: 10px; padding: 12px 20px; background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .screen-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .screen-dot.r { background: #f87171; }
+        .screen-dot.y { background: #fbbf24; }
+        .screen-dot.g { background: #34d399; }
+        .screen-bar-title { font-size: 10px; color: #64748b; margin-left: 8px; }
+        .screen-body { padding: 24px; }
+
+        /* Filter Bar */
+        .filter-bar { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+        .filter-chip { padding: 6px 14px; border-radius: 8px; font-size: 9px; font-weight: 600; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: #94a3b8; }
+        .filter-chip.active { background: rgba(52, 211, 153, 0.15); border-color: rgba(52, 211, 153, 0.4); color: #34d399; }
+
+        /* Queue Items */
+        .queue-list { display: flex; flex-direction: column; gap: 8px; }
+        .q-item { background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px 20px; display: grid; grid-template-columns: 60px 1fr 140px 100px 80px 120px; align-items: center; gap: 16px; cursor: pointer; transition: all 0.2s; }
+        .q-item:hover { border-color: rgba(52, 211, 153, 0.3); transform: translateX(4px); }
+        .q-item.ready { border-left: 3px solid #34d399; }
+        .q-item.review { border-left: 3px solid #fbbf24; }
+        .q-item.exception { border-left: 3px solid #f87171; }
+        .q-item.parked { border-left: 3px solid #64748b; }
+
+        .q-score { text-align: center; }
+        .q-score-val { font-size: 16px; font-weight: 700; }
+        .q-score-val.high { color: #34d399; }
+        .q-score-val.mid { color: #fbbf24; }
+        .q-score-val.low { color: #f87171; }
+        .q-score-label { font-size: 7px; color: #475569; text-transform: uppercase; }
+
+        .q-info .q-vendor { font-size: 12px; font-weight: 600; color: #e2e8f0; margin-bottom: 3px; }
+        .q-info .q-detail { font-size: 10px; color: #64748b; }
+
+        .q-amount { font-size: 13px; font-weight: 700; color: #e2e8f0; text-align: right; }
+        .q-type { font-size: 9px; color: #94a3b8; text-align: center; }
+
+        .q-status { text-align: center; }
+        .q-status-badge { font-size: 8px; font-weight: 600; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; }
+        .q-status-badge.ready { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+        .q-status-badge.review { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+        .q-status-badge.exception { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+        .q-status-badge.parked { background: rgba(100, 116, 139, 0.15); color: #94a3b8; }
+
+        .q-ai-hint { font-size: 9px; color: #8b5cf6; line-height: 1.4; }
+        .q-ai-hint::before { content: '🤖 '; font-size: 8px; }
+
+        /* Queue Header Row */
+        .q-header { display: grid; grid-template-columns: 60px 1fr 140px 100px 80px 120px; gap: 16px; padding: 0 20px 10px; font-size: 8px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+
+        /* AI Prioritization Explanation */
+        .ai-priority { background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.2); border-radius: 12px; padding: 20px; margin-bottom: 28px; }
+        .ai-priority-header { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+        .ai-priority-dot { width: 6px; height: 6px; background: #8b5cf6; border-radius: 50%; box-shadow: 0 0 8px rgba(139, 92, 246, 0.5); }
+        .ai-priority-label { font-size: 8px; color: #8b5cf6; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .ai-priority-text { font-size: 11px; color: #cbd5e1; line-height: 1.8; }
+        .ai-priority-text strong { color: #fbbf24; }
+
+        /* Priority Factors */
+        .factors-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 28px; }
+        .factor-card { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 18px; }
+        .factor-name { font-size: 12px; font-weight: 700; color: #e2e8f0; margin-bottom: 6px; }
+        .factor-desc { font-size: 10px; color: #94a3b8; line-height: 1.7; }
+        .factor-weight { font-size: 9px; color: #34d399; margin-top: 8px; font-weight: 600; }
+
+        /* Features */
+        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+        .feat-card { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; }
+        .feat-icon { font-size: 20px; margin-bottom: 10px; }
+        .feat-name { font-size: 12px; font-weight: 700; color: #e2e8f0; margin-bottom: 6px; }
+        .feat-desc { font-size: 10px; color: #94a3b8; line-height: 1.7; }
+
+        /* KPIs */
+        .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .kpi-card { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(52, 211, 153, 0.2); border-radius: 12px; padding: 18px; }
+        .kpi-name { font-size: 11px; font-weight: 600; color: #e2e8f0; margin-bottom: 6px; }
+        .kpi-val { font-size: 20px; font-weight: 700; color: #34d399; margin-bottom: 4px; }
+        .kpi-desc { font-size: 9px; color: #64748b; line-height: 1.5; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="tile-badge">
+                <span class="tile-num">TILE 2</span>
+                <span class="tile-type">Operational • My Work Queue</span>
+            </div>
+            <div class="tile-title">Smart Work Queue</div>
+            <div class="tile-subtitle">AI Prioritizes Your Day — You Process the Invoices</div>
+        </div>
+
+        <div class="philosophy">
+            <div class="philosophy-title">👤 Human-in-the-Loop Philosophy</div>
+            <div class="philosophy-text">
+                Every morning the AP clerk opens their queue. Without Mantrix, it's a flat list sorted by date — no intelligence, no priority, no context.
+                <strong>Mantrix AI ranks every invoice by financial impact, urgency, and processing complexity</strong> so the clerk works on what matters first.
+                The clerk still processes every invoice. AI just makes sure the <strong>$2.1M payment blocker</strong> isn't buried behind 50 routine invoices.
+            </div>
+            <div class="human-badge">👤 Human Processes · AI Prioritizes</div>
+        </div>
+
+        <!-- Queue Stats -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">📊</div>
+                <div class="section-title">Today's Queue — At a Glance</div>
+            </div>
+            <div class="queue-stats">
+                <div class="qs-card">
+                    <div class="qs-val" style="color: #e2e8f0;">47</div>
+                    <div class="qs-label">In My Queue</div>
+                    <div class="qs-sub">Assigned to me today</div>
+                </div>
+                <div class="qs-card">
+                    <div class="qs-val" style="color: #34d399;">31</div>
+                    <div class="qs-label">Ready to Post</div>
+                    <div class="qs-sub">AI pre-matched, high confidence</div>
+                </div>
+                <div class="qs-card">
+                    <div class="qs-val" style="color: #fbbf24;">12</div>
+                    <div class="qs-label">Need Review</div>
+                    <div class="qs-sub">Partial match or variance</div>
+                </div>
+                <div class="qs-card">
+                    <div class="qs-val" style="color: #f87171;">4</div>
+                    <div class="qs-label">Exceptions</div>
+                    <div class="qs-sub">Need investigation</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Queue Screen -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">🖥️</div>
+                <div class="section-title">Queue Screen Layout</div>
+            </div>
+            <div class="screen-mockup">
+                <div class="screen-bar">
+                    <div class="screen-dot r"></div>
+                    <div class="screen-dot y"></div>
+                    <div class="screen-dot g"></div>
+                    <div class="screen-bar-title">My Work Queue — Sarah Chen · AP Clerk · Feb 6, 2026</div>
+                </div>
+                <div class="screen-body">
+                    <div class="filter-bar">
+                        <div class="filter-chip active">All (47)</div>
+                        <div class="filter-chip">Ready to Post (31)</div>
+                        <div class="filter-chip">Need Review (12)</div>
+                        <div class="filter-chip">Exceptions (4)</div>
+                        <div class="filter-chip">Parked (8)</div>
+                        <div class="filter-chip">Payment Blocking</div>
+                    </div>
+
+                    <div class="q-header">
+                        <div>Score</div>
+                        <div>Vendor / Invoice</div>
+                        <div style="text-align: right;">Amount</div>
+                        <div style="text-align: center;">Type</div>
+                        <div style="text-align: center;">Status</div>
+                        <div>AI Insight</div>
+                    </div>
+
+                    <div class="queue-list">
+                        <div class="q-item exception">
+                            <div class="q-score"><div class="q-score-val low">42</div><div class="q-score-label">AI Score</div></div>
+                            <div class="q-info"><div class="q-vendor">Lockheed Martin</div><div class="q-detail">INV-LM-8834 · PO 4500087654 · Stuck 4 days</div></div>
+                            <div class="q-amount">$312,500</div>
+                            <div class="q-type">PO-Backed<br>Price Variance</div>
+                            <div class="q-status"><div class="q-status-badge exception">Exception</div></div>
+                            <div class="q-ai-hint">PO price wrong — buyer needs to correct ME22N</div>
+                        </div>
+                        <div class="q-item review">
+                            <div class="q-score"><div class="q-score-val mid">68</div><div class="q-score-label">AI Score</div></div>
+                            <div class="q-info"><div class="q-vendor">ABC Industrial Supply</div><div class="q-detail">INV-ABC-2241 · PO 4500091234 · Freight variance</div></div>
+                            <div class="q-amount">$8,420</div>
+                            <div class="q-type">PO-Backed<br>Freight Issue</div>
+                            <div class="q-status"><div class="q-status-badge review">Review</div></div>
+                            <div class="q-ai-hint">Freight 4.8% above contract — drift pattern detected</div>
+                        </div>
+                        <div class="q-item ready">
+                            <div class="q-score"><div class="q-score-val high">97</div><div class="q-score-label">AI Score</div></div>
+                            <div class="q-info"><div class="q-vendor">Thales Defense</div><div class="q-detail">INV-2026-045231 · PO 4500098765 · 3-way match</div></div>
+                            <div class="q-amount">$45,200</div>
+                            <div class="q-type">PO-Backed<br>3-Way Match</div>
+                            <div class="q-status"><div class="q-status-badge ready">Ready</div></div>
+                            <div class="q-ai-hint">Full match — 0.3% variance within tolerance</div>
+                        </div>
+                        <div class="q-item ready">
+                            <div class="q-score"><div class="q-score-val high">96</div><div class="q-score-label">AI Score</div></div>
+                            <div class="q-info"><div class="q-vendor">Grainger Inc</div><div class="q-detail">INV-GR-44120 · Non-PO · Office Supplies</div></div>
+                            <div class="q-amount">$1,840</div>
+                            <div class="q-type">Non-PO<br>GL 54200</div>
+                            <div class="q-status"><div class="q-status-badge ready">Ready</div></div>
+                            <div class="q-ai-hint">Matches 14 prior invoices — GL/CC suggested</div>
+                        </div>
+                        <div class="q-item review">
+                            <div class="q-score"><div class="q-score-val mid">72</div><div class="q-score-label">AI Score</div></div>
+                            <div class="q-info"><div class="q-vendor">Fastenal Company</div><div class="q-detail">INV-FS-9920 · PO 4500099012 · Partial GR</div></div>
+                            <div class="q-amount">$8,750</div>
+                            <div class="q-type">Service Entry<br>Partial GR</div>
+                            <div class="q-status"><div class="q-status-badge review">Review</div></div>
+                            <div class="q-ai-hint">35/50 EA received — remaining expected today per EKET</div>
+                        </div>
+                        <div class="q-item parked">
+                            <div class="q-score"><div class="q-score-val" style="color: #64748b;">—</div><div class="q-score-label">Parked</div></div>
+                            <div class="q-info"><div class="q-vendor">TechParts International</div><div class="q-detail">INV-TP-1102 · Parked 02/04 · Waiting on buyer</div></div>
+                            <div class="q-amount">$24,500</div>
+                            <div class="q-type">PO-Backed<br>Awaiting Info</div>
+                            <div class="q-status"><div class="q-status-badge parked">Parked</div></div>
+                            <div class="q-ai-hint">Buyer J. Martinez notified — no response yet</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Prioritization -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">🧠</div>
+                <div class="section-title">How AI Prioritizes the Queue</div>
+            </div>
+            <div class="ai-priority">
+                <div class="ai-priority-header">
+                    <div class="ai-priority-dot"></div>
+                    <div class="ai-priority-label">AI Prioritization Logic</div>
+                </div>
+                <div class="ai-priority-text">
+                    The queue is <strong>not sorted by date</strong>. It's sorted by a weighted priority score that considers
+                    financial impact, payment urgency, processing complexity, and aging. The clerk doesn't need to guess
+                    what's important — <strong>the highest-impact items surface to the top</strong>. Exceptions that block
+                    payment runs are always prioritized above routine postings.
+                </div>
+            </div>
+            <div class="factors-grid">
+                <div class="factor-card">
+                    <div class="factor-name">💰 Financial Impact</div>
+                    <div class="factor-desc">Higher dollar amounts rank higher. A $312K invoice blocking a payment run outranks a $1.8K routine posting.</div>
+                    <div class="factor-weight">Weight: 35%</div>
+                </div>
+                <div class="factor-card">
+                    <div class="factor-name">⏰ Payment Urgency</div>
+                    <div class="factor-desc">Invoices approaching payment deadlines, especially those with early-pay discounts (2/10 Net 30), rank higher.</div>
+                    <div class="factor-weight">Weight: 25%</div>
+                </div>
+                <div class="factor-card">
+                    <div class="factor-name">📋 Processing Complexity</div>
+                    <div class="factor-desc">Exceptions and partial matches surface above clean matches. The clerk handles complex items when fresh, routine items later.</div>
+                    <div class="factor-weight">Weight: 20%</div>
+                </div>
+                <div class="factor-card">
+                    <div class="factor-name">📅 Aging & SLA</div>
+                    <div class="factor-desc">Invoices stuck longer than SLA targets get boosted. Parked items that have been waiting for responses get escalated.</div>
+                    <div class="factor-weight">Weight: 20%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">⚡</div>
+                <div class="section-title">Queue Features</div>
+            </div>
+            <div class="features-grid">
+                <div class="feat-card">
+                    <div class="feat-icon">📦</div>
+                    <div class="feat-name">Batch Review Mode</div>
+                    <div class="feat-desc">For "Ready to Post" invoices — clerk can review AI recommendations in bulk and confirm/reject each with one click per invoice.</div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-icon">🔍</div>
+                    <div class="feat-name">Pre-Loaded Context</div>
+                    <div class="feat-desc">Click any queue item → Tile 1 opens with all AI analysis already complete. No waiting. Invoice, match, recommendation — instant.</div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-icon">🔔</div>
+                    <div class="feat-name">Smart Notifications</div>
+                    <div class="feat-desc">Parked invoice got a response? GR just posted for a held invoice? AI surfaces changes so the clerk doesn't have to check manually.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">📊</div>
+                <div class="section-title">Queue Effectiveness KPIs</div>
+            </div>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-name">Queue Clearance Rate</div>
+                    <div class="kpi-val">> 90%</div>
+                    <div class="kpi-desc">% of daily queue processed by end of day.</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-name">Avg Time per Invoice</div>
+                    <div class="kpi-val">< 90 sec</div>
+                    <div class="kpi-desc">Including AI-assisted review. Pre-Mantrix: 8-12 min.</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-name">Payment Blockers Resolved</div>
+                    <div class="kpi-val">< 4 hrs</div>
+                    <div class="kpi-desc">Time from queue entry to resolution for payment-blocking items.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANTRIX AP — Tile 5: My Status Tracker</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'JetBrains Mono', monospace; background: #060a12; min-height: 100vh; color: #e2e8f0; }
+
+        .hero { text-align: center; padding: 70px 40px 50px; position: relative; }
+        .hero::before { content: ''; position: absolute; top: -80px; left: 50%; transform: translateX(-50%); width: 500px; height: 500px; background: radial-gradient(circle, rgba(52, 211, 153, 0.07) 0%, transparent 60%); }
+        .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; border: 1px solid rgba(52, 211, 153, 0.3); border-radius: 100px; font-size: 10px; color: #34d399; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; margin-bottom: 20px; background: rgba(52, 211, 153, 0.06); }
+        .hero-badge::before { content: ''; width: 6px; height: 6px; background: #34d399; border-radius: 50%; box-shadow: 0 0 12px rgba(52, 211, 153, 0.6); }
+        .hero-title { font-size: 34px; font-weight: 800; margin-bottom: 14px; line-height: 1.2; }
+        .hero-title .grad { background: linear-gradient(135deg, #34d399, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-sub { font-size: 12px; color: #94a3b8; max-width: 600px; margin: 0 auto 16px; line-height: 1.9; }
+        .hero-sub strong { color: #e2e8f0; }
+        .hero-roles { display: flex; justify-content: center; gap: 16px; }
+        .hero-role { display: flex; align-items: center; gap: 6px; font-size: 10px; padding: 6px 14px; border-radius: 8px; }
+        .hero-role.human { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.2); }
+        .hero-role.ai { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.2); }
+
+        .section { max-width: 1400px; margin: 0 auto; padding: 50px 40px; }
+        .divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(52, 211, 153, 0.2), transparent); max-width: 1400px; margin: 0 auto; }
+        .section-label { font-size: 9px; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; margin-bottom: 8px; }
+        .section-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+        .section-desc { font-size: 12px; color: #94a3b8; line-height: 1.9; max-width: 700px; margin-bottom: 32px; }
+        .section-desc strong { color: #e2e8f0; }
+
+        /* Daily Summary Strip */
+        .summary-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 36px; }
+        .summary-card { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 18px; text-align: center; position: relative; overflow: hidden; }
+        .summary-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+        .sc-green::before { background: #34d399; }
+        .sc-amber::before { background: #fbbf24; }
+        .sc-blue::before { background: #3b82f6; }
+        .sc-red::before { background: #f87171; }
+        .sc-purple::before { background: #8b5cf6; }
+        .summary-num { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+        .summary-num.green { color: #34d399; }
+        .summary-num.amber { color: #fbbf24; }
+        .summary-num.blue { color: #3b82f6; }
+        .summary-num.red { color: #f87171; }
+        .summary-num.purple { color: #8b5cf6; }
+        .summary-label { font-size: 9px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .summary-detail { font-size: 8px; color: #475569; }
+
+        /* Screen Mockup */
+        .screen { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; overflow: hidden; margin-bottom: 36px; }
+        .screen-bar { display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: rgba(0,0,0,0.4); }
+        .screen-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .screen-dot.r { background: #f87171; }
+        .screen-dot.y { background: #fbbf24; }
+        .screen-dot.g { background: #34d399; }
+        .screen-title { font-size: 9px; color: #64748b; margin-left: 8px; }
+        .screen-body { padding: 20px; }
+
+        /* Tab Bar */
+        .tabs { display: flex; gap: 4px; margin-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 10px; }
+        .tab { font-size: 9px; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; color: #475569; }
+        .tab.active { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+        .tab .count { font-size: 8px; padding: 1px 5px; border-radius: 3px; margin-left: 4px; }
+        .tab.active .count { background: rgba(52, 211, 153, 0.2); }
+
+        /* Table */
+        .data-table { width: 100%; border-collapse: collapse; font-size: 9px; }
+        .data-table th { text-align: left; padding: 8px 10px; color: #475569; font-weight: 600; text-transform: uppercase; font-size: 7px; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .data-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr { transition: background 0.2s; }
+        .data-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        /* Status Badges */
+        .status { display: inline-flex; align-items: center; gap: 4px; font-size: 8px; font-weight: 600; padding: 3px 8px; border-radius: 4px; }
+        .status.posted { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+        .status.parked { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+        .status.routed { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+        .status.rejected { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+        .status.updated { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+
+        /* Notification Dot */
+        .notif { display: inline-flex; align-items: center; gap: 4px; }
+        .notif-dot { width: 6px; height: 6px; border-radius: 50%; background: #8b5cf6; box-shadow: 0 0 8px rgba(139, 92, 246, 0.5); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        /* AI Insight Badge */
+        .ai-insight { font-size: 8px; color: #8b5cf6; background: rgba(139, 92, 246, 0.1); padding: 3px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; }
+        .ai-insight::before { content: '🤖'; font-size: 8px; }
+
+        /* Parked Detail Card */
+        .parked-detail { background: rgba(251, 191, 36, 0.04); border: 1px solid rgba(251, 191, 36, 0.1); border-radius: 10px; padding: 16px; margin-top: 10px; }
+        .parked-reason { font-size: 10px; color: #fbbf24; font-weight: 600; margin-bottom: 6px; }
+        .parked-status { font-size: 9px; color: #94a3b8; line-height: 1.7; }
+
+        /* Personal Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 36px; }
+        .stat-card { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 18px; text-align: center; }
+        .stat-value { font-size: 24px; font-weight: 800; color: #e2e8f0; margin-bottom: 2px; }
+        .stat-label { font-size: 8px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .stat-trend { font-size: 8px; font-weight: 600; }
+        .stat-trend.up { color: #34d399; }
+        .stat-trend.down { color: #f87171; }
+
+        /* Feature Cards */
+        .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 28px; }
+        .feature-card { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 22px; }
+        .feature-icon { font-size: 22px; margin-bottom: 10px; }
+        .feature-name { font-size: 13px; font-weight: 700; color: #e2e8f0; margin-bottom: 6px; }
+        .feature-desc { font-size: 10px; color: #94a3b8; line-height: 1.7; }
+        .feature-desc strong { color: #e2e8f0; }
+
+        /* KPI Card */
+        .kpi-row { display: flex; gap: 14px; margin-bottom: 28px; flex-wrap: wrap; }
+        .kpi-card { flex: 1; min-width: 200px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 18px; }
+        .kpi-label { font-size: 8px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 600; }
+        .kpi-value { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .kpi-sub { font-size: 9px; color: #64748b; }
+    </style>
+</head>
+<body>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-badge">Tile 5 — Operational Layer</div>
+        <h1 class="hero-title"><span class="grad">My Status Tracker</span></h1>
+        <p class="hero-sub">
+            The clerk's home base. <strong>Every invoice I touched, what happened to it, and what needs my attention.</strong>
+            This is where the clerk starts their day and closes it.
+        </p>
+        <div class="hero-roles">
+            <div class="hero-role human">👤 Human Monitors Own Work</div>
+            <div class="hero-role ai">🤖 AI Detects Status Changes</div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- WHY THIS TILE -->
+    <section class="section">
+        <div class="section-label" style="color: #34d399;">Why This Tile Exists</div>
+        <div class="section-title">The Clerk's Missing Dashboard</div>
+        <div class="section-desc">
+            In SAP today, a clerk has no single view of "my work." To check status, they open FBL1N, search RBKP,
+            dig through email for buyer responses, check MIR7 for parked items, and hope their spreadsheet is up to date.
+            <strong>Tile 5 eliminates all of that. One screen. Everything I touched. What's done, what's stuck, what changed.</strong>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- DAILY SUMMARY -->
+    <section class="section">
+        <div class="section-label" style="color: #22d3ee;">Daily Summary</div>
+        <div class="section-title">Sarah's Dashboard — February 6, 2026</div>
+
+        <div class="summary-strip">
+            <div class="summary-card sc-green">
+                <div class="summary-num green">94</div>
+                <div class="summary-label">Posted Today</div>
+                <div class="summary-detail">$2.1M total value</div>
+            </div>
+            <div class="summary-card sc-amber">
+                <div class="summary-num amber">7</div>
+                <div class="summary-label">Parked</div>
+                <div class="summary-detail">3 awaiting GR · 2 routed · 2 on hold</div>
+            </div>
+            <div class="summary-card sc-blue">
+                <div class="summary-num blue">4</div>
+                <div class="summary-label">Routed to Buyer</div>
+                <div class="summary-detail">1 response received 🟣</div>
+            </div>
+            <div class="summary-card sc-red">
+                <div class="summary-num red">2</div>
+                <div class="summary-label">Rejected</div>
+                <div class="summary-detail">Vendor notified</div>
+            </div>
+            <div class="summary-card sc-purple">
+                <div class="summary-num purple">3</div>
+                <div class="summary-label">Status Changed</div>
+                <div class="summary-detail">AI detected updates ⚡</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- SCREEN MOCKUP -->
+    <section class="section">
+        <div class="section-label" style="color: #fbbf24;">Main Screen</div>
+        <div class="section-title">My Status — Invoice Tracker</div>
+
+        <div class="screen">
+            <div class="screen-bar">
+                <div class="screen-dot r"></div>
+                <div class="screen-dot y"></div>
+                <div class="screen-dot g"></div>
+                <div class="screen-title">Mantrix AP — My Status · Sarah Chen · Feb 6, 2026</div>
+            </div>
+            <div class="screen-body">
+                <div class="tabs">
+                    <div class="tab">All <span class="count">107</span></div>
+                    <div class="tab">Posted <span class="count">94</span></div>
+                    <div class="tab active">Parked <span class="count">7</span></div>
+                    <div class="tab">Routed <span class="count">4</span></div>
+                    <div class="tab">Rejected <span class="count">2</span></div>
+                    <div class="tab"><span class="notif"><span class="notif-dot"></span></span> Updates <span class="count">3</span></div>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Vendor / Invoice</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Parked Reason</th>
+                            <th>Days</th>
+                            <th>AI Update</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="notif"><span class="notif-dot"></span></span></td>
+                            <td>
+                                <div style="font-weight: 600; color: #e2e8f0;">Thales Defense & Security</div>
+                                <div style="color: #64748b;">INV-2026-8834 · PO 4500098765</div>
+                            </td>
+                            <td style="font-weight: 600;">$45,200</td>
+                            <td><span class="status updated">GR POSTED ⚡</span></td>
+                            <td style="color: #94a3b8;">Missing GR (WEBRE)</td>
+                            <td style="color: #fbbf24;">3</td>
+                            <td><span class="ai-insight">GR 5001234567 posted today — ready to re-process</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="notif"><span class="notif-dot"></span></span></td>
+                            <td>
+                                <div style="font-weight: 600; color: #e2e8f0;">Lockheed Martin</div>
+                                <div style="color: #64748b;">INV-2026-9102 · PO 4500099012</div>
+                            </td>
+                            <td style="font-weight: 600;">$312,500</td>
+                            <td><span class="status routed">ROUTED</span></td>
+                            <td style="color: #94a3b8;">Price variance → Buyer J. Martinez</td>
+                            <td style="color: #3b82f6;">1</td>
+                            <td><span class="ai-insight">Buyer responded: "Approved — contract escalation"</span></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <div style="font-weight: 600; color: #e2e8f0;">Raytheon Technologies</div>
+                                <div style="color: #64748b;">INV-2026-8801 · PO 4500097890</div>
+                            </td>
+                            <td style="font-weight: 600;">$87,300</td>
+                            <td><span class="status parked">PARKED</span></td>
+                            <td style="color: #94a3b8;">Partial GR — 80 of 120 units received</td>
+                            <td style="color: #fbbf24;">5</td>
+                            <td><span class="ai-insight">EKET shows delivery 2/7 — likely tomorrow</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="notif"><span class="notif-dot"></span></span></td>
+                            <td>
+                                <div style="font-weight: 600; color: #e2e8f0;">Northrop Grumman</div>
+                                <div style="color: #64748b;">INV-2026-8790 · Non-PO</div>
+                            </td>
+                            <td style="font-weight: 600;">$4,200</td>
+                            <td><span class="status routed">ROUTED</span></td>
+                            <td style="color: #94a3b8;">Non-PO > $2,500 → Mgr approval</td>
+                            <td style="color: #3b82f6;">2</td>
+                            <td><span class="ai-insight">Manager approved — ready to post as FB60</span></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <div style="font-weight: 600; color: #e2e8f0;">Grainger</div>
+                                <div style="color: #64748b;">INV-2026-9230 · PO 4500098432</div>
+                            </td>
+                            <td style="font-weight: 600;">$1,840</td>
+                            <td><span class="status parked">PARKED</span></td>
+                            <td style="color: #94a3b8;">UOM mismatch — invoice KG, PO LB</td>
+                            <td style="color: #fbbf24;">1</td>
+                            <td><span class="ai-insight">Converted: 50 KG = 110.23 LB. Within tolerance.</span></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <div style="font-weight: 600; color: #e2e8f0;">Allied Signal</div>
+                                <div style="color: #64748b;">INV-2026-8712 · PO 4500096501</div>
+                            </td>
+                            <td style="font-weight: 600;">$23,400</td>
+                            <td><span class="status parked">PARKED</span></td>
+                            <td style="color: #94a3b8;">Vendor on payment hold (LFB1 block)</td>
+                            <td style="color: #f87171;">8</td>
+                            <td style="color: #475569; font-size: 8px;">No change — vendor still blocked</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <div style="font-weight: 600; color: #e2e8f0;">BAE Systems</div>
+                                <div style="color: #64748b;">INV-2026-8905 · PO 4500098200</div>
+                            </td>
+                            <td style="font-weight: 600;">$156,000</td>
+                            <td><span class="status parked">PARKED</span></td>
+                            <td style="color: #94a3b8;">Missing SES — service PO, no entry sheet</td>
+                            <td style="color: #fbbf24;">4</td>
+                            <td style="color: #475569; font-size: 8px;">SES not yet created in ML81N</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- AI STATUS CHANGE DETECTION -->
+    <section class="section">
+        <div class="section-label" style="color: #8b5cf6;">AI-Powered Status Changes</div>
+        <div class="section-title">How AI Detects Updates — Without the Clerk Checking</div>
+        <div class="section-desc">
+            Mantrix continuously monitors SAP for changes that affect parked or routed invoices.
+            When something changes, it appears as a <span class="notif" style="display: inline-flex;"><span class="notif-dot" style="animation: none;"></span></span>
+            notification in Tile 5. <strong>The clerk doesn't have to check. The work comes to them.</strong>
+        </div>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📦</div>
+                <div class="feature-name">GR Posted Detection</div>
+                <div class="feature-desc">
+                    Invoice was parked because <strong>EKPO-WEBRE = 'X'</strong> and no GR existed.
+                    Mantrix monitors <strong>MATDOC</strong> for movement type 101 against this PO line.
+                    When GR appears → notification: "GR posted. Ready to re-process."
+                    Clerk clicks → opens Tile 1 with GR data pre-loaded. One-click post.
+                </div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💬</div>
+                <div class="feature-name">Buyer Response Detection</div>
+                <div class="feature-desc">
+                    Invoice was routed to a buyer for price variance approval.
+                    When buyer responds (via Mantrix routing or email), the response attaches to the invoice.
+                    Notification: "Buyer approved — contract escalation confirmed." Clerk clicks → post.
+                </div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📋</div>
+                <div class="feature-name">Service Entry Sheet Created</div>
+                <div class="feature-desc">
+                    Service PO invoice was parked because no SES existed in <strong>ESLH/ESKN</strong>.
+                    Mantrix monitors for SES creation against this PO line (ML81N completion).
+                    When SES appears → "Service entry sheet created. Ready to re-process."
+                </div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔓</div>
+                <div class="feature-name">Vendor Block Lifted</div>
+                <div class="feature-desc">
+                    Invoice parked because vendor has payment block in <strong>LFB1-ZAHLS</strong>.
+                    Mantrix monitors vendor master for block removal.
+                    When cleared → "Vendor block removed. Invoice can proceed." Clerk re-queues.
+                </div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <div class="feature-name">PO Change Detection</div>
+                <div class="feature-desc">
+                    Invoice parked due to price mismatch. Buyer updates PO price in ME22N.
+                    Mantrix detects <strong>EKPO-NETPR</strong> change and re-runs match.
+                    If price now matches → "PO updated. Price now within tolerance. Ready to post."
+                </div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📄</div>
+                <div class="feature-name">Additional GR (Partial Resolution)</div>
+                <div class="feature-desc">
+                    Invoice for 120 units, only 80 received. Parked.
+                    When additional GR posts (40 more units) → "Additional GR: now 120 of 120 received.
+                    Full match achieved." Clerk clicks → post.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- PERSONAL STATS -->
+    <section class="section">
+        <div class="section-label" style="color: #34d399;">My Performance</div>
+        <div class="section-title">Personal Stats — For the Clerk, Not the Manager</div>
+        <div class="section-desc">
+            This is the clerk's own professional development view. Not surveillance — <strong>self-improvement</strong>.
+            "How am I doing? Am I getting faster? Are my overrides improving the model?"
+            The department head sees aggregate team stats in Enterprise Pulse — not individual stats.
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">94</div>
+                <div class="stat-label">Invoices Posted Today</div>
+                <div class="stat-trend up">↑ 12% vs. my 30-day avg (84)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">47s</div>
+                <div class="stat-label">Avg Time per Invoice</div>
+                <div class="stat-trend up">↓ from 62s last month</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">91%</div>
+                <div class="stat-label">First-Pass Post Rate</div>
+                <div class="stat-trend up">↑ 3pts vs. last month</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">14</div>
+                <div class="stat-label">AI Overrides This Week</div>
+                <div class="stat-trend" style="color: #94a3b8;">12 improved accuracy · 2 neutral</div>
+            </div>
+        </div>
+
+        <div class="kpi-row">
+            <div class="kpi-card">
+                <div class="kpi-label">My Posted Value (This Month)</div>
+                <div class="kpi-value" style="color: #34d399;">$4.2M</div>
+                <div class="kpi-sub">1,847 invoices · 98.7% accuracy</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">My Exception Resolution</div>
+                <div class="kpi-value" style="color: #fbbf24;">8 min avg</div>
+                <div class="kpi-sub">Down from 22 min pre-Mantrix</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">AI Match Acceptance Rate</div>
+                <div class="kpi-value" style="color: #8b5cf6;">89%</div>
+                <div class="kpi-sub">I accepted 89% of AI matches — model learning from my 11% overrides</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Parked Items Avg Age</div>
+                <div class="kpi-value" style="color: #22d3ee;">2.4 days</div>
+                <div class="kpi-sub">7 currently parked · oldest: 8 days (vendor blocked)</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- SAP DATA -->
+    <section class="section">
+        <div class="section-label" style="color: #22d3ee;">SAP Data Sources</div>
+        <div class="section-title">What Tile 5 Reads from SAP</div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px;">
+            <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 22px;">
+                <div style="font-size: 11px; font-weight: 700; color: #22d3ee; margin-bottom: 12px;">Posted Invoice Status</div>
+                <div style="font-size: 9px; color: #94a3b8; line-height: 1.8;">
+                    <div><code style="background: rgba(34,211,238,0.1); padding: 1px 5px; border-radius: 3px; color: #22d3ee; font-size: 8px;">RBKP</code> Invoice document header — posting date, status, amounts</div>
+                    <div><code style="background: rgba(34,211,238,0.1); padding: 1px 5px; border-radius: 3px; color: #22d3ee; font-size: 8px;">RSEG</code> Invoice line items — material, qty, amount, PO reference</div>
+                    <div><code style="background: rgba(34,211,238,0.1); padding: 1px 5px; border-radius: 3px; color: #22d3ee; font-size: 8px;">BSEG</code> Accounting line items — GL account, cost center, posting</div>
+                </div>
+            </div>
+            <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 22px;">
+                <div style="font-size: 11px; font-weight: 700; color: #fbbf24; margin-bottom: 12px;">Parked Item Monitoring</div>
+                <div style="font-size: 9px; color: #94a3b8; line-height: 1.8;">
+                    <div><code style="background: rgba(251,191,36,0.1); padding: 1px 5px; border-radius: 3px; color: #fbbf24; font-size: 8px;">MATDOC/MSEG</code> GR posting detection (movement type 101)</div>
+                    <div><code style="background: rgba(251,191,36,0.1); padding: 1px 5px; border-radius: 3px; color: #fbbf24; font-size: 8px;">ESLH/ESKN</code> Service entry sheet creation detection</div>
+                    <div><code style="background: rgba(251,191,36,0.1); padding: 1px 5px; border-radius: 3px; color: #fbbf24; font-size: 8px;">EKPO</code> PO item changes — price, qty, deletion flag</div>
+                    <div><code style="background: rgba(251,191,36,0.1); padding: 1px 5px; border-radius: 3px; color: #fbbf24; font-size: 8px;">LFB1</code> Vendor payment block status changes</div>
+                    <div><code style="background: rgba(251,191,36,0.1); padding: 1px 5px; border-radius: 3px; color: #fbbf24; font-size: 8px;">CDHDR/CDPOS</code> Change document tracking for PO/vendor changes</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- DESIGN PRINCIPLES -->
+    <section class="section">
+        <div class="section-label" style="color: #94a3b8;">Design Principles</div>
+        <div class="section-title">Tile 5 Rules</div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px;">
+            <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 18px;">
+                <div style="font-size: 11px; font-weight: 700; color: #e2e8f0; margin-bottom: 6px;">🏠 Clerk's Home, Not Manager's Dashboard</div>
+                <div style="font-size: 9px; color: #64748b; line-height: 1.6;">Personal stats are visible only to the clerk. The department head sees team aggregates in Enterprise Pulse — never individual clerk metrics from Tile 5.</div>
+            </div>
+            <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 18px;">
+                <div style="font-size: 11px; font-weight: 700; color: #e2e8f0; margin-bottom: 6px;">🔔 Work Comes to You</div>
+                <div style="font-size: 9px; color: #64748b; line-height: 1.6;">AI monitors SAP for status changes on parked items. When something changes, notification appears. No checking. No T-code hopping. No "let me look in MIR7."</div>
+            </div>
+            <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 18px;">
+                <div style="font-size: 11px; font-weight: 700; color: #e2e8f0; margin-bottom: 6px;">🔄 One-Click Resume</div>
+                <div style="font-size: 9px; color: #64748b; line-height: 1.6;">Click any parked/routed item → opens Tile 1 with all AI analysis pre-loaded, updated with new data. Don't start from scratch. Resume where you left off.</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- BEFORE/AFTER -->
+    <section class="section">
+        <div class="section-label" style="color: #f87171;">Impact</div>
+        <div class="section-title">Before Tile 5 vs. After</div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div style="background: rgba(248, 113, 113, 0.04); border: 1px solid rgba(248, 113, 113, 0.12); border-radius: 14px; padding: 24px;">
+                <div style="font-size: 11px; font-weight: 700; color: #f87171; margin-bottom: 14px;">Before — Without Tile 5</div>
+                <div style="font-size: 10px; color: #94a3b8; line-height: 2;">
+                    <div>Open MIR7 to find parked invoices</div>
+                    <div>Open ME23N to check if GR was posted</div>
+                    <div>Open MB03 to see GR details</div>
+                    <div>Check email for buyer responses</div>
+                    <div>Maintain personal Excel tracker</div>
+                    <div>No notification when blockers clear</div>
+                    <div>Start from scratch when re-opening parked invoice</div>
+                    <div>"I think I parked that one... where is it?"</div>
+                </div>
+            </div>
+            <div style="background: rgba(52, 211, 153, 0.04); border: 1px solid rgba(52, 211, 153, 0.12); border-radius: 14px; padding: 24px;">
+                <div style="font-size: 11px; font-weight: 700; color: #34d399; margin-bottom: 14px;">After — With Tile 5</div>
+                <div style="font-size: 10px; color: #94a3b8; line-height: 2;">
+                    <div>One screen shows all my parked, routed, posted items</div>
+                    <div>AI detects GR posting → notification appears</div>
+                    <div>AI detects buyer response → notification appears</div>
+                    <div>AI detects SES creation → notification appears</div>
+                    <div>No spreadsheets needed</div>
+                    <div>Purple dot means "something changed — act on it"</div>
+                    <div>Click → resumes in Tile 1 with all context loaded</div>
+                    <div>"I see 3 updates. Let me clear those first."</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>

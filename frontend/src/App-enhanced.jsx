@@ -180,6 +180,12 @@ import FuelManagement from './components/routeai/FuelManagement';
 import MaintenanceScheduler from './components/routeai/MaintenanceScheduler';
 import TraxxAILanding from './components/TraxxAILanding';
 import MasterDataLanding from './components/masterdata/MasterDataLanding';
+import MantrixAPLanding from './components/mantrixap/MantrixAPLanding';
+import InvoiceEntry from './components/mantrixap/InvoiceEntry';
+import SmartWorkQueue from './components/mantrixap/SmartWorkQueue';
+import ExceptionReview from './components/mantrixap/ExceptionReview';
+import PostingReview from './components/mantrixap/PostingReview';
+import MyStatusTracker from './components/mantrixap/MyStatusTracker';
 import KitControlTower from './components/traxxai/KitControlTower';
 import WhoMustActNow from './components/traxxai/WhoMustActNow';
 import LogisticsEconomics from './components/traxxai/LogisticsEconomics';
@@ -276,6 +282,7 @@ function App() {
   const [ordlyView, setOrdlyView] = usePersistedState('mantrix-ordlyView', 'landing'); // 'landing', module IDs
   const [o2cView, setO2cView] = usePersistedState('mantrix-o2cView', 'landing'); // 'landing', module IDs
   const [traxxView, setTraxxView] = usePersistedState('mantrix-traxxView', 'landing'); // 'landing', 'nexxt-smade', 'nexxt-operations'
+  const [apView, setApView] = usePersistedState('mantrix-apView', 'landing'); // 'landing', 'invoice-entry', 'work-queue', 'exception-review', 'posting-review', 'my-status'
   const [currentFioriTile, setCurrentFioriTile] = useState(null); // { tileId, title, moduleId, moduleColor }
   const [axisAIView, setAxisAIView] = useState('landing'); // 'landing', 'forecast', 'budget', 'driver', 'scenario', 'insights'
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
@@ -683,6 +690,9 @@ function App() {
                       setTraxxView('landing');
                     } else if (moduleId === 'masterdata') {
                       setCoreAIView('masterdata');
+                    } else if (moduleId === 'mantrixap') {
+                      setCoreAIView('mantrixap');
+                      setApView('landing');
                     }
                   }} />
                 </Box>
@@ -1253,6 +1263,35 @@ function App() {
                     darkMode={darkMode}
                     onBack={() => setCoreAIView('landing')}
                   />
+                </Box>
+              </Fade>
+              <Fade in={coreAIView === 'mantrixap'} timeout={300}>
+                <Box sx={{ display: coreAIView === 'mantrixap' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
+                  {apView === 'landing' && (
+                    <MantrixAPLanding
+                      darkMode={darkMode}
+                      onBack={() => setCoreAIView('landing')}
+                      onNavigate={(tileId) => {
+                        console.log('MantrixAP tile clicked:', tileId);
+                        setApView(tileId);
+                      }}
+                    />
+                  )}
+                  {apView === 'invoice-entry' && (
+                    <InvoiceEntry darkMode={darkMode} onBack={() => setApView('landing')} onNavigate={(view) => setApView(view)} />
+                  )}
+                  {apView === 'work-queue' && (
+                    <SmartWorkQueue darkMode={darkMode} onBack={() => setApView('landing')} onNavigate={(view) => setApView(view)} />
+                  )}
+                  {apView === 'exception-review' && (
+                    <ExceptionReview darkMode={darkMode} onBack={() => setApView('landing')} onNavigate={(view) => setApView(view)} />
+                  )}
+                  {apView === 'posting-review' && (
+                    <PostingReview darkMode={darkMode} onBack={() => setApView('landing')} onNavigate={(view) => setApView(view)} />
+                  )}
+                  {apView === 'my-status' && (
+                    <MyStatusTracker darkMode={darkMode} onBack={() => setApView('landing')} onNavigate={(view) => setApView(view)} />
+                  )}
                 </Box>
               </Fade>
             </Box>

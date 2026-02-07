@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANTRIX AP — Operational Tile 3: Exception Review</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'JetBrains Mono', monospace; background: linear-gradient(135deg, #0a0f1a 0%, #1a150a 100%); min-height: 100vh; color: #e2e8f0; padding: 40px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        .header { margin-bottom: 36px; padding-bottom: 20px; border-bottom: 2px solid rgba(251, 191, 36, 0.4); }
+        .tile-badge { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .tile-num { background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; color: #0a0f1a; }
+        .tile-type { font-size: 10px; color: #fbbf24; text-transform: uppercase; letter-spacing: 1px; }
+        .tile-title { font-size: 30px; font-weight: 700; background: linear-gradient(135deg, #fbbf24, #fde68a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+        .tile-subtitle { font-size: 13px; color: #94a3b8; }
+
+        .philosophy { background: linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(251, 191, 36, 0.04)); border: 1px solid rgba(251, 191, 36, 0.25); border-radius: 14px; padding: 24px; margin-bottom: 36px; }
+        .philosophy-title { font-size: 12px; font-weight: 700; color: #fbbf24; margin-bottom: 10px; }
+        .philosophy-text { font-size: 12px; color: #cbd5e1; line-height: 1.9; }
+        .philosophy-text strong { color: #fbbf24; }
+        .human-badge { display: inline-block; background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.3); color: #fbbf24; font-size: 9px; font-weight: 700; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; margin-top: 12px; }
+
+        .section { margin-bottom: 36px; }
+        .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+        .section-icon { width: 36px; height: 36px; background: rgba(251, 191, 36, 0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .section-title { font-size: 16px; font-weight: 600; color: #e2e8f0; }
+
+        /* Screen Mockup */
+        .screen-mockup { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; margin-bottom: 28px; }
+        .screen-bar { display: flex; align-items: center; gap: 10px; padding: 12px 20px; background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .screen-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .screen-dot.r { background: #f87171; }
+        .screen-dot.y { background: #fbbf24; }
+        .screen-dot.g { background: #34d399; }
+        .screen-bar-title { font-size: 10px; color: #64748b; margin-left: 8px; }
+        .screen-body { padding: 24px; }
+        .screen-grid { display: grid; grid-template-columns: 1fr 380px; gap: 20px; }
+
+        /* Exception Detail */
+        .exc-banner { background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(248, 113, 113, 0.06)); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 12px; padding: 18px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
+        .exc-banner-left .exc-banner-vendor { font-size: 16px; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
+        .exc-banner-left .exc-banner-detail { font-size: 10px; color: #94a3b8; }
+        .exc-banner-right { text-align: right; }
+        .exc-banner-amount { font-size: 20px; font-weight: 700; color: #fbbf24; }
+        .exc-banner-stuck { font-size: 10px; color: #f87171; }
+
+        /* Root Cause Card */
+        .root-cause { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 20px; margin-bottom: 18px; border-left: 4px solid #fbbf24; }
+        .rc-header { font-size: 9px; color: #fbbf24; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 10px; }
+        .rc-title { font-size: 14px; font-weight: 700; color: #e2e8f0; margin-bottom: 8px; }
+        .rc-desc { font-size: 11px; color: #cbd5e1; line-height: 1.8; }
+        .rc-desc strong { color: #fbbf24; }
+
+        /* Evidence Table */
+        .evidence { background: rgba(0,0,0,0.15); border-radius: 10px; padding: 16px; margin-bottom: 18px; }
+        .evidence-title { font-size: 9px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; font-weight: 600; }
+        .ev-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 10px; }
+        .ev-row:last-child { border-bottom: none; }
+        .ev-label { color: #64748b; }
+        .ev-val { color: #e2e8f0; font-weight: 600; }
+        .ev-val code { background: rgba(34, 211, 238, 0.1); padding: 1px 5px; border-radius: 3px; color: #22d3ee; font-size: 9px; }
+
+        /* Precedent */
+        .precedent { background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.2); border-radius: 10px; padding: 16px; margin-bottom: 18px; }
+        .prec-title { font-size: 9px; color: #8b5cf6; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 600; }
+        .prec-text { font-size: 10px; color: #cbd5e1; line-height: 1.8; }
+        .prec-text strong { color: #34d399; }
+
+        /* AI Panel */
+        .ai-panel { background: rgba(10, 15, 26, 0.8); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 22px; }
+        .ai-panel-header { display: flex; align-items: center; gap: 6px; margin-bottom: 16px; }
+        .ai-panel-dot { width: 6px; height: 6px; background: #8b5cf6; border-radius: 50%; box-shadow: 0 0 8px rgba(139, 92, 246, 0.5); }
+        .ai-panel-label { font-size: 8px; color: #8b5cf6; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+
+        .ai-rec { background: rgba(0,0,0,0.2); border-radius: 10px; padding: 16px; margin-bottom: 16px; border-left: 3px solid #8b5cf6; }
+        .ai-rec-text { font-size: 11px; color: #cbd5e1; line-height: 1.9; }
+        .ai-rec-text strong { color: #e2e8f0; }
+
+        .human-actions-title { font-size: 8px; color: #fbbf24; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-weight: 600; }
+        .human-btn { width: 100%; padding: 12px 16px; border: none; border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; cursor: pointer; margin-bottom: 6px; text-align: left; }
+        .human-btn.post { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+        .human-btn.park { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.2); }
+        .human-btn.route { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
+        .human-btn.reject { background: rgba(248, 113, 113, 0.1); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.2); }
+        .btn-sub { font-size: 8px; color: #475569; font-weight: 400; margin-top: 2px; }
+
+        .override-note { font-size: 9px; color: #64748b; margin-top: 12px; line-height: 1.6; padding: 10px; background: rgba(0,0,0,0.15); border-radius: 8px; }
+        .override-note strong { color: #fbbf24; }
+
+        /* Exception Taxonomy */
+        .tax-table { width: 100%; border-collapse: collapse; font-size: 10px; background: rgba(15, 23, 42, 0.8); border-radius: 12px; overflow: hidden; margin-bottom: 28px; }
+        .tax-table th { text-align: left; padding: 12px; background: rgba(0,0,0,0.4); color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 8px; letter-spacing: 0.5px; }
+        .tax-table td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .tax-table tr:last-child td { border-bottom: none; }
+
+        .rc-badge { font-size: 8px; padding: 3px 8px; border-radius: 4px; font-weight: 600; text-transform: uppercase; }
+        .rc-badge.price { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+        .rc-badge.qty { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+        .rc-badge.master { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+        .rc-badge.dup { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+        .rc-badge.policy { background: rgba(248, 113, 113, 0.2); color: #f87171; }
+
+        /* KPIs */
+        .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+        .kpi-card { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 12px; padding: 18px; }
+        .kpi-name { font-size: 11px; font-weight: 600; color: #e2e8f0; margin-bottom: 6px; }
+        .kpi-val { font-size: 20px; font-weight: 700; color: #fbbf24; margin-bottom: 4px; }
+        .kpi-desc { font-size: 9px; color: #64748b; line-height: 1.5; }
+
+        /* Diff Card */
+        .diff-card { background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(139, 92, 246, 0.06)); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 14px; padding: 24px; }
+        .diff-title { font-size: 13px; font-weight: 700; color: #fbbf24; margin-bottom: 16px; }
+        .diff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .diff-col-title { font-size: 10px; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; }
+        .diff-col-title.them { color: #f87171; }
+        .diff-col-title.us { color: #34d399; }
+        .diff-item { font-size: 10px; color: #94a3b8; padding: 5px 0; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="tile-badge">
+                <span class="tile-num">TILE 3</span>
+                <span class="tile-type">Operational • Exception Review</span>
+            </div>
+            <div class="tile-title">Exception Review & Resolution</div>
+            <div class="tile-subtitle">AI Diagnoses the Root Cause — You Decide the Resolution</div>
+        </div>
+
+        <div class="philosophy">
+            <div class="philosophy-title">👤 Human-in-the-Loop Philosophy</div>
+            <div class="philosophy-text">
+                Exceptions are where AP clerks spend 80% of their time. Without Mantrix, the clerk sees a cryptic SAP error code and starts digging.
+                <strong>Mantrix AI does the digging</strong> — it identifies the root cause (not the symptom), pulls historical precedent, checks SAP fields, and
+                presents a clear recommendation. But <strong>the clerk decides</strong>: post within tolerance, route to buyer, park, or reject.
+                Every human decision feeds back to improve future recommendations.
+            </div>
+            <div class="human-badge">👤 Human Resolves · AI Diagnoses</div>
+        </div>
+
+        <!-- Screen Mockup -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">🖥️</div>
+                <div class="section-title">Exception Review Screen</div>
+            </div>
+            <div class="screen-mockup">
+                <div class="screen-bar">
+                    <div class="screen-dot r"></div>
+                    <div class="screen-dot y"></div>
+                    <div class="screen-dot g"></div>
+                    <div class="screen-bar-title">Exception Review — INV-LM-8834 · Lockheed Martin · Price Variance</div>
+                </div>
+                <div class="screen-body">
+                    <div class="screen-grid">
+                        <div>
+                            <!-- Exception Banner -->
+                            <div class="exc-banner">
+                                <div class="exc-banner-left">
+                                    <div class="exc-banner-vendor">Lockheed Martin · INV-LM-8834</div>
+                                    <div class="exc-banner-detail">PO 4500087654 · Line 10 · Material 300045</div>
+                                </div>
+                                <div class="exc-banner-right">
+                                    <div class="exc-banner-amount">$312,500</div>
+                                    <div class="exc-banner-stuck">⏱ Stuck 4 days</div>
+                                </div>
+                            </div>
+
+                            <!-- Root Cause -->
+                            <div class="root-cause">
+                                <div class="rc-header">🔍 AI Root Cause Analysis</div>
+                                <div class="rc-title">Price Variance — Contract Escalation</div>
+                                <div class="rc-desc">
+                                    Invoice price <strong>$312,500</strong> vs PO price <strong>$306,250</strong> — a 2.04% variance.
+                                    The underlying contract (condition ZPR0 in <code style="background:rgba(34,211,238,0.1);padding:1px 5px;border-radius:3px;color:#22d3ee;font-size:10px;">KONV</code>)
+                                    has a valid annual escalation clause allowing up to 3%. This variance falls within contract terms.
+                                </div>
+                            </div>
+
+                            <!-- Evidence -->
+                            <div class="evidence">
+                                <div class="evidence-title">SAP Evidence — Fields AI Checked</div>
+                                <div class="ev-row"><span class="ev-label">PO Net Price</span><span class="ev-val"><code>EKPO-NETPR</code> $306,250.00</span></div>
+                                <div class="ev-row"><span class="ev-label">Invoice Amount</span><span class="ev-val"><code>RSEG-WRBTR</code> $312,500.00</span></div>
+                                <div class="ev-row"><span class="ev-label">Variance</span><span class="ev-val" style="color: #fbbf24;">2.04% ($6,250)</span></div>
+                                <div class="ev-row"><span class="ev-label">Contract Condition</span><span class="ev-val"><code>KONV-KBETR</code> ZPR0 — 3% esc.</span></div>
+                                <div class="ev-row"><span class="ev-label">GR Status</span><span class="ev-val" style="color: #34d399;">✓ Complete (<code>EKBE</code>)</span></div>
+                                <div class="ev-row"><span class="ev-label">Vendor Reliability</span><span class="ev-val">97.1 (89 invoices)</span></div>
+                                <div class="ev-row"><span class="ev-label">SAP Tolerance</span><span class="ev-val"><code>OMR6</code> 1.0% (exceeded)</span></div>
+                            </div>
+
+                            <!-- Precedent -->
+                            <div class="precedent">
+                                <div class="prec-title">📜 Historical Precedent</div>
+                                <div class="prec-text">
+                                    This exact pattern (Lockheed Martin + price variance within contract escalation) has occurred
+                                    <strong>18 times</strong> in the last 12 months. In all 18 cases, the invoice was approved and posted.
+                                    Zero reversals. Zero audit flags. Average variance in prior cases: 1.8%.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: AI + Human Actions -->
+                        <div>
+                            <div class="ai-panel">
+                                <div class="ai-panel-header">
+                                    <div class="ai-panel-dot"></div>
+                                    <div class="ai-panel-label">AI Recommendation</div>
+                                </div>
+                                <div class="ai-rec">
+                                    <div class="ai-rec-text">
+                                        <strong>Recommend: Post within tolerance.</strong><br><br>
+                                        Variance is within contract escalation clause. 18/18 historical precedent approved. Vendor reliability 97.1. No anomalies. GR complete.
+                                        <br><br>
+                                        However, SAP static tolerance (OMR6: 1.0%) is exceeded. Posting requires your confirmation to override the SAP tolerance block.
+                                    </div>
+                                </div>
+
+                                <div class="human-actions-title">👤 Your Decision</div>
+                                <button class="human-btn post">✓ Approve & Post (MIRO)<div class="btn-sub">Override SAP tolerance — contract clause justifies variance</div></button>
+                                <button class="human-btn route">↗ Route to Buyer for PO Correction<div class="btn-sub">Send to buyer to update PO price via ME22N</div></button>
+                                <button class="human-btn park">⏸ Park — Need More Info<div class="btn-sub">Park invoice with AI context attached</div></button>
+                                <button class="human-btn reject">✕ Reject & Return to Vendor<div class="btn-sub">Return with variance explanation</div></button>
+
+                                <div class="override-note">
+                                    <strong>📝 Your decision is logged.</strong> If you override the AI recommendation,
+                                    we'll ask for a brief reason. This trains the model to make better recommendations.
+                                    Every override improves accuracy for the next similar exception.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exception Taxonomy -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">🗂️</div>
+                <div class="section-title">Exception Types AI Detects</div>
+            </div>
+            <table class="tax-table">
+                <thead>
+                    <tr><th>Root Cause</th><th>AI Detection</th><th>What Clerk Sees</th><th>Typical Resolution</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="rc-badge price">Price — Contract</span></td>
+                        <td>Variance within KONV escalation clause</td>
+                        <td>Clear explanation + contract reference + precedent count</td>
+                        <td>Clerk posts within tolerance or routes for PO update</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rc-badge price">Price — PO Error</span></td>
+                        <td>PO price doesn't match contract — entry error likely</td>
+                        <td>Root cause flagged as PO error, not invoice error</td>
+                        <td>Clerk routes to buyer for PO correction (ME22N)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rc-badge qty">Qty — GR Pending</span></td>
+                        <td>EKET delivery date passed, no 101 in MATDOC</td>
+                        <td>GR expected date + vendor delivery history + lag estimate</td>
+                        <td>Clerk parks and waits, or contacts receiving</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rc-badge qty">Qty — Partial GR</span></td>
+                        <td>EKBE shows partial GR, remaining qty outstanding</td>
+                        <td>Received vs expected breakdown with timeline</td>
+                        <td>Clerk posts partial or waits for remaining GR</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rc-badge master">Master Data</span></td>
+                        <td>LFA1/LFB1 change detected — bank, terms, or address</td>
+                        <td>Specific field change flagged with date and old/new values</td>
+                        <td>Clerk routes to master data team for validation</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rc-badge dup">Duplicate</span></td>
+                        <td>Multi-dimensional match against RBKP/RSEG</td>
+                        <td>Matching invoice shown side-by-side with similarity %</td>
+                        <td>Clerk confirms duplicate → reject, or confirms unique → post</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rc-badge policy">Policy Violation</span></td>
+                        <td>SOX/delegation/segregation rule triggered</td>
+                        <td>Specific policy cited with violation detail</td>
+                        <td>Clerk escalates to compliance — cannot override</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- KPIs -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">📊</div>
+                <div class="section-title">Exception Resolution KPIs</div>
+            </div>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-name">Avg Resolution Time</div>
+                    <div class="kpi-val">< 15 min</div>
+                    <div class="kpi-desc">From exception open to decision. Pre-Mantrix: 2-4 hours of investigation.</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-name">Root Cause Accuracy</div>
+                    <div class="kpi-val">> 95%</div>
+                    <div class="kpi-desc">% of time AI correctly identifies the actual root cause, not just the symptom.</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-name">Recommendation Acceptance</div>
+                    <div class="kpi-val">> 85%</div>
+                    <div class="kpi-desc">% of time clerk follows AI recommendation. Overrides train the model.</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-name">Exception Aging</div>
+                    <div class="kpi-val">< 2 days</div>
+                    <div class="kpi-desc">Avg time exception stays open. Pre-Mantrix: 5-8 days.</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-name">Repeat Exception Rate</div>
+                    <div class="kpi-val">< 10%</div>
+                    <div class="kpi-desc">% of exceptions from the same root cause. AI surfaces structural issues.</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-name">Human Touch Reduction</div>
+                    <div class="kpi-val">60%</div>
+                    <div class="kpi-desc">Reduction in time spent per exception vs manual investigation.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Differentiator -->
+        <div class="diff-card">
+            <div class="diff-title">⚡ What Makes This Different</div>
+            <div class="diff-grid">
+                <div>
+                    <div class="diff-col-title them">SAP Native / Fiori</div>
+                    <div class="diff-item">Error code: "M8 147 — Amount variance exceeded"</div>
+                    <div class="diff-item">Clerk opens ME23N, MB03, MRBR to investigate</div>
+                    <div class="diff-item">No historical context — each exception starts from zero</div>
+                    <div class="diff-item">Resolution = email chain with buyer</div>
+                    <div class="diff-item">Same exception type recurs — nobody tracks patterns</div>
+                </div>
+                <div>
+                    <div class="diff-col-title us">Mantrix Tile 3</div>
+                    <div class="diff-item">✓ "Price Variance — Contract escalation 2.04%, within 3% clause"</div>
+                    <div class="diff-item">✓ All SAP fields pre-checked — evidence on one screen</div>
+                    <div class="diff-item">✓ "Seen 18× before — all approved, zero reversals"</div>
+                    <div class="diff-item">✓ One-click route to buyer with pre-filled context</div>
+                    <div class="diff-item">✓ AI flags patterns → structural issues surface to management</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
