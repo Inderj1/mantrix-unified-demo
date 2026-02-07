@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Box,
   Paper,
@@ -472,7 +472,11 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
   const colors = getColors(darkMode);
   const [selectedRow, setSelectedRow] = useState(null);
   const [viewMode, setViewMode] = useState('grid');
-  useEffect(() => { if (selectedRow) window.scrollTo(0, 0); }, [selectedRow]);
+  const scrollPosRef = useRef(0);
+  useEffect(() => {
+    if (selectedRow) { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    else { window.scrollTo({ top: scrollPosRef.current, behavior: 'smooth' }); }
+  }, [selectedRow]);
 
   // Compute summary metrics
   const summaryMetrics = useMemo(() => {
@@ -488,6 +492,7 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
   }, []);
 
   const handleRowClick = (params) => {
+    scrollPosRef.current = window.scrollY;
     setSelectedRow(params.row);
   };
 
@@ -502,7 +507,7 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
     {
       field: 'vendor',
       headerName: 'Vendor',
-      flex: 1,
+      width: 180,
       minWidth: 160,
       renderCell: (params) => (
         <Typography sx={{ fontWeight: 700, fontSize: '0.8rem', color: colors.text }}>
@@ -1362,26 +1367,26 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
             </Typography>
           </Box>
           <Box sx={{ height: 520 }}>
-            <DataGrid
-              rows={VENDOR_DATA}
-              columns={columns}
-              density="compact"
-              disableRowSelectionOnClick
-              onRowClick={handleRowClick}
-              slots={{ toolbar: GridToolbar }}
-              slotProps={{
-                toolbar: {
-                  showQuickFilter: true,
-                  quickFilterProps: { debounceMs: 300 },
-                },
-              }}
-              initialState={{
-                pagination: { paginationModel: { pageSize: 12 } },
-                sorting: { sortModel: [{ field: 'otdPct', sort: 'asc' }] },
-              }}
-              pageSizeOptions={[12, 25]}
-              sx={dataGridSx}
-            />
+              <DataGrid
+                rows={VENDOR_DATA}
+                columns={columns}
+                density="compact"
+                disableRowSelectionOnClick
+                onRowClick={handleRowClick}
+                slots={{ toolbar: GridToolbar }}
+                slotProps={{
+                  toolbar: {
+                    showQuickFilter: true,
+                    quickFilterProps: { debounceMs: 300 },
+                  },
+                }}
+                initialState={{
+                  pagination: { paginationModel: { pageSize: 12 } },
+                  sorting: { sortModel: [{ field: 'otdPct', sort: 'asc' }] },
+                }}
+                pageSizeOptions={[12, 25]}
+                sx={dataGridSx}
+              />
           </Box>
         </Paper>
       )}
@@ -1419,7 +1424,7 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
           <Breadcrumbs separator={<NavigateNextIcon sx={{ fontSize: 14, color: colors.textSecondary }} />}>
             <Link underline="hover" sx={{ fontSize: '0.75rem', color: colors.textSecondary, cursor: 'pointer', fontWeight: 600 }} onClick={onBack}>Lam Research</Link>
             {selectedRow ? [
-              <Link key="tile" underline="hover" sx={{ fontSize: '0.75rem', color: colors.textSecondary, cursor: 'pointer', fontWeight: 600 }} onClick={() => setSelectedRow(null)}>Supply Risk & Vendor Perf.</Link>,
+              <Link key="tile" underline="hover" sx={{ fontSize: '0.75rem', color: colors.textSecondary, cursor: 'pointer', fontWeight: 600 }} onClick={handleCloseDetail}>Supply Risk & Vendor Perf.</Link>,
               <Typography key="detail" sx={{ fontSize: '0.75rem', color: MODULE_COLOR, fontWeight: 700 }}>{selectedRow.vendor}</Typography>,
             ] : (
               <Typography sx={{ fontSize: '0.75rem', color: MODULE_COLOR, fontWeight: 700 }}>Supply Risk & Vendor Perf.</Typography>

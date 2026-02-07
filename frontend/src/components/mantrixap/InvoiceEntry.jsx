@@ -31,8 +31,10 @@ import {
   matchDetails,
   poScheduleCheck,
   workflowSteps,
+  invoiceLineItems,
 } from './apMockData';
 import { apTheme, MODULE_NAVY, NAVY_DARK, NAVY_BLUE } from './apTheme';
+import LineItemMatchEngine from './LineItemMatchEngine';
 
 const TILE_COLOR = MODULE_NAVY;
 
@@ -62,8 +64,43 @@ const SourceIndicator = ({ source }) => {
   );
 };
 
-const InvoiceEntry = ({ onBack, darkMode = false, onNavigate }) => {
-  const [selectedInvoice, setSelectedInvoice] = useState(null);
+// Normalize a row from any tile into InvoiceEntry's expected shape
+const normalizeInvoice = (row) => {
+  if (!row) return null;
+  // If already has invoiceNum, it's native — return as-is
+  if (row.invoiceNum) return row;
+  // Extract invoice # and PO from `detail` field (e.g. "INV-LM-8834 · PO 4500087654 · ...")
+  const parts = (row.detail || '').split(' · ');
+  const invNum = parts[0] || 'Unknown';
+  const poMatch = (row.detail || '').match(/PO (\d+)/);
+  const poRef = poMatch ? poMatch[1] : (row.detail || '').includes('Non-PO') ? '—' : '—';
+  // Try to find exact match in invoiceList by invoice number
+  const found = invoiceList.find((inv) => inv.invoiceNum === invNum);
+  if (found) return found;
+  // Try fuzzy match by vendor name
+  const vendorMatch = invoiceList.find((inv) => inv.vendor === row.vendor || row.vendor?.includes(inv.vendor) || inv.vendor?.includes(row.vendor));
+  if (vendorMatch) return vendorMatch;
+  // Build from available fields
+  const scoreVal = row.score ?? row.confidence ?? row.aiScore ?? null;
+  const scoreLvl = row.scoreLevel || (scoreVal > 90 ? 'high' : scoreVal > 60 ? 'mid' : scoreVal ? 'low' : 'parked');
+  return {
+    id: row.id || 0,
+    invoiceNum: invNum,
+    vendor: row.vendor || 'Unknown',
+    date: '02/04/2026',
+    amount: row.amount || '$0.00',
+    poRef,
+    type: (row.type || '').split('\n')[0] || (poRef === '—' ? 'Non-PO' : 'PO-Backed'),
+    matchType: row.matchType || (row.type || '').split('\n')[1] || '—',
+    aiScore: scoreVal,
+    scoreLevel: scoreLvl,
+    status: row.status === 'ready' ? 'matched' : row.status || 'review',
+    aiHint: row.aiHint || row.reason || row.aiUpdate || '—',
+  };
+};
+
+const InvoiceEntry = ({ onBack, darkMode = false, onNavigate, initialInvoice = null, onClearInitialInvoice }) => {
+  const [selectedInvoice, setSelectedInvoice] = useState(() => normalizeInvoice(initialInvoice));
   const [pdfFullscreen, setPdfFullscreen] = useState(false);
   const [activeDocTab, setActiveDocTab] = useState('invoice');
 
@@ -178,6 +215,11 @@ const InvoiceEntry = ({ onBack, darkMode = false, onNavigate }) => {
     setPdfFullscreen(false);
   };
 
+  const handleBackToList = () => {
+    setSelectedInvoice(null);
+    if (onClearInitialInvoice) onClearInitialInvoice();
+  };
+
   // Build dynamic extracted fields for the selected invoice
   const getExtractedFieldRows = (inv) => {
     if (!inv) return [];
@@ -217,9 +259,9 @@ const InvoiceEntry = ({ onBack, darkMode = false, onNavigate }) => {
             CORE.AI
           </Link>
           <Link underline="hover" color="inherit" onClick={onBack} sx={{ cursor: 'pointer', fontSize: '0.85rem', color: textSecondary }}>
-            MANTRIX AP
+            AP.AI
           </Link>
-          <Link underline="hover" color="inherit" onClick={() => setSelectedInvoice(null)} sx={{ cursor: 'pointer', fontSize: '0.85rem', color: textSecondary }}>
+          <Link underline="hover" color="inherit" onClick={handleBackToList} sx={{ cursor: 'pointer', fontSize: '0.85rem', color: textSecondary }}>
             Invoice Entry
           </Link>
           <Typography color={textColor} sx={{ fontSize: '0.85rem', fontWeight: 600 }}>
@@ -244,7 +286,7 @@ const InvoiceEntry = ({ onBack, darkMode = false, onNavigate }) => {
                 {selectedInvoice.amount} · {selectedInvoice.matchType}
               </Typography>
             </Box>
-            <Button size="small" startIcon={<ArrowBackIcon />} onClick={() => setSelectedInvoice(null)} sx={{ color: textSecondary }}>
+            <Button size="small" startIcon={<ArrowBackIcon />} onClick={handleBackToList} sx={{ color: textSecondary }}>
               Back to List
             </Button>
           </Stack>
@@ -588,6 +630,38 @@ const InvoiceEntry = ({ onBack, darkMode = false, onNavigate }) => {
           <Grid item xs={12} md={5} sx={{ display: 'flex' }}>
             <Card sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'auto', borderRadius: 3, border: `1px solid ${borderColor}`, bgcolor: cardBg }}>
               <CardContent sx={{ p: 2.5 }}>
+                {/* Line-Item Match Summary (if line items exist) */}
+                {invoiceLineItems[selectedInvoice.id] && (() => {
+                  const lines = invoiceLineItems[selectedInvoice.id];
+                  const matchedCount = lines.filter((l) => l.matchStatus === 'matched').length;
+                  const exceptionCount = lines.filter((l) => ['exception', 'partial', 'unplanned'].includes(l.matchStatus)).length;
+                  return (
+                    <Paper sx={{ p: 1.5, borderRadius: 2, bgcolor: darkMode ? '#0d1117' : alpha('#f0f4f8', 0.6), border: `1px solid ${borderColor}`, mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: textSecondary }}>
+                        Line-Item Match
+                      </Typography>
+                      <Stack direction="row" spacing={0.5}>
+                        <Chip
+                          label={`${matchedCount}/${lines.length} matched`}
+                          size="small"
+                          sx={{
+                            bgcolor: matchedCount === lines.length ? alpha('#10b981', 0.12) : alpha('#f59e0b', 0.12),
+                            color: matchedCount === lines.length ? '#059669' : '#d97706',
+                            fontWeight: 700, fontSize: '0.6rem', height: 20,
+                          }}
+                        />
+                        {exceptionCount > 0 && (
+                          <Chip
+                            label={`${exceptionCount} exception${exceptionCount > 1 ? 's' : ''}`}
+                            size="small"
+                            sx={{ bgcolor: alpha('#ef4444', 0.12), color: '#dc2626', fontWeight: 600, fontSize: '0.6rem', height: 20 }}
+                          />
+                        )}
+                      </Stack>
+                    </Paper>
+                  );
+                })()}
+
                 {/* Confidence Ring */}
                 <Paper sx={{ p: 2.5, borderRadius: 2, bgcolor: darkMode ? '#0d1117' : '#f8fafc', border: `1px solid ${borderColor}`, mb: 2, textAlign: 'center' }}>
                   <Box sx={{ position: 'relative', display: 'inline-flex', mb: 1 }}>
@@ -655,6 +729,70 @@ const InvoiceEntry = ({ onBack, darkMode = false, onNavigate }) => {
                   </CardContent>
                 </Card>
 
+                {/* PO Candidate Ranking (PO-backed invoices) */}
+                {selectedInvoice.poRef && selectedInvoice.poRef !== '—' && (
+                  <Paper sx={{ p: 2, borderRadius: 2, bgcolor: darkMode ? '#0d1117' : '#f8fafc', border: `1px solid ${borderColor}`, mb: 2 }}>
+                    <Typography variant="caption" sx={{ color: TILE_COLOR, textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 700, fontSize: '0.65rem', mb: 1.5, display: 'block' }}>
+                      PO Candidate Ranking
+                    </Typography>
+                    {[
+                      { po: selectedInvoice.poRef, confidence: 97, match: 'Exact vendor + amount + date', rank: 1 },
+                      { po: `${selectedInvoice.poRef.slice(0, -1)}8`, confidence: 34, match: 'Same vendor, different material', rank: 2 },
+                      { po: `${selectedInvoice.poRef.slice(0, -2)}01`, confidence: 12, match: 'Similar amount, different vendor', rank: 3 },
+                    ].map((candidate, ci) => (
+                      <Box key={ci} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 0.8, borderBottom: ci < 2 ? `1px solid ${alpha(borderColor, 0.5)}` : 'none' }}>
+                        <Box>
+                          <Stack direction="row" spacing={0.5} alignItems="center">
+                            <Chip label={`#${candidate.rank}`} size="small" sx={{ bgcolor: ci === 0 ? alpha('#10b981', 0.12) : alpha('#64748b', 0.08), color: ci === 0 ? '#059669' : textSecondary, fontWeight: 700, fontSize: '0.6rem', height: 18, width: 28 }} />
+                            <Typography variant="caption" sx={{ color: textColor, fontWeight: 600, fontSize: '0.72rem' }}>
+                              PO {candidate.po}
+                            </Typography>
+                          </Stack>
+                          <Typography variant="caption" sx={{ color: textSecondary, fontSize: '0.62rem', ml: 4, display: 'block' }}>
+                            {candidate.match}
+                          </Typography>
+                        </Box>
+                        <Chip
+                          label={`${candidate.confidence}%`}
+                          size="small"
+                          sx={{
+                            bgcolor: candidate.confidence > 90 ? alpha('#10b981', 0.12) : candidate.confidence > 50 ? alpha('#fbbf24', 0.12) : alpha('#64748b', 0.08),
+                            color: candidate.confidence > 90 ? '#059669' : candidate.confidence > 50 ? '#d97706' : textSecondary,
+                            fontWeight: 700, fontSize: '0.65rem', height: 22,
+                          }}
+                        />
+                      </Box>
+                    ))}
+                  </Paper>
+                )}
+
+                {/* GL Auto-Coding (Non-PO invoices, or PO invoices with unplanned cost lines) */}
+                {((!selectedInvoice.poRef || selectedInvoice.poRef === '—') || (invoiceLineItems[selectedInvoice.id] && invoiceLineItems[selectedInvoice.id].some((l) => l.matchStatus === 'unplanned'))) && (
+                  <Paper sx={{ p: 2, borderRadius: 2, bgcolor: darkMode ? '#0d1117' : alpha('#8b5cf6', 0.03), border: `1px solid ${borderColor}`, mb: 2 }}>
+                    <Typography variant="caption" sx={{ color: '#7c3aed', textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 700, fontSize: '0.65rem', mb: 1.5, display: 'block' }}>
+                      GL Auto-Coding — AI Suggested
+                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 0.8, borderBottom: `1px solid ${alpha(borderColor, 0.5)}` }}>
+                      <Typography variant="caption" sx={{ color: textSecondary, fontSize: '0.72rem' }}>GL Account</Typography>
+                      <Stack direction="row" spacing={0.5} alignItems="center">
+                        <Chip label="54200" size="small" sx={{ bgcolor: alpha('#7c3aed', 0.1), color: '#7c3aed', fontWeight: 600, fontSize: '0.65rem', height: 20 }} />
+                        <Typography variant="caption" sx={{ color: textColor, fontWeight: 600, fontSize: '0.72rem' }}>Office Supplies</Typography>
+                      </Stack>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 0.8, borderBottom: `1px solid ${alpha(borderColor, 0.5)}` }}>
+                      <Typography variant="caption" sx={{ color: textSecondary, fontSize: '0.72rem' }}>Cost Center</Typography>
+                      <Typography variant="caption" sx={{ color: textColor, fontWeight: 600, fontSize: '0.72rem' }}>CC1000 — General Admin</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 0.8 }}>
+                      <Typography variant="caption" sx={{ color: textSecondary, fontSize: '0.72rem' }}>Confidence</Typography>
+                      <Chip label="96.1%" size="small" sx={{ bgcolor: alpha('#10b981', 0.12), color: '#059669', fontWeight: 700, fontSize: '0.65rem', height: 22 }} />
+                    </Box>
+                    <Typography variant="caption" sx={{ color: textSecondary, fontSize: '0.62rem', mt: 1, display: 'block', lineHeight: 1.5 }}>
+                      Based on 14 prior invoices from this vendor with identical description pattern.
+                    </Typography>
+                  </Paper>
+                )}
+
                 {/* Decision Buttons */}
                 <Typography variant="caption" sx={{ color: '#d97706', textTransform: 'uppercase', letterSpacing: 1, fontWeight: 600, fontSize: '0.6rem', mb: 1, display: 'block' }}>
                   Your Decision
@@ -690,6 +828,11 @@ const InvoiceEntry = ({ onBack, darkMode = false, onNavigate }) => {
             </Card>
           </Grid>
         </Grid>
+
+        {/* Line-Item Match Engine — full width below two-panel layout */}
+        {invoiceLineItems[selectedInvoice.id] && (
+          <LineItemMatchEngine invoiceId={selectedInvoice.id} darkMode={darkMode} />
+        )}
       </Box>
     );
   }
@@ -703,7 +846,7 @@ const InvoiceEntry = ({ onBack, darkMode = false, onNavigate }) => {
           CORE.AI
         </Link>
         <Link underline="hover" color="inherit" onClick={onBack} sx={{ cursor: 'pointer', fontSize: '0.85rem', color: textSecondary }}>
-          MANTRIX AP
+          AP.AI
         </Link>
         <Typography color={textColor} sx={{ fontSize: '0.85rem', fontWeight: 600 }}>
           Invoice Entry

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Box,
   Paper,
@@ -102,7 +102,13 @@ const DETAIL_DATA = {
 // ============================================
 const LamSafetyStockEconomics = ({ onBack, darkMode = false }) => {
   const [selectedRow, setSelectedRow] = useState(null);
-  useEffect(() => { if (selectedRow) window.scrollTo(0, 0); }, [selectedRow]);
+  const scrollPosRef = useRef(0);
+  const handleDrillDown = (id) => { scrollPosRef.current = window.scrollY; setSelectedRow(id); };
+  const handleDrillBack = () => { setSelectedRow(null); };
+  useEffect(() => {
+    if (selectedRow) { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    else { window.scrollTo({ top: scrollPosRef.current, behavior: 'smooth' }); }
+  }, [selectedRow]);
   const colors = getColors(darkMode);
 
   // ---- KPI summaries ----
@@ -138,7 +144,7 @@ const LamSafetyStockEconomics = ({ onBack, darkMode = false }) => {
     {
       field: 'material',
       headerName: 'Material',
-      flex: 1.2,
+      width: 180,
       renderCell: (p) => <Typography sx={{ fontWeight: 600, fontSize: '0.8rem', color: colors.text }}>{p.value}</Typography>,
     },
     {
@@ -208,7 +214,7 @@ const LamSafetyStockEconomics = ({ onBack, darkMode = false }) => {
     {
       field: 'rationale',
       headerName: 'Rationale',
-      flex: 1,
+      width: 180,
       minWidth: 140,
       renderCell: (p) => <Typography sx={{ fontSize: '0.75rem', color: colors.textSecondary, fontStyle: 'italic' }}>{p.row.rationale}</Typography>,
     },
@@ -476,32 +482,32 @@ const LamSafetyStockEconomics = ({ onBack, darkMode = false }) => {
 
       {/* DataGrid */}
       <Paper elevation={0} sx={{ bgcolor: colors.paper, border: `1px solid ${colors.border}`, borderRadius: 2, mb: 2 }}>
-        <Box sx={{ height: 520, width: '100%' }}>
-          <DataGrid
-            rows={MOCK_DATA}
-            columns={columns}
-            density="compact"
-            disableRowSelectionOnClick
-            onRowClick={(params) => setSelectedRow(params.id)}
-            slots={{ toolbar: GridToolbar }}
-            slotProps={{
-              toolbar: { showQuickFilter: true, quickFilterProps: { debounceMs: 300 } },
-            }}
-            initialState={{
-              pagination: { paginationModel: { pageSize: 15 } },
-              sorting: { sortModel: [{ field: 'deltaCapital', sort: 'asc' }] },
-            }}
-            pageSizeOptions={[10, 15, 25]}
-            sx={{
-              border: 'none',
-              ...stoxTheme.getDataGridSx({ clickable: true }),
-              '& .MuiDataGrid-row': {
-                cursor: 'pointer',
-                '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.06) },
-              },
-              ...darkGridSx,
-            }}
-          />
+        <Box sx={{ height: 520 }}>
+            <DataGrid
+              rows={MOCK_DATA}
+              columns={columns}
+              density="compact"
+              disableRowSelectionOnClick
+              onRowClick={(params) => handleDrillDown(params.id)}
+              slots={{ toolbar: GridToolbar }}
+              slotProps={{
+                toolbar: { showQuickFilter: true, quickFilterProps: { debounceMs: 300 } },
+              }}
+              initialState={{
+                pagination: { paginationModel: { pageSize: 15 } },
+                sorting: { sortModel: [{ field: 'deltaCapital', sort: 'asc' }] },
+              }}
+              pageSizeOptions={[10, 15, 25]}
+              sx={{
+                border: 'none',
+                ...stoxTheme.getDataGridSx({ clickable: true }),
+                '& .MuiDataGrid-row': {
+                  cursor: 'pointer',
+                  '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.06) },
+                },
+                ...darkGridSx,
+              }}
+            />
         </Box>
       </Paper>
     </>
@@ -528,14 +534,14 @@ const LamSafetyStockEconomics = ({ onBack, darkMode = false }) => {
           gap: 2,
         }}
       >
-        <IconButton onClick={selectedRow ? () => setSelectedRow(null) : onBack} size="small" sx={{ bgcolor: alpha(MODULE_COLOR, 0.08), '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.15) } }}>
+        <IconButton onClick={selectedRow ? handleDrillBack : onBack} size="small" sx={{ bgcolor: alpha(MODULE_COLOR, 0.08), '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.15) } }}>
           <ArrowBackIcon sx={{ fontSize: 20, color: MODULE_COLOR }} />
         </IconButton>
         <Box sx={{ flex: 1 }}>
           <Breadcrumbs separator={<NavigateNextIcon sx={{ fontSize: 14, color: colors.textSecondary }} />} sx={{ mb: 0.5 }}>
             <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>Lam Research</Link>
             {selectedData ? [
-              <Link key="tile" underline="hover" onClick={() => setSelectedRow(null)} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>Safety Stock Economics</Link>,
+              <Link key="tile" underline="hover" onClick={handleDrillBack} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>Safety Stock Economics</Link>,
               <Typography key="detail" sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 700 }}>{selectedData.material}</Typography>,
             ] : (
               <Typography sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 700 }}>Safety Stock Economics</Typography>

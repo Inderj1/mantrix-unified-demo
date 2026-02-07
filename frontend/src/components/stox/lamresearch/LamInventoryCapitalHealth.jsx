@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Box,
   Paper,
@@ -163,7 +163,13 @@ const BELOW_SS = classSummary('Below SS');
 export default function LamInventoryCapitalHealth({ onBack, darkMode = false }) {
   const colors = getColors(darkMode);
   const [selectedRow, setSelectedRow] = useState(null);
-  useEffect(() => { if (selectedRow) window.scrollTo(0, 0); }, [selectedRow]);
+  const scrollPosRef = useRef(0);
+  const handleDrillDown = (row) => { scrollPosRef.current = window.scrollY; setSelectedRow(row); };
+  const handleDrillBack = () => { setSelectedRow(null); };
+  useEffect(() => {
+    if (selectedRow) { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    else { window.scrollTo({ top: scrollPosRef.current, behavior: 'smooth' }); }
+  }, [selectedRow]);
 
   // ----- Dark mode colors -----
   const bgColor = darkMode ? '#0d1117' : colors.background;
@@ -281,7 +287,7 @@ export default function LamInventoryCapitalHealth({ onBack, darkMode = false }) 
     {
       field: 'material',
       headerName: 'Material',
-      flex: 1.2,
+      width: 180,
       renderCell: (params) => (
         <Typography sx={{ fontWeight: 700, fontSize: '0.8rem', color: textColor }}>{params.value}</Typography>
       ),
@@ -620,31 +626,31 @@ export default function LamInventoryCapitalHealth({ onBack, darkMode = false }) 
           </Typography>
         </Box>
         <Box sx={{ height: 520 }}>
-          <DataGrid
-            rows={MOCK_DATA}
-            columns={columns}
-            density="compact"
-            disableRowSelectionOnClick
-            onRowClick={(params) => setSelectedRow(params.row)}
-            initialState={{
-              pagination: { paginationModel: { pageSize: 15 } },
-              sorting: { sortModel: [{ field: 'capitalValue', sort: 'desc' }] },
-            }}
-            pageSizeOptions={[10, 15, 25]}
-            slots={{ toolbar: GridToolbar }}
-            slotProps={{
-              toolbar: {
-                showQuickFilter: true,
-                quickFilterProps: { debounceMs: 300 },
-                sx: {
-                  p: 1,
-                  '& .MuiButton-root': { color: textSecondary, fontSize: '0.75rem' },
-                  '& .MuiInputBase-root': { color: textColor, fontSize: '0.8rem' },
+            <DataGrid
+              rows={MOCK_DATA}
+              columns={columns}
+              density="compact"
+              disableRowSelectionOnClick
+              onRowClick={(params) => handleDrillDown(params.row)}
+              initialState={{
+                pagination: { paginationModel: { pageSize: 15 } },
+                sorting: { sortModel: [{ field: 'capitalValue', sort: 'desc' }] },
+              }}
+              pageSizeOptions={[10, 15, 25]}
+              slots={{ toolbar: GridToolbar }}
+              slotProps={{
+                toolbar: {
+                  showQuickFilter: true,
+                  quickFilterProps: { debounceMs: 300 },
+                  sx: {
+                    p: 1,
+                    '& .MuiButton-root': { color: textSecondary, fontSize: '0.75rem' },
+                    '& .MuiInputBase-root': { color: textColor, fontSize: '0.8rem' },
+                  },
                 },
-              },
-            }}
-            sx={dataGridSx}
-          />
+              }}
+              sx={dataGridSx}
+            />
         </Box>
       </Paper>
     </>
@@ -763,7 +769,7 @@ export default function LamInventoryCapitalHealth({ onBack, darkMode = false }) 
         <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
           <Button
             startIcon={<ArrowBackIcon />}
-            onClick={selectedRow ? () => setSelectedRow(null) : onBack}
+            onClick={selectedRow ? handleDrillBack : onBack}
             size="small"
             sx={{
               textTransform: 'none',
@@ -778,7 +784,7 @@ export default function LamInventoryCapitalHealth({ onBack, darkMode = false }) 
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ '& .MuiBreadcrumb-separator': { color: textSecondary } }}>
             <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.75rem', color: textSecondary, cursor: 'pointer' }}>Lam Research</Link>
             {selectedRow ? [
-              <Link key="tile" underline="hover" onClick={() => setSelectedRow(null)} sx={{ fontSize: '0.75rem', color: textSecondary, cursor: 'pointer' }}>Inventory Capital Health</Link>,
+              <Link key="tile" underline="hover" onClick={handleDrillBack} sx={{ fontSize: '0.75rem', color: textSecondary, cursor: 'pointer' }}>Inventory Capital Health</Link>,
               <Typography key="detail" sx={{ fontSize: '0.75rem', color: colors.primary, fontWeight: 600 }}>{selectedRow.material}</Typography>,
             ] : (
               <Typography sx={{ fontSize: '0.75rem', color: colors.primary, fontWeight: 600 }}>Inventory Capital Health</Typography>

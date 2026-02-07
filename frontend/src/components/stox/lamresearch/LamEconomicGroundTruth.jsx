@@ -243,7 +243,7 @@ const LamEconomicGroundTruth = ({ onBack, darkMode = false }) => {
     {
       field: 'material',
       headerName: 'Material',
-      flex: 1.2,
+      width: 180,
       renderCell: (params) => (
         <Typography
           sx={{
@@ -670,12 +670,13 @@ const LamEconomicGroundTruth = ({ onBack, darkMode = false }) => {
       </Alert>
 
       {/* KPI Cards */}
-      <Grid container spacing={1.5} sx={{ mb: 2 }}>
+      <Box sx={{ display: 'flex', gap: 1.5, mb: 2, overflowX: 'auto', pb: 0.5 }}>
         {kpiCards.map((kpi, idx) => (
-          <Grid item xs={12} sm={6} md={2} key={idx}>
-            <Card
+          <Card key={idx}
               elevation={0}
               sx={{
+                flex: '1 0 0',
+                minWidth: 150,
                 borderRadius: 2,
                 bgcolor: darkMode ? '#21262d' : '#ffffff',
                 border: `1px solid ${colors.border}`,
@@ -722,9 +723,8 @@ const LamEconomicGroundTruth = ({ onBack, darkMode = false }) => {
                 </Typography>
               </CardContent>
             </Card>
-          </Grid>
         ))}
-      </Grid>
+      </Box>
 
       {/* DataGrid + Detail Panel */}
       <Grid container spacing={2}>
@@ -747,36 +747,36 @@ const LamEconomicGroundTruth = ({ onBack, darkMode = false }) => {
               </Typography>
             </Box>
             <Box sx={{ height: 520 }}>
-              <DataGrid
-                rows={MOCK_DATA}
-                columns={columns}
-                density="compact"
-                disableRowSelectionOnClick
-                onRowClick={(params) => setSelectedRow(params.id)}
-                slots={{ toolbar: GridToolbar }}
-                slotProps={{
-                  toolbar: {
-                    showQuickFilter: true,
-                    quickFilterProps: { debounceMs: 300 },
-                  },
-                }}
-                initialState={{
-                  pagination: { paginationModel: { pageSize: 15 } },
-                }}
-                pageSizeOptions={[10, 15, 25]}
-                sx={{
-                  ...dataGridSx,
-                  '& .MuiDataGrid-row': {
-                    ...dataGridSx['& .MuiDataGrid-row'],
-                    '&.Mui-selected': {
-                      bgcolor: darkMode ? alpha('#4d9eff', 0.12) : alpha(MODULE_COLOR, 0.08),
-                      '&:hover': {
-                        bgcolor: darkMode ? alpha('#4d9eff', 0.16) : alpha(MODULE_COLOR, 0.12),
+                <DataGrid
+                  rows={MOCK_DATA}
+                  columns={columns}
+                  density="compact"
+                  disableRowSelectionOnClick
+                  onRowClick={(params) => setSelectedRow(params.id)}
+                  slots={{ toolbar: GridToolbar }}
+                  slotProps={{
+                    toolbar: {
+                      showQuickFilter: true,
+                      quickFilterProps: { debounceMs: 300 },
+                    },
+                  }}
+                  initialState={{
+                    pagination: { paginationModel: { pageSize: 15 } },
+                  }}
+                  pageSizeOptions={[10, 15, 25]}
+                  sx={{
+                    ...dataGridSx,
+                    '& .MuiDataGrid-row': {
+                      ...dataGridSx['& .MuiDataGrid-row'],
+                      '&.Mui-selected': {
+                        bgcolor: darkMode ? alpha('#4d9eff', 0.12) : alpha(MODULE_COLOR, 0.08),
+                        '&:hover': {
+                          bgcolor: darkMode ? alpha('#4d9eff', 0.16) : alpha(MODULE_COLOR, 0.12),
+                        },
                       },
                     },
-                  },
-                }}
-              />
+                  }}
+                />
             </Box>
           </Paper>
         </Grid>

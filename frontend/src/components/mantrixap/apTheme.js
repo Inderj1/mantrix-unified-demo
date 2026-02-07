@@ -193,6 +193,27 @@ export const apTheme = {
       miro: { bgcolor: alpha(NAVY_BLUE, 0.15), color: '#1565c0', fontWeight: 600 },
       fb60: { bgcolor: alpha(NAVY_DARK, 0.15), color: NAVY_DARK, fontWeight: 600 },
     },
+    // Line-item matching engine chips
+    matchStrategy: {
+      'key-based':       { bgcolor: alpha(NAVY_DARK, 0.12), color: NAVY_DARK, fontWeight: 600 },
+      'vendor-material': { bgcolor: alpha('#7c3aed', 0.12), color: '#7c3aed', fontWeight: 600 },
+      'semantic':        { bgcolor: alpha('#0891b2', 0.12), color: '#0891b2', fontWeight: 600 },
+      'qty-price':       { bgcolor: alpha('#d97706', 0.12), color: '#d97706', fontWeight: 600 },
+      'gr-xref':         { bgcolor: alpha('#059669', 0.12), color: '#059669', fontWeight: 600 },
+      'elimination':     { bgcolor: alpha('#64748b', 0.12), color: '#64748b', fontWeight: 600 },
+    },
+    guardrail: {
+      hard:  { bgcolor: alpha('#ef4444', 0.12), color: '#dc2626', fontWeight: 600 },
+      soft:  { bgcolor: alpha('#f59e0b', 0.12), color: '#d97706', fontWeight: 600 },
+      audit: { bgcolor: alpha(NAVY_BLUE, 0.12), color: '#1565c0', fontWeight: 600 },
+    },
+    lineMatch: {
+      matched:   { bgcolor: alpha('#10b981', 0.12), color: '#059669', fontWeight: 600 },
+      partial:   { bgcolor: alpha('#f59e0b', 0.12), color: '#d97706', fontWeight: 600 },
+      exception: { bgcolor: alpha('#ef4444', 0.12), color: '#dc2626', fontWeight: 600 },
+      unmatched: { bgcolor: alpha('#64748b', 0.12), color: '#64748b', fontWeight: 600 },
+      unplanned: { bgcolor: alpha('#7c3aed', 0.12), color: '#7c3aed', fontWeight: 600 },
+    },
   },
 
   // Card styles (matching ordlyTheme)

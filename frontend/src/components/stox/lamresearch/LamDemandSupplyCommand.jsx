@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Box, Paper, Typography, Grid, Card, CardContent, Chip, Breadcrumbs, Link,
   Stack, IconButton, LinearProgress, Button, Tooltip as MuiTooltip,
@@ -168,7 +168,13 @@ const MARGIN_GRADE_COLORS = { High: '#10b981', Med: '#f59e0b', Low: '#ef4444' };
 export default function LamDemandSupplyCommand({ onBack, darkMode = false }) {
   const [selectedRow, setSelectedRow] = useState(null);
   const [horizon, setHorizon] = useState('30d');
-  useEffect(() => { if (selectedRow) window.scrollTo(0, 0); }, [selectedRow]);
+  const scrollPosRef = useRef(0);
+  const handleDrillDown = (row) => { scrollPosRef.current = window.scrollY; setSelectedRow(row); };
+  const handleDrillBack = () => { setSelectedRow(null); };
+  useEffect(() => {
+    if (selectedRow) { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    else { window.scrollTo({ top: scrollPosRef.current, behavior: 'smooth' }); }
+  }, [selectedRow]);
   const colors = getColors(darkMode);
 
   const bg = darkMode ? '#0d1117' : colors.background;
@@ -283,7 +289,7 @@ export default function LamDemandSupplyCommand({ onBack, darkMode = false }) {
     {
       field: 'material',
       headerName: 'Material',
-      flex: 1.2,
+      width: 180,
       renderCell: (p) => (
         <Typography sx={{ fontWeight: 700, fontSize: '0.8rem', color: textPrimary }}>{p.value}</Typography>
       ),
@@ -551,18 +557,18 @@ export default function LamDemandSupplyCommand({ onBack, darkMode = false }) {
           Material Demand-Supply Breakdown
         </Typography>
         <Box sx={{ height: 520 }}>
-          <DataGrid
-            rows={materialRows}
-            columns={columns}
-            density="compact"
-            pageSize={18}
-            rowsPerPageOptions={[10, 18, 50]}
-            disableSelectionOnClick
-            onRowClick={(params) => setSelectedRow(params.row)}
-            slots={{ toolbar: GridToolbar }}
-            slotProps={{ toolbar: { showQuickFilter: true, quickFilterProps: { debounceMs: 200 } } }}
-            sx={dataGridSx}
-          />
+            <DataGrid
+              rows={materialRows}
+              columns={columns}
+              density="compact"
+              pageSize={18}
+              rowsPerPageOptions={[10, 18, 50]}
+              disableSelectionOnClick
+              onRowClick={(params) => handleDrillDown(params.row)}
+              slots={{ toolbar: GridToolbar }}
+              slotProps={{ toolbar: { showQuickFilter: true, quickFilterProps: { debounceMs: 200 } } }}
+              sx={dataGridSx}
+            />
         </Box>
       </Paper>
     </>
@@ -735,14 +741,14 @@ export default function LamDemandSupplyCommand({ onBack, darkMode = false }) {
       {/* Shared header */}
       <Paper sx={{ p: 1.5, mb: 2, bgcolor: paperBg, border: `1px solid ${borderColor}`, borderRadius: 2 }}>
         <Stack direction="row" alignItems="center" spacing={1}>
-          <IconButton onClick={selectedRow ? () => setSelectedRow(null) : onBack} size="small" sx={{ color: MODULE_COLOR }}>
+          <IconButton onClick={selectedRow ? handleDrillBack : onBack} size="small" sx={{ color: MODULE_COLOR }}>
             <ArrowBackIcon fontSize="small" />
           </IconButton>
           <Box sx={{ flex: 1 }}>
             <Breadcrumbs separator={<NavigateNextIcon sx={{ fontSize: 14, color: textSecondary }} />} sx={{ mb: 0.5 }}>
               <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: textSecondary, cursor: 'pointer' }}>Lam Research</Link>
               {selectedRow ? [
-                <Link key="tile" underline="hover" onClick={() => setSelectedRow(null)} sx={{ fontSize: '0.7rem', color: textSecondary, cursor: 'pointer' }}>Demand vs Supply Command</Link>,
+                <Link key="tile" underline="hover" onClick={handleDrillBack} sx={{ fontSize: '0.7rem', color: textSecondary, cursor: 'pointer' }}>Demand vs Supply Command</Link>,
                 <Typography key="detail" sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 600 }}>{selectedRow.material}</Typography>,
               ] : (
                 <Typography sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 600 }}>Demand vs Supply Command</Typography>

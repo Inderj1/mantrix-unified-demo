@@ -380,3 +380,115 @@ export const personalKPIs = [
   { label: 'AI Match Acceptance Rate', value: '89%', sub: 'I accepted 89% of AI matches — model learning from my 11% overrides', color: '#1976d2' },
   { label: 'Parked Items Avg Age', value: '2.4 days', sub: '7 currently parked · oldest: 8 days (vendor blocked)', color: '#00357a' },
 ];
+
+// ============ LINE-ITEM MATCHING ENGINE ============
+
+export const matchStrategies = [
+  { id: 'key-based', name: 'Key-Based', weight: 30, description: 'PO line #, material #, item category — exact field match', icon: 'Key' },
+  { id: 'vendor-material', name: 'Vendor-Material Dict', weight: 25, description: 'Learned vendor→material mapping from historical invoices', icon: 'MenuBook' },
+  { id: 'semantic', name: 'Semantic', weight: 15, description: 'NLP comparison of invoice description vs PO description', icon: 'Psychology' },
+  { id: 'qty-price', name: 'Qty/Price Heuristic', weight: 15, description: 'Quantity × unit-price cross-match with tolerance bands', icon: 'Calculate' },
+  { id: 'gr-xref', name: 'GR Cross-Ref', weight: 10, description: 'Goods receipt line → PO line back-reference via MATDOC', icon: 'Inventory' },
+  { id: 'elimination', name: 'Elimination', weight: 5, description: 'Remaining unmatched lines paired by exclusion', icon: 'FilterAlt' },
+];
+
+export const guardrailDefs = [
+  // Hard stops — block posting
+  { id: 'gs-price', name: 'Price Ceiling', type: 'hard', rule: 'Line unit price > PO price + tolerance → block', icon: 'Block' },
+  { id: 'gs-qty', name: 'Over-Delivery', type: 'hard', rule: 'Invoice qty > GR qty (no tolerance override) → block', icon: 'Block' },
+  { id: 'gs-dup', name: 'Duplicate Line', type: 'hard', rule: 'Same PO line billed twice in open invoices → block', icon: 'Block' },
+  { id: 'gs-po-closed', name: 'PO Line Closed', type: 'hard', rule: 'EKPO delivery-complete flag set → block', icon: 'Block' },
+  // Soft warnings — clerk can override
+  { id: 'gs-price-drift', name: 'Price Drift', type: 'soft', rule: 'Unit price >1% but ≤3% above PO → warn', icon: 'Warning' },
+  { id: 'gs-partial-gr', name: 'Partial GR', type: 'soft', rule: 'GR qty < invoice qty but remaining expected → warn', icon: 'Warning' },
+  { id: 'gs-uom', name: 'UOM Mismatch', type: 'soft', rule: 'Invoice UOM ≠ PO UOM (convertible) → warn', icon: 'Warning' },
+  // Audit rules — log only
+  { id: 'gs-first-vendor', name: 'First Invoice', type: 'audit', rule: 'First invoice from this vendor-material combo → log', icon: 'Visibility' },
+  { id: 'gs-amount-outlier', name: 'Amount Outlier', type: 'audit', rule: 'Line amount >2σ from vendor avg → log for review', icon: 'Visibility' },
+];
+
+// Line items for invoices — keyed by invoice id
+export const invoiceLineItems = {
+  // INV-2026-045231 — Thales Defense (id: 1) — clean 3-way match
+  1: [
+    { lineNum: 1, description: 'Radar Module Assembly RM-200', qty: 40, unit: 'EA', unitPrice: 680.00, amount: 27200.00, poLine: 10, matchStatus: 'matched', matchStrategy: 'key-based', confidence: 98.5, grRef: 'GR-5000045678' },
+    { lineNum: 2, description: 'Power Supply Unit PSU-12V', qty: 40, unit: 'EA', unitPrice: 245.00, amount: 9800.00, poLine: 20, matchStatus: 'matched', matchStrategy: 'key-based', confidence: 97.8, grRef: 'GR-5000045678' },
+    { lineNum: 3, description: 'Cable Harness CH-RDR-4M', qty: 80, unit: 'EA', unitPrice: 52.50, amount: 4200.00, poLine: 30, matchStatus: 'matched', matchStrategy: 'vendor-material', confidence: 96.2, grRef: 'GR-5000045678' },
+    { lineNum: 4, description: 'Shipping & Handling', qty: 1, unit: 'LS', unitPrice: 4000.00, amount: 4000.00, poLine: 40, matchStatus: 'matched', matchStrategy: 'elimination', confidence: 94.1, grRef: 'GR-5000045678' },
+  ],
+  // INV-2026-045233 — Lockheed Martin (id: 3) — price variance on line 2
+  3: [
+    { lineNum: 1, description: 'Avionics Control Unit ACU-500', qty: 10, unit: 'EA', unitPrice: 18750.00, amount: 187500.00, poLine: 10, matchStatus: 'matched', matchStrategy: 'key-based', confidence: 97.2, grRef: 'GR-5000044501' },
+    { lineNum: 2, description: 'Flight Computer FC-MK4', qty: 5, unit: 'EA', unitPrice: 22500.00, amount: 112500.00, poLine: 20, matchStatus: 'exception', matchStrategy: 'key-based', confidence: 42.0, grRef: 'GR-5000044501' },
+    { lineNum: 3, description: 'Integration Test Kit ITK-AV', qty: 1, unit: 'LS', unitPrice: 12500.00, amount: 12500.00, poLine: 30, matchStatus: 'matched', matchStrategy: 'semantic', confidence: 91.5, grRef: 'GR-5000044501' },
+  ],
+  // INV-FS-9920 — Fastenal (id: 5) — partial delivery, qty mismatch on line 3
+  5: [
+    { lineNum: 1, description: 'Hex Bolt M10x40 Grade 8.8', qty: 500, unit: 'EA', unitPrice: 2.80, amount: 1400.00, poLine: 10, matchStatus: 'matched', matchStrategy: 'key-based', confidence: 99.1, grRef: 'GR-5000046200' },
+    { lineNum: 2, description: 'Lock Washer M10 SS304', qty: 500, unit: 'EA', unitPrice: 1.20, amount: 600.00, poLine: 20, matchStatus: 'matched', matchStrategy: 'vendor-material', confidence: 96.8, grRef: 'GR-5000046200' },
+    { lineNum: 3, description: 'Flange Nut M10 Zinc', qty: 500, unit: 'EA', unitPrice: 1.90, amount: 950.00, poLine: 30, matchStatus: 'partial', matchStrategy: 'qty-price', confidence: 68.0, grRef: 'GR-5000046200' },
+    { lineNum: 4, description: 'Flat Washer M10 USS', qty: 350, unit: 'EA', unitPrice: 0.85, amount: 297.50, poLine: 40, matchStatus: 'partial', matchStrategy: 'key-based', confidence: 72.4, grRef: null },
+    { lineNum: 5, description: 'Expedited Freight Surcharge', qty: 1, unit: 'LS', unitPrice: 5502.50, amount: 5502.50, poLine: null, matchStatus: 'unplanned', matchStrategy: 'elimination', confidence: 35.0, grRef: null },
+  ],
+};
+
+// PO line items — keyed by PO reference
+export const poLineItems = {
+  '4500098765': [
+    { lineNum: 10, material: '300100', description: 'Radar Module Assembly RM-200', qty: 40, unit: 'EA', unitPrice: 680.00, amount: 27200.00, grQty: 40, grDate: '02/03/2026' },
+    { lineNum: 20, material: '300101', description: 'Power Supply Unit PSU-12V', qty: 40, unit: 'EA', unitPrice: 245.00, amount: 9800.00, grQty: 40, grDate: '02/03/2026' },
+    { lineNum: 30, material: '300102', description: 'Cable Harness CH-RDR-4M', qty: 80, unit: 'EA', unitPrice: 52.50, amount: 4200.00, grQty: 80, grDate: '02/03/2026' },
+    { lineNum: 40, material: '900001', description: 'Shipping & Handling', qty: 1, unit: 'LS', unitPrice: 4000.00, amount: 4000.00, grQty: 1, grDate: '02/03/2026' },
+  ],
+  '4500087654': [
+    { lineNum: 10, material: '400500', description: 'Avionics Control Unit ACU-500', qty: 10, unit: 'EA', unitPrice: 18750.00, amount: 187500.00, grQty: 10, grDate: '02/01/2026' },
+    { lineNum: 20, material: '400501', description: 'Flight Computer FC-MK4', qty: 5, unit: 'EA', unitPrice: 22000.00, amount: 110000.00, grQty: 5, grDate: '02/01/2026' },
+    { lineNum: 30, material: '400502', description: 'Integration Test Kit ITK-AV', qty: 1, unit: 'LS', unitPrice: 12500.00, amount: 12500.00, grQty: 1, grDate: '02/01/2026' },
+  ],
+  '4500099012': [
+    { lineNum: 10, material: '500200', description: 'Hex Bolt M10x40 Gr 8.8', qty: 500, unit: 'EA', unitPrice: 2.80, amount: 1400.00, grQty: 500, grDate: '02/02/2026' },
+    { lineNum: 20, material: '500201', description: 'Lock Washer M10 SS304', qty: 500, unit: 'EA', unitPrice: 1.20, amount: 600.00, grQty: 500, grDate: '02/02/2026' },
+    { lineNum: 30, material: '500202', description: 'Flange Nut M10 Zinc Plated', qty: 750, unit: 'EA', unitPrice: 1.90, amount: 1425.00, grQty: 500, grDate: '02/02/2026' },
+    { lineNum: 40, material: '500203', description: 'Flat Washer M10 USS', qty: 500, unit: 'EA', unitPrice: 0.85, amount: 425.00, grQty: 350, grDate: '02/02/2026' },
+  ],
+};
+
+// Line-level match results — keyed by invoice id
+export const lineMatchResults = {
+  1: [
+    { invoiceLine: 1, poLine: 10, strategy: 'key-based', confidence: 98.5, varianceType: null, variancePct: 0, guardrailFlags: [], resolved: true },
+    { invoiceLine: 2, poLine: 20, strategy: 'key-based', confidence: 97.8, varianceType: null, variancePct: 0, guardrailFlags: [], resolved: true },
+    { invoiceLine: 3, poLine: 30, strategy: 'vendor-material', confidence: 96.2, varianceType: null, variancePct: 0, guardrailFlags: ['gs-first-vendor'], resolved: true },
+    { invoiceLine: 4, poLine: 40, strategy: 'elimination', confidence: 94.1, varianceType: null, variancePct: 0, guardrailFlags: [], resolved: true },
+  ],
+  3: [
+    { invoiceLine: 1, poLine: 10, strategy: 'key-based', confidence: 97.2, varianceType: null, variancePct: 0, guardrailFlags: [], resolved: true },
+    { invoiceLine: 2, poLine: 20, strategy: 'key-based', confidence: 42.0, varianceType: 'price', variancePct: 2.27, guardrailFlags: ['gs-price-drift'], resolved: false },
+    { invoiceLine: 3, poLine: 30, strategy: 'semantic', confidence: 91.5, varianceType: null, variancePct: 0, guardrailFlags: [], resolved: true },
+  ],
+  5: [
+    { invoiceLine: 1, poLine: 10, strategy: 'key-based', confidence: 99.1, varianceType: null, variancePct: 0, guardrailFlags: [], resolved: true },
+    { invoiceLine: 2, poLine: 20, strategy: 'vendor-material', confidence: 96.8, varianceType: null, variancePct: 0, guardrailFlags: [], resolved: true },
+    { invoiceLine: 3, poLine: 30, strategy: 'qty-price', confidence: 68.0, varianceType: 'qty', variancePct: -33.3, guardrailFlags: ['gs-partial-gr'], resolved: false },
+    { invoiceLine: 4, poLine: 40, strategy: 'key-based', confidence: 72.4, varianceType: 'qty', variancePct: -30.0, guardrailFlags: ['gs-partial-gr'], resolved: false },
+    { invoiceLine: 5, poLine: null, strategy: 'elimination', confidence: 35.0, varianceType: 'unplanned', variancePct: null, guardrailFlags: ['gs-amount-outlier'], resolved: false },
+  ],
+};
+
+// Exception line details — for ExceptionReview line-level table
+export const exceptionLineDetails = {
+  // Lockheed Martin — INV-2026-045233 (id: 3)
+  3: [
+    { lineNum: 1, exceptionType: null, field: null, invoiceVal: '$18,750.00', poVal: '$18,750.00', variance: '0%', aiSuggestion: 'Exact match — no action needed' },
+    { lineNum: 2, exceptionType: 'Price Variance', field: 'Unit Price', invoiceVal: '$22,500.00', poVal: '$22,000.00', variance: '+2.27%', aiSuggestion: 'Contract escalation clause ZPR0 allows up to 3% — approve' },
+    { lineNum: 3, exceptionType: null, field: null, invoiceVal: '$12,500.00', poVal: '$12,500.00', variance: '0%', aiSuggestion: 'Exact match — no action needed' },
+  ],
+  // Fastenal — INV-FS-9920 (id: 5)
+  5: [
+    { lineNum: 1, exceptionType: null, field: null, invoiceVal: '500 EA', poVal: '500 EA', variance: '0%', aiSuggestion: 'Exact match' },
+    { lineNum: 2, exceptionType: null, field: null, invoiceVal: '500 EA', poVal: '500 EA', variance: '0%', aiSuggestion: 'Exact match' },
+    { lineNum: 3, exceptionType: 'Qty Mismatch', field: 'Quantity', invoiceVal: '500 EA', poVal: '750 EA (500 received)', variance: '-33.3%', aiSuggestion: 'Partial GR — 500 of 750 received. Remaining expected 02/07.' },
+    { lineNum: 4, exceptionType: 'Qty Mismatch', field: 'Quantity', invoiceVal: '350 EA', poVal: '500 EA (350 received)', variance: '-30.0%', aiSuggestion: 'Partial GR — 350 of 500 received. Park and wait for remaining.' },
+    { lineNum: 5, exceptionType: 'Unplanned Cost', field: 'No PO Line', invoiceVal: '$5,502.50', poVal: '—', variance: 'N/A', aiSuggestion: 'Expedited freight — no PO line. Suggest GL 54300 / CC1000.' },
+  ],
+};

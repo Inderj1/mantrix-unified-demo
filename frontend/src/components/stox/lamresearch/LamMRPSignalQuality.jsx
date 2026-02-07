@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Box,
   Paper,
@@ -125,7 +125,13 @@ const PRESCRIPTIVE_FIXES = {
 // ============================================
 const LamMRPSignalQuality = ({ onBack, darkMode = false }) => {
   const [selectedRow, setSelectedRow] = useState(null);
-  useEffect(() => { if (selectedRow) window.scrollTo(0, 0); }, [selectedRow]);
+  const scrollPosRef = useRef(0);
+  const handleDrillDown = (row) => { scrollPosRef.current = window.scrollY; setSelectedRow(row); };
+  const handleDrillBack = () => { setSelectedRow(null); };
+  useEffect(() => {
+    if (selectedRow) { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    else { window.scrollTo({ top: scrollPosRef.current, behavior: 'smooth' }); }
+  }, [selectedRow]);
   const colors = getColors(darkMode);
 
   // Signal chip helper
@@ -173,7 +179,7 @@ const LamMRPSignalQuality = ({ onBack, darkMode = false }) => {
     {
       field: 'material',
       headerName: 'Material',
-      flex: 1.2,
+      width: 180,
       renderCell: (params) => (
         <Typography sx={{ fontWeight: 700, fontSize: '0.8rem', color: colors.text }}>{params.value}</Typography>
       ),
@@ -262,7 +268,7 @@ const LamMRPSignalQuality = ({ onBack, darkMode = false }) => {
     {
       field: 'rootCause',
       headerName: 'Root Cause',
-      flex: 1,
+      width: 160,
       renderCell: (params) => (
         <Typography sx={{ fontSize: '0.8rem', color: colors.textSecondary }}>{params.value}</Typography>
       ),
@@ -537,32 +543,32 @@ const LamMRPSignalQuality = ({ onBack, darkMode = false }) => {
           Material Signal Analysis
         </Typography>
         <Box sx={{ height: 480 }}>
-          <DataGrid
-            rows={MOCK_DATA}
-            columns={columns}
-            density="compact"
-            disableRowSelectionOnClick
-            onRowClick={(params) => setSelectedRow(params.row)}
-            slots={{ toolbar: GridToolbar }}
-            slotProps={{
-              toolbar: {
-                showQuickFilter: true,
-                quickFilterProps: { debounceMs: 300 },
-              },
-            }}
-            initialState={{
-              sorting: { sortModel: [{ field: 'noiseCost', sort: 'desc' }] },
-            }}
-            sx={{
-              ...stoxTheme.getDataGridSx({ clickable: true }),
-              ...dataGridDarkSx,
-              border: 'none',
-              '& .MuiDataGrid-toolbarContainer': {
-                p: 1,
-                gap: 1,
-              },
-            }}
-          />
+            <DataGrid
+              rows={MOCK_DATA}
+              columns={columns}
+              density="compact"
+              disableRowSelectionOnClick
+              onRowClick={(params) => handleDrillDown(params.row)}
+              slots={{ toolbar: GridToolbar }}
+              slotProps={{
+                toolbar: {
+                  showQuickFilter: true,
+                  quickFilterProps: { debounceMs: 300 },
+                },
+              }}
+              initialState={{
+                sorting: { sortModel: [{ field: 'noiseCost', sort: 'desc' }] },
+              }}
+              sx={{
+                ...stoxTheme.getDataGridSx({ clickable: true }),
+                ...dataGridDarkSx,
+                border: 'none',
+                '& .MuiDataGrid-toolbarContainer': {
+                  p: 1,
+                  gap: 1,
+                },
+              }}
+            />
         </Box>
       </Paper>
     </>
@@ -716,14 +722,14 @@ const LamMRPSignalQuality = ({ onBack, darkMode = false }) => {
     <Box sx={{ p: 2, bgcolor: darkMode ? '#0d1117' : '#f8fbfd', minHeight: '100vh' }}>
       {/* Header */}
       <Paper sx={{ ...paperSx, mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-        <IconButton onClick={selectedRow ? () => setSelectedRow(null) : onBack} size="small" sx={{ color: MODULE_COLOR }}>
+        <IconButton onClick={selectedRow ? handleDrillBack : onBack} size="small" sx={{ color: MODULE_COLOR }}>
           <ArrowBackIcon />
         </IconButton>
         <Box sx={{ flex: 1 }}>
           <Breadcrumbs separator={<NavigateNextIcon sx={{ fontSize: 14, color: colors.textSecondary }} />} sx={{ mb: 0.5 }}>
             <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>Lam Research</Link>
             {selectedRow ? [
-              <Link key="tile" underline="hover" onClick={() => setSelectedRow(null)} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>MRP Signal Quality</Link>,
+              <Link key="tile" underline="hover" onClick={handleDrillBack} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>MRP Signal Quality</Link>,
               <Typography key="detail" sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 600 }}>{selectedRow.material}</Typography>,
             ] : (
               <Typography sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 600 }}>MRP Signal Quality</Typography>

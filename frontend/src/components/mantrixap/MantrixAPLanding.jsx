@@ -53,7 +53,7 @@ const MantrixAPLanding = ({ onBack, darkMode = false, onNavigate }) => {
           color={textColor}
           sx={{ fontSize: '0.85rem', fontWeight: 600 }}
         >
-          MANTRIX AP
+          AP.AI
         </Typography>
       </Breadcrumbs>
 
@@ -84,7 +84,7 @@ const MantrixAPLanding = ({ onBack, darkMode = false, onNavigate }) => {
           <Box sx={{ flex: 1 }}>
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
               <Typography variant="h5" fontWeight={700} sx={{ color: MODULE_COLOR }}>
-                MANTRIX AP
+                AP.AI
               </Typography>
               <Chip
                 label="5 Tiles"

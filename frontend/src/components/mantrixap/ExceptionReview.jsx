@@ -1,15 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box, Grid, Card, CardContent, Typography, Chip, Stack, Button,
-  Breadcrumbs, Link, Paper,
+  Breadcrumbs, Link, Paper, Snackbar, Alert,
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import {
   NavigateNext as NavigateNextIcon,
   ArrowBack as ArrowBackIcon,
+  AccessTime as AccessTimeIcon,
+  TrackChanges as TrackChangesIcon,
+  ThumbUp as ThumbUpIcon,
+  HourglassBottom as HourglassBottomIcon,
 } from '@mui/icons-material';
 import { DataGrid } from '@mui/x-data-grid';
-import { exceptionEvidence, exceptionTaxonomy } from './apMockData';
+import { exceptionEvidence, exceptionTaxonomy, exceptionKPIs, exceptionLineDetails } from './apMockData';
 import { apTheme, MODULE_NAVY, NAVY_DARK, NAVY_BLUE } from './apTheme';
 
 const TILE_COLOR = MODULE_NAVY; // navy #00357a
@@ -30,6 +35,7 @@ const decisionButtons = [
 ];
 
 const ExceptionReview = ({ onBack, darkMode = false, onNavigate }) => {
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const bgColor = darkMode ? '#0d1117' : '#f8fafc';
   const cardBg = darkMode ? '#161b22' : '#fff';
   const textColor = darkMode ? '#e6edf3' : '#1e293b';
@@ -77,7 +83,7 @@ const ExceptionReview = ({ onBack, darkMode = false, onNavigate }) => {
           onClick={onBack}
           sx={{ cursor: 'pointer', fontSize: '0.85rem', color: textSecondary }}
         >
-          MANTRIX AP
+          AP.AI
         </Link>
         <Typography color={textColor} sx={{ fontSize: '0.85rem', fontWeight: 600 }}>
           Exception Review
@@ -113,6 +119,34 @@ const ExceptionReview = ({ onBack, darkMode = false, onNavigate }) => {
           </Button>
         </Stack>
       </Paper>
+
+      {/* KPI Cards */}
+      <Grid container spacing={1.5} sx={{ mb: 3 }}>
+        {exceptionKPIs.slice(0, 4).map((kpi, idx) => {
+          const icons = [<AccessTimeIcon key="a" />, <TrackChangesIcon key="t" />, <ThumbUpIcon key="th" />, <HourglassBottomIcon key="h" />];
+          const colors = ['#d97706', '#059669', TILE_COLOR, '#dc2626'];
+          return (
+            <Grid item xs={6} sm={3} key={idx}>
+              <Card sx={{ borderRadius: 3, bgcolor: cardBg, border: `1px solid ${borderColor}`, height: '100%' }}>
+                <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                  <Box sx={{ color: colors[idx], mb: 0.5, opacity: 0.7 }}>
+                    {React.cloneElement(icons[idx], { sx: { fontSize: 18 } })}
+                  </Box>
+                  <Typography variant="caption" sx={{ color: textSecondary, textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 600, fontSize: '0.6rem', display: 'block' }}>
+                    {kpi.name}
+                  </Typography>
+                  <Typography variant="h5" fontWeight={700} sx={{ color: colors[idx], lineHeight: 1.2, my: 0.5 }}>
+                    {kpi.value}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: textSecondary, fontSize: '0.6rem', lineHeight: 1.4 }}>
+                    {kpi.desc}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          );
+        })}
+      </Grid>
 
       {/* Two-Panel Screen Mockup */}
       <Card
@@ -241,6 +275,68 @@ const ExceptionReview = ({ onBack, darkMode = false, onNavigate }) => {
                 </CardContent>
               </Card>
 
+              {/* Line-Level Exception Table */}
+              {exceptionLineDetails[3] && (() => {
+                const lines = exceptionLineDetails[3];
+                const exLines = lines.filter((l) => l.exceptionType);
+                return (
+                  <Card sx={{ mb: 2, bgcolor: darkMode ? '#161b22' : '#fff', border: `1px solid ${borderColor}`, borderRadius: 2 }}>
+                    <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
+                        <Typography variant="caption" sx={{ color: textSecondary, textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 600, fontSize: '0.65rem' }}>
+                          Line-Level Exception Detail
+                        </Typography>
+                        <Chip
+                          label={`${exLines.length} of ${lines.length} lines have exceptions`}
+                          size="small"
+                          sx={{ bgcolor: alpha('#ef4444', 0.12), color: '#dc2626', fontWeight: 600, fontSize: '0.6rem', height: 20 }}
+                        />
+                      </Stack>
+                      <TableContainer>
+                        <Table size="small">
+                          <TableHead>
+                            <TableRow sx={{ '& th': { bgcolor: darkMode ? '#21262d' : '#f8fafc', color: darkMode ? '#e6edf3' : TILE_COLOR, fontSize: '0.6rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, py: 0.8, borderBottom: `1px solid ${borderColor}` } }}>
+                              <TableCell sx={{ width: 40 }}>Line</TableCell>
+                              <TableCell>Exception</TableCell>
+                              <TableCell>Field</TableCell>
+                              <TableCell align="right">Invoice</TableCell>
+                              <TableCell align="right">PO</TableCell>
+                              <TableCell align="center">Variance</TableCell>
+                              <TableCell>AI Suggestion</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {lines.map((line) => {
+                              const varianceNum = parseFloat(line.variance);
+                              const varianceColor = !line.exceptionType ? '#059669' : Math.abs(varianceNum) > 2 ? '#dc2626' : Math.abs(varianceNum) >= 1 ? '#d97706' : '#059669';
+                              return (
+                                <TableRow key={line.lineNum} sx={{ '& td': { borderBottom: `1px solid ${alpha(borderColor, 0.5)}`, py: 0.8 } }}>
+                                  <TableCell sx={{ color: textColor, fontSize: '0.72rem', fontWeight: 600 }}>{line.lineNum}</TableCell>
+                                  <TableCell>
+                                    {line.exceptionType ? (
+                                      <Chip label={line.exceptionType} size="small" sx={{ bgcolor: alpha('#ef4444', 0.12), color: '#dc2626', fontWeight: 600, fontSize: '0.58rem', height: 20 }} />
+                                    ) : (
+                                      <Chip label="OK" size="small" sx={{ bgcolor: alpha('#10b981', 0.12), color: '#059669', fontWeight: 600, fontSize: '0.58rem', height: 20 }} />
+                                    )}
+                                  </TableCell>
+                                  <TableCell sx={{ color: textSecondary, fontSize: '0.68rem' }}>{line.field || '—'}</TableCell>
+                                  <TableCell align="right" sx={{ color: textColor, fontSize: '0.7rem', fontWeight: 600 }}>{line.invoiceVal}</TableCell>
+                                  <TableCell align="right" sx={{ color: textSecondary, fontSize: '0.7rem' }}>{line.poVal}</TableCell>
+                                  <TableCell align="center" sx={{ color: varianceColor, fontSize: '0.72rem', fontWeight: 700 }}>{line.variance}</TableCell>
+                                  <TableCell sx={{ color: textSecondary, fontSize: '0.65rem', maxWidth: 200 }}>
+                                    <Typography noWrap sx={{ fontSize: '0.65rem', color: textSecondary }}>{line.aiSuggestion}</Typography>
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </CardContent>
+                  </Card>
+                );
+              })()}
+
               {/* Precedent */}
               <Card
                 sx={{ mb: 1, bgcolor: alpha(NAVY_DARK, 0.06), border: `1px solid ${alpha(NAVY_DARK, 0.2)}`, borderRadius: 2 }}
@@ -308,6 +404,16 @@ const ExceptionReview = ({ onBack, darkMode = false, onNavigate }) => {
                         key={idx}
                         fullWidth
                         variant="text"
+                        onClick={() => {
+                          const messages = [
+                            'Invoice INV-LM-8834 posted to SAP (MIRO) with tolerance override. Audit trail logged.',
+                            'Invoice INV-LM-8834 routed to Buyer J. Martinez for PO correction (ME22N).',
+                            'Invoice INV-LM-8834 parked with AI context attached. Will monitor for updates.',
+                            'Invoice INV-LM-8834 rejected and returned to Lockheed Martin with variance explanation.',
+                          ];
+                          const severities = ['success', 'info', 'warning', 'error'];
+                          setSnackbar({ open: true, message: messages[idx], severity: severities[idx] });
+                        }}
                         sx={{
                           justifyContent: 'flex-start', textAlign: 'left', textTransform: 'none',
                           bgcolor: alpha(btn.color, 0.1), color: btn.color,
@@ -357,6 +463,22 @@ const ExceptionReview = ({ onBack, darkMode = false, onNavigate }) => {
           />
         </Box>
       </Card>
+
+      {/* Decision Snackbar */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+          severity={snackbar.severity}
+          sx={{ width: '100%', fontWeight: 600, fontSize: '0.8rem' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

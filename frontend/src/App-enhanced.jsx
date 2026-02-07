@@ -291,6 +291,7 @@ function App() {
   const [o2cView, setO2cView] = usePersistedState('mantrix-o2cView', 'landing'); // 'landing', module IDs
   const [traxxView, setTraxxView] = usePersistedState('mantrix-traxxView', 'landing'); // 'landing', 'nexxt-smade', 'nexxt-operations'
   const [apView, setApView] = usePersistedState('mantrix-apView', 'landing'); // 'landing', 'invoice-entry', 'work-queue', 'exception-review', 'posting-review', 'my-status'
+  const [selectedAPInvoice, setSelectedAPInvoice] = useState(null); // cross-tile nav: invoice row to open in InvoiceEntry
   const [currentFioriTile, setCurrentFioriTile] = useState(null); // { tileId, title, moduleId, moduleColor }
   const [axisAIView, setAxisAIView] = useState('landing'); // 'landing', 'forecast', 'budget', 'driver', 'scenario', 'insights'
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
@@ -1321,19 +1322,19 @@ function App() {
                     />
                   )}
                   {apView === 'invoice-entry' && (
-                    <InvoiceEntry darkMode={darkMode} onBack={() => setApView('landing')} onNavigate={(view) => setApView(view)} />
+                    <InvoiceEntry darkMode={darkMode} onBack={() => setApView('landing')} onNavigate={(view) => setApView(view)} initialInvoice={selectedAPInvoice} onClearInitialInvoice={() => setSelectedAPInvoice(null)} />
                   )}
                   {apView === 'work-queue' && (
-                    <SmartWorkQueue darkMode={darkMode} onBack={() => setApView('landing')} onNavigate={(view) => setApView(view)} />
+                    <SmartWorkQueue darkMode={darkMode} onBack={() => setApView('landing')} onNavigate={(view) => setApView(view)} onNavigateWithInvoice={(inv) => { setSelectedAPInvoice(inv); setApView('invoice-entry'); }} />
                   )}
                   {apView === 'exception-review' && (
                     <ExceptionReview darkMode={darkMode} onBack={() => setApView('landing')} onNavigate={(view) => setApView(view)} />
                   )}
                   {apView === 'posting-review' && (
-                    <PostingReview darkMode={darkMode} onBack={() => setApView('landing')} onNavigate={(view) => setApView(view)} />
+                    <PostingReview darkMode={darkMode} onBack={() => setApView('landing')} onNavigate={(view) => setApView(view)} onNavigateWithInvoice={(inv) => { setSelectedAPInvoice(inv); setApView('invoice-entry'); }} />
                   )}
                   {apView === 'my-status' && (
-                    <MyStatusTracker darkMode={darkMode} onBack={() => setApView('landing')} onNavigate={(view) => setApView(view)} />
+                    <MyStatusTracker darkMode={darkMode} onBack={() => setApView('landing')} onNavigate={(view) => setApView(view)} onNavigateWithInvoice={(inv) => { setSelectedAPInvoice(inv); setApView('invoice-entry'); }} />
                   )}
                 </Box>
               </Fade>
