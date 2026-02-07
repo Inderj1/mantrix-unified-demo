@@ -8,6 +8,7 @@ from datetime import datetime
 from typing import List, Dict, Any
 from ..db.postgresql_client import PostgreSQLClient
 from .pulse_monitor_service import PulseMonitorService
+from .pulse_proactive_service import PulseProactiveService
 
 logger = structlog.get_logger()
 
@@ -26,6 +27,7 @@ class PulseScheduler:
         self.check_interval = check_interval
         self.pg_client = PostgreSQLClient(database="customer_analytics")
         self.pulse_service = PulseMonitorService()
+        self.proactive_service = PulseProactiveService()
         self.running = False
 
     async def start(self):
@@ -83,21 +85,39 @@ class PulseScheduler:
         return monitors or []
 
     async def _execute_monitor_safe(self, monitor_id: str):
-        """Execute a proactive agent with error handling"""
+        """Execute a proactive agent with error handling.
+        Branches by action_level: if a pattern_id and action_level are set,
+        runs through the proactive pipeline instead of the standard monitor."""
         try:
             logger.info(f"Executing proactive agent {monitor_id}")
 
-            # Execute the agent
-            result = await self.pulse_service.execute_monitor(monitor_id)
+            # Check if this monitor has a proactive pattern + action_level
+            monitor = self.pulse_service._get_monitor(monitor_id)
+            pattern_id = monitor.get('pattern_id') if monitor else None
+            action_level = monitor.get('action_level') if monitor else None
+
+            if pattern_id and action_level:
+                # Run through proactive pattern pipeline
+                result = await self.proactive_service.run_pattern(
+                    pattern_id=pattern_id,
+                    action_level=action_level,
+                )
+                logger.info(
+                    f"Proactive pattern {pattern_id} executed at level {action_level}",
+                    status=result.get('status'),
+                    detection_count=result.get('detection_count', 0)
+                )
+            else:
+                # Standard monitor execution
+                result = await self.pulse_service.execute_monitor(monitor_id)
+                logger.info(
+                    f"Monitor {monitor_id} executed successfully",
+                    status=result.get('status'),
+                    alert_triggered=result.get('alert_triggered', False)
+                )
 
             # Update next_run time
             self._update_next_run(monitor_id)
-
-            logger.info(
-                f"Monitor {monitor_id} executed successfully",
-                status=result.get('status'),
-                alert_triggered=result.get('alert_triggered', False)
-            )
 
         except Exception as e:
             logger.error(f"Failed to execute monitor {monitor_id}: {e}")

@@ -1,92 +1,90 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import {
   Box,
+  Tabs,
+  Tab,
   Dialog,
   DialogContent,
+  alpha,
 } from '@mui/material';
+import {
+  Psychology as PsychologyIcon,
+  SmartToy as AgentsIcon,
+} from '@mui/icons-material';
 import AgentCreationWizard from './pulse/AgentCreationWizard';
-import EnterprisePulseLanding from './pulse/EnterprisePulseLanding';
-import KitAlertsView from './pulse/KitAlertsView';
+import ProactiveActionsTab from './pulse/ProactiveActionsTab';
 import AgentsManagementView from './pulse/AgentsManagementView';
+import { getColors } from '../config/brandColors';
 
 const EnterprisePulse = ({ darkMode = false }) => {
   const { user } = useUser();
-  // Use fixed 'persona' ID for persona-based insights
   const userId = 'persona';
-  const [showWizard, setShowWizard] = useState(false);
-  const [selectedView, setSelectedView] = useState(null);
-  const [alertCount, setAlertCount] = useState(12);
-  const [agentCount, setAgentCount] = useState(8);
+  const colors = getColors(darkMode);
 
-  // Dark mode colors
+  const [activeTab, setActiveTab] = useState(0);
+  const [showWizard, setShowWizard] = useState(false);
+
   const bgColor = darkMode ? '#0d1117' : '#f5f5f5';
 
-  const handleTileClick = (tileId) => {
-    setSelectedView(tileId);
-  };
-
-  const handleBack = () => {
-    setSelectedView(null);
-  };
-
-  // Render ML Insights view (KitAlertsView)
-  if (selectedView === 'alerts') {
-    return (
-      <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: bgColor }}>
-        <KitAlertsView onBack={handleBack} darkMode={darkMode} />
-      </Box>
-    );
-  }
-
-  // Render AI Agents view (AgentsManagementView)
-  if (selectedView === 'agents') {
-    return (
-      <Box sx={{
-        p: 3,
-        height: '100%',
-        overflowY: 'auto',
-        overflowX: 'hidden',
-        bgcolor: bgColor
-      }}>
-        {/* Agent Creation Wizard Dialog */}
-        <Dialog
-          open={showWizard}
-          onClose={() => setShowWizard(false)}
-          maxWidth="md"
-          fullWidth
+  return (
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: bgColor }}>
+      {/* Tab Bar */}
+      <Box sx={{ borderBottom: 1, borderColor: darkMode ? 'rgba(255,255,255,0.1)' : 'divider', bgcolor: colors.paper }}>
+        <Tabs
+          value={activeTab}
+          onChange={(_, v) => setActiveTab(v)}
+          sx={{
+            px: 3,
+            '& .MuiTab-root': {
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '0.9rem',
+              color: colors.textSecondary,
+              minHeight: 48,
+              '&.Mui-selected': { color: colors.primary },
+            },
+            '& .MuiTabs-indicator': { bgcolor: colors.primary },
+          }}
         >
-          <DialogContent sx={{ p: 3 }}>
-            <AgentCreationWizard
-              userId={userId}
+          <Tab icon={<PsychologyIcon sx={{ fontSize: 20 }} />} iconPosition="start" label="Proactive Actions" />
+          <Tab icon={<AgentsIcon sx={{ fontSize: 20 }} />} iconPosition="start" label="AI Agents" />
+        </Tabs>
+      </Box>
+
+      {/* Tab Content */}
+      <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', p: 3 }}>
+        {activeTab === 0 && (
+          <ProactiveActionsTab darkMode={darkMode} />
+        )}
+
+        {activeTab === 1 && (
+          <>
+            <Dialog
+              open={showWizard}
               onClose={() => setShowWizard(false)}
-              onSave={() => {
-                setShowWizard(false);
-              }}
+              maxWidth="md"
+              fullWidth
+            >
+              <DialogContent sx={{ p: 3 }}>
+                <AgentCreationWizard
+                  userId={userId}
+                  onClose={() => setShowWizard(false)}
+                  onSave={() => setShowWizard(false)}
+                  darkMode={darkMode}
+                />
+              </DialogContent>
+            </Dialog>
+
+            <AgentsManagementView
+              userId={userId}
+              onBack={() => setActiveTab(0)}
+              onCreateAgent={() => setShowWizard(true)}
               darkMode={darkMode}
             />
-          </DialogContent>
-        </Dialog>
-
-        <AgentsManagementView
-          userId={userId}
-          onBack={handleBack}
-          onCreateAgent={() => setShowWizard(true)}
-          darkMode={darkMode}
-        />
+          </>
+        )}
       </Box>
-    );
-  }
-
-  // Render landing page with tiles
-  return (
-    <Box sx={{ p: 3, height: '100%', overflowY: 'auto', bgcolor: bgColor }}>
-      <EnterprisePulseLanding
-        onTileClick={handleTileClick}
-        alertCount={alertCount}
-        agentCount={agentCount}
-        darkMode={darkMode}
-      />
     </Box>
   );
 };

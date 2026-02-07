@@ -149,6 +149,14 @@ import DemandVariabilityIntelligence from './components/stox/distribution/Demand
 import SupplySignalAnalyzer from './components/stox/distribution/SupplySignalAnalyzer';
 import MRPParameterAdvisor from './components/stox/distribution/MRPParameterAdvisor';
 import { default as DistWhatIfSimulator } from './components/stox/distribution/WhatIfSimulator';
+import StoxLamResearchLanding from './components/StoxLamResearchLanding';
+import LamEconomicGroundTruth from './components/stox/lamresearch/LamEconomicGroundTruth';
+import LamInventoryCapitalHealth from './components/stox/lamresearch/LamInventoryCapitalHealth';
+import LamDemandSupplyCommand from './components/stox/lamresearch/LamDemandSupplyCommand';
+import LamSupplyRisk from './components/stox/lamresearch/LamSupplyRisk';
+import LamSafetyStockEconomics from './components/stox/lamresearch/LamSafetyStockEconomics';
+import LamMRPSignalQuality from './components/stox/lamresearch/LamMRPSignalQuality';
+import LamCapitalImpactSimulator from './components/stox/lamresearch/LamCapitalImpactSimulator';
 import ModuleTilesView from './components/stox/ModuleTilesView.jsx';
 import FioriTileDetail from './components/stox/FioriTileDetail.jsx';
 import TicketingSystem from './components/stox/TicketingSystem.jsx';
@@ -757,6 +765,8 @@ function App() {
                           setStoxView('dc-modules');
                         } else if (category === 'distribution') {
                           setStoxView('distribution-landing');
+                        } else if (category === 'lam-research') {
+                          setStoxView('lam-research-landing');
                         }
                       }}
                       initialView={stoxView === 'store-modules' ? 'store' : stoxView === 'dc-modules' ? 'dc' : null}
@@ -843,6 +853,39 @@ function App() {
                   )}
                   {stoxView === 'dist-whatif-simulator' && (
                     <DistWhatIfSimulator darkMode={darkMode} onBack={() => setStoxView('distribution-landing')} />
+                  )}
+                  {stoxView === 'lam-research-landing' && (
+                    <StoxLamResearchLanding darkMode={darkMode}
+                      onBack={() => setStoxView('landing')}
+                      onTileClick={(tileId) => setStoxView(tileId)} />
+                  )}
+                  {stoxView === 'lam-economic-ground-truth' && (
+                    <LamEconomicGroundTruth darkMode={darkMode}
+                      onBack={() => setStoxView('lam-research-landing')} />
+                  )}
+                  {stoxView === 'lam-inventory-capital-health' && (
+                    <LamInventoryCapitalHealth darkMode={darkMode}
+                      onBack={() => setStoxView('lam-research-landing')} />
+                  )}
+                  {stoxView === 'lam-demand-supply-command' && (
+                    <LamDemandSupplyCommand darkMode={darkMode}
+                      onBack={() => setStoxView('lam-research-landing')} />
+                  )}
+                  {stoxView === 'lam-supply-risk' && (
+                    <LamSupplyRisk darkMode={darkMode}
+                      onBack={() => setStoxView('lam-research-landing')} />
+                  )}
+                  {stoxView === 'lam-safety-stock-economics' && (
+                    <LamSafetyStockEconomics darkMode={darkMode}
+                      onBack={() => setStoxView('lam-research-landing')} />
+                  )}
+                  {stoxView === 'lam-mrp-signal-quality' && (
+                    <LamMRPSignalQuality darkMode={darkMode}
+                      onBack={() => setStoxView('lam-research-landing')} />
+                  )}
+                  {stoxView === 'lam-capital-impact-simulator' && (
+                    <LamCapitalImpactSimulator darkMode={darkMode}
+                      onBack={() => setStoxView('lam-research-landing')} />
                   )}
                   {/* {stoxView === 'stoxshift' && (
                     <StoxShiftAI onBack={() => setStoxView('landing')} />

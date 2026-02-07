@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STOX.AI | Tile 1 — Inventory Capital Health</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --bg-primary: #0a0f1a; --bg-secondary: #111827; --bg-tertiary: #1e293b; --border-color: #334155; --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b; --cyan-400: #22d3ee; --cyan-500: #06b6d4; --emerald-400: #34d399; --emerald-500: #10b981; --amber-400: #fbbf24; --amber-500: #f59e0b; --red-400: #f87171; --red-500: #ef4444; }
+        body { font-family: 'JetBrains Mono', monospace; background: var(--bg-primary); background-image: radial-gradient(ellipse at 40% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%), radial-gradient(ellipse at 60% 80%, rgba(6, 182, 212, 0.06) 0%, transparent 50%); color: var(--text-primary); min-height: 100vh; padding: 24px; }
+        .container { max-width: 1800px; margin: 0 auto; }
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid rgba(71, 85, 105, 0.3); }
+        .logo-section { display: flex; align-items: center; gap: 16px; }
+        .logo { width: 52px; height: 52px; background: linear-gradient(135deg, var(--emerald-500), var(--cyan-500)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 8px 32px rgba(16, 185, 129, 0.3); }
+        .brand h1 { font-size: 26px; font-weight: 700; background: linear-gradient(135deg, var(--emerald-400), var(--cyan-400)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .brand p { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 3px; margin-top: 2px; }
+        .tile-badge { background: linear-gradient(135deg, var(--emerald-500), var(--cyan-500)); padding: 10px 20px; border-radius: 8px; font-size: 11px; font-weight: 600; letter-spacing: 1px; color: var(--bg-primary); }
+        .premise-banner { background: linear-gradient(135deg, rgba(16, 185, 129, 0.06), rgba(6, 182, 212, 0.04)); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 14px; padding: 20px 28px; margin-bottom: 28px; display: flex; align-items: center; gap: 16px; }
+        .premise-banner .icon { font-size: 28px; } .premise-banner .text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; } .premise-banner .text strong { color: var(--emerald-400); }
+
+        /* Dual-Lens Summary */
+        .dual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+        .dual-panel { background: rgba(17, 24, 39, 0.7); border: 1px solid rgba(51, 65, 85, 0.4); border-radius: 16px; padding: 24px; }
+        .dual-panel h3 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .dual-panel h3.qty { color: var(--cyan-400); } .dual-panel h3.val { color: var(--emerald-400); }
+        .dual-panel h3 .sap-badge { margin-left: auto; font-size: 9px; padding: 3px 8px; border-radius: 4px; }
+        .dual-panel h3 .sap-badge.cyan { color: rgba(6, 182, 212, 0.7); background: rgba(6, 182, 212, 0.1); }
+        .dual-panel h3 .sap-badge.emerald { color: rgba(16, 185, 129, 0.7); background: rgba(16, 185, 129, 0.1); }
+        .dual-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .dual-metric { background: rgba(10, 15, 26, 0.5); border-radius: 10px; padding: 16px; text-align: center; border: 1px solid rgba(51, 65, 85, 0.3); }
+        .dual-metric .label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .dual-metric .value { font-size: 24px; font-weight: 700; }
+        .dual-metric .sub { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Decomposition Strip */
+        .decomp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+        .decomp-card { background: rgba(17, 24, 39, 0.6); border-radius: 14px; padding: 20px; border: 1px solid rgba(51, 65, 85, 0.4); }
+        .decomp-card.strategic { border-left: 5px solid var(--emerald-500); } .decomp-card.excess { border-left: 5px solid var(--amber-500); } .decomp-card.obsolete { border-left: 5px solid var(--red-500); } .decomp-card.below-ss { border-left: 5px solid var(--cyan-500); }
+        .decomp-card .card-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
+        .decomp-card .qty-line { font-size: 22px; font-weight: 700; }
+        .decomp-card .val-line { font-size: 16px; font-weight: 600; margin-top: 4px; }
+        .decomp-card .pct-line { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+
+        /* Charts */
+        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+        .chart-card { background: rgba(17, 24, 39, 0.5); border: 1px solid rgba(51, 65, 85, 0.4); border-radius: 16px; padding: 24px; }
+        .chart-card h3 { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .chart-card h3 .icon { color: var(--emerald-400); }
+        .chart-container-lg { height: 220px; }
+
+        /* Table */
+        .table-section { background: rgba(17, 24, 39, 0.5); border: 1px solid rgba(51, 65, 85, 0.4); border-radius: 16px; overflow: hidden; }
+        .table-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid rgba(51, 65, 85, 0.4); background: linear-gradient(90deg, rgba(16, 185, 129, 0.08), rgba(6, 182, 212, 0.05)); }
+        .table-header h2 { font-size: 14px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1.5px; } .table-header h2 span { color: var(--emerald-400); }
+        .table-filters { display: flex; gap: 12px; }
+        .filter-select { background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); padding: 8px 12px; border-radius: 6px; font-family: inherit; font-size: 11px; cursor: pointer; }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th { padding: 14px 10px; text-align: left; font-size: 9px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; background: rgba(10, 15, 26, 0.6); border-bottom: 1px solid rgba(51, 65, 85, 0.4); }
+        .data-table th.qty-col { border-bottom: 2px solid rgba(6, 182, 212, 0.3); }
+        .data-table th.val-col { border-bottom: 2px solid rgba(16, 185, 129, 0.3); }
+        .data-table td { padding: 14px 10px; border-bottom: 1px solid rgba(51, 65, 85, 0.2); font-size: 11px; }
+        .data-table tr { cursor: pointer; transition: all 0.2s; } .data-table tr:hover { background: rgba(16, 185, 129, 0.05); }
+        .metric-value { font-weight: 600; } .metric-value.good { color: var(--emerald-400); } .metric-value.warning { color: var(--amber-400); } .metric-value.critical { color: var(--red-400); } .metric-value.cyan { color: var(--cyan-400); }
+        .class-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 600; }
+        .class-badge.strategic { background: rgba(16, 185, 129, 0.15); color: var(--emerald-400); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .class-badge.excess { background: rgba(251, 191, 36, 0.15); color: var(--amber-400); border: 1px solid rgba(251, 191, 36, 0.3); }
+        .class-badge.obsolete { background: rgba(239, 68, 68, 0.15); color: var(--red-400); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .class-badge.under { background: rgba(6, 182, 212, 0.15); color: var(--cyan-400); border: 1px solid rgba(6, 182, 212, 0.3); }
+        .drill-icon { opacity: 0; transition: all 0.2s; color: var(--emerald-400); } .data-table tr:hover .drill-icon { opacity: 1; transform: translateX(4px); }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; } .status-dot.green { background: var(--emerald-500); } .status-dot.yellow { background: var(--amber-500); } .status-dot.red { background: var(--red-500); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* Detail */
+        .detail-view { display: none; } .detail-view.active { display: block; } .list-view { display: block; } .list-view.hidden { display: none; }
+        .back-btn { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(51, 65, 85, 0.4); border-radius: 8px; color: var(--text-secondary); cursor: pointer; font-family: inherit; font-size: 12px; margin-bottom: 24px; transition: all 0.2s; }
+        .back-btn:hover { background: rgba(16, 185, 129, 0.1); color: var(--emerald-400); }
+        .detail-header { display: flex; align-items: center; gap: 20px; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid rgba(51, 65, 85, 0.3); }
+        .detail-logo { width: 64px; height: 64px; background: linear-gradient(135deg, var(--emerald-500), var(--cyan-500)); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .detail-title h1 { font-size: 26px; font-weight: 700; } .detail-title h1 .material-id { color: var(--emerald-400); }
+        .detail-title p { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
+        .detail-badges { margin-left: auto; }
+        .detail-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .detail-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
+        .detail-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+        .detail-card { background: rgba(17, 24, 39, 0.6); border: 1px solid rgba(51, 65, 85, 0.4); border-radius: 14px; padding: 20px; }
+        .detail-card h3 { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .detail-card h3 .icon { color: var(--emerald-400); } .detail-card h3 .sap-badge { margin-left: auto; font-size: 9px; color: rgba(16, 185, 129, 0.7); background: rgba(16, 185, 129, 0.1); padding: 3px 8px; border-radius: 4px; }
+        .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(51, 65, 85, 0.2); } .info-row:last-child { border-bottom: none; }
+        .info-row .label { font-size: 11px; color: var(--text-muted); } .info-row .value { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+        .mini-kpi { text-align: center; padding: 16px; background: rgba(10, 15, 26, 0.5); border-radius: 10px; border: 1px solid rgba(51, 65, 85, 0.3); }
+        .mini-kpi .label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; } .mini-kpi .value { font-size: 22px; font-weight: 700; } .mini-kpi .sub { font-size: 10px; margin-top: 4px; }
+        .chart-container { height: 180px; margin-top: 12px; }
+        .ai-panel { background: linear-gradient(135deg, rgba(16, 185, 129, 0.06), rgba(6, 182, 212, 0.04)); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 14px; padding: 24px; margin-top: 24px; position: relative; overflow: hidden; }
+        .ai-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--emerald-500), var(--cyan-500), var(--emerald-500)); background-size: 200% 100%; animation: shimmer 3s ease infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .ai-panel-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .ai-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--emerald-500), var(--cyan-500)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .ai-panel-header h3 { font-size: 14px; font-weight: 600; color: var(--emerald-400); margin: 0; } .ai-panel-header p { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .ai-confidence { margin-left: auto; text-align: right; } .ai-confidence .value { font-size: 20px; font-weight: 700; color: var(--emerald-400); } .ai-confidence .label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; }
+        .ai-recommendation { background: rgba(10, 15, 26, 0.5); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+        .ai-recommendation .title { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .ai-recommendation .title .priority { font-size: 9px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+        .ai-recommendation .title .priority.high { background: rgba(239, 68, 68, 0.2); color: var(--red-400); }
+        .ai-recommendation .content { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+        .ai-recommendation .impact { display: flex; gap: 20px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(51, 65, 85, 0.3); flex-wrap: wrap; }
+        .ai-recommendation .impact-item { display: flex; align-items: center; gap: 6px; font-size: 11px; } .ai-recommendation .impact-item .label { color: var(--text-muted); } .ai-recommendation .impact-item .value { font-weight: 600; }
+        .ai-actions { display: flex; gap: 12px; margin-top: 20px; }
+        .ai-action-btn { padding: 10px 20px; border-radius: 8px; font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; }
+        .ai-action-btn.primary { background: linear-gradient(135deg, var(--emerald-500), var(--cyan-500)); color: var(--bg-primary); }
+        .ai-action-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4); }
+        .ai-action-btn.secondary { background: rgba(51, 65, 85, 0.5); color: var(--text-secondary); border: 1px solid rgba(51, 65, 85, 0.5); }
+        .footer { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; padding-top: 20px; border-top: 1px solid rgba(51, 65, 85, 0.2); font-size: 11px; color: var(--text-muted); }
+        .footer .info { display: flex; gap: 16px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-section"><div class="logo">💎</div><div class="brand"><h1>STOX.AI</h1><p>Inventory Capital Health</p></div></div>
+            <div class="tile-badge">TILE 1 — BALANCE SHEET LENS</div>
+        </div>
+        <div class="premise-banner">
+            <div class="icon">📊</div>
+            <div class="text"><strong>How many units do we hold? How much capital is deployed? Is it earning its keep?</strong><br>Every number shown in both EA and $. Planners see quantities. CFOs see capital. Same screen, same row, same SKU. Inventory decomposes into Strategic (protect), Excess (release), Obsolescence Risk (write-down), and Under-Safety-Stock (invest).</div>
+        </div>
+
+        <div class="list-view" id="listView">
+            <!-- Dual-Lens Summary -->
+            <div class="dual-grid">
+                <div class="dual-panel">
+                    <h3 class="qty">📦 Quantity Position <span class="sap-badge cyan">MARD / MARC</span></h3>
+                    <div class="dual-metrics">
+                        <div class="dual-metric"><div class="label">Total On-Hand</div><div class="value" style="color: var(--cyan-400);">148,240 EA</div><div class="sub">Across 2,286 SKU-locations</div></div>
+                        <div class="dual-metric"><div class="label">Inventory Turns</div><div class="value" style="color: var(--emerald-400);">5.4×</div><div class="sub">Target: 7.2× (industry avg)</div></div>
+                        <div class="dual-metric"><div class="label">Avg Coverage</div><div class="value" style="color: var(--amber-400);">68 days</div><div class="sub">Target: 45 days</div></div>
+                    </div>
+                </div>
+                <div class="dual-panel">
+                    <h3 class="val">💰 Capital Position <span class="sap-badge emerald">MBEW / ACDOCA</span></h3>
+                    <div class="dual-metrics">
+                        <div class="dual-metric"><div class="label">Total Capital Deployed</div><div class="value" style="color: var(--emerald-400);">$42.8M</div><div class="sub">Avg unit cost: $288.70</div></div>
+                        <div class="dual-metric"><div class="label">Carrying Cost</div><div class="value" style="color: var(--amber-400);">$9.4M/yr</div><div class="sub">22% rate (WACC + storage + obs)</div></div>
+                        <div class="dual-metric"><div class="label">Inventory ROIC</div><div class="value" style="color: var(--red-400);">18.2%</div><div class="sub">Target: 25% (above WACC)</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Capital Decomposition — Qty + $ -->
+            <div class="decomp-grid">
+                <div class="decomp-card strategic">
+                    <div class="card-label">🛡️ Strategic (Protect)</div>
+                    <div class="qty-line" style="color: var(--emerald-400);">84,620 EA</div>
+                    <div class="val-line" style="color: var(--emerald-400);">$24.6M</div>
+                    <div class="pct-line">57% of stock | Serving active demand</div>
+                </div>
+                <div class="decomp-card excess">
+                    <div class="card-label">⚠️ Excess (Release)</div>
+                    <div class="qty-line" style="color: var(--amber-400);">42,180 EA</div>
+                    <div class="val-line" style="color: var(--amber-400);">$11.8M</div>
+                    <div class="pct-line">28% of stock | >90d coverage, low risk to SL</div>
+                </div>
+                <div class="decomp-card obsolete">
+                    <div class="card-label">🔴 Obsolescence Risk</div>
+                    <div class="qty-line" style="color: var(--red-400);">15,020 EA</div>
+                    <div class="val-line" style="color: var(--red-400);">$3.2M</div>
+                    <div class="pct-line">10% of stock | No demand >180d</div>
+                </div>
+                <div class="decomp-card below-ss">
+                    <div class="card-label">🔵 Below Safety Stock</div>
+                    <div class="qty-line" style="color: var(--cyan-400);">6,420 EA short</div>
+                    <div class="val-line" style="color: var(--cyan-400);">$3.4M to invest</div>
+                    <div class="pct-line">89 SKUs | Revenue at risk: $18.2M</div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3><span class="icon">📊</span> Inventory Decomposition — Quantities (EA)</h3>
+                    <div class="chart-container-lg"><canvas id="qtyChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3><span class="icon">💰</span> Inventory Decomposition — Capital ($M)</h3>
+                    <div class="chart-container-lg"><canvas id="valChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Dual-Lens Table -->
+            <div class="table-section">
+                <div class="table-header">
+                    <h2><span>Inventory Health</span> — Every SKU in Quantities & Capital</h2>
+                    <div class="table-filters">
+                        <select class="filter-select"><option>All Plants</option><option>P1000 - Detroit</option><option>P2000 - Phoenix</option><option>P3000 - Seattle</option></select>
+                        <select class="filter-select"><option>All Classes</option><option>🟢 Strategic</option><option>🟡 Excess</option><option>🔴 Obsolete</option><option>🔵 Below SS</option></select>
+                        <select class="filter-select"><option>Sort: Capital $ ↓</option><option>Sort: Excess EA ↓</option><option>Sort: ROIC ↑</option><option>Sort: Coverage ↓</option></select>
+                    </div>
+                </div>
+                <table class="data-table">
+                    <thead><tr>
+                        <th>Material</th><th>Plant</th><th>Class</th>
+                        <th class="qty-col">On-Hand (EA)</th><th class="qty-col">Required (EA)</th><th class="qty-col">Excess (EA)</th><th class="qty-col">Coverage</th>
+                        <th class="val-col">Capital ($)</th><th class="val-col">Excess ($)</th><th class="val-col">ROIC</th><th class="val-col">Carry $/yr</th><th></th>
+                    </tr></thead>
+                    <tbody>
+                        <tr onclick="showDetail('MAT-3089')">
+                            <td style="font-weight: 600;">MAT-3089</td><td>P1000</td>
+                            <td><span class="class-badge excess"><span class="status-dot yellow"></span>Excess</span></td>
+                            <td class="metric-value cyan">4,230 EA</td><td>1,430 EA</td><td class="metric-value warning">2,800 EA</td><td class="metric-value warning">142d</td>
+                            <td class="metric-value good">$846K</td><td class="metric-value warning">$560K</td><td class="metric-value critical">6.2%</td><td class="metric-value warning">$186K</td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                        <tr onclick="showDetail('MAT-1001')">
+                            <td style="font-weight: 600;">MAT-1001</td><td>P1000</td>
+                            <td><span class="class-badge under"><span class="status-dot red"></span>Below SS</span></td>
+                            <td class="metric-value cyan">1,420 EA</td><td>1,618 EA</td><td class="metric-value cyan">-198 EA</td><td class="metric-value critical">4d</td>
+                            <td class="metric-value good">$284K</td><td class="metric-value cyan">-$39.6K</td><td class="metric-value warning">14.8%</td><td class="metric-value good">$62K</td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                        <tr onclick="showDetail('MAT-4012')">
+                            <td style="font-weight: 600;">MAT-4012</td><td>P3000</td>
+                            <td><span class="class-badge excess"><span class="status-dot yellow"></span>Excess</span></td>
+                            <td class="metric-value cyan">4,840 EA</td><td>680 EA</td><td class="metric-value warning">4,160 EA</td><td class="metric-value warning">128d</td>
+                            <td class="metric-value good">$629K</td><td class="metric-value warning">$541K</td><td class="metric-value critical">3.8%</td><td class="metric-value warning">$138K</td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                        <tr onclick="showDetail('MAT-2045')">
+                            <td style="font-weight: 600;">MAT-2045</td><td>P2000</td>
+                            <td><span class="class-badge strategic"><span class="status-dot green"></span>Strategic</span></td>
+                            <td class="metric-value cyan">6,420 EA</td><td>5,200 EA</td><td class="metric-value good">1,220 EA</td><td class="metric-value good">42d</td>
+                            <td class="metric-value good">$899K</td><td class="metric-value good">$171K</td><td class="metric-value good">28.4%</td><td class="metric-value good">$198K</td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                        <tr onclick="showDetail('MAT-7801')">
+                            <td style="font-weight: 600;">MAT-7801</td><td>P1000</td>
+                            <td><span class="class-badge obsolete"><span class="status-dot red"></span>Obsolete</span></td>
+                            <td class="metric-value cyan">2,840 EA</td><td>0 EA</td><td class="metric-value critical">2,840 EA</td><td class="metric-value critical">∞</td>
+                            <td class="metric-value good">$426K</td><td class="metric-value critical">$426K</td><td class="metric-value critical">0.0%</td><td class="metric-value critical">$94K</td>
+                            <td><span class="drill-icon">→</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- DETAIL VIEW -->
+        <div class="detail-view" id="detailView">
+            <button class="back-btn" onclick="showList()">← Back to Capital Health</button>
+            <div class="detail-header">
+                <div class="detail-logo">💎</div>
+                <div class="detail-title">
+                    <h1><span class="material-id">MAT-3089</span> @ P1000 — Detroit</h1>
+                    <p>Precision Bearing Assembly | UoM: EA | Std Cost: $200.00 | Avg Selling: $312.60 | Margin: 36.0%</p>
+                </div>
+                <div class="detail-badges"><span class="class-badge excess"><span class="status-dot yellow"></span>Excess — 2,800 EA / $560K releasable</span></div>
+            </div>
+            <div class="detail-grid-4">
+                <div class="mini-kpi"><div class="label">On-Hand</div><div class="value" style="color: var(--cyan-400);">4,230 EA</div><div class="sub" style="color: var(--emerald-400);">$846K capital</div></div>
+                <div class="mini-kpi"><div class="label">Required Stock</div><div class="value" style="color: var(--text-primary);">1,430 EA</div><div class="sub" style="color: var(--text-muted);">$286K (SS + pipeline)</div></div>
+                <div class="mini-kpi"><div class="label">Excess Qty</div><div class="value" style="color: var(--amber-400);">2,800 EA</div><div class="sub" style="color: var(--amber-400);">$560K releasable</div></div>
+                <div class="mini-kpi"><div class="label">ROIC</div><div class="value" style="color: var(--red-400);">6.2%</div><div class="sub" style="color: var(--red-400);">Below 12% WACC</div></div>
+            </div>
+            <div class="detail-grid-3">
+                <div class="detail-card">
+                    <h3><span class="icon">📦</span> Quantity Decomposition <span class="sap-badge">MARD / MARC</span></h3>
+                    <div class="info-row"><span class="label">Total On-Hand (LABST)</span><span class="value" style="color: var(--cyan-400);">4,230 EA</span></div>
+                    <div class="info-row"><span class="label">Safety Stock (EISBE)</span><span class="value">810 EA</span></div>
+                    <div class="info-row"><span class="label">Reorder Point (MINBE)</span><span class="value">1,200 EA</span></div>
+                    <div class="info-row"><span class="label">Avg Daily Demand</span><span class="value">29.8 EA/day</span></div>
+                    <div class="info-row"><span class="label">Coverage Days</span><span class="value" style="color: var(--amber-400);">142 days</span></div>
+                    <div class="info-row"><span class="label">Required (SS + 30d demand)</span><span class="value">1,430 EA</span></div>
+                    <div class="info-row"><span class="label">Excess (On-Hand - Required)</span><span class="value" style="color: var(--amber-400);">2,800 EA</span></div>
+                </div>
+                <div class="detail-card">
+                    <h3><span class="icon">💰</span> Capital Decomposition <span class="sap-badge">MBEW / ACDOCA</span></h3>
+                    <div class="info-row"><span class="label">Inventory Value (std)</span><span class="value" style="color: var(--emerald-400);">$846,000</span></div>
+                    <div class="info-row"><span class="label">Required Capital</span><span class="value">$286,000</span></div>
+                    <div class="info-row"><span class="label">Excess Capital</span><span class="value" style="color: var(--amber-400);">$560,000</span></div>
+                    <div class="info-row"><span class="label">Carrying Cost (22%)</span><span class="value" style="color: var(--amber-400);">$186,120/yr</span></div>
+                    <div class="info-row"><span class="label">Carrying on Excess Alone</span><span class="value" style="color: var(--red-400);">$123,200/yr</span></div>
+                    <div class="info-row"><span class="label">COGS Contribution</span><span class="value">$2.18M/yr</span></div>
+                    <div class="info-row"><span class="label">ROIC = COGS / Avg Inv</span><span class="value" style="color: var(--red-400);">6.2%</span></div>
+                </div>
+                <div class="detail-card">
+                    <h3><span class="icon">📈</span> Aging & Turns Profile</h3>
+                    <div class="chart-container"><canvas id="agingChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- AI Panel -->
+            <div class="ai-panel">
+                <div class="ai-panel-header">
+                    <div class="ai-icon">🤖</div>
+                    <div><h3>STOX.AI Capital Optimization Engine</h3><p>Every recommendation in both EA and $ — traceable to SAP parameters</p></div>
+                    <div class="ai-confidence"><div class="value">91%</div><div class="label">Confidence</div></div>
+                </div>
+                <div class="ai-recommendation">
+                    <div class="title">💎 Release 2,800 EA ($560K) — Structural Excess with 6.2% ROIC<span class="priority high">HIGH IMPACT</span></div>
+                    <div class="content">
+                        <strong>Root Cause:</strong> Safety stock is set at 810 EA (EISBE) but optimal is 320 EA based on demand CV (0.38) and supplier LT variance. Additionally, lot size is FX 500, forcing over-procurement. Combined, these two parameters inflate stock by ~2,800 EA beyond what's needed.<br><br>
+                        <strong>Recommended SAP Changes:</strong><br>
+                        1. EISBE (Safety Stock): 810 EA → 320 EA | Δ = -490 EA / -$98K | Service impact: none (demand is stable)<br>
+                        2. DISLS (Lot Size): FX 500 → EX (lot-for-lot) | Δ = -1,800 EA avg / -$360K | Eliminates lumpy ordering<br>
+                        3. MINBE (Reorder Point): 1,200 → 620 EA | Δ = -580 EA / -$116K | Aligned to corrected PLIFZ<br><br>
+                        <strong>Combined Effect:</strong> Stock drops from 4,230 EA → 1,430 EA. Capital drops from $846K → $286K. ROIC jumps from 6.2% → 126.9%.
+                    </div>
+                    <div class="impact">
+                        <div class="impact-item"><span class="label">Qty Released:</span><span class="value" style="color: var(--emerald-400);">2,800 EA</span></div>
+                        <div class="impact-item"><span class="label">Capital Released:</span><span class="value" style="color: var(--emerald-400);">$560K</span></div>
+                        <div class="impact-item"><span class="label">Carry Cost Saved:</span><span class="value" style="color: var(--emerald-400);">$123K/yr</span></div>
+                        <div class="impact-item"><span class="label">ROIC After:</span><span class="value" style="color: var(--emerald-400);">126.9%</span></div>
+                    </div>
+                </div>
+                <div class="ai-actions">
+                    <button class="ai-action-btn primary">✓ Generate SAP Change Request</button>
+                    <button class="ai-action-btn secondary">📊 Simulate Service Impact</button>
+                    <button class="ai-action-btn secondary">📋 Export to Tile 6 Memo</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="info"><span>STOX.AI Inventory Capital Health</span><span>•</span><span>Tile 1 of 6</span><span>•</span><span>Layer: Balance Sheet</span><span>•</span><span>Last Refresh: <span id="refreshTime"></span></span></div>
+            <div>© 2025 Cloud Mantra LLC | Mantrix.AI</div>
+        </div>
+    </div>
+    <script>
+        function showDetail(m) { document.getElementById('listView').classList.add('hidden'); document.getElementById('detailView').classList.add('active'); setTimeout(renderDetailCharts, 100); }
+        function showList() { document.getElementById('listView').classList.remove('hidden'); document.getElementById('detailView').classList.remove('active'); }
+        let agingC;
+        function renderDetailCharts() {
+            const ac = document.getElementById('agingChart').getContext('2d');
+            if (agingC) agingC.destroy();
+            agingC = new Chart(ac, { type: 'bar', data: { labels: ['0-30d','31-60d','61-90d','91-120d','121-180d','>180d'],
+                datasets: [{ label: 'Qty (EA)', data: [620,410,380,840,1280,700], backgroundColor: ['rgba(16,185,129,0.6)','rgba(16,185,129,0.5)','rgba(251,191,36,0.5)','rgba(251,191,36,0.6)','rgba(239,68,68,0.5)','rgba(239,68,68,0.6)'], borderRadius: 4 }]},
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 9 } } }, y: { grid: { color: 'rgba(51,65,85,0.2)' }, ticks: { color: '#64748b', font: { size: 9 } } } } }
+            });
+        }
+        // L1 Charts
+        new Chart(document.getElementById('qtyChart').getContext('2d'), { type: 'doughnut', data: { labels: ['Strategic','Excess','Obsolescence','Below SS'],
+            datasets: [{ data: [84620,42180,15020,6420], backgroundColor: ['rgba(16,185,129,0.7)','rgba(251,191,36,0.7)','rgba(239,68,68,0.7)','rgba(6,182,212,0.7)'], borderWidth: 0 }]},
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 10 }, padding: 16, generateLabels: c => c.data.labels.map((l,i) => ({ text: l+': '+(c.data.datasets[0].data[i]/1000).toFixed(1)+'K EA', fillStyle: c.data.datasets[0].backgroundColor[i], index: i })) } } } }
+        });
+        new Chart(document.getElementById('valChart').getContext('2d'), { type: 'doughnut', data: { labels: ['Strategic $24.6M','Excess $11.8M','Obsolescence $3.2M','Below SS $3.4M'],
+            datasets: [{ data: [24.6,11.8,3.2,3.4], backgroundColor: ['rgba(16,185,129,0.7)','rgba(251,191,36,0.7)','rgba(239,68,68,0.7)','rgba(6,182,212,0.7)'], borderWidth: 0 }]},
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 10 }, padding: 16 } } } }
+        });
+        document.getElementById('refreshTime').textContent = new Date().toLocaleString();
+    </script>
+</body>
+</html>

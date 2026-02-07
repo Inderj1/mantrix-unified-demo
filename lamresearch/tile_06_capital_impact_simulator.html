@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STOX.AI | Tile 6 — Capital Impact Simulator</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}:root{--bg-primary:#0a0f1a;--bg-secondary:#111827;--border-color:#334155;--text-primary:#f8fafc;--text-secondary:#94a3b8;--text-muted:#64748b;--cyan-400:#22d3ee;--emerald-400:#34d399;--emerald-500:#10b981;--amber-400:#fbbf24;--red-400:#f87171;--red-500:#ef4444;--rose-400:#fb7185;--rose-500:#f43f5e;--gold-400:#fbbf24;--gold-500:#f59e0b}
+body{font-family:'JetBrains Mono',monospace;background:var(--bg-primary);background-image:radial-gradient(ellipse at 50% 10%,rgba(244,63,94,0.1) 0%,transparent 40%),radial-gradient(ellipse at 80% 90%,rgba(251,191,36,0.08) 0%,transparent 40%);color:var(--text-primary);min-height:100vh;padding:24px}
+.container{max-width:1800px;margin:0 auto}.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid rgba(71,85,105,0.3)}
+.logo-section{display:flex;align-items:center;gap:16px}.logo{width:52px;height:52px;background:linear-gradient(135deg,var(--rose-500),var(--gold-500));border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 8px 32px rgba(244,63,94,0.3)}
+.brand h1{font-size:26px;font-weight:700;background:linear-gradient(135deg,var(--rose-400),var(--gold-400));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.brand p{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:3px;margin-top:2px}
+.tile-badge{background:linear-gradient(135deg,var(--rose-500),var(--gold-500));padding:10px 20px;border-radius:8px;font-size:11px;font-weight:600;letter-spacing:1px;color:white}
+.premise-banner{background:linear-gradient(135deg,rgba(244,63,94,0.06),rgba(251,191,36,0.04));border:1px solid rgba(244,63,94,0.2);border-radius:14px;padding:20px 28px;margin-bottom:28px;display:flex;align-items:center;gap:16px}
+.premise-banner .icon{font-size:28px}.premise-banner .text{font-size:13px;color:var(--text-secondary);line-height:1.6}.premise-banner .text strong{color:var(--rose-400)}
+.dual-exec{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+.dual-panel{background:rgba(17,24,39,0.7);border:1px solid rgba(51,65,85,0.4);border-radius:16px;padding:24px}
+.dual-panel h3{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.dual-panel h3.qty{color:var(--cyan-400)}.dual-panel h3.val{color:var(--rose-400)}
+.dual-panel h3 .sap-badge{margin-left:auto;font-size:9px;padding:3px 8px;border-radius:4px;color:rgba(244,63,94,0.7);background:rgba(244,63,94,0.1)}
+.dual-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.dual-metric{background:rgba(10,15,26,0.5);border-radius:10px;padding:16px;text-align:center;border:1px solid rgba(51,65,85,0.3)}
+.dual-metric .label{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}.dual-metric .value{font-size:24px;font-weight:700}.dual-metric .sub{font-size:10px;color:var(--text-muted);margin-top:4px}
+.exec-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.exec-card{background:rgba(17,24,39,0.7);border:1px solid rgba(51,65,85,0.4);border-radius:16px;padding:24px;transition:all 0.3s}.exec-card:hover{transform:translateY(-3px)}
+.exec-card .label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px}.exec-card .value{font-size:32px;font-weight:700;line-height:1}
+.exec-card .sub{font-size:11px;color:var(--text-muted);margin-top:8px}.exec-card .sub strong{color:var(--text-secondary)}
+.exec-card.release{border-left:5px solid var(--emerald-500)}.exec-card.invest{border-left:5px solid var(--amber-400)}.exec-card.roi{border-left:5px solid var(--cyan-400)}.exec-card.risk{border-left:5px solid var(--rose-500)}
+.scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:28px}
+.scenario-card{background:rgba(17,24,39,0.5);border:1px solid rgba(51,65,85,0.4);border-radius:16px;padding:24px;cursor:pointer;transition:all 0.3s}
+.scenario-card:hover{border-color:rgba(244,63,94,0.3);transform:translateY(-2px)}.scenario-card.selected{border-color:rgba(244,63,94,0.6);background:rgba(244,63,94,0.05)}
+.sc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.sc-title{font-size:13px;font-weight:600}
+.sc-tag{font-size:9px;padding:3px 10px;border-radius:4px;font-weight:600}.sc-tag.recommended{background:rgba(16,185,129,0.2);color:var(--emerald-400)}.sc-tag.conservative{background:rgba(59,130,246,0.2);color:#60a5fa}.sc-tag.aggressive{background:rgba(244,63,94,0.2);color:var(--rose-400)}
+.sc-metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px}.sc-metric .label{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}.sc-metric .value{font-size:16px;font-weight:700}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px}
+.chart-card{background:rgba(17,24,39,0.6);border:1px solid rgba(51,65,85,0.4);border-radius:14px;padding:24px}
+.chart-card h3{font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.chart-card h3 .icon{color:var(--rose-400)}.chart-container-lg{height:220px}
+.trace-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px}
+.trace-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:28px}
+.trace-card{background:rgba(17,24,39,0.5);border:1px solid rgba(51,65,85,0.4);border-radius:12px;padding:16px;text-align:center;transition:all 0.3s}.trace-card:hover{border-color:rgba(244,63,94,0.3)}
+.t-num{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}.t-name{font-size:10px;color:var(--text-secondary);margin-bottom:8px}
+.t-qty{font-size:14px;font-weight:700;color:var(--cyan-400)}.t-val{font-size:14px;font-weight:700;margin-top:4px}.t-desc{font-size:9px;color:var(--text-muted);margin-top:6px}
+.memo-section{background:rgba(17,24,39,0.4);border:1px solid rgba(51,65,85,0.4);border-radius:16px;padding:32px;margin-bottom:28px}
+.memo-section h2{font-size:16px;font-weight:700;color:var(--rose-400);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.memo-section h2 .badge{font-size:9px;background:rgba(244,63,94,0.2);color:var(--rose-400);padding:3px 10px;border-radius:4px;font-weight:600}
+.memo-row{display:grid;grid-template-columns:200px 1fr;gap:20px;padding:16px 0;border-bottom:1px solid rgba(51,65,85,0.2)}.memo-row:last-child{border-bottom:none}
+.memo-row .memo-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;padding-top:2px}
+.memo-row .memo-value{font-size:13px;color:var(--text-secondary);line-height:1.7}.memo-row .memo-value strong{color:var(--text-primary)}
+.decision-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px}
+.decision-btn{padding:20px 24px;border-radius:14px;border:2px solid;font-family:inherit;cursor:pointer;transition:all 0.3s;text-align:left;background:transparent}
+.decision-btn .btn-title{font-size:14px;font-weight:700;margin-bottom:6px}.decision-btn .btn-desc{font-size:11px;opacity:0.8}
+.decision-btn.approve{border-color:rgba(16,185,129,0.4);color:var(--emerald-400)}.decision-btn.approve:hover{background:rgba(16,185,129,0.1);transform:translateY(-2px)}
+.decision-btn.modify{border-color:rgba(251,191,36,0.4);color:var(--amber-400)}.decision-btn.modify:hover{background:rgba(251,191,36,0.1);transform:translateY(-2px)}
+.decision-btn.reject{border-color:rgba(239,68,68,0.4);color:var(--red-400)}.decision-btn.reject:hover{background:rgba(239,68,68,0.1);transform:translateY(-2px)}
+.ai-panel{background:linear-gradient(135deg,rgba(244,63,94,0.06),rgba(251,191,36,0.04));border:1px solid rgba(244,63,94,0.25);border-radius:14px;padding:24px;position:relative;overflow:hidden}
+.ai-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--rose-500),var(--gold-500),var(--rose-500));background-size:200% 100%;animation:shimmer 3s ease infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.ai-panel-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.ai-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--rose-500),var(--gold-500));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.ai-panel-header h3{font-size:16px;font-weight:700;color:var(--rose-400);margin:0}.ai-panel-header p{font-size:11px;color:var(--text-muted);margin-top:2px}
+.ai-confidence{margin-left:auto;text-align:right}.ai-confidence .value{font-size:24px;font-weight:700;color:var(--emerald-400)}.ai-confidence .label{font-size:9px;color:var(--text-muted);text-transform:uppercase}
+.ai-content{font-size:12px;color:var(--text-secondary);line-height:1.7}.ai-content strong{color:var(--text-primary)}
+.footer{display:flex;justify-content:space-between;align-items:center;margin-top:32px;padding-top:20px;border-top:1px solid rgba(51,65,85,0.2);font-size:11px;color:var(--text-muted)}.footer .info{display:flex;gap:16px}
+</style></head>
+<body><div class="container">
+<div class="header"><div class="logo-section"><div class="logo">🏛️</div><div class="brand"><h1>STOX.AI</h1><p>Capital Impact Simulator</p></div></div><div class="tile-badge">TILE 6 — CFO / BOARD LENS</div></div>
+<div class="premise-banner"><div class="icon">🎯</div><div class="text"><strong>If we accept these recommendations, what happens — in units AND dollars — to cash, margin, and risk?</strong><br>Every recommendation from Tiles 0–5 aggregated. Total SKUs, total units repositioned, total capital impact. Three scenarios. Monte Carlo. Board-ready memo. Approve / Reject / Modify — full audit trail to SAP rows and actual quantities.</div></div>
+<div class="dual-exec">
+<div class="dual-panel"><h3 class="qty">📦 Quantity Impact <span class="sap-badge">MARC / MARD</span></h3>
+<div class="dual-metrics">
+<div class="dual-metric"><div class="label">SKUs Affected</div><div class="value" style="color:var(--cyan-400)">342</div><div class="sub">of 2,286 total (15%)</div></div>
+<div class="dual-metric"><div class="label">Units Repositioned</div><div class="value" style="color:var(--cyan-400)">86,820 EA</div><div class="sub">↓38,400 reduce | ↑6,420 add</div></div>
+<div class="dual-metric"><div class="label">Net Reduction</div><div class="value" style="color:var(--emerald-400)">-31,980 EA</div><div class="sub">148,240 → 116,260 EA (-22%)</div></div>
+</div></div>
+<div class="dual-panel"><h3 class="val">💰 Capital Impact <span class="sap-badge">MBEW / ACDOCA</span></h3>
+<div class="dual-metrics">
+<div class="dual-metric"><div class="label">Capital Released</div><div class="value" style="color:var(--emerald-400)">$11.8M</div><div class="sub">SS reductions + excess</div></div>
+<div class="dual-metric"><div class="label">Capital Invested</div><div class="value" style="color:var(--amber-400)">$3.4M</div><div class="sub">Protecting $18.2M revenue</div></div>
+<div class="dual-metric"><div class="label">Net Freed</div><div class="value" style="color:var(--emerald-400)">-$8.4M</div><div class="sub">$42.8M → $34.4M</div></div>
+</div></div></div>
+<div class="exec-grid">
+<div class="exec-card release"><div class="label">Working Capital Released</div><div class="value" style="color:var(--emerald-400)">$8.4M</div><div class="sub"><strong>31,980 EA</strong> net reduction across 342 SKUs</div></div>
+<div class="exec-card invest"><div class="label">EBITDA Impact</div><div class="value" style="color:var(--amber-400)">+$2.1M</div><div class="sub"><strong>Carry ↓$2.6M</strong> + Stockout ↓$1.8M — Noise ↓$3.6M</div></div>
+<div class="exec-card roi"><div class="label">ROIC Delta</div><div class="value" style="color:var(--cyan-400)">+6.8pp</div><div class="sub"><strong>18.2% → 25.0%</strong> | Turns: 5.4× → 7.1×</div></div>
+<div class="exec-card risk"><div class="label">Downside (P5)</div><div class="value" style="color:var(--rose-400)">$1.2M</div><div class="sub"><strong>Monte Carlo floor</strong> — still positive at 95% CI</div></div>
+</div>
+<div class="scenario-grid">
+<div class="scenario-card selected" onclick="selectScenario(this)"><div class="sc-header"><span class="sc-title">📊 Recommended</span><span class="sc-tag recommended">RECOMMENDED</span></div>
+<div class="sc-metrics"><div class="sc-metric"><div class="label">Qty Change</div><div class="value" style="color:var(--emerald-400)">-31,980 EA</div></div>
+<div class="sc-metric"><div class="label">Capital Freed</div><div class="value" style="color:var(--emerald-400)">$8.4M</div></div>
+<div class="sc-metric"><div class="label">Service Level</div><div class="value" style="color:var(--emerald-400)">+0.4%</div></div>
+<div class="sc-metric"><div class="label">EBITDA</div><div class="value" style="color:var(--emerald-400)">+$2.1M</div></div></div></div>
+<div class="scenario-card" onclick="selectScenario(this)"><div class="sc-header"><span class="sc-title">🛡️ Conservative</span><span class="sc-tag conservative">CONSERVATIVE</span></div>
+<div class="sc-metrics"><div class="sc-metric"><div class="label">Qty Change</div><div class="value" style="color:var(--emerald-400)">-16,200 EA</div></div>
+<div class="sc-metric"><div class="label">Capital Freed</div><div class="value" style="color:var(--emerald-400)">$4.2M</div></div>
+<div class="sc-metric"><div class="label">Service Level</div><div class="value" style="color:var(--emerald-400)">+0.8%</div></div>
+<div class="sc-metric"><div class="label">EBITDA</div><div class="value" style="color:var(--emerald-400)">+$1.0M</div></div></div></div>
+<div class="scenario-card" onclick="selectScenario(this)"><div class="sc-header"><span class="sc-title">🚀 Aggressive</span><span class="sc-tag aggressive">AGGRESSIVE</span></div>
+<div class="sc-metrics"><div class="sc-metric"><div class="label">Qty Change</div><div class="value" style="color:var(--emerald-400)">-58,400 EA</div></div>
+<div class="sc-metric"><div class="label">Capital Freed</div><div class="value" style="color:var(--emerald-400)">$14.6M</div></div>
+<div class="sc-metric"><div class="label">Service Level</div><div class="value" style="color:var(--amber-400)">-1.2%</div></div>
+<div class="sc-metric"><div class="label">EBITDA</div><div class="value" style="color:var(--emerald-400)">+$3.8M</div></div></div></div>
+</div>
+<div class="charts-grid">
+<div class="chart-card"><h3><span class="icon">📈</span> Working Capital & Inventory Qty (12 Months)</h3><div class="chart-container-lg"><canvas id="cashFlowChart"></canvas></div></div>
+<div class="chart-card"><h3><span class="icon">🎲</span> Monte Carlo — Capital Release Distribution (1,000 Runs)</h3><div class="chart-container-lg"><canvas id="monteCarloChart"></canvas></div></div>
+</div>
+<div class="trace-label">Impact Traceability — Units AND Dollars From Each Tile</div>
+<div class="trace-grid">
+<div class="trace-card"><div class="t-num">Tile 0</div><div class="t-name">Ground Truth</div><div class="t-qty">206 SKUs excluded</div><div class="t-val" style="color:var(--amber-400)">$651K</div><div class="t-desc">Margin illusion corrected</div></div>
+<div class="trace-card"><div class="t-num">Tile 1</div><div class="t-name">Capital Health</div><div class="t-qty">42,180 EA excess</div><div class="t-val" style="color:var(--emerald-400)">$11.8M</div><div class="t-desc">Balance sheet decomposition</div></div>
+<div class="trace-card"><div class="t-num">Tile 2</div><div class="t-name">Demand vs Supply</div><div class="t-qty">22,780 EA gap</div><div class="t-val" style="color:var(--emerald-400)">$18.2M</div><div class="t-desc">Bottlenecks priced</div></div>
+<div class="trace-card"><div class="t-num">Tile 3</div><div class="t-name">Supply Risk</div><div class="t-qty">41,140 EA late</div><div class="t-val" style="color:var(--emerald-400)">$4.8M</div><div class="t-desc">Vendor capital tax</div></div>
+<div class="trace-card"><div class="t-num">Tile 4</div><div class="t-name">SS Economics</div><div class="t-qty">-38,400 / +6,420 EA</div><div class="t-val" style="color:var(--emerald-400)">$2.8M</div><div class="t-desc">Parameters justified</div></div>
+<div class="trace-card"><div class="t-num">Tile 5</div><div class="t-name">Signal Quality</div><div class="t-qty">42,000 EA false</div><div class="t-val" style="color:var(--emerald-400)">$3.6M</div><div class="t-desc">MRP noise priced</div></div>
+</div>
+<div class="memo-section">
+<h2>📋 Board-Ready Capital Memo <span class="badge">AUTO-GENERATED</span></h2>
+<div class="memo-row"><div class="memo-label">Executive Summary</div>
+<div class="memo-value">STOX.AI analysis of <strong>2,286 SKU-locations</strong> (148,240 EA / $42.8M) across 3 plants identifies <strong>31,980 EA of net inventory reduction</strong> releasing <strong>$8.4M working capital</strong> with service level improvement of +0.4%. Simultaneously, <strong>6,420 EA reinvested</strong> across 89 SKUs to protect <strong>$18.2M revenue-at-risk</strong>.</div></div>
+<div class="memo-row"><div class="memo-label">Quantity Impact</div>
+<div class="memo-value">SS reductions: <strong>-38,400 EA across 126 SKUs</strong> (avg -305 EA/SKU) | SS increases: <strong>+6,420 EA across 89 SKUs</strong> (avg +72 EA/SKU) | Lot size changes: <strong>127 SKUs FX → EX</strong> | PLIFZ corrections: <strong>186 SKUs</strong> | False POs prevented: <strong>42,000 EA/year</strong> | Planner hours recovered: <strong>1,420 hrs/yr</strong></div></div>
+<div class="memo-row"><div class="memo-label">P&L Impact</div>
+<div class="memo-value">Carrying cost: <strong>-$2.6M/yr</strong> (22% on released capital) | Stockout avoidance: <strong>+$1.8M</strong> (89 SKU reinvestment) | MRP noise: <strong>-$3.6M</strong> (expedites + false POs + labor) | Net EBITDA: <strong>+$2.1M/yr</strong></div></div>
+<div class="memo-row"><div class="memo-label">Balance Sheet</div>
+<div class="memo-value">Inventory: <strong>148,240 → 116,260 EA (-22%)</strong> | Capital: <strong>$42.8M → $34.4M (-$8.4M)</strong> | Turns: <strong>5.4× → 7.1×</strong> | CCC: <strong>-6.2 days</strong> | ROIC: <strong>18.2% → 25.0%</strong> | FCF: <strong>+$8.4M one-time + $2.1M annual</strong></div></div>
+<div class="memo-row"><div class="memo-label">Risk (Monte Carlo)</div>
+<div class="memo-value"><strong>P50 = -31,980 EA / -$8.4M</strong> | <strong>P5 = -8,400 EA / -$1.2M</strong> (still positive) | <strong>P95 = -52,000 EA / -$12.8M</strong> | SL range: <strong>94.2%–97.8%</strong> (current 95.4%)</div></div>
+<div class="memo-row"><div class="memo-label">Implementation</div>
+<div class="memo-value">Phase 1 (0-30d): <strong>126 SS reductions: -38,400 EA / -$4.2M</strong> — zero risk | Phase 2 (30-60d): <strong>89 SS increases + 186 LT fixes: +6,420 EA / +$3.4M</strong> — protects $18.2M | Phase 3 (60-90d): <strong>Vendor + lot size: -42,000 EA false orders / -$4.2M</strong></div></div>
+<div class="memo-row"><div class="memo-label">Audit Trail</div>
+<div class="memo-value"><strong>Every recommendation traces:</strong> SAP table → qty change (EA) → $ impact → business rule → Tile source. 206 SKUs excluded (Tile 0 trust &lt;60%). Full package: 342 change requests with before/after values. Downloadable.</div></div>
+</div>
+<div class="decision-grid">
+<button class="decision-btn approve"><div class="btn-title">✓ Approve Recommended</div><div class="btn-desc">Release 31,980 EA / $8.4M. Generate 342 SAP change requests. 3 phases over 90 days.</div></button>
+<button class="decision-btn modify"><div class="btn-title">✏️ Modify & Re-Simulate</div><div class="btn-desc">Adjust capital constraints, service floors, exclude SKUs. Re-run Monte Carlo.</div></button>
+<button class="decision-btn reject"><div class="btn-title">✗ Reject — More Data</div><div class="btn-desc">Flag concerns. Request deeper analysis. Schedule joint review.</div></button>
+</div>
+<div class="ai-panel">
+<div class="ai-panel-header"><div class="ai-icon">🤖</div><div><h3>STOX.AI Capital Decision Intelligence</h3><p>Every unit counted. Every dollar traced. Every recommendation explainable.</p></div>
+<div class="ai-confidence"><div class="value">89%</div><div class="label">Portfolio Confidence</div></div></div>
+<div class="ai-content">
+<strong>What o9 / Kinaxis / SAP IBP say:</strong> "Reduce inventory by 12%."<br><br>
+<strong>What STOX.AI says:</strong><br>
+• <strong>Which 31,980 EA to remove:</strong> 38,400 EA excess (126 SKUs, zero service risk) minus 6,420 EA to ADD (89 under-protected SKUs defending $18.2M revenue)<br>
+• <strong>Which 42,180 EA are safe to release</strong> ($11.8M) vs 84,620 EA strategic ($24.6M — protect) vs 15,020 EA obsolescence risk ($3.2M — write down)<br>
+• <strong>Which 22,780 EA are in active shortage</strong> ($4.6M revenue risk) with exact SO numbers: "SO 300012847, Boeing, 400 EA, Feb 12"<br>
+• <strong>Which 41,140 EA arrived late</strong> from which vendors, creating $9.2M forced buffer, costing $3.8M/yr<br>
+• <strong>Which 42,000 EA of false POs</strong> MRP generates monthly from wrong parameters, wasting 1,420 planner hrs and $3.6M/yr<br><br>
+<strong>Bottom line:</strong> 31,980 EA removed. $8.4M freed. $2.1M annual. ROIC 18.2% → 25.0%. Turns 5.4× → 7.1×. Every unit traceable. Every dollar auditable. 90 days. Board-ready.
+</div></div>
+<div class="footer"><div class="info"><span>STOX.AI Capital Impact Simulator</span><span>•</span><span>Tile 6 of 6</span><span>•</span><span>Layer: CFO / Board</span><span>•</span><span>Last Refresh: <span id="refreshTime"></span></span></div><div>© 2025 Cloud Mantra LLC | Mantrix.AI</div></div>
+</div>
+<script>
+function selectScenario(el){document.querySelectorAll('.scenario-card').forEach(c=>c.classList.remove('selected'));el.classList.add('selected')}
+new Chart(document.getElementById('cashFlowChart').getContext('2d'),{type:'line',data:{labels:['M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12'],
+datasets:[
+{label:'Current Inv (K EA)',data:[148,148,149,148,149,148,149,148,149,148,148,148],borderColor:'#64748b',borderWidth:2,borderDash:[6,4],fill:false,tension:0.3,pointRadius:0,yAxisID:'y1'},
+{label:'Optimized (K EA)',data:[148,142,136,131,127,122,118,117,116,116,116,116],borderColor:'#22d3ee',borderWidth:2,fill:false,tension:0.3,pointRadius:2,pointBackgroundColor:'#22d3ee',yAxisID:'y1'},
+{label:'Working Capital ($M)',data:[42.8,41.2,39.8,38.4,37.2,36.0,35.2,34.8,34.6,34.4,34.4,34.4],borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.1)',borderWidth:2,fill:true,tension:0.3,pointRadius:3,pointBackgroundColor:'#10b981'},
+{label:'Cum Cash Freed ($M)',data:[0,1.6,3.0,4.4,5.6,6.8,7.6,8.0,8.2,8.4,8.4,8.4],borderColor:'#fbbf24',borderWidth:2,fill:false,tension:0.3,pointRadius:2}
+]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+plugins:{legend:{position:'top',labels:{color:'#94a3b8',font:{size:9},boxWidth:10}}},
+scales:{x:{grid:{color:'rgba(51,65,85,0.2)'},ticks:{color:'#64748b',font:{size:9}}},y:{grid:{color:'rgba(51,65,85,0.2)'},ticks:{color:'#64748b',font:{size:9},callback:v=>'$'+v+'M'},min:30,max:46},y1:{position:'right',grid:{display:false},ticks:{color:'#22d3ee',font:{size:9},callback:v=>v+'K'},min:110,max:155}}}
+});
+new Chart(document.getElementById('monteCarloChart').getContext('2d'),{type:'bar',data:{labels:['$0-2M','$2-4M','$4-6M','$6-8M','$8-10M','$10-12M','$12-14M','$14M+'],
+datasets:[{label:'Scenarios',data:[12,45,120,280,310,148,62,23],
+backgroundColor:['rgba(239,68,68,0.5)','rgba(239,68,68,0.5)','rgba(251,191,36,0.5)','rgba(16,185,129,0.5)','rgba(16,185,129,0.5)','rgba(16,185,129,0.5)','rgba(6,182,212,0.5)','rgba(6,182,212,0.5)'],borderRadius:4}]},
+options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#64748b',font:{size:9}}},y:{grid:{color:'rgba(51,65,85,0.2)'},ticks:{color:'#64748b',font:{size:9}}}}}
+});
+document.getElementById('refreshTime').textContent=new Date().toLocaleString();
+</script></body></html>

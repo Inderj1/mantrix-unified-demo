@@ -134,16 +134,16 @@ const teamMembers = [
   { id: 'system', name: 'Ordly AI', role: 'Automated Agent', avatar: 'AI' },
 ];
 
-// Sample customers - Arizona Beverages retail partners
+// Sample customers - Composite1 industrial partners
 const customers = [
-  { id: 'CUST-001', name: 'Walmart', segment: 'STRATEGIC' },
-  { id: 'CUST-002', name: 'Costco', segment: 'STRATEGIC' },
-  { id: 'CUST-003', name: 'Target', segment: 'KEY' },
-  { id: 'CUST-004', name: 'Kroger', segment: 'KEY' },
-  { id: 'CUST-005', name: '7-Eleven', segment: 'GROWTH' },
-  { id: 'CUST-006', name: 'Publix', segment: 'KEY' },
-  { id: 'CUST-007', name: 'HEB', segment: 'GROWTH' },
-  { id: 'CUST-008', name: 'CVS', segment: 'STANDARD' },
+  { id: 'CUST-001', name: 'AutoMotion Corp', segment: 'STRATEGIC' },
+  { id: 'CUST-002', name: 'Pacific Equipment Ltd', segment: 'STRATEGIC' },
+  { id: 'CUST-003', name: 'Apex Manufacturing', segment: 'KEY' },
+  { id: 'CUST-004', name: 'TechDrive Systems', segment: 'KEY' },
+  { id: 'CUST-005', name: 'Precision Parts Inc', segment: 'GROWTH' },
+  { id: 'CUST-006', name: 'Summit Industrial', segment: 'KEY' },
+  { id: 'CUST-007', name: 'Western Hydraulics', segment: 'GROWTH' },
+  { id: 'CUST-008', name: 'Lakeside Engineering', segment: 'STANDARD' },
 ];
 
 // Helper functions
@@ -228,43 +228,43 @@ export const createTicketFromAction = (action, alertData, user = null) => {
   };
 };
 
-// Module-specific sample data for realistic scenarios - Arizona Beverages
+// Module-specific sample data for realistic scenarios - Composite1 Industrial
 const moduleScenarios = {
   [TICKET_SOURCES.STOX_AI]: [
-    { action: ACTION_TYPES.REORDER_TRIGGERED, title: 'Reorder Triggered: Green Tea 24PK', desc: 'Safety stock threshold reached for Keasbey NJ DC', material: 'AZ Green Tea 24PK' },
-    { action: ACTION_TYPES.SAFETY_STOCK_ADJUSTED, title: 'Safety Stock Adjusted: Douglas GA', desc: 'Increased safety stock by 15% for summer demand', material: 'AZ Arnold Palmer 4PK' },
-    { action: ACTION_TYPES.REALLOCATION_EXECUTED, title: 'Reallocation: Keasbey → Douglas', desc: 'Transferred 15,000 cases to prevent stockout', material: 'AZ Mucho Mango 4PK' },
-    { action: ACTION_TYPES.SHORTAGE_ALERT_RAISED, title: 'Shortage Alert: Southeast Region', desc: 'Projected stockout in 5 days for Arnold Palmer', material: 'AZ Arnold Palmer 24PK' },
-    { action: ACTION_TYPES.WORKING_CAPITAL_OPTIMIZED, title: 'Working Capital Optimized', desc: 'Released $85K through inventory optimization at Keasbey', material: 'Multiple SKUs' },
-    { action: ACTION_TYPES.MRP_PARAMETER_CHANGED, title: 'MRP Lead Time Updated', desc: 'Adjusted Niagara Bottling lead time from 14 to 21 days', material: 'Tea Concentrate' },
-    { action: ACTION_TYPES.STORE_REPLENISHMENT, title: 'Store Replenishment: Walmart DC', desc: 'Auto-generated replenishment order for 8 SKUs', material: 'Assorted Beverages' },
+    { action: ACTION_TYPES.REORDER_TRIGGERED, title: 'Reorder Triggered: Hydraulic Pump Assembly', desc: 'Safety stock threshold reached for P1000 Detroit', material: 'Hydraulic Pump Assembly' },
+    { action: ACTION_TYPES.SAFETY_STOCK_ADJUSTED, title: 'Safety Stock Adjusted: P4000 Atlanta', desc: 'Increased safety stock by 15% for Q4 demand ramp-up', material: 'Bearing Assembly 2x4' },
+    { action: ACTION_TYPES.REALLOCATION_EXECUTED, title: 'Reallocation: P1000 Detroit → P4000 Atlanta', desc: 'Transferred 15,000 units to prevent stockout', material: 'Gasket Kit Standard' },
+    { action: ACTION_TYPES.SHORTAGE_ALERT_RAISED, title: 'Shortage Alert: Southeast Region', desc: 'Projected stockout in 5 days for Control Valve Assembly', material: 'Control Valve Assembly' },
+    { action: ACTION_TYPES.WORKING_CAPITAL_OPTIMIZED, title: 'Working Capital Optimized', desc: 'Released $85K through inventory optimization at P1000 Detroit', material: 'Multiple SKUs' },
+    { action: ACTION_TYPES.MRP_PARAMETER_CHANGED, title: 'MRP Lead Time Updated', desc: 'Adjusted VENDOR-A lead time from 14 to 21 days', material: 'Raw Material Castings' },
+    { action: ACTION_TYPES.STORE_REPLENISHMENT, title: 'Replenishment: AutoMotion Corp', desc: 'Auto-generated replenishment order for 8 SKUs', material: 'Assorted Materials' },
   ],
   [TICKET_SOURCES.MARGEN_AI]: [
-    { action: ACTION_TYPES.MARGIN_ALERT, title: 'Margin Alert: Green Tea Line', desc: 'Gross margin dropped 3.2% vs last month', material: null },
-    { action: ACTION_TYPES.CLV_UPDATED, title: 'CLV Recalculated: Strategic Retailers', desc: 'Updated CLV for Walmart and Costco accounts', material: null },
-    { action: ACTION_TYPES.SEGMENT_CHANGED, title: 'Segment Migration: 7-Eleven', desc: 'Moved from Growth to Key based on volume increase', material: null },
+    { action: ACTION_TYPES.MARGIN_ALERT, title: 'Margin Alert: Hydraulics Line', desc: 'Gross margin dropped 3.2% vs last month', material: null },
+    { action: ACTION_TYPES.CLV_UPDATED, title: 'CLV Recalculated: Strategic Accounts', desc: 'Updated CLV for AutoMotion Corp and Pacific Equipment accounts', material: null },
+    { action: ACTION_TYPES.SEGMENT_CHANGED, title: 'Segment Migration: Precision Parts', desc: 'Moved from Growth to Key based on volume increase', material: null },
     { action: ACTION_TYPES.CHURN_RISK_FLAGGED, title: 'Churn Risk: Regional Distributor', desc: 'High churn probability (78%) detected', material: null },
     { action: ACTION_TYPES.REVENUE_FORECAST, title: 'Q2 Revenue Forecast Updated', desc: 'Revised forecast: $12.4M (+8% YoY)', material: null },
   ],
   [TICKET_SOURCES.ORDLY_AI]: [
-    { action: ACTION_TYPES.ORDER_COMMITTED, title: 'SAP Commit: Walmart PO-2025-4521', desc: 'Order committed to SAP with 98% match confidence', material: 'PO-2025-4521' },
-    { action: ACTION_TYPES.DEMAND_SIGNAL_PROCESSED, title: 'EDI 850 Processed: Costco', desc: 'Processed 45 line items from demand signal', material: 'Multiple Items' },
-    { action: ACTION_TYPES.NETWORK_OPTIMIZED, title: 'Network Optimization Complete', desc: 'Optimized fulfillment across 5 production facilities', material: null },
-    { action: ACTION_TYPES.ARBITRATION_COMPLETED, title: 'Arbitration: Multi-DC Conflict', desc: 'Resolved allocation conflict for Green Tea 24PK', material: 'AZ Green Tea 24PK' },
-    { action: ACTION_TYPES.ORDER_PROMISE_UPDATED, title: 'Promise Date Updated: Target Order', desc: 'Revised delivery from Jan 15 to Jan 12', material: 'Target Order #8842' },
+    { action: ACTION_TYPES.ORDER_COMMITTED, title: 'SAP Commit: AutoMotion PO-2025-4521', desc: 'Order committed to SAP with 98% match confidence', material: 'PO-2025-4521' },
+    { action: ACTION_TYPES.DEMAND_SIGNAL_PROCESSED, title: 'EDI 850 Processed: Pacific Equipment', desc: 'Processed 45 line items from demand signal', material: 'Multiple Items' },
+    { action: ACTION_TYPES.NETWORK_OPTIMIZED, title: 'Network Optimization Complete', desc: 'Optimized fulfillment across 5 production plants', material: null },
+    { action: ACTION_TYPES.ARBITRATION_COMPLETED, title: 'Arbitration: Multi-Plant Conflict', desc: 'Resolved allocation conflict for Hydraulic Pump Assembly', material: 'Hydraulic Pump Assembly' },
+    { action: ACTION_TYPES.ORDER_PROMISE_UPDATED, title: 'Promise Date Updated: Apex Mfg Order', desc: 'Revised delivery from Jan 15 to Jan 12', material: 'Apex Mfg Order #8842' },
   ],
   [TICKET_SOURCES.AXIS_AI]: [
-    { action: ACTION_TYPES.FORECAST_UPDATED, title: 'Demand Forecast: Summer 2025', desc: 'ML model updated forecast with 94% accuracy', material: null },
-    { action: ACTION_TYPES.SCENARIO_CREATED, title: 'Scenario: 15% Summer Surge', desc: 'Created what-if scenario for production planning', material: null },
-    { action: ACTION_TYPES.BUDGET_ALERT, title: 'Budget Variance Alert', desc: 'Packaging COGS exceeding budget by 4.2%', material: null },
+    { action: ACTION_TYPES.FORECAST_UPDATED, title: 'Demand Forecast: Q4 2025', desc: 'ML model updated forecast with 94% accuracy', material: null },
+    { action: ACTION_TYPES.SCENARIO_CREATED, title: 'Scenario: 15% Q4 Demand Surge', desc: 'Created what-if scenario for production planning', material: null },
+    { action: ACTION_TYPES.BUDGET_ALERT, title: 'Budget Variance Alert', desc: 'Raw materials COGS exceeding budget by 4.2%', material: null },
   ],
   [TICKET_SOURCES.PROCESS_AI]: [
-    { action: ACTION_TYPES.AI_QUERY_EXECUTED, title: 'Workflow Optimized: Bottling Line', desc: 'Identified 3 bottlenecks in Santa Clarita production', material: null },
-    { action: ACTION_TYPES.RECOMMENDATION_GENERATED, title: 'Process Improvement: Packaging', desc: 'Suggested automation for case packing', material: null },
+    { action: ACTION_TYPES.AI_QUERY_EXECUTED, title: 'Workflow Optimized: Assembly Line', desc: 'Identified 3 bottlenecks in P2000 Phoenix production', material: null },
+    { action: ACTION_TYPES.RECOMMENDATION_GENERATED, title: 'Process Improvement: Final Assembly', desc: 'Suggested automation for packaging and dispatch', material: null },
   ],
   [TICKET_SOURCES.EMAIL_INTEL]: [
-    { action: ACTION_TYPES.DEMAND_SIGNAL_PROCESSED, title: 'Email PO Extracted: Kroger', desc: 'Parsed order details from email attachment', material: 'PO-EMAIL-8842' },
-    { action: ACTION_TYPES.INSIGHT_GENERATED, title: 'Customer Intent Detected', desc: 'Identified urgent order request from HEB', material: null },
+    { action: ACTION_TYPES.DEMAND_SIGNAL_PROCESSED, title: 'Email PO Extracted: TechDrive Systems', desc: 'Parsed order details from email attachment', material: 'PO-EMAIL-8842' },
+    { action: ACTION_TYPES.INSIGHT_GENERATED, title: 'Customer Intent Detected', desc: 'Identified urgent order request from Summit Industrial', material: null },
   ],
 };
 
@@ -326,7 +326,7 @@ export const generateSampleTickets = (count = 25) => {
         `Quote preparation for ${customer.name}`,
         `ML-recommended action for ${customer.name}`,
       ]);
-      material = randomItem(['AZ Green Tea 24PK', 'AZ Arnold Palmer 4PK', 'AZ Mucho Mango 24PK', 'AZ Lemon Tea 12PK']);
+      material = randomItem(['Hydraulic Pump Assembly', 'Bearing Assembly 2x4', 'Gasket Kit Standard', 'Control Valve Assembly']);
     }
 
     const activity = [

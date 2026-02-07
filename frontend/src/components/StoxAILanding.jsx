@@ -44,6 +44,7 @@ import {
   AccountBalance as AccountBalanceIcon,
   Storefront as StorefrontIcon,
   LocalShipping as LocalShippingIcon,
+  Memory as MemoryIcon,
 } from '@mui/icons-material';
 
 // Import centralized brand colors
@@ -77,6 +78,15 @@ const categoryTiles = [
     icon: LocalShippingIcon,
     color: MODULE_COLOR,
     stats: { label: 'Modules', value: '5' },
+  },
+  {
+    id: 'lam-research',
+    title: 'STOX (MFG - LAM RESEARCH)',
+    subtitle: 'Semiconductor Equipment',
+    description: 'Semiconductor equipment manufacturing optimization for etch, deposition, and clean systems',
+    icon: MemoryIcon,
+    color: MODULE_COLOR,
+    stats: { label: 'Tiles', value: '7' },
   },
 ];
 
@@ -397,6 +407,10 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView, dar
       if (onCategorySelect) {
         onCategorySelect('distribution');
       }
+    } else if (categoryId === 'lam-research') {
+      if (onCategorySelect) {
+        onCategorySelect('lam-research');
+      }
     }
   };
 
@@ -627,7 +641,7 @@ const StoxAILanding = ({ onTileClick, onBack, onCategorySelect, initialView, dar
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
               <Avatar sx={{ width: 32, height: 32, bgcolor: MODULE_COLOR }}><InventoryIcon sx={{ fontSize: 18 }} /></Avatar>
               <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>STOX.AI</Typography>
-              <Chip label="2 Modules" size="small" sx={{ bgcolor: alpha(MODULE_COLOR, darkMode ? 0.2 : 0.1), color: MODULE_COLOR, fontWeight: 600, fontSize: '0.7rem' }} />
+              <Chip label="4 Modules" size="small" sx={{ bgcolor: alpha(MODULE_COLOR, darkMode ? 0.2 : 0.1), color: MODULE_COLOR, fontWeight: 600, fontSize: '0.7rem' }} />
             </Stack>
             <Typography variant="body2" sx={{ color: colors.textSecondary }}>Smart Inventory & Supply Chain Optimization Platform</Typography>
           </Box>

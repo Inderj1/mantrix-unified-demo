@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STOX.AI | Tile 0 — Economic Ground Truth</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--bg:#0a0f1a;--bg2:#111827;--bg3:#1e293b;--brd:#334155;--t1:#f8fafc;--t2:#94a3b8;--t3:#64748b;--gold:#fbbf24;--gold2:#f59e0b;--gold3:#d97706;--cyan:#22d3ee;--em:#34d399;--em2:#10b981;--am:#fbbf24;--am2:#f59e0b;--red:#f87171;--red2:#ef4444;--pur:#a78bfa}
+        body{font-family:'JetBrains Mono',monospace;background:var(--bg);background-image:radial-gradient(ellipse at 20% 20%,rgba(251,191,36,0.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(148,163,184,0.06) 0%,transparent 50%);color:var(--t1);min-height:100vh;padding:24px}
+        .ctr{max-width:1800px;margin:0 auto}
+        .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid rgba(71,85,105,0.3)}
+        .logo-s{display:flex;align-items:center;gap:16px}
+        .logo{width:48px;height:48px;background:linear-gradient(135deg,var(--gold2),var(--gold3));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 6px 24px rgba(251,191,36,0.3)}
+        .brand h1{font-size:24px;font-weight:700;background:linear-gradient(135deg,var(--gold),var(--t2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .brand p{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:3px;margin-top:2px}
+        .badge{background:linear-gradient(135deg,var(--gold2),var(--gold3));padding:8px 16px;border-radius:6px;font-size:10px;font-weight:600;letter-spacing:1px;color:var(--bg)}
+        .banner{background:linear-gradient(135deg,rgba(251,191,36,0.06),rgba(148,163,184,0.03));border:1px solid rgba(251,191,36,0.2);border-radius:12px;padding:16px 24px;margin-bottom:24px;display:flex;align-items:center;gap:14px;font-size:12px;color:var(--t2);line-height:1.5}
+        .banner strong{color:var(--gold)}
+        .sgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:24px}
+        .sc{background:rgba(17,24,39,0.7);border:1px solid rgba(51,65,85,0.4);border-radius:12px;padding:18px;transition:all 0.3s;position:relative;overflow:hidden}
+        .sc:hover{transform:translateY(-2px);border-color:rgba(251,191,36,0.3)}
+        .sc .lb{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+        .sc .v{font-size:26px;font-weight:700;line-height:1}
+        .sc .q{font-size:12px;color:var(--t2);margin-top:5px;font-weight:500}
+        .sc .s{font-size:10px;color:var(--t3);margin-top:3px}
+        .sc.gd{border-left:4px solid var(--em2)}.sc.wn{border-left:4px solid var(--am2)}.sc.cr{border-left:4px solid var(--red2)}.sc.gl{border-left:4px solid var(--gold2)}.sc.cy{border-left:4px solid var(--cyan)}
+        .ts{background:rgba(17,24,39,0.5);border:1px solid rgba(51,65,85,0.4);border-radius:14px;overflow:hidden}
+        .th{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(51,65,85,0.4);background:linear-gradient(90deg,rgba(251,191,36,0.08),rgba(148,163,184,0.04))}
+        .th h2{font-size:12px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:1.5px}.th h2 span{color:var(--gold)}
+        .fltr{display:flex;gap:10px}
+        .fsel{background:var(--bg2);border:1px solid var(--brd);color:var(--t1);padding:6px 10px;border-radius:6px;font-family:inherit;font-size:10px;cursor:pointer}
+        table{width:100%;border-collapse:collapse}
+        th{padding:12px 10px;text-align:left;font-size:8px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:1px;background:rgba(10,15,26,0.6);border-bottom:1px solid rgba(51,65,85,0.4)}
+        td{padding:12px 10px;border-bottom:1px solid rgba(51,65,85,0.15);font-size:11px}
+        tr{cursor:pointer;transition:all 0.2s}tr:hover{background:rgba(251,191,36,0.04)}tr:hover td:first-child{color:var(--gold)}
+        .dv{display:flex;flex-direction:column;gap:1px}.dv .q{font-size:11px;font-weight:600;color:var(--t1)}.dv .d{font-size:9px;color:var(--t3)}
+        .gb{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:16px;font-size:9px;font-weight:600}
+        .gb.ok{background:rgba(16,185,129,0.15);color:var(--em);border:1px solid rgba(16,185,129,0.3)}
+        .gb.rv{background:rgba(251,191,36,0.15);color:var(--am);border:1px solid rgba(251,191,36,0.3)}
+        .gb.ex{background:rgba(239,68,68,0.15);color:var(--red);border:1px solid rgba(239,68,68,0.3)}
+        .dot{width:5px;height:5px;border-radius:50%;animation:p 2s infinite}
+        .dot.g{background:var(--em2);box-shadow:0 0 6px var(--em2)}.dot.y{background:var(--am2);box-shadow:0 0 6px var(--am2)}.dot.r{background:var(--red2);box-shadow:0 0 6px var(--red2)}
+        @keyframes p{0%,100%{opacity:1}50%{opacity:0.5}}
+        .mv{font-weight:600}.mv.g{color:var(--em)}.mv.w{color:var(--am)}.mv.c{color:var(--red)}
+        .di{opacity:0;transition:all 0.2s;color:var(--gold)}tr:hover .di{opacity:1;transform:translateX(4px)}
+        .dtl{display:none}.dtl.act{display:block}.lv{display:block}.lv.hid{display:none}
+        .bb{display:flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(30,41,59,0.5);border:1px solid rgba(51,65,85,0.4);border-radius:6px;color:var(--t2);cursor:pointer;font-family:inherit;font-size:11px;margin-bottom:20px;transition:all 0.2s}
+        .bb:hover{background:rgba(251,191,36,0.1);color:var(--gold);border-color:rgba(251,191,36,0.3)}
+        .dh{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid rgba(51,65,85,0.3)}
+        .dl{width:56px;height:56px;background:linear-gradient(135deg,var(--gold2),var(--gold3));border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 6px 24px rgba(251,191,36,0.3)}
+        .dt h1{font-size:22px;font-weight:700}.dt h1 .mi{color:var(--gold)}.dt h1 .pi{color:var(--t2);font-size:16px}
+        .dt p{font-size:12px;color:var(--t3);margin-top:4px}.dbg{margin-left:auto}
+        .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+        .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+        .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+        .dc{background:rgba(17,24,39,0.6);border:1px solid rgba(51,65,85,0.4);border-radius:12px;padding:18px}
+        .dc h3{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+        .dc h3 .ic{color:var(--gold)}.dc h3 .sap{margin-left:auto;font-size:8px;color:rgba(251,191,36,0.7);background:rgba(251,191,36,0.1);padding:2px 6px;border-radius:3px}
+        .ir{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(51,65,85,0.15)}.ir:last-child{border-bottom:none}
+        .ir .lb{font-size:10px;color:var(--t3)}.ir .vl{font-size:11px;font-weight:600;color:var(--t1);text-align:right}
+        .mk{text-align:center;padding:14px;background:rgba(10,15,26,0.5);border-radius:8px;border:1px solid rgba(51,65,85,0.3)}
+        .mk .lb{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}.mk .v{font-size:20px;font-weight:700}.mk .q{font-size:11px;color:var(--t2);margin-top:3px;font-weight:500}.mk .dl{font-size:9px;margin-top:3px}
+        .cc{height:170px;margin-top:14px}
+        .ap{background:linear-gradient(135deg,rgba(251,191,36,0.06),rgba(148,163,184,0.03));border:1px solid rgba(251,191,36,0.25);border-radius:12px;padding:20px;margin-top:20px;position:relative;overflow:hidden}
+        .ap::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold2),var(--gold3),var(--gold2));background-size:200% 100%;animation:sh 3s ease infinite}
+        @keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+        .aph{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+        .ai{width:36px;height:36px;background:linear-gradient(135deg,var(--gold2),var(--gold3));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
+        .aph h3{font-size:13px;font-weight:600;color:var(--gold);margin:0}.aph p{font-size:10px;color:var(--t3);margin-top:2px}
+        .acf{margin-left:auto;text-align:right}.acf .v{font-size:18px;font-weight:700;color:var(--em)}.acf .lb{font-size:8px;color:var(--t3);text-transform:uppercase}
+        .ar{background:rgba(10,15,26,0.5);border-radius:8px;padding:14px;margin-bottom:12px}
+        .ar .tl{font-size:11px;font-weight:600;color:var(--t1);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+        .ar .tl .pr{font-size:8px;padding:2px 6px;border-radius:3px;font-weight:600}
+        .ar .tl .pr.h{background:rgba(239,68,68,0.2);color:var(--red)}.ar .tl .pr.l{background:rgba(16,185,129,0.2);color:var(--em)}
+        .ar .ct{font-size:11px;color:var(--t2);line-height:1.6}
+        .ar .imp{display:flex;gap:20px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(51,65,85,0.3);flex-wrap:wrap}
+        .ar .imp-i{display:flex;align-items:center;gap:5px;font-size:10px}.ar .imp-i .lb{color:var(--t3)}.ar .imp-i .vl{font-weight:600}
+        .aact{display:flex;gap:10px;margin-top:16px}
+        .abtn{padding:8px 16px;border-radius:6px;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.2s;border:none}
+        .abtn.p{background:linear-gradient(135deg,var(--gold2),var(--gold3));color:var(--bg)}.abtn.p:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(251,191,36,0.4)}
+        .abtn.s{background:rgba(51,65,85,0.5);color:var(--t2);border:1px solid rgba(51,65,85,0.5)}.abtn.s:hover{background:rgba(251,191,36,0.1);color:var(--gold)}
+        .ft{display:flex;justify-content:space-between;align-items:center;margin-top:28px;padding-top:16px;border-top:1px solid rgba(51,65,85,0.2);font-size:10px;color:var(--t3)}.ft .inf{display:flex;gap:14px}
+    </style>
+</head>
+<body>
+<div class="ctr">
+    <div class="hdr"><div class="logo-s"><div class="logo">🏛️</div><div class="brand"><h1>STOX.AI</h1><p>Economic Ground Truth</p></div></div><div class="badge">TILE 0 — FOUNDATION LAYER</div></div>
+    <div class="banner">⚖️ <strong>Before optimizing a single unit — costs must be economically interpretable.</strong> SAP data is technically correct but economically incoherent out of the box. Tile 0 validates each SKU-location's costing, valuation, and UoM. On-hand qty × unit cost = inventory value — but if unit cost is fiction, every downstream tile inherits the lie.</div>
+    <div class="lv" id="lv">
+        <div class="sgrid">
+            <div class="sc gl"><div class="lb">Economic Trust Score</div><div class="v" style="color:var(--gold)">84.2%</div><div class="q">2,286 SKU-locations scored</div><div class="s">Portfolio-weighted average</div></div>
+            <div class="sc gd"><div class="lb">Decision-Grade SKUs</div><div class="v" style="color:var(--em)">1,642</div><div class="q">486,200 EA on-hand ($31.4M)</div><div class="s">71.8% — cleared for optimization</div></div>
+            <div class="sc wn"><div class="lb">Review Required</div><div class="v" style="color:var(--am)">438</div><div class="q">82,400 EA ($28.4M book, ~$24.1M true)</div><div class="s">$4.3M phantom value at risk</div></div>
+            <div class="sc cr"><div class="lb">Excluded — Untrusted</div><div class="v" style="color:var(--red)">206</div><div class="q">14,600 EA ($12.1M book, ~$8.4M true)</div><div class="s">$3.7M ghost value on books</div></div>
+            <div class="sc cy"><div class="lb">Cost Drift > 15%</div><div class="v" style="color:var(--cyan)">89 SKUs</div><div class="q">28,400 EA affected</div><div class="s">Avg +22.4% std vs actual</div></div>
+            <div class="sc gl"><div class="lb">Total Inventory Analyzed</div><div class="v" style="color:var(--gold)">583,200 EA</div><div class="q">$71.9M book / $63.9M true</div><div class="s">$8.0M total phantom value</div></div>
+        </div>
+        <div class="ts">
+            <div class="th"><h2><span>Economic</span> Data Trust — SKU Inventory Detail</h2>
+                <div class="fltr"><select class="fsel"><option>All Plants</option><option>P1000 - Detroit</option><option>P2000 - Phoenix</option><option>P3000 - Seattle</option></select>
+                <select class="fsel"><option>All Grades</option><option>✅ Decision</option><option>⚠️ Review</option><option>🚫 Excluded</option></select>
+                <select class="fsel"><option>Sort: Value ↓</option><option>Sort: On-Hand EA ↓</option><option>Sort: Drift ↓</option><option>Sort: Trust ↓</option></select></div>
+            </div>
+            <table>
+                <thead><tr><th>Material</th><th>Plant</th><th>Trust</th><th>Grade</th><th>On-Hand</th><th>Std Cost / EA</th><th>Actual Cost / EA</th><th>Book Value</th><th>True Value</th><th>Drift</th><th>Avg Demand</th><th>UoM</th><th></th></tr></thead>
+                <tbody>
+                    <tr onclick="sd('MAT-1001')"><td style="font-weight:600">MAT-1001</td><td>P1000</td><td><span class="mv w">74</span></td><td><span class="gb rv"><span class="dot y"></span>Review</span></td>
+                        <td style="font-weight:600">142 EA</td><td>$200.00</td><td style="color:var(--am)">$237.20</td>
+                        <td><div class="dv"><span class="q">$28,400</span></div></td><td><div class="dv"><span class="q" style="color:var(--am)">$33,682</span></div></td>
+                        <td class="mv w">+18.6%</td><td><div class="dv"><span class="q">48 EA/day</span><span class="d">17,520 EA/yr</span></div></td><td class="mv g">EA ✓</td><td><span class="di">→</span></td></tr>
+                    <tr onclick="sd('MAT-3089')"><td style="font-weight:600">MAT-3089</td><td>P1000</td><td><span class="mv g">96</span></td><td><span class="gb ok"><span class="dot g"></span>Decision</span></td>
+                        <td style="font-weight:600">4,230 EA</td><td>$200.00</td><td style="color:var(--em)">$203.72</td>
+                        <td><div class="dv"><span class="q">$846,000</span></div></td><td><div class="dv"><span class="q" style="color:var(--em)">$861,738</span></div></td>
+                        <td class="mv g">+1.9%</td><td><div class="dv"><span class="q">24 EA/day</span><span class="d">8,760 EA/yr</span></div></td><td class="mv g">EA ✓</td><td><span class="di">→</span></td></tr>
+                    <tr onclick="sd('MAT-2045')"><td style="font-weight:600">MAT-2045</td><td>P2000</td><td><span class="mv g">92</span></td><td><span class="gb ok"><span class="dot g"></span>Decision</span></td>
+                        <td style="font-weight:600">856 EA</td><td>$150.00</td><td style="color:var(--em)">$154.42</td>
+                        <td><div class="dv"><span class="q">$128,400</span></div></td><td><div class="dv"><span class="q" style="color:var(--em)">$132,184</span></div></td>
+                        <td class="mv g">+2.9%</td><td><div class="dv"><span class="q">18 EA/day</span><span class="d">6,570 EA/yr</span></div></td><td class="mv g">EA ✓</td><td><span class="di">→</span></td></tr>
+                    <tr onclick="sd('MAT-4012')"><td style="font-weight:600">MAT-4012</td><td>P3000</td><td><span class="mv g">89</span></td><td><span class="gb ok"><span class="dot g"></span>Decision</span></td>
+                        <td style="font-weight:600">1,280 EA</td><td>$400.00</td><td style="color:var(--em)">$420.50</td>
+                        <td><div class="dv"><span class="q">$512,000</span></div></td><td><div class="dv"><span class="q" style="color:var(--em)">$538,240</span></div></td>
+                        <td class="mv g">+5.1%</td><td><div class="dv"><span class="q">12 EA/day</span><span class="d">4,380 EA/yr</span></div></td><td class="mv g">EA ✓</td><td><span class="di">→</span></td></tr>
+                    <tr onclick="sd('MAT-5067')"><td style="font-weight:600">MAT-5067</td><td>P2000</td><td><span class="mv c">48</span></td><td><span class="gb ex"><span class="dot r"></span>Excluded</span></td>
+                        <td style="font-weight:600">460 EA</td><td>$200.00</td><td style="color:var(--red)">$114.80</td>
+                        <td><div class="dv"><span class="q">$92,000</span></div></td><td><div class="dv"><span class="q" style="color:var(--red)">$52,808</span></div></td>
+                        <td class="mv c">-42.6%</td><td><div class="dv"><span class="q">6 EA/day</span><span class="d">2,190 EA/yr</span></div></td><td class="mv c">KG/EA ✗</td><td><span class="di">→</span></td></tr>
+                    <tr onclick="sd('MAT-6200')"><td style="font-weight:600">MAT-6200</td><td>P1000</td><td><span class="mv w">68</span></td><td><span class="gb rv"><span class="dot y"></span>Review</span></td>
+                        <td style="font-weight:600">6,200 EA</td><td>$200.00</td><td style="color:var(--am)">$244.23</td>
+                        <td><div class="dv"><span class="q">$1,240,000</span></div></td><td><div class="dv"><span class="q" style="color:var(--am)">$1,514,226</span></div></td>
+                        <td class="mv w">+22.1%</td><td><div class="dv"><span class="q">32 EA/day</span><span class="d">11,680 EA/yr</span></div></td><td class="mv g">EA ✓</td><td><span class="di">→</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- L3 Detail -->
+    <div class="dtl" id="dv">
+        <button class="bb" onclick="sl()">← Back to Trust Matrix</button>
+        <div class="dh"><div class="dl">🏛️</div><div class="dt"><h1><span class="mi" id="dm">MAT-1001</span> <span class="pi">@ P1000 - Detroit</span></h1><p>Hydraulic Pump Assembly | UoM: EA | Valuation: Standard (V) | Procurement: External</p></div><div class="dbg"><span class="gb rv"><span class="dot y"></span>Review Required — Trust 74</span></div></div>
+        <div class="g4">
+            <div class="mk"><div class="lb">On-Hand Quantity</div><div class="v" style="color:var(--t1)">142 EA</div><div class="q">Unrestricted stock</div></div>
+            <div class="mk"><div class="lb">Avg Daily Demand</div><div class="v" style="color:var(--t1)">48 EA/day</div><div class="q">17,520 EA annual</div></div>
+            <div class="mk"><div class="lb">Coverage (at demand rate)</div><div class="v" style="color:var(--red)">3.0 days</div><div class="q">142 ÷ 48 = 2.96 days</div></div>
+            <div class="mk"><div class="lb">Phantom Value on 142 EA</div><div class="v" style="color:var(--red)">-$5,282</div><div class="q">Book $28.4K vs True $33.7K</div></div>
+        </div>
+        <div class="g2">
+            <div class="dc"><h3><span class="ic">💰</span> Unit Cost Analysis <span class="sap">MBEW / CKIS / CK40N</span></h3>
+                <div class="ir"><span class="lb">Standard Price (STPRS)</span><span class="vl">$200.00 / EA</span></div>
+                <div class="ir"><span class="lb">Moving Avg Price (VERPR)</span><span class="vl" style="color:var(--am)">$237.20 / EA (+$37.20)</span></div>
+                <div class="ir"><span class="lb">Last PO Price (GR confirmed)</span><span class="vl" style="color:var(--am)">$241.60 / EA</span></div>
+                <div class="ir"><span class="lb">Last Cost Roll (CK40N)</span><span class="vl" style="color:var(--red)">8 months ago</span></div>
+                <div class="ir"><span class="lb">142 EA on-hand @ Std</span><span class="vl">$28,400</span></div>
+                <div class="ir"><span class="lb">142 EA on-hand @ Actual</span><span class="vl" style="color:var(--am)">$33,682</span></div>
+                <div class="ir"><span class="lb">17,520 EA annual @ Std vs Actual</span><span class="vl" style="color:var(--red)">$3.50M vs $4.16M = $651K gap</span></div>
+            </div>
+            <div class="dc"><h3><span class="ic">📉</span> Std vs Actual Cost Drift (12 Months)</h3><div class="cc"><canvas id="cdc"></canvas></div></div>
+        </div>
+        <div class="g3">
+            <div class="dc"><h3><span class="ic">📊</span> Margin @ Std vs Actual <span class="sap">ACDOCA</span></h3>
+                <div class="ir"><span class="lb">Sell Price (avg)</span><span class="vl">$320.60 / EA</span></div>
+                <div class="ir"><span class="lb">Margin @ Std Cost</span><span class="vl" style="color:var(--em)">$120.60 / EA (37.6%)</span></div>
+                <div class="ir"><span class="lb">Margin @ Actual Cost</span><span class="vl" style="color:var(--am)">$83.40 / EA (26.0%)</span></div>
+                <div class="ir"><span class="lb">Margin Illusion per EA</span><span class="vl" style="color:var(--red)">$37.20 / EA overstated</span></div>
+                <div class="ir"><span class="lb">Annual Margin Illusion</span><span class="vl" style="color:var(--red)">17,520 EA × $37.20 = $651K</span></div>
+            </div>
+            <div class="dc"><h3><span class="ic">🔐</span> Valuation Integrity <span class="sap">MBEW</span></h3>
+                <div class="ir"><span class="lb">Price Control</span><span class="vl">S (Standard)</span></div>
+                <div class="ir"><span class="lb">Cross-Plant Consistency</span><span class="vl" style="color:var(--em)">✓ 2.1% variance</span></div>
+                <div class="ir"><span class="lb">Total Stock (all plants)</span><span class="vl">1,420 EA across 3 plants</span></div>
+                <div class="ir"><span class="lb">Book Value (all plants)</span><span class="vl">$284,000 ($200/EA)</span></div>
+                <div class="ir"><span class="lb">True Value (all plants)</span><span class="vl" style="color:var(--am)">$336,824 ($237.20/EA)</span></div>
+            </div>
+            <div class="dc"><h3><span class="ic">📋</span> Data Completeness <span class="sap">MARA/MARC</span></h3>
+                <div class="ir"><span class="lb">Material Master</span><span class="vl" style="color:var(--em)">100% complete</span></div>
+                <div class="ir"><span class="lb">Costing Data (BOM/routing)</span><span class="vl" style="color:var(--am)">82% (missing freight)</span></div>
+                <div class="ir"><span class="lb">Demand History</span><span class="vl" style="color:var(--em)">12 months / 17,520 EA</span></div>
+                <div class="ir"><span class="lb">Supply History</span><span class="vl" style="color:var(--em)">25 GRs / 12 months</span></div>
+                <div class="ir"><span class="lb">UoM Chain</span><span class="vl" style="color:var(--em)">✓ EA → EA → EA</span></div>
+            </div>
+        </div>
+        <div class="ap"><div class="aph"><div class="ai">🤖</div><div><h3>STOX.AI Economic Validation</h3><p>Every unit of inventory must be valued at economic truth before optimization</p></div><div class="acf"><div class="v">74%</div><div class="lb">Trust Score</div></div></div>
+            <div class="ar"><div class="tl">⚠️ 142 EA on hand valued on fiction — $651K annual margin illusion<span class="pr h">HIGH</span></div>
+                <div class="ct"><strong>Finding:</strong> Standard cost $200/EA hasn't been rolled in 8 months. Actual cost is $237.20/EA (+18.6%). On the 142 EA currently in P1000, that's $5,282 of phantom value. At 48 EA/day consumption rate (17,520 EA/yr), margin reporting overstates profitability by $651K/year across the portfolio. Every downstream tile — capital health, demand quality, safety stock economics — will use the corrected $237.20/EA basis.<br><br>
+                <strong>Root Cause:</strong> Steel prices +12% since last CK40N. Freight surcharges +6.4%. Last PO already at $241.60/EA (trending further). The standard no longer represents economic reality.<br><br>
+                <strong>STOX.AI Action:</strong> Using VERPR $237.20/EA as economic truth for all 1,420 EA across 3 plants. Downstream tiles recalculate: Tile 1 (capital health) = 142 EA × $237.20 = $33,682 true value. Tile 4 (SS economics) = carrying cost per EA at actual, not standard.</div>
+                <div class="imp">
+                    <div class="imp-i"><span class="lb">On-Hand:</span><span class="vl">142 EA (P1000)</span></div>
+                    <div class="imp-i"><span class="lb">Total Stock:</span><span class="vl">1,420 EA (all plants)</span></div>
+                    <div class="imp-i"><span class="lb">Phantom Value:</span><span class="vl" style="color:var(--red)">$52,824 (all plants)</span></div>
+                    <div class="imp-i"><span class="lb">Margin Illusion:</span><span class="vl" style="color:var(--red)">$651K/yr</span></div>
+                </div>
+            </div>
+            <div class="aact"><button class="abtn p">✓ Accept $237.20/EA Valuation</button><button class="abtn s">📊 Full Cost Roll History</button><button class="abtn s">📋 Export Audit</button></div>
+        </div>
+    </div>
+    <div class="ft"><div class="inf"><span>STOX.AI Economic Ground Truth</span><span>•</span><span>Tile 0 of 6</span><span>•</span><span>Layer: Foundation</span><span>•</span><span>Last Refresh: <span id="rt"></span></span></div><div>© 2025 Cloud Mantra LLC | Mantrix.AI</div></div>
+</div>
+<script>
+let c1=null;
+function sd(m){document.getElementById('lv').classList.add('hid');document.getElementById('dv').classList.add('act');document.getElementById('dm').textContent=m;setTimeout(rc,100);}
+function sl(){document.getElementById('lv').classList.remove('hid');document.getElementById('dv').classList.remove('act');}
+function rc(){const x=document.getElementById('cdc').getContext('2d');if(c1)c1.destroy();
+    c1=new Chart(x,{type:'line',data:{labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],datasets:[
+        {label:'Std Cost ($/EA)',data:Array(12).fill(200),borderColor:'#64748b',borderWidth:2,borderDash:[6,4],fill:false,tension:0,pointRadius:0},
+        {label:'Actual Cost ($/EA)',data:[198,202,208,212,218,222,226,230,232,234,236,237.2],borderColor:'#fbbf24',backgroundColor:'rgba(251,191,36,0.1)',borderWidth:2,fill:true,tension:0.3,pointRadius:3,pointBackgroundColor:'#fbbf24'},
+        {label:'Last PO ($/EA)',data:[null,null,null,null,null,null,null,null,null,null,null,241.6],borderColor:'#f87171',pointRadius:6,pointBackgroundColor:'#f87171',showLine:false}
+    ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'top',labels:{color:'#94a3b8',font:{size:9},boxWidth:10}}},scales:{x:{grid:{color:'rgba(51,65,85,0.2)'},ticks:{color:'#64748b',font:{size:9}}},y:{grid:{color:'rgba(51,65,85,0.2)'},ticks:{color:'#64748b',font:{size:9},callback:v=>'$'+v},min:190,max:250}}}});
+}
+document.getElementById('rt').textContent=new Date().toLocaleString();
+</script>
+</body>
+</html>

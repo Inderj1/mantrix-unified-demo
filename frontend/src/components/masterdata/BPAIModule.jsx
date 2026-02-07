@@ -1502,15 +1502,17 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
             {analysisNavItems.map((item) => (
               <Tooltip key={item.id} title={!sidebarOpen ? item.label : ''} placement="right">
                 <ListItemButton
+                  selected={activeSection === item.id}
+                  onClick={() => setActiveSection(item.id)}
                   sx={{
-                    ...masterDataTheme.tabs.sidebarItem(false, darkMode),
+                    ...masterDataTheme.tabs.sidebarItem(activeSection === item.id, darkMode),
                     mb: 0.5,
                     justifyContent: sidebarOpen ? 'flex-start' : 'center',
                     px: sidebarOpen ? 1 : 1.5,
                   }}
                 >
                   <ListItemIcon sx={{ minWidth: sidebarOpen ? 32 : 'auto', justifyContent: 'center' }}>
-                    <item.Icon sx={{ fontSize: 18, color: textSecondary }} />
+                    <item.Icon sx={{ fontSize: 18, color: activeSection === item.id ? BP_COLOR : textSecondary }} />
                   </ListItemIcon>
                   {sidebarOpen && (
                     <>
@@ -1518,8 +1520,8 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                         primary={item.label}
                         primaryTypographyProps={{
                           fontSize: '0.8rem',
-                          fontWeight: 500,
-                          color: textSecondary,
+                          fontWeight: activeSection === item.id ? 600 : 500,
+                          color: activeSection === item.id ? BP_COLOR : textSecondary,
                         }}
                       />
                       {item.badge && (
@@ -1554,23 +1556,25 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
             {toolsNavItems.map((item) => (
               <Tooltip key={item.id} title={!sidebarOpen ? item.label : ''} placement="right">
                 <ListItemButton
+                  selected={activeSection === item.id}
+                  onClick={() => setActiveSection(item.id)}
                   sx={{
-                    ...masterDataTheme.tabs.sidebarItem(false, darkMode),
+                    ...masterDataTheme.tabs.sidebarItem(activeSection === item.id, darkMode),
                     mb: 0.5,
                     justifyContent: sidebarOpen ? 'flex-start' : 'center',
                     px: sidebarOpen ? 1 : 1.5,
                   }}
                 >
                   <ListItemIcon sx={{ minWidth: sidebarOpen ? 32 : 'auto', justifyContent: 'center' }}>
-                    <item.Icon sx={{ fontSize: 18, color: textSecondary }} />
+                    <item.Icon sx={{ fontSize: 18, color: activeSection === item.id ? BP_COLOR : textSecondary }} />
                   </ListItemIcon>
                   {sidebarOpen && (
                     <ListItemText
                       primary={item.label}
                       primaryTypographyProps={{
                         fontSize: '0.8rem',
-                        fontWeight: 500,
-                        color: textSecondary,
+                        fontWeight: activeSection === item.id ? 600 : 500,
+                        color: activeSection === item.id ? BP_COLOR : textSecondary,
                       }}
                     />
                   )}

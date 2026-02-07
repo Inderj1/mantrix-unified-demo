@@ -146,6 +146,43 @@ const ALERT_ACTIONS = {
     { key: 'offer_alternative', label: 'Higher-Margin Alt', icon: AttachMoneyIcon, color: 'primary', description: 'Propose higher-margin alternative' },
     { key: 'bundle_products', label: 'Bundle Products', icon: ShoppingCartIcon, color: 'info', description: 'Cross-sell complementary products' },
   ],
+
+  // COPA Profitability Intelligence Actions
+  copa_margin_erosion: [
+    { key: 'price_adjustment', label: 'Price Adjustment', icon: AttachMoneyIcon, color: 'primary', description: 'Submit price correction to SAP pricing module' },
+    { key: 'cost_investigation', label: 'Cost Investigation', icon: SearchIcon, color: 'info', description: 'Investigate raw material cost drivers' },
+    { key: 'product_mix', label: 'Product Mix Review', icon: TrendingUpIcon, color: 'warning', description: 'Shift mix toward higher-margin categories' },
+  ],
+  copa_customer_contribution: [
+    { key: 'discount_review', label: 'Review Discounts', icon: AttachMoneyIcon, color: 'primary', description: 'Review customer discount structure in SAP' },
+    { key: 'value_discussion', label: 'Value Discussion', icon: PhoneIcon, color: 'info', description: 'Schedule value proposition review with customer' },
+    { key: 'tier_reclassify', label: 'Reclassify Tier', icon: PeopleIcon, color: 'warning', description: 'Consider customer pricing tier change' },
+  ],
+  copa_discount_leakage: [
+    { key: 'rebate_recalc', label: 'Recalculate Rebates', icon: AttachMoneyIcon, color: 'error', description: 'Trigger rebate recalculation in SAP' },
+    { key: 'condition_audit', label: 'Condition Audit', icon: SearchIcon, color: 'primary', description: 'Audit pricing condition records' },
+    { key: 'tighten_approvals', label: 'Tighten Approvals', icon: AssignmentIcon, color: 'warning', description: 'Strengthen discount approval thresholds' },
+  ],
+  copa_cost_variance: [
+    { key: 'variance_investigate', label: 'Investigate Variance', icon: SearchIcon, color: 'primary', description: 'Launch root-cause analysis for variance' },
+    { key: 'allocation_review', label: 'Allocation Review', icon: ReceiptIcon, color: 'info', description: 'Review cost allocation methodology' },
+    { key: 'budget_adjust', label: 'Budget Adjustment', icon: TrendingUpIcon, color: 'warning', description: 'Propose budget restatement' },
+  ],
+  copa_supplier_degradation: [
+    { key: 'scorecard_update', label: 'Update Scorecard', icon: SpeedIcon, color: 'primary', description: 'Update vendor scorecard in SAP MM' },
+    { key: 'alt_sourcing', label: 'Alternative Sourcing', icon: LocalShippingIcon, color: 'warning', description: 'Evaluate alternative suppliers' },
+    { key: 'perf_review', label: 'Performance Review', icon: PeopleIcon, color: 'info', description: 'Schedule supplier review meeting' },
+  ],
+  copa_contract_profitability: [
+    { key: 'renegotiate', label: 'Flag Renegotiation', icon: ReceiptIcon, color: 'error', description: 'Flag contract for renegotiation in Command Tower' },
+    { key: 'scope_review', label: 'Scope Review', icon: SearchIcon, color: 'primary', description: 'Review scope creep and change orders' },
+    { key: 'escalate_commercial', label: 'Escalate', icon: TrendingUpIcon, color: 'warning', description: 'Escalate to commercial leadership' },
+  ],
+  copa_regional_shift: [
+    { key: 'regional_pricing', label: 'Regional Pricing', icon: AttachMoneyIcon, color: 'primary', description: 'Review regional pricing strategy' },
+    { key: 'freight_optimize', label: 'Freight Analysis', icon: LocalShippingIcon, color: 'info', description: 'Analyze freight cost drivers by region' },
+    { key: 'distribution_review', label: 'Distribution Review', icon: BuildIcon, color: 'warning', description: 'Review regional distribution efficiency' },
+  ],
 };
 
 // Default actions for unknown types

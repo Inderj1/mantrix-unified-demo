@@ -1,5 +1,5 @@
 // Enterprise Pulse Proactive ML Agents
-// Business intelligence agents that help Arizona Beverages optimize inventory, margins, and operations
+// Business intelligence agents that optimize inventory, margins, and operations across Composite1 plants
 
 export const kitMonitoringAgents = [
   // ============================================
@@ -72,7 +72,7 @@ export const kitMonitoringAgents = [
   {
     id: 'agent-stox-seasonal-005',
     name: 'Seasonal Demand Agent',
-    description: 'Adjusts safety stock and reorder points based on seasonal beverage demand patterns (summer surge, holidays)',
+    description: 'Adjusts safety stock and reorder points based on seasonal demand patterns (Q4 ramp-up, production cycles)',
     natural_language_query: 'Alert when approaching seasonal demand surge and recommend safety stock adjustments based on historical patterns',
     category: 'stox_inventory',
     enabled: true,
@@ -82,7 +82,7 @@ export const kitMonitoringAgents = [
     true_positives: 28,
     false_positives: 2,
     last_run: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
-    business_value: 'Captures 15% summer demand uplift',
+    business_value: 'Captures 15% seasonal demand uplift',
     ml_model: 'SeasonalForecaster',
   },
 
@@ -133,7 +133,7 @@ export const kitMonitoringAgents = [
     id: 'agent-leadtime-008',
     name: 'Delivery Promise Agent',
     description: 'Monitors promised delivery dates vs production and logistics capacity to prevent SLA breaches',
-    natural_language_query: 'Alert when promised delivery dates are at risk based on bottling capacity and carrier availability',
+    natural_language_query: 'Alert when promised delivery dates are at risk based on plant capacity and carrier availability',
     category: 'ordly_operations',
     enabled: true,
     severity: 'high',

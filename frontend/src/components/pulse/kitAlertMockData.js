@@ -22,6 +22,15 @@ export const ALERT_TYPES = {
   // Operations Intelligence Alerts
   LEAD_TIME_RISK: 'lead_time_risk',
   UPSELL_OPPORTUNITY: 'upsell_opportunity',
+
+  // COPA Profitability Intelligence Alerts
+  COPA_MARGIN_EROSION: 'copa_margin_erosion',
+  COPA_CUSTOMER_CONTRIBUTION: 'copa_customer_contribution',
+  COPA_DISCOUNT_LEAKAGE: 'copa_discount_leakage',
+  COPA_COST_VARIANCE: 'copa_cost_variance',
+  COPA_SUPPLIER_DEGRADATION: 'copa_supplier_degradation',
+  COPA_CONTRACT_PROFITABILITY: 'copa_contract_profitability',
+  COPA_REGIONAL_SHIFT: 'copa_regional_shift',
 };
 
 // Alert Type Labels
@@ -45,6 +54,15 @@ export const ALERT_TYPE_LABELS = {
   // Operations Intelligence
   lead_time_risk: 'Lead Time Risk',
   upsell_opportunity: 'Upsell Opportunity',
+
+  // COPA Profitability Intelligence
+  copa_margin_erosion: 'COPA Margin Erosion',
+  copa_customer_contribution: 'Customer Contribution Decline',
+  copa_discount_leakage: 'Discount/Rebate Leakage',
+  copa_cost_variance: 'Cost Variance Spike',
+  copa_supplier_degradation: 'Supplier Degradation',
+  copa_contract_profitability: 'Contract Profitability',
+  copa_regional_shift: 'Regional Profitability Shift',
 };
 
 // Alert Category mapping
@@ -53,6 +71,7 @@ export const ALERT_CATEGORIES = {
   pricing_intelligence: ['price_below_optimal', 'margin_erosion'],
   customer_intelligence: ['order_gap_detected', 'churn_risk_high', 'reorder_opportunity'],
   operations_intelligence: ['lead_time_risk', 'upsell_opportunity'],
+  copa_profitability: ['copa_margin_erosion', 'copa_customer_contribution', 'copa_discount_leakage', 'copa_cost_variance', 'copa_supplier_degradation', 'copa_contract_profitability', 'copa_regional_shift'],
 };
 
 // Severity Levels
@@ -71,32 +90,35 @@ export const STATUS = {
   IN_PROGRESS: 'in_progress',
   SNOOZED: 'snoozed',
   RESOLVED: 'resolved',
+  SIMULATED: 'simulated',
+  EXECUTED: 'executed',
+  PENDING_APPROVAL: 'pending_approval',
 };
 
-// Sample customers - Arizona Beverages retail partners
+// Sample customers - Composite1 industrial partners
 const customers = [
-  { id: 'CUST-001', name: 'Walmart', segment: 'STRATEGIC', avgOrderValue: 850000, region: 'National' },
-  { id: 'CUST-002', name: 'Costco', segment: 'STRATEGIC', avgOrderValue: 720000, region: 'National' },
-  { id: 'CUST-003', name: 'Target', segment: 'KEY', avgOrderValue: 425000, region: 'National' },
-  { id: 'CUST-004', name: 'Kroger', segment: 'KEY', avgOrderValue: 380000, region: 'National' },
-  { id: 'CUST-005', name: '7-Eleven', segment: 'KEY', avgOrderValue: 285000, region: 'National' },
-  { id: 'CUST-006', name: 'Publix', segment: 'KEY', avgOrderValue: 195000, region: 'Southeast' },
-  { id: 'CUST-007', name: 'HEB', segment: 'GROWTH', avgOrderValue: 165000, region: 'Central' },
-  { id: 'CUST-008', name: 'CVS', segment: 'GROWTH', avgOrderValue: 125000, region: 'National' },
-  { id: 'CUST-009', name: 'Walgreens', segment: 'STANDARD', avgOrderValue: 95000, region: 'National' },
-  { id: 'CUST-010', name: 'Safeway', segment: 'GROWTH', avgOrderValue: 145000, region: 'West' },
+  { id: 'CUST-001', name: 'AutoMotion Corp', segment: 'STRATEGIC', avgOrderValue: 850000, region: 'Midwest' },
+  { id: 'CUST-002', name: 'Pacific Equipment Ltd', segment: 'STRATEGIC', avgOrderValue: 720000, region: 'West' },
+  { id: 'CUST-003', name: 'Apex Manufacturing', segment: 'KEY', avgOrderValue: 425000, region: 'National' },
+  { id: 'CUST-004', name: 'TechDrive Systems', segment: 'KEY', avgOrderValue: 380000, region: 'Midwest' },
+  { id: 'CUST-005', name: 'Precision Parts Inc', segment: 'KEY', avgOrderValue: 285000, region: 'Northeast' },
+  { id: 'CUST-006', name: 'Summit Industrial', segment: 'KEY', avgOrderValue: 195000, region: 'Southeast' },
+  { id: 'CUST-007', name: 'Western Hydraulics', segment: 'GROWTH', avgOrderValue: 165000, region: 'West' },
+  { id: 'CUST-008', name: 'Lakeside Engineering', segment: 'GROWTH', avgOrderValue: 125000, region: 'Midwest' },
+  { id: 'CUST-009', name: 'Continental Motors', segment: 'STANDARD', avgOrderValue: 95000, region: 'National' },
+  { id: 'CUST-010', name: 'Redline Automation', segment: 'GROWTH', avgOrderValue: 145000, region: 'West' },
 ];
 
-// Sample products - Arizona Beverages product catalog
+// Sample materials - Composite1 industrial products (aligned with STOX distribution)
 const materials = [
-  { id: 'AZ-GT-24', name: 'AZ Green Tea 24PK', category: 'Tea', margin: 0.42 },
-  { id: 'AZ-AP-24', name: 'AZ Arnold Palmer 24PK', category: 'Tea', margin: 0.45 },
-  { id: 'AZ-GT-4', name: 'AZ Green Tea 4PK', category: 'Tea', margin: 0.38 },
-  { id: 'AZ-AP-4', name: 'AZ Arnold Palmer 4PK', category: 'Tea', margin: 0.40 },
-  { id: 'AZ-MM-24', name: 'AZ Mucho Mango 24PK', category: 'Fruit Drink', margin: 0.35 },
-  { id: 'AZ-LT-24', name: 'AZ Lemon Tea 24PK', category: 'Tea', margin: 0.42 },
-  { id: 'AZ-WM-24', name: 'AZ Watermelon 24PK', category: 'Fruit Drink', margin: 0.36 },
-  { id: 'AZ-RX-12', name: 'AZ RX Energy 12PK', category: 'Energy', margin: 0.48 },
+  { id: 'MAT-1001', name: 'Hydraulic Pump Assembly', category: 'Hydraulics', margin: 0.42 },
+  { id: 'MAT-2045', name: 'Bearing Assembly 2x4', category: 'Bearings', margin: 0.38 },
+  { id: 'MAT-3089', name: 'Gasket Kit Standard', category: 'Seals', margin: 0.45 },
+  { id: 'MAT-4012', name: 'Control Valve Assembly', category: 'Valves', margin: 0.40 },
+  { id: 'MAT-5067', name: 'Electronic Sensor Module', category: 'Electronics', margin: 0.48 },
+  { id: 'MAT-7721', name: 'Legacy Connector Type-B', category: 'Connectors', margin: 0.35 },
+  { id: 'MAT-6034', name: 'Precision Gear Set', category: 'Drivetrain', margin: 0.36 },
+  { id: 'MAT-8090', name: 'Thermal Coupling Unit', category: 'Thermal', margin: 0.42 },
 ];
 
 // Sample sales reps
@@ -133,7 +155,7 @@ const aiSuggestions = {
   ],
   seasonal_demand_shift: [
     { action: 'increase_safety_stock', reason: 'Build inventory ahead of seasonal surge', confidence: 0.92 },
-    { action: 'accelerate_production', reason: 'Schedule additional bottling runs', confidence: 0.88 },
+    { action: 'accelerate_production', reason: 'Schedule additional production runs', confidence: 0.88 },
     { action: 'secure_capacity', reason: 'Reserve carrier capacity for peak season', confidence: 0.84 },
   ],
   price_below_optimal: [
@@ -180,6 +202,43 @@ const aiSuggestions = {
     { action: 'suggest_volume_tier', reason: 'Customer close to next discount tier', confidence: 0.91 },
     { action: 'offer_alternative', reason: 'Higher-margin alternative meets same specs', confidence: 0.88 },
     { action: 'bundle_products', reason: 'Cross-sell complementary products', confidence: 0.82 },
+  ],
+
+  // COPA Profitability Intelligence Suggestions
+  copa_margin_erosion: [
+    { action: 'price_adjustment', reason: 'Margin declined below threshold — recommend price correction', confidence: 0.94 },
+    { action: 'cost_investigation', reason: 'Investigate raw material cost increases driving margin loss', confidence: 0.88 },
+    { action: 'product_mix_review', reason: 'Shift product mix toward higher-margin categories', confidence: 0.82 },
+  ],
+  copa_customer_contribution: [
+    { action: 'discount_review', reason: 'Customer contribution below target — review discount structure', confidence: 0.93 },
+    { action: 'value_discussion', reason: 'Schedule value proposition review with customer', confidence: 0.86 },
+    { action: 'tier_reclassification', reason: 'Consider reclassifying customer pricing tier', confidence: 0.79 },
+  ],
+  copa_discount_leakage: [
+    { action: 'rebate_recalculation', reason: 'Excess discounts detected — recalculate rebate conditions', confidence: 0.95 },
+    { action: 'condition_audit', reason: 'Audit pricing condition records for mismatches', confidence: 0.89 },
+    { action: 'approval_tightening', reason: 'Tighten discount approval workflow thresholds', confidence: 0.83 },
+  ],
+  copa_cost_variance: [
+    { action: 'variance_investigation', reason: 'Significant plan-vs-actual variance — investigate root cause', confidence: 0.92 },
+    { action: 'allocation_review', reason: 'Review cost allocation methodology for affected centers', confidence: 0.85 },
+    { action: 'budget_adjustment', reason: 'Propose budget restatement for next planning cycle', confidence: 0.78 },
+  ],
+  copa_supplier_degradation: [
+    { action: 'vendor_scorecard_update', reason: 'Supplier OTD and quality metrics declining — update scorecard', confidence: 0.91 },
+    { action: 'alternative_sourcing', reason: 'Evaluate alternative suppliers for affected materials', confidence: 0.86 },
+    { action: 'performance_review', reason: 'Schedule supplier performance review meeting', confidence: 0.80 },
+  ],
+  copa_contract_profitability: [
+    { action: 'renegotiation_flag', reason: 'Contract profitability below bid assumptions — flag for renegotiation', confidence: 0.90 },
+    { action: 'scope_review', reason: 'Review contract scope creep and change orders', confidence: 0.84 },
+    { action: 'escalation', reason: 'Escalate to commercial leadership for strategic review', confidence: 0.77 },
+  ],
+  copa_regional_shift: [
+    { action: 'regional_pricing_review', reason: 'Regional margins shifted significantly — review pricing strategy', confidence: 0.89 },
+    { action: 'freight_optimization', reason: 'Analyze freight cost drivers in underperforming regions', confidence: 0.85 },
+    { action: 'distribution_review', reason: 'Review regional distribution network efficiency', confidence: 0.80 },
   ],
 };
 
@@ -277,13 +336,13 @@ const generateAlert = (type, overrides = {}) => {
   let revenueImpact = 0;
   let marginImpact = 0;
 
-  // Arizona Beverages DC locations for STOX.AI alerts
+  // Composite1 plant locations for STOX.AI alerts (aligned with STOX distribution)
   const dcLocations = [
-    { id: 'DC-KEASBEY', name: 'Keasbey NJ', region: 'Northeast' },
-    { id: 'MFG-DRINKPAK', name: 'Santa Clarita CA', region: 'West' },
-    { id: 'MFG-POLAR', name: 'Douglas GA', region: 'Southeast' },
-    { id: 'MFG-TAMPICO', name: 'Wharton TX', region: 'Central' },
-    { id: 'MFG-MAXPAK', name: 'Lakeland FL', region: 'Southeast' },
+    { id: 'P1000', name: 'P1000 Detroit', region: 'Midwest' },
+    { id: 'P2000', name: 'P2000 Phoenix', region: 'West' },
+    { id: 'P3000', name: 'P3000 Seattle', region: 'West' },
+    { id: 'P4000', name: 'P4000 Atlanta', region: 'Southeast' },
+    { id: 'P5000', name: 'P5000 Houston', region: 'Central' },
   ];
   const dc = randomItem(dcLocations);
 
@@ -350,7 +409,7 @@ const generateAlert = (type, overrides = {}) => {
 
     case ALERT_TYPES.SEASONAL_DEMAND_SHIFT:
       metrics = {
-        season: randomItem(['Summer', 'Memorial Day', 'July 4th', 'Labor Day']),
+        season: randomItem(['Q4 Ramp-up', 'Spring Maintenance', 'Summer Shutdown', 'Year-End Push']),
         demandIncrease: randomInt(15, 40),
         weeksUntilPeak: randomInt(2, 6),
         currentSafetyStock: randomInt(8000, 12000),
@@ -438,7 +497,7 @@ const generateAlert = (type, overrides = {}) => {
         promisedDate: daysAgo(-randomInt(5, 15)),
         realisticDate: daysAgo(-randomInt(8, 20)),
         bufferDays: 0,
-        reason: randomItem(['Bottling line backlog', 'Tea concentrate shortage', 'Carrier delays', 'DC capacity constraint']),
+        reason: randomItem(['Production line backlog', 'Raw material shortage', 'Carrier delays', 'Plant capacity constraint']),
       };
       metrics.bufferDays = Math.round((new Date(metrics.promisedDate) - new Date(metrics.realisticDate)) / (1000 * 60 * 60 * 24));
       title = `Lead Time Risk: ${quoteId}`;

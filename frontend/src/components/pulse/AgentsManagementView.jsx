@@ -363,31 +363,6 @@ const AgentsManagementView = ({ userId = 'persona', onBack, onCreateAgent, darkM
     <Box sx={{ bgcolor: colors.background, minHeight: '100%' }}>
       {/* Header */}
       <Paper elevation={0} sx={{ p: 2, borderRadius: 0, mb: 3, boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.1)', bgcolor: colors.paper }}>
-        {/* Breadcrumb Navigation */}
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" sx={{ color: colors.textSecondary }} />}>
-            <Link
-              component="button"
-              variant="body1"
-              onClick={onBack}
-              sx={{ textDecoration: 'none', color: colors.text, '&:hover': { textDecoration: 'underline' } }}
-            >
-              ENTERPRISE PULSE
-            </Link>
-            <Typography variant="body1" fontWeight={600} sx={{ color: colors.primary }}>
-              Agents Management
-            </Typography>
-          </Breadcrumbs>
-          <Button
-            startIcon={<ArrowBackIcon />}
-            onClick={onBack}
-            variant="outlined"
-            size="small"
-            sx={{ color: colors.primary, borderColor: colors.primary }}
-          >
-            Back
-          </Button>
-        </Stack>
         {/* Title Section */}
         <Box display="flex" alignItems="center" gap={2}>
           <Box

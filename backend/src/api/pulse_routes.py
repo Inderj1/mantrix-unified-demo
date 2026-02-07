@@ -7,12 +7,14 @@ from typing import List, Dict, Any, Optional
 from pydantic import BaseModel
 import structlog
 from ..core.pulse_monitor_service import PulseMonitorService
+from ..core.pulse_proactive_service import PulseProactiveService
 
 logger = structlog.get_logger()
 router = APIRouter(prefix="/api/v1/pulse", tags=["enterprise-pulse"])
 
-# Initialize service
+# Initialize services
 pulse_service = PulseMonitorService()
+proactive_service = PulseProactiveService()
 
 
 # Request/Response Models
@@ -594,3 +596,102 @@ async def get_pulse_stats(user_id: str = Query(..., description="User ID")):
             status_code=500,
             detail=f"Failed to get pulse stats: {str(e)}"
         )
+
+
+# ================================================================
+# Proactive Pattern Endpoints
+# ================================================================
+
+class RunPatternRequest(BaseModel):
+    action_level: str = "recommend"  # recommend | simulate | execute
+    custom_thresholds: Optional[Dict[str, Any]] = None
+
+
+class ApproveActionRequest(BaseModel):
+    pass
+
+
+class RejectActionRequest(BaseModel):
+    reason: str = ""
+
+
+@router.get("/patterns")
+async def list_patterns(
+    category: Optional[str] = Query(None, description="Filter by category: copa or stox")
+):
+    """List all 12 proactive pattern templates."""
+    try:
+        patterns = proactive_service.list_patterns(category=category)
+        return {
+            "success": True,
+            "patterns": patterns,
+            "total": len(patterns),
+        }
+    except Exception as e:
+        logger.error(f"Error listing patterns: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/patterns/{pattern_id}")
+async def get_pattern(pattern_id: str):
+    """Get a single pattern template with full detail."""
+    try:
+        pattern = proactive_service.get_pattern_detail(pattern_id)
+        if not pattern:
+            raise HTTPException(status_code=404, detail="Pattern not found")
+        return {"success": True, "pattern": pattern}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting pattern: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/patterns/{pattern_id}/run")
+async def run_pattern(pattern_id: str, request: RunPatternRequest):
+    """
+    Run a proactive pattern at the specified automation level.
+    - recommend: detect + AI recommendation
+    - simulate: detect + what-if scenarios
+    - execute: detect + simulate + prepare ERP action (requires approval)
+    """
+    try:
+        if request.action_level not in ("recommend", "simulate", "execute"):
+            raise HTTPException(
+                status_code=400,
+                detail="action_level must be 'recommend', 'simulate', or 'execute'"
+            )
+
+        result = await proactive_service.run_pattern(
+            pattern_id=pattern_id,
+            action_level=request.action_level,
+            custom_thresholds=request.custom_thresholds,
+        )
+        return {"success": True, "data": result}
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error running pattern {pattern_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/actions/{action_id}/approve")
+async def approve_action(action_id: str):
+    """Approve a pending execute action. Dispatches to Command Tower."""
+    try:
+        result = await proactive_service.approve_action(action_id)
+        return {"success": True, "data": result}
+    except Exception as e:
+        logger.error(f"Error approving action {action_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/actions/{action_id}/reject")
+async def reject_action(action_id: str, request: RejectActionRequest):
+    """Reject a pending execute action."""
+    try:
+        result = await proactive_service.reject_action(action_id, reason=request.reason)
+        return {"success": True, "data": result}
+    except Exception as e:
+        logger.error(f"Error rejecting action {action_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
