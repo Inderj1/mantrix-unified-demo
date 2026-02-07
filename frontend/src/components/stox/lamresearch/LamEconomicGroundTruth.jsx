@@ -614,13 +614,9 @@ const LamEconomicGroundTruth = ({ onBack, darkMode = false }) => {
             <Card
               elevation={0}
               sx={{
-                borderLeft: `4px solid ${kpi.color}`,
                 borderRadius: 2,
                 bgcolor: darkMode ? '#21262d' : '#ffffff',
                 border: `1px solid ${colors.border}`,
-                borderLeftColor: kpi.color,
-                borderLeftWidth: 4,
-                borderLeftStyle: 'solid',
               }}
             >
               <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
@@ -780,9 +776,6 @@ const LamEconomicGroundTruth = ({ onBack, darkMode = false }) => {
                     mb: 1.5,
                     bgcolor: darkMode ? '#161b22' : alpha(MODULE_COLOR, 0.03),
                     border: `1px solid ${colors.border}`,
-                    borderLeftColor: darkMode ? '#4d9eff' : MODULE_COLOR,
-                    borderLeftWidth: 4,
-                    borderLeftStyle: 'solid',
                     borderRadius: 2,
                   }}
                 >
@@ -850,9 +843,6 @@ const LamEconomicGroundTruth = ({ onBack, darkMode = false }) => {
                     mb: 1.5,
                     bgcolor: darkMode ? '#161b22' : alpha('#10b981', 0.03),
                     border: `1px solid ${colors.border}`,
-                    borderLeftColor: '#10b981',
-                    borderLeftWidth: 4,
-                    borderLeftStyle: 'solid',
                     borderRadius: 2,
                   }}
                 >

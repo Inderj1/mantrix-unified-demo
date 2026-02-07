@@ -14,7 +14,6 @@ import {
   Error as ErrorIcon,
   CheckCircle as CheckCircleIcon,
   Info as InfoIcon,
-  Close as CloseIcon,
 } from '@mui/icons-material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import {
@@ -366,33 +365,16 @@ export default function LamDemandSupplyCommand({ onBack, darkMode = false }) {
     }),
   };
 
-  return (
-    <Box sx={{ bgcolor: bg, minHeight: '100vh', p: 2 }}>
-      {/* ========== HEADER ========== */}
-      <Paper sx={{ p: 1.5, mb: 2, bgcolor: paperBg, border: `1px solid ${borderColor}`, borderRadius: 2 }}>
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <IconButton onClick={onBack} size="small" sx={{ color: MODULE_COLOR }}>
-            <ArrowBackIcon fontSize="small" />
-          </IconButton>
-          <Box sx={{ flex: 1 }}>
-            <Breadcrumbs separator={<NavigateNextIcon sx={{ fontSize: 14, color: textSecondary }} />} sx={{ mb: 0.5 }}>
-              <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: textSecondary, cursor: 'pointer' }}>CORE.AI</Link>
-              <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: textSecondary, cursor: 'pointer' }}>STOX.AI</Link>
-              <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: textSecondary, cursor: 'pointer' }}>Lam Research</Link>
-              <Typography sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 600 }}>Demand vs Supply Command</Typography>
-            </Breadcrumbs>
-            <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: textPrimary }}>
-              Demand vs Supply Command Center &mdash; Operational Heart
-            </Typography>
-          </Box>
-        </Stack>
-      </Paper>
-
+  // ============================================
+  // LIST VIEW - summary cards, bottleneck alerts, chart, DataGrid
+  // ============================================
+  const renderListView = () => (
+    <>
       {/* ========== DUAL-LENS SUMMARY ========== */}
       <Grid container spacing={2} sx={{ mb: 2 }}>
         {summaryCards.map((card) => (
           <Grid item xs={12} md={4} key={card.label}>
-            <Paper sx={{ p: 2, bgcolor: paperBg, border: `1px solid ${borderColor}`, borderLeft: `4px solid ${card.color}`, borderRadius: 2, height: '100%' }}>
+            <Paper sx={{ p: 2, bgcolor: paperBg, border: `1px solid ${borderColor}`, borderRadius: 2, height: '100%' }}>
               <Stack direction="row" spacing={2} alignItems="center">
                 <Box sx={{ width: 44, height: 44, borderRadius: '50%', bgcolor: alpha(card.color, 0.1), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {React.cloneElement(card.icon, { sx: { color: card.color, fontSize: 22 } })}
@@ -462,125 +444,137 @@ export default function LamDemandSupplyCommand({ onBack, darkMode = false }) {
           />
         </Box>
       </Paper>
+    </>
+  );
 
-      {/* ========== DETAIL PANEL ========== */}
-      {selectedRow && (
-        <Paper sx={{ p: 2, bgcolor: paperBg, border: `1px solid ${borderColor}`, borderRadius: 2 }}>
-          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-            <Stack direction="row" alignItems="center" spacing={1.5}>
-              <Typography sx={{ fontSize: '0.95rem', fontWeight: 700, color: textPrimary }}>
-                {selectedRow.material}
-              </Typography>
-              <Chip
-                label={selectedRow.status}
-                size="small"
-                sx={{
-                  fontSize: '0.7rem',
-                  fontWeight: 600,
-                  bgcolor: alpha(STATUS_COLORS[selectedRow.status], 0.12),
-                  color: STATUS_COLORS[selectedRow.status],
-                  border: `1px solid ${alpha(STATUS_COLORS[selectedRow.status], 0.3)}`,
-                }}
-              />
-              <Typography sx={{ fontSize: '0.75rem', color: textSecondary }}>
-                {selectedRow.plant}
-              </Typography>
-            </Stack>
-            <IconButton size="small" onClick={() => setSelectedRow(null)} sx={{ color: textSecondary }}>
-              <CloseIcon fontSize="small" />
-            </IconButton>
-          </Stack>
+  // ============================================
+  // DETAIL VIEW - full-view replacement with material drill-down
+  // ============================================
+  const renderDetailView = () => (
+    <>
+      <Grid container spacing={2}>
+        {/* ---- Quick Summary + Open Sales Orders ---- */}
+        <Grid item xs={12} md={3}>
+          <Card sx={{ bgcolor: cardBg, border: `1px solid ${borderColor}`, borderRadius: 2, boxShadow: 'none', mb: 2 }}>
+            <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+              <Typography sx={{ fontSize: '0.75rem', color: textSecondary, fontWeight: 600, mb: 1 }}>Quick Summary</Typography>
+              {[
+                { l: 'Demand', v: `${fmtNum(selectedRow.demandEA)} EA` },
+                { l: 'Supply', v: `${fmtNum(selectedRow.supplyEA)} EA` },
+                { l: 'Gap', v: `${selectedRow.gapEA < 0 ? '' : '+'}${fmtNum(selectedRow.gapEA)} EA` },
+                { l: 'Coverage', v: `${selectedRow.coverage}%` },
+                { l: 'Demand $', v: fmtCurrency(selectedRow.demandValue) },
+                { l: 'Gap $', v: fmtCurrency(selectedRow.gapValue) },
+                { l: 'Margin', v: `${selectedRow.marginPct}%` },
+              ].map((r) => (
+                <Stack key={r.l} direction="row" justifyContent="space-between" sx={{ py: 0.4 }}>
+                  <Typography sx={{ fontSize: '0.8rem', color: textSecondary }}>{r.l}</Typography>
+                  <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: textPrimary }}>{r.v}</Typography>
+                </Stack>
+              ))}
+            </CardContent>
+          </Card>
 
-          <Grid container spacing={2}>
-            {/* ---- Material summary card ---- */}
-            <Grid item xs={12} md={3}>
-              <Card sx={{ bgcolor: cardBg, border: `1px solid ${borderColor}`, borderLeft: `4px solid ${STATUS_COLORS[selectedRow.status]}`, borderRadius: 2, boxShadow: 'none', mb: 2 }}>
-                <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
-                  <Typography sx={{ fontSize: '0.7rem', color: textSecondary, fontWeight: 600, mb: 0.5 }}>Quick Summary</Typography>
-                  {[
-                    { l: 'Demand', v: `${fmtNum(selectedRow.demandEA)} EA` },
-                    { l: 'Supply', v: `${fmtNum(selectedRow.supplyEA)} EA` },
-                    { l: 'Gap', v: `${selectedRow.gapEA < 0 ? '' : '+'}${fmtNum(selectedRow.gapEA)} EA` },
-                    { l: 'Coverage', v: `${selectedRow.coverage}%` },
-                    { l: 'Demand $', v: fmtCurrency(selectedRow.demandValue) },
-                    { l: 'Gap $', v: fmtCurrency(selectedRow.gapValue) },
-                    { l: 'Margin', v: `${selectedRow.marginPct}%` },
-                  ].map((r) => (
-                    <Stack key={r.l} direction="row" justifyContent="space-between" sx={{ py: 0.3 }}>
-                      <Typography sx={{ fontSize: '0.75rem', color: textSecondary }}>{r.l}</Typography>
-                      <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: textPrimary }}>{r.v}</Typography>
-                    </Stack>
+          {/* ---- Open Sales Orders ---- */}
+          <Card sx={{ bgcolor: cardBg, border: `1px solid ${borderColor}`, borderRadius: 2, boxShadow: 'none' }}>
+            <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+              <Typography sx={{ fontSize: '0.75rem', color: textSecondary, fontWeight: 600, mb: 1 }}>Open Sales Orders</Typography>
+              {mockSalesOrders.map((so) => (
+                <Stack key={so.so} direction="row" justifyContent="space-between" alignItems="center" sx={{ py: 0.6, borderBottom: `1px solid ${borderColor}`, '&:last-child': { borderBottom: 'none' } }}>
+                  <Box>
+                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: MODULE_COLOR }}>{so.so}</Typography>
+                    <Typography sx={{ fontSize: '0.7rem', color: textSecondary }}>{so.customer}</Typography>
+                  </Box>
+                  <Box sx={{ textAlign: 'right' }}>
+                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: textPrimary }}>{fmtNum(so.qty)} EA</Typography>
+                    <Typography sx={{ fontSize: '0.7rem', color: textSecondary }}>{so.date}</Typography>
+                  </Box>
+                </Stack>
+              ))}
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* ---- Waterfall table ---- */}
+        <Grid item xs={12} md={5}>
+          <Paper sx={{ bgcolor: cardBg, border: `1px solid ${borderColor}`, borderRadius: 2, height: '100%' }}>
+            <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: textPrimary, p: 2, pb: 0 }}>
+              Week-by-Week Supply / Demand Breakdown
+            </Typography>
+            <TableContainer sx={{ maxHeight: 420 }}>
+              <Table size="small" stickyHeader>
+                <TableHead>
+                  <TableRow>
+                    {['Week', 'Opening', 'Demand', 'Supply', 'Closing'].map((h) => (
+                      <TableCell key={h} sx={{ fontSize: '0.7rem', fontWeight: 700, color: textPrimary, bgcolor: darkMode ? '#21262d' : '#f8fafc', borderBottom: `2px solid ${borderColor}`, py: 0.5 }}>
+                        {h}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {waterfallData.map((r) => (
+                    <TableRow key={r.week} sx={{ '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.04) } }}>
+                      <TableCell sx={{ fontSize: '0.75rem', fontWeight: 600, color: MODULE_COLOR, py: 0.5, borderBottom: `1px solid ${borderColor}` }}>{r.week}</TableCell>
+                      <TableCell sx={{ fontSize: '0.75rem', color: textPrimary, py: 0.5, borderBottom: `1px solid ${borderColor}` }}>{fmtNum(r.opening)}</TableCell>
+                      <TableCell sx={{ fontSize: '0.75rem', color: '#ef4444', fontWeight: 600, py: 0.5, borderBottom: `1px solid ${borderColor}` }}>-{fmtNum(r.demand)}</TableCell>
+                      <TableCell sx={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600, py: 0.5, borderBottom: `1px solid ${borderColor}` }}>+{fmtNum(r.supply)}</TableCell>
+                      <TableCell sx={{ fontSize: '0.75rem', fontWeight: 700, color: r.closing < 0 ? '#ef4444' : textPrimary, py: 0.5, borderBottom: `1px solid ${borderColor}` }}>{fmtNum(r.closing)}</TableCell>
+                    </TableRow>
                   ))}
-                </CardContent>
-              </Card>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
+        </Grid>
 
-              {/* ---- Open Sales Orders ---- */}
-              <Card sx={{ bgcolor: cardBg, border: `1px solid ${borderColor}`, borderRadius: 2, boxShadow: 'none' }}>
-                <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
-                  <Typography sx={{ fontSize: '0.7rem', color: textSecondary, fontWeight: 600, mb: 1 }}>Open Sales Orders</Typography>
-                  {mockSalesOrders.map((so) => (
-                    <Stack key={so.so} direction="row" justifyContent="space-between" alignItems="center" sx={{ py: 0.5, borderBottom: `1px solid ${borderColor}`, '&:last-child': { borderBottom: 'none' } }}>
-                      <Box>
-                        <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: MODULE_COLOR }}>{so.so}</Typography>
-                        <Typography sx={{ fontSize: '0.65rem', color: textSecondary }}>{so.customer}</Typography>
-                      </Box>
-                      <Box sx={{ textAlign: 'right' }}>
-                        <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: textPrimary }}>{fmtNum(so.qty)} EA</Typography>
-                        <Typography sx={{ fontSize: '0.65rem', color: textSecondary }}>{so.date}</Typography>
-                      </Box>
-                    </Stack>
-                  ))}
-                </CardContent>
-              </Card>
-            </Grid>
+        {/* ---- Forecast vs Actual line chart ---- */}
+        <Grid item xs={12} md={4}>
+          <Paper sx={{ p: 2, bgcolor: cardBg, border: `1px solid ${borderColor}`, borderRadius: 2, height: '100%' }}>
+            <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: textPrimary, mb: 1.5 }}>
+              12-Week Forecast vs Actual
+            </Typography>
+            <Box sx={{ height: 340 }}>
+              <Line data={detailLineData} options={detailLineOptions} />
+            </Box>
+          </Paper>
+        </Grid>
+      </Grid>
+    </>
+  );
 
-            {/* ---- Waterfall table ---- */}
-            <Grid item xs={12} md={5}>
-              <Paper sx={{ bgcolor: cardBg, border: `1px solid ${borderColor}`, borderRadius: 2 }}>
-                <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: textPrimary, p: 1.5, pb: 0 }}>
-                  Week-by-Week Supply / Demand Breakdown
-                </Typography>
-                <TableContainer sx={{ maxHeight: 340 }}>
-                  <Table size="small" stickyHeader>
-                    <TableHead>
-                      <TableRow>
-                        {['Week', 'Opening', 'Demand', 'Supply', 'Closing'].map((h) => (
-                          <TableCell key={h} sx={{ fontSize: '0.7rem', fontWeight: 700, color: textPrimary, bgcolor: darkMode ? '#21262d' : '#f8fafc', borderBottom: `2px solid ${borderColor}`, py: 0.5 }}>
-                            {h}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {waterfallData.map((r) => (
-                        <TableRow key={r.week} sx={{ '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.04) } }}>
-                          <TableCell sx={{ fontSize: '0.75rem', fontWeight: 600, color: MODULE_COLOR, py: 0.4, borderBottom: `1px solid ${borderColor}` }}>{r.week}</TableCell>
-                          <TableCell sx={{ fontSize: '0.75rem', color: textPrimary, py: 0.4, borderBottom: `1px solid ${borderColor}` }}>{fmtNum(r.opening)}</TableCell>
-                          <TableCell sx={{ fontSize: '0.75rem', color: '#ef4444', fontWeight: 600, py: 0.4, borderBottom: `1px solid ${borderColor}` }}>-{fmtNum(r.demand)}</TableCell>
-                          <TableCell sx={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600, py: 0.4, borderBottom: `1px solid ${borderColor}` }}>+{fmtNum(r.supply)}</TableCell>
-                          <TableCell sx={{ fontSize: '0.75rem', fontWeight: 700, color: r.closing < 0 ? '#ef4444' : textPrimary, py: 0.4, borderBottom: `1px solid ${borderColor}` }}>{fmtNum(r.closing)}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Paper>
-            </Grid>
+  return (
+    <Box sx={{ bgcolor: bg, minHeight: '100vh', p: 2 }}>
+      {/* Shared header */}
+      <Paper sx={{ p: 1.5, mb: 2, bgcolor: paperBg, border: `1px solid ${borderColor}`, borderRadius: 2 }}>
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <IconButton onClick={selectedRow ? () => setSelectedRow(null) : onBack} size="small" sx={{ color: MODULE_COLOR }}>
+            <ArrowBackIcon fontSize="small" />
+          </IconButton>
+          <Box sx={{ flex: 1 }}>
+            <Breadcrumbs separator={<NavigateNextIcon sx={{ fontSize: 14, color: textSecondary }} />} sx={{ mb: 0.5 }}>
+              <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: textSecondary, cursor: 'pointer' }}>CORE.AI</Link>
+              <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: textSecondary, cursor: 'pointer' }}>STOX.AI</Link>
+              <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: textSecondary, cursor: 'pointer' }}>Lam Research</Link>
+              {selectedRow ? (
+                <>
+                  <Link underline="hover" onClick={() => setSelectedRow(null)} sx={{ fontSize: '0.7rem', color: textSecondary, cursor: 'pointer' }}>Demand vs Supply Command</Link>
+                  <Typography sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 600 }}>{selectedRow.material}</Typography>
+                </>
+              ) : (
+                <Typography sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 600 }}>Demand vs Supply Command</Typography>
+              )}
+            </Breadcrumbs>
+            <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: textPrimary }}>
+              {selectedRow
+                ? `${selectedRow.material} \u2014 Demand & Supply Detail`
+                : 'Demand vs Supply Command Center \u2014 Operational Heart'}
+            </Typography>
+          </Box>
+        </Stack>
+      </Paper>
 
-            {/* ---- Forecast vs Actual line chart ---- */}
-            <Grid item xs={12} md={4}>
-              <Paper sx={{ p: 1.5, bgcolor: cardBg, border: `1px solid ${borderColor}`, borderRadius: 2, height: '100%' }}>
-                <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: textPrimary, mb: 1 }}>
-                  12-Week Forecast vs Actual
-                </Typography>
-                <Box sx={{ height: 280 }}>
-                  <Line data={detailLineData} options={detailLineOptions} />
-                </Box>
-              </Paper>
-            </Grid>
-          </Grid>
-        </Paper>
-      )}
+      {selectedRow ? renderDetailView() : renderListView()}
     </Box>
   );
 }

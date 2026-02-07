@@ -588,7 +588,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
       <Grid container spacing={2} sx={{ mt: 1, mb: 3 }}>
         {dashboardMetrics.map((metric, index) => (
           <Grid item xs={6} md={2} key={index}>
-            <Card variant="outlined" sx={{ borderLeft: `3px solid ${metric.color}` }}>
+            <Card variant="outlined">
               <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                 <Typography sx={{ fontSize: '0.7rem', color: textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>
                   {metric.label}
@@ -1273,7 +1273,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
           { label: 'AI SUGGESTIONS', value: '142', color: MODULE_NAVY },
         ].map((metric, index) => (
           <Grid item xs={6} md={2} key={index}>
-            <Card variant="outlined" sx={{ borderLeft: `3px solid ${metric.color}` }}>
+            <Card variant="outlined">
               <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                 <Typography sx={{ fontSize: '0.7rem', color: textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>
                   {metric.label}
@@ -1490,7 +1490,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
       <Grid container spacing={2} sx={{ mb: 3 }}>
         {issueStats.map((stat, index) => (
           <Grid item xs={6} md key={index}>
-            <Card variant="outlined" sx={{ borderLeft: `3px solid ${stat.color}` }}>
+            <Card variant="outlined">
               <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                 <Typography sx={{ fontSize: '0.7rem', color: textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>
                   {stat.label}
@@ -2640,7 +2640,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
               <Typography variant="overline" sx={{ color: textSecondary, fontSize: '0.65rem', display: 'block', mb: 1 }}>
                 AI Rationale
               </Typography>
-              <Paper elevation={0} sx={{ p: 2, bgcolor: alpha(MODULE_NAVY, 0.05), borderRadius: 2, border: `1px solid ${alpha(MODULE_NAVY, 0.1)}`, ...masterDataTheme.borders.cardAccent(NAVY_BLUE) }}>
+              <Paper elevation={0} sx={{ p: 2, bgcolor: alpha(MODULE_NAVY, 0.05), borderRadius: 2, border: `1px solid ${alpha(MODULE_NAVY, 0.1)}` }}>
                 <Typography variant="body2" sx={{ color: textColor, lineHeight: 1.6 }}>
                   {selectedFieldForInsight.rationale}
                 </Typography>

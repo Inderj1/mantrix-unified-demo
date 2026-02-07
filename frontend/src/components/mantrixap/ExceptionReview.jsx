@@ -144,8 +144,7 @@ const ExceptionReview = ({ onBack, darkMode = false, onNavigate }) => {
                 sx={{
                   mb: 2,
                   bgcolor: alpha(TILE_COLOR, 0.06),
-                  border: `1px solid ${alpha(TILE_COLOR, 0.2)}`,
-                  borderLeft: `4px solid ${TILE_COLOR}`,
+                  border: '1px solid rgba(0,0,0,0.1)',
                   borderRadius: 2,
                 }}
               >
@@ -176,9 +175,8 @@ const ExceptionReview = ({ onBack, darkMode = false, onNavigate }) => {
                 sx={{
                   mb: 2,
                   bgcolor: darkMode ? '#21262d' : '#fafafa',
-                  borderLeft: `4px solid ${TILE_COLOR}`,
                   borderRadius: 2,
-                  border: `1px solid ${borderColor}`,
+                  border: '1px solid rgba(0,0,0,0.1)',
                 }}
               >
                 <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
@@ -281,7 +279,7 @@ const ExceptionReview = ({ onBack, darkMode = false, onNavigate }) => {
                   </Stack>
 
                   <Card
-                    sx={{ mb: 2.5, bgcolor: darkMode ? '#161b22' : '#fff', borderLeft: `3px solid ${NAVY_DARK}`, borderRadius: 2, border: `1px solid ${alpha(NAVY_DARK, 0.15)}` }}
+                    sx={{ mb: 2.5, bgcolor: darkMode ? '#161b22' : '#fff', borderRadius: 2, border: '1px solid rgba(0,0,0,0.1)' }}
                   >
                     <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                       <Typography variant="body2" sx={{ color: textColor, lineHeight: 1.9, fontSize: '0.82rem' }}>

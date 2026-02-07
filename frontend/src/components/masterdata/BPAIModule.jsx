@@ -557,7 +557,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
       <Grid container spacing={2} sx={{ mt: 1, mb: 3 }}>
         {bpDashboardMetrics.map((metric, index) => (
           <Grid item xs={6} md={2} key={index}>
-            <Card variant="outlined" sx={{ borderLeft: `3px solid ${metric.color}` }}>
+            <Card variant="outlined">
               <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                 <Typography sx={{ fontSize: '0.7rem', color: textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>
                   {metric.label}
@@ -662,7 +662,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
               </Typography>
             </Stack>
             <Stack spacing={1.5}>
-              <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: bgColor, borderLeft: '4px solid #10b981' }}>
+              <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: bgColor }}>
                 <Stack direction="row" spacing={1} alignItems="center">
                   <MergeIcon sx={{ fontSize: 18, color: '#10b981' }} />
                   <Typography variant="body2" sx={{ color: textColor, fontSize: '0.82rem' }}>
@@ -670,7 +670,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                   </Typography>
                 </Stack>
               </Box>
-              <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: bgColor, borderLeft: '4px solid #ef4444' }}>
+              <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: bgColor }}>
                 <Stack direction="row" spacing={1} alignItems="center">
                   <BlockIcon sx={{ fontSize: 18, color: '#ef4444' }} />
                   <Typography variant="body2" sx={{ color: textColor, fontSize: '0.82rem' }}>
@@ -678,7 +678,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                   </Typography>
                 </Stack>
               </Box>
-              <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: bgColor, borderLeft: `4px solid ${NAVY_BLUE}` }}>
+              <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: bgColor }}>
                 <Stack direction="row" spacing={1} alignItems="center">
                   <SpeedIcon sx={{ fontSize: 18, color: NAVY_BLUE }} />
                   <Typography variant="body2" sx={{ color: textColor, fontSize: '0.82rem' }}>
@@ -1085,7 +1085,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
           { label: 'TOTAL VALUE', value: '$142.7M', color: MODULE_NAVY },
         ].map((metric, index) => (
           <Grid item xs={6} md={2} key={index}>
-            <Card variant="outlined" sx={{ borderLeft: `3px solid ${metric.color}` }}>
+            <Card variant="outlined">
               <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                 <Typography sx={{ fontSize: '0.7rem', color: textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>
                   {metric.label}
@@ -1298,7 +1298,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
       {/* Summary Stats - matching AP.AI Card pattern */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} md={3}>
-          <Card variant="outlined" sx={{ borderLeft: `3px solid ${BP_COLOR}` }}>
+          <Card variant="outlined">
             <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
               <Typography sx={{ fontSize: '0.7rem', color: textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Ready to Create</Typography>
               <Typography variant="h4" fontWeight={700} sx={{ color: BP_COLOR }}>3,124</Typography>
@@ -1306,7 +1306,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
           </Card>
         </Grid>
         <Grid item xs={12} md={3}>
-          <Card variant="outlined" sx={{ borderLeft: '3px solid #f59e0b' }}>
+          <Card variant="outlined">
             <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
               <Typography sx={{ fontSize: '0.7rem', color: textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Pending Review</Typography>
               <Typography variant="h4" fontWeight={700} sx={{ color: '#f59e0b' }}>576</Typography>
@@ -1314,7 +1314,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
           </Card>
         </Grid>
         <Grid item xs={12} md={3}>
-          <Card variant="outlined" sx={{ borderLeft: '3px solid #ef4444' }}>
+          <Card variant="outlined">
             <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
               <Typography sx={{ fontSize: '0.7rem', color: textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Excluded</Typography>
               <Typography variant="h4" fontWeight={700} sx={{ color: '#ef4444' }}>147</Typography>
@@ -1322,7 +1322,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
           </Card>
         </Grid>
         <Grid item xs={12} md={3}>
-          <Card variant="outlined" sx={{ borderLeft: `3px solid ${NAVY_BLUE}` }}>
+          <Card variant="outlined">
             <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
               <Typography sx={{ fontSize: '0.7rem', color: textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Total Value</Typography>
               <Typography variant="h4" fontWeight={700} sx={{ color: NAVY_BLUE }}>$142.7M</Typography>
@@ -1831,7 +1831,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
               <Typography variant="overline" sx={{ color: textSecondary, fontSize: '0.65rem', display: 'block', mb: 1 }}>
                 AI Rationale
               </Typography>
-              <Paper elevation={0} sx={{ p: 2, bgcolor: alpha(BP_COLOR, 0.05), borderRadius: 2, border: `1px solid ${alpha(BP_COLOR, 0.1)}`, borderLeft: `4px solid ${NAVY_BLUE}` }}>
+              <Paper elevation={0} sx={{ p: 2, bgcolor: alpha(BP_COLOR, 0.05), borderRadius: 2, border: `1px solid ${alpha(BP_COLOR, 0.1)}` }}>
                 <Typography variant="body2" sx={{ color: textColor, lineHeight: 1.6, fontSize: '0.82rem' }}>
                   {selectedFieldForInsight.rationale}
                 </Typography>

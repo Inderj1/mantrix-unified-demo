@@ -327,7 +327,6 @@ export const masterDataTheme = {
   // Border helpers
   borders: {
     card: (darkMode) => `1px solid ${darkMode ? '#30363d' : '#e2e8f0'}`,
-    cardAccent: (color) => ({ borderLeft: `4px solid ${color}` }),
     subtle: (darkMode) => `1px solid ${darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
   },
 

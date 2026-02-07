@@ -7,7 +7,6 @@ import {
   Card,
   CardContent,
   Chip,
-  Button,
   Breadcrumbs,
   Link,
   Stack,
@@ -341,30 +340,15 @@ const LamMRPSignalQuality = ({ onBack, darkMode = false }) => {
       }
     : {};
 
-  return (
-    <Box sx={{ p: 2, bgcolor: darkMode ? '#0d1117' : '#f8fbfd', minHeight: '100vh' }}>
-      {/* Header */}
-      <Paper sx={{ ...paperSx, mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-        <IconButton onClick={onBack} size="small" sx={{ color: MODULE_COLOR }}>
-          <ArrowBackIcon />
-        </IconButton>
-        <Box sx={{ flex: 1 }}>
-          <Breadcrumbs separator={<NavigateNextIcon sx={{ fontSize: 14, color: colors.textSecondary }} />} sx={{ mb: 0.5 }}>
-            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>CORE.AI</Link>
-            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>STOX.AI</Link>
-            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>Lam Research</Link>
-            <Typography sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 600 }}>MRP Signal Quality</Typography>
-          </Breadcrumbs>
-          <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: colors.text }}>
-            MRP Signal Quality &mdash; Internal Noise Lens
-          </Typography>
-        </Box>
-      </Paper>
-
+  // ============================================
+  // List View - summary cards, signal funnel, DataGrid
+  // ============================================
+  const renderListView = () => (
+    <>
       {/* Dual-lens summary */}
       <Grid container spacing={2} sx={{ mb: 2 }}>
         <Grid item xs={12} md={6}>
-          <Paper sx={{ ...paperSx, borderLeft: `4px solid ${MODULE_COLOR}` }}>
+          <Paper sx={{ ...paperSx }}>
             <Stack direction="row" spacing={1.5} alignItems="flex-start">
               <Box sx={{ p: 1, bgcolor: alpha(MODULE_COLOR, 0.1), borderRadius: 1, mt: 0.5 }}>
                 <SpeedIcon sx={{ fontSize: 22, color: MODULE_COLOR }} />
@@ -388,7 +372,7 @@ const LamMRPSignalQuality = ({ onBack, darkMode = false }) => {
           </Paper>
         </Grid>
         <Grid item xs={12} md={6}>
-          <Paper sx={{ ...paperSx, borderLeft: '4px solid #dc2626' }}>
+          <Paper sx={{ ...paperSx }}>
             <Stack direction="row" spacing={1.5} alignItems="flex-start">
               <Box sx={{ p: 1, bgcolor: alpha('#dc2626', 0.1), borderRadius: 1, mt: 0.5 }}>
                 <AttachMoneyIcon sx={{ fontSize: 22, color: '#dc2626' }} />
@@ -460,7 +444,7 @@ const LamMRPSignalQuality = ({ onBack, darkMode = false }) => {
       </Paper>
 
       {/* DataGrid */}
-      <Paper sx={{ ...paperSx, mb: 2 }}>
+      <Paper sx={{ ...paperSx }}>
         <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: colors.text, mb: 1.5 }}>
           Material Signal Analysis
         </Typography>
@@ -493,144 +477,183 @@ const LamMRPSignalQuality = ({ onBack, darkMode = false }) => {
           />
         </Box>
       </Paper>
+    </>
+  );
 
-      {/* Detail Panel */}
-      {selectedRow && (
-        <Paper sx={{ ...paperSx }}>
-          <Grid container spacing={2}>
-            {/* Material info + signal chip */}
-            <Grid item xs={12}>
-              <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
-                <Typography sx={{ fontSize: '0.95rem', fontWeight: 700, color: colors.text }}>
-                  {selectedRow.material}
-                </Typography>
-                {getSignalChip(selectedRow.signal)}
-                {getPlantChip(selectedRow.plant)}
-                <Button
-                  size="small"
-                  onClick={() => setSelectedRow(null)}
-                  sx={{ ml: 'auto', textTransform: 'none', borderRadius: 2, fontWeight: 600, fontSize: '0.75rem', color: colors.textSecondary }}
-                >
-                  Close
-                </Button>
-              </Stack>
-            </Grid>
+  // ============================================
+  // Detail View - full-page replacement layout
+  // ============================================
+  const renderDetailView = () => (
+    <>
+      {/* Key metrics row */}
+      <Grid container spacing={2} sx={{ mb: 2 }}>
+        {[
+          { label: 'MRP Messages', value: formatNumber(selectedRow.messages), color: MODULE_COLOR },
+          { label: 'Actionable', value: `${selectedRow.actionable}%`, color: '#059669' },
+          { label: 'False POs', value: formatNumber(selectedRow.falsePOs), color: '#dc2626' },
+          { label: 'Noise Cost/yr', value: formatCurrency(selectedRow.noiseCost), color: '#dc2626' },
+          { label: 'Planner Hours', value: `${selectedRow.plannerHrs} hrs`, color: '#f59e0b' },
+        ].map((metric, i) => (
+          <Grid item xs={6} sm={4} md key={i}>
+            <Paper sx={{ ...paperSx, textAlign: 'center', py: 1.5 }}>
+              <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.5 }}>
+                {metric.label}
+              </Typography>
+              <Typography sx={{ fontSize: '1.1rem', fontWeight: 700, color: metric.color }}>
+                {metric.value}
+              </Typography>
+            </Paper>
+          </Grid>
+        ))}
+      </Grid>
 
-            {/* Root Cause Decomposition Chart */}
-            <Grid item xs={12} md={6}>
-              <Card sx={{ ...cardSx, borderLeft: `4px solid ${MODULE_COLOR}` }}>
-                <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                  <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: colors.text, mb: 1.5 }}>
-                    Root Cause Decomposition
+      {/* Root Cause Decomposition Chart + Cost Breakdown side by side */}
+      <Grid container spacing={2} sx={{ mb: 2 }}>
+        <Grid item xs={12} md={7}>
+          <Card sx={{ ...cardSx }}>
+            <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+              <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: colors.text, mb: 2 }}>
+                Root Cause Decomposition
+              </Typography>
+              <Box sx={{ height: 240 }}>
+                {rootCauseChartData && (
+                  <Bar data={rootCauseChartData} options={chartOptions} />
+                )}
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={5}>
+          <Card sx={{ ...cardSx, height: '100%' }}>
+            <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+              <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: colors.text, mb: 2 }}>
+                Cost Breakdown
+              </Typography>
+              {[
+                { label: 'False PO Costs', value: formatCurrency(Math.round(selectedRow.noiseCost * 0.52)), color: '#dc2626' },
+                { label: 'Expedite Costs', value: formatCurrency(Math.round(selectedRow.noiseCost * 0.31)), color: '#f59e0b' },
+                { label: 'Planner Waste', value: formatCurrency(Math.round(selectedRow.plannerHrs * 85 * 12)), color: '#64748b' },
+                { label: 'Total Annual Cost', value: formatCurrency(selectedRow.noiseCost), color: colors.text, bold: true },
+              ].map((item, i) => (
+                <Stack key={i} direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1, pt: i === 3 ? 1 : 0, borderTop: i === 3 ? `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` : 'none' }}>
+                  <Typography sx={{ fontSize: '0.8rem', color: colors.textSecondary }}>{item.label}</Typography>
+                  <Typography sx={{ fontSize: '0.9rem', fontWeight: item.bold ? 700 : 600, color: item.color }}>
+                    {item.value}
                   </Typography>
-                  <Box sx={{ height: 180 }}>
-                    {rootCauseChartData && (
-                      <Bar data={rootCauseChartData} options={chartOptions} />
-                    )}
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
+                </Stack>
+              ))}
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
-            {/* Cost Breakdown */}
-            <Grid item xs={12} md={6}>
-              <Card sx={{ ...cardSx, borderLeft: '4px solid #dc2626' }}>
-                <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                  <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: colors.text, mb: 1.5 }}>
-                    Cost Breakdown
-                  </Typography>
-                  {[
-                    { label: 'False PO Costs', value: formatCurrency(Math.round(selectedRow.noiseCost * 0.52)), color: '#dc2626' },
-                    { label: 'Expedite Costs', value: formatCurrency(Math.round(selectedRow.noiseCost * 0.31)), color: '#f59e0b' },
-                    { label: 'Planner Waste', value: formatCurrency(Math.round(selectedRow.plannerHrs * 85 * 12)), color: '#64748b' },
-                    { label: 'Total Annual Cost', value: formatCurrency(selectedRow.noiseCost), color: colors.text, bold: true },
-                  ].map((item, i) => (
-                    <Stack key={i} direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.75, pt: i === 3 ? 0.75 : 0, borderTop: i === 3 ? `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` : 'none' }}>
-                      <Typography sx={{ fontSize: '0.75rem', color: colors.textSecondary }}>{item.label}</Typography>
-                      <Typography sx={{ fontSize: '0.8rem', fontWeight: item.bold ? 700 : 600, color: item.color }}>
-                        {item.value}
-                      </Typography>
-                    </Stack>
+      {/* Prescriptive Fixes Table - full width */}
+      <Card sx={{ ...cardSx }}>
+        <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+          <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: colors.text, mb: 2 }}>
+            Prescriptive Fixes
+          </Typography>
+          <Box sx={{ overflowX: 'auto' }}>
+            <Box component="table" sx={{ width: '100%', borderCollapse: 'collapse' }}>
+              <Box component="thead">
+                <Box component="tr">
+                  {['Fix', 'Parameter', 'Current', 'Proposed', 'Impact'].map((h) => (
+                    <Box
+                      component="th"
+                      key={h}
+                      sx={{
+                        textAlign: 'left',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        color: colors.textSecondary,
+                        pb: 1.5,
+                        pr: 3,
+                        borderBottom: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
+                      }}
+                    >
+                      {h}
+                    </Box>
                   ))}
-                </CardContent>
-              </Card>
-            </Grid>
-
-            {/* Prescriptive Fixes Table */}
-            <Grid item xs={12}>
-              <Card sx={{ ...cardSx, borderLeft: `4px solid #10b981` }}>
-                <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                  <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: colors.text, mb: 1.5 }}>
-                    Prescriptive Fixes
-                  </Typography>
-                  <Box sx={{ overflowX: 'auto' }}>
-                    <Box component="table" sx={{ width: '100%', borderCollapse: 'collapse' }}>
-                      <Box component="thead">
-                        <Box component="tr">
-                          {['Fix', 'Parameter', 'Current', 'Proposed', 'Impact'].map((h) => (
-                            <Box
-                              component="th"
-                              key={h}
-                              sx={{
-                                textAlign: 'left',
-                                fontSize: '0.7rem',
-                                fontWeight: 700,
-                                color: colors.textSecondary,
-                                pb: 1,
-                                pr: 2,
-                                borderBottom: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
-                              }}
-                            >
-                              {h}
-                            </Box>
-                          ))}
-                        </Box>
-                      </Box>
-                      <Box component="tbody">
-                        {(PRESCRIPTIVE_FIXES[selectedRow.rootCause] || []).map((row, i) => (
-                          <Box component="tr" key={i} sx={{ '&:hover': { bgcolor: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' } }}>
-                            <Box component="td" sx={{ fontSize: '0.75rem', fontWeight: 600, color: colors.text, py: 0.75, pr: 2 }}>{row.fix}</Box>
-                            <Box component="td" sx={{ py: 0.75, pr: 2 }}>
-                              <Chip
-                                label={row.parameter}
-                                size="small"
-                                sx={{
-                                  height: 20,
-                                  fontSize: '0.65rem',
-                                  fontWeight: 700,
-                                  bgcolor: alpha(MODULE_COLOR, 0.1),
-                                  color: darkMode ? '#8bb8e8' : MODULE_COLOR,
-                                  border: `1px solid ${alpha(MODULE_COLOR, 0.2)}`,
-                                }}
-                              />
-                            </Box>
-                            <Box component="td" sx={{ fontSize: '0.75rem', color: colors.textSecondary, py: 0.75, pr: 2 }}>{row.current}</Box>
-                            <Box component="td" sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#059669', py: 0.75, pr: 2 }}>{row.proposed}</Box>
-                            <Box component="td" sx={{ py: 0.75 }}>
-                              <Chip
-                                label={row.impact}
-                                size="small"
-                                sx={{
-                                  height: 20,
-                                  fontSize: '0.65rem',
-                                  fontWeight: 700,
-                                  bgcolor: alpha('#10b981', 0.12),
-                                  color: '#059669',
-                                  border: `1px solid ${alpha('#059669', 0.25)}`,
-                                }}
-                              />
-                            </Box>
-                          </Box>
-                        ))}
-                      </Box>
+                </Box>
+              </Box>
+              <Box component="tbody">
+                {(PRESCRIPTIVE_FIXES[selectedRow.rootCause] || []).map((row, i) => (
+                  <Box component="tr" key={i} sx={{ '&:hover': { bgcolor: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' } }}>
+                    <Box component="td" sx={{ fontSize: '0.8rem', fontWeight: 600, color: colors.text, py: 1, pr: 3 }}>{row.fix}</Box>
+                    <Box component="td" sx={{ py: 1, pr: 3 }}>
+                      <Chip
+                        label={row.parameter}
+                        size="small"
+                        sx={{
+                          height: 22,
+                          fontSize: '0.7rem',
+                          fontWeight: 700,
+                          bgcolor: alpha(MODULE_COLOR, 0.1),
+                          color: darkMode ? '#8bb8e8' : MODULE_COLOR,
+                          border: `1px solid ${alpha(MODULE_COLOR, 0.2)}`,
+                        }}
+                      />
+                    </Box>
+                    <Box component="td" sx={{ fontSize: '0.8rem', color: colors.textSecondary, py: 1, pr: 3 }}>{row.current}</Box>
+                    <Box component="td" sx={{ fontSize: '0.8rem', fontWeight: 600, color: '#059669', py: 1, pr: 3 }}>{row.proposed}</Box>
+                    <Box component="td" sx={{ py: 1 }}>
+                      <Chip
+                        label={row.impact}
+                        size="small"
+                        sx={{
+                          height: 22,
+                          fontSize: '0.7rem',
+                          fontWeight: 700,
+                          bgcolor: alpha('#10b981', 0.12),
+                          color: '#059669',
+                          border: `1px solid ${alpha('#059669', 0.25)}`,
+                        }}
+                      />
                     </Box>
                   </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-        </Paper>
-      )}
+                ))}
+              </Box>
+            </Box>
+          </Box>
+        </CardContent>
+      </Card>
+    </>
+  );
+
+  // ============================================
+  // Main return - header/breadcrumbs + conditional view
+  // ============================================
+  return (
+    <Box sx={{ p: 2, bgcolor: darkMode ? '#0d1117' : '#f8fbfd', minHeight: '100vh' }}>
+      {/* Header */}
+      <Paper sx={{ ...paperSx, mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+        <IconButton onClick={selectedRow ? () => setSelectedRow(null) : onBack} size="small" sx={{ color: MODULE_COLOR }}>
+          <ArrowBackIcon />
+        </IconButton>
+        <Box sx={{ flex: 1 }}>
+          <Breadcrumbs separator={<NavigateNextIcon sx={{ fontSize: 14, color: colors.textSecondary }} />} sx={{ mb: 0.5 }}>
+            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>CORE.AI</Link>
+            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>STOX.AI</Link>
+            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>Lam Research</Link>
+            {selectedRow ? (
+              <>
+                <Link underline="hover" onClick={() => setSelectedRow(null)} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>MRP Signal Quality</Link>
+                <Typography sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 600 }}>{selectedRow.material} Detail</Typography>
+              </>
+            ) : (
+              <Typography sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 600 }}>MRP Signal Quality</Typography>
+            )}
+          </Breadcrumbs>
+          <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: colors.text }}>
+            {selectedRow
+              ? `${selectedRow.material} \u2014 Signal Detail`
+              : 'MRP Signal Quality \u2014 Internal Noise Lens'}
+          </Typography>
+        </Box>
+      </Paper>
+
+      {selectedRow ? renderDetailView() : renderListView()}
     </Box>
   );
 };

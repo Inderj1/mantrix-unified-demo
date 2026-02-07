@@ -21,7 +21,6 @@ import {
   NavigateNext as NavigateNextIcon,
   LocalShipping as LocalShippingIcon,
   AttachMoney as AttachMoneyIcon,
-  Close as CloseIcon,
 } from '@mui/icons-material';
 import { Bar } from 'react-chartjs-2';
 import {
@@ -624,78 +623,52 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
   };
 
   // ============================================
-  // RENDER: DETAIL PANEL
+  // RENDER: DETAIL VIEW (full-page replacement)
   // ============================================
-  const renderDetailPanel = () => {
-    if (!selectedRow) return null;
+  const renderDetailView = () => {
     const row = selectedRow;
     const riskChipColor = getRiskChipColor(row.risk);
 
     return (
-      <Paper
-        elevation={0}
-        sx={{
-          mt: 2,
-          p: 2.5,
-          bgcolor: colors.paper,
-          border: `1px solid ${colors.border}`,
-          borderRadius: 2,
-        }}
-      >
-        {/* Detail Header */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Stack direction="row" spacing={1.5} alignItems="center">
-            <Typography sx={{ fontWeight: 700, fontSize: '1rem', color: colors.text }}>
-              {row.vendor}
-            </Typography>
-            <Chip
-              label={row.risk}
-              size="small"
-              sx={{ ...riskChipColor, border: '1px solid', fontWeight: 700, fontSize: '0.7rem' }}
-            />
-          </Stack>
-          <IconButton size="small" onClick={handleCloseDetail} sx={{ color: colors.textSecondary }}>
-            <CloseIcon fontSize="small" />
-          </IconButton>
-        </Box>
-
-        <Grid container spacing={2}>
+      <>
+        {/* Detail Cards */}
+        <Grid container spacing={2.5} sx={{ mb: 3 }}>
           {/* Vendor Info Card */}
           <Grid item xs={12} md={4}>
             <Card
               elevation={0}
               sx={{
-                bgcolor: colors.cardBg,
+                bgcolor: colors.paper,
                 border: `1px solid ${colors.border}`,
                 borderLeft: `4px solid ${MODULE_COLOR}`,
                 borderRadius: 2,
                 height: '100%',
               }}
             >
-              <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                <Typography sx={{ fontWeight: 700, fontSize: '0.85rem', color: colors.text, mb: 1.5 }}>
+              <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+                <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: colors.text, mb: 2 }}>
                   Vendor Summary
                 </Typography>
-                <Stack spacing={1}>
+                <Stack spacing={1.5}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>SKU Count</Typography>
-                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: colors.text }}>{row.skuCount}</Typography>
+                    <Typography sx={{ fontSize: '0.8rem', color: colors.textSecondary }}>SKU Count</Typography>
+                    <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: colors.text }}>{row.skuCount}</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>Total Ordered</Typography>
-                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: colors.text }}>{formatNumber(row.orderedEA)} EA</Typography>
+                    <Typography sx={{ fontSize: '0.8rem', color: colors.textSecondary }}>Total Ordered</Typography>
+                    <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: colors.text }}>{formatNumber(row.orderedEA)} EA</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>On-Time Delivery</Typography>
-                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: getOtdColor(row.otdPct) }}>{row.otdPct}%</Typography>
+                    <Typography sx={{ fontSize: '0.8rem', color: colors.textSecondary }}>On-Time Delivery</Typography>
+                    <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: getOtdColor(row.otdPct) }}>{row.otdPct}%</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>Late Deliveries</Typography>
-                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: '#ef4444' }}>{formatNumber(row.lateEA)} EA</Typography>
+                    <Typography sx={{ fontSize: '0.8rem', color: colors.textSecondary }}>Late Deliveries</Typography>
+                    <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: '#ef4444' }}>{formatNumber(row.lateEA)} EA</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>LT Gap</Typography>
-                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: row.ltGapDays > 10 ? '#ef4444' : colors.text }}>{row.ltGapDays} days</Typography>
+                    <Typography sx={{ fontSize: '0.8rem', color: colors.textSecondary }}>LT Gap</Typography>
+                    <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: row.ltGapDays > 10 ? '#ef4444' : colors.text }}>{row.ltGapDays} days</Typography>
                   </Box>
                 </Stack>
               </CardContent>
@@ -707,37 +680,37 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
             <Card
               elevation={0}
               sx={{
-                bgcolor: colors.cardBg,
+                bgcolor: colors.paper,
                 border: `1px solid ${colors.border}`,
-                borderLeft: '4px solid #0ea5e9',
+                borderLeft: `4px solid #f59e0b`,
                 borderRadius: 2,
                 height: '100%',
               }}
             >
-              <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                <Typography sx={{ fontWeight: 700, fontSize: '0.85rem', color: colors.text, mb: 1.5 }}>
+              <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+                <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: colors.text, mb: 2 }}>
                   Lead Time Distribution
                 </Typography>
-                <Stack spacing={1}>
+                <Stack spacing={1.5}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>Avg Lead Time</Typography>
-                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: colors.text }}>{row.avgLT} days</Typography>
+                    <Typography sx={{ fontSize: '0.8rem', color: colors.textSecondary }}>Avg Lead Time</Typography>
+                    <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: colors.text }}>{row.avgLT} days</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>Std Deviation</Typography>
-                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: colors.text }}>{row.stdDev} days</Typography>
+                    <Typography sx={{ fontSize: '0.8rem', color: colors.textSecondary }}>Std Deviation</Typography>
+                    <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: colors.text }}>{row.stdDev} days</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>Min LT</Typography>
-                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: '#10b981' }}>{row.minLT} days</Typography>
+                    <Typography sx={{ fontSize: '0.8rem', color: colors.textSecondary }}>Min LT</Typography>
+                    <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: '#10b981' }}>{row.minLT} days</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>Max LT</Typography>
-                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: '#ef4444' }}>{row.maxLT} days</Typography>
+                    <Typography sx={{ fontSize: '0.8rem', color: colors.textSecondary }}>Max LT</Typography>
+                    <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: '#ef4444' }}>{row.maxLT} days</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>CV %</Typography>
-                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: row.cvPct > 20 ? '#f59e0b' : colors.text }}>{row.cvPct}%</Typography>
+                    <Typography sx={{ fontSize: '0.8rem', color: colors.textSecondary }}>CV %</Typography>
+                    <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: row.cvPct > 20 ? '#f59e0b' : colors.text }}>{row.cvPct}%</Typography>
                   </Box>
                 </Stack>
               </CardContent>
@@ -749,33 +722,33 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
             <Card
               elevation={0}
               sx={{
-                bgcolor: colors.cardBg,
+                bgcolor: colors.paper,
                 border: `1px solid ${colors.border}`,
-                borderLeft: '4px solid #f59e0b',
+                borderLeft: `4px solid #ef4444`,
                 borderRadius: 2,
                 height: '100%',
               }}
             >
-              <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                <Typography sx={{ fontWeight: 700, fontSize: '0.85rem', color: colors.text, mb: 1.5 }}>
+              <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+                <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: colors.text, mb: 2 }}>
                   Financial Impact Breakdown
                 </Typography>
-                <Stack spacing={1}>
+                <Stack spacing={1.5}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>Safety Stock Burden</Typography>
-                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#ef4444' }}>{formatCurrency(row.ssBurden)}</Typography>
+                    <Typography sx={{ fontSize: '0.8rem', color: colors.textSecondary }}>Safety Stock Burden</Typography>
+                    <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: '#ef4444' }}>{formatCurrency(row.ssBurden)}</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>Risk Premium</Typography>
-                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: '#f59e0b' }}>{formatCurrency(row.riskPremium)}/yr</Typography>
+                    <Typography sx={{ fontSize: '0.8rem', color: colors.textSecondary }}>Risk Premium</Typography>
+                    <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: '#f59e0b' }}>{formatCurrency(row.riskPremium)}/yr</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary }}>Expedite Costs</Typography>
-                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: colors.text }}>{formatCurrency(row.expediteCosts)}</Typography>
+                    <Typography sx={{ fontSize: '0.8rem', color: colors.textSecondary }}>Expedite Costs</Typography>
+                    <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: colors.text }}>{formatCurrency(row.expediteCosts)}</Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', pt: 0.5, borderTop: `1px solid ${colors.border}` }}>
-                    <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: colors.textSecondary }}>Total Impact</Typography>
-                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#ef4444' }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', pt: 1, borderTop: `1px solid ${colors.border}` }}>
+                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: colors.textSecondary }}>Total Impact</Typography>
+                    <Typography sx={{ fontSize: '0.9rem', fontWeight: 700, color: '#ef4444' }}>
                       {formatCurrency(row.ssBurden + row.riskPremium + row.expediteCosts)}
                     </Typography>
                   </Box>
@@ -783,87 +756,30 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
               </CardContent>
             </Card>
           </Grid>
-
-          {/* Bar Chart */}
-          <Grid item xs={12}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2,
-                bgcolor: colors.cardBg,
-                border: `1px solid ${colors.border}`,
-                borderRadius: 2,
-                height: 280,
-              }}
-            >
-              <Bar data={getDeliveryChartData(row)} options={chartOptions} />
-            </Paper>
-          </Grid>
         </Grid>
-      </Paper>
+
+        {/* Bar Chart - Full Width */}
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            bgcolor: colors.paper,
+            border: `1px solid ${colors.border}`,
+            borderRadius: 2,
+            height: 340,
+          }}
+        >
+          <Bar data={getDeliveryChartData(row)} options={chartOptions} />
+        </Paper>
+      </>
     );
   };
 
   // ============================================
-  // RENDER: MAIN
+  // RENDER: LIST VIEW
   // ============================================
-  return (
-    <Box sx={{ p: 3, bgcolor: colors.background, minHeight: '100vh' }}>
-      {/* Header */}
-      <Paper
-        elevation={0}
-        sx={{
-          p: 2,
-          mb: 2.5,
-          bgcolor: colors.paper,
-          border: `1px solid ${colors.border}`,
-          borderRadius: 2,
-        }}
-      >
-        <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-          <IconButton
-            size="small"
-            onClick={onBack}
-            sx={{
-              bgcolor: alpha(MODULE_COLOR, 0.08),
-              color: MODULE_COLOR,
-              '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.15) },
-            }}
-          >
-            <ArrowBackIcon fontSize="small" />
-          </IconButton>
-          <Breadcrumbs separator={<NavigateNextIcon sx={{ fontSize: 14, color: colors.textSecondary }} />}>
-            <Link
-              underline="hover"
-              sx={{ fontSize: '0.75rem', color: colors.textSecondary, cursor: 'pointer', fontWeight: 600 }}
-              onClick={onBack}
-            >
-              CORE.AI
-            </Link>
-            <Link
-              underline="hover"
-              sx={{ fontSize: '0.75rem', color: colors.textSecondary, cursor: 'pointer', fontWeight: 600 }}
-              onClick={onBack}
-            >
-              STOX.AI
-            </Link>
-            <Link
-              underline="hover"
-              sx={{ fontSize: '0.75rem', color: colors.textSecondary, cursor: 'pointer', fontWeight: 600 }}
-              onClick={onBack}
-            >
-              Lam Research
-            </Link>
-            <Typography sx={{ fontSize: '0.75rem', color: MODULE_COLOR, fontWeight: 700 }}>
-              Supply Risk & Vendor Perf.
-            </Typography>
-          </Breadcrumbs>
-        </Stack>
-        <Typography sx={{ fontWeight: 700, fontSize: '1.15rem', color: colors.text }}>
-          Supply Risk & Vendor Performance — External Risk Lens
-        </Typography>
-      </Paper>
-
+  const renderListView = () => (
+    <>
       {/* Dual-Lens Summary Cards */}
       <Grid container spacing={2} sx={{ mb: 2.5 }}>
         {/* Vendor Delivery Performance */}
@@ -874,7 +790,6 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
               p: 2,
               bgcolor: colors.paper,
               border: `1px solid ${colors.border}`,
-              borderLeft: `4px solid ${MODULE_COLOR}`,
               borderRadius: 2,
               height: '100%',
             }}
@@ -934,7 +849,6 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
               p: 2,
               bgcolor: colors.paper,
               border: `1px solid ${colors.border}`,
-              borderLeft: `4px solid ${MODULE_COLOR}`,
               borderRadius: 2,
               height: '100%',
             }}
@@ -1028,9 +942,87 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
           />
         </Box>
       </Paper>
+    </>
+  );
 
-      {/* Detail Panel */}
-      {renderDetailPanel()}
+  // ============================================
+  // RENDER: MAIN
+  // ============================================
+  return (
+    <Box sx={{ p: 3, bgcolor: colors.background, minHeight: '100vh' }}>
+      {/* Header */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 2,
+          mb: 2.5,
+          bgcolor: colors.paper,
+          border: `1px solid ${colors.border}`,
+          borderRadius: 2,
+        }}
+      >
+        <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
+          <IconButton
+            size="small"
+            onClick={onBack}
+            sx={{
+              bgcolor: alpha(MODULE_COLOR, 0.08),
+              color: MODULE_COLOR,
+              '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.15) },
+            }}
+          >
+            <ArrowBackIcon fontSize="small" />
+          </IconButton>
+          <Breadcrumbs separator={<NavigateNextIcon sx={{ fontSize: 14, color: colors.textSecondary }} />}>
+            <Link
+              underline="hover"
+              sx={{ fontSize: '0.75rem', color: colors.textSecondary, cursor: 'pointer', fontWeight: 600 }}
+              onClick={onBack}
+            >
+              CORE.AI
+            </Link>
+            <Link
+              underline="hover"
+              sx={{ fontSize: '0.75rem', color: colors.textSecondary, cursor: 'pointer', fontWeight: 600 }}
+              onClick={onBack}
+            >
+              STOX.AI
+            </Link>
+            <Link
+              underline="hover"
+              sx={{ fontSize: '0.75rem', color: colors.textSecondary, cursor: 'pointer', fontWeight: 600 }}
+              onClick={onBack}
+            >
+              Lam Research
+            </Link>
+            {selectedRow ? (
+              <>
+                <Link
+                  underline="hover"
+                  sx={{ fontSize: '0.75rem', color: colors.textSecondary, cursor: 'pointer', fontWeight: 600 }}
+                  onClick={() => setSelectedRow(null)}
+                >
+                  Supply Risk & Vendor Perf.
+                </Link>
+                <Typography sx={{ fontSize: '0.75rem', color: MODULE_COLOR, fontWeight: 700 }}>
+                  {selectedRow.vendor} Detail
+                </Typography>
+              </>
+            ) : (
+              <Typography sx={{ fontSize: '0.75rem', color: MODULE_COLOR, fontWeight: 700 }}>
+                Supply Risk & Vendor Perf.
+              </Typography>
+            )}
+          </Breadcrumbs>
+        </Stack>
+        <Typography sx={{ fontWeight: 700, fontSize: '1.15rem', color: colors.text }}>
+          {selectedRow
+            ? `${selectedRow.vendor} — Vendor Performance Detail`
+            : 'Supply Risk & Vendor Performance — External Risk Lens'}
+        </Typography>
+      </Paper>
+
+      {selectedRow ? renderDetailView() : renderListView()}
     </Box>
   );
 };

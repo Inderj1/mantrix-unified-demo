@@ -12,7 +12,6 @@ import {
   Link,
   Stack,
   LinearProgress,
-  Collapse,
   Divider,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
@@ -418,50 +417,9 @@ export default function LamInventoryCapitalHealth({ onBack, darkMode = false }) 
     },
   };
 
-  // ======== RENDER ========
-  return (
-    <Box sx={{ bgcolor: bgColor, minHeight: '100vh', p: 2.5 }}>
-      {/* ---- HEADER ---- */}
-      <Paper
-        elevation={0}
-        sx={{
-          p: 2,
-          mb: 2.5,
-          bgcolor: paperBg,
-          border: `1px solid ${borderColor}`,
-          borderRadius: 2,
-        }}
-      >
-        <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-          <Button
-            startIcon={<ArrowBackIcon />}
-            onClick={onBack}
-            size="small"
-            sx={{
-              textTransform: 'none',
-              borderRadius: 2,
-              fontWeight: 600,
-              color: colors.primary,
-              '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.08) },
-            }}
-          >
-            Back
-          </Button>
-          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ '& .MuiBreadcrumb-separator': { color: textSecondary } }}>
-            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.75rem', color: textSecondary, cursor: 'pointer' }}>CORE.AI</Link>
-            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.75rem', color: textSecondary, cursor: 'pointer' }}>STOX.AI</Link>
-            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.75rem', color: textSecondary, cursor: 'pointer' }}>Lam Research</Link>
-            <Typography sx={{ fontSize: '0.75rem', color: colors.primary, fontWeight: 600 }}>Inventory Capital Health</Typography>
-          </Breadcrumbs>
-        </Stack>
-        <Typography variant="h6" sx={{ fontWeight: 700, color: textColor, fontSize: '1.1rem' }}>
-          Inventory Capital Health &mdash; Balance Sheet Lens
-        </Typography>
-        <Typography sx={{ fontSize: '0.75rem', color: textSecondary, mt: 0.3 }}>
-          Comprehensive view of inventory positions, capital deployment, and return metrics for semiconductor manufacturing
-        </Typography>
-      </Paper>
-
+  // ======== RENDER: LIST VIEW ========
+  const renderListView = () => (
+    <>
       {/* ---- DUAL-LENS SUMMARY ---- */}
       <Grid container spacing={2} sx={{ mb: 2.5 }}>
         {/* Quantity Position */}
@@ -473,7 +431,6 @@ export default function LamInventoryCapitalHealth({ onBack, darkMode = false }) 
               bgcolor: paperBg,
               border: `1px solid ${borderColor}`,
               borderRadius: 2,
-              borderLeft: `4px solid ${MODULE_COLOR}`,
             }}
           >
             <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
@@ -506,7 +463,6 @@ export default function LamInventoryCapitalHealth({ onBack, darkMode = false }) 
               bgcolor: paperBg,
               border: `1px solid ${borderColor}`,
               borderRadius: 2,
-              borderLeft: `4px solid #f59e0b`,
             }}
           >
             <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
@@ -542,7 +498,6 @@ export default function LamInventoryCapitalHealth({ onBack, darkMode = false }) 
                 sx={{
                   bgcolor: cardBg,
                   border: `1px solid ${borderColor}`,
-                  borderLeft: `4px solid ${card.color}`,
                   borderRadius: 2,
                 }}
               >
@@ -614,7 +569,7 @@ export default function LamInventoryCapitalHealth({ onBack, darkMode = false }) 
           bgcolor: paperBg,
           border: `1px solid ${borderColor}`,
           borderRadius: 2,
-          mb: selectedRow ? 0 : 2.5,
+          mb: 2.5,
         }}
       >
         <Box sx={{ p: 1.5, borderBottom: `1px solid ${borderColor}` }}>
@@ -650,128 +605,159 @@ export default function LamInventoryCapitalHealth({ onBack, darkMode = false }) 
           />
         </Box>
       </Paper>
+    </>
+  );
 
-      {/* ---- DETAIL PANEL ---- */}
-      <Collapse in={!!selectedRow}>
-        {selectedRow && (
-          <Paper
+  // ======== RENDER: DETAIL VIEW ========
+  const renderDetailView = () => (
+    <Box>
+      <Grid container spacing={2.5}>
+        {/* Material Info Card */}
+        <Grid item xs={12} md={4}>
+          <Card
             elevation={0}
             sx={{
-              mt: 2,
-              p: 2,
-              bgcolor: paperBg,
-              border: `1px solid ${borderColor}`,
+              bgcolor: darkMode ? alpha(MODULE_COLOR, 0.08) : alpha(MODULE_COLOR, 0.04),
+              border: `1px solid ${alpha(MODULE_COLOR, 0.15)}`,
               borderRadius: 2,
-              borderTop: `3px solid ${CLASS_COLORS[selectedRow.class] || MODULE_COLOR}`,
+              height: '100%',
             }}
           >
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-              <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: textColor }}>
-                Detail: {selectedRow.material}
-              </Typography>
-              <Button
-                size="small"
-                onClick={() => setSelectedRow(null)}
-                sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 600, color: textSecondary }}
-              >
-                Close
-              </Button>
-            </Stack>
+            <CardContent sx={{ p: 1.5 }}>
+              <Typography sx={{ fontWeight: 700, fontSize: '0.85rem', color: textColor, mb: 1.5 }}>Material Info</Typography>
+              {[
+                { label: 'Material', value: selectedRow.material },
+                { label: 'Plant', value: selectedRow.plant },
+                { label: 'Class', value: selectedRow.class },
+                { label: 'On-Hand', value: `${formatNumber(selectedRow.onHandEA)} EA` },
+                { label: 'Required', value: `${formatNumber(selectedRow.requiredEA)} EA` },
+                { label: 'Excess', value: `${formatNumber(selectedRow.excessEA)} EA` },
+                { label: 'Coverage', value: `${selectedRow.coverage} days` },
+              ].map((item) => (
+                <Stack key={item.label} direction="row" justifyContent="space-between" sx={{ mb: 0.6 }}>
+                  <Typography sx={{ fontSize: '0.7rem', color: textSecondary }}>{item.label}</Typography>
+                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: textColor }}>{item.value}</Typography>
+                </Stack>
+              ))}
+            </CardContent>
+          </Card>
+        </Grid>
 
-            <Grid container spacing={2.5}>
-              {/* Material Info Card */}
-              <Grid item xs={12} md={4}>
-                <Card
-                  elevation={0}
-                  sx={{
-                    bgcolor: darkMode ? alpha(MODULE_COLOR, 0.08) : alpha(MODULE_COLOR, 0.04),
-                    border: `1px solid ${alpha(MODULE_COLOR, 0.15)}`,
-                    borderLeft: `4px solid ${CLASS_COLORS[selectedRow.class] || MODULE_COLOR}`,
-                    borderRadius: 2,
-                    height: '100%',
-                  }}
-                >
-                  <CardContent sx={{ p: 1.5 }}>
-                    <Typography sx={{ fontWeight: 700, fontSize: '0.85rem', color: textColor, mb: 1.5 }}>Material Info</Typography>
-                    {[
-                      { label: 'Material', value: selectedRow.material },
-                      { label: 'Plant', value: selectedRow.plant },
-                      { label: 'Class', value: selectedRow.class },
-                      { label: 'On-Hand', value: `${formatNumber(selectedRow.onHandEA)} EA` },
-                      { label: 'Required', value: `${formatNumber(selectedRow.requiredEA)} EA` },
-                      { label: 'Excess', value: `${formatNumber(selectedRow.excessEA)} EA` },
-                      { label: 'Coverage', value: `${selectedRow.coverage} days` },
-                    ].map((item) => (
-                      <Stack key={item.label} direction="row" justifyContent="space-between" sx={{ mb: 0.6 }}>
-                        <Typography sx={{ fontSize: '0.7rem', color: textSecondary }}>{item.label}</Typography>
-                        <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: textColor }}>{item.value}</Typography>
-                      </Stack>
-                    ))}
-                  </CardContent>
-                </Card>
-              </Grid>
+        {/* Aging Analysis Bar Chart */}
+        <Grid item xs={12} md={4}>
+          <Card
+            elevation={0}
+            sx={{
+              bgcolor: cardBg,
+              border: `1px solid ${borderColor}`,
+              borderRadius: 2,
+              height: '100%',
+            }}
+          >
+            <CardContent sx={{ p: 1.5 }}>
+              <Typography sx={{ fontWeight: 700, fontSize: '0.85rem', color: textColor, mb: 1 }}>Aging Analysis</Typography>
+              <Box sx={{ height: 200 }}>
+                {agingBarData && <Bar data={agingBarData} options={agingBarOptions} />}
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
 
-              {/* Aging Analysis Bar Chart */}
-              <Grid item xs={12} md={4}>
-                <Card
-                  elevation={0}
-                  sx={{
-                    bgcolor: cardBg,
-                    border: `1px solid ${borderColor}`,
-                    borderRadius: 2,
-                    height: '100%',
-                  }}
-                >
-                  <CardContent sx={{ p: 1.5 }}>
-                    <Typography sx={{ fontWeight: 700, fontSize: '0.85rem', color: textColor, mb: 1 }}>Aging Analysis</Typography>
-                    <Box sx={{ height: 200 }}>
-                      {agingBarData && <Bar data={agingBarData} options={agingBarOptions} />}
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
+        {/* Financial Summary */}
+        <Grid item xs={12} md={4}>
+          <Card
+            elevation={0}
+            sx={{
+              bgcolor: cardBg,
+              border: `1px solid ${borderColor}`,
+              borderRadius: 2,
+              height: '100%',
+            }}
+          >
+            <CardContent sx={{ p: 1.5 }}>
+              <Typography sx={{ fontWeight: 700, fontSize: '0.85rem', color: textColor, mb: 1.5 }}>Financial Summary</Typography>
+              {[
+                { label: 'Book Value', value: formatCurrency(selectedRow.bookValue), color: textColor },
+                { label: 'Market Value', value: formatCurrency(selectedRow.marketValue), color: '#059669' },
+                { label: 'Write-Down Risk', value: formatCurrency(selectedRow.writeDownRisk), color: selectedRow.writeDownRisk > 0 ? '#ef4444' : '#059669' },
+                { label: 'Capital Deployed', value: formatCurrency(selectedRow.capitalValue), color: textColor },
+                { label: 'Excess Capital', value: formatCurrency(selectedRow.excessCapital), color: selectedRow.excessCapital > 0 ? '#ef4444' : textSecondary },
+                { label: 'Carrying Cost/Yr', value: formatCurrency(selectedRow.carryPerYear), color: '#d97706' },
+                { label: 'ROIC', value: selectedRow.roic > 0 ? `${selectedRow.roic}%` : '--', color: selectedRow.roic >= 15 ? '#059669' : selectedRow.roic > 0 ? '#d97706' : '#dc2626' },
+              ].map((item) => (
+                <Stack key={item.label} direction="row" justifyContent="space-between" sx={{ mb: 0.6 }}>
+                  <Typography sx={{ fontSize: '0.7rem', color: textSecondary }}>{item.label}</Typography>
+                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: item.color }}>{item.value}</Typography>
+                </Stack>
+              ))}
+              <Divider sx={{ my: 1, borderColor: borderColor }} />
+              <Stack direction="row" justifyContent="space-between">
+                <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: textSecondary }}>Net Position</Typography>
+                <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: selectedRow.marketValue >= selectedRow.bookValue ? '#059669' : '#ef4444' }}>
+                  {selectedRow.marketValue >= selectedRow.bookValue ? '+' : '-'}{formatCurrency(Math.abs(selectedRow.marketValue - selectedRow.bookValue))}
+                </Typography>
+              </Stack>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
+  );
 
-              {/* Financial Summary */}
-              <Grid item xs={12} md={4}>
-                <Card
-                  elevation={0}
-                  sx={{
-                    bgcolor: cardBg,
-                    border: `1px solid ${borderColor}`,
-                    borderRadius: 2,
-                    height: '100%',
-                  }}
-                >
-                  <CardContent sx={{ p: 1.5 }}>
-                    <Typography sx={{ fontWeight: 700, fontSize: '0.85rem', color: textColor, mb: 1.5 }}>Financial Summary</Typography>
-                    {[
-                      { label: 'Book Value', value: formatCurrency(selectedRow.bookValue), color: textColor },
-                      { label: 'Market Value', value: formatCurrency(selectedRow.marketValue), color: '#059669' },
-                      { label: 'Write-Down Risk', value: formatCurrency(selectedRow.writeDownRisk), color: selectedRow.writeDownRisk > 0 ? '#ef4444' : '#059669' },
-                      { label: 'Capital Deployed', value: formatCurrency(selectedRow.capitalValue), color: textColor },
-                      { label: 'Excess Capital', value: formatCurrency(selectedRow.excessCapital), color: selectedRow.excessCapital > 0 ? '#ef4444' : textSecondary },
-                      { label: 'Carrying Cost/Yr', value: formatCurrency(selectedRow.carryPerYear), color: '#d97706' },
-                      { label: 'ROIC', value: selectedRow.roic > 0 ? `${selectedRow.roic}%` : '--', color: selectedRow.roic >= 15 ? '#059669' : selectedRow.roic > 0 ? '#d97706' : '#dc2626' },
-                    ].map((item) => (
-                      <Stack key={item.label} direction="row" justifyContent="space-between" sx={{ mb: 0.6 }}>
-                        <Typography sx={{ fontSize: '0.7rem', color: textSecondary }}>{item.label}</Typography>
-                        <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: item.color }}>{item.value}</Typography>
-                      </Stack>
-                    ))}
-                    <Divider sx={{ my: 1, borderColor: borderColor }} />
-                    <Stack direction="row" justifyContent="space-between">
-                      <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: textSecondary }}>Net Position</Typography>
-                      <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: selectedRow.marketValue >= selectedRow.bookValue ? '#059669' : '#ef4444' }}>
-                        {selectedRow.marketValue >= selectedRow.bookValue ? '+' : '-'}{formatCurrency(Math.abs(selectedRow.marketValue - selectedRow.bookValue))}
-                      </Typography>
-                    </Stack>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
-          </Paper>
-        )}
-      </Collapse>
+  // ======== MAIN RENDER ========
+  return (
+    <Box sx={{ bgcolor: bgColor, minHeight: '100vh', p: 2.5 }}>
+      {/* ---- HEADER ---- */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 2,
+          mb: 2.5,
+          bgcolor: paperBg,
+          border: `1px solid ${borderColor}`,
+          borderRadius: 2,
+        }}
+      >
+        <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
+          <Button
+            startIcon={<ArrowBackIcon />}
+            onClick={selectedRow ? () => setSelectedRow(null) : onBack}
+            size="small"
+            sx={{
+              textTransform: 'none',
+              borderRadius: 2,
+              fontWeight: 600,
+              color: colors.primary,
+              '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.08) },
+            }}
+          >
+            Back
+          </Button>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ '& .MuiBreadcrumb-separator': { color: textSecondary } }}>
+            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.75rem', color: textSecondary, cursor: 'pointer' }}>CORE.AI</Link>
+            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.75rem', color: textSecondary, cursor: 'pointer' }}>STOX.AI</Link>
+            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.75rem', color: textSecondary, cursor: 'pointer' }}>Lam Research</Link>
+            {selectedRow ? (
+              <>
+                <Link underline="hover" onClick={() => setSelectedRow(null)} sx={{ fontSize: '0.75rem', color: textSecondary, cursor: 'pointer' }}>Inventory Capital Health</Link>
+                <Typography sx={{ fontSize: '0.75rem', color: colors.primary, fontWeight: 600 }}>{selectedRow.material} Detail</Typography>
+              </>
+            ) : (
+              <Typography sx={{ fontSize: '0.75rem', color: colors.primary, fontWeight: 600 }}>Inventory Capital Health</Typography>
+            )}
+          </Breadcrumbs>
+        </Stack>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: textColor, fontSize: '1.1rem' }}>
+          {selectedRow ? `${selectedRow.material} \u2014 Detail View` : 'Inventory Capital Health \u2014 Balance Sheet Lens'}
+        </Typography>
+        <Typography sx={{ fontSize: '0.75rem', color: textSecondary, mt: 0.3 }}>
+          {selectedRow
+            ? `Detailed inventory position, aging analysis, and financial metrics for ${selectedRow.material}`
+            : 'Comprehensive view of inventory positions, capital deployment, and return metrics for semiconductor manufacturing'}
+        </Typography>
+      </Paper>
+
+      {selectedRow ? renderDetailView() : renderListView()}
     </Box>
   );
 }

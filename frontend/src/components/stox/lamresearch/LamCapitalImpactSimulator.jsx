@@ -301,7 +301,6 @@ export default function LamCapitalImpactSimulator({ onBack, darkMode = false }) 
               p: 2,
               bgcolor: paperBg,
               border: `1px solid ${borderColor}`,
-              borderLeft: `4px solid ${MODULE_COLOR}`,
               borderRadius: 2,
             }}
           >
@@ -334,7 +333,6 @@ export default function LamCapitalImpactSimulator({ onBack, darkMode = false }) 
               p: 2,
               bgcolor: paperBg,
               border: `1px solid ${borderColor}`,
-              borderLeft: `4px solid ${MODULE_COLOR}`,
               borderRadius: 2,
             }}
           >
@@ -371,7 +369,6 @@ export default function LamCapitalImpactSimulator({ onBack, darkMode = false }) 
               sx={{
                 bgcolor: cardBg,
                 border: `1px solid ${borderColor}`,
-                borderLeft: `4px solid ${kpi.border}`,
                 borderRadius: 2,
               }}
             >
@@ -546,7 +543,6 @@ export default function LamCapitalImpactSimulator({ onBack, darkMode = false }) 
               sx={{
                 bgcolor: alpha(tile.color, darkMode ? 0.06 : 0.03),
                 border: `1px solid ${borderColor}`,
-                borderLeft: `4px solid ${tile.color}`,
                 borderRadius: 2,
               }}
             >
@@ -585,7 +581,6 @@ export default function LamCapitalImpactSimulator({ onBack, darkMode = false }) 
           mb: 2,
           bgcolor: paperBg,
           border: `1px solid ${borderColor}`,
-          borderLeft: `4px solid ${MODULE_COLOR}`,
           borderRadius: 2,
         }}
       >

@@ -219,9 +219,8 @@ const LamSafetyStockEconomics = ({ onBack, darkMode = false }) => {
     },
   ];
 
-  // ---- Detail panel ----
-  const renderDetailPanel = () => {
-    if (!selectedRow) return null;
+  // ---- Detail view (full-page replacement) ----
+  const renderDetailView = () => {
     const row = MOCK_DATA.find((r) => r.id === selectedRow);
     if (!row) return null;
     const d = DETAIL_DATA[row.id];
@@ -238,11 +237,11 @@ const LamSafetyStockEconomics = ({ onBack, darkMode = false }) => {
     ];
 
     return (
-      <Box sx={{ mt: 2 }}>
+      <>
         <Grid container spacing={2}>
           {/* Material info card */}
           <Grid item xs={12} md={4}>
-            <Card sx={{ bgcolor: colors.paper, border: `1px solid ${colors.border}`, borderLeft: `4px solid ${MODULE_COLOR}`, borderRadius: 2 }}>
+            <Card sx={{ bgcolor: colors.paper, border: `1px solid ${colors.border}`, borderRadius: 2 }}>
               <CardContent sx={{ p: 2 }}>
                 <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: colors.text, mb: 1 }}>{row.material}</Typography>
                 <Stack spacing={1}>
@@ -269,7 +268,7 @@ const LamSafetyStockEconomics = ({ onBack, darkMode = false }) => {
 
           {/* Safety Stock Formula card */}
           <Grid item xs={12} md={8}>
-            <Card sx={{ bgcolor: colors.paper, border: `1px solid ${colors.border}`, borderLeft: `4px solid ${MODULE_COLOR}`, borderRadius: 2 }}>
+            <Card sx={{ bgcolor: colors.paper, border: `1px solid ${colors.border}`, borderRadius: 2 }}>
               <CardContent sx={{ p: 2 }}>
                 <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: colors.text, mb: 1.5 }}>Safety Stock Formula</Typography>
                 <Box sx={{ bgcolor: darkMode ? '#0d1117' : '#f8fafc', borderRadius: 1, p: 1.5, mb: 1.5, border: `1px solid ${colors.border}` }}>
@@ -333,7 +332,7 @@ const LamSafetyStockEconomics = ({ onBack, darkMode = false }) => {
 
           {/* Capital Impact Summary */}
           <Grid item xs={12} md={5}>
-            <Card sx={{ bgcolor: colors.paper, border: `1px solid ${colors.border}`, borderLeft: '4px solid #10b981', borderRadius: 2 }}>
+            <Card sx={{ bgcolor: colors.paper, border: `1px solid ${colors.border}`, borderRadius: 2 }}>
               <CardContent sx={{ p: 2 }}>
                 <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: colors.text, mb: 1.5 }}>Capital Impact</Typography>
                 <Stack spacing={1.5}>
@@ -353,7 +352,7 @@ const LamSafetyStockEconomics = ({ onBack, darkMode = false }) => {
             </Card>
           </Grid>
         </Grid>
-      </Box>
+      </>
     );
   };
 
@@ -369,79 +368,9 @@ const LamSafetyStockEconomics = ({ onBack, darkMode = false }) => {
       }
     : {};
 
-  // ============================================
-  // Render
-  // ============================================
-  return (
-    <Box sx={{ p: 2, bgcolor: colors.background, minHeight: '100vh' }}>
-      {/* Header */}
-      <Paper
-        elevation={0}
-        sx={{
-          p: 2,
-          mb: 2,
-          bgcolor: colors.paper,
-          border: `1px solid ${colors.border}`,
-          borderRadius: 2,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 2,
-        }}
-      >
-        <IconButton onClick={onBack} size="small" sx={{ bgcolor: alpha(MODULE_COLOR, 0.08), '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.15) } }}>
-          <ArrowBackIcon sx={{ fontSize: 20, color: MODULE_COLOR }} />
-        </IconButton>
-        <Box sx={{ flex: 1 }}>
-          <Breadcrumbs separator={<NavigateNextIcon sx={{ fontSize: 14, color: colors.textSecondary }} />} sx={{ mb: 0.5 }}>
-            {['CORE.AI', 'STOX.AI', 'Lam Research', 'Safety Stock Economics'].map((crumb, idx, arr) => (
-              idx < arr.length - 1 ? (
-                <Link
-                  key={crumb}
-                  underline="hover"
-                  onClick={onBack}
-                  sx={{
-                    fontSize: '0.7rem',
-                    color: colors.textSecondary,
-                    cursor: 'pointer',
-                  }}
-                >
-                  {crumb}
-                </Link>
-              ) : (
-                <Typography
-                  key={crumb}
-                  sx={{
-                    fontSize: '0.7rem',
-                    color: MODULE_COLOR,
-                    fontWeight: 700,
-                  }}
-                >
-                  {crumb}
-                </Typography>
-              )
-            ))}
-          </Breadcrumbs>
-          <Typography sx={{ fontSize: '1.1rem', fontWeight: 700, color: colors.text }}>
-            Safety Stock & Reorder Economics — Decision Engine
-          </Typography>
-        </Box>
-        <Button
-          variant="outlined"
-          startIcon={<DownloadIcon sx={{ fontSize: 16 }} />}
-          sx={{
-            textTransform: 'none',
-            borderRadius: 2,
-            fontWeight: 600,
-            fontSize: '0.75rem',
-            borderColor: alpha(MODULE_COLOR, 0.3),
-            color: MODULE_COLOR,
-            '&:hover': { borderColor: MODULE_COLOR, bgcolor: alpha(MODULE_COLOR, 0.05) },
-          }}
-        >
-          Export
-        </Button>
-      </Paper>
-
+  // ---- List view (summary cards + DataGrid) ----
+  const renderListView = () => (
+    <>
       {/* Dual-lens summary cards */}
       <Grid container spacing={2} sx={{ mb: 2 }}>
         {/* Quantity Recommendations */}
@@ -452,7 +381,6 @@ const LamSafetyStockEconomics = ({ onBack, darkMode = false }) => {
               p: 2,
               bgcolor: colors.paper,
               border: `1px solid ${colors.border}`,
-              borderLeft: `4px solid ${MODULE_COLOR}`,
               borderRadius: 2,
             }}
           >
@@ -487,7 +415,6 @@ const LamSafetyStockEconomics = ({ onBack, darkMode = false }) => {
               p: 2,
               bgcolor: colors.paper,
               border: `1px solid ${colors.border}`,
-              borderLeft: '4px solid #10b981',
               borderRadius: 2,
             }}
           >
@@ -523,7 +450,7 @@ const LamSafetyStockEconomics = ({ onBack, darkMode = false }) => {
             columns={columns}
             density="compact"
             disableRowSelectionOnClick
-            onRowClick={(params) => setSelectedRow(params.id === selectedRow ? null : params.id)}
+            onRowClick={(params) => setSelectedRow(params.id)}
             slots={{ toolbar: GridToolbar }}
             slotProps={{
               toolbar: { showQuickFilter: true, quickFilterProps: { debounceMs: 300 } },
@@ -539,17 +466,79 @@ const LamSafetyStockEconomics = ({ onBack, darkMode = false }) => {
               '& .MuiDataGrid-row': {
                 cursor: 'pointer',
                 '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.06) },
-                '&.Mui-selected': { bgcolor: alpha(MODULE_COLOR, 0.1), '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.14) } },
               },
               ...darkGridSx,
             }}
-            getRowClassName={(params) => (params.id === selectedRow ? 'Mui-selected' : '')}
           />
         </Box>
       </Paper>
+    </>
+  );
 
-      {/* Detail Panel */}
-      {renderDetailPanel()}
+  // ============================================
+  // Render
+  // ============================================
+  const selectedData = selectedRow ? MOCK_DATA.find((r) => r.id === selectedRow) : null;
+
+  return (
+    <Box sx={{ p: 2, bgcolor: colors.background, minHeight: '100vh' }}>
+      {/* Shared header */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 2,
+          mb: 2,
+          bgcolor: colors.paper,
+          border: `1px solid ${colors.border}`,
+          borderRadius: 2,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+        }}
+      >
+        <IconButton onClick={selectedRow ? () => setSelectedRow(null) : onBack} size="small" sx={{ bgcolor: alpha(MODULE_COLOR, 0.08), '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.15) } }}>
+          <ArrowBackIcon sx={{ fontSize: 20, color: MODULE_COLOR }} />
+        </IconButton>
+        <Box sx={{ flex: 1 }}>
+          <Breadcrumbs separator={<NavigateNextIcon sx={{ fontSize: 14, color: colors.textSecondary }} />} sx={{ mb: 0.5 }}>
+            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>CORE.AI</Link>
+            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>STOX.AI</Link>
+            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>Lam Research</Link>
+            {selectedData ? (
+              <>
+                <Link underline="hover" onClick={() => setSelectedRow(null)} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>Safety Stock Economics</Link>
+                <Typography sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 700 }}>{selectedData.material}</Typography>
+              </>
+            ) : (
+              <Typography sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 700 }}>Safety Stock Economics</Typography>
+            )}
+          </Breadcrumbs>
+          <Typography sx={{ fontSize: '1.1rem', fontWeight: 700, color: colors.text }}>
+            {selectedData
+              ? `${selectedData.material} \u2014 ${selectedData.plant}`
+              : 'Safety Stock & Reorder Economics \u2014 Decision Engine'}
+          </Typography>
+        </Box>
+        {!selectedRow && (
+          <Button
+            variant="outlined"
+            startIcon={<DownloadIcon sx={{ fontSize: 16 }} />}
+            sx={{
+              textTransform: 'none',
+              borderRadius: 2,
+              fontWeight: 600,
+              fontSize: '0.75rem',
+              borderColor: alpha(MODULE_COLOR, 0.3),
+              color: MODULE_COLOR,
+              '&:hover': { borderColor: MODULE_COLOR, bgcolor: alpha(MODULE_COLOR, 0.05) },
+            }}
+          >
+            Export
+          </Button>
+        )}
+      </Paper>
+
+      {selectedRow ? renderDetailView() : renderListView()}
     </Box>
   );
 };

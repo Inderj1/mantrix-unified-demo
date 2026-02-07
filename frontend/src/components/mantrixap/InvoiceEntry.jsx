@@ -524,7 +524,7 @@ const InvoiceEntry = ({ onBack, darkMode = false, onNavigate }) => {
                         variant="outlined"
                         sx={{
                           p: 1,
-                          borderLeft: `3px solid #10b981`,
+                          border: '1px solid rgba(0,0,0,0.1)',
                           display: 'flex',
                           flexDirection: 'column',
                           bgcolor: darkMode ? alpha('#64748b', 0.05) : 'white',
@@ -546,11 +546,10 @@ const InvoiceEntry = ({ onBack, darkMode = false, onNavigate }) => {
                         variant="outlined"
                         sx={{
                           p: 1,
-                          borderLeft: `3px solid ${field.sap ? NAVY_DARK : '#e2e8f0'}`,
+                          border: '1px solid rgba(0,0,0,0.1)',
                           display: 'flex',
                           flexDirection: 'column',
                           bgcolor: field.sap ? alpha(NAVY_DARK, 0.06) : alpha('#64748b', 0.02),
-                          borderColor: field.sap ? alpha(NAVY_DARK, 0.2) : 'divider',
                         }}
                       >
                         {field.sap ? (
@@ -640,7 +639,7 @@ const InvoiceEntry = ({ onBack, darkMode = false, onNavigate }) => {
                 </Paper>
 
                 {/* AI Recommendation */}
-                <Card sx={{ mb: 2, bgcolor: alpha(NAVY_DARK, 0.04), border: `1px solid ${alpha(NAVY_DARK, 0.15)}`, borderLeft: `4px solid ${TILE_COLOR}`, borderRadius: 2 }}>
+                <Card sx={{ mb: 2, bgcolor: alpha(NAVY_DARK, 0.04), border: '1px solid rgba(0,0,0,0.1)', borderRadius: 2 }}>
                   <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                     <Stack direction="row" spacing={0.5} alignItems="center" sx={{ mb: 1 }}>
                       <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: TILE_COLOR, boxShadow: `0 0 8px ${alpha(TILE_COLOR, 0.5)}` }} />
