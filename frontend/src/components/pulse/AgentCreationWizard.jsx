@@ -9,8 +9,6 @@ import {
   Typography,
   Paper,
   Grid,
-  Card,
-  CardContent,
   Chip,
   FormControl,
   InputLabel,
@@ -28,6 +26,9 @@ import {
   StepConnector,
   stepConnectorClasses,
   styled,
+  Collapse,
+  Tooltip,
+  InputAdornment,
 } from '@mui/material';
 import {
   AutoAwesome as AutoAwesomeIcon,
@@ -83,13 +84,18 @@ import {
   EnergySavingsLeaf as EnergySavingsLeafIcon,
   Build as BuildIcon,
   Schema as SchemaIcon,
+  ExpandMore as ExpandMoreIcon,
+  Search as SearchIcon,
 } from '@mui/icons-material';
+import { getColors } from '../../config/brandColors';
+import { PROACTIVE_PATTERNS, PATTERN_SOURCE_LABELS } from './proactivePatternData';
 
-const steps = ['Choose Template or Create', 'Configure Agent', 'Review & Deploy'];
+const steps = ['Select Agent', 'Configure', 'Review & Deploy'];
 
-// Category definitions — one per CORE.AI module
+// Category definitions — one per CORE.AI module + Proactive
 const categories = [
   { id: 'all', label: 'All Templates', icon: AutoAwesomeIcon, color: '#6366f1' },
+  { id: 'proactive', label: 'Proactive', icon: PsychologyIcon, color: '#e11d48', description: 'Proactive Detection Patterns' },
   { id: 'stox', label: 'Stox.AI', icon: InventoryIcon, color: '#00357a', description: 'Inventory & Distribution Intelligence' },
   { id: 'margen', label: 'Margen.AI', icon: ShowChartIcon, color: '#10b981', description: 'Margin & Profitability Intelligence' },
   { id: 'ordly', label: 'Ordly.AI', icon: ShoppingCartIcon, color: '#7c3aed', description: 'Order Intelligence & Automation' },
@@ -427,8 +433,30 @@ const BUILT_IN_TEMPLATES = [
   },
 ];
 
+// Convert PROACTIVE_PATTERNS to template format
+const PATTERN_TEMPLATES = PROACTIVE_PATTERNS.map(p => ({
+  id: `pattern-${p.id}`,
+  name: p.name,
+  category: 'proactive',
+  icon: PsychologyIcon,
+  description: p.description,
+  capabilities: [
+    `Source: ${PATTERN_SOURCE_LABELS[p.source]}`,
+    `ERP: ${p.erpAction}`,
+    p.status === 'detected' ? `${p.detectionCount} detections` : 'Clear',
+  ],
+  default_frequency: 'daily',
+  default_severity: p.detectionCount >= 5 ? 'critical' : p.detectionCount >= 3 ? 'high' : 'medium',
+  automation_level: p.defaultLevel,
+  business_value: p.erpAction,
+  ml_model: 'ProactiveDetector',
+  natural_language_template: p.description,
+  _patternSource: p.source,
+  _patternActions: p.actions,
+  _detectionTables: p.detectionTables,
+}));
+
 // ── Module-specific configuration context ──
-// Each module gets its own scope items, actions, and ERP target modules
 const MODULE_CONFIG = {
   stox: {
     scopeLabel: 'Distribution Scope',
@@ -573,9 +601,23 @@ const MODULE_CONFIG = {
     ],
     erpModules: ['FI', 'CO', 'EC'],
   },
+  proactive: {
+    scopeLabel: 'Detection Scope',
+    scopeSections: [
+      { label: 'Detection Sources', field: 'scope_primary', color: '#e11d48', items: ['COPA Profitability', 'STOX Supply Chain', 'SAP Tables', 'BigQuery Views'] },
+      { label: 'Business Areas', field: 'scope_secondary', color: '#0ea5e9', items: ['Revenue Protection', 'Cost Control', 'Inventory', 'Procurement', 'Planning'] },
+      { label: 'Action Types', field: 'scope_tertiary', color: '#10b981', items: ['Price Adjustment', 'PO Creation', 'Parameter Update', 'Vendor Review', 'Stock Transfer'] },
+    ],
+    actions: [
+      { key: 'auto_detect', label: 'Auto-Detection', desc: 'Run pattern detection', icon: PsychologyIcon },
+      { key: 'erp_action', label: 'ERP Action', desc: 'Execute via Command Tower', icon: StorageIcon },
+      { key: 'escalation', label: 'Auto-Escalation', desc: 'Escalate on threshold breach', icon: WarningIcon },
+      { key: 'simulation', label: 'What-If Simulation', desc: 'Run scenario analysis', icon: TimelineIcon },
+    ],
+    erpModules: ['MM', 'CO', 'SD'],
+  },
 };
 
-// Fallback for custom agents or unknown modules
 const DEFAULT_MODULE_CONFIG = MODULE_CONFIG.stox;
 
 const ESCALATION_TIERS = [
@@ -598,24 +640,199 @@ const StepperConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.completed} .${stepConnectorClasses.line}`]: { backgroundColor: '#00357a' },
 }));
 
+// Custom stepper icon
+const STEP_ICONS = {
+  1: AutoAwesomeIcon,
+  2: TuneIcon,
+  3: RocketLaunchIcon,
+};
+
+const StepIconRoot = styled(Box)(({ ownerState }) => ({
+  width: 36,
+  height: 36,
+  borderRadius: '50%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  transition: 'all 0.2s',
+  ...(ownerState.active && {
+    backgroundColor: '#00357a',
+    color: '#fff',
+    boxShadow: '0 2px 8px rgba(0,53,122,0.3)',
+  }),
+  ...(ownerState.completed && {
+    backgroundColor: '#00357a',
+    color: '#fff',
+  }),
+  ...(!ownerState.active && !ownerState.completed && {
+    backgroundColor: 'rgba(0,53,122,0.08)',
+    color: '#64748b',
+  }),
+}));
+
+function CustomStepIcon(props) {
+  const { active, completed, icon } = props;
+  const IconComp = STEP_ICONS[icon];
+  return (
+    <StepIconRoot ownerState={{ active, completed }}>
+      {completed ? <CheckCircleIcon sx={{ fontSize: 20 }} /> : <IconComp sx={{ fontSize: 20 }} />}
+    </StepIconRoot>
+  );
+}
+
+// Helper: wizard card style
+const wizardCardSx = (accentColor, isActive, dm, colors) => ({
+  p: 1.5,
+  borderRadius: 2,
+  border: `1px solid ${isActive ? alpha(accentColor, 0.3) : dm ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+  bgcolor: isActive ? alpha(accentColor, dm ? 0.12 : 0.04) : colors.cardBg,
+  boxShadow: dm ? '0 1px 4px rgba(0,0,0,0.3)' : '0 1px 3px rgba(0,0,0,0.08)',
+  cursor: 'pointer',
+  transition: 'all 0.15s',
+  '&:hover': {
+    boxShadow: dm ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.12)',
+    borderColor: alpha(accentColor, 0.35),
+    transform: 'translateY(-1px)',
+  },
+});
+
+// Helper: section header style
+const wizardSectionSx = (dm, colors) => ({
+  p: 1.5,
+  mb: 2,
+  borderRadius: 1.5,
+  bgcolor: colors.paper,
+  border: `1px solid ${dm ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+  boxShadow: dm ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.1)',
+  display: 'flex',
+  alignItems: 'center',
+  gap: 1,
+  cursor: 'pointer',
+  userSelect: 'none',
+});
+
+// ── Featured categories for the "All" view ──
+const FEATURED_CATEGORIES = ['proactive', 'stox', 'margen', 'ordly'];
+
+// ── Execution plan builder: maps template + config into a multi-step pipeline ──
+const EXECUTION_STEP_TYPES = {
+  detect:    { label: 'Detect',    icon: 'search',  desc: 'Pattern detection & anomaly scan' },
+  query:     { label: 'Query',     icon: 'data',    desc: 'Data retrieval from source systems' },
+  analyze:   { label: 'Analyze',   icon: 'brain',   desc: 'AI/ML analysis & scoring' },
+  decide:    { label: 'Decide',    icon: 'rule',    desc: 'Apply business rules & thresholds' },
+  simulate:  { label: 'Simulate',  icon: 'play',    desc: 'Run what-if scenarios' },
+  approve:   { label: 'Approve',   icon: 'shield',  desc: 'Human-in-the-loop approval gate' },
+  execute:   { label: 'Execute',   icon: 'bolt',    desc: 'Execute action in target system' },
+  notify:    { label: 'Notify',    icon: 'bell',    desc: 'Send alerts & notifications' },
+  learn:     { label: 'Learn',     icon: 'refresh', desc: 'Feedback loop & model improvement' },
+};
+
+const buildExecutionPlan = (template, cfg) => {
+  const steps = [];
+  const cat = template?.category || 'stox';
+  const level = cfg?.automation_level || template?.automation_level || 'recommend';
+  const modCfg = MODULE_CONFIG[cat] || DEFAULT_MODULE_CONFIG;
+  const source = template?._patternSource;
+
+  // Step 1: Detection / data query
+  if (source) {
+    steps.push({
+      type: 'detect',
+      title: `Run ${source.toUpperCase()} pattern detection`,
+      detail: `Scan ${(template?._detectionTables || []).join(', ') || 'source tables'} for anomalies`,
+      integration: `BigQuery · SAP ${modCfg.erpModules.join('/')}`,
+    });
+  } else {
+    steps.push({
+      type: 'query',
+      title: `Query ${modCfg.erpModules.join(', ')} data`,
+      detail: template?.description || 'Retrieve data from configured source systems',
+      integration: `SAP S/4HANA · BigQuery · API`,
+    });
+  }
+
+  // Step 2: AI analysis
+  steps.push({
+    type: 'analyze',
+    title: `AI analysis via ${template?.ml_model || 'ML Engine'}`,
+    detail: `Confidence threshold: ${cfg?.confidence_threshold || 85}% · Lookback: ${cfg?.lookback_window || '13 weeks'}`,
+    integration: `Vertex AI · ${template?.ml_model || 'Custom Model'}`,
+  });
+
+  // Step 3: Business rules & decisioning
+  steps.push({
+    type: 'decide',
+    title: 'Apply business rules & thresholds',
+    detail: `Severity: ${cfg?.severity || 'medium'} · Frequency: ${cfg?.frequency || 'daily'}`,
+    integration: 'Rules Engine · Threshold Config',
+  });
+
+  // Step 4: Simulate (if level is simulate or execute)
+  if (level === 'simulate' || level === 'execute') {
+    steps.push({
+      type: 'simulate',
+      title: 'Run what-if simulation',
+      detail: source
+        ? (template?._patternActions?.simulate || 'Simulate impact scenarios')
+        : `Model impact of recommended actions across ${modCfg.scopeSections[0]?.label?.toLowerCase() || 'scope'}`,
+      integration: 'Simulation Engine · Monte Carlo',
+    });
+  }
+
+  // Step 5: Approval gate (if ERP approval required or level != execute)
+  if (cfg?.erp_approval_required !== false || level !== 'execute') {
+    steps.push({
+      type: 'approve',
+      title: 'Human approval gate',
+      detail: level === 'execute'
+        ? 'Auto-execute with audit trail (bypass available for authorized users)'
+        : 'Review recommendations before execution · Approve, modify, or reject',
+      integration: 'Command Tower · Approval Workflow',
+    });
+  }
+
+  // Step 6: Execute (if level is simulate or execute)
+  if (level === 'simulate' || level === 'execute') {
+    const enabledActions = cfg?.automated_actions
+      ? Object.entries(cfg.automated_actions).filter(([, v]) => v).map(([k]) => k)
+      : [];
+    const actionLabels = enabledActions.length > 0
+      ? enabledActions.map(k => {
+          const a = modCfg.actions.find(a => a.key === k);
+          return a?.label || k;
+        }).join(', ')
+      : (source ? (template?._patternActions?.execute || 'Execute ERP action') : 'Execute configured actions');
+    steps.push({
+      type: 'execute',
+      title: `Execute via ${cfg?.erp_system === 'sap_s4hana' ? 'SAP S/4HANA' : 'ERP'}`,
+      detail: actionLabels,
+      integration: `Command Tower · SAP ${modCfg.erpModules[0]} · API Gateway`,
+    });
+  }
+
+  // Step 7: Notify
+  steps.push({
+    type: 'notify',
+    title: 'Alert & escalation',
+    detail: `${(cfg?.escalation_rules || []).filter(r => r.enabled).length} escalation tiers active`,
+    integration: 'Email · Slack · SMS · In-app',
+  });
+
+  // Step 8: Learn
+  steps.push({
+    type: 'learn',
+    title: 'Continuous learning',
+    detail: 'Incorporate feedback to improve accuracy · Track precision & recall over time',
+    integration: 'Feedback Loop · Model Registry',
+  });
+
+  return steps;
+};
+
 const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user', darkMode = false }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const getColors = (dm) => ({
-    primary: dm ? '#4d9eff' : '#00357a',
-    secondary: dm ? '#2d8ce6' : '#002352',
-    success: dm ? '#36d068' : '#10b981',
-    warning: dm ? '#f59e0b' : '#f59e0b',
-    error: dm ? '#ff6b6b' : '#ef4444',
-    text: dm ? '#e6edf3' : '#1e293b',
-    textSecondary: dm ? '#8b949e' : '#64748b',
-    background: dm ? '#0d1117' : '#f8fbfd',
-    paper: dm ? '#161b22' : '#ffffff',
-    cardBg: dm ? '#21262d' : '#ffffff',
-    border: dm ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
-  });
 
   const colors = getColors(darkMode);
 
@@ -624,6 +841,15 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user', darkMode =
   const [naturalLanguage, setNaturalLanguage] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [apiTemplates, setApiTemplates] = useState([]);
+  const [templateSearch, setTemplateSearch] = useState('');
+  const [showAllTemplates, setShowAllTemplates] = useState(false);
+
+  // Step 2 state — collapsible sections
+  const [expandedSections, setExpandedSections] = useState({ basic: true });
+
+  const toggleSection = (key) => {
+    setExpandedSections(prev => ({ ...prev, [key]: !prev[key] }));
+  };
 
   // Step 2 state — full configuration
   const [config, setConfig] = useState({
@@ -633,36 +859,30 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user', darkMode =
     severity: 'medium',
     enabled: true,
     alertCondition: '',
-    // Automation
     automation_level: 'recommend',
     automated_actions: {
       auto_po: false, safety_stock: false, dc_transfer: false,
       mrp_tuning: false, forecast_override: false, supplier_escalation: false,
     },
-    // Monitoring Scope (generic fields populated per module)
     scope_primary: [],
     scope_secondary: [],
     scope_tertiary: [],
-    // ERP
     erp_system: 'sap_s4hana',
     writeback_mode: 'read_only',
     erp_target_module: 'MM',
     erp_approval_required: true,
     command_tower_sync: true,
-    // AI
     confidence_threshold: 85,
     analysis_depth: 'standard',
     ml_model: '',
     lookback_window: '13_weeks',
     forecast_horizon: '4_weeks',
-    // Escalation
     escalation_rules: [
       { tier: 1, enabled: true, hours: '0-2' },
       { tier: 2, enabled: true, hours: '2-4' },
       { tier: 3, enabled: true, hours: '4-8' },
       { tier: 4, enabled: false, hours: '8+' },
     ],
-    // Notifications
     notification_config: {
       email: false, sms: false, voice_call: false,
       slack: false, teams: false, ai_agent: false,
@@ -678,7 +898,7 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user', darkMode =
   const loadTemplates = async () => {
     try {
       const response = await fetch('/api/v1/pulse/templates');
-      if (!response.ok) return; // API templates optional — built-in templates always available
+      if (!response.ok) return;
       const data = await response.json();
       if (data.success && data.templates) setApiTemplates(data.templates);
     } catch (err) {
@@ -686,32 +906,52 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user', darkMode =
     }
   };
 
-  // Merge API templates with built-in
-  const allTemplates = [...BUILT_IN_TEMPLATES, ...apiTemplates.filter(t => !BUILT_IN_TEMPLATES.some(b => b.name === t.name))];
+  // Merge all templates: built-in + proactive patterns + API
+  const allTemplates = [...BUILT_IN_TEMPLATES, ...PATTERN_TEMPLATES, ...apiTemplates.filter(t => !BUILT_IN_TEMPLATES.some(b => b.name === t.name))];
 
-  const filteredTemplates = selectedCategory === 'all'
-    ? allTemplates
-    : allTemplates.filter(t => t.category === selectedCategory);
+  // Filter by category + search
+  const getFilteredTemplates = () => {
+    let templates = selectedCategory === 'all'
+      ? allTemplates
+      : allTemplates.filter(t => t.category === selectedCategory);
+
+    if (templateSearch.trim()) {
+      const q = templateSearch.toLowerCase();
+      templates = templates.filter(t =>
+        t.name.toLowerCase().includes(q) ||
+        t.description.toLowerCase().includes(q)
+      );
+    }
+    return templates;
+  };
+
+  const filteredTemplates = getFilteredTemplates();
+
+  // Featured templates: first 2 from each of the top 4 categories
+  const getFeaturedTemplates = () => {
+    const featured = [];
+    for (const catId of FEATURED_CATEGORIES) {
+      const catTemplates = allTemplates.filter(t => t.category === catId);
+      featured.push(...catTemplates.slice(0, 2));
+    }
+    return featured;
+  };
 
   const getCategoryInfo = (categoryId) => categories.find(c => c.id === categoryId) || categories[0];
 
-  // Get module-specific config for the current template
   const getModuleConfig = () => {
     const cat = selectedTemplate?.category || 'stox';
     return MODULE_CONFIG[cat] || DEFAULT_MODULE_CONFIG;
   };
 
-  // When template is selected, pre-fill config with module-aware defaults
   const selectTemplate = (template) => {
     setSelectedTemplate(template);
     setNaturalLanguage('');
     const modCfg = MODULE_CONFIG[template.category] || DEFAULT_MODULE_CONFIG;
-    // Pre-select first 3 items from each scope section
     const scopeDefaults = {};
     modCfg.scopeSections.forEach(s => {
       scopeDefaults[s.field] = s.items.slice(0, Math.min(3, s.items.length));
     });
-    // Pre-enable first 2 actions
     const actionDefaults = {};
     modCfg.actions.forEach((a, i) => { actionDefaults[a.key] = i < 2; });
     setConfig(prev => ({
@@ -766,20 +1006,18 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user', darkMode =
             return;
           }
         }
-        // API unavailable or failed — proceed in demo mode with template/NL data
         setAgentData({
           natural_language_query: selectedTemplate?.natural_language_template || naturalLanguage,
-          sql_query: selectedTemplate ? '-- SQL will be generated upon deployment' : '-- Custom SQL will be generated upon deployment',
+          execution_steps: buildExecutionPlan(selectedTemplate, config),
         });
         if (!selectedTemplate) {
           setConfig(prev => ({ ...prev, name: naturalLanguage.slice(0, 50) || 'Custom Agent' }));
         }
         setActiveStep(1);
       } catch (err) {
-        // API completely unavailable — proceed in demo mode
         setAgentData({
           natural_language_query: selectedTemplate?.natural_language_template || naturalLanguage,
-          sql_query: '-- SQL will be generated upon deployment',
+          execution_steps: buildExecutionPlan(selectedTemplate, config),
         });
         if (!selectedTemplate) {
           setConfig(prev => ({ ...prev, name: naturalLanguage.slice(0, 50) || 'Custom Agent' }));
@@ -809,7 +1047,7 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user', darkMode =
           user_id: userId,
           ...config,
           natural_language_query: agentData?.natural_language_query,
-          sql_query: agentData?.sql_query,
+          execution_steps: agentData?.execution_steps,
           data_source: agentData?.data_source,
         }),
       });
@@ -821,11 +1059,9 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user', darkMode =
           return;
         }
       }
-      // API unavailable — still close in demo mode
       if (onSave) onSave('demo-agent-' + Date.now());
       if (onClose) onClose();
     } catch (err) {
-      // API unavailable — close in demo mode
       if (onSave) onSave('demo-agent-' + Date.now());
       if (onClose) onClose();
     } finally {
@@ -837,6 +1073,14 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user', darkMode =
     const current = config[field];
     const updated = current.includes(value) ? current.filter(v => v !== value) : [...current, value];
     setConfig({ ...config, [field]: updated });
+  };
+
+  const handleSelectAll = (field, items) => {
+    setConfig({ ...config, [field]: [...items] });
+  };
+
+  const handleClearAll = (field) => {
+    setConfig({ ...config, [field]: [] });
   };
 
   const handleActionToggle = (key) => {
@@ -865,258 +1109,383 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user', darkMode =
       '& .MuiMenuItem-root': { color: colors.text, '&:hover': { bgcolor: darkMode ? 'rgba(255,255,255,0.08)' : undefined } },
     }},
   };
-  const cardSx = { bgcolor: colors.cardBg, border: `1px solid ${colors.border}` };
-  const sectionSx = { color: colors.text, display: 'flex', alignItems: 'center', gap: 1 };
   const automationColors = { recommend: colors.primary, simulate: colors.warning, execute: colors.success };
 
-  // ──────────── STEP 1: Choose Template ────────────
-  const renderStep1 = () => (
-    <Box>
-      <Typography variant="h6" fontWeight={700} gutterBottom sx={{ color: colors.text }}>
-        Create Your Proactive Agent
-      </Typography>
-      <Typography variant="body2" sx={{ color: colors.textSecondary, mb: 3 }}>
-        Choose a pre-built template to get started quickly, or describe a custom agent below.
-      </Typography>
+  // ──────────── STEP 1: Select Agent ────────────
+  const renderStep1 = () => {
+    const showFeatured = selectedCategory === 'all' && !templateSearch.trim() && !showAllTemplates;
+    const displayTemplates = showFeatured ? getFeaturedTemplates() : filteredTemplates;
 
-      {/* Category Tabs */}
-      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 3 }}>
-        {categories.map((cat) => {
-          const IconComp = cat.icon;
-          const isSelected = selectedCategory === cat.id;
-          return (
-            <Chip
-              key={cat.id}
-              icon={<IconComp sx={{ fontSize: 18, color: isSelected ? 'white' : cat.color + ' !important' }} />}
-              label={cat.label}
-              onClick={() => setSelectedCategory(cat.id)}
-              sx={{
-                bgcolor: isSelected ? cat.color : 'transparent',
-                color: isSelected ? 'white' : colors.text,
-                border: `1px solid ${isSelected ? cat.color : colors.border}`,
-                fontWeight: isSelected ? 600 : 400,
-                '&:hover': { bgcolor: isSelected ? cat.color : alpha(cat.color, 0.1) },
-              }}
-            />
-          );
-        })}
-      </Box>
+    return (
+      <Box>
+        {/* Hero NL Input */}
+        <Paper
+          elevation={0}
+          sx={{
+            p: 2.5,
+            borderRadius: 2,
+            mb: 3,
+            bgcolor: alpha(colors.primary, darkMode ? 0.06 : 0.02),
+            boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.06)',
+            border: `1px solid ${alpha(colors.primary, 0.1)}`,
+          }}
+        >
+          <Typography variant="subtitle1" fontWeight={700} sx={{ color: colors.text, mb: 1 }}>
+            Describe what you want the agent to do
+          </Typography>
+          <TextField
+            fullWidth
+            multiline
+            rows={2}
+            placeholder="Example: Alert me when any DC's inventory drops below 3 days of supply for top-selling SKUs..."
+            value={naturalLanguage}
+            onChange={(e) => { setNaturalLanguage(e.target.value); setSelectedTemplate(null); }}
+            sx={{
+              ...inputSx,
+              '& .MuiOutlinedInput-root': {
+                ...inputSx['& .MuiOutlinedInput-root'],
+                bgcolor: colors.paper,
+                '&.Mui-focused fieldset': { borderColor: colors.primary, borderWidth: 2 },
+              },
+            }}
+          />
+          <Box sx={{ display: 'flex', gap: 0.5, mt: 1.5, flexWrap: 'wrap' }}>
+            {[
+              'Show inventory levels below safety stock',
+              'Track gross margin by region monthly',
+              'Monitor late deliveries over 3 days',
+              'Detect stalled sales orders in pipeline',
+              'Alert when surgical kit readiness drops',
+              'Flag master data quality issues',
+            ].map(suggestion => (
+              <Chip
+                key={suggestion}
+                label={suggestion}
+                size="small"
+                variant="outlined"
+                onClick={() => { setNaturalLanguage(suggestion); setSelectedTemplate(null); }}
+                sx={{ cursor: 'pointer', fontSize: '0.68rem', height: 24, borderColor: colors.border, color: colors.textSecondary, '&:hover': { bgcolor: alpha(colors.primary, 0.08), borderColor: colors.primary } }}
+              />
+            ))}
+          </Box>
+        </Paper>
 
-      {/* Template Grid */}
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="subtitle2" fontWeight={600} gutterBottom sx={{ color: colors.text }}>
-          {selectedCategory === 'all' ? 'All Agent Templates' : `${getCategoryInfo(selectedCategory).label} Templates`}
-          <Chip label={filteredTemplates.length} size="small" sx={{ ml: 1, height: 20, fontSize: '0.65rem', bgcolor: alpha(colors.primary, 0.1), color: colors.primary }} />
-        </Typography>
-        <Grid container spacing={1.5}>
-          {filteredTemplates.map((template) => {
+        <Divider sx={{ my: 2.5, borderColor: colors.border }}>
+          <Typography variant="caption" sx={{ color: colors.textSecondary, px: 2 }}>OR CHOOSE A TEMPLATE</Typography>
+        </Divider>
+
+        {/* Category Tabs */}
+        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mb: 2 }}>
+          {categories.map((cat) => {
+            const IconComp = cat.icon;
+            const isSelected = selectedCategory === cat.id;
+            return (
+              <Chip
+                key={cat.id}
+                icon={<IconComp sx={{ fontSize: 16, color: isSelected ? 'white' : cat.color + ' !important' }} />}
+                label={cat.label}
+                size="small"
+                onClick={() => { setSelectedCategory(cat.id); setShowAllTemplates(false); }}
+                sx={{
+                  height: 28,
+                  fontSize: '0.7rem',
+                  bgcolor: isSelected ? cat.color : 'transparent',
+                  color: isSelected ? 'white' : colors.text,
+                  border: `1px solid ${isSelected ? cat.color : colors.border}`,
+                  fontWeight: isSelected ? 600 : 400,
+                  '&:hover': { bgcolor: isSelected ? cat.color : alpha(cat.color, 0.1) },
+                }}
+              />
+            );
+          })}
+        </Box>
+
+        {/* Template search bar */}
+        <TextField
+          fullWidth
+          size="small"
+          placeholder="Search templates by name or description..."
+          value={templateSearch}
+          onChange={(e) => setTemplateSearch(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon sx={{ fontSize: 18, color: colors.textSecondary }} />
+              </InputAdornment>
+            ),
+          }}
+          sx={{
+            mb: 2,
+            '& .MuiOutlinedInput-root': {
+              fontSize: '0.8rem',
+              height: 36,
+              bgcolor: darkMode ? alpha('#fff', 0.04) : alpha('#000', 0.02),
+              '& fieldset': { borderColor: colors.border },
+              '&:hover fieldset': { borderColor: colors.primary },
+            },
+          }}
+        />
+
+        {/* Template count header */}
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
+          <Typography variant="subtitle2" fontWeight={600} sx={{ color: colors.text }}>
+            {showFeatured ? 'Featured Templates' : selectedCategory === 'all' ? 'All Agent Templates' : `${getCategoryInfo(selectedCategory).label} Templates`}
+            <Chip label={showFeatured ? displayTemplates.length : filteredTemplates.length} size="small" sx={{ ml: 1, height: 18, fontSize: '0.6rem', bgcolor: alpha(colors.primary, 0.1), color: colors.primary }} />
+          </Typography>
+          {showFeatured && (
+            <Button
+              size="small"
+              onClick={() => setShowAllTemplates(true)}
+              sx={{ textTransform: 'none', fontSize: '0.72rem', fontWeight: 600, color: colors.primary }}
+            >
+              Show all {allTemplates.length} templates
+            </Button>
+          )}
+          {!showFeatured && selectedCategory === 'all' && !templateSearch.trim() && (
+            <Button
+              size="small"
+              onClick={() => setShowAllTemplates(false)}
+              sx={{ textTransform: 'none', fontSize: '0.72rem', fontWeight: 600, color: colors.primary }}
+            >
+              Show featured only
+            </Button>
+          )}
+        </Box>
+
+        {/* Template Grid — 4-col */}
+        <Grid container spacing={1}>
+          {displayTemplates.map((template) => {
             const catInfo = getCategoryInfo(template.category);
             const isSelected = selectedTemplate?.id === template.id;
             const TplIcon = template.icon || catInfo.icon;
             return (
-              <Grid item xs={12} sm={6} md={4} key={template.id}>
-                <Card
-                  variant="outlined"
-                  sx={{
-                    cursor: 'pointer',
-                    height: '100%',
-                    transition: 'all 0.2s',
-                    borderWidth: isSelected ? 2 : 1,
-                    borderColor: isSelected ? catInfo.color : colors.border,
-                    bgcolor: isSelected ? alpha(catInfo.color, darkMode ? 0.15 : 0.04) : colors.cardBg,
-                    '&:hover': { borderColor: catInfo.color, transform: 'translateY(-2px)', boxShadow: `0 4px 12px ${alpha(catInfo.color, 0.15)}` },
-                  }}
-                  onClick={() => selectTemplate(template)}
+              <Grid item xs={12} sm={6} md={3} key={template.id}>
+                <Tooltip
+                  title={
+                    <Box>
+                      {template.capabilities?.map((cap, i) => (
+                        <Typography key={i} variant="caption" sx={{ display: 'block', fontSize: '0.65rem' }}>{cap}</Typography>
+                      ))}
+                    </Box>
+                  }
+                  arrow
+                  placement="top"
                 >
-                  <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 1 }}>
+                  <Paper
+                    elevation={0}
+                    sx={wizardCardSx(catInfo.color, isSelected, darkMode, colors)}
+                    onClick={() => selectTemplate(template)}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 0.75 }}>
                       <Box sx={{
-                        width: 36, height: 36, borderRadius: 1.5, flexShrink: 0,
+                        width: 30, height: 30, borderRadius: 1, flexShrink: 0,
                         bgcolor: alpha(catInfo.color, 0.12),
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                       }}>
-                        <TplIcon sx={{ fontSize: 20, color: catInfo.color }} />
+                        <TplIcon sx={{ fontSize: 16, color: catInfo.color }} />
                       </Box>
                       <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography variant="body2" fontWeight={700} sx={{ color: colors.text, lineHeight: 1.3 }}>
+                        <Typography variant="caption" fontWeight={700} sx={{ color: colors.text, lineHeight: 1.3, display: 'block', fontSize: '0.72rem' }}>
                           {template.name}
                         </Typography>
                         <Chip
                           label={catInfo.label}
                           size="small"
-                          sx={{ height: 18, fontSize: '0.6rem', mt: 0.3, bgcolor: alpha(catInfo.color, 0.1), color: catInfo.color }}
+                          sx={{ height: 16, fontSize: '0.55rem', mt: 0.25, bgcolor: alpha(catInfo.color, 0.1), color: catInfo.color }}
                         />
                       </Box>
-                      {isSelected && <CheckCircleIcon sx={{ fontSize: 20, color: catInfo.color, flexShrink: 0 }} />}
+                      {isSelected && <CheckCircleIcon sx={{ fontSize: 16, color: catInfo.color, flexShrink: 0 }} />}
                     </Box>
 
-                    <Typography variant="caption" sx={{ color: colors.textSecondary, display: 'block', mb: 1, lineHeight: 1.4 }}>
-                      {template.description}
-                    </Typography>
-
-                    {/* Capabilities */}
-                    {template.capabilities && (
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 1 }}>
-                        {template.capabilities.map((cap, i) => (
-                          <Chip key={i} label={cap} size="small" variant="outlined"
-                            sx={{ height: 18, fontSize: '0.6rem', borderColor: colors.border, color: colors.textSecondary }}
-                          />
-                        ))}
-                      </Box>
-                    )}
-
-                    {/* Footer: business value + frequency */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
+                    {/* Business value + freq/severity */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       {template.business_value && (
-                        <Typography variant="caption" fontWeight={600} sx={{ color: colors.success }}>
+                        <Typography variant="caption" fontWeight={600} sx={{ color: colors.success, fontSize: '0.6rem' }}>
                           {template.business_value}
                         </Typography>
                       )}
-                      <Box sx={{ display: 'flex', gap: 0.5 }}>
+                      <Box sx={{ display: 'flex', gap: 0.3 }}>
                         <Chip label={template.default_frequency} size="small"
-                          sx={{ height: 18, fontSize: '0.6rem', bgcolor: alpha(colors.primary, 0.1), color: colors.primary }}
+                          sx={{ height: 16, fontSize: '0.55rem', bgcolor: alpha(colors.primary, 0.1), color: colors.primary }}
                         />
                         <Chip label={template.default_severity} size="small"
                           sx={{
-                            height: 18, fontSize: '0.6rem',
+                            height: 16, fontSize: '0.55rem',
                             bgcolor: alpha(template.default_severity === 'critical' ? colors.error : template.default_severity === 'high' ? colors.warning : colors.primary, 0.1),
                             color: template.default_severity === 'critical' ? colors.error : template.default_severity === 'high' ? colors.warning : colors.primary,
                           }}
                         />
                       </Box>
                     </Box>
-                  </CardContent>
-                </Card>
+                  </Paper>
+                </Tooltip>
               </Grid>
             );
           })}
         </Grid>
+
+        {/* Selected template preview */}
+        {selectedTemplate && (
+          <Paper
+            elevation={0}
+            sx={{
+              mt: 2,
+              p: 2,
+              borderRadius: 2,
+              bgcolor: alpha(getCategoryInfo(selectedTemplate.category).color, darkMode ? 0.08 : 0.03),
+              boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.08)',
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <CheckCircleIcon sx={{ fontSize: 18, color: getCategoryInfo(selectedTemplate.category).color }} />
+              <Typography variant="subtitle2" fontWeight={700} sx={{ color: colors.text }}>
+                {selectedTemplate.name}
+              </Typography>
+            </Box>
+            <Typography variant="caption" sx={{ color: colors.textSecondary, display: 'block', mb: 1, lineHeight: 1.5 }}>
+              {selectedTemplate.description}
+            </Typography>
+            {selectedTemplate.capabilities && (
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 1 }}>
+                {selectedTemplate.capabilities.map((cap, i) => (
+                  <Chip key={i} label={cap} size="small"
+                    sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha(colors.primary, 0.08), color: colors.primary }}
+                  />
+                ))}
+              </Box>
+            )}
+            {selectedTemplate.natural_language_template && (
+              <Typography variant="caption" sx={{ color: colors.text, fontStyle: 'italic', fontSize: '0.7rem' }}>
+                "{selectedTemplate.natural_language_template}"
+              </Typography>
+            )}
+          </Paper>
+        )}
       </Box>
+    );
+  };
 
-      <Divider sx={{ my: 3, borderColor: colors.border }}>
-        <Typography variant="caption" sx={{ color: colors.textSecondary, px: 2 }}>OR</Typography>
-      </Divider>
+  // ──────────── STEP 2: Configure ────────────
+  const renderStep2 = () => {
+    const modCfg = getModuleConfig();
 
-      {/* Custom Query */}
+    // Section header renderer
+    const SectionHeader = ({ sectionKey, icon: Icon, label, children }) => (
+      <>
+        <Paper
+          elevation={0}
+          sx={wizardSectionSx(darkMode, colors)}
+          onClick={() => toggleSection(sectionKey)}
+        >
+          <Icon sx={{ fontSize: 20, color: colors.primary }} />
+          <Typography variant="subtitle2" fontWeight={600} sx={{ flex: 1, color: colors.text }}>
+            {label}
+          </Typography>
+          {!expandedSections[sectionKey] && children}
+          <ExpandMoreIcon sx={{
+            fontSize: 20, color: colors.textSecondary,
+            transform: expandedSections[sectionKey] ? 'rotate(180deg)' : 'none',
+            transition: '0.2s',
+          }} />
+        </Paper>
+      </>
+    );
+
+    return (
       <Box>
-        <Typography variant="subtitle2" fontWeight={600} gutterBottom sx={{ color: colors.text }}>
-          Describe What You Want the Agent to Do
-        </Typography>
-        <TextField
-          fullWidth multiline rows={3}
-          placeholder="Example: Alert me when any DC's inventory drops below 3 days of supply for top-selling SKUs"
-          value={naturalLanguage}
-          onChange={(e) => { setNaturalLanguage(e.target.value); setSelectedTemplate(null); }}
-          sx={{ ...inputSx, mt: 1 }}
-        />
-        <Box sx={{ display: 'flex', gap: 1, mt: 1, flexWrap: 'wrap' }}>
-          {[
-            'Show inventory levels below safety stock',
-            'Track gross margin by region monthly',
-            'Monitor late deliveries over 3 days',
-            'Detect stalled sales orders in pipeline',
-            'Alert when surgical kit readiness drops',
-            'Flag master data quality issues',
-          ].map(suggestion => (
-            <Chip
-              key={suggestion}
-              label={suggestion}
-              size="small"
-              variant="outlined"
-              onClick={() => { setNaturalLanguage(suggestion); setSelectedTemplate(null); }}
-              sx={{ cursor: 'pointer', fontSize: '0.7rem', borderColor: colors.border, color: colors.textSecondary, '&:hover': { bgcolor: alpha(colors.primary, 0.08), borderColor: colors.primary } }}
-            />
-          ))}
-        </Box>
-      </Box>
-    </Box>
-  );
-
-  // ──────────── STEP 2: Configure Agent ────────────
-  const renderStep2 = () => (
-    <Box>
-      <Typography variant="h6" fontWeight={700} gutterBottom sx={{ color: colors.text }}>
-        Configure Agent
-      </Typography>
-
-      <Grid container spacing={3}>
-        {/* Basic Info */}
-        <Grid item xs={12}>
-          <Typography variant="subtitle1" fontWeight={600} sx={sectionSx} gutterBottom>
-            <SpeedIcon sx={{ fontSize: 20, color: colors.primary }} /> Basic Settings
-          </Typography>
-          <Divider sx={{ mb: 2, borderColor: colors.border }} />
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth label="Agent Name" value={config.name} onChange={(e) => setConfig({ ...config, name: e.target.value })} required sx={inputSx} />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth label="Description" value={config.description} onChange={(e) => setConfig({ ...config, description: e.target.value })} sx={inputSx} />
-            </Grid>
-            <Grid item xs={4}>
-              <FormControl fullWidth size="small" sx={inputSx}>
-                <InputLabel>Frequency</InputLabel>
-                <Select value={config.frequency} label="Frequency" onChange={(e) => setConfig({ ...config, frequency: e.target.value })} MenuProps={menuProps}>
-                  <MenuItem value="real-time">Real-time</MenuItem>
-                  <MenuItem value="hourly">Hourly</MenuItem>
-                  <MenuItem value="daily">Daily</MenuItem>
-                  <MenuItem value="weekly">Weekly</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={4}>
-              <FormControl fullWidth size="small" sx={inputSx}>
-                <InputLabel>Severity</InputLabel>
-                <Select value={config.severity} label="Severity" onChange={(e) => setConfig({ ...config, severity: e.target.value })} MenuProps={menuProps}>
-                  <MenuItem value="critical">Critical</MenuItem>
-                  <MenuItem value="high">High</MenuItem>
-                  <MenuItem value="medium">Medium</MenuItem>
-                  <MenuItem value="low">Low</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={4}>
-              <FormControl fullWidth size="small" sx={inputSx}>
-                <InputLabel>Status</InputLabel>
-                <Select value={config.enabled} label="Status" onChange={(e) => setConfig({ ...config, enabled: e.target.value })} MenuProps={menuProps}>
-                  <MenuItem value={true}>Enabled</MenuItem>
-                  <MenuItem value={false}>Disabled</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
-        </Grid>
-
-        {/* Automation Level + Actions */}
-        <Grid item xs={12}>
-          <Typography variant="subtitle1" fontWeight={600} sx={sectionSx} gutterBottom>
-            <BoltIcon sx={{ fontSize: 20, color: colors.primary }} /> Automated Actions
-          </Typography>
-          <Divider sx={{ mb: 2, borderColor: colors.border }} />
-
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="body2" sx={{ color: colors.textSecondary, mb: 1 }}>Automation Level</Typography>
-            <ToggleButtonGroup
-              value={config.automation_level} exclusive size="small"
-              onChange={(e, val) => val && setConfig({ ...config, automation_level: val })}
-              sx={{ '& .MuiToggleButton-root': { color: colors.textSecondary, borderColor: colors.border, textTransform: 'none', px: 2.5, '&.Mui-selected': { bgcolor: alpha(automationColors[config.automation_level], 0.15), color: automationColors[config.automation_level], borderColor: automationColors[config.automation_level], fontWeight: 600 } } }}
-            >
-              <ToggleButton value="recommend"><PsychologyIcon sx={{ fontSize: 16, mr: 0.5 }} /> Recommend</ToggleButton>
-              <ToggleButton value="simulate"><TimelineIcon sx={{ fontSize: 16, mr: 0.5 }} /> Simulate</ToggleButton>
-              <ToggleButton value="execute"><CheckCircleIcon sx={{ fontSize: 16, mr: 0.5 }} /> Execute</ToggleButton>
-            </ToggleButtonGroup>
+        {/* Section A: Basic Settings */}
+        <SectionHeader sectionKey="basic" icon={SpeedIcon} label="Basic Settings">
+          <Box sx={{ display: 'flex', gap: 0.5 }}>
+            <Chip label={config.name || 'Unnamed'} size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha(colors.primary, 0.1), color: colors.primary }} />
+            <Chip label={config.frequency} size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha(colors.primary, 0.08), color: colors.primary }} />
+            <Chip label={config.severity} size="small" sx={{ height: 20, fontSize: '0.65rem',
+              bgcolor: alpha(config.severity === 'critical' ? colors.error : config.severity === 'high' ? colors.warning : colors.primary, 0.1),
+              color: config.severity === 'critical' ? colors.error : config.severity === 'high' ? colors.warning : colors.primary,
+            }} />
           </Box>
+        </SectionHeader>
+        <Collapse in={expandedSections.basic}>
+          <Box sx={{ mb: 3, px: 0.5 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField fullWidth label="Agent Name" value={config.name} onChange={(e) => setConfig({ ...config, name: e.target.value })} required sx={inputSx} />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField fullWidth label="Description" value={config.description} onChange={(e) => setConfig({ ...config, description: e.target.value })} sx={inputSx} />
+              </Grid>
+              <Grid item xs={4}>
+                <FormControl fullWidth size="small" sx={inputSx}>
+                  <InputLabel>Frequency</InputLabel>
+                  <Select value={config.frequency} label="Frequency" onChange={(e) => setConfig({ ...config, frequency: e.target.value })} MenuProps={menuProps}>
+                    <MenuItem value="real-time">Real-time</MenuItem>
+                    <MenuItem value="hourly">Hourly</MenuItem>
+                    <MenuItem value="daily">Daily</MenuItem>
+                    <MenuItem value="weekly">Weekly</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={4}>
+                <FormControl fullWidth size="small" sx={inputSx}>
+                  <InputLabel>Severity</InputLabel>
+                  <Select value={config.severity} label="Severity" onChange={(e) => setConfig({ ...config, severity: e.target.value })} MenuProps={menuProps}>
+                    <MenuItem value="critical">Critical</MenuItem>
+                    <MenuItem value="high">High</MenuItem>
+                    <MenuItem value="medium">Medium</MenuItem>
+                    <MenuItem value="low">Low</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={4}>
+                <FormControl fullWidth size="small" sx={inputSx}>
+                  <InputLabel>Status</InputLabel>
+                  <Select value={config.enabled} label="Status" onChange={(e) => setConfig({ ...config, enabled: e.target.value })} MenuProps={menuProps}>
+                    <MenuItem value={true}>Enabled</MenuItem>
+                    <MenuItem value={false}>Disabled</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+          </Box>
+        </Collapse>
 
-          <Grid container spacing={1}>
-            {getModuleConfig().actions.map(({ key, label, desc, icon: Icon }) => (
-              <Grid item xs={12} sm={6} key={key}>
-                <Card variant="outlined" sx={{
-                  ...cardSx, cursor: 'pointer', transition: 'all 0.2s',
-                  borderColor: config.automated_actions[key] ? alpha(colors.primary, 0.5) : colors.border,
-                  bgcolor: config.automated_actions[key] ? alpha(colors.primary, darkMode ? 0.1 : 0.03) : colors.cardBg,
-                  '&:hover': { borderColor: colors.primary },
-                }} onClick={() => handleActionToggle(key)}>
-                  <CardContent sx={{ py: 1, px: 1.5, '&:last-child': { pb: 1 } }}>
+        {/* Section B: Automated Actions */}
+        <SectionHeader sectionKey="actions" icon={BoltIcon} label="Automated Actions">
+          <Box sx={{ display: 'flex', gap: 0.5 }}>
+            <Chip label={config.automation_level} size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha(automationColors[config.automation_level], 0.12), color: automationColors[config.automation_level] }} />
+            <Chip label={`${Object.values(config.automated_actions).filter(Boolean).length} actions`} size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha(colors.primary, 0.08), color: colors.primary }} />
+          </Box>
+        </SectionHeader>
+        <Collapse in={expandedSections.actions}>
+          <Box sx={{ mb: 3, px: 0.5 }}>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" sx={{ color: colors.textSecondary, mb: 1 }}>Automation Level</Typography>
+              <ToggleButtonGroup
+                value={config.automation_level} exclusive size="small"
+                onChange={(e, val) => val && setConfig({ ...config, automation_level: val })}
+                sx={{ '& .MuiToggleButton-root': { color: colors.textSecondary, borderColor: colors.border, textTransform: 'none', px: 2.5, '&.Mui-selected': { bgcolor: alpha(automationColors[config.automation_level], 0.15), color: automationColors[config.automation_level], borderColor: automationColors[config.automation_level], fontWeight: 600 } } }}
+              >
+                <ToggleButton value="recommend"><PsychologyIcon sx={{ fontSize: 16, mr: 0.5 }} /> Recommend</ToggleButton>
+                <ToggleButton value="simulate"><TimelineIcon sx={{ fontSize: 16, mr: 0.5 }} /> Simulate</ToggleButton>
+                <ToggleButton value="execute"><CheckCircleIcon sx={{ fontSize: 16, mr: 0.5 }} /> Execute</ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
+
+            <Grid container spacing={1}>
+              {modCfg.actions.map(({ key, label, desc, icon: Icon }) => (
+                <Grid item xs={12} sm={6} key={key}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      ...wizardCardSx(
+                        config.automated_actions[key] ? colors.primary : colors.border,
+                        config.automated_actions[key],
+                        darkMode,
+                        colors
+                      ),
+                      border: `1px solid ${config.automated_actions[key] ? alpha(colors.primary, 0.2) : colors.border}`,
+                    }}
+                    onClick={() => handleActionToggle(key)}
+                  >
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Icon sx={{ fontSize: 18, color: config.automated_actions[key] ? colors.primary : colors.textSecondary }} />
@@ -1129,182 +1498,201 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user', darkMode =
                         sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: colors.primary }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: colors.primary } }}
                       />
                     </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </Grid>
-
-        {/* Monitoring Scope */}
-        <Grid item xs={12}>
-          <Typography variant="subtitle1" fontWeight={600} sx={sectionSx} gutterBottom>
-            <WarehouseIcon sx={{ fontSize: 20, color: colors.primary }} /> {getModuleConfig().scopeLabel || 'Monitoring Scope'}
-          </Typography>
-          <Divider sx={{ mb: 2, borderColor: colors.border }} />
-
-          {getModuleConfig().scopeSections.map(({ label, field, items, color }) => (
-            <Box key={field} sx={{ mb: 2 }}>
-              <Typography variant="body2" fontWeight={600} sx={{ color: colors.text, mb: 0.5 }}>{label}</Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                {items.map(item => (
-                  <Chip key={item} label={item} size="small"
-                    onClick={() => handleChipToggle(field, item)}
-                    variant={config[field].includes(item) ? 'filled' : 'outlined'}
-                    sx={{
-                      fontWeight: 500, fontSize: '0.75rem', height: 30, borderRadius: '8px',
-                      ...(config[field].includes(item) ? {
-                        bgcolor: color,
-                        color: '#fff',
-                        border: `1px solid ${color}`,
-                        '&:hover': { bgcolor: alpha(color, 0.85) },
-                      } : {
-                        bgcolor: darkMode ? alpha(colors.textSecondary, 0.08) : '#f1f5f9',
-                        color: colors.textSecondary,
-                        border: `1px solid ${darkMode ? alpha(colors.textSecondary, 0.15) : '#e2e8f0'}`,
-                        '&:hover': { bgcolor: alpha(color, 0.1), borderColor: alpha(color, 0.3), color: color },
-                      }),
-                    }}
-                  />
-                ))}
-              </Box>
-            </Box>
-          ))}
-        </Grid>
-
-        {/* ERP + AI in a 2-column layout */}
-        <Grid item xs={12} sm={6}>
-          <Typography variant="subtitle1" fontWeight={600} sx={sectionSx} gutterBottom>
-            <StorageIcon sx={{ fontSize: 20, color: colors.primary }} /> ERP Integration
-          </Typography>
-          <Divider sx={{ mb: 2, borderColor: colors.border }} />
-
-          <Grid container spacing={1.5}>
-            <Grid item xs={12}>
-              <FormControl fullWidth size="small" sx={inputSx}>
-                <InputLabel>ERP System</InputLabel>
-                <Select value={config.erp_system} label="ERP System" onChange={(e) => setConfig({ ...config, erp_system: e.target.value })} MenuProps={menuProps}>
-                  <MenuItem value="sap_s4hana">SAP S/4HANA</MenuItem>
-                  <MenuItem value="sap_ibp">SAP IBP</MenuItem>
-                  <MenuItem value="oracle_erp">Oracle ERP Cloud</MenuItem>
-                  <MenuItem value="manual">Manual / Excel</MenuItem>
-                </Select>
-              </FormControl>
+                  </Paper>
+                </Grid>
+              ))}
             </Grid>
-            <Grid item xs={6}>
-              <FormControl fullWidth size="small" sx={inputSx}>
-                <InputLabel>Target Module</InputLabel>
-                <Select value={config.erp_target_module} label="Target Module" onChange={(e) => setConfig({ ...config, erp_target_module: e.target.value })} MenuProps={menuProps}>
-                  {getModuleConfig().erpModules.map(m => {
-                    const labels = { MM: 'Materials Mgmt', PP: 'Production', SD: 'Sales & Dist', CO: 'Controlling', WM: 'Warehouse', FI: 'Finance', PM: 'Plant Maintenance', BC: 'Basis/Cross-App', EC: 'Enterprise Ctrl', ALL: 'All Modules' };
-                    return <MenuItem key={m} value={m}>{m} - {labels[m] || m}</MenuItem>;
-                  })}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={6}>
-              <FormControl fullWidth size="small" sx={inputSx}>
-                <InputLabel>Writeback</InputLabel>
-                <Select value={config.writeback_mode} label="Writeback" onChange={(e) => setConfig({ ...config, writeback_mode: e.target.value })} MenuProps={menuProps}>
-                  <MenuItem value="read_only">Read-Only</MenuItem>
-                  <MenuItem value="bidirectional">Bidirectional</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                <FormControlLabel
-                  control={<Switch size="small" checked={config.erp_approval_required} onChange={(e) => setConfig({ ...config, erp_approval_required: e.target.checked })}
-                    sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: colors.warning }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: colors.warning } }} />}
-                  label={<Typography variant="caption" sx={{ color: colors.text }}>Require approval before ERP writes</Typography>}
-                />
-                <FormControlLabel
-                  control={<Switch size="small" checked={config.command_tower_sync} onChange={(e) => setConfig({ ...config, command_tower_sync: e.target.checked })}
-                    sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: colors.success }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: colors.success } }} />}
-                  label={<Typography variant="caption" sx={{ color: colors.text }}>Sync to Command Tower</Typography>}
-                />
-              </Box>
-            </Grid>
-          </Grid>
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
-          <Typography variant="subtitle1" fontWeight={600} sx={sectionSx} gutterBottom>
-            <PsychologyIcon sx={{ fontSize: 20, color: colors.primary }} /> AI Analysis
-          </Typography>
-          <Divider sx={{ mb: 2, borderColor: colors.border }} />
-
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="caption" fontWeight={600} sx={{ color: colors.text }}>
-              Confidence Threshold: {config.confidence_threshold}%
-            </Typography>
-            <Slider value={config.confidence_threshold} onChange={(e, val) => setConfig({ ...config, confidence_threshold: val })}
-              min={50} max={99} step={1} valueLabelDisplay="auto" valueLabelFormat={(v) => `${v}%`}
-              sx={{ color: config.confidence_threshold >= 90 ? colors.success : colors.primary, '& .MuiSlider-thumb': { width: 14, height: 14 } }}
-            />
           </Box>
-          <Grid container spacing={1.5}>
-            <Grid item xs={12}>
-              <FormControl fullWidth size="small" sx={inputSx}>
-                <InputLabel>Analysis Depth</InputLabel>
-                <Select value={config.analysis_depth} label="Analysis Depth" onChange={(e) => setConfig({ ...config, analysis_depth: e.target.value })} MenuProps={menuProps}>
-                  <MenuItem value="quick">Quick Scan</MenuItem>
-                  <MenuItem value="standard">Standard</MenuItem>
-                  <MenuItem value="deep">Deep Analysis</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={6}>
-              <FormControl fullWidth size="small" sx={inputSx}>
-                <InputLabel>Lookback</InputLabel>
-                <Select value={config.lookback_window} label="Lookback" onChange={(e) => setConfig({ ...config, lookback_window: e.target.value })} MenuProps={menuProps}>
-                  <MenuItem value="4_weeks">4 Weeks</MenuItem>
-                  <MenuItem value="8_weeks">8 Weeks</MenuItem>
-                  <MenuItem value="13_weeks">13 Weeks</MenuItem>
-                  <MenuItem value="26_weeks">26 Weeks</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={6}>
-              <FormControl fullWidth size="small" sx={inputSx}>
-                <InputLabel>Forecast</InputLabel>
-                <Select value={config.forecast_horizon} label="Forecast" onChange={(e) => setConfig({ ...config, forecast_horizon: e.target.value })} MenuProps={menuProps}>
-                  <MenuItem value="1_week">1 Week</MenuItem>
-                  <MenuItem value="4_weeks">4 Weeks</MenuItem>
-                  <MenuItem value="8_weeks">8 Weeks</MenuItem>
-                  <MenuItem value="13_weeks">13 Weeks</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
-          {config.ml_model && (
-            <Box sx={{ mt: 1.5 }}>
-              <Typography variant="caption" sx={{ color: colors.textSecondary }}>ML Model</Typography>
-              <Chip label={config.ml_model} size="small" sx={{ display: 'flex', width: 'fit-content', mt: 0.3, bgcolor: alpha('#8b5cf6', 0.1), color: '#8b5cf6', fontWeight: 600 }} />
-            </Box>
-          )}
-        </Grid>
+        </Collapse>
 
-        {/* Escalation Rules */}
-        <Grid item xs={12}>
-          <Typography variant="subtitle1" fontWeight={600} sx={sectionSx} gutterBottom>
-            <AccountTreeIcon sx={{ fontSize: 20, color: colors.primary }} /> Escalation Rules
+        {/* Section C: Monitoring Scope */}
+        <SectionHeader sectionKey="scope" icon={WarehouseIcon} label={modCfg.scopeLabel || 'Monitoring Scope'}>
+          <Box sx={{ display: 'flex', gap: 0.5 }}>
+            {modCfg.scopeSections.map(s => (
+              <Chip key={s.field} label={`${config[s.field]?.length || 0} ${s.label.toLowerCase()}`} size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha(s.color, 0.1), color: s.color }} />
+            ))}
+          </Box>
+        </SectionHeader>
+        <Collapse in={expandedSections.scope}>
+          <Box sx={{ mb: 3, px: 0.5 }}>
+            {modCfg.scopeSections.map(({ label, field, items, color }) => (
+              <Box key={field} sx={{ mb: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
+                  <Typography variant="body2" fontWeight={600} sx={{ color: colors.text }}>{label}</Typography>
+                  <Box sx={{ display: 'flex', gap: 0.5 }}>
+                    <Button size="small" onClick={() => handleSelectAll(field, items)} sx={{ minWidth: 0, textTransform: 'none', fontSize: '0.65rem', color: colors.primary, p: 0 }}>All</Button>
+                    <Button size="small" onClick={() => handleClearAll(field)} sx={{ minWidth: 0, textTransform: 'none', fontSize: '0.65rem', color: colors.textSecondary, p: 0 }}>Clear</Button>
+                  </Box>
+                </Box>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  {items.map(item => (
+                    <Chip key={item} label={item} size="small"
+                      onClick={() => handleChipToggle(field, item)}
+                      variant={config[field].includes(item) ? 'filled' : 'outlined'}
+                      sx={{
+                        fontWeight: 500, fontSize: '0.7rem', height: 26, borderRadius: '8px',
+                        ...(config[field].includes(item) ? {
+                          bgcolor: color,
+                          color: '#fff',
+                          border: `1px solid ${color}`,
+                          '&:hover': { bgcolor: alpha(color, 0.85) },
+                        } : {
+                          bgcolor: darkMode ? alpha(colors.textSecondary, 0.08) : '#f1f5f9',
+                          color: colors.textSecondary,
+                          border: `1px solid ${darkMode ? alpha(colors.textSecondary, 0.15) : '#e2e8f0'}`,
+                          '&:hover': { bgcolor: alpha(color, 0.1), borderColor: alpha(color, 0.3), color: color },
+                        }),
+                      }}
+                    />
+                  ))}
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        </Collapse>
+
+        {/* Section D: ERP Integration */}
+        <SectionHeader sectionKey="erp" icon={StorageIcon} label="ERP Integration">
+          <Typography variant="caption" sx={{ color: colors.textSecondary, fontSize: '0.65rem' }}>
+            {config.erp_system === 'sap_s4hana' ? 'SAP S/4HANA' : config.erp_system} &middot; {config.erp_target_module} &middot; {config.writeback_mode === 'bidirectional' ? 'Bidirectional' : 'Read-only'}
           </Typography>
-          <Divider sx={{ mb: 2, borderColor: colors.border }} />
-          <Grid container spacing={1}>
-            {ESCALATION_TIERS.map((tier, idx) => {
-              const rule = config.escalation_rules[idx];
-              const TierIcon = tier.icon;
-              const tierColors = [colors.primary, '#f59e0b', '#f97316', colors.error];
-              return (
-                <Grid item xs={12} sm={6} md={3} key={tier.tier}>
-                  <Card variant="outlined" sx={{
-                    ...cardSx,
-                    borderColor: rule.enabled ? alpha(tierColors[idx], 0.4) : colors.border,
-                    bgcolor: rule.enabled ? alpha(tierColors[idx], darkMode ? 0.08 : 0.02) : colors.cardBg,
-                    opacity: rule.enabled ? 1 : 0.5,
-                  }}>
-                    <CardContent sx={{ py: 1.5, px: 1.5, '&:last-child': { pb: 1.5 } }}>
+        </SectionHeader>
+        <Collapse in={expandedSections.erp}>
+          <Box sx={{ mb: 3, px: 0.5 }}>
+            <Grid container spacing={1.5}>
+              <Grid item xs={12}>
+                <FormControl fullWidth size="small" sx={inputSx}>
+                  <InputLabel>ERP System</InputLabel>
+                  <Select value={config.erp_system} label="ERP System" onChange={(e) => setConfig({ ...config, erp_system: e.target.value })} MenuProps={menuProps}>
+                    <MenuItem value="sap_s4hana">SAP S/4HANA</MenuItem>
+                    <MenuItem value="sap_ibp">SAP IBP</MenuItem>
+                    <MenuItem value="oracle_erp">Oracle ERP Cloud</MenuItem>
+                    <MenuItem value="manual">Manual / Excel</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={6}>
+                <FormControl fullWidth size="small" sx={inputSx}>
+                  <InputLabel>Target Module</InputLabel>
+                  <Select value={config.erp_target_module} label="Target Module" onChange={(e) => setConfig({ ...config, erp_target_module: e.target.value })} MenuProps={menuProps}>
+                    {modCfg.erpModules.map(m => {
+                      const labels = { MM: 'Materials Mgmt', PP: 'Production', SD: 'Sales & Dist', CO: 'Controlling', WM: 'Warehouse', FI: 'Finance', PM: 'Plant Maintenance', BC: 'Basis/Cross-App', EC: 'Enterprise Ctrl', ALL: 'All Modules' };
+                      return <MenuItem key={m} value={m}>{m} - {labels[m] || m}</MenuItem>;
+                    })}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={6}>
+                <FormControl fullWidth size="small" sx={inputSx}>
+                  <InputLabel>Writeback</InputLabel>
+                  <Select value={config.writeback_mode} label="Writeback" onChange={(e) => setConfig({ ...config, writeback_mode: e.target.value })} MenuProps={menuProps}>
+                    <MenuItem value="read_only">Read-Only</MenuItem>
+                    <MenuItem value="bidirectional">Bidirectional</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                  <FormControlLabel
+                    control={<Switch size="small" checked={config.erp_approval_required} onChange={(e) => setConfig({ ...config, erp_approval_required: e.target.checked })}
+                      sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: colors.warning }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: colors.warning } }} />}
+                    label={<Typography variant="caption" sx={{ color: colors.text }}>Require approval before ERP writes</Typography>}
+                  />
+                  <FormControlLabel
+                    control={<Switch size="small" checked={config.command_tower_sync} onChange={(e) => setConfig({ ...config, command_tower_sync: e.target.checked })}
+                      sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: colors.success }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: colors.success } }} />}
+                    label={<Typography variant="caption" sx={{ color: colors.text }}>Sync to Command Tower</Typography>}
+                  />
+                </Box>
+              </Grid>
+            </Grid>
+          </Box>
+        </Collapse>
+
+        {/* Section E: AI Analysis */}
+        <SectionHeader sectionKey="ai" icon={PsychologyIcon} label="AI Analysis">
+          <Typography variant="caption" sx={{ color: colors.textSecondary, fontSize: '0.65rem' }}>
+            {config.confidence_threshold}% confidence &middot; {config.analysis_depth} &middot; {config.lookback_window.replace('_', ' ')}
+          </Typography>
+        </SectionHeader>
+        <Collapse in={expandedSections.ai}>
+          <Box sx={{ mb: 3, px: 0.5 }}>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="caption" fontWeight={600} sx={{ color: colors.text }}>
+                Confidence Threshold: {config.confidence_threshold}%
+              </Typography>
+              <Slider value={config.confidence_threshold} onChange={(e, val) => setConfig({ ...config, confidence_threshold: val })}
+                min={50} max={99} step={1} valueLabelDisplay="auto" valueLabelFormat={(v) => `${v}%`}
+                sx={{ color: config.confidence_threshold >= 90 ? colors.success : colors.primary, '& .MuiSlider-thumb': { width: 14, height: 14 } }}
+              />
+            </Box>
+            <Grid container spacing={1.5}>
+              <Grid item xs={12}>
+                <FormControl fullWidth size="small" sx={inputSx}>
+                  <InputLabel>Analysis Depth</InputLabel>
+                  <Select value={config.analysis_depth} label="Analysis Depth" onChange={(e) => setConfig({ ...config, analysis_depth: e.target.value })} MenuProps={menuProps}>
+                    <MenuItem value="quick">Quick Scan</MenuItem>
+                    <MenuItem value="standard">Standard</MenuItem>
+                    <MenuItem value="deep">Deep Analysis</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={6}>
+                <FormControl fullWidth size="small" sx={inputSx}>
+                  <InputLabel>Lookback</InputLabel>
+                  <Select value={config.lookback_window} label="Lookback" onChange={(e) => setConfig({ ...config, lookback_window: e.target.value })} MenuProps={menuProps}>
+                    <MenuItem value="4_weeks">4 Weeks</MenuItem>
+                    <MenuItem value="8_weeks">8 Weeks</MenuItem>
+                    <MenuItem value="13_weeks">13 Weeks</MenuItem>
+                    <MenuItem value="26_weeks">26 Weeks</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={6}>
+                <FormControl fullWidth size="small" sx={inputSx}>
+                  <InputLabel>Forecast</InputLabel>
+                  <Select value={config.forecast_horizon} label="Forecast" onChange={(e) => setConfig({ ...config, forecast_horizon: e.target.value })} MenuProps={menuProps}>
+                    <MenuItem value="1_week">1 Week</MenuItem>
+                    <MenuItem value="4_weeks">4 Weeks</MenuItem>
+                    <MenuItem value="8_weeks">8 Weeks</MenuItem>
+                    <MenuItem value="13_weeks">13 Weeks</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+            {config.ml_model && (
+              <Box sx={{ mt: 1.5 }}>
+                <Typography variant="caption" sx={{ color: colors.textSecondary }}>ML Model</Typography>
+                <Chip label={config.ml_model} size="small" sx={{ display: 'flex', width: 'fit-content', mt: 0.3, bgcolor: alpha('#8b5cf6', 0.1), color: '#8b5cf6', fontWeight: 600 }} />
+              </Box>
+            )}
+          </Box>
+        </Collapse>
+
+        {/* Section F: Escalation Rules */}
+        <SectionHeader sectionKey="escalation" icon={AccountTreeIcon} label="Escalation Rules">
+          <Chip label={`${config.escalation_rules.filter(r => r.enabled).length} tiers active`} size="small" sx={{ height: 20, fontSize: '0.65rem', bgcolor: alpha(colors.primary, 0.1), color: colors.primary }} />
+        </SectionHeader>
+        <Collapse in={expandedSections.escalation}>
+          <Box sx={{ mb: 3, px: 0.5 }}>
+            <Grid container spacing={1}>
+              {ESCALATION_TIERS.map((tier, idx) => {
+                const rule = config.escalation_rules[idx];
+                const TierIcon = tier.icon;
+                const tierColors = [colors.primary, '#f59e0b', '#f97316', colors.error];
+                return (
+                  <Grid item xs={12} sm={6} md={3} key={tier.tier}>
+                    <Paper
+                      elevation={0}
+                      sx={{
+                        p: 1.5,
+                        borderRadius: 2,
+                        border: `1px solid ${rule.enabled ? alpha(tierColors[idx], 0.25) : colors.border}`,
+                        bgcolor: rule.enabled ? alpha(tierColors[idx], darkMode ? 0.08 : 0.02) : colors.cardBg,
+                        boxShadow: darkMode ? '0 1px 4px rgba(0,0,0,0.3)' : '0 1px 3px rgba(0,0,0,0.08)',
+                        opacity: rule.enabled ? 1 : 0.5,
+                      }}
+                    >
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                           <TierIcon sx={{ fontSize: 16, color: tierColors[idx] }} />
@@ -1316,16 +1704,16 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user', darkMode =
                         />
                       </Box>
                       <Typography variant="caption" sx={{ color: colors.textSecondary, fontSize: '0.65rem' }}>{tier.action}</Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              );
-            })}
-          </Grid>
-        </Grid>
-      </Grid>
-    </Box>
-  );
+                    </Paper>
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </Box>
+        </Collapse>
+      </Box>
+    );
+  };
 
   // ──────────── STEP 3: Review & Deploy ────────────
   const renderStep3 = () => {
@@ -1346,7 +1734,15 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user', darkMode =
         <Grid container spacing={2}>
           {/* Agent Summary Card */}
           <Grid item xs={12}>
-            <Paper elevation={0} sx={{ p: 2.5, borderRadius: 2, bgcolor: alpha(colors.primary, darkMode ? 0.1 : 0.03), border: `1px solid ${alpha(colors.primary, 0.2)}` }}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2.5,
+                borderRadius: 2,
+                bgcolor: alpha(catInfo.color, darkMode ? 0.1 : 0.03),
+                boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.08)',
+              }}
+            >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                 <Box sx={{ width: 48, height: 48, borderRadius: 2, bgcolor: alpha(catInfo.color, 0.15), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <RocketLaunchIcon sx={{ fontSize: 24, color: catInfo.color }} />
@@ -1367,7 +1763,7 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user', darkMode =
                 ].map(item => (
                   <Grid item xs={4} sm={2} key={item.label}>
                     <Typography variant="caption" sx={{ color: colors.textSecondary }}>{item.label}</Typography>
-                    <Chip label={item.value} size="small" sx={{ display: 'flex', width: 'fit-content', mt: 0.3, bgcolor: alpha(item.color, 0.12), color: item.color, fontWeight: 600, fontSize: '0.7rem' }} />
+                    <Chip label={item.value} size="small" sx={{ display: 'flex', width: 'fit-content', mt: 0.3, bgcolor: alpha(item.color, 0.12), color: item.color, fontWeight: 600, fontSize: '0.65rem', height: 20 }} />
                   </Grid>
                 ))}
               </Grid>
@@ -1376,7 +1772,16 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user', darkMode =
 
           {/* Monitoring Scope Summary */}
           <Grid item xs={12} sm={6}>
-            <Paper variant="outlined" sx={{ p: 2, borderColor: colors.border, bgcolor: colors.cardBg, height: '100%' }}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2,
+                borderRadius: 2,
+                bgcolor: colors.cardBg,
+                boxShadow: darkMode ? '0 1px 4px rgba(0,0,0,0.3)' : '0 1px 3px rgba(0,0,0,0.08)',
+                height: '100%',
+              }}
+            >
               <Typography variant="subtitle2" fontWeight={600} sx={{ color: colors.primary, mb: 1.5 }}>
                 <WarehouseIcon sx={{ fontSize: 16, mr: 0.5, verticalAlign: 'middle' }} />
                 {modCfg.scopeLabel || 'Monitoring Scope'}
@@ -1398,7 +1803,16 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user', darkMode =
 
           {/* Actions & Escalation Summary */}
           <Grid item xs={12} sm={6}>
-            <Paper variant="outlined" sx={{ p: 2, borderColor: colors.border, bgcolor: colors.cardBg, height: '100%' }}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2,
+                borderRadius: 2,
+                bgcolor: colors.cardBg,
+                boxShadow: darkMode ? '0 1px 4px rgba(0,0,0,0.3)' : '0 1px 3px rgba(0,0,0,0.08)',
+                height: '100%',
+              }}
+            >
               <Typography variant="subtitle2" fontWeight={600} sx={{ color: colors.primary, mb: 1.5 }}>
                 <BoltIcon sx={{ fontSize: 16, mr: 0.5, verticalAlign: 'middle' }} />
                 Actions & Escalation
@@ -1444,17 +1858,106 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user', darkMode =
             </Paper>
           </Grid>
 
-          {/* Query */}
+          {/* Agent Execution Plan */}
           {agentData?.natural_language_query && (
             <Grid item xs={12}>
-              <Paper variant="outlined" sx={{ p: 2, borderColor: colors.border, bgcolor: colors.cardBg }}>
-                <Typography variant="subtitle2" fontWeight={600} sx={{ color: colors.primary, mb: 1 }}>Agent Query</Typography>
-                <Typography variant="body2" sx={{ color: colors.text, mb: 1 }}>{agentData.natural_language_query}</Typography>
-                {agentData.sql_query && agentData.sql_query !== '-- Generated SQL will appear here' && (
-                  <Paper sx={{ p: 1.5, bgcolor: darkMode ? '#0d1117' : '#1e293b', color: '#e2e8f0', fontFamily: 'monospace', fontSize: 11, overflow: 'auto', borderRadius: 1 }}>
-                    {agentData.sql_query}
-                  </Paper>
-                )}
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2,
+                  borderRadius: 2,
+                  bgcolor: colors.cardBg,
+                  boxShadow: darkMode ? '0 1px 4px rgba(0,0,0,0.3)' : '0 1px 3px rgba(0,0,0,0.08)',
+                }}
+              >
+                <Typography variant="subtitle2" fontWeight={600} sx={{ color: colors.primary, mb: 0.5 }}>Agent Objective</Typography>
+                <Typography variant="body2" sx={{ color: colors.text, mb: 2, fontStyle: 'italic' }}>
+                  "{agentData.natural_language_query}"
+                </Typography>
+
+                <Typography variant="subtitle2" fontWeight={600} sx={{ color: colors.primary, mb: 1.5 }}>Execution Pipeline</Typography>
+                <Box sx={{ position: 'relative' }}>
+                  {(agentData.execution_steps || []).map((step, idx) => {
+                    const stepMeta = EXECUTION_STEP_TYPES[step.type] || EXECUTION_STEP_TYPES.query;
+                    const isLast = idx === (agentData.execution_steps || []).length - 1;
+                    const stepColors = {
+                      detect: colors.warning,
+                      query: colors.primary,
+                      analyze: '#8b5cf6',
+                      decide: colors.primary,
+                      simulate: colors.warning,
+                      approve: '#e11d48',
+                      execute: colors.success,
+                      notify: '#0891b2',
+                      learn: '#6366f1',
+                    };
+                    const sColor = stepColors[step.type] || colors.primary;
+
+                    return (
+                      <Box key={idx} sx={{ display: 'flex', gap: 1.5, mb: isLast ? 0 : 0.5 }}>
+                        {/* Left: step number + connector line */}
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 28, flexShrink: 0 }}>
+                          <Box sx={{
+                            width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            bgcolor: alpha(sColor, 0.15), border: `2px solid ${sColor}`,
+                          }}>
+                            <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: sColor }}>{idx + 1}</Typography>
+                          </Box>
+                          {!isLast && (
+                            <Box sx={{ width: 2, flex: 1, minHeight: 16, bgcolor: alpha(sColor, 0.2), my: 0.25 }} />
+                          )}
+                        </Box>
+                        {/* Right: step detail */}
+                        <Box sx={{ flex: 1, pb: isLast ? 0 : 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.25 }}>
+                            <Chip
+                              label={stepMeta.label}
+                              size="small"
+                              sx={{
+                                height: 18, fontSize: '0.6rem', fontWeight: 700,
+                                bgcolor: alpha(sColor, 0.12), color: sColor, border: `1px solid ${alpha(sColor, 0.25)}`,
+                              }}
+                            />
+                            <Typography variant="caption" fontWeight={600} sx={{ color: colors.text, fontSize: '0.72rem' }}>
+                              {step.title}
+                            </Typography>
+                          </Box>
+                          <Typography variant="caption" sx={{ color: colors.textSecondary, display: 'block', lineHeight: 1.4, fontSize: '0.65rem', mb: 0.25 }}>
+                            {step.detail}
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: alpha(sColor, 0.7), fontSize: '0.6rem' }}>
+                            {step.integration}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    );
+                  })}
+                </Box>
+
+                {/* Security & guardrails footer */}
+                <Box sx={{
+                  mt: 2, pt: 1.5, borderTop: `1px solid ${colors.border}`,
+                  display: 'flex', flexWrap: 'wrap', gap: 0.5,
+                }}>
+                  {[
+                    { label: 'Audit Trail', color: colors.primary },
+                    { label: 'Role-Based Access', color: colors.primary },
+                    { label: config.erp_approval_required ? 'Approval Required' : 'Auto-Approved', color: config.erp_approval_required ? '#e11d48' : colors.success },
+                    { label: `${config.writeback_mode === 'read_only' ? 'Read-Only' : config.writeback_mode === 'write_with_approval' ? 'Write w/ Approval' : 'Full Write'}`, color: config.writeback_mode === 'read_only' ? colors.primary : colors.warning },
+                    { label: 'Encrypted', color: colors.primary },
+                  ].map((badge) => (
+                    <Chip
+                      key={badge.label}
+                      label={badge.label}
+                      size="small"
+                      variant="outlined"
+                      sx={{
+                        height: 20, fontSize: '0.6rem', fontWeight: 600,
+                        borderColor: alpha(badge.color, 0.3), color: badge.color,
+                      }}
+                    />
+                  ))}
+                </Box>
               </Paper>
             </Grid>
           )}
@@ -1462,9 +1965,10 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user', darkMode =
           {/* Deploy Info */}
           <Grid item xs={12}>
             <Alert severity="info" icon={<RocketLaunchIcon />} sx={{ bgcolor: darkMode ? alpha(colors.primary, 0.1) : undefined }}>
-              This agent will run <strong>{config.frequency}</strong> with <strong>{config.automation_level}</strong> automation.
-              {config.erp_approval_required && ' All ERP actions require approval.'}
-              {' '}The agent will continuously learn and improve accuracy from your feedback.
+              This agent runs <strong>{config.frequency}</strong> with <strong>{config.automation_level}</strong> automation
+              across <strong>{(agentData?.execution_steps || []).length} pipeline steps</strong>.
+              {config.erp_approval_required && ' Human approval required before any system writes.'}
+              {' '}All actions are logged with full audit trail. The agent continuously learns from your feedback.
             </Alert>
           </Grid>
         </Grid>
@@ -1477,15 +1981,7 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user', darkMode =
       <Stepper activeStep={activeStep} alternativeLabel connector={<StepperConnector />} sx={{ mb: 4 }}>
         {steps.map((label, idx) => (
           <Step key={label}>
-            <StepLabel
-              StepIconProps={{
-                sx: {
-                  color: idx <= activeStep ? colors.primary : colors.border,
-                  '&.Mui-active': { color: colors.primary },
-                  '&.Mui-completed': { color: colors.primary },
-                },
-              }}
-            >
+            <StepLabel StepIconComponent={CustomStepIcon}>
               <Typography variant="caption" fontWeight={idx === activeStep ? 700 : 400} sx={{ color: idx <= activeStep ? colors.text : colors.textSecondary }}>
                 {label}
               </Typography>
@@ -1505,17 +2001,36 @@ const AgentCreationWizard = ({ onClose, onSave, userId = 'demo_user', darkMode =
       </Box>
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4, pt: 2, borderTop: `1px solid ${colors.border}` }}>
-        <Button disabled={activeStep === 0 || loading} onClick={handleBack} sx={{ color: colors.textSecondary }}>
+        <Button
+          disabled={activeStep === 0 || loading}
+          onClick={handleBack}
+          variant="text"
+          sx={{ color: colors.textSecondary, textTransform: 'none' }}
+        >
           Back
         </Button>
         <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button onClick={onClose} disabled={loading} sx={{ color: colors.primary }}>Cancel</Button>
+          <Button
+            onClick={onClose}
+            disabled={loading}
+            variant="outlined"
+            sx={{ borderColor: colors.border, color: colors.primary, textTransform: 'none' }}
+          >
+            Cancel
+          </Button>
           <Button
             variant="contained"
             onClick={handleNext}
             disabled={loading}
             startIcon={loading ? <CircularProgress size={18} /> : activeStep === 2 ? <RocketLaunchIcon /> : null}
-            sx={{ bgcolor: colors.primary, '&:hover': { bgcolor: colors.secondary }, px: 3 }}
+            sx={{
+              bgcolor: activeStep === 2 ? colors.success : colors.primary,
+              '&:hover': { bgcolor: activeStep === 2 ? alpha(colors.success, 0.85) : colors.secondary },
+              px: 4,
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 600,
+            }}
           >
             {loading ? 'Processing...' : activeStep === 2 ? 'Deploy Agent' : 'Next'}
           </Button>
