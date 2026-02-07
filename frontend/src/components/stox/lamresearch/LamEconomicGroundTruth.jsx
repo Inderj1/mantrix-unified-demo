@@ -32,6 +32,7 @@ import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
   Close as CloseIcon,
+  AttachMoney as AttachMoneyIcon,
 } from '@mui/icons-material';
 import { Line } from 'react-chartjs-2';
 import {
@@ -77,6 +78,14 @@ const formatPercent = (value) => {
   return `${Number(value).toFixed(1)}%`;
 };
 
+const fmtCurrencyShort = (value) => {
+  if (value == null) return '-';
+  const abs = Math.abs(value);
+  if (abs >= 1000000) return `$${(abs / 1000000).toFixed(1)}M`;
+  if (abs >= 1000) return `$${(abs / 1000).toFixed(0)}K`;
+  return `$${abs.toFixed(0)}`;
+};
+
 // ============================================
 // Mock Data - 15 Semiconductor SKUs
 // ============================================
@@ -103,8 +112,12 @@ const generateMockData = () => {
 
   return materials.map((m, idx) => {
     const driftPct = ((m.actualCost - m.stdCost) / m.stdCost) * 100;
+    const id = idx + 1;
+    const phantomValue = m.onHandEA * (m.actualCost - m.stdCost);
+    const uomFlag = (id === 7 || id === 9) ? 'Mismatch' : 'OK';
+    const bomCheck = (id === 5 || id === 13 || id === 14) ? 'Review' : 'Validated';
     return {
-      id: idx + 1,
+      id,
       material: m.name,
       plant: m.plant,
       trustScore: m.trustScore,
@@ -115,6 +128,9 @@ const generateMockData = () => {
       bookValue: m.bookValue,
       trueValue: m.trueValue,
       driftPct: parseFloat(driftPct.toFixed(1)),
+      phantomValue,
+      uomFlag,
+      bomCheck,
       demand: m.demand,
       uom: m.uom,
     };
@@ -160,6 +176,7 @@ const LamEconomicGroundTruth = ({ onBack, darkMode = false }) => {
     const excluded = MOCK_DATA.filter((r) => r.grade === 'C').length;
     const driftEvents = MOCK_DATA.filter((r) => Math.abs(r.driftPct) > 5).length;
     const totalVolume = MOCK_DATA.reduce((sum, r) => sum + r.onHandEA, 0);
+    const totalPhantomValue = MOCK_DATA.reduce((sum, r) => sum + Math.abs(r.phantomValue), 0);
     return {
       trustScore: avgTrust,
       decisionGrade: 1642,
@@ -167,6 +184,7 @@ const LamEconomicGroundTruth = ({ onBack, darkMode = false }) => {
       excluded: 206,
       driftEvents: 89,
       totalVolume: 583200,
+      totalPhantomValue,
     };
   }, []);
 
@@ -177,6 +195,7 @@ const LamEconomicGroundTruth = ({ onBack, darkMode = false }) => {
     { label: 'Review Required', value: formatNumber(kpis.reviewRequired), color: '#f59e0b', icon: <ReviewIcon sx={{ fontSize: 20 }} /> },
     { label: 'Excluded Items', value: formatNumber(kpis.excluded), color: '#ef4444', icon: <ExcludedIcon sx={{ fontSize: 20 }} /> },
     { label: 'Cost Drift Events', value: formatNumber(kpis.driftEvents), color: '#06b6d4', icon: <DriftIcon sx={{ fontSize: 20 }} /> },
+    { label: 'Phantom Capital', value: fmtCurrencyShort(kpis.totalPhantomValue), color: '#ef4444', icon: <AttachMoneyIcon sx={{ fontSize: 20 }} /> },
     { label: 'Total Volume', value: `${formatNumber(kpis.totalVolume)} EA`, color: MODULE_COLOR, icon: <VolumeIcon sx={{ fontSize: 20 }} /> },
   ];
 
@@ -365,17 +384,89 @@ const LamEconomicGroundTruth = ({ onBack, darkMode = false }) => {
       renderCell: (params) => {
         const driftColor = getDriftColor(params.value);
         const isPositive = params.value > 0;
+        const row = params.row;
+        const tooltipTitle = `Cost drift: ${row.driftPct > 0 ? '+' : ''}${row.driftPct}% ($${row.stdCost} std vs $${row.actualCost} actual) | Phantom: ${fmtCurrencyShort(row.phantomValue)}`;
         return (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}>
-            {isPositive ? (
-              <TrendingUp sx={{ fontSize: 14, color: driftColor }} />
-            ) : (
-              <TrendingDown sx={{ fontSize: 14, color: driftColor }} />
-            )}
-            <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: driftColor }}>
-              {isPositive ? '+' : ''}{params.value}%
-            </Typography>
-          </Box>
+          <Tooltip title={tooltipTitle} arrow>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}>
+              {isPositive ? (
+                <TrendingUp sx={{ fontSize: 14, color: driftColor }} />
+              ) : (
+                <TrendingDown sx={{ fontSize: 14, color: driftColor }} />
+              )}
+              <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: driftColor }}>
+                {isPositive ? '+' : ''}{params.value}%
+              </Typography>
+            </Box>
+          </Tooltip>
+        );
+      },
+    },
+    {
+      field: 'phantomValue',
+      headerName: 'Phantom $',
+      width: 110,
+      align: 'right',
+      headerAlign: 'right',
+      type: 'number',
+      renderCell: (params) => {
+        const isPositivePhantom = params.row.actualCost > params.row.stdCost;
+        return (
+          <Typography
+            sx={{
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              color: isPositivePhantom ? '#ef4444' : '#10b981',
+            }}
+          >
+            {fmtCurrencyShort(Math.abs(params.value))}
+          </Typography>
+        );
+      },
+    },
+    {
+      field: 'uomFlag',
+      headerName: 'UoM',
+      width: 90,
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => {
+        const isOk = params.value === 'OK';
+        return (
+          <Chip
+            label={params.value}
+            size="small"
+            sx={{
+              bgcolor: isOk ? alpha('#10b981', 0.12) : alpha('#ef4444', 0.12),
+              color: isOk ? '#059669' : '#dc2626',
+              fontWeight: 600,
+              fontSize: '0.7rem',
+              height: 22,
+            }}
+          />
+        );
+      },
+    },
+    {
+      field: 'bomCheck',
+      headerName: 'BOM',
+      width: 90,
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => {
+        const isValidated = params.value === 'Validated';
+        return (
+          <Chip
+            label={params.value}
+            size="small"
+            sx={{
+              bgcolor: isValidated ? alpha('#10b981', 0.12) : alpha('#f59e0b', 0.12),
+              color: isValidated ? '#059669' : '#d97706',
+              fontWeight: 600,
+              fontSize: '0.7rem',
+              height: 22,
+            }}
+          />
         );
       },
     },
@@ -550,40 +641,11 @@ const LamEconomicGroundTruth = ({ onBack, darkMode = false }) => {
             </Tooltip>
             <Box>
               <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ mb: 0.5 }}>
-                <Link
-                  underline="hover"
-                  onClick={onBack}
-                  sx={{ fontSize: '0.75rem', color: colors.textSecondary, cursor: 'pointer' }}
-                >
-                  CORE.AI
-                </Link>
-                <Link
-                  underline="hover"
-                  onClick={onBack}
-                  sx={{ fontSize: '0.75rem', color: colors.textSecondary, cursor: 'pointer' }}
-                >
-                  STOX.AI
-                </Link>
-                <Link
-                  underline="hover"
-                  onClick={onBack}
-                  sx={{ fontSize: '0.75rem', color: colors.textSecondary, cursor: 'pointer' }}
-                >
-                  Lam Research
-                </Link>
-                <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: darkMode ? '#4d9eff' : MODULE_COLOR }}>
-                  Economic Ground Truth
-                </Typography>
+                <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.75rem', color: colors.textSecondary, cursor: 'pointer' }}>Lam Research</Link>
+                <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: darkMode ? '#4d9eff' : MODULE_COLOR }}>Economic Ground Truth</Typography>
               </Breadcrumbs>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontWeight: 700,
-                  fontSize: '1.1rem',
-                  color: colors.text,
-                }}
-              >
-                Economic Ground Truth
+              <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '1.1rem', color: colors.text }}>
+                Cost & Valuation Integrity
               </Typography>
             </Box>
           </Box>

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -13,6 +13,11 @@ import {
   Stack,
   LinearProgress,
   Divider,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
@@ -158,6 +163,7 @@ const BELOW_SS = classSummary('Below SS');
 export default function LamInventoryCapitalHealth({ onBack, darkMode = false }) {
   const colors = getColors(darkMode);
   const [selectedRow, setSelectedRow] = useState(null);
+  useEffect(() => { if (selectedRow) window.scrollTo(0, 0); }, [selectedRow]);
 
   // ----- Dark mode colors -----
   const bgColor = darkMode ? '#0d1117' : colors.background;
@@ -172,7 +178,7 @@ export default function LamInventoryCapitalHealth({ onBack, darkMode = false }) 
     { label: 'Strategic', icon: VerifiedIcon, color: MODULE_COLOR, ea: STRATEGIC.ea, cap: STRATEGIC.cap, pct: STRATEGIC.pctQty },
     { label: 'Excess', icon: WarningIcon, color: '#f59e0b', ea: EXCESS.ea, cap: EXCESS.cap, pct: EXCESS.pctQty },
     { label: 'Obsolescence Risk', icon: DeleteIcon, color: '#ef4444', ea: OBSOLESCENCE.ea, cap: OBSOLESCENCE.cap, pct: OBSOLESCENCE.pctQty },
-    { label: 'Below Safety Stock', icon: ShieldIcon, color: '#06b6d4', ea: BELOW_SS.ea, cap: BELOW_SS.cap, pct: BELOW_SS.pctQty },
+    { label: 'Below Safety Stock', icon: ShieldIcon, color: '#06b6d4', ea: BELOW_SS.ea, cap: BELOW_SS.cap, pct: BELOW_SS.pctQty, revenueAtRisk: 3200000 },
   ];
 
   // ======== DOUGHNUT DATA ========
@@ -216,7 +222,13 @@ export default function LamInventoryCapitalHealth({ onBack, darkMode = false }) 
       },
       tooltip: {
         callbacks: {
-          label: (ctx) => `${ctx.label}: ${ctx.parsed}%`,
+          label: (ctx) => {
+            const idx = ctx.dataIndex;
+            const labels = ['Strategic', 'Excess', 'Obsolescence', 'Below SS'];
+            const eaValues = [STRATEGIC.ea, EXCESS.ea, OBSOLESCENCE.ea, BELOW_SS.ea];
+            const capValues = [STRATEGIC.cap, EXCESS.cap, OBSOLESCENCE.cap, BELOW_SS.cap];
+            return `${labels[idx]}: ${ctx.parsed}% | ${formatNumber(eaValues[idx])} EA | ${formatCurrency(capValues[idx])}`;
+          },
         },
       },
     },
@@ -487,40 +499,70 @@ export default function LamInventoryCapitalHealth({ onBack, darkMode = false }) 
         </Grid>
       </Grid>
 
-      {/* ---- 4 DECOMPOSITION CARDS ---- */}
-      <Grid container spacing={2} sx={{ mb: 2.5 }}>
-        {decompositionCards.map((card) => {
-          const Icon = card.icon;
-          return (
-            <Grid item xs={6} md={3} key={card.label}>
-              <Card
-                elevation={0}
-                sx={{
-                  bgcolor: cardBg,
-                  border: `1px solid ${borderColor}`,
-                  borderRadius: 2,
-                }}
-              >
-                <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
-                  <Stack direction="row" alignItems="center" spacing={0.8} sx={{ mb: 1 }}>
-                    <Icon sx={{ color: card.color, fontSize: 18 }} />
-                    <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: textSecondary }}>{card.label}</Typography>
-                  </Stack>
-                  <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: textColor }}>
-                    {formatNumber(card.ea)} EA
-                  </Typography>
-                  <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: card.color }}>
-                    {formatCurrency(card.cap)}
-                  </Typography>
-                  <Typography sx={{ fontSize: '0.7rem', color: textSecondary, mt: 0.5 }}>
-                    {card.pct}% of total
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          );
-        })}
-      </Grid>
+      {/* ---- DECOMPOSITION TABLE ---- */}
+      <Paper
+        elevation={0}
+        sx={{
+          mb: 2.5,
+          bgcolor: paperBg,
+          border: `1px solid ${borderColor}`,
+          borderRadius: 2,
+          overflow: 'hidden',
+        }}
+      >
+        <Box sx={{ p: 1.5, borderBottom: `1px solid ${borderColor}` }}>
+          <Typography sx={{ fontWeight: 700, fontSize: '0.85rem', color: textColor }}>
+            Inventory Decomposition
+          </Typography>
+        </Box>
+        <Table size="small">
+          <TableHead>
+            <TableRow sx={{ bgcolor: darkMode ? '#21262d' : '#f8fafc' }}>
+              <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', color: textSecondary, borderBottom: `1px solid ${borderColor}` }}>Category</TableCell>
+              <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.75rem', color: textSecondary, borderBottom: `1px solid ${borderColor}` }}>Quantity (EA)</TableCell>
+              <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.75rem', color: textSecondary, borderBottom: `1px solid ${borderColor}` }}>Capital ($)</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {decompositionCards.map((card) => {
+              const Icon = card.icon;
+              return (
+                <TableRow key={card.label} sx={{ '&:last-child td': { borderBottom: 0 } }}>
+                  <TableCell sx={{ borderBottom: `1px solid ${borderColor}`, py: 1.2 }}>
+                    <Stack direction="row" alignItems="center" spacing={0.8}>
+                      <Icon sx={{ color: card.color, fontSize: 18 }} />
+                      <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: card.color }}>{card.label}</Typography>
+                    </Stack>
+                  </TableCell>
+                  <TableCell align="right" sx={{ borderBottom: `1px solid ${borderColor}`, py: 1.2 }}>
+                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: textColor }}>{formatNumber(card.ea)} EA</Typography>
+                  </TableCell>
+                  <TableCell align="right" sx={{ borderBottom: `1px solid ${borderColor}`, py: 1.2 }}>
+                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: textColor }}>{formatCurrency(card.cap)}</Typography>
+                    {card.revenueAtRisk && (
+                      <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: '#ef4444', mt: 0.3 }}>
+                        {formatCurrency(card.revenueAtRisk)} revenue at risk
+                      </Typography>
+                    )}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+            {/* TOTAL ROW */}
+            <TableRow>
+              <TableCell sx={{ borderTop: `2px solid ${borderColor}`, borderBottom: 0, py: 1.2 }}>
+                <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: textColor }}>TOTAL</Typography>
+              </TableCell>
+              <TableCell align="right" sx={{ borderTop: `2px solid ${borderColor}`, borderBottom: 0, py: 1.2 }}>
+                <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: textColor }}>{formatNumber(TOTAL_ON_HAND)} EA</Typography>
+              </TableCell>
+              <TableCell align="right" sx={{ borderTop: `2px solid ${borderColor}`, borderBottom: 0, py: 1.2 }}>
+                <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: textColor }}>{formatCurrency(TOTAL_CAPITAL)}</Typography>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </Paper>
 
       {/* ---- DOUGHNUT CHARTS ---- */}
       <Grid container spacing={2} sx={{ mb: 2.5 }}>
@@ -734,25 +776,21 @@ export default function LamInventoryCapitalHealth({ onBack, darkMode = false }) 
             Back
           </Button>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ '& .MuiBreadcrumb-separator': { color: textSecondary } }}>
-            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.75rem', color: textSecondary, cursor: 'pointer' }}>CORE.AI</Link>
-            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.75rem', color: textSecondary, cursor: 'pointer' }}>STOX.AI</Link>
             <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.75rem', color: textSecondary, cursor: 'pointer' }}>Lam Research</Link>
-            {selectedRow ? (
-              <>
-                <Link underline="hover" onClick={() => setSelectedRow(null)} sx={{ fontSize: '0.75rem', color: textSecondary, cursor: 'pointer' }}>Inventory Capital Health</Link>
-                <Typography sx={{ fontSize: '0.75rem', color: colors.primary, fontWeight: 600 }}>{selectedRow.material} Detail</Typography>
-              </>
-            ) : (
+            {selectedRow ? [
+              <Link key="tile" underline="hover" onClick={() => setSelectedRow(null)} sx={{ fontSize: '0.75rem', color: textSecondary, cursor: 'pointer' }}>Inventory Capital Health</Link>,
+              <Typography key="detail" sx={{ fontSize: '0.75rem', color: colors.primary, fontWeight: 600 }}>{selectedRow.material}</Typography>,
+            ] : (
               <Typography sx={{ fontSize: '0.75rem', color: colors.primary, fontWeight: 600 }}>Inventory Capital Health</Typography>
             )}
           </Breadcrumbs>
         </Stack>
         <Typography variant="h6" sx={{ fontWeight: 700, color: textColor, fontSize: '1.1rem' }}>
-          {selectedRow ? `${selectedRow.material} \u2014 Detail View` : 'Inventory Capital Health \u2014 Balance Sheet Lens'}
+          {selectedRow ? 'Inventory Detail View' : 'Inventory Capital Health \u2014 Balance Sheet Lens'}
         </Typography>
         <Typography sx={{ fontSize: '0.75rem', color: textSecondary, mt: 0.3 }}>
           {selectedRow
-            ? `Detailed inventory position, aging analysis, and financial metrics for ${selectedRow.material}`
+            ? `Inventory position, aging analysis, and financial metrics for ${selectedRow.material}`
             : 'Comprehensive view of inventory positions, capital deployment, and return metrics for semiconductor manufacturing'}
         </Typography>
       </Paper>

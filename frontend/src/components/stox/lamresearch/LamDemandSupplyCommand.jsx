@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Box, Paper, Typography, Grid, Card, CardContent, Chip, Breadcrumbs, Link,
   Stack, IconButton, LinearProgress, Button, Tooltip as MuiTooltip,
@@ -40,6 +40,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineEleme
 
 const PLANTS = ['P1000 (Fremont)', 'P2000 (Tualatin)', 'P3000 (Livermore)', 'P4000 (Chandler)'];
 const STATUSES = ['Shortage', 'Tight', 'Covered', 'Excess'];
+const HORIZONS = ['7d', '14d', '30d', '60d'];
 
 const STATUS_COLORS = {
   Shortage: '#ef4444',
@@ -48,25 +49,46 @@ const STATUS_COLORS = {
   Excess: '#06b6d4',
 };
 
+const buildRow = (id, material, plant, status, demandEA, supplyEA, gapEA, coverage, demandValue, gapValue, marginPct, soRatio, fcRatio, onHandRatio, openPORatio, plannedRatio, fcConfidence) => {
+  const soQty = Math.round(demandEA * soRatio);
+  const fcQty = demandEA - soQty;
+  const onHandEA = Math.round(supplyEA * onHandRatio);
+  const openPO = Math.round(supplyEA * openPORatio);
+  const plannedEA = Math.round(supplyEA * plannedRatio);
+  const inTransit = supplyEA - onHandEA - openPO - plannedEA;
+  const unitPrice = demandValue / demandEA;
+  const revenueAtRisk = gapEA < 0 ? Math.round(Math.abs(gapEA) * unitPrice) : 0;
+  const marginGrade = marginPct >= 40 ? 'High' : marginPct >= 30 ? 'Med' : 'Low';
+  return {
+    id, material, plant, status,
+    soQty, fcQty, demandEA,
+    onHandEA, openPO, plannedEA, inTransit, supplyEA,
+    gapEA, coverage, demandValue, gapValue, marginPct,
+    confidence: soRatio >= 0.95 ? 100 : fcConfidence,
+    revenueAtRisk,
+    marginGrade,
+  };
+};
+
 const materialRows = [
-  { id: 1, material: 'RF Generator Module', plant: 'P1000 (Fremont)', status: 'Shortage', demandEA: 4820, supplyEA: 3140, gapEA: -1680, coverage: 28, demandValue: 4218000, gapValue: -1470000, marginPct: 42.1 },
-  { id: 2, material: 'Wafer Chamber Liner', plant: 'P2000 (Tualatin)', status: 'Tight', demandEA: 12640, supplyEA: 10920, gapEA: -1720, coverage: 55, demandValue: 2654000, gapValue: -361000, marginPct: 38.4 },
-  { id: 3, material: 'ESC (Electrostatic Chuck)', plant: 'P1000 (Fremont)', status: 'Shortage', demandEA: 3280, supplyEA: 1960, gapEA: -1320, coverage: 22, demandValue: 5248000, gapValue: -2112000, marginPct: 46.8 },
-  { id: 4, material: 'Etch Gas Manifold', plant: 'P3000 (Livermore)', status: 'Tight', demandEA: 8440, supplyEA: 7120, gapEA: -1320, coverage: 62, demandValue: 1856000, gapValue: -290000, marginPct: 35.2 },
-  { id: 5, material: 'Plasma Source Assembly', plant: 'P4000 (Chandler)', status: 'Covered', demandEA: 6240, supplyEA: 7480, gapEA: 1240, coverage: 88, demandValue: 4368000, gapValue: 0, marginPct: 41.5 },
-  { id: 6, material: 'CVD Showerhead', plant: 'P2000 (Tualatin)', status: 'Covered', demandEA: 18920, supplyEA: 20180, gapEA: 1260, coverage: 92, demandValue: 3216000, gapValue: 0, marginPct: 33.8 },
-  { id: 7, material: 'Process Kit', plant: 'P1000 (Fremont)', status: 'Covered', demandEA: 42680, supplyEA: 44120, gapEA: 1440, coverage: 95, demandValue: 5976000, gapValue: 0, marginPct: 28.6 },
-  { id: 8, material: 'Matching Network', plant: 'P3000 (Livermore)', status: 'Tight', demandEA: 5640, supplyEA: 4820, gapEA: -820, coverage: 48, demandValue: 3948000, gapValue: -574000, marginPct: 44.2 },
-  { id: 9, material: 'Quartz Window', plant: 'P4000 (Chandler)', status: 'Covered', demandEA: 14280, supplyEA: 15640, gapEA: 1360, coverage: 86, demandValue: 1714000, gapValue: 0, marginPct: 31.4 },
-  { id: 10, material: 'Turbomolecular Pump', plant: 'P2000 (Tualatin)', status: 'Shortage', demandEA: 2160, supplyEA: 1280, gapEA: -880, coverage: 18, demandValue: 6480000, gapValue: -2640000, marginPct: 48.6 },
-  { id: 11, material: 'Gas Panel Assembly', plant: 'P1000 (Fremont)', status: 'Covered', demandEA: 7840, supplyEA: 8960, gapEA: 1120, coverage: 91, demandValue: 2744000, gapValue: 0, marginPct: 36.2 },
-  { id: 12, material: 'Endpoint Detector', plant: 'P3000 (Livermore)', status: 'Tight', demandEA: 4960, supplyEA: 3840, gapEA: -1120, coverage: 52, demandValue: 3472000, gapValue: -784000, marginPct: 39.8 },
-  { id: 13, material: 'Robot Arm Assembly', plant: 'P4000 (Chandler)', status: 'Covered', demandEA: 3680, supplyEA: 4240, gapEA: 560, coverage: 84, demandValue: 5152000, gapValue: 0, marginPct: 43.1 },
-  { id: 14, material: 'Load Lock Assembly', plant: 'P2000 (Tualatin)', status: 'Covered', demandEA: 2840, supplyEA: 3120, gapEA: 280, coverage: 89, demandValue: 3976000, gapValue: 0, marginPct: 40.6 },
-  { id: 15, material: 'Throttle Valve', plant: 'P1000 (Fremont)', status: 'Tight', demandEA: 9640, supplyEA: 8120, gapEA: -1520, coverage: 58, demandValue: 1446000, gapValue: -228000, marginPct: 29.4 },
-  { id: 16, material: 'Ceramic Ring', plant: 'P3000 (Livermore)', status: 'Excess', demandEA: 22480, supplyEA: 31640, gapEA: 9160, coverage: 142, demandValue: 1124000, gapValue: 0, marginPct: 24.8 },
-  { id: 17, material: 'High Flow Gas Line', plant: 'P4000 (Chandler)', status: 'Covered', demandEA: 16840, supplyEA: 18260, gapEA: 1420, coverage: 87, demandValue: 2526000, gapValue: 0, marginPct: 32.6 },
-  { id: 18, material: 'Power Distribution Unit', plant: 'P2000 (Tualatin)', status: 'Excess', demandEA: 5280, supplyEA: 7420, gapEA: 2140, coverage: 138, demandValue: 3696000, gapValue: 0, marginPct: 37.4 },
+  buildRow(1,  'RF Generator Module',      'P1000 (Fremont)',   'Shortage', 4820,  3140,  -1680, 28,  4218000,  -1470000, 42.1, 0.65, 0.35, 0.45, 0.30, 0.15, 74),
+  buildRow(2,  'Wafer Chamber Liner',       'P2000 (Tualatin)',  'Tight',    12640, 10920, -1720, 55,  2654000,  -361000,  38.4, 0.72, 0.28, 0.42, 0.32, 0.16, 78),
+  buildRow(3,  'ESC (Electrostatic Chuck)', 'P1000 (Fremont)',   'Shortage', 3280,  1960,  -1320, 22,  5248000,  -2112000, 46.8, 0.62, 0.38, 0.48, 0.28, 0.14, 71),
+  buildRow(4,  'Etch Gas Manifold',         'P3000 (Livermore)', 'Tight',    8440,  7120,  -1320, 62,  1856000,  -290000,  35.2, 0.68, 0.32, 0.44, 0.31, 0.15, 76),
+  buildRow(5,  'Plasma Source Assembly',    'P4000 (Chandler)',  'Covered',  6240,  7480,  1240,  88,  4368000,  0,        41.5, 0.75, 0.25, 0.46, 0.30, 0.16, 82),
+  buildRow(6,  'CVD Showerhead',            'P2000 (Tualatin)',  'Covered',  18920, 20180, 1260,  92,  3216000,  0,        33.8, 0.78, 0.22, 0.43, 0.33, 0.15, 80),
+  buildRow(7,  'Process Kit',               'P1000 (Fremont)',   'Covered',  42680, 44120, 1440,  95,  5976000,  0,        28.6, 0.80, 0.20, 0.50, 0.28, 0.14, 85),
+  buildRow(8,  'Matching Network',          'P3000 (Livermore)', 'Tight',    5640,  4820,  -820,  48,  3948000,  -574000,  44.2, 0.66, 0.34, 0.42, 0.34, 0.16, 72),
+  buildRow(9,  'Quartz Window',             'P4000 (Chandler)',  'Covered',  14280, 15640, 1360,  86,  1714000,  0,        31.4, 0.74, 0.26, 0.47, 0.30, 0.15, 79),
+  buildRow(10, 'Turbomolecular Pump',       'P2000 (Tualatin)',  'Shortage', 2160,  1280,  -880,  18,  6480000,  -2640000, 48.6, 0.60, 0.40, 0.44, 0.30, 0.17, 68),
+  buildRow(11, 'Gas Panel Assembly',        'P1000 (Fremont)',   'Covered',  7840,  8960,  1120,  91,  2744000,  0,        36.2, 0.76, 0.24, 0.45, 0.32, 0.15, 81),
+  buildRow(12, 'Endpoint Detector',         'P3000 (Livermore)', 'Tight',    4960,  3840,  -1120, 52,  3472000,  -784000,  39.8, 0.70, 0.30, 0.43, 0.33, 0.16, 75),
+  buildRow(13, 'Robot Arm Assembly',        'P4000 (Chandler)',  'Covered',  3680,  4240,  560,   84,  5152000,  0,        43.1, 0.73, 0.27, 0.48, 0.29, 0.15, 83),
+  buildRow(14, 'Load Lock Assembly',        'P2000 (Tualatin)',  'Covered',  2840,  3120,  280,   89,  3976000,  0,        40.6, 0.77, 0.23, 0.46, 0.31, 0.16, 80),
+  buildRow(15, 'Throttle Valve',            'P1000 (Fremont)',   'Tight',    9640,  8120,  -1520, 58,  1446000,  -228000,  29.4, 0.64, 0.36, 0.41, 0.35, 0.18, 70),
+  buildRow(16, 'Ceramic Ring',              'P3000 (Livermore)', 'Excess',   22480, 31640, 9160,  142, 1124000,  0,        24.8, 0.82, 0.18, 0.50, 0.28, 0.14, 84),
+  buildRow(17, 'High Flow Gas Line',        'P4000 (Chandler)',  'Covered',  16840, 18260, 1420,  87,  2526000,  0,        32.6, 0.71, 0.29, 0.44, 0.32, 0.17, 77),
+  buildRow(18, 'Power Distribution Unit',   'P2000 (Tualatin)',  'Excess',   5280,  7420,  2140,  138, 3696000,  0,        37.4, 0.79, 0.21, 0.49, 0.27, 0.15, 82),
 ];
 
 const weekLabels = ['Wk1', 'Wk2', 'Wk3', 'Wk4', 'Wk5', 'Wk6', 'Wk7', 'Wk8', 'Wk9', 'Wk10', 'Wk11', 'Wk12'];
@@ -75,15 +97,28 @@ const weeklyDemand = [-22400, -24800, -19600, -26200, -28000, -21800, -23400, -2
 const weeklySupply = [18600, 21200, 17800, 24400, 26800, 20400, 22000, 23800, 16200, 25600, 22400, 30000];
 const weeklyNet = weeklyDemand.map((d, i) => d + weeklySupply[i]);
 
+const AVG_UNIT_PRICE = 875;
+
 const generateWaterfallData = () => {
   const opening = 4200;
-  const data = [{ week: 'Opening', opening, demand: 0, supply: 0, closing: opening }];
+  const data = [];
   let balance = opening;
+  let cumulative = opening;
+  data.push({ week: 'Opening', opening, demand: 0, supply: 0, closing: opening, cumPosition: cumulative, dollarExposure: opening * AVG_UNIT_PRICE });
   weekLabels.forEach((wk, i) => {
     const demand = Math.abs(Math.round(weeklyDemand[i] / 80));
     const supply = Math.round(weeklySupply[i] / 80);
     balance = balance - demand + supply;
-    data.push({ week: wk, opening: balance + demand - supply, demand, supply, closing: balance });
+    cumulative += balance;
+    data.push({
+      week: wk,
+      opening: balance + demand - supply,
+      demand,
+      supply,
+      closing: balance,
+      cumPosition: cumulative,
+      dollarExposure: balance * AVG_UNIT_PRICE,
+    });
   });
   return data;
 };
@@ -93,6 +128,18 @@ const mockSalesOrders = [
   { so: 'SO-4401312', qty: 85, date: '2025-02-18', customer: 'Samsung' },
   { so: 'SO-4401345', qty: 64, date: '2025-02-22', customer: 'Intel' },
   { so: 'SO-4401378', qty: 42, date: '2025-03-01', customer: 'Micron' },
+];
+
+const mockForecastOrders = [
+  { fc: 'FC-2025-Q1-A', qty: 180, date: '2025-03-15', confidence: 82, source: 'ML Model' },
+  { fc: 'FC-2025-Q1-B', qty: 145, date: '2025-03-28', confidence: 76, source: 'Customer Signal' },
+  { fc: 'FC-2025-Q2-A', qty: 210, date: '2025-04-12', confidence: 68, source: 'ML Model' },
+];
+
+const mockPurchaseOrders = [
+  { po: 'PO-8801234', qty: 200, vendor: 'VENDOR-KYOCERA', dueDate: '2025-02-20', otdRisk: 22 },
+  { po: 'PO-8801256', qty: 150, vendor: 'VENDOR-EDWARDS', dueDate: '2025-03-05', otdRisk: 38 },
+  { po: 'PO-8801278', qty: 95, vendor: 'VENDOR-MKS', dueDate: '2025-03-15', otdRisk: 12 },
 ];
 
 const forecastVsActual = {
@@ -113,11 +160,15 @@ const fmtCurrency = (v) => {
   return `${sign}$${abs.toFixed(0)}`;
 };
 
+const MARGIN_GRADE_COLORS = { High: '#10b981', Med: '#f59e0b', Low: '#ef4444' };
+
 // ============================================
 // COMPONENT
 // ============================================
 export default function LamDemandSupplyCommand({ onBack, darkMode = false }) {
   const [selectedRow, setSelectedRow] = useState(null);
+  const [horizon, setHorizon] = useState('30d');
+  useEffect(() => { if (selectedRow) window.scrollTo(0, 0); }, [selectedRow]);
   const colors = getColors(darkMode);
 
   const bg = darkMode ? '#0d1117' : colors.background;
@@ -258,15 +309,44 @@ export default function LamDemandSupplyCommand({ onBack, darkMode = false }) {
     },
     {
       field: 'demandEA',
-      headerName: 'Demand EA',
-      width: 100,
+      headerName: 'Total Demand',
+      width: 110,
       type: 'number',
       renderCell: (p) => <Typography sx={{ fontSize: '0.8rem', color: textPrimary }}>{fmtNum(p.value)}</Typography>,
     },
     {
+      field: 'soQty',
+      headerName: 'SO Qty',
+      width: 90,
+      type: 'number',
+      renderCell: (p) => <Typography sx={{ fontSize: '0.8rem', color: textPrimary }}>{fmtNum(p.value)}</Typography>,
+    },
+    {
+      field: 'fcQty',
+      headerName: 'FC Qty',
+      width: 90,
+      type: 'number',
+      renderCell: (p) => <Typography sx={{ fontSize: '0.8rem', color: textPrimary }}>{fmtNum(p.value)}</Typography>,
+    },
+    {
+      field: 'confidence',
+      headerName: 'Confidence',
+      width: 90,
+      renderCell: (p) => {
+        const chipColor = p.value === 100 ? '#10b981' : '#f59e0b';
+        return (
+          <Chip
+            label={`${p.value}%`}
+            size="small"
+            sx={{ fontSize: '0.7rem', fontWeight: 600, bgcolor: alpha(chipColor, 0.12), color: chipColor, border: `1px solid ${alpha(chipColor, 0.3)}` }}
+          />
+        );
+      },
+    },
+    {
       field: 'supplyEA',
-      headerName: 'Supply EA',
-      width: 100,
+      headerName: 'Total Supply',
+      width: 110,
       type: 'number',
       renderCell: (p) => <Typography sx={{ fontSize: '0.8rem', color: textPrimary }}>{fmtNum(p.value)}</Typography>,
     },
@@ -305,6 +385,17 @@ export default function LamDemandSupplyCommand({ onBack, darkMode = false }) {
       },
     },
     {
+      field: 'revenueAtRisk',
+      headerName: 'Rev @ Risk',
+      width: 110,
+      type: 'number',
+      renderCell: (p) => (
+        <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: p.value > 0 ? '#ef4444' : textSecondary }}>
+          {p.value > 0 ? fmtCurrency(p.value) : '--'}
+        </Typography>
+      ),
+    },
+    {
       field: 'demandValue',
       headerName: 'Demand $',
       width: 110,
@@ -321,6 +412,17 @@ export default function LamDemandSupplyCommand({ onBack, darkMode = false }) {
           {fmtCurrency(p.value)}
         </Typography>
       ),
+    },
+    {
+      field: 'marginGrade',
+      headerName: 'Margin',
+      width: 80,
+      renderCell: (p) => {
+        const c = MARGIN_GRADE_COLORS[p.value] || '#64748b';
+        return (
+          <Chip label={p.value} size="small" sx={{ fontSize: '0.7rem', fontWeight: 600, bgcolor: alpha(c, 0.12), color: c, border: `1px solid ${alpha(c, 0.3)}` }} />
+        );
+      },
     },
     {
       field: 'marginPct',
@@ -390,7 +492,26 @@ export default function LamDemandSupplyCommand({ onBack, darkMode = false }) {
         ))}
       </Grid>
 
-      {/* ========== BOTTLENECK ALERT CARDS ========== */}
+      {/* ========== BOTTLENECK HORIZON TOGGLE + ALERT CARDS ========== */}
+      <Stack direction="row" spacing={1} sx={{ mb: 1.5 }}>
+        {HORIZONS.map((h) => (
+          <Chip
+            key={h}
+            label={h}
+            size="small"
+            onClick={() => setHorizon(h)}
+            sx={{
+              fontWeight: 600,
+              fontSize: '0.7rem',
+              bgcolor: horizon === h ? MODULE_COLOR : alpha(MODULE_COLOR, 0.08),
+              color: horizon === h ? '#fff' : MODULE_COLOR,
+              cursor: 'pointer',
+              '&:hover': { bgcolor: horizon === h ? MODULE_COLOR : alpha(MODULE_COLOR, 0.15) },
+            }}
+          />
+        ))}
+      </Stack>
+
       <Grid container spacing={2} sx={{ mb: 2 }}>
         {bottleneckCards.map((b) => (
           <Grid item xs={6} md={3} key={b.label}>
@@ -453,18 +574,26 @@ export default function LamDemandSupplyCommand({ onBack, darkMode = false }) {
   const renderDetailView = () => (
     <>
       <Grid container spacing={2}>
-        {/* ---- Quick Summary + Open Sales Orders ---- */}
+        {/* ---- Quick Summary + Open Sales Orders + Forecast Orders + Purchase Orders ---- */}
         <Grid item xs={12} md={3}>
           <Card sx={{ bgcolor: cardBg, border: `1px solid ${borderColor}`, borderRadius: 2, boxShadow: 'none', mb: 2 }}>
             <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
               <Typography sx={{ fontSize: '0.75rem', color: textSecondary, fontWeight: 600, mb: 1 }}>Quick Summary</Typography>
               {[
                 { l: 'Demand', v: `${fmtNum(selectedRow.demandEA)} EA` },
+                { l: 'SO Demand', v: `${fmtNum(selectedRow.soQty)} EA` },
+                { l: 'FC Demand', v: `${fmtNum(selectedRow.fcQty)} EA` },
                 { l: 'Supply', v: `${fmtNum(selectedRow.supplyEA)} EA` },
+                { l: 'On-Hand', v: `${fmtNum(selectedRow.onHandEA)} EA` },
+                { l: 'Open PO', v: `${fmtNum(selectedRow.openPO)} EA` },
+                { l: 'Planned', v: `${fmtNum(selectedRow.plannedEA)} EA` },
+                { l: 'In-Transit', v: `${fmtNum(selectedRow.inTransit)} EA` },
                 { l: 'Gap', v: `${selectedRow.gapEA < 0 ? '' : '+'}${fmtNum(selectedRow.gapEA)} EA` },
                 { l: 'Coverage', v: `${selectedRow.coverage}%` },
+                { l: 'Confidence', v: `${selectedRow.confidence}%` },
                 { l: 'Demand $', v: fmtCurrency(selectedRow.demandValue) },
                 { l: 'Gap $', v: fmtCurrency(selectedRow.gapValue) },
+                { l: 'Revenue at Risk', v: selectedRow.revenueAtRisk > 0 ? fmtCurrency(selectedRow.revenueAtRisk) : '--' },
                 { l: 'Margin', v: `${selectedRow.marginPct}%` },
               ].map((r) => (
                 <Stack key={r.l} direction="row" justifyContent="space-between" sx={{ py: 0.4 }}>
@@ -476,7 +605,7 @@ export default function LamDemandSupplyCommand({ onBack, darkMode = false }) {
           </Card>
 
           {/* ---- Open Sales Orders ---- */}
-          <Card sx={{ bgcolor: cardBg, border: `1px solid ${borderColor}`, borderRadius: 2, boxShadow: 'none' }}>
+          <Card sx={{ bgcolor: cardBg, border: `1px solid ${borderColor}`, borderRadius: 2, boxShadow: 'none', mb: 2 }}>
             <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
               <Typography sx={{ fontSize: '0.75rem', color: textSecondary, fontWeight: 600, mb: 1 }}>Open Sales Orders</Typography>
               {mockSalesOrders.map((so) => (
@@ -488,6 +617,62 @@ export default function LamDemandSupplyCommand({ onBack, darkMode = false }) {
                   <Box sx={{ textAlign: 'right' }}>
                     <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: textPrimary }}>{fmtNum(so.qty)} EA</Typography>
                     <Typography sx={{ fontSize: '0.7rem', color: textSecondary }}>{so.date}</Typography>
+                  </Box>
+                </Stack>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* ---- Forecast Orders ---- */}
+          <Card sx={{ bgcolor: cardBg, border: `1px solid ${borderColor}`, borderRadius: 2, boxShadow: 'none', mb: 2 }}>
+            <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+              <Typography sx={{ fontSize: '0.75rem', color: textSecondary, fontWeight: 600, mb: 1 }}>Forecast Orders</Typography>
+              {mockForecastOrders.map((fc) => (
+                <Stack key={fc.fc} direction="row" justifyContent="space-between" alignItems="center" sx={{ py: 0.6, borderBottom: `1px solid ${borderColor}`, '&:last-child': { borderBottom: 'none' } }}>
+                  <Box>
+                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: MODULE_COLOR }}>{fc.fc}</Typography>
+                    <Typography sx={{ fontSize: '0.7rem', color: textSecondary }}>{fc.source}</Typography>
+                  </Box>
+                  <Box sx={{ textAlign: 'right' }}>
+                    <Stack direction="row" spacing={0.5} alignItems="center" justifyContent="flex-end">
+                      <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: textPrimary }}>{fmtNum(fc.qty)} EA</Typography>
+                      <Chip
+                        label={`${fc.confidence}%`}
+                        size="small"
+                        sx={{
+                          fontSize: '0.65rem',
+                          fontWeight: 600,
+                          height: 18,
+                          bgcolor: alpha(fc.confidence >= 80 ? '#10b981' : '#f59e0b', 0.12),
+                          color: fc.confidence >= 80 ? '#10b981' : '#f59e0b',
+                        }}
+                      />
+                    </Stack>
+                    <Typography sx={{ fontSize: '0.7rem', color: textSecondary }}>{fc.date}</Typography>
+                  </Box>
+                </Stack>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* ---- Open Purchase Orders ---- */}
+          <Card sx={{ bgcolor: cardBg, border: `1px solid ${borderColor}`, borderRadius: 2, boxShadow: 'none' }}>
+            <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+              <Typography sx={{ fontSize: '0.75rem', color: textSecondary, fontWeight: 600, mb: 1 }}>Open Purchase Orders</Typography>
+              {mockPurchaseOrders.map((po) => (
+                <Stack key={po.po} direction="row" justifyContent="space-between" alignItems="center" sx={{ py: 0.6, borderBottom: `1px solid ${borderColor}`, '&:last-child': { borderBottom: 'none' } }}>
+                  <Box>
+                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: MODULE_COLOR }}>{po.po}</Typography>
+                    <Typography sx={{ fontSize: '0.7rem', color: textSecondary }}>{po.vendor}</Typography>
+                  </Box>
+                  <Box sx={{ textAlign: 'right' }}>
+                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: textPrimary }}>{fmtNum(po.qty)} EA</Typography>
+                    <Stack direction="row" spacing={0.5} alignItems="center" justifyContent="flex-end">
+                      <Typography sx={{ fontSize: '0.7rem', color: textSecondary }}>{po.dueDate}</Typography>
+                      <Typography sx={{ fontSize: '0.65rem', fontWeight: 600, color: po.otdRisk > 20 ? '#ef4444' : textSecondary }}>
+                        OTD {po.otdRisk}%
+                      </Typography>
+                    </Stack>
                   </Box>
                 </Stack>
               ))}
@@ -505,7 +690,7 @@ export default function LamDemandSupplyCommand({ onBack, darkMode = false }) {
               <Table size="small" stickyHeader>
                 <TableHead>
                   <TableRow>
-                    {['Week', 'Opening', 'Demand', 'Supply', 'Closing'].map((h) => (
+                    {['Week', 'Opening', 'Demand', 'Supply', 'Closing', 'Cum. Position', '$ Exposure'].map((h) => (
                       <TableCell key={h} sx={{ fontSize: '0.7rem', fontWeight: 700, color: textPrimary, bgcolor: darkMode ? '#21262d' : '#f8fafc', borderBottom: `2px solid ${borderColor}`, py: 0.5 }}>
                         {h}
                       </TableCell>
@@ -517,9 +702,11 @@ export default function LamDemandSupplyCommand({ onBack, darkMode = false }) {
                     <TableRow key={r.week} sx={{ '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.04) } }}>
                       <TableCell sx={{ fontSize: '0.75rem', fontWeight: 600, color: MODULE_COLOR, py: 0.5, borderBottom: `1px solid ${borderColor}` }}>{r.week}</TableCell>
                       <TableCell sx={{ fontSize: '0.75rem', color: textPrimary, py: 0.5, borderBottom: `1px solid ${borderColor}` }}>{fmtNum(r.opening)}</TableCell>
-                      <TableCell sx={{ fontSize: '0.75rem', color: '#ef4444', fontWeight: 600, py: 0.5, borderBottom: `1px solid ${borderColor}` }}>-{fmtNum(r.demand)}</TableCell>
-                      <TableCell sx={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600, py: 0.5, borderBottom: `1px solid ${borderColor}` }}>+{fmtNum(r.supply)}</TableCell>
+                      <TableCell sx={{ fontSize: '0.75rem', color: '#ef4444', fontWeight: 600, py: 0.5, borderBottom: `1px solid ${borderColor}` }}>{r.demand === 0 ? '--' : `-${fmtNum(r.demand)}`}</TableCell>
+                      <TableCell sx={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600, py: 0.5, borderBottom: `1px solid ${borderColor}` }}>{r.supply === 0 ? '--' : `+${fmtNum(r.supply)}`}</TableCell>
                       <TableCell sx={{ fontSize: '0.75rem', fontWeight: 700, color: r.closing < 0 ? '#ef4444' : textPrimary, py: 0.5, borderBottom: `1px solid ${borderColor}` }}>{fmtNum(r.closing)}</TableCell>
+                      <TableCell sx={{ fontSize: '0.75rem', fontWeight: 600, color: r.cumPosition < 0 ? '#ef4444' : textPrimary, py: 0.5, borderBottom: `1px solid ${borderColor}` }}>{fmtNum(r.cumPosition)}</TableCell>
+                      <TableCell sx={{ fontSize: '0.75rem', fontWeight: 600, color: r.dollarExposure < 0 ? '#ef4444' : textPrimary, py: 0.5, borderBottom: `1px solid ${borderColor}` }}>{fmtCurrency(r.dollarExposure)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -553,21 +740,17 @@ export default function LamDemandSupplyCommand({ onBack, darkMode = false }) {
           </IconButton>
           <Box sx={{ flex: 1 }}>
             <Breadcrumbs separator={<NavigateNextIcon sx={{ fontSize: 14, color: textSecondary }} />} sx={{ mb: 0.5 }}>
-              <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: textSecondary, cursor: 'pointer' }}>CORE.AI</Link>
-              <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: textSecondary, cursor: 'pointer' }}>STOX.AI</Link>
               <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: textSecondary, cursor: 'pointer' }}>Lam Research</Link>
-              {selectedRow ? (
-                <>
-                  <Link underline="hover" onClick={() => setSelectedRow(null)} sx={{ fontSize: '0.7rem', color: textSecondary, cursor: 'pointer' }}>Demand vs Supply Command</Link>
-                  <Typography sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 600 }}>{selectedRow.material}</Typography>
-                </>
-              ) : (
+              {selectedRow ? [
+                <Link key="tile" underline="hover" onClick={() => setSelectedRow(null)} sx={{ fontSize: '0.7rem', color: textSecondary, cursor: 'pointer' }}>Demand vs Supply Command</Link>,
+                <Typography key="detail" sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 600 }}>{selectedRow.material}</Typography>,
+              ] : (
                 <Typography sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 600 }}>Demand vs Supply Command</Typography>
               )}
             </Breadcrumbs>
             <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: textPrimary }}>
               {selectedRow
-                ? `${selectedRow.material} \u2014 Demand & Supply Detail`
+                ? 'Demand & Supply Detail'
                 : 'Demand vs Supply Command Center \u2014 Operational Heart'}
             </Typography>
           </Box>

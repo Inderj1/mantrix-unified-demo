@@ -13,6 +13,11 @@ import {
   IconButton,
   Button,
   Divider,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import {
@@ -55,6 +60,25 @@ ChartJS.register(
   Legend,
   Filler
 );
+
+// ============================================
+// Formatting Helpers
+// ============================================
+const formatCurrency = (value) => {
+  if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
+  if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
+  return `$${value}`;
+};
+const formatNumber = (value) => value.toLocaleString();
+
+// ============================================
+// Implementation Waves Data
+// ============================================
+const WAVES = [
+  { wave: 'Wave 1', timeline: 'Weeks 1-4', skus: 148, ea: 34200, capital: 3800000, status: 'Ready' },
+  { wave: 'Wave 2', timeline: 'Weeks 5-8', skus: 126, ea: 28400, capital: 2200000, status: 'Planning' },
+  { wave: 'Wave 3', timeline: 'Weeks 9-12', skus: 68, ea: 24220, capital: 2400000, status: 'Queued' },
+];
 
 // ============================================
 // Scenario Data
@@ -101,18 +125,6 @@ const MONTE_CARLO_RANGES = ['$2M', '$3M', '$4M', '$5M', '$6M', '$7M', '$8M', '$9
 const MONTE_CARLO_PROBS = [1.2, 2.8, 5.1, 8.4, 12.6, 16.2, 18.8, 17.4, 10.2, 4.8, 1.6, 0.7, 0.2];
 
 // ============================================
-// Traceability Tiles Data
-// ============================================
-const TRACE_TILES = [
-  { id: 'T0', name: 'Economic Ground Truth', value: 'Trust 84.2%', color: MODULE_COLOR },
-  { id: 'T1', name: 'Inventory Health', value: '$42.8M', color: MODULE_COLOR },
-  { id: 'T2', name: 'Demand / Supply', value: '-22,780 EA gap', color: MODULE_COLOR },
-  { id: 'T3', name: 'Supply Risk', value: '78% OTD', color: MODULE_COLOR },
-  { id: 'T4', name: 'Safety Stock', value: '$2.8M released', color: MODULE_COLOR },
-  { id: 'T5', name: 'MRP Quality', value: '26% actionable', color: MODULE_COLOR },
-];
-
-// ============================================
 // Component
 // ============================================
 export default function LamCapitalImpactSimulator({ onBack, darkMode = false }) {
@@ -126,6 +138,16 @@ export default function LamCapitalImpactSimulator({ onBack, darkMode = false }) 
   const textPrimary = darkMode ? '#e6edf3' : '#1e293b';
   const textSecondary = darkMode ? '#8b949e' : '#64748b';
   const borderColor = darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)';
+
+  // ---- Traceability Tiles (scenario-dependent) ----
+  const TRACE_TILES = [
+    { id: 'T0', name: 'Economic Ground Truth', value: 'Trust 84.2%', color: MODULE_COLOR },
+    { id: 'T1', name: 'Inventory Health', value: selectedScenario === 'aggressive' ? '$38.2M' : selectedScenario === 'conservative' ? '$40.6M' : '$42.8M', color: MODULE_COLOR },
+    { id: 'T2', name: 'Demand / Supply', value: '-22,780 EA gap', color: MODULE_COLOR },
+    { id: 'T3', name: 'Supply Risk', value: '78% OTD', color: MODULE_COLOR },
+    { id: 'T4', name: 'Safety Stock', value: selectedScenario === 'aggressive' ? '$4.8M released' : selectedScenario === 'conservative' ? '$1.4M released' : '$2.8M released', color: MODULE_COLOR },
+    { id: 'T5', name: 'MRP Quality', value: '26% actionable', color: MODULE_COLOR },
+  ];
 
   // ---- Chart: Working Capital & Inventory ----
   const wcChartData = {
@@ -229,7 +251,12 @@ export default function LamCapitalImpactSimulator({ onBack, darkMode = false }) 
         bodyColor: textSecondary,
         borderColor,
         borderWidth: 1,
-        callbacks: { label: (ctx) => `Probability: ${ctx.parsed.y}%` },
+        callbacks: {
+          label: (ctx) => {
+            const eaRanges = ['2K-4K', '4K-6K', '6K-8K', '8K-12K', '12K-16K', '16K-20K', '20K-26K', '26K-32K', '32K-38K', '38K-42K', '42K-46K', '46K-50K', '50K-54K'];
+            return `Probability: ${ctx.parsed.y}% | ${eaRanges[ctx.dataIndex] || ''} EA`;
+          }
+        },
       },
     },
     scales: {
@@ -277,13 +304,11 @@ export default function LamCapitalImpactSimulator({ onBack, darkMode = false }) 
         </IconButton>
         <Box sx={{ flex: 1 }}>
           <Breadcrumbs separator={<NavigateNextIcon sx={{ fontSize: 14, color: textSecondary }} />} sx={{ mb: 0.5 }}>
-            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: textSecondary, cursor: 'pointer' }}>CORE.AI</Link>
-            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: textSecondary, cursor: 'pointer' }}>STOX.AI</Link>
             <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: textSecondary, cursor: 'pointer' }}>Lam Research</Link>
             <Typography sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 600 }}>Capital Impact Simulator</Typography>
           </Breadcrumbs>
           <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: textPrimary }}>
-            Capital Impact Simulator — CFO / Board Lens
+            CFO / Board Lens
           </Typography>
         </Box>
         <Chip label="Tile 6" size="small" sx={{ bgcolor: alpha(MODULE_COLOR, 0.1), color: MODULE_COLOR, fontWeight: 700, fontSize: '0.7rem' }} />
@@ -528,6 +553,72 @@ export default function LamCapitalImpactSimulator({ onBack, darkMode = false }) 
           </Paper>
         </Grid>
       </Grid>
+
+      {/* ============================================ */}
+      {/* IMPLEMENTATION WAVES                          */}
+      {/* ============================================ */}
+      <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: textPrimary, mb: 1 }}>
+        Implementation Waves
+      </Typography>
+      <Paper
+        elevation={0}
+        sx={{
+          mb: 2,
+          bgcolor: paperBg,
+          border: `1px solid ${borderColor}`,
+          borderRadius: 2,
+          overflow: 'hidden',
+        }}
+      >
+        <Table size="small">
+          <TableHead>
+            <TableRow sx={{ '& th': { fontWeight: 700, fontSize: '0.75rem', color: textSecondary, borderBottom: `2px solid ${borderColor}` } }}>
+              <TableCell>Wave</TableCell>
+              <TableCell>Timeline</TableCell>
+              <TableCell align="right">SKUs</TableCell>
+              <TableCell align="right">EA Qty</TableCell>
+              <TableCell align="right">Capital</TableCell>
+              <TableCell align="center">Status</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {WAVES.map((wave) => (
+              <TableRow key={wave.wave} sx={{ '& td': { fontSize: '0.8rem', color: textPrimary, borderBottom: `1px solid ${borderColor}` } }}>
+                <TableCell sx={{ fontWeight: 600 }}>{wave.wave}</TableCell>
+                <TableCell>{wave.timeline}</TableCell>
+                <TableCell align="right">{wave.skus}</TableCell>
+                <TableCell align="right">{formatNumber(wave.ea)} EA</TableCell>
+                <TableCell align="right">{formatCurrency(wave.capital)}</TableCell>
+                <TableCell align="center">
+                  <Chip
+                    label={wave.status}
+                    size="small"
+                    sx={{
+                      fontSize: '0.65rem',
+                      fontWeight: 600,
+                      height: 22,
+                      bgcolor: alpha(
+                        wave.status === 'Ready' ? '#10b981' : wave.status === 'Planning' ? '#f59e0b' : '#64748b',
+                        0.12
+                      ),
+                      color: wave.status === 'Ready' ? '#10b981' : wave.status === 'Planning' ? '#f59e0b' : '#64748b',
+                    }}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+            {/* Total row */}
+            <TableRow sx={{ '& td': { fontSize: '0.8rem', fontWeight: 700, color: textPrimary, borderBottom: 'none' } }}>
+              <TableCell sx={{ fontWeight: 700 }}>Total</TableCell>
+              <TableCell />
+              <TableCell align="right">342</TableCell>
+              <TableCell align="right">{formatNumber(86820)} EA</TableCell>
+              <TableCell align="right">$8.4M</TableCell>
+              <TableCell />
+            </TableRow>
+          </TableBody>
+        </Table>
+      </Paper>
 
       {/* ============================================ */}
       {/* 6 TRACEABILITY MINI-TILES                    */}

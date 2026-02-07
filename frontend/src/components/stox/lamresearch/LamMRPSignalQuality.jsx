@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -69,21 +69,21 @@ const ROOT_CAUSES = [
 ];
 
 const MOCK_DATA = [
-  { id: 1, material: 'RF Generator Module', plant: 'P1000', signal: 'Clean', messages: 62, actionable: 48, falsePOs: 2, noiseCost: 28000, plannerHrs: 5, rootCause: 'Rounding error' },
-  { id: 2, material: 'Wafer Chamber Liner', plant: 'P2000', signal: 'Noisy', messages: 185, actionable: 42, falsePOs: 28, noiseCost: 245000, plannerHrs: 32, rootCause: 'Lot size mismatch' },
-  { id: 3, material: 'ESC (Electrostatic Chuck)', plant: 'P1000', signal: 'Toxic', messages: 276, actionable: 18, falsePOs: 45, noiseCost: 480000, plannerHrs: 48, rootCause: 'Phantom demand' },
-  { id: 4, material: 'Etch Gas Manifold', plant: 'P3000', signal: 'Noisy', messages: 142, actionable: 38, falsePOs: 22, noiseCost: 198000, plannerHrs: 26, rootCause: 'Frozen horizon violation' },
-  { id: 5, material: 'Plasma Source Assembly', plant: 'P1000', signal: 'Clean', messages: 54, actionable: 41, falsePOs: 1, noiseCost: 22000, plannerHrs: 4, rootCause: 'Rounding error' },
-  { id: 6, material: 'CVD Showerhead', plant: 'P2000', signal: 'Noisy', messages: 168, actionable: 55, falsePOs: 18, noiseCost: 172000, plannerHrs: 22, rootCause: 'Lead time drift' },
-  { id: 7, material: 'Process Kit', plant: 'P4000', signal: 'Toxic', messages: 240, actionable: 14, falsePOs: 42, noiseCost: 415000, plannerHrs: 44, rootCause: 'Obsolete BOM' },
-  { id: 8, material: 'Matching Network', plant: 'P1000', signal: 'Noisy', messages: 128, actionable: 36, falsePOs: 15, noiseCost: 156000, plannerHrs: 18, rootCause: 'Lead time drift' },
-  { id: 9, material: 'Quartz Window', plant: 'P3000', signal: 'Toxic', messages: 210, actionable: 12, falsePOs: 38, noiseCost: 392000, plannerHrs: 42, rootCause: 'Phantom demand' },
-  { id: 10, material: 'Turbomolecular Pump', plant: 'P2000', signal: 'Clean', messages: 48, actionable: 38, falsePOs: 0, noiseCost: 20000, plannerHrs: 4, rootCause: 'Rounding error' },
-  { id: 11, material: 'Gas Panel Assembly', plant: 'P4000', signal: 'Noisy', messages: 155, actionable: 52, falsePOs: 20, noiseCost: 188000, plannerHrs: 24, rootCause: 'Lot size mismatch' },
-  { id: 12, material: 'Endpoint Detector', plant: 'P3000', signal: 'Clean', messages: 58, actionable: 45, falsePOs: 1, noiseCost: 25000, plannerHrs: 6, rootCause: 'Rounding error' },
-  { id: 13, material: 'Robot Arm Assembly', plant: 'P1000', signal: 'Toxic', messages: 265, actionable: 10, falsePOs: 40, noiseCost: 460000, plannerHrs: 46, rootCause: 'Frozen horizon violation' },
-  { id: 14, material: 'Load Lock Assembly', plant: 'P2000', signal: 'Noisy', messages: 136, actionable: 34, falsePOs: 16, noiseCost: 165000, plannerHrs: 20, rootCause: 'Lead time drift' },
-  { id: 15, material: 'Throttle Valve', plant: 'P4000', signal: 'Noisy', messages: 120, actionable: 53, falsePOs: 12, noiseCost: 134000, plannerHrs: 19, rootCause: 'Lot size mismatch' },
+  { id: 1, material: 'RF Generator Module', plant: 'P1000', signal: 'Clean', messages: 62, actionable: 48, falsePOs: 2, noiseCost: 28000, plannerHrs: 5, rootCause: 'Rounding error', affectedEA: 1240, affectedCapital: 30380, reschedIn: 8, reschedOut: 5, falseCancels: 2 },
+  { id: 2, material: 'Wafer Chamber Liner', plant: 'P2000', signal: 'Noisy', messages: 185, actionable: 42, falsePOs: 28, noiseCost: 245000, plannerHrs: 32, rootCause: 'Lot size mismatch', affectedEA: 8420, affectedCapital: 265000, reschedIn: 42, reschedOut: 28, falseCancels: 18 },
+  { id: 3, material: 'ESC (Electrostatic Chuck)', plant: 'P1000', signal: 'Toxic', messages: 276, actionable: 18, falsePOs: 45, noiseCost: 480000, plannerHrs: 48, rootCause: 'Phantom demand', affectedEA: 14200, affectedCapital: 498000, reschedIn: 68, reschedOut: 45, falseCancels: 35 },
+  { id: 4, material: 'Etch Gas Manifold', plant: 'P3000', signal: 'Noisy', messages: 142, actionable: 38, falsePOs: 22, noiseCost: 198000, plannerHrs: 26, rootCause: 'Frozen horizon violation', affectedEA: 6800, affectedCapital: 210000, reschedIn: 35, reschedOut: 22, falseCancels: 15 },
+  { id: 5, material: 'Plasma Source Assembly', plant: 'P1000', signal: 'Clean', messages: 54, actionable: 41, falsePOs: 1, noiseCost: 22000, plannerHrs: 4, rootCause: 'Rounding error', affectedEA: 980, affectedCapital: 24000, reschedIn: 6, reschedOut: 3, falseCancels: 1 },
+  { id: 6, material: 'CVD Showerhead', plant: 'P2000', signal: 'Noisy', messages: 168, actionable: 55, falsePOs: 18, noiseCost: 172000, plannerHrs: 22, rootCause: 'Lead time drift', affectedEA: 7200, affectedCapital: 185000, reschedIn: 38, reschedOut: 25, falseCancels: 12 },
+  { id: 7, material: 'Process Kit', plant: 'P4000', signal: 'Toxic', messages: 240, actionable: 14, falsePOs: 42, noiseCost: 415000, plannerHrs: 44, rootCause: 'Obsolete BOM', affectedEA: 12800, affectedCapital: 430000, reschedIn: 62, reschedOut: 42, falseCancels: 30 },
+  { id: 8, material: 'Matching Network', plant: 'P1000', signal: 'Noisy', messages: 128, actionable: 36, falsePOs: 15, noiseCost: 156000, plannerHrs: 18, rootCause: 'Lead time drift', affectedEA: 5400, affectedCapital: 168000, reschedIn: 28, reschedOut: 18, falseCancels: 10 },
+  { id: 9, material: 'Quartz Window', plant: 'P3000', signal: 'Toxic', messages: 210, actionable: 12, falsePOs: 38, noiseCost: 392000, plannerHrs: 42, rootCause: 'Phantom demand', affectedEA: 11600, affectedCapital: 405000, reschedIn: 55, reschedOut: 38, falseCancels: 28 },
+  { id: 10, material: 'Turbomolecular Pump', plant: 'P2000', signal: 'Clean', messages: 48, actionable: 38, falsePOs: 0, noiseCost: 20000, plannerHrs: 4, rootCause: 'Rounding error', affectedEA: 820, affectedCapital: 22000, reschedIn: 5, reschedOut: 2, falseCancels: 0 },
+  { id: 11, material: 'Gas Panel Assembly', plant: 'P4000', signal: 'Noisy', messages: 155, actionable: 52, falsePOs: 20, noiseCost: 188000, plannerHrs: 24, rootCause: 'Lot size mismatch', affectedEA: 6600, affectedCapital: 200000, reschedIn: 35, reschedOut: 22, falseCancels: 14 },
+  { id: 12, material: 'Endpoint Detector', plant: 'P3000', signal: 'Clean', messages: 58, actionable: 45, falsePOs: 1, noiseCost: 25000, plannerHrs: 6, rootCause: 'Rounding error', affectedEA: 1100, affectedCapital: 28000, reschedIn: 7, reschedOut: 4, falseCancels: 1 },
+  { id: 13, material: 'Robot Arm Assembly', plant: 'P1000', signal: 'Toxic', messages: 265, actionable: 10, falsePOs: 40, noiseCost: 460000, plannerHrs: 46, rootCause: 'Frozen horizon violation', affectedEA: 13500, affectedCapital: 475000, reschedIn: 65, reschedOut: 40, falseCancels: 32 },
+  { id: 14, material: 'Load Lock Assembly', plant: 'P2000', signal: 'Noisy', messages: 136, actionable: 34, falsePOs: 16, noiseCost: 165000, plannerHrs: 20, rootCause: 'Lead time drift', affectedEA: 5800, affectedCapital: 178000, reschedIn: 30, reschedOut: 20, falseCancels: 11 },
+  { id: 15, material: 'Throttle Valve', plant: 'P4000', signal: 'Noisy', messages: 120, actionable: 53, falsePOs: 12, noiseCost: 134000, plannerHrs: 19, rootCause: 'Lot size mismatch', affectedEA: 4800, affectedCapital: 148000, reschedIn: 25, reschedOut: 15, falseCancels: 8 },
 ];
 
 // Prescriptive fixes per root cause
@@ -125,6 +125,7 @@ const PRESCRIPTIVE_FIXES = {
 // ============================================
 const LamMRPSignalQuality = ({ onBack, darkMode = false }) => {
   const [selectedRow, setSelectedRow] = useState(null);
+  useEffect(() => { if (selectedRow) window.scrollTo(0, 0); }, [selectedRow]);
   const colors = getColors(darkMode);
 
   // Signal chip helper
@@ -228,6 +229,28 @@ const LamMRPSignalQuality = ({ onBack, darkMode = false }) => {
       ),
     },
     {
+      field: 'affectedEA',
+      headerName: 'Affected EA',
+      width: 100,
+      type: 'number',
+      renderCell: (params) => (
+        <Typography sx={{ fontSize: '0.8rem', color: params.value > 5000 ? '#dc2626' : colors.text, fontWeight: params.value > 5000 ? 700 : 400 }}>
+          {formatNumber(params.value)}
+        </Typography>
+      ),
+    },
+    {
+      field: 'affectedCapital',
+      headerName: 'Affected $',
+      width: 110,
+      type: 'number',
+      renderCell: (params) => (
+        <Typography sx={{ fontSize: '0.8rem', color: params.value > 100000 ? '#dc2626' : colors.text, fontWeight: params.value > 100000 ? 700 : 400 }}>
+          {formatCurrency(params.value)}
+        </Typography>
+      ),
+    },
+    {
       field: 'plannerHrs',
       headerName: 'Planner Hrs',
       width: 90,
@@ -245,6 +268,13 @@ const LamMRPSignalQuality = ({ onBack, darkMode = false }) => {
       ),
     },
   ], [darkMode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Noise decomposition by message type
+  const noiseByType = [
+    { type: 'Reschedule-In', count: 680, pct: 50, ea: 42800, capital: 1420000, color: '#f59e0b' },
+    { type: 'Reschedule-Out', count: 412, pct: 30, ea: 28400, capital: 980000, color: '#06b6d4' },
+    { type: 'False Cancels', count: 269, pct: 20, ea: 18200, capital: 620000, color: '#ef4444' },
+  ];
 
   // Signal funnel stages
   const funnelStages = [
@@ -438,9 +468,67 @@ const LamMRPSignalQuality = ({ onBack, darkMode = false }) => {
                   },
                 }}
               />
+              {idx === 3 && (
+                <Typography sx={{ fontSize: '0.65rem', color: colors.textSecondary, mt: 0.5 }}>
+                  680 reschedule-in + 412 reschedule-out + 269 false cancels
+                </Typography>
+              )}
             </Box>
           ))}
         </Stack>
+      </Paper>
+
+      {/* Noise Decomposition by Message Type */}
+      <Paper sx={{ ...paperSx, mb: 2 }}>
+        <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: colors.text, mb: 2 }}>
+          Noise Decomposition by Message Type
+        </Typography>
+        <Grid container spacing={2}>
+          {noiseByType.map((item, idx) => (
+            <Grid item xs={12} md={4} key={idx}>
+              <Paper sx={{
+                p: 2,
+                bgcolor: darkMode ? '#21262d' : '#fff',
+                border: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
+                borderRadius: 2,
+              }}>
+                <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: item.color, mb: 1.5 }}>
+                  {item.type}
+                </Typography>
+                <Typography sx={{ fontSize: '1.2rem', fontWeight: 700, color: colors.text }}>
+                  {formatNumber(item.count)}
+                </Typography>
+                <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary, mb: 1 }}>
+                  messages
+                </Typography>
+                <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
+                  <Typography sx={{ fontSize: '0.75rem', color: colors.textSecondary }}>EA Affected</Typography>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text }}>{formatNumber(item.ea)}</Typography>
+                </Stack>
+                <Stack direction="row" justifyContent="space-between" sx={{ mb: 1.5 }}>
+                  <Typography sx={{ fontSize: '0.75rem', color: colors.textSecondary }}>Capital Affected</Typography>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text }}>{formatCurrency(item.capital)}</Typography>
+                </Stack>
+                <LinearProgress
+                  variant="determinate"
+                  value={item.pct}
+                  sx={{
+                    height: 8,
+                    borderRadius: 2,
+                    bgcolor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+                    '& .MuiLinearProgress-bar': {
+                      bgcolor: item.color,
+                      borderRadius: 2,
+                    },
+                  }}
+                />
+                <Typography sx={{ fontSize: '0.65rem', color: colors.textSecondary, mt: 0.5, textAlign: 'right' }}>
+                  {item.pct}% of noise
+                </Typography>
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
       </Paper>
 
       {/* DataGrid */}
@@ -633,23 +721,36 @@ const LamMRPSignalQuality = ({ onBack, darkMode = false }) => {
         </IconButton>
         <Box sx={{ flex: 1 }}>
           <Breadcrumbs separator={<NavigateNextIcon sx={{ fontSize: 14, color: colors.textSecondary }} />} sx={{ mb: 0.5 }}>
-            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>CORE.AI</Link>
-            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>STOX.AI</Link>
             <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>Lam Research</Link>
-            {selectedRow ? (
-              <>
-                <Link underline="hover" onClick={() => setSelectedRow(null)} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>MRP Signal Quality</Link>
-                <Typography sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 600 }}>{selectedRow.material} Detail</Typography>
-              </>
-            ) : (
+            {selectedRow ? [
+              <Link key="tile" underline="hover" onClick={() => setSelectedRow(null)} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>MRP Signal Quality</Link>,
+              <Typography key="detail" sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 600 }}>{selectedRow.material}</Typography>,
+            ] : (
               <Typography sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 600 }}>MRP Signal Quality</Typography>
             )}
           </Breadcrumbs>
-          <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: colors.text }}>
-            {selectedRow
-              ? `${selectedRow.material} \u2014 Signal Detail`
-              : 'MRP Signal Quality \u2014 Internal Noise Lens'}
-          </Typography>
+          <Stack direction="row" alignItems="center">
+            <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: colors.text }}>
+              {selectedRow
+                ? 'Signal Detail'
+                : 'MRP Signal Quality \u2014 Internal Noise Lens'}
+            </Typography>
+            {!selectedRow && (
+              <Chip
+                label="INTERNAL"
+                size="small"
+                sx={{
+                  ml: 1,
+                  fontSize: '0.6rem',
+                  fontWeight: 700,
+                  height: 20,
+                  bgcolor: alpha(MODULE_COLOR, 0.12),
+                  color: MODULE_COLOR,
+                  border: `1px solid ${alpha(MODULE_COLOR, 0.3)}`,
+                }}
+              />
+            )}
+          </Stack>
         </Box>
       </Paper>
 

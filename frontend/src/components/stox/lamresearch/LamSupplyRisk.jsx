@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -13,6 +13,12 @@ import {
   IconButton,
   LinearProgress,
   Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
@@ -59,6 +65,10 @@ const VENDOR_DATA = [
     maxLT: 68,
     cvPct: 26.9,
     expediteCosts: 340000,
+    receivedEA: 7192,
+    shortShipEA: 620,
+    openEA: 2480,
+    fillRate: 58,
     monthlyOnTime: [320, 290, 310, 340, 280, 260, 300, 330, 310, 350, 290, 270],
     monthlyLate:  [220, 260, 240, 210, 270, 290, 250, 220, 240, 200, 260, 280],
   },
@@ -80,6 +90,10 @@ const VENDOR_DATA = [
     maxLT: 61,
     cvPct: 25.5,
     expediteCosts: 275000,
+    receivedEA: 5696,
+    shortShipEA: 445,
+    openEA: 1780,
+    fillRate: 64,
     monthlyOnTime: [380, 400, 370, 350, 390, 420, 410, 380, 360, 400, 430, 405],
     monthlyLate:  [180, 160, 190, 210, 170, 140, 150, 180, 200, 160, 130, 155],
   },
@@ -101,6 +115,10 @@ const VENDOR_DATA = [
     maxLT: 48,
     cvPct: 24.0,
     expediteCosts: 195000,
+    receivedEA: 7344,
+    shortShipEA: 408,
+    openEA: 1530,
+    fillRate: 72,
     monthlyOnTime: [520, 540, 510, 530, 560, 580, 550, 520, 540, 570, 590, 534],
     monthlyLate:  [200, 180, 210, 190, 160, 140, 170, 200, 180, 150, 130, 186],
   },
@@ -122,6 +140,10 @@ const VENDOR_DATA = [
     maxLT: 42,
     cvPct: 21.8,
     expediteCosts: 155000,
+    receivedEA: 4788,
+    shortShipEA: 252,
+    openEA: 945,
+    fillRate: 76,
     monthlyOnTime: [340, 360, 350, 370, 380, 390, 360, 340, 370, 390, 400, 367],
     monthlyLate:  [110, 90, 100, 80, 70, 60, 90, 110, 80, 60, 50, 83],
   },
@@ -143,6 +165,10 @@ const VENDOR_DATA = [
     maxLT: 39,
     cvPct: 20.8,
     expediteCosts: 140000,
+    receivedEA: 6084,
+    shortShipEA: 312,
+    openEA: 1170,
+    fillRate: 78,
     monthlyOnTime: [460, 480, 470, 490, 500, 510, 480, 460, 490, 510, 520, 488],
     monthlyLate:  [130, 110, 120, 100, 90, 80, 110, 130, 100, 80, 70, 103],
   },
@@ -164,6 +190,10 @@ const VENDOR_DATA = [
     maxLT: 34,
     cvPct: 19.1,
     expediteCosts: 95000,
+    receivedEA: 4374,
+    shortShipEA: 216,
+    openEA: 810,
+    fillRate: 81,
     monthlyOnTime: [350, 370, 360, 380, 390, 400, 370, 350, 380, 400, 410, 378],
     monthlyLate:  [80, 60, 70, 50, 40, 30, 60, 80, 50, 30, 20, 50],
   },
@@ -185,6 +215,10 @@ const VENDOR_DATA = [
     maxLT: 30,
     cvPct: 19.0,
     expediteCosts: 78000,
+    receivedEA: 3864,
+    shortShipEA: 184,
+    openEA: 690,
+    fillRate: 84,
     monthlyOnTime: [300, 320, 310, 330, 340, 350, 320, 300, 330, 350, 360, 328],
     monthlyLate:  [55, 35, 45, 25, 15, 5, 35, 55, 25, 5, 0, 28],
   },
@@ -206,6 +240,10 @@ const VENDOR_DATA = [
     maxLT: 28,
     cvPct: 17.8,
     expediteCosts: 62000,
+    receivedEA: 3354,
+    shortShipEA: 156,
+    openEA: 585,
+    fillRate: 86,
     monthlyOnTime: [270, 290, 280, 300, 310, 320, 290, 270, 300, 320, 330, 298],
     monthlyLate:  [40, 20, 30, 10, 0, 0, 20, 40, 10, 0, 0, 15],
   },
@@ -227,6 +265,10 @@ const VENDOR_DATA = [
     maxLT: 24,
     cvPct: 18.1,
     expediteCosts: 55000,
+    receivedEA: 6248,
+    shortShipEA: 284,
+    openEA: 1065,
+    fillRate: 88,
     monthlyOnTime: [500, 520, 510, 530, 540, 560, 520, 500, 530, 560, 570, 530],
     monthlyLate:  [60, 40, 50, 30, 20, 0, 40, 60, 30, 0, 0, 30],
   },
@@ -248,6 +290,10 @@ const VENDOR_DATA = [
     maxLT: 20,
     cvPct: 15.0,
     expediteCosts: 32000,
+    receivedEA: 5336,
+    shortShipEA: 174,
+    openEA: 870,
+    fillRate: 92,
     monthlyOnTime: [440, 460, 450, 470, 480, 490, 460, 440, 470, 490, 500, 468],
     monthlyLate:  [30, 10, 20, 0, 0, 0, 10, 30, 0, 0, 0, 9],
   },
@@ -269,6 +315,10 @@ const VENDOR_DATA = [
     maxLT: 18,
     cvPct: 15.0,
     expediteCosts: 22000,
+    receivedEA: 4700,
+    shortShipEA: 150,
+    openEA: 750,
+    fillRate: 94,
     monthlyOnTime: [390, 400, 395, 410, 420, 430, 400, 390, 410, 430, 440, 410],
     monthlyLate:  [18, 8, 13, 0, 0, 0, 8, 18, 0, 0, 0, 6],
   },
@@ -290,12 +340,69 @@ const VENDOR_DATA = [
     maxLT: 15,
     cvPct: 14.0,
     expediteCosts: 12000,
+    receivedEA: 4032,
+    shortShipEA: 126,
+    openEA: 630,
+    fillRate: 96,
     monthlyOnTime: [340, 350, 345, 360, 370, 380, 350, 340, 360, 380, 390, 360],
     monthlyLate:  [10, 2, 5, 0, 0, 0, 2, 10, 0, 0, 0, 3],
   },
 ];
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+// ============================================
+// HEAT MAP DATA
+// ============================================
+const HEAT_MAP_SKUS = ['RF Gen', 'Chamber', 'ESC', 'Manifold', 'Pump', 'Showerhead'];
+
+const HEAT_MAP_DATA = [
+  // KYOCERA
+  { vendor: 'VENDOR-KYOCERA', skus: [
+    { sku: 'RF Gen', shortEA: 320, shortValue: 64000 },
+    { sku: 'Chamber', shortEA: 180, shortValue: 28800 },
+    { sku: 'ESC', shortEA: 0, shortValue: 0 },
+    { sku: 'Manifold', shortEA: 45, shortValue: 9000 },
+    { sku: 'Pump', shortEA: 75, shortValue: 22500 },
+    { sku: 'Showerhead', shortEA: 0, shortValue: 0 },
+  ]},
+  // EDWARDS
+  { vendor: 'VENDOR-EDWARDS', skus: [
+    { sku: 'RF Gen', shortEA: 0, shortValue: 0 },
+    { sku: 'Chamber', shortEA: 220, shortValue: 35200 },
+    { sku: 'ESC', shortEA: 145, shortValue: 43500 },
+    { sku: 'Manifold', shortEA: 0, shortValue: 0 },
+    { sku: 'Pump', shortEA: 80, shortValue: 24000 },
+    { sku: 'Showerhead', shortEA: 0, shortValue: 0 },
+  ]},
+  // MKS
+  { vendor: 'VENDOR-MKS', skus: [
+    { sku: 'RF Gen', shortEA: 95, shortValue: 19000 },
+    { sku: 'Chamber', shortEA: 0, shortValue: 0 },
+    { sku: 'ESC', shortEA: 0, shortValue: 0 },
+    { sku: 'Manifold', shortEA: 210, shortValue: 42000 },
+    { sku: 'Pump', shortEA: 0, shortValue: 0 },
+    { sku: 'Showerhead', shortEA: 103, shortValue: 15450 },
+  ]},
+  // VAT
+  { vendor: 'VENDOR-VAT', skus: [
+    { sku: 'RF Gen', shortEA: 0, shortValue: 0 },
+    { sku: 'Chamber', shortEA: 0, shortValue: 0 },
+    { sku: 'ESC', shortEA: 92, shortValue: 27600 },
+    { sku: 'Manifold', shortEA: 68, shortValue: 13600 },
+    { sku: 'Pump', shortEA: 42, shortValue: 12600 },
+    { sku: 'Showerhead', shortEA: 50, shortValue: 7500 },
+  ]},
+  // ENTEGRIS
+  { vendor: 'VENDOR-ENTEGRIS', skus: [
+    { sku: 'RF Gen', shortEA: 112, shortValue: 22400 },
+    { sku: 'Chamber', shortEA: 0, shortValue: 0 },
+    { sku: 'ESC', shortEA: 0, shortValue: 0 },
+    { sku: 'Manifold', shortEA: 0, shortValue: 0 },
+    { sku: 'Pump', shortEA: 120, shortValue: 36000 },
+    { sku: 'Showerhead', shortEA: 80, shortValue: 12000 },
+  ]},
+];
 
 // ============================================
 // UTILITY FUNCTIONS
@@ -324,12 +431,48 @@ const getOtdColor = (pct) => {
   return '#10b981';
 };
 
+const getFillRateColor = (pct) => {
+  if (pct >= 85) return '#10b981';
+  if (pct >= 70) return '#f59e0b';
+  return '#ef4444';
+};
+
+const getHeatCellBg = (shortEA, darkMode) => {
+  if (shortEA === 0) return darkMode ? alpha('#10b981', 0.12) : alpha('#10b981', 0.08);
+  // Scale red intensity: max shortEA in data is ~320
+  const intensity = Math.min(shortEA / 350, 1);
+  const baseAlpha = darkMode ? 0.15 + intensity * 0.35 : 0.08 + intensity * 0.25;
+  return alpha('#ef4444', baseAlpha);
+};
+
+// ============================================
+// LEAD TIME HISTOGRAM GENERATOR
+// ============================================
+const generateLTHistogram = (row) => {
+  const bins = [];
+  const binSize = 5;
+  const range = row.maxLT - row.minLT;
+  const numBins = Math.max(4, Math.ceil(range / binSize));
+  for (let i = 0; i < numBins; i++) {
+    const binStart = row.minLT + i * binSize;
+    const binEnd = binStart + binSize;
+    // Generate mock frequency -- bell curve centered around avgLT
+    const center = row.avgLT;
+    const dist = Math.abs(binStart + binSize / 2 - center);
+    const freq = Math.max(2, Math.round(20 * Math.exp(-dist * dist / (2 * row.stdDev * row.stdDev * 4))));
+    bins.push({ label: `${binStart}-${binEnd}d`, freq });
+  }
+  return bins;
+};
+
 // ============================================
 // COMPONENT
 // ============================================
 const LamSupplyRisk = ({ onBack, darkMode = false }) => {
   const colors = getColors(darkMode);
   const [selectedRow, setSelectedRow] = useState(null);
+  const [viewMode, setViewMode] = useState('grid');
+  useEffect(() => { if (selectedRow) window.scrollTo(0, 0); }, [selectedRow]);
 
   // Compute summary metrics
   const summaryMetrics = useMemo(() => {
@@ -443,6 +586,75 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
       ),
     },
     {
+      field: 'receivedEA',
+      headerName: 'Received EA',
+      width: 100,
+      type: 'number',
+      align: 'right',
+      headerAlign: 'right',
+      renderCell: (params) => (
+        <Typography sx={{ fontSize: '0.8rem', color: colors.text }}>
+          {formatNumber(params.value)}
+        </Typography>
+      ),
+    },
+    {
+      field: 'shortShipEA',
+      headerName: 'Short Ship',
+      width: 100,
+      type: 'number',
+      align: 'right',
+      headerAlign: 'right',
+      renderCell: (params) => (
+        <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: params.value > 300 ? '#ef4444' : colors.text }}>
+          {formatNumber(params.value)}
+        </Typography>
+      ),
+    },
+    {
+      field: 'openEA',
+      headerName: 'Open EA',
+      width: 90,
+      type: 'number',
+      align: 'right',
+      headerAlign: 'right',
+      renderCell: (params) => (
+        <Typography sx={{ fontSize: '0.8rem', color: colors.text }}>
+          {formatNumber(params.value)}
+        </Typography>
+      ),
+    },
+    {
+      field: 'fillRate',
+      headerName: 'Fill Rate',
+      width: 90,
+      type: 'number',
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => {
+        const pct = params.value;
+        const barColor = getFillRateColor(pct);
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, width: '100%' }}>
+            <LinearProgress
+              variant="determinate"
+              value={pct}
+              sx={{
+                flex: 1,
+                height: 6,
+                borderRadius: 3,
+                bgcolor: alpha(barColor, 0.15),
+                '& .MuiLinearProgress-bar': { bgcolor: barColor, borderRadius: 3 },
+              }}
+            />
+            <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: barColor, minWidth: 28, textAlign: 'right' }}>
+              {pct}%
+            </Typography>
+          </Box>
+        );
+      },
+    },
+    {
       field: 'otdPct',
       headerName: 'OTD %',
       width: 80,
@@ -495,6 +707,19 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
       renderCell: (params) => (
         <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: colors.text }}>
           {formatCurrency(params.value)}/yr
+        </Typography>
+      ),
+    },
+    {
+      field: 'expediteCosts',
+      headerName: 'Expedite $',
+      width: 100,
+      type: 'number',
+      align: 'right',
+      headerAlign: 'right',
+      renderCell: (params) => (
+        <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: colors.text }}>
+          {formatCurrency(params.value)}
         </Typography>
       ),
     },
@@ -623,6 +848,178 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
   };
 
   // ============================================
+  // LEAD TIME HISTOGRAM CHART
+  // ============================================
+  const getLTHistogramData = (row) => {
+    const bins = generateLTHistogram(row);
+    return {
+      labels: bins.map(b => b.label),
+      datasets: [
+        {
+          label: 'Frequency',
+          data: bins.map(b => b.freq),
+          backgroundColor: darkMode ? alpha(MODULE_COLOR, 0.7) : alpha(MODULE_COLOR, 0.8),
+          borderColor: MODULE_COLOR,
+          borderWidth: 1,
+          borderRadius: 2,
+        },
+      ],
+    };
+  };
+
+  const ltHistogramOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: true,
+        text: 'Lead Time Distribution (Histogram)',
+        color: darkMode ? '#e6edf3' : '#1e293b',
+        font: { size: 13, weight: 700 },
+        padding: { bottom: 12 },
+      },
+      tooltip: {
+        backgroundColor: darkMode ? '#21262d' : '#ffffff',
+        titleColor: darkMode ? '#e6edf3' : '#1e293b',
+        bodyColor: darkMode ? '#8b949e' : '#64748b',
+        borderColor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+        borderWidth: 1,
+      },
+    },
+    scales: {
+      x: {
+        grid: {
+          color: darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+        },
+        ticks: {
+          color: darkMode ? '#8b949e' : '#64748b',
+          font: { size: 10 },
+        },
+      },
+      y: {
+        grid: {
+          color: darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+        },
+        ticks: {
+          color: darkMode ? '#8b949e' : '#64748b',
+          font: { size: 10 },
+          stepSize: 1,
+        },
+        title: {
+          display: true,
+          text: 'PO Count',
+          color: darkMode ? '#8b949e' : '#64748b',
+          font: { size: 10 },
+        },
+      },
+    },
+  };
+
+  // ============================================
+  // RENDER: HEAT MAP VIEW
+  // ============================================
+  const renderHeatMap = () => (
+    <Paper
+      elevation={0}
+      sx={{
+        bgcolor: colors.paper,
+        border: `1px solid ${colors.border}`,
+        borderRadius: 2,
+        overflow: 'hidden',
+      }}
+    >
+      <Box sx={{ p: 2, borderBottom: `1px solid ${colors.border}` }}>
+        <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', color: colors.text }}>
+          Vendor x SKU Short-Ship Heat Map
+        </Typography>
+        <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary, mt: 0.25 }}>
+          Red intensity indicates short-ship severity by vendor and SKU category
+        </Typography>
+      </Box>
+      <TableContainer>
+        <Table size="small">
+          <TableHead>
+            <TableRow sx={{ bgcolor: darkMode ? '#21262d' : alpha(MODULE_COLOR, 0.04) }}>
+              <TableCell
+                sx={{
+                  fontWeight: 700,
+                  fontSize: '0.8rem',
+                  color: colors.text,
+                  borderBottom: `2px solid ${colors.border}`,
+                  minWidth: 150,
+                }}
+              >
+                Vendor
+              </TableCell>
+              {HEAT_MAP_SKUS.map((sku) => (
+                <TableCell
+                  key={sku}
+                  align="center"
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: '0.75rem',
+                    color: colors.text,
+                    borderBottom: `2px solid ${colors.border}`,
+                    minWidth: 120,
+                  }}
+                >
+                  {sku}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {HEAT_MAP_DATA.map((row) => (
+              <TableRow key={row.vendor} sx={{ '&:hover': { bgcolor: darkMode ? alpha('#4d9eff', 0.06) : alpha(MODULE_COLOR, 0.03) } }}>
+                <TableCell
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: '0.78rem',
+                    color: colors.text,
+                    borderBottom: `1px solid ${colors.border}`,
+                  }}
+                >
+                  {row.vendor}
+                </TableCell>
+                {row.skus.map((skuData) => (
+                  <TableCell
+                    key={`${row.vendor}-${skuData.sku}`}
+                    align="center"
+                    sx={{
+                      bgcolor: getHeatCellBg(skuData.shortEA, darkMode),
+                      borderBottom: `1px solid ${colors.border}`,
+                      borderLeft: `1px solid ${colors.border}`,
+                      py: 1,
+                    }}
+                  >
+                    {skuData.shortEA > 0 ? (
+                      <Box>
+                        <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: darkMode ? '#fca5a5' : '#dc2626' }}>
+                          {skuData.shortEA} EA
+                        </Typography>
+                        <Typography sx={{ fontSize: '0.65rem', fontWeight: 600, color: darkMode ? '#f87171' : '#b91c1c' }}>
+                          {formatCurrency(skuData.shortValue)}
+                        </Typography>
+                      </Box>
+                    ) : (
+                      <Typography sx={{ fontSize: '0.8rem', color: darkMode ? '#6ee7b7' : '#059669', fontWeight: 600 }}>
+                        ---
+                      </Typography>
+                    )}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Paper>
+  );
+
+  // ============================================
   // RENDER: DETAIL VIEW (full-page replacement)
   // ============================================
   const renderDetailView = () => {
@@ -640,7 +1037,6 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
               sx={{
                 bgcolor: colors.paper,
                 border: `1px solid ${colors.border}`,
-                borderLeft: `4px solid ${MODULE_COLOR}`,
                 borderRadius: 2,
                 height: '100%',
               }}
@@ -682,7 +1078,6 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
               sx={{
                 bgcolor: colors.paper,
                 border: `1px solid ${colors.border}`,
-                borderLeft: `4px solid #f59e0b`,
                 borderRadius: 2,
                 height: '100%',
               }}
@@ -724,7 +1119,6 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
               sx={{
                 bgcolor: colors.paper,
                 border: `1px solid ${colors.border}`,
-                borderLeft: `4px solid #ef4444`,
                 borderRadius: 2,
                 height: '100%',
               }}
@@ -763,6 +1157,7 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
           elevation={0}
           sx={{
             p: 3,
+            mb: 3,
             bgcolor: colors.paper,
             border: `1px solid ${colors.border}`,
             borderRadius: 2,
@@ -770,6 +1165,20 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
           }}
         >
           <Bar data={getDeliveryChartData(row)} options={chartOptions} />
+        </Paper>
+
+        {/* Lead Time Histogram */}
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            bgcolor: colors.paper,
+            border: `1px solid ${colors.border}`,
+            borderRadius: 2,
+            height: 300,
+          }}
+        >
+          <Bar data={getLTHistogramData(row)} options={ltHistogramOptions} />
         </Paper>
       </>
     );
@@ -901,47 +1310,81 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
         </Grid>
       </Grid>
 
-      {/* DataGrid */}
-      <Paper
-        elevation={0}
-        sx={{
-          bgcolor: colors.paper,
-          border: `1px solid ${colors.border}`,
-          borderRadius: 2,
-          overflow: 'hidden',
-        }}
-      >
-        <Box sx={{ p: 2, borderBottom: `1px solid ${colors.border}` }}>
-          <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', color: colors.text }}>
-            Vendor Risk Scorecard
-          </Typography>
-          <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary, mt: 0.25 }}>
-            Click a row to view detailed vendor performance analysis
-          </Typography>
-        </Box>
-        <Box sx={{ height: 520 }}>
-          <DataGrid
-            rows={VENDOR_DATA}
-            columns={columns}
-            density="compact"
-            disableRowSelectionOnClick
-            onRowClick={handleRowClick}
-            slots={{ toolbar: GridToolbar }}
-            slotProps={{
-              toolbar: {
-                showQuickFilter: true,
-                quickFilterProps: { debounceMs: 300 },
-              },
-            }}
-            initialState={{
-              pagination: { paginationModel: { pageSize: 12 } },
-              sorting: { sortModel: [{ field: 'otdPct', sort: 'asc' }] },
-            }}
-            pageSizeOptions={[12, 25]}
-            sx={dataGridSx}
-          />
-        </Box>
-      </Paper>
+      {/* View Mode Toggle */}
+      <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+        <Chip
+          label="Grid View"
+          size="small"
+          onClick={() => setViewMode('grid')}
+          sx={{
+            fontWeight: 600,
+            fontSize: '0.75rem',
+            bgcolor: viewMode === 'grid' ? alpha(MODULE_COLOR, 0.15) : 'transparent',
+            color: viewMode === 'grid' ? MODULE_COLOR : colors.textSecondary,
+            border: `1px solid ${viewMode === 'grid' ? alpha(MODULE_COLOR, 0.3) : colors.border}`,
+            cursor: 'pointer',
+            '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.1) },
+          }}
+        />
+        <Chip
+          label="Heat Map"
+          size="small"
+          onClick={() => setViewMode('heatmap')}
+          sx={{
+            fontWeight: 600,
+            fontSize: '0.75rem',
+            bgcolor: viewMode === 'heatmap' ? alpha(MODULE_COLOR, 0.15) : 'transparent',
+            color: viewMode === 'heatmap' ? MODULE_COLOR : colors.textSecondary,
+            border: `1px solid ${viewMode === 'heatmap' ? alpha(MODULE_COLOR, 0.3) : colors.border}`,
+            cursor: 'pointer',
+            '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.1) },
+          }}
+        />
+      </Stack>
+
+      {viewMode === 'heatmap' ? renderHeatMap() : (
+        /* DataGrid */
+        <Paper
+          elevation={0}
+          sx={{
+            bgcolor: colors.paper,
+            border: `1px solid ${colors.border}`,
+            borderRadius: 2,
+            overflow: 'hidden',
+          }}
+        >
+          <Box sx={{ p: 2, borderBottom: `1px solid ${colors.border}` }}>
+            <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', color: colors.text }}>
+              Vendor Risk Scorecard
+            </Typography>
+            <Typography sx={{ fontSize: '0.7rem', color: colors.textSecondary, mt: 0.25 }}>
+              Click a row to view detailed vendor performance analysis
+            </Typography>
+          </Box>
+          <Box sx={{ height: 520 }}>
+            <DataGrid
+              rows={VENDOR_DATA}
+              columns={columns}
+              density="compact"
+              disableRowSelectionOnClick
+              onRowClick={handleRowClick}
+              slots={{ toolbar: GridToolbar }}
+              slotProps={{
+                toolbar: {
+                  showQuickFilter: true,
+                  quickFilterProps: { debounceMs: 300 },
+                },
+              }}
+              initialState={{
+                pagination: { paginationModel: { pageSize: 12 } },
+                sorting: { sortModel: [{ field: 'otdPct', sort: 'asc' }] },
+              }}
+              pageSizeOptions={[12, 25]}
+              sx={dataGridSx}
+            />
+          </Box>
+        </Paper>
+      )}
     </>
   );
 
@@ -974,50 +1417,18 @@ const LamSupplyRisk = ({ onBack, darkMode = false }) => {
             <ArrowBackIcon fontSize="small" />
           </IconButton>
           <Breadcrumbs separator={<NavigateNextIcon sx={{ fontSize: 14, color: colors.textSecondary }} />}>
-            <Link
-              underline="hover"
-              sx={{ fontSize: '0.75rem', color: colors.textSecondary, cursor: 'pointer', fontWeight: 600 }}
-              onClick={onBack}
-            >
-              CORE.AI
-            </Link>
-            <Link
-              underline="hover"
-              sx={{ fontSize: '0.75rem', color: colors.textSecondary, cursor: 'pointer', fontWeight: 600 }}
-              onClick={onBack}
-            >
-              STOX.AI
-            </Link>
-            <Link
-              underline="hover"
-              sx={{ fontSize: '0.75rem', color: colors.textSecondary, cursor: 'pointer', fontWeight: 600 }}
-              onClick={onBack}
-            >
-              Lam Research
-            </Link>
-            {selectedRow ? (
-              <>
-                <Link
-                  underline="hover"
-                  sx={{ fontSize: '0.75rem', color: colors.textSecondary, cursor: 'pointer', fontWeight: 600 }}
-                  onClick={() => setSelectedRow(null)}
-                >
-                  Supply Risk & Vendor Perf.
-                </Link>
-                <Typography sx={{ fontSize: '0.75rem', color: MODULE_COLOR, fontWeight: 700 }}>
-                  {selectedRow.vendor} Detail
-                </Typography>
-              </>
-            ) : (
-              <Typography sx={{ fontSize: '0.75rem', color: MODULE_COLOR, fontWeight: 700 }}>
-                Supply Risk & Vendor Perf.
-              </Typography>
+            <Link underline="hover" sx={{ fontSize: '0.75rem', color: colors.textSecondary, cursor: 'pointer', fontWeight: 600 }} onClick={onBack}>Lam Research</Link>
+            {selectedRow ? [
+              <Link key="tile" underline="hover" sx={{ fontSize: '0.75rem', color: colors.textSecondary, cursor: 'pointer', fontWeight: 600 }} onClick={() => setSelectedRow(null)}>Supply Risk & Vendor Perf.</Link>,
+              <Typography key="detail" sx={{ fontSize: '0.75rem', color: MODULE_COLOR, fontWeight: 700 }}>{selectedRow.vendor}</Typography>,
+            ] : (
+              <Typography sx={{ fontSize: '0.75rem', color: MODULE_COLOR, fontWeight: 700 }}>Supply Risk & Vendor Perf.</Typography>
             )}
           </Breadcrumbs>
         </Stack>
         <Typography sx={{ fontWeight: 700, fontSize: '1.15rem', color: colors.text }}>
           {selectedRow
-            ? `${selectedRow.vendor} — Vendor Performance Detail`
+            ? 'Vendor Performance Detail'
             : 'Supply Risk & Vendor Performance — External Risk Lens'}
         </Typography>
       </Paper>

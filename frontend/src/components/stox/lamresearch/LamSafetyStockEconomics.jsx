@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -61,21 +61,21 @@ const formatPercent = (value) => {
 // Mock Data — 15 Semiconductor Materials
 // ============================================
 const MOCK_DATA = [
-  { id: 1,  material: 'RF Generator Module',     plant: 'P1000', action: 'Reduce',   currentSS: 4200, optimalSS: 1680, deltaEA: -2520,  deltaCapital: -617400,  marginProtected: 98.2, roi: 320 },
-  { id: 2,  material: 'Wafer Chamber Liner',      plant: 'P2000', action: 'Reduce',   currentSS: 6800, optimalSS: 3400, deltaEA: -3400,  deltaCapital: -129200,  marginProtected: 97.1, roi: 185 },
-  { id: 3,  material: 'ESC (Electrostatic Chuck)', plant: 'P1000', action: 'Reduce',   currentSS: 2400, optimalSS: 960,  deltaEA: -1440,  deltaCapital: -262080,  marginProtected: 96.5, roi: 410 },
-  { id: 4,  material: 'Etch Gas Manifold',        plant: 'P3000', action: 'Maintain',  currentSS: 3600, optimalSS: 3600, deltaEA: 0,      deltaCapital: 0,        marginProtected: 99.4, roi: 0   },
-  { id: 5,  material: 'Plasma Source Assembly',    plant: 'P1000', action: 'Reduce',    currentSS: 1200, optimalSS: 480,  deltaEA: -720,   deltaCapital: -231120,  marginProtected: 95.8, roi: 450 },
-  { id: 6,  material: 'CVD Showerhead',           plant: 'P2000', action: 'Increase',  currentSS: 2800, optimalSS: 3920, deltaEA: 1120,   deltaCapital: 82880,    marginProtected: 99.8, roi: 85  },
-  { id: 7,  material: 'Process Kit',              plant: 'P4000', action: 'Reduce',    currentSS: 8000, optimalSS: 4000, deltaEA: -4000,  deltaCapital: -84000,   marginProtected: 93.2, roi: 140 },
-  { id: 8,  material: 'Matching Network',         plant: 'P1000', action: 'Maintain',  currentSS: 1800, optimalSS: 1800, deltaEA: 0,      deltaCapital: 0,        marginProtected: 98.9, roi: 0   },
-  { id: 9,  material: 'Quartz Window',            plant: 'P3000', action: 'Reduce',    currentSS: 7200, optimalSS: 4320, deltaEA: -2880,  deltaCapital: -36000,   marginProtected: 92.1, roi: 110 },
-  { id: 10, material: 'Turbomolecular Pump',      plant: 'P2000', action: 'Reduce',    currentSS: 800,  optimalSS: 320,  deltaEA: -480,   deltaCapital: -139200,  marginProtected: 96.8, roi: 290 },
-  { id: 11, material: 'Gas Panel Assembly',       plant: 'P4000', action: 'Increase',  currentSS: 2000, optimalSS: 2800, deltaEA: 800,    deltaCapital: 73600,    marginProtected: 99.6, roi: 92  },
-  { id: 12, material: 'Endpoint Detector',        plant: 'P3000', action: 'Maintain',  currentSS: 1400, optimalSS: 1400, deltaEA: 0,      deltaCapital: 0,        marginProtected: 98.4, roi: 0   },
-  { id: 13, material: 'Robot Arm Assembly',        plant: 'P1000', action: 'Reduce',    currentSS: 600,  optimalSS: 240,  deltaEA: -360,   deltaCapital: -151200,  marginProtected: 94.7, roi: 380 },
-  { id: 14, material: 'Load Lock Assembly',        plant: 'P2000', action: 'Maintain',  currentSS: 900,  optimalSS: 900,  deltaEA: 0,      deltaCapital: 0,        marginProtected: 97.5, roi: 0   },
-  { id: 15, material: 'Throttle Valve',           plant: 'P4000', action: 'Maintain',  currentSS: 5200, optimalSS: 5200, deltaEA: 0,      deltaCapital: 0,        marginProtected: 99.1, roi: 0   },
+  { id: 1,  material: 'RF Generator Module',     plant: 'P1000', action: 'Reduce',   currentSS: 4200, optimalSS: 1680, deltaEA: -2520,  deltaCapital: -617400,  reorderPt: 5600, optimalROP: 2900, lotSize: 500, optimalLot: 350, rationale: 'LT variance + high service level', marginProtected: 98.2, roi: 320 },
+  { id: 2,  material: 'Wafer Chamber Liner',      plant: 'P2000', action: 'Reduce',   currentSS: 6800, optimalSS: 3400, deltaEA: -3400,  deltaCapital: -129200,  reorderPt: 8200, optimalROP: 5100, lotSize: 1000, optimalLot: 800, rationale: 'Demand CV + excess buffer', marginProtected: 97.1, roi: 185 },
+  { id: 3,  material: 'ESC (Electrostatic Chuck)', plant: 'P1000', action: 'Reduce',   currentSS: 2400, optimalSS: 960,  deltaEA: -1440,  deltaCapital: -262080,  reorderPt: 3200, optimalROP: 1640, lotSize: 200, optimalLot: 150, rationale: 'LT variance + high service level', marginProtected: 96.5, roi: 410 },
+  { id: 4,  material: 'Etch Gas Manifold',        plant: 'P3000', action: 'Maintain',  currentSS: 3600, optimalSS: 3600, deltaEA: 0,      deltaCapital: 0,        reorderPt: 4800, optimalROP: 4800, lotSize: 400, optimalLot: 400, rationale: 'Parameters optimal', marginProtected: 99.4, roi: 0   },
+  { id: 5,  material: 'Plasma Source Assembly',    plant: 'P1000', action: 'Reduce',    currentSS: 1200, optimalSS: 480,  deltaEA: -720,   deltaCapital: -231120,  reorderPt: 1800, optimalROP: 840, lotSize: 100, optimalLot: 80, rationale: 'LT variance + demand volatility', marginProtected: 95.8, roi: 450 },
+  { id: 6,  material: 'CVD Showerhead',           plant: 'P2000', action: 'Increase',  currentSS: 2800, optimalSS: 3920, deltaEA: 1120,   deltaCapital: 82880,    reorderPt: 3600, optimalROP: 4720, lotSize: 300, optimalLot: 400, rationale: 'Below SS risk + demand growth', marginProtected: 99.8, roi: 85  },
+  { id: 7,  material: 'Process Kit',              plant: 'P4000', action: 'Reduce',    currentSS: 8000, optimalSS: 4000, deltaEA: -4000,  deltaCapital: -84000,   reorderPt: 9500, optimalROP: 5500, lotSize: 2000, optimalLot: 1200, rationale: 'Low service level + excess buffer', marginProtected: 93.2, roi: 140 },
+  { id: 8,  material: 'Matching Network',         plant: 'P1000', action: 'Maintain',  currentSS: 1800, optimalSS: 1800, deltaEA: 0,      deltaCapital: 0,        reorderPt: 2500, optimalROP: 2500, lotSize: 150, optimalLot: 150, rationale: 'Parameters optimal', marginProtected: 98.9, roi: 0   },
+  { id: 9,  material: 'Quartz Window',            plant: 'P3000', action: 'Reduce',    currentSS: 7200, optimalSS: 4320, deltaEA: -2880,  deltaCapital: -36000,   reorderPt: 8400, optimalROP: 5520, lotSize: 1500, optimalLot: 1000, rationale: 'Low CV + excess buffer', marginProtected: 92.1, roi: 110 },
+  { id: 10, material: 'Turbomolecular Pump',      plant: 'P2000', action: 'Reduce',    currentSS: 800,  optimalSS: 320,  deltaEA: -480,   deltaCapital: -139200,  reorderPt: 1200, optimalROP: 580, lotSize: 50, optimalLot: 40, rationale: 'LT variance + demand volatility', marginProtected: 96.8, roi: 290 },
+  { id: 11, material: 'Gas Panel Assembly',       plant: 'P4000', action: 'Increase',  currentSS: 2000, optimalSS: 2800, deltaEA: 800,    deltaCapital: 73600,    reorderPt: 2800, optimalROP: 3600, lotSize: 250, optimalLot: 350, rationale: 'Below SS risk + demand growth', marginProtected: 99.6, roi: 92  },
+  { id: 12, material: 'Endpoint Detector',        plant: 'P3000', action: 'Maintain',  currentSS: 1400, optimalSS: 1400, deltaEA: 0,      deltaCapital: 0,        reorderPt: 1900, optimalROP: 1900, lotSize: 120, optimalLot: 120, rationale: 'Parameters optimal', marginProtected: 98.4, roi: 0   },
+  { id: 13, material: 'Robot Arm Assembly',        plant: 'P1000', action: 'Reduce',    currentSS: 600,  optimalSS: 240,  deltaEA: -360,   deltaCapital: -151200,  reorderPt: 850, optimalROP: 440, lotSize: 30, optimalLot: 25, rationale: 'LT variance + high service level', marginProtected: 94.7, roi: 380 },
+  { id: 14, material: 'Load Lock Assembly',        plant: 'P2000', action: 'Maintain',  currentSS: 900,  optimalSS: 900,  deltaEA: 0,      deltaCapital: 0,        reorderPt: 1300, optimalROP: 1300, lotSize: 60, optimalLot: 60, rationale: 'Parameters optimal', marginProtected: 97.5, roi: 0   },
+  { id: 15, material: 'Throttle Valve',           plant: 'P4000', action: 'Maintain',  currentSS: 5200, optimalSS: 5200, deltaEA: 0,      deltaCapital: 0,        reorderPt: 6400, optimalROP: 6400, lotSize: 600, optimalLot: 600, rationale: 'Parameters optimal', marginProtected: 99.1, roi: 0   },
 ];
 
 // Detail data per material (SAP parameters + formula variables)
@@ -102,6 +102,7 @@ const DETAIL_DATA = {
 // ============================================
 const LamSafetyStockEconomics = ({ onBack, darkMode = false }) => {
   const [selectedRow, setSelectedRow] = useState(null);
+  useEffect(() => { if (selectedRow) window.scrollTo(0, 0); }, [selectedRow]);
   const colors = getColors(darkMode);
 
   // ---- KPI summaries ----
@@ -191,6 +192,27 @@ const LamSafetyStockEconomics = ({ onBack, darkMode = false }) => {
       },
     },
     {
+      field: 'reorderPt',
+      headerName: 'ROP',
+      width: 90,
+      type: 'number',
+      renderCell: (p) => <Typography sx={{ fontSize: '0.8rem', color: colors.text }}>{formatNumber(p.row.reorderPt)} EA</Typography>,
+    },
+    {
+      field: 'lotSize',
+      headerName: 'Lot Size',
+      width: 90,
+      type: 'number',
+      renderCell: (p) => <Typography sx={{ fontSize: '0.8rem', color: colors.text }}>{formatNumber(p.row.lotSize)} EA</Typography>,
+    },
+    {
+      field: 'rationale',
+      headerName: 'Rationale',
+      flex: 1,
+      minWidth: 140,
+      renderCell: (p) => <Typography sx={{ fontSize: '0.75rem', color: colors.textSecondary, fontStyle: 'italic' }}>{p.row.rationale}</Typography>,
+    },
+    {
       field: 'marginProtected',
       headerName: 'Margin %',
       width: 100,
@@ -230,10 +252,18 @@ const LamSafetyStockEconomics = ({ onBack, darkMode = false }) => {
     const annualCarryingSaved = (d.ssCostCurr - d.ssCostProp) * annualCarryingRate;
 
     const sapParams = [
-      { param: 'PLIFZ', label: 'Planned Delivery Time (days)', current: `${d.plifzCurr} days`, proposed: `${d.plifzProp} days`, delta: d.plifzProp - d.plifzCurr === 0 ? '\u2014' : `${d.plifzProp - d.plifzCurr} days` },
-      { param: 'EISBE', label: 'Safety Stock (EA)',            current: formatNumber(d.eisbeCurr), proposed: formatNumber(d.eisbeProp), delta: d.eisbeProp - d.eisbeCurr === 0 ? '\u2014' : `${d.eisbeProp - d.eisbeCurr > 0 ? '+' : ''}${formatNumber(d.eisbeProp - d.eisbeCurr)}` },
-      { param: 'MINBE', label: 'Reorder Point (EA)',           current: formatNumber(d.minbeCurr), proposed: formatNumber(d.minbeProp), delta: d.minbeProp - d.minbeCurr === 0 ? '\u2014' : `${d.minbeProp - d.minbeCurr > 0 ? '+' : ''}${formatNumber(d.minbeProp - d.minbeCurr)}` },
-      { param: 'DISLS', label: 'Lot Size (EA)',                current: formatNumber(d.dislsCurr), proposed: formatNumber(d.dislsProp), delta: d.dislsProp - d.dislsCurr === 0 ? '\u2014' : `${d.dislsProp - d.dislsCurr > 0 ? '+' : ''}${formatNumber(d.dislsProp - d.dislsCurr)}` },
+      { param: 'PLIFZ', label: 'Planned Delivery Time (days)', current: `${d.plifzCurr} days`, proposed: `${d.plifzProp} days`,
+        delta: d.plifzProp - d.plifzCurr === 0 ? '\u2014' : `${d.plifzProp - d.plifzCurr} days`,
+        deltaCapital: d.plifzProp - d.plifzCurr === 0 ? 0 : Math.round((d.plifzProp - d.plifzCurr) * -2800) },
+      { param: 'EISBE', label: 'Safety Stock (EA)', current: formatNumber(d.eisbeCurr), proposed: formatNumber(d.eisbeProp),
+        delta: d.eisbeProp - d.eisbeCurr === 0 ? '\u2014' : `${d.eisbeProp - d.eisbeCurr > 0 ? '+' : ''}${formatNumber(d.eisbeProp - d.eisbeCurr)}`,
+        deltaCapital: Math.round((d.eisbeProp - d.eisbeCurr) * (d.ssCostCurr / d.eisbeCurr || 0)) },
+      { param: 'MINBE', label: 'Reorder Point (EA)', current: formatNumber(d.minbeCurr), proposed: formatNumber(d.minbeProp),
+        delta: d.minbeProp - d.minbeCurr === 0 ? '\u2014' : `${d.minbeProp - d.minbeCurr > 0 ? '+' : ''}${formatNumber(d.minbeProp - d.minbeCurr)}`,
+        deltaCapital: Math.round((d.minbeProp - d.minbeCurr) * (d.ssCostCurr / d.eisbeCurr || 0) * 0.4) },
+      { param: 'DISLS', label: 'Lot Size (EA)', current: formatNumber(d.dislsCurr), proposed: formatNumber(d.dislsProp),
+        delta: d.dislsProp - d.dislsCurr === 0 ? '\u2014' : `${d.dislsProp - d.dislsCurr > 0 ? '+' : ''}${formatNumber(d.dislsProp - d.dislsCurr)}`,
+        deltaCapital: Math.round((d.dislsProp - d.dislsCurr) * (d.ssCostCurr / d.eisbeCurr || 0) * 0.2) },
     ];
 
     return (
@@ -307,6 +337,7 @@ const LamSafetyStockEconomics = ({ onBack, darkMode = false }) => {
                         <TableCell align="right">Current</TableCell>
                         <TableCell align="right">Proposed</TableCell>
                         <TableCell align="right">&Delta;</TableCell>
+                        <TableCell align="right">&Delta; Capital</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -321,6 +352,7 @@ const LamSafetyStockEconomics = ({ onBack, darkMode = false }) => {
                           <TableCell align="right">{sp.current}</TableCell>
                           <TableCell align="right" sx={{ fontWeight: 600, color: `${colors.primary} !important` }}>{sp.proposed}</TableCell>
                           <TableCell align="right" sx={{ fontWeight: 600, color: sp.delta === '\u2014' ? `${colors.textSecondary} !important` : `#059669 !important` }}>{sp.delta}</TableCell>
+                          <TableCell align="right" sx={{ fontWeight: 600, color: `${sp.deltaCapital < 0 ? '#059669' : sp.deltaCapital > 0 ? '#d97706' : colors.textSecondary} !important` }}>{formatCurrency(sp.deltaCapital)}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -501,21 +533,17 @@ const LamSafetyStockEconomics = ({ onBack, darkMode = false }) => {
         </IconButton>
         <Box sx={{ flex: 1 }}>
           <Breadcrumbs separator={<NavigateNextIcon sx={{ fontSize: 14, color: colors.textSecondary }} />} sx={{ mb: 0.5 }}>
-            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>CORE.AI</Link>
-            <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>STOX.AI</Link>
             <Link underline="hover" onClick={onBack} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>Lam Research</Link>
-            {selectedData ? (
-              <>
-                <Link underline="hover" onClick={() => setSelectedRow(null)} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>Safety Stock Economics</Link>
-                <Typography sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 700 }}>{selectedData.material}</Typography>
-              </>
-            ) : (
+            {selectedData ? [
+              <Link key="tile" underline="hover" onClick={() => setSelectedRow(null)} sx={{ fontSize: '0.7rem', color: colors.textSecondary, cursor: 'pointer' }}>Safety Stock Economics</Link>,
+              <Typography key="detail" sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 700 }}>{selectedData.material}</Typography>,
+            ] : (
               <Typography sx={{ fontSize: '0.7rem', color: MODULE_COLOR, fontWeight: 700 }}>Safety Stock Economics</Typography>
             )}
           </Breadcrumbs>
           <Typography sx={{ fontSize: '1.1rem', fontWeight: 700, color: colors.text }}>
             {selectedData
-              ? `${selectedData.material} \u2014 ${selectedData.plant}`
+              ? `${selectedData.plant} \u2014 Safety Stock Detail`
               : 'Safety Stock & Reorder Economics \u2014 Decision Engine'}
           </Typography>
         </Box>
