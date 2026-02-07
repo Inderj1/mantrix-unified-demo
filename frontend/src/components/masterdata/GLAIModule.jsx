@@ -33,6 +33,8 @@ import {
   TableHead,
   TableRow,
   Drawer,
+  Card,
+  CardContent,
 } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import {
@@ -81,13 +83,7 @@ import {
   Info as InfoIcon,
 } from '@mui/icons-material';
 
-import { MODULE_COLOR, getColors as getBrandColors } from '../../config/brandColors';
-
-// Get consistent colors based on dark mode - same pattern as STOX components
-const getColors = (darkMode) => ({
-  ...getBrandColors(darkMode),
-  // Additional component-specific colors if needed
-});
+import { masterDataTheme, MODULE_NAVY, NAVY_DARK, NAVY_BLUE, NAVY_DEEP } from './masterDataTheme';
 
 // Sidebar navigation items with mode-specific labels
 const sidebarNavItems = [
@@ -104,12 +100,12 @@ const toolsNavItems = [
 
 // Mock data for dashboard metrics - styled like Inventory Health Check
 const dashboardMetrics = [
-  { label: 'HEALTHY', value: '2,891', color: '#0ea5a9' },
+  { label: 'HEALTHY', value: '2,891', color: NAVY_BLUE },
   { label: 'MODERATE', value: '287', color: '#f59e0b' },
-  { label: 'CRITICAL', value: '69', color: '#0ea5a9' },
+  { label: 'CRITICAL', value: '69', color: '#ef4444' },
   { label: 'UNMAPPED $', value: '$1.2M', color: '#ef4444' },
   { label: 'MAP RATE', value: '89%', color: '#10b981' },
-  { label: 'AVG CONF', value: '94%', color: '#00357a' },
+  { label: 'AVG CONF', value: '94%', color: MODULE_NAVY },
 ];
 
 // Mock data for account matching with field-level recommendations
@@ -301,7 +297,7 @@ const uploadCards = [
 const issueStats = [
   { label: 'CRITICAL', value: 12, color: '#ef4444' },
   { label: 'HIGH', value: 47, color: '#f59e0b' },
-  { label: 'MEDIUM', value: 156, color: '#3b82f6' },
+  { label: 'MEDIUM', value: 156, color: '#1565c0' },
   { label: 'LOW', value: 284, color: '#6b7280' },
   { label: 'RESOLVED', value: 89, color: '#10b981' },
 ];
@@ -335,8 +331,12 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
     );
   };
 
-  // Get consistent colors based on dark mode
-  const colors = getColors(darkMode);
+  // Local color variables matching ORDLY.AI pattern
+  const bgColor = darkMode ? '#0d1117' : '#f8fafc';
+  const cardBg = darkMode ? '#161b22' : '#fff';
+  const textColor = darkMode ? '#e6edf3' : '#1e293b';
+  const textSecondary = darkMode ? '#8b949e' : '#64748b';
+  const borderColor = darkMode ? '#30363d' : '#e2e8f0';
 
   const handleModeChange = (event, newMode) => {
     if (newMode !== null) {
@@ -366,21 +366,14 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
   };
 
   const getStatusChip = (status) => {
-    const config = {
-      approved: { color: '#10b981', label: 'Approved' },
-      review: { color: '#f59e0b', label: 'Review' },
-      rejected: { color: '#ef4444', label: 'Rejected' },
-      proposed: { color: '#3b82f6', label: 'Proposed' },
-    };
-    const { color, label } = config[status] || config.review;
+    const chipStyle = masterDataTheme.chips.status[status] || masterDataTheme.chips.status.review;
+    const labelMap = { approved: 'Approved', review: 'Review', rejected: 'Rejected', proposed: 'Proposed' };
     return (
       <Chip
-        label={label}
+        label={labelMap[status] || 'Review'}
         size="small"
         sx={{
-          bgcolor: alpha(color, 0.1),
-          color: color,
-          fontWeight: 600,
+          ...chipStyle,
           fontSize: '0.7rem',
         }}
       />
@@ -394,35 +387,35 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
     return (
       <Box sx={{
         p: 2,
-        bgcolor: darkMode ? 'rgba(0,53,122,0.08)' : 'rgba(0,53,122,0.03)',
-        borderTop: `1px solid ${colors.border}`,
-        borderBottom: `1px solid ${colors.border}`,
+        bgcolor: darkMode ? alpha(MODULE_NAVY, 0.08) : alpha(MODULE_NAVY, 0.03),
+        borderTop: `1px solid ${borderColor}`,
+        borderBottom: `1px solid ${borderColor}`,
       }}>
         <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
-          <AIIcon sx={{ fontSize: 18, color: MODULE_COLOR }} />
-          <Typography variant="subtitle2" fontWeight={600} sx={{ color: colors.text }}>
+          <AIIcon sx={{ fontSize: 18, color: MODULE_NAVY }} />
+          <Typography variant="subtitle2" fontWeight={600} sx={{ color: textColor }}>
             Field-Level AI Recommendations for {account.sourceAccount}
           </Typography>
           <Chip
             label={`${account.fields.filter(f => f.status === 'proposed').length} proposed overrides`}
             size="small"
-            sx={{ bgcolor: alpha('#3b82f6', 0.1), color: '#3b82f6', fontWeight: 600, fontSize: '0.65rem' }}
+            sx={{ bgcolor: alpha(NAVY_BLUE, 0.1), color: '#1565c0', fontWeight: 600, fontSize: '0.65rem' }}
           />
         </Stack>
 
-        <TableContainer component={Paper} elevation={0} sx={{ bgcolor: colors.paper, border: `1px solid ${colors.border}`, borderRadius: 2 }}>
+        <TableContainer component={Paper} elevation={0} sx={{ bgcolor: cardBg, border: `1px solid ${borderColor}`, borderRadius: 2 }}>
           <Table size="small">
             <TableHead>
-              <TableRow sx={{ bgcolor: colors.background }}>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem', py: 1 }}>Table</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem', py: 1 }}>Field</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem', py: 1 }}>Field Name</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem', py: 1 }}>YCOA Default</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem', py: 1 }}>AI Recommendation</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem', py: 1 }}>Confidence</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem', py: 1 }}>Rationale</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem', py: 1 }}>Status</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem', py: 1 }}>Actions</TableCell>
+              <TableRow sx={{ bgcolor: bgColor }}>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.75rem', py: 1 }}>Table</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.75rem', py: 1 }}>Field</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.75rem', py: 1 }}>Field Name</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.75rem', py: 1 }}>YCOA Default</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.75rem', py: 1 }}>AI Recommendation</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.75rem', py: 1 }}>Confidence</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.75rem', py: 1 }}>Rationale</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.75rem', py: 1 }}>Status</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.75rem', py: 1 }}>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -432,17 +425,17 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                   <TableRow
                     key={field.id}
                     sx={{
-                      bgcolor: isOverride ? alpha('#3b82f6', darkMode ? 0.08 : 0.03) : 'transparent',
-                      '&:hover': { bgcolor: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }
+                      bgcolor: isOverride ? alpha(NAVY_BLUE, darkMode ? 0.08 : 0.03) : 'transparent',
+                      '&:hover': { bgcolor: darkMode ? alpha('#fff', 0.03) : alpha('#000', 0.02) }
                     }}
                   >
-                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.75rem', color: colors.textSecondary, py: 1 }}>
+                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.75rem', color: textSecondary, py: 1 }}>
                       {field.table}
                     </TableCell>
-                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.75rem', fontWeight: 600, color: MODULE_COLOR, py: 1 }}>
+                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.75rem', fontWeight: 600, color: MODULE_NAVY, py: 1 }}>
                       {field.field}
                     </TableCell>
-                    <TableCell sx={{ fontSize: '0.75rem', color: colors.text, py: 1 }}>
+                    <TableCell sx={{ fontSize: '0.75rem', color: textColor, py: 1 }}>
                       {field.fieldName}
                     </TableCell>
                     <TableCell align="center" sx={{ py: 1 }}>
@@ -455,7 +448,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                           fontSize: '0.7rem',
                           fontFamily: 'monospace',
                           bgcolor: alpha('#6b7280', 0.1),
-                          color: colors.textSecondary,
+                          color: textSecondary,
                         }}
                       />
                     </TableCell>
@@ -469,9 +462,9 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                           fontSize: '0.7rem',
                           fontFamily: 'monospace',
                           fontWeight: 600,
-                          bgcolor: isOverride ? alpha('#3b82f6', 0.15) : alpha('#10b981', 0.1),
-                          color: isOverride ? '#3b82f6' : '#10b981',
-                          border: isOverride ? `1px solid ${alpha('#3b82f6', 0.3)}` : 'none',
+                          bgcolor: isOverride ? alpha(NAVY_BLUE, 0.15) : alpha('#10b981', 0.1),
+                          color: isOverride ? NAVY_BLUE : '#10b981',
+                          border: isOverride ? `1px solid ${alpha(NAVY_BLUE, 0.3)}` : 'none',
                         }}
                       />
                     </TableCell>
@@ -488,7 +481,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                         }}
                       />
                     </TableCell>
-                    <TableCell sx={{ fontSize: '0.7rem', color: colors.textSecondary, py: 1, maxWidth: 200 }}>
+                    <TableCell sx={{ fontSize: '0.7rem', color: textSecondary, py: 1, maxWidth: 200 }}>
                       <Typography variant="caption" sx={{ display: 'block', lineHeight: 1.3 }}>
                         {field.rationale}
                       </Typography>
@@ -502,7 +495,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                           <IconButton
                             size="small"
                             onClick={() => setSelectedFieldForInsight(field)}
-                            sx={{ color: MODULE_COLOR }}
+                            sx={{ color: MODULE_NAVY }}
                           >
                             <ViewEvidenceIcon sx={{ fontSize: 16 }} />
                           </IconButton>
@@ -550,7 +543,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
     switch (severity) {
       case 'critical': return '#ef4444';
       case 'high': return '#f59e0b';
-      case 'medium': return '#2d7aff';
+      case 'medium': return NAVY_BLUE;
       default: return '#6b7280';
     }
   };
@@ -559,58 +552,55 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
   const renderDashboard = () => (
     <Box>
       {/* Header with icon - matching Inventory Health Check */}
-      <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1 }}>
-        <Box sx={{ width: 48, height: 48, borderRadius: 2, bgcolor: alpha('#0ea5a9', 0.15), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <AccountBalanceIcon sx={{ fontSize: 28, color: '#0ea5a9' }} />
-        </Box>
-        <Box>
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
-              GL Account Health Check
-            </Typography>
-            <Chip label="Demo Data" size="small" icon={<WarningIcon sx={{ fontSize: 14 }} />} sx={{ bgcolor: alpha('#f59e0b', 0.1), color: '#f59e0b', fontWeight: 600, fontSize: '0.7rem' }} />
-          </Stack>
-          <Typography variant="body2" sx={{ color: colors.textSecondary }}>
-            Monitor GL account health scores, mapping coverage, and data quality metrics
-          </Typography>
-        </Box>
-      </Stack>
-
-      {/* Metrics Row - matching Inventory Health Check style */}
       <Paper
         elevation={0}
         sx={{
-          mt: 3,
-          mb: 3,
-          borderRadius: 2,
-          border: `1px solid ${colors.border}`,
-          bgcolor: colors.paper,
-          overflow: 'hidden',
-        }}
+          p: 2.5, borderRadius: 2, mb: 0,
+          bgcolor: cardBg,
+          border: `1px solid ${borderColor}`,
+                  }}
       >
-        <Grid container>
-          {dashboardMetrics.map((metric, index) => (
-            <Grid
-              item
-              xs={6}
-              md={2}
-              key={index}
-              sx={{
-                borderRight: index < dashboardMetrics.length - 1 ? `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` : 'none',
-              }}
-            >
-              <Box sx={{ p: 2 }}>
-                <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: metric.color, textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.5 }}>
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Avatar sx={{ width: 48, height: 48, bgcolor: alpha(NAVY_BLUE, 0.1), color: NAVY_BLUE }}>
+            <AccountBalanceIcon sx={{ fontSize: 28 }} />
+          </Avatar>
+          <Box sx={{ flex: 1 }}>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+              <Chip label="GL.AI" size="small" sx={{ bgcolor: MODULE_NAVY, color: '#fff', fontWeight: 700, fontSize: '0.7rem' }} />
+              <Typography variant="caption" sx={{ color: MODULE_NAVY, textTransform: 'uppercase', letterSpacing: 1 }}>
+                Health Dashboard
+              </Typography>
+            </Stack>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+              <Typography variant="h5" fontWeight={700} sx={{ color: textColor }}>
+                GL Account Health Check
+              </Typography>
+              <Chip label="Demo Data" size="small" icon={<WarningIcon sx={{ fontSize: 14 }} />} sx={{ bgcolor: alpha('#f59e0b', 0.1), color: '#f59e0b', fontWeight: 600, fontSize: '0.7rem' }} />
+            </Stack>
+            <Typography variant="body2" sx={{ color: textSecondary }}>
+              Monitor GL account health scores, mapping coverage, and data quality metrics
+            </Typography>
+          </Box>
+        </Stack>
+      </Paper>
+
+      {/* Metrics Row - matching AP.AI stat cards */}
+      <Grid container spacing={2} sx={{ mt: 1, mb: 3 }}>
+        {dashboardMetrics.map((metric, index) => (
+          <Grid item xs={6} md={2} key={index}>
+            <Card variant="outlined" sx={{ borderLeft: `3px solid ${metric.color}` }}>
+              <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                <Typography sx={{ fontSize: '0.7rem', color: textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>
                   {metric.label}
                 </Typography>
-                <Typography variant="h5" fontWeight={700} sx={{ color: metric.color }}>
+                <Typography variant="h4" fontWeight={700} sx={{ color: metric.color }}>
                   {metric.value}
                 </Typography>
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
-      </Paper>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
 
       {/* Health Score and Issues Grid */}
       <Grid container spacing={3} sx={{ mb: 3 }}>
@@ -620,13 +610,13 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
             elevation={0}
             sx={{
               p: 3,
-              borderRadius: 3,
-              border: `1px solid ${colors.border}`,
-              bgcolor: colors.paper,
+              borderRadius: 2,
+              border: `1px solid ${borderColor}`,
+              bgcolor: cardBg,
               height: '100%',
-            }}
+                          }}
           >
-            <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, color: colors.text }}>
+            <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, color: textColor }}>
               Overall GL Health Score
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -636,7 +626,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                     width: 120,
                     height: 120,
                     borderRadius: '50%',
-                    background: `conic-gradient(${MODULE_COLOR} 0deg, ${MODULE_COLOR} ${72 * 3.6}deg, ${darkMode ? '#1e2d42' : '#e5e7eb'} ${72 * 3.6}deg)`,
+                    background: `conic-gradient(${MODULE_NAVY} 0deg, ${MODULE_NAVY} ${72 * 3.6}deg, ${darkMode ? '#1e2d42' : '#e5e7eb'} ${72 * 3.6}deg)`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -647,14 +637,14 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                       width: 100,
                       height: 100,
                       borderRadius: '50%',
-                      bgcolor: colors.paper,
+                      bgcolor: cardBg,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}
                   >
-                    <Typography variant="h4" fontWeight={700} sx={{ color: MODULE_COLOR }}>
-                      72<Typography component="span" variant="body2" sx={{ color: colors.textSecondary }}>/100</Typography>
+                    <Typography variant="h4" fontWeight={700} sx={{ color: MODULE_NAVY }}>
+                      72<Typography component="span" variant="body2" sx={{ color: textSecondary }}>/100</Typography>
                     </Typography>
                   </Box>
                 </Box>
@@ -669,18 +659,18 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
           <Paper
             elevation={0}
             sx={{
-              borderRadius: 3,
-              border: `1px solid ${colors.border}`,
-              bgcolor: colors.paper,
+              borderRadius: 2,
+              border: `1px solid ${borderColor}`,
+              bgcolor: cardBg,
               height: '100%',
               overflow: 'hidden',
-            }}
+                          }}
           >
-            <Box sx={{ p: 2, borderBottom: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}>
+            <Box sx={{ p: 2, borderBottom: `1px solid ${borderColor}` }}>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Stack direction="row" spacing={1} alignItems="center">
                   <ErrorIcon sx={{ color: '#ef4444', fontSize: 20 }} />
-                  <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
+                  <Typography variant="subtitle1" fontWeight={600} sx={{ color: textColor }}>
                     Critical Issues
                   </Typography>
                 </Stack>
@@ -707,10 +697,10 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                 >
                   <Box sx={{ width: 4, height: 36, borderRadius: 1, bgcolor: getSeverityColor(issue.severity) }} />
                   <Box sx={{ flex: 1 }}>
-                    <Typography variant="body2" fontWeight={600} sx={{ color: colors.text, fontSize: '0.8rem' }}>
+                    <Typography variant="body2" fontWeight={600} sx={{ color: textColor, fontSize: '0.8rem' }}>
                       {issue.title}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: darkMode ? '#5d7290' : 'text.secondary' }}>
+                    <Typography variant="caption" sx={{ color: textSecondary }}>
                       {issue.description}
                     </Typography>
                   </Box>
@@ -726,17 +716,17 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
           <Paper
             elevation={0}
             sx={{
-              borderRadius: 3,
-              border: `1px solid ${colors.border}`,
-              bgcolor: colors.paper,
+              borderRadius: 2,
+              border: `1px solid ${borderColor}`,
+              bgcolor: cardBg,
               height: '100%',
               overflow: 'hidden',
-            }}
+                          }}
           >
-            <Box sx={{ p: 2, borderBottom: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}>
+            <Box sx={{ p: 2, borderBottom: `1px solid ${borderColor}` }}>
               <Stack direction="row" spacing={1} alignItems="center">
-                <BarChartIcon sx={{ color: MODULE_COLOR, fontSize: 20 }} />
-                <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
+                <BarChartIcon sx={{ color: MODULE_NAVY, fontSize: 20 }} />
+                <Typography variant="subtitle1" fontWeight={600} sx={{ color: textColor }}>
                   Issue Distribution
                 </Typography>
               </Stack>
@@ -757,10 +747,10 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                 >
                   <Box sx={{ width: 4, height: 36, borderRadius: 1, bgcolor: getSeverityColor(issue.severity) }} />
                   <Box sx={{ flex: 1 }}>
-                    <Typography variant="body2" fontWeight={600} sx={{ color: colors.text, fontSize: '0.8rem' }}>
+                    <Typography variant="body2" fontWeight={600} sx={{ color: textColor, fontSize: '0.8rem' }}>
                       {issue.title}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: darkMode ? '#5d7290' : 'text.secondary' }}>
+                    <Typography variant="caption" sx={{ color: textSecondary }}>
                       {issue.description}
                     </Typography>
                   </Box>
@@ -776,38 +766,38 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 3,
-          border: `1px solid ${colors.border}`,
-          bgcolor: colors.paper,
+          borderRadius: 2,
+          border: `1px solid ${borderColor}`,
+          bgcolor: cardBg,
           overflow: 'hidden',
-        }}
+                  }}
       >
-        <Box sx={{ p: 2, borderBottom: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}>
+        <Box sx={{ p: 2, borderBottom: `1px solid ${borderColor}` }}>
           <Stack direction="row" spacing={1} alignItems="center">
-            <AIIcon sx={{ color: MODULE_COLOR, fontSize: 20 }} />
-            <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
+            <AIIcon sx={{ color: MODULE_NAVY, fontSize: 20 }} />
+            <Typography variant="subtitle1" fontWeight={600} sx={{ color: textColor }}>
               Quick Actions
             </Typography>
           </Stack>
         </Box>
         <Box sx={{ p: 2 }}>
           <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap>
-            <Button variant="outlined" size="small" startIcon={<UploadIcon />} onClick={() => setActiveSection('data-ingestion')} sx={{ borderColor: 'divider' }}>
+            <Button variant="outlined" size="small" startIcon={<UploadIcon />} onClick={() => setActiveSection('data-ingestion')} sx={masterDataTheme.buttons.secondary}>
               New Analysis
             </Button>
-            <Button variant="outlined" size="small" startIcon={<LinkIcon />} onClick={() => setActiveSection('account-matching')} sx={{ borderColor: 'divider' }}>
+            <Button variant="outlined" size="small" startIcon={<LinkIcon />} onClick={() => setActiveSection('account-matching')} sx={masterDataTheme.buttons.secondary}>
               Review Mappings
             </Button>
-            <Button variant="outlined" size="small" startIcon={<TableChartIcon />} onClick={() => setActiveSection('output-table')} sx={{ borderColor: 'divider' }}>
+            <Button variant="outlined" size="small" startIcon={<TableChartIcon />} onClick={() => setActiveSection('output-table')} sx={masterDataTheme.buttons.secondary}>
               Remediation Workbench
             </Button>
-            <Button variant="outlined" size="small" startIcon={<ReportsIcon />} sx={{ borderColor: 'divider' }}>
+            <Button variant="outlined" size="small" startIcon={<ReportsIcon />} sx={masterDataTheme.buttons.secondary}>
               Generate Report
             </Button>
-            <Button variant="outlined" size="small" startIcon={<DownloadIcon />} sx={{ borderColor: 'divider' }}>
+            <Button variant="outlined" size="small" startIcon={<DownloadIcon />} sx={masterDataTheme.buttons.secondary}>
               Export All Issues
             </Button>
-            <Button variant="outlined" size="small" startIcon={<SyncIcon />} sx={{ borderColor: 'divider' }}>
+            <Button variant="outlined" size="small" startIcon={<SyncIcon />} sx={masterDataTheme.buttons.secondary}>
               Sync with S/4HANA
             </Button>
           </Stack>
@@ -825,15 +815,20 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
 
     return (
       <Box>
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-          <UploadIcon sx={{ color: MODULE_COLOR }} />
-          <Typography variant="h5" fontWeight={700} sx={{ color: darkMode ? '#e6edf3' : MODULE_COLOR }}>
+        <Paper elevation={0} sx={{ p: 2.5, borderRadius: 2, mb: 3, bgcolor: cardBg, border: `1px solid ${borderColor}` }}>
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+            <Chip label="GL.AI" size="small" sx={{ bgcolor: MODULE_NAVY, color: '#fff', fontWeight: 700, fontSize: '0.7rem' }} />
+            <Typography variant="caption" sx={{ color: MODULE_NAVY, textTransform: 'uppercase', letterSpacing: 1 }}>
+              Data Ingestion
+            </Typography>
+          </Stack>
+          <Typography variant="h5" fontWeight={700} sx={{ color: darkMode ? '#e6edf3' : MODULE_NAVY }}>
             Data Ingestion
           </Typography>
-        </Stack>
-        <Typography variant="body2" sx={{ mb: 3, color: colors.textSecondary }}>
-          Upload source Chart of Accounts and target YCOA structure for AI-powered mapping
-        </Typography>
+          <Typography variant="body2" sx={{ color: textSecondary }}>
+            Upload source Chart of Accounts and target YCOA structure for AI-powered mapping
+          </Typography>
+        </Paper>
 
         {/* Source System Selection */}
         <Paper
@@ -842,11 +837,11 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
             p: 2.5,
             borderRadius: 2,
             mb: 2,
-            border: `1px solid ${colors.border}`,
-            bgcolor: colors.paper,
+            border: `1px solid ${borderColor}`,
+            bgcolor: cardBg,
           }}
         >
-          <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, color: colors.text }}>
+          <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, color: textColor }}>
             Select Source System
           </Typography>
           <Grid container spacing={1.5}>
@@ -862,12 +857,12 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                     gap: 1.5,
                     cursor: 'pointer',
                     borderRadius: 2,
-                    border: `2px solid ${selectedSystem === system.id ? MODULE_COLOR : colors.border}`,
-                    bgcolor: selectedSystem === system.id ? alpha(MODULE_COLOR, darkMode ? 0.15 : 0.05) : 'transparent',
+                    border: `2px solid ${selectedSystem === system.id ? MODULE_NAVY : borderColor}`,
+                    bgcolor: selectedSystem === system.id ? alpha(MODULE_NAVY, darkMode ? 0.15 : 0.05) : 'transparent',
                     transition: 'all 0.2s ease',
                     '&:hover': {
-                      borderColor: MODULE_COLOR,
-                      bgcolor: alpha(MODULE_COLOR, darkMode ? 0.1 : 0.03),
+                      borderColor: MODULE_NAVY,
+                      bgcolor: alpha(MODULE_NAVY, darkMode ? 0.1 : 0.03),
                     },
                   }}
                 >
@@ -884,9 +879,9 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                       }}
                     />
                   ) : (
-                    <system.Icon sx={{ fontSize: 24, color: colors.textSecondary }} />
+                    <system.Icon sx={{ fontSize: 24, color: textSecondary }} />
                   )}
-                  <Typography variant="caption" fontWeight={600} sx={{ color: colors.text }}>
+                  <Typography variant="caption" fontWeight={600} sx={{ color: textColor }}>
                     {system.name}
                   </Typography>
                 </Paper>
@@ -911,13 +906,12 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                     height: '100%',
                     borderRadius: 2,
                     cursor: isUploaded ? 'default' : 'pointer',
-                    border: `2px dashed ${isUploaded ? '#10b981' : colors.border}`,
-                    bgcolor: isUploaded ? alpha('#10b981', darkMode ? 0.1 : 0.05) : colors.paper,
+                    border: `2px dashed ${isUploaded ? '#10b981' : borderColor}`,
+                    bgcolor: isUploaded ? alpha('#10b981', darkMode ? 0.1 : 0.05) : cardBg,
                     transition: 'all 0.3s ease',
                     '&:hover': !isUploaded && {
-                      borderColor: MODULE_COLOR,
+                      borderColor: MODULE_NAVY,
                       transform: 'translateY(-4px)',
-                      boxShadow: `0 8px 24px ${alpha(MODULE_COLOR, 0.15)}`,
                     },
                   }}
                 >
@@ -925,7 +919,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                     width: 56,
                     height: 56,
                     borderRadius: 2,
-                    bgcolor: isUploaded ? alpha('#10b981', 0.15) : alpha(MODULE_COLOR, darkMode ? 0.15 : 0.1),
+                    bgcolor: isUploaded ? alpha('#10b981', 0.15) : alpha(MODULE_NAVY, darkMode ? 0.15 : 0.1),
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -934,12 +928,12 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                     {isUploaded ? (
                       <CheckIcon sx={{ fontSize: 28, color: '#10b981' }} />
                     ) : (
-                      <UploadIcon sx={{ fontSize: 28, color: MODULE_COLOR }} />
+                      <UploadIcon sx={{ fontSize: 28, color: MODULE_NAVY }} />
                     )}
                   </Box>
 
                   <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-                    <Typography variant="subtitle1" fontWeight={700} sx={{ color: colors.text }}>
+                    <Typography variant="subtitle1" fontWeight={700} sx={{ color: textColor }}>
                       {card.title}
                     </Typography>
                     {card.required && (
@@ -947,7 +941,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                     )}
                   </Stack>
 
-                  <Typography variant="body2" sx={{ color: colors.textSecondary, mb: 2 }}>
+                  <Typography variant="body2" sx={{ color: textSecondary, mb: 2 }}>
                     {card.description}
                   </Typography>
 
@@ -958,8 +952,8 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                         height: 22,
                         fontSize: '0.65rem',
                         fontFamily: 'monospace',
-                        bgcolor: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
-                        color: colors.textSecondary,
+                        bgcolor: darkMode ? alpha('#fff', 0.08) : alpha('#000', 0.05),
+                        color: textSecondary,
                       }} />
                     ))}
                   </Stack>
@@ -967,7 +961,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                   {isUploading && (
                     <Box>
                       <LinearProgress sx={{ borderRadius: 1, mb: 1 }} />
-                      <Typography variant="caption" sx={{ color: colors.textSecondary }}>
+                      <Typography variant="caption" sx={{ color: textSecondary }}>
                         Uploading...
                       </Typography>
                     </Box>
@@ -981,7 +975,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                           <Typography variant="caption" fontWeight={600} sx={{ color: '#10b981', display: 'block' }}>
                             {isUploaded.name}
                           </Typography>
-                          <Typography variant="caption" sx={{ color: colors.textSecondary }}>
+                          <Typography variant="caption" sx={{ color: textSecondary }}>
                             {isUploaded.rows.toLocaleString()} rows • {isUploaded.uploadedAt}
                           </Typography>
                         </Box>
@@ -1001,13 +995,13 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
             p: 2.5,
             borderRadius: 2,
             mb: 2,
-            border: `1px solid ${colors.border}`,
-            bgcolor: colors.paper,
+            border: `1px solid ${borderColor}`,
+            bgcolor: cardBg,
           }}
         >
           <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
-            <SettingsIcon sx={{ color: MODULE_COLOR, fontSize: 18 }} />
-            <Typography variant="body1" fontWeight={600} sx={{ color: colors.text }}>
+            <SettingsIcon sx={{ color: MODULE_NAVY, fontSize: 18 }} />
+            <Typography variant="body1" fontWeight={600} sx={{ color: textColor }}>
               Analysis Configuration
             </Typography>
           </Stack>
@@ -1058,7 +1052,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ pt: 1 }}>
           <Stack direction="row" spacing={1} alignItems="center">
             <CheckIcon sx={{ fontSize: 16, color: '#10b981' }} />
-            <Typography variant="body2" sx={{ color: colors.textSecondary }}>
+            <Typography variant="body2" sx={{ color: textSecondary }}>
               {Object.keys(uploadedFiles).length} of 3 files uploaded
             </Typography>
           </Stack>
@@ -1068,9 +1062,8 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
             disabled={!uploadedFiles['source-coa'] || !uploadedFiles['target-ycoa']}
             onClick={() => setActiveSection('account-matching')}
             sx={{
-              bgcolor: MODULE_COLOR,
-              '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.9) },
-              '&.Mui-disabled': { bgcolor: alpha(MODULE_COLOR, 0.3) },
+              ...masterDataTheme.buttons.primary,
+              '&.Mui-disabled': { bgcolor: alpha(MODULE_NAVY, 0.3) },
             }}
           >
             Run AI Analysis
@@ -1084,12 +1077,12 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
   const renderSystemConnection = () => (
     <Box>
       <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-        <LinkIcon sx={{ color: MODULE_COLOR }} />
-        <Typography variant="h5" fontWeight={700} sx={{ color: darkMode ? '#e6edf3' : MODULE_COLOR }}>
+        <LinkIcon sx={{ color: MODULE_NAVY }} />
+        <Typography variant="h5" fontWeight={700} sx={{ color: darkMode ? '#e6edf3' : MODULE_NAVY }}>
           System Connection
         </Typography>
       </Stack>
-      <Typography variant="body2" sx={{ mb: 3, color: colors.textSecondary }}>
+      <Typography variant="body2" sx={{ mb: 3, color: textSecondary }}>
         Connect to your S/4HANA system to analyze GL master data health and identify optimization opportunities.
       </Typography>
 
@@ -1100,12 +1093,12 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
             elevation={0}
             sx={{
               p: 3,
-              borderRadius: 3,
-              border: `1px solid ${colors.border}`,
-              bgcolor: colors.paper,
+              borderRadius: 2,
+              border: `1px solid ${borderColor}`,
+              bgcolor: cardBg,
             }}
           >
-            <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 3, color: colors.text }}>
+            <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 3, color: textColor }}>
               S/4HANA Connection Settings
             </Typography>
             <Grid container spacing={2}>
@@ -1148,7 +1141,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
             elevation={0}
             sx={{
               p: 3,
-              borderRadius: 3,
+              borderRadius: 2,
               border: `2px solid #10b981`,
               bgcolor: alpha('#10b981', darkMode ? 0.1 : 0.05),
             }}
@@ -1160,16 +1153,16 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
               </Typography>
             </Stack>
             <Stack spacing={1}>
-              <Typography variant="body2" sx={{ color: colors.textSecondary }}>
+              <Typography variant="body2" sx={{ color: textSecondary }}>
                 • 3,247 GL accounts found
               </Typography>
-              <Typography variant="body2" sx={{ color: colors.textSecondary }}>
+              <Typography variant="body2" sx={{ color: textSecondary }}>
                 • ACDOCA access confirmed
               </Typography>
-              <Typography variant="body2" sx={{ color: colors.textSecondary }}>
+              <Typography variant="body2" sx={{ color: textSecondary }}>
                 • 18 months of data available
               </Typography>
-              <Typography variant="body2" sx={{ color: colors.textSecondary }}>
+              <Typography variant="body2" sx={{ color: textSecondary }}>
                 • All company codes accessible
               </Typography>
             </Stack>
@@ -1182,25 +1175,25 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
             elevation={0}
             sx={{
               p: 3,
-              borderRadius: 3,
-              border: `1px solid ${colors.border}`,
-              bgcolor: colors.paper,
+              borderRadius: 2,
+              border: `1px solid ${borderColor}`,
+              bgcolor: cardBg,
             }}
           >
-            <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, color: colors.text }}>
+            <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, color: textColor }}>
               Scope Selection
             </Typography>
             <Stack direction="row" spacing={3}>
               <Stack direction="row" spacing={1} alignItems="center">
-                <input type="checkbox" defaultChecked style={{ accentColor: MODULE_COLOR }} />
+                <input type="checkbox" defaultChecked style={{ accentColor: MODULE_NAVY }} />
                 <Typography variant="body2">1000 - US Operations</Typography>
               </Stack>
               <Stack direction="row" spacing={1} alignItems="center">
-                <input type="checkbox" defaultChecked style={{ accentColor: MODULE_COLOR }} />
+                <input type="checkbox" defaultChecked style={{ accentColor: MODULE_NAVY }} />
                 <Typography variant="body2">2000 - EU Operations</Typography>
               </Stack>
               <Stack direction="row" spacing={1} alignItems="center">
-                <input type="checkbox" style={{ accentColor: MODULE_COLOR }} />
+                <input type="checkbox" style={{ accentColor: MODULE_NAVY }} />
                 <Typography variant="body2">3000 - APAC Operations</Typography>
               </Stack>
             </Stack>
@@ -1221,10 +1214,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
           size="large"
           startIcon={<RunIcon />}
           onClick={() => setActiveSection('account-matching')}
-          sx={{
-            bgcolor: MODULE_COLOR,
-            '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.9) },
-          }}
+          sx={masterDataTheme.buttons.primary}
         >
           Run Health Analysis
         </Button>
@@ -1241,69 +1231,65 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
 
     return (
       <Box>
-        {/* Header with icon - matching Inventory Health Check */}
-        <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-          <Box sx={{ width: 48, height: 48, borderRadius: 2, bgcolor: alpha('#0ea5a9', 0.15), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <LinkIcon sx={{ fontSize: 28, color: '#0ea5a9' }} />
-          </Box>
-          <Box sx={{ flex: 1 }}>
-            <Stack direction="row" spacing={1} alignItems="center">
-              <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
-                Account Matching
+        {/* Header with icon - matching AP.AI drilldown pattern */}
+        <Paper elevation={0} sx={{ p: 2.5, borderRadius: 2, mb: 3, bgcolor: cardBg, border: `1px solid ${borderColor}` }}>
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Box>
+              <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+                <Chip label="GL.AI" size="small" sx={{ bgcolor: MODULE_NAVY, color: '#fff', fontWeight: 700, fontSize: '0.7rem' }} />
+                <Typography variant="caption" sx={{ color: MODULE_NAVY, textTransform: 'uppercase', letterSpacing: 1 }}>
+                  Account Matching
+                </Typography>
+              </Stack>
+              <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+                <Typography variant="h5" fontWeight={700} sx={{ color: textColor }}>
+                  Account Matching
+                </Typography>
+                <Chip label="Demo Data" size="small" icon={<WarningIcon sx={{ fontSize: 14 }} />} sx={{ bgcolor: alpha('#f59e0b', 0.1), color: '#f59e0b', fontWeight: 600, fontSize: '0.7rem' }} />
+              </Stack>
+              <Typography variant="body2" sx={{ color: textSecondary }}>
+                AI-powered mapping of source GL accounts to target S/4HANA YCOA with confidence scoring
               </Typography>
-              <Chip label="Demo Data" size="small" icon={<WarningIcon sx={{ fontSize: 14 }} />} sx={{ bgcolor: alpha('#f59e0b', 0.1), color: '#f59e0b', fontWeight: 600, fontSize: '0.7rem' }} />
+            </Box>
+            <Stack direction="row" spacing={1}>
+              <IconButton sx={{ border: `1px solid ${borderColor}` }}>
+                <RefreshIcon />
+              </IconButton>
+              <IconButton sx={{ border: `1px solid ${borderColor}` }}>
+                <DownloadIcon />
+              </IconButton>
             </Stack>
-            <Typography variant="body2" sx={{ color: colors.textSecondary }}>
-              AI-powered mapping of source GL accounts to target S/4HANA YCOA with confidence scoring
-            </Typography>
-          </Box>
-          <Stack direction="row" spacing={1}>
-            <IconButton sx={{ border: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` }}>
-              <RefreshIcon />
-            </IconButton>
-            <IconButton sx={{ border: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` }}>
-              <DownloadIcon />
-            </IconButton>
           </Stack>
-        </Stack>
+        </Paper>
 
-      {/* Metrics Row - like Inventory Health Check */}
-      <Paper
-        elevation={0}
-        sx={{
-          mb: 3,
-          borderRadius: 2,
-          border: `1px solid ${colors.border}`,
-          bgcolor: colors.paper,
-          overflow: 'hidden',
-        }}
-      >
-        <Grid container>
-          {[
-            { label: 'MAPPED', value: '2,891', color: '#10b981' },
-            { label: 'PENDING', value: '287', color: '#f59e0b' },
-            { label: 'UNMAPPED', value: '69', color: '#ef4444' },
-            { label: 'HIGH CONF', value: '2,456', color: '#0ea5a9' },
-            { label: 'AVG CONF', value: '94%', color: '#10b981' },
-            { label: 'AI SUGGESTIONS', value: '142', color: '#00357a' },
-          ].map((metric, index) => (
-            <Grid item xs={6} md={2} key={index} sx={{ borderRight: index < 5 ? `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` : 'none' }}>
-              <Box sx={{ p: 2 }}>
-                <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: metric.color, textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.5 }}>
+      {/* Metrics Row - matching AP.AI stat cards */}
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        {[
+          { label: 'MAPPED', value: '2,891', color: '#10b981' },
+          { label: 'PENDING', value: '287', color: '#f59e0b' },
+          { label: 'UNMAPPED', value: '69', color: '#ef4444' },
+          { label: 'HIGH CONF', value: '2,456', color: NAVY_BLUE },
+          { label: 'AVG CONF', value: '94%', color: '#10b981' },
+          { label: 'AI SUGGESTIONS', value: '142', color: MODULE_NAVY },
+        ].map((metric, index) => (
+          <Grid item xs={6} md={2} key={index}>
+            <Card variant="outlined" sx={{ borderLeft: `3px solid ${metric.color}` }}>
+              <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                <Typography sx={{ fontSize: '0.7rem', color: textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>
                   {metric.label}
                 </Typography>
-                <Typography variant="h5" fontWeight={700} sx={{ color: metric.color }}>
+                <Typography variant="h4" fontWeight={700} sx={{ color: metric.color }}>
                   {metric.value}
                 </Typography>
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
-      </Paper>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
 
       {/* Filters Row - like Inventory Health Check */}
       <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-        <FilterIcon sx={{ color: colors.textSecondary }} />
+        <FilterIcon sx={{ color: textSecondary }} />
         <FormControl size="small" sx={{ minWidth: 100 }}>
           <InputLabel>Status</InputLabel>
           <Select defaultValue="All" label="Status">
@@ -1334,7 +1320,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
           </Select>
         </FormControl>
         <Box sx={{ flex: 1 }} />
-        <Typography variant="body2" sx={{ color: colors.textSecondary }}>
+        <Typography variant="body2" sx={{ color: textSecondary }}>
           Showing {mockAccountsWithFields.length} of {mockAccountsWithFields.length} accounts
         </Typography>
       </Stack>
@@ -1343,25 +1329,31 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 3,
-          border: `1px solid ${colors.border}`,
-          bgcolor: colors.paper,
+          borderRadius: 2,
+          border: `1px solid ${borderColor}`,
+          bgcolor: cardBg,
           overflow: 'hidden',
-        }}
+                  }}
       >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1.5, bgcolor: darkMode ? '#21262d' : '#f1f5f9', borderBottom: `1px solid ${borderColor}` }}>
+          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#f87171' }} />
+          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#fbbf24' }} />
+          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#34d399' }} />
+          <Typography variant="caption" sx={{ color: textSecondary, ml: 1 }}>Account Mapping Results — Feb 6, 2026</Typography>
+        </Box>
         <TableContainer>
           <Table size="small">
             <TableHead>
-              <TableRow sx={{ bgcolor: colors.background }}>
+              <TableRow sx={{ bgcolor: bgColor }}>
                 <TableCell sx={{ width: 40, p: 1 }} />
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>Source Account</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>Source Description</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>Target YCOA</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>Target Description</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>Map Conf</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>Method</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>AI Overrides</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>Status</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>Source Account</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>Source Description</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>Target YCOA</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>Target Description</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>Map Conf</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>Method</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>AI Overrides</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>Status</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -1373,27 +1365,27 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                     <TableRow
                       sx={{
                         cursor: 'pointer',
-                        bgcolor: isExpanded ? (darkMode ? 'rgba(0,53,122,0.1)' : 'rgba(0,53,122,0.03)') : 'transparent',
-                        '&:hover': { bgcolor: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' },
+                        bgcolor: isExpanded ? (darkMode ? alpha(MODULE_NAVY, 0.1) : alpha(MODULE_NAVY, 0.03)) : 'transparent',
+                        '&:hover': { bgcolor: darkMode ? alpha('#fff', 0.03) : alpha('#000', 0.02) },
                         borderBottom: isExpanded ? 'none' : undefined,
                       }}
                       onClick={() => toggleRowExpansion(account.id)}
                     >
                       <TableCell sx={{ p: 1 }}>
-                        <IconButton size="small" sx={{ color: MODULE_COLOR }}>
+                        <IconButton size="small" sx={{ color: MODULE_NAVY }}>
                           {isExpanded ? <ExpandMoreIcon /> : <ChevronRightIcon />}
                         </IconButton>
                       </TableCell>
-                      <TableCell sx={{ fontFamily: 'monospace', color: colors.text, py: 1.5 }}>
+                      <TableCell sx={{ fontFamily: 'monospace', color: textColor, py: 1.5 }}>
                         {account.sourceAccount}
                       </TableCell>
-                      <TableCell sx={{ color: colors.textSecondary, fontSize: '0.85rem', py: 1.5 }}>
+                      <TableCell sx={{ color: textSecondary, fontSize: '0.85rem', py: 1.5 }}>
                         {account.sourceDesc}
                       </TableCell>
-                      <TableCell sx={{ fontFamily: 'monospace', fontWeight: 600, color: MODULE_COLOR, py: 1.5 }}>
+                      <TableCell sx={{ fontFamily: 'monospace', fontWeight: 600, color: MODULE_NAVY, py: 1.5 }}>
                         {account.targetAccount}
                       </TableCell>
-                      <TableCell sx={{ color: colors.textSecondary, fontSize: '0.85rem', py: 1.5 }}>
+                      <TableCell sx={{ color: textSecondary, fontSize: '0.85rem', py: 1.5 }}>
                         {account.targetDesc}
                       </TableCell>
                       <TableCell align="center" sx={{ py: 1.5 }}>
@@ -1408,7 +1400,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                           }}
                         />
                       </TableCell>
-                      <TableCell sx={{ color: colors.textSecondary, fontSize: '0.75rem', py: 1.5 }}>
+                      <TableCell sx={{ color: textSecondary, fontSize: '0.75rem', py: 1.5 }}>
                         {account.mappingMethod}
                       </TableCell>
                       <TableCell align="center" sx={{ py: 1.5 }}>
@@ -1417,8 +1409,8 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                           label={`${account.fieldsOverridden}/${account.fieldsTotal}`}
                           size="small"
                           sx={{
-                            bgcolor: hasOverrides ? alpha('#3b82f6', 0.1) : alpha('#6b7280', 0.1),
-                            color: hasOverrides ? '#3b82f6' : '#6b7280',
+                            bgcolor: hasOverrides ? alpha(NAVY_BLUE, 0.1) : alpha('#6b7280', 0.1),
+                            color: hasOverrides ? NAVY_BLUE : '#6b7280',
                             fontWeight: 600,
                             fontSize: '0.7rem',
                             '& .MuiChip-icon': { color: 'inherit' }
@@ -1451,10 +1443,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
           size="large"
           endIcon={<ArrowForwardIcon />}
           onClick={() => setActiveSection('output-table')}
-          sx={{
-            bgcolor: MODULE_COLOR,
-            '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.9) },
-          }}
+          sx={masterDataTheme.buttons.primary}
         >
           Proceed to Output Table
         </Button>
@@ -1466,62 +1455,58 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
   // Issue Detection Section (Governance Mode)
   const renderIssueDetection = () => (
     <Box>
-      {/* Header with icon */}
-      <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-        <Box sx={{ width: 48, height: 48, borderRadius: 2, bgcolor: alpha('#ef4444', 0.15), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <WarningIcon sx={{ fontSize: 28, color: '#ef4444' }} />
-        </Box>
-        <Box sx={{ flex: 1 }}>
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
-              Issue Detection
+      {/* Header with icon - matching AP.AI drilldown pattern */}
+      <Paper elevation={0} sx={{ p: 2.5, borderRadius: 2, mb: 3, bgcolor: cardBg, border: `1px solid ${borderColor}` }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Box>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+              <Chip label="GL.AI" size="small" sx={{ bgcolor: MODULE_NAVY, color: '#fff', fontWeight: 700, fontSize: '0.7rem' }} />
+              <Typography variant="caption" sx={{ color: MODULE_NAVY, textTransform: 'uppercase', letterSpacing: 1 }}>
+                Issue Detection
+              </Typography>
+            </Stack>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+              <Typography variant="h5" fontWeight={700} sx={{ color: textColor }}>
+                Issue Detection
+              </Typography>
+              <Chip label="Demo Data" size="small" icon={<WarningIcon sx={{ fontSize: 14 }} />} sx={{ bgcolor: alpha('#f59e0b', 0.1), color: '#f59e0b', fontWeight: 600, fontSize: '0.7rem' }} />
+            </Stack>
+            <Typography variant="body2" sx={{ color: textSecondary }}>
+              AI-detected issues in GL master data requiring attention and remediation
             </Typography>
-            <Chip label="Demo Data" size="small" icon={<WarningIcon sx={{ fontSize: 14 }} />} sx={{ bgcolor: alpha('#f59e0b', 0.1), color: '#f59e0b', fontWeight: 600, fontSize: '0.7rem' }} />
+          </Box>
+          <Stack direction="row" spacing={1}>
+            <Button variant="outlined" size="small" startIcon={<RefreshIcon />} sx={masterDataTheme.buttons.secondary}>
+              Re-scan
+            </Button>
+            <IconButton sx={{ border: `1px solid ${borderColor}` }}>
+              <DownloadIcon />
+            </IconButton>
           </Stack>
-          <Typography variant="body2" sx={{ color: colors.textSecondary }}>
-            AI-detected issues in GL master data requiring attention and remediation
-          </Typography>
-        </Box>
-        <Stack direction="row" spacing={1}>
-          <Button variant="outlined" size="small" startIcon={<RefreshIcon />} sx={{ borderColor: 'divider' }}>
-            Re-scan
-          </Button>
-          <IconButton sx={{ border: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` }}>
-            <DownloadIcon />
-          </IconButton>
         </Stack>
-      </Stack>
+      </Paper>
 
-      {/* Issue Stats Row */}
-      <Paper
-        elevation={0}
-        sx={{
-          mb: 3,
-          borderRadius: 2,
-          border: `1px solid ${colors.border}`,
-          bgcolor: colors.paper,
-          overflow: 'hidden',
-        }}
-      >
-        <Grid container>
-          {issueStats.map((stat, index) => (
-            <Grid item xs={6} md key={index} sx={{ borderRight: index < issueStats.length - 1 ? `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` : 'none' }}>
-              <Box sx={{ p: 2 }}>
-                <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: stat.color, textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.5 }}>
+      {/* Issue Stats Row - matching AP.AI stat cards */}
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        {issueStats.map((stat, index) => (
+          <Grid item xs={6} md key={index}>
+            <Card variant="outlined" sx={{ borderLeft: `3px solid ${stat.color}` }}>
+              <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                <Typography sx={{ fontSize: '0.7rem', color: textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>
                   {stat.label}
                 </Typography>
-                <Typography variant="h5" fontWeight={700} sx={{ color: stat.color }}>
+                <Typography variant="h4" fontWeight={700} sx={{ color: stat.color }}>
                   {stat.value}
                 </Typography>
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
-      </Paper>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
 
       {/* Filters Row */}
       <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-        <FilterIcon sx={{ color: colors.textSecondary }} />
+        <FilterIcon sx={{ color: textSecondary }} />
         <FormControl size="small" sx={{ minWidth: 100 }}>
           <InputLabel>Severity</InputLabel>
           <Select defaultValue="All" label="Severity">
@@ -1552,7 +1537,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
           </Select>
         </FormControl>
         <Box sx={{ flex: 1 }} />
-        <Typography variant="body2" sx={{ color: colors.textSecondary }}>
+        <Typography variant="body2" sx={{ color: textSecondary }}>
           Showing {mockIssues.length} issues
         </Typography>
       </Stack>
@@ -1561,12 +1546,18 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 3,
-          border: `1px solid ${colors.border}`,
-          bgcolor: colors.paper,
+          borderRadius: 2,
+          border: `1px solid ${borderColor}`,
+          bgcolor: cardBg,
           overflow: 'hidden',
-        }}
+                  }}
       >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1.5, bgcolor: darkMode ? '#21262d' : '#f1f5f9', borderBottom: `1px solid ${borderColor}` }}>
+          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#f87171' }} />
+          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#fbbf24' }} />
+          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#34d399' }} />
+          <Typography variant="caption" sx={{ color: textSecondary, ml: 1 }}>Issue Detection Results — Feb 6, 2026</Typography>
+        </Box>
         <DataGrid
           rows={mockIssues}
           columns={[
@@ -1580,7 +1571,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                   width: 4,
                   height: 32,
                   borderRadius: 1,
-                  bgcolor: params.value === 'critical' ? '#ef4444' : params.value === 'high' ? '#f59e0b' : '#3b82f6',
+                  bgcolor: params.value === 'critical' ? '#ef4444' : params.value === 'high' ? '#f59e0b' : NAVY_BLUE,
                 }}/>
               ),
             },
@@ -1589,7 +1580,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
               headerName: 'Account',
               width: 100,
               renderCell: (params) => (
-                <Typography sx={{ fontFamily: 'monospace', color: MODULE_COLOR, fontWeight: 600 }}>
+                <Typography sx={{ fontFamily: 'monospace', color: MODULE_NAVY, fontWeight: 600 }}>
                   {params.value}
                 </Typography>
               ),
@@ -1600,7 +1591,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
               flex: 1,
               minWidth: 250,
               renderCell: (params) => (
-                <Typography variant="body2" fontWeight={500} sx={{ color: colors.text }}>
+                <Typography variant="body2" fontWeight={500} sx={{ color: textColor }}>
                   {params.value}
                 </Typography>
               ),
@@ -1610,7 +1601,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
               headerName: 'Category',
               width: 130,
               renderCell: (params) => (
-                <Chip label={params.value} size="small" sx={{ bgcolor: alpha(MODULE_COLOR, 0.1), color: MODULE_COLOR, fontSize: '0.7rem' }} />
+                <Chip label={params.value} size="small" sx={{ bgcolor: alpha(MODULE_NAVY, 0.1), color: MODULE_NAVY, fontSize: '0.7rem' }} />
               ),
             },
             {
@@ -1636,7 +1627,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
               headerName: 'Last Detected',
               width: 120,
               renderCell: (params) => (
-                <Typography variant="body2" sx={{ color: colors.textSecondary, fontSize: '0.8rem' }}>
+                <Typography variant="body2" sx={{ color: textSecondary, fontSize: '0.8rem' }}>
                   {params.value}
                 </Typography>
               ),
@@ -1649,7 +1640,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
               renderCell: () => (
                 <Stack direction="row" spacing={0.5}>
                   <Tooltip title="Remediate">
-                    <IconButton size="small" sx={{ color: MODULE_COLOR }}>
+                    <IconButton size="small" sx={{ color: MODULE_NAVY }}>
                       <RemediationIcon sx={{ fontSize: 18 }} />
                     </IconButton>
                   </Tooltip>
@@ -1686,29 +1677,19 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
             params.row.severity === 'critical' ? 'row-critical' : params.row.severity === 'high' ? 'row-high' : ''
           }
           sx={{
-            border: 'none',
+            ...masterDataTheme.getDataGridSx({ darkMode }),
             '& .MuiDataGrid-toolbarContainer': {
               padding: 2,
               gap: 2,
-              borderBottom: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
-            },
-            '& .MuiDataGrid-columnHeaders': {
-              bgcolor: colors.background,
-              borderBottom: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
-            },
-            '& .MuiDataGrid-columnHeaderTitle': {
-              fontWeight: 600,
-              color: colors.text,
+              borderBottom: masterDataTheme.borders.subtle(darkMode),
             },
             '& .row-critical': {
-              bgcolor: 'rgba(239, 68, 68, 0.03)',
+              borderLeft: '3px solid #ef4444',
+              bgcolor: alpha('#ef4444', 0.03),
             },
             '& .row-high': {
-              bgcolor: 'rgba(245, 158, 11, 0.03)',
-            },
-            '& .MuiDataGrid-footerContainer': {
-              borderTop: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
-              bgcolor: colors.background,
+              borderLeft: '3px solid #f59e0b',
+              bgcolor: alpha('#f59e0b', 0.03),
             },
           }}
         />
@@ -1721,10 +1702,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
           size="large"
           endIcon={<ArrowForwardIcon />}
           onClick={() => setActiveSection('output-table')}
-          sx={{
-            bgcolor: MODULE_COLOR,
-            '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.9) },
-          }}
+          sx={masterDataTheme.buttons.primary}
         >
           Proceed to Remediation
         </Button>
@@ -1741,46 +1719,51 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
 
     return (
       <Box>
-        <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-          <Box sx={{ width: 48, height: 48, borderRadius: 2, bgcolor: alpha(MODULE_COLOR, 0.15), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <TableChartIcon sx={{ fontSize: 28, color: MODULE_COLOR }} />
-          </Box>
-          <Box sx={{ flex: 1 }}>
-            <Stack direction="row" spacing={1} alignItems="center">
-              <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
-                Output Table
+        <Paper elevation={0} sx={{ p: 2.5, borderRadius: 2, mb: 3, bgcolor: cardBg, border: `1px solid ${borderColor}` }}>
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Box>
+              <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+                <Chip label="GL.AI" size="small" sx={{ bgcolor: MODULE_NAVY, color: '#fff', fontWeight: 700, fontSize: '0.7rem' }} />
+                <Typography variant="caption" sx={{ color: MODULE_NAVY, textTransform: 'uppercase', letterSpacing: 1 }}>
+                  Output Table
+                </Typography>
+              </Stack>
+              <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+                <Typography variant="h5" fontWeight={700} sx={{ color: textColor }}>
+                  Output Table
+                </Typography>
+                <Chip
+                  label={outputViewMode === 'account' ? 'Account View' : 'Field View'}
+                  size="small"
+                  sx={{ bgcolor: alpha(MODULE_NAVY, 0.1), color: MODULE_NAVY, fontWeight: 600, fontSize: '0.7rem' }}
+                />
+              </Stack>
+              <Typography variant="body2" sx={{ color: textSecondary }}>
+                Review final mappings and export to CSV, Excel, or SAP LSMW format for migration
               </Typography>
-              <Chip
-                label={outputViewMode === 'account' ? 'Account View' : 'Field View'}
-                size="small"
-                sx={{ bgcolor: alpha(MODULE_COLOR, 0.1), color: MODULE_COLOR, fontWeight: 600, fontSize: '0.7rem' }}
-              />
-            </Stack>
-            <Typography variant="body2" sx={{ color: colors.textSecondary }}>
-              Review final mappings and export to CSV, Excel, or SAP LSMW format for migration
-            </Typography>
-          </Box>
-          <ToggleButtonGroup
-            value={outputViewMode}
-            exclusive
-            onChange={(e, newMode) => newMode && setOutputViewMode(newMode)}
-            size="small"
-            sx={{
-              '& .MuiToggleButton-root': {
-                textTransform: 'none',
-                px: 2,
-                '&.Mui-selected': {
-                  bgcolor: alpha(MODULE_COLOR, 0.1),
-                  color: MODULE_COLOR,
-                  '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.15) }
+            </Box>
+            <ToggleButtonGroup
+              value={outputViewMode}
+              exclusive
+              onChange={(e, newMode) => newMode && setOutputViewMode(newMode)}
+              size="small"
+              sx={{
+                '& .MuiToggleButton-root': {
+                  textTransform: 'none',
+                  px: 2,
+                  '&.Mui-selected': {
+                    bgcolor: alpha(MODULE_NAVY, 0.1),
+                    color: MODULE_NAVY,
+                    '&:hover': { bgcolor: alpha(MODULE_NAVY, 0.15) }
+                  }
                 }
-              }
-            }}
-          >
-            <ToggleButton value="account">Account View</ToggleButton>
-            <ToggleButton value="field">Field View</ToggleButton>
-          </ToggleButtonGroup>
-        </Stack>
+              }}
+            >
+              <ToggleButton value="account">Account View</ToggleButton>
+              <ToggleButton value="field">Field View</ToggleButton>
+            </ToggleButtonGroup>
+          </Stack>
+        </Paper>
 
       {/* Export Options */}
       <Paper
@@ -1789,16 +1772,16 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
           p: 2.5,
           borderRadius: 2,
           mb: 3,
-          border: `1px solid ${colors.border}`,
-          bgcolor: colors.paper,
+          border: `1px solid ${borderColor}`,
+          bgcolor: cardBg,
         }}
       >
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Box>
-            <Typography variant="subtitle2" fontWeight={600} sx={{ color: colors.text }}>
+            <Typography variant="subtitle2" fontWeight={600} sx={{ color: textColor }}>
               Export {outputViewMode === 'account' ? 'Account Mappings' : 'Field-Level Data'}
             </Typography>
-            <Typography variant="caption" sx={{ color: colors.textSecondary }}>
+            <Typography variant="caption" sx={{ color: textSecondary }}>
               {outputViewMode === 'account'
                 ? `${mockAccountsWithFields.filter(m => m.status === 'approved').length} accounts ready for export`
                 : `${mockFieldLevelExport.filter(m => m.status === 'approved').length} field-level records ready for export`
@@ -1806,65 +1789,65 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
             </Typography>
           </Box>
           <Stack direction="row" spacing={1}>
-            <Button variant="outlined" size="small" startIcon={<DownloadIcon />} sx={{ borderColor: 'divider', fontSize: '0.8rem' }}>
+            <Button variant="outlined" size="small" startIcon={<DownloadIcon />} sx={{ ...masterDataTheme.buttons.ghost, fontSize: '0.8rem' }}>
               CSV
             </Button>
-            <Button variant="outlined" size="small" startIcon={<DownloadIcon />} sx={{ borderColor: 'divider', fontSize: '0.8rem' }}>
+            <Button variant="outlined" size="small" startIcon={<DownloadIcon />} sx={{ ...masterDataTheme.buttons.ghost, fontSize: '0.8rem' }}>
               Excel
             </Button>
-            <Button variant="outlined" size="small" startIcon={<DownloadIcon />} sx={{ borderColor: 'divider', fontSize: '0.8rem' }}>
+            <Button variant="outlined" size="small" startIcon={<DownloadIcon />} sx={{ ...masterDataTheme.buttons.ghost, fontSize: '0.8rem' }}>
               LSMW
             </Button>
-            <Button variant="contained" size="small" startIcon={<DownloadIcon />} sx={{ bgcolor: MODULE_COLOR, fontSize: '0.8rem' }}>
+            <Button variant="contained" size="small" startIcon={<DownloadIcon />} sx={{ ...masterDataTheme.buttons.primary, fontSize: '0.8rem' }}>
               All Formats
             </Button>
           </Stack>
         </Stack>
       </Paper>
 
-      {/* Summary Stats */}
+      {/* Summary Stats - matching AP.AI Card pattern */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={6} md={3}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, bgcolor: alpha('#10b981', 0.1), textAlign: 'center', border: `1px solid ${alpha('#10b981', 0.2)}` }}>
-            <Typography variant="h4" fontWeight={700} sx={{ color: '#10b981' }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, bgcolor: cardBg, textAlign: 'center', border: `1px solid ${borderColor}` }}>
+            <Typography sx={{ fontWeight: 700, color: '#10b981', fontSize: '2rem', lineHeight: 1.1, mb: 0.5 }}>
               {outputViewMode === 'account' ? mockAccountsWithFields.filter(a => a.status === 'approved').length : mockFieldLevelExport.filter(f => f.status === 'approved').length}
             </Typography>
-            <Typography variant="body2" sx={{ color: colors.textSecondary }}>
+            <Typography variant="caption" sx={{ color: textSecondary, textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600, fontSize: '0.65rem' }}>
               {outputViewMode === 'account' ? 'Approved Accounts' : 'Approved Fields'}
             </Typography>
           </Paper>
         </Grid>
         <Grid item xs={6} md={3}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, bgcolor: alpha('#3b82f6', 0.1), textAlign: 'center', border: `1px solid ${alpha('#3b82f6', 0.2)}` }}>
-            <Typography variant="h4" fontWeight={700} sx={{ color: '#3b82f6' }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, bgcolor: cardBg, textAlign: 'center', border: `1px solid ${borderColor}` }}>
+            <Typography sx={{ fontWeight: 700, color: '#1565c0', fontSize: '2rem', lineHeight: 1.1, mb: 0.5 }}>
               {outputViewMode === 'account'
                 ? mockAccountsWithFields.reduce((sum, a) => sum + a.fieldsOverridden, 0)
                 : mockFieldLevelExport.filter(f => f.ycoaDefault !== f.aiRecommendation).length
               }
             </Typography>
-            <Typography variant="body2" sx={{ color: colors.textSecondary }}>AI Overrides</Typography>
+            <Typography variant="caption" sx={{ color: textSecondary, textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600, fontSize: '0.65rem' }}>AI Overrides</Typography>
           </Paper>
         </Grid>
         <Grid item xs={6} md={3}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, bgcolor: alpha('#f59e0b', 0.1), textAlign: 'center', border: `1px solid ${alpha('#f59e0b', 0.2)}` }}>
-            <Typography variant="h4" fontWeight={700} sx={{ color: '#f59e0b' }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, bgcolor: cardBg, textAlign: 'center', border: `1px solid ${borderColor}` }}>
+            <Typography sx={{ fontWeight: 700, color: '#f59e0b', fontSize: '2rem', lineHeight: 1.1, mb: 0.5 }}>
               {outputViewMode === 'account'
                 ? mockAccountsWithFields.filter(a => a.status === 'review').length
                 : mockFieldLevelExport.filter(f => f.status === 'proposed' || f.status === 'review').length
               }
             </Typography>
-            <Typography variant="body2" sx={{ color: colors.textSecondary }}>Pending Review</Typography>
+            <Typography variant="caption" sx={{ color: textSecondary, textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600, fontSize: '0.65rem' }}>Pending Review</Typography>
           </Paper>
         </Grid>
         <Grid item xs={6} md={3}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, bgcolor: alpha(MODULE_COLOR, 0.1), textAlign: 'center', border: `1px solid ${alpha(MODULE_COLOR, 0.2)}` }}>
-            <Typography variant="h4" fontWeight={700} sx={{ color: MODULE_COLOR }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, bgcolor: cardBg, textAlign: 'center', border: `1px solid ${borderColor}` }}>
+            <Typography sx={{ fontWeight: 700, color: MODULE_NAVY, fontSize: '2rem', lineHeight: 1.1, mb: 0.5 }}>
               {outputViewMode === 'account'
                 ? `${Math.round((mockAccountsWithFields.filter(a => a.status === 'approved').length / mockAccountsWithFields.length) * 100)}%`
                 : `${Math.round((mockFieldLevelExport.filter(f => f.status === 'approved').length / mockFieldLevelExport.length) * 100)}%`
               }
             </Typography>
-            <Typography variant="body2" sx={{ color: colors.textSecondary }}>Coverage Rate</Typography>
+            <Typography variant="caption" sx={{ color: textSecondary, textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600, fontSize: '0.65rem' }}>Coverage Rate</Typography>
           </Paper>
         </Grid>
       </Grid>
@@ -1873,28 +1856,28 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
       {outputViewMode === 'account' && (
         <TableContainer component={Paper} elevation={0} sx={{
           borderRadius: 2,
-          border: `1px solid ${colors.border}`,
-          bgcolor: colors.paper,
+          border: `1px solid ${borderColor}`,
+          bgcolor: cardBg,
         }}>
           <Table size="small">
             <TableHead>
-              <TableRow sx={{ bgcolor: colors.background }}>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>Source Account</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>Source Description</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>Target YCOA</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>Target Description</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>Map Conf</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>AI Overrides</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>Status</TableCell>
+              <TableRow sx={{ bgcolor: bgColor }}>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>Source Account</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>Source Description</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>Target YCOA</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>Target Description</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>Map Conf</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>AI Overrides</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>Status</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {mockAccountsWithFields.map((row) => (
-                <TableRow key={row.id} sx={{ '&:hover': { bgcolor: darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' } }}>
-                  <TableCell sx={{ fontFamily: 'monospace', color: colors.text }}>{row.sourceAccount}</TableCell>
-                  <TableCell sx={{ color: colors.textSecondary, fontSize: '0.85rem' }}>{row.sourceDesc}</TableCell>
-                  <TableCell sx={{ color: MODULE_COLOR, fontFamily: 'monospace', fontWeight: 600 }}>{row.targetAccount}</TableCell>
-                  <TableCell sx={{ color: colors.textSecondary, fontSize: '0.85rem' }}>{row.targetDesc}</TableCell>
+                <TableRow key={row.id} sx={{ '&:hover': { bgcolor: darkMode ? alpha('#fff', 0.02) : alpha('#000', 0.02) } }}>
+                  <TableCell sx={{ fontFamily: 'monospace', color: textColor }}>{row.sourceAccount}</TableCell>
+                  <TableCell sx={{ color: textSecondary, fontSize: '0.85rem' }}>{row.sourceDesc}</TableCell>
+                  <TableCell sx={{ color: MODULE_NAVY, fontFamily: 'monospace', fontWeight: 600 }}>{row.targetAccount}</TableCell>
+                  <TableCell sx={{ color: textSecondary, fontSize: '0.85rem' }}>{row.targetDesc}</TableCell>
                   <TableCell align="center">
                     <Chip
                       label={`${row.mappingConfidence}%`}
@@ -1913,8 +1896,8 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                       label={`${row.fieldsOverridden}/${row.fieldsTotal}`}
                       size="small"
                       sx={{
-                        bgcolor: row.fieldsOverridden > 0 ? alpha('#3b82f6', 0.1) : alpha('#6b7280', 0.1),
-                        color: row.fieldsOverridden > 0 ? '#3b82f6' : '#6b7280',
+                        bgcolor: row.fieldsOverridden > 0 ? alpha(NAVY_BLUE, 0.1) : alpha('#6b7280', 0.1),
+                        color: row.fieldsOverridden > 0 ? NAVY_BLUE : '#6b7280',
                         fontWeight: 600,
                         fontSize: '0.7rem',
                         '& .MuiChip-icon': { color: 'inherit' }
@@ -1935,21 +1918,21 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
       {outputViewMode === 'field' && (
         <TableContainer component={Paper} elevation={0} sx={{
           borderRadius: 2,
-          border: `1px solid ${colors.border}`,
-          bgcolor: colors.paper,
+          border: `1px solid ${borderColor}`,
+          bgcolor: cardBg,
         }}>
           <Table size="small">
             <TableHead>
-              <TableRow sx={{ bgcolor: colors.background }}>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem' }}>Source GL</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem' }}>Target YCOA</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem' }}>Table</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem' }}>Field</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem' }}>Field Name</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem' }}>YCOA Default</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem' }}>AI Rec</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem' }}>Conf</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem' }}>Status</TableCell>
+              <TableRow sx={{ bgcolor: bgColor }}>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.75rem' }}>Source GL</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.75rem' }}>Target YCOA</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.75rem' }}>Table</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.75rem' }}>Field</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.75rem' }}>Field Name</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.75rem' }}>YCOA Default</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.75rem' }}>AI Rec</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.75rem' }}>Conf</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.75rem' }}>Status</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -1959,15 +1942,15 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                   <TableRow
                     key={row.id}
                     sx={{
-                      bgcolor: isOverride ? alpha('#3b82f6', darkMode ? 0.08 : 0.03) : 'transparent',
-                      '&:hover': { bgcolor: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }
+                      bgcolor: isOverride ? alpha(NAVY_BLUE, darkMode ? 0.08 : 0.03) : 'transparent',
+                      '&:hover': { bgcolor: darkMode ? alpha('#fff', 0.03) : alpha('#000', 0.02) }
                     }}
                   >
-                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8rem', color: colors.text }}>{row.sourceAccount}</TableCell>
-                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8rem', fontWeight: 600, color: MODULE_COLOR }}>{row.targetAccount}</TableCell>
-                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.75rem', color: colors.textSecondary }}>{row.table}</TableCell>
-                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.75rem', fontWeight: 600, color: MODULE_COLOR }}>{row.field}</TableCell>
-                    <TableCell sx={{ fontSize: '0.75rem', color: colors.text }}>{row.fieldName}</TableCell>
+                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8rem', color: textColor }}>{row.sourceAccount}</TableCell>
+                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8rem', fontWeight: 600, color: MODULE_NAVY }}>{row.targetAccount}</TableCell>
+                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.75rem', color: textSecondary }}>{row.table}</TableCell>
+                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.75rem', fontWeight: 600, color: MODULE_NAVY }}>{row.field}</TableCell>
+                    <TableCell sx={{ fontSize: '0.75rem', color: textColor }}>{row.fieldName}</TableCell>
                     <TableCell align="center">
                       <Chip
                         label={row.ycoaDefault || '—'}
@@ -1978,7 +1961,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                           fontSize: '0.65rem',
                           fontFamily: 'monospace',
                           bgcolor: alpha('#6b7280', 0.1),
-                          color: colors.textSecondary,
+                          color: textSecondary,
                         }}
                       />
                     </TableCell>
@@ -1992,9 +1975,9 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                           fontSize: '0.65rem',
                           fontFamily: 'monospace',
                           fontWeight: 600,
-                          bgcolor: isOverride ? alpha('#3b82f6', 0.15) : alpha('#10b981', 0.1),
-                          color: isOverride ? '#3b82f6' : '#10b981',
-                          border: isOverride ? `1px solid ${alpha('#3b82f6', 0.3)}` : 'none',
+                          bgcolor: isOverride ? alpha(NAVY_BLUE, 0.15) : alpha('#10b981', 0.1),
+                          color: isOverride ? NAVY_BLUE : '#10b981',
+                          border: isOverride ? `1px solid ${alpha(NAVY_BLUE, 0.3)}` : 'none',
                         }}
                       />
                     </TableCell>
@@ -2029,25 +2012,25 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
   const renderRemediation = () => (
     <Box>
       <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-        <Box sx={{ width: 48, height: 48, borderRadius: 2, bgcolor: alpha(MODULE_COLOR, 0.15), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <RemediationIcon sx={{ fontSize: 28, color: MODULE_COLOR }} />
+        <Box sx={{ width: 48, height: 48, borderRadius: 2, bgcolor: alpha(MODULE_NAVY, 0.15), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <RemediationIcon sx={{ fontSize: 28, color: MODULE_NAVY }} />
         </Box>
         <Box sx={{ flex: 1 }}>
           <Stack direction="row" spacing={1} alignItems="center">
-            <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
+            <Typography variant="h5" fontWeight={700} sx={{ color: textColor }}>
               Remediation Workbench
             </Typography>
             <Chip label="12 pending" size="small" sx={{ bgcolor: alpha('#f59e0b', 0.1), color: '#f59e0b', fontWeight: 600, fontSize: '0.7rem' }} />
           </Stack>
-          <Typography variant="body2" sx={{ color: colors.textSecondary }}>
+          <Typography variant="body2" sx={{ color: textSecondary }}>
             Apply fixes to identified GL master data issues. Changes can be exported or pushed directly to S/4HANA.
           </Typography>
         </Box>
         <Stack direction="row" spacing={1}>
-          <Button variant="outlined" size="small" startIcon={<DownloadIcon />} sx={{ borderColor: 'divider' }}>
+          <Button variant="outlined" size="small" startIcon={<DownloadIcon />} sx={masterDataTheme.buttons.secondary}>
             Export Changes
           </Button>
-          <Button variant="contained" size="small" startIcon={<SyncIcon />} sx={{ bgcolor: MODULE_COLOR }}>
+          <Button variant="contained" size="small" startIcon={<SyncIcon />} sx={masterDataTheme.buttons.primary}>
             Push to S/4HANA
           </Button>
         </Stack>
@@ -2058,25 +2041,25 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
         <Grid item xs={12} md={3}>
           <Paper elevation={0} sx={{ p: 2, borderRadius: 2, bgcolor: alpha('#ef4444', 0.1), textAlign: 'center' }}>
             <Typography variant="h4" fontWeight={700} sx={{ color: '#ef4444' }}>12</Typography>
-            <Typography variant="body2" sx={{ color: colors.textSecondary }}>Critical Pending</Typography>
+            <Typography variant="body2" sx={{ color: textSecondary }}>Critical Pending</Typography>
           </Paper>
         </Grid>
         <Grid item xs={12} md={3}>
           <Paper elevation={0} sx={{ p: 2, borderRadius: 2, bgcolor: alpha('#f59e0b', 0.1), textAlign: 'center' }}>
             <Typography variant="h4" fontWeight={700} sx={{ color: '#f59e0b' }}>47</Typography>
-            <Typography variant="body2" sx={{ color: colors.textSecondary }}>High Priority</Typography>
+            <Typography variant="body2" sx={{ color: textSecondary }}>High Priority</Typography>
           </Paper>
         </Grid>
         <Grid item xs={12} md={3}>
           <Paper elevation={0} sx={{ p: 2, borderRadius: 2, bgcolor: alpha('#10b981', 0.1), textAlign: 'center' }}>
             <Typography variant="h4" fontWeight={700} sx={{ color: '#10b981' }}>89</Typography>
-            <Typography variant="body2" sx={{ color: colors.textSecondary }}>Resolved This Week</Typography>
+            <Typography variant="body2" sx={{ color: textSecondary }}>Resolved This Week</Typography>
           </Paper>
         </Grid>
         <Grid item xs={12} md={3}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, bgcolor: alpha(MODULE_COLOR, 0.1), textAlign: 'center' }}>
-            <Typography variant="h4" fontWeight={700} sx={{ color: MODULE_COLOR }}>72%</Typography>
-            <Typography variant="body2" sx={{ color: colors.textSecondary }}>Health Score</Typography>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 2, bgcolor: alpha(MODULE_NAVY, 0.1), textAlign: 'center' }}>
+            <Typography variant="h4" fontWeight={700} sx={{ color: MODULE_NAVY }}>72%</Typography>
+            <Typography variant="body2" sx={{ color: textSecondary }}>Health Score</Typography>
           </Paper>
         </Grid>
       </Grid>
@@ -2086,26 +2069,26 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
         elevation={0}
         sx={{
           p: 3,
-          borderRadius: 3,
+          borderRadius: 2,
           mb: 3,
-          border: `1px solid ${colors.border}`,
-          bgcolor: colors.paper,
+          border: `1px solid ${borderColor}`,
+          bgcolor: cardBg,
         }}
       >
-        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, color: colors.text }}>
+        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, color: textColor }}>
           Quick Remediation Actions
         </Typography>
         <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
-          <Button variant="outlined" size="small" startIcon={<AIIcon />} sx={{ borderColor: 'divider' }}>
+          <Button variant="outlined" size="small" startIcon={<AIIcon />} sx={masterDataTheme.buttons.secondary}>
             Auto-fix Settings Issues (23)
           </Button>
-          <Button variant="outlined" size="small" startIcon={<AIIcon />} sx={{ borderColor: 'divider' }}>
+          <Button variant="outlined" size="small" startIcon={<AIIcon />} sx={masterDataTheme.buttons.secondary}>
             Mark Dormant Accounts (847)
           </Button>
-          <Button variant="outlined" size="small" startIcon={<AIIcon />} sx={{ borderColor: 'divider' }}>
+          <Button variant="outlined" size="small" startIcon={<AIIcon />} sx={masterDataTheme.buttons.secondary}>
             Merge Duplicate Clusters (12)
           </Button>
-          <Button variant="outlined" size="small" startIcon={<ReportsIcon />} sx={{ borderColor: 'divider' }}>
+          <Button variant="outlined" size="small" startIcon={<ReportsIcon />} sx={masterDataTheme.buttons.secondary}>
             Generate Remediation Report
           </Button>
         </Stack>
@@ -2115,15 +2098,15 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 3,
-          border: `1px solid ${colors.border}`,
-          bgcolor: colors.paper,
+          borderRadius: 2,
+          border: `1px solid ${borderColor}`,
+          bgcolor: cardBg,
           overflow: 'hidden',
         }}
       >
-        <Box sx={{ p: 2, borderBottom: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}>
+        <Box sx={{ p: 2, borderBottom: `1px solid ${borderColor}` }}>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
+            <Typography variant="subtitle1" fontWeight={600} sx={{ color: textColor }}>
               Pending Remediation Items
             </Typography>
             <Button size="small" sx={{ fontSize: '0.75rem' }}>View All</Button>
@@ -2132,7 +2115,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
         <TableContainer>
           <Table size="small">
             <TableHead>
-              <TableRow sx={{ bgcolor: colors.background }}>
+              <TableRow sx={{ bgcolor: bgColor }}>
                 <TableCell sx={{ fontWeight: 600, width: 8 }}></TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Account</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Issue</TableCell>
@@ -2150,7 +2133,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                   <TableCell>
                     <Box sx={{ width: 4, height: 32, borderRadius: 1, bgcolor: item.severity === 'critical' ? '#ef4444' : '#f59e0b' }} />
                   </TableCell>
-                  <TableCell sx={{ fontFamily: 'monospace', color: MODULE_COLOR, fontWeight: 600 }}>{item.account}</TableCell>
+                  <TableCell sx={{ fontFamily: 'monospace', color: MODULE_NAVY, fontWeight: 600 }}>{item.account}</TableCell>
                   <TableCell>{item.issue}</TableCell>
                   <TableCell>
                     <Chip label={item.fix} size="small" sx={{ bgcolor: alpha('#10b981', 0.1), color: '#10b981', fontSize: '0.7rem' }} />
@@ -2163,7 +2146,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Edit">
-                        <IconButton size="small" sx={{ color: MODULE_COLOR }}>
+                        <IconButton size="small" sx={{ color: MODULE_NAVY }}>
                           <EditIcon sx={{ fontSize: 18 }} />
                         </IconButton>
                       </Tooltip>
@@ -2200,14 +2183,14 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
   };
 
   return (
-    <Box sx={{ display: 'flex', height: '100%', bgcolor: colors.background }}>
+    <Box sx={{ display: 'flex', height: '100%', bgcolor: bgColor }}>
       {/* Left Sidebar */}
       <Box
         sx={{
           width: sidebarOpen ? 260 : 64,
           flexShrink: 0,
           bgcolor: darkMode ? '#0a1019' : 'white',
-          borderRight: `1px solid ${darkMode ? '#1e2d42' : 'rgba(0,0,0,0.08)'}`,
+          borderRight: `1px solid ${borderColor}`,
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
@@ -2216,26 +2199,26 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
         }}
       >
         {/* Sidebar Header */}
-        <Box sx={{ p: sidebarOpen ? 2 : 1, borderBottom: `1px solid ${darkMode ? '#1e2d42' : 'rgba(0,0,0,0.08)'}` }}>
+        <Box sx={{ p: sidebarOpen ? 2 : 1, borderBottom: `1px solid ${borderColor}` }}>
           <Stack direction="row" spacing={1.5} alignItems="center" justifyContent={sidebarOpen ? 'flex-start' : 'center'}>
             <IconButton
               onClick={() => setSidebarOpen(!sidebarOpen)}
               sx={{
                 width: 40,
                 height: 40,
-                bgcolor: alpha(MODULE_COLOR, 0.1),
-                color: MODULE_COLOR,
-                '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.2) },
+                bgcolor: alpha(MODULE_NAVY, 0.1),
+                color: MODULE_NAVY,
+                '&:hover': { bgcolor: alpha(MODULE_NAVY, 0.2) },
               }}
             >
               {sidebarOpen ? <MenuOpenIcon /> : <MenuIcon />}
             </IconButton>
             {sidebarOpen && (
               <Box>
-                <Typography variant="subtitle1" fontWeight={700} sx={{ color: darkMode ? '#e6edf3' : MODULE_COLOR, lineHeight: 1.2 }}>
+                <Typography variant="subtitle1" fontWeight={700} sx={{ color: darkMode ? '#e6edf3' : MODULE_NAVY, lineHeight: 1.2 }}>
                   GL.AI
                 </Typography>
-                <Typography variant="caption" sx={{ color: darkMode ? '#5d7290' : 'text.secondary' }}>
+                <Typography variant="caption" sx={{ color: textSecondary }}>
                   General Ledger Intelligence
                 </Typography>
               </Box>
@@ -2245,8 +2228,8 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
 
         {/* Mode Toggle */}
         {sidebarOpen ? (
-          <Box sx={{ p: 2, borderBottom: `1px solid ${darkMode ? '#1e2d42' : 'rgba(0,0,0,0.08)'}` }}>
-            <Typography variant="caption" sx={{ color: darkMode ? '#5d7290' : 'text.secondary', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, display: 'block', mb: 1 }}>
+          <Box sx={{ p: 2, borderBottom: `1px solid ${borderColor}` }}>
+            <Typography variant="caption" sx={{ color: textSecondary, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, display: 'block', mb: 1 }}>
               Operating Mode
             </Typography>
             <ToggleButtonGroup
@@ -2264,11 +2247,11 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                   py: 1,
                   fontSize: '0.75rem',
                   fontWeight: 600,
-                  color: darkMode ? '#5d7290' : 'text.secondary',
+                  color: textSecondary,
                   '&.Mui-selected': {
-                    bgcolor: MODULE_COLOR,
+                    bgcolor: MODULE_NAVY,
                     color: 'white',
-                    '&:hover': { bgcolor: MODULE_COLOR },
+                    '&:hover': { bgcolor: MODULE_NAVY },
                   },
                 },
               }}
@@ -2278,16 +2261,16 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
             </ToggleButtonGroup>
           </Box>
         ) : (
-          <Box sx={{ p: 1, borderBottom: `1px solid ${darkMode ? '#1e2d42' : 'rgba(0,0,0,0.08)'}`, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
+          <Box sx={{ p: 1, borderBottom: `1px solid ${borderColor}`, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
             <Tooltip title="Migration Mode" placement="right">
               <IconButton
                 onClick={() => setOperatingMode('migration')}
                 sx={{
                   width: 36,
                   height: 36,
-                  bgcolor: operatingMode === 'migration' ? MODULE_COLOR : 'transparent',
+                  bgcolor: operatingMode === 'migration' ? MODULE_NAVY : 'transparent',
                   color: operatingMode === 'migration' ? 'white' : darkMode ? '#5d7290' : 'text.secondary',
-                  '&:hover': { bgcolor: operatingMode === 'migration' ? MODULE_COLOR : alpha(MODULE_COLOR, 0.1) },
+                  '&:hover': { bgcolor: operatingMode === 'migration' ? MODULE_NAVY : alpha(MODULE_NAVY, 0.1) },
                 }}
               >
                 <SyncIcon sx={{ fontSize: 18 }} />
@@ -2299,9 +2282,9 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                 sx={{
                   width: 36,
                   height: 36,
-                  bgcolor: operatingMode === 'governance' ? MODULE_COLOR : 'transparent',
+                  bgcolor: operatingMode === 'governance' ? MODULE_NAVY : 'transparent',
                   color: operatingMode === 'governance' ? 'white' : darkMode ? '#5d7290' : 'text.secondary',
-                  '&:hover': { bgcolor: operatingMode === 'governance' ? MODULE_COLOR : alpha(MODULE_COLOR, 0.1) },
+                  '&:hover': { bgcolor: operatingMode === 'governance' ? MODULE_NAVY : alpha(MODULE_NAVY, 0.1) },
                 }}
               >
                 <SecurityIcon sx={{ fontSize: 18 }} />
@@ -2313,7 +2296,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
         {/* Navigation */}
         <Box sx={{ flex: 1, overflow: 'auto', p: sidebarOpen ? 1.5 : 1 }}>
           {sidebarOpen && (
-            <Typography variant="caption" sx={{ color: darkMode ? '#5d7290' : 'text.secondary', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, px: 1, display: 'block', mb: 1 }}>
+            <Typography variant="caption" sx={{ color: textSecondary, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, px: 1, display: 'block', mb: 1 }}>
               Workflow
             </Typography>
           )}
@@ -2327,22 +2310,14 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                     selected={activeSection === item.id}
                     onClick={() => setActiveSection(item.id)}
                     sx={{
-                      borderRadius: 2,
+                      ...masterDataTheme.tabs.sidebarItem(activeSection === item.id, darkMode),
                       mb: 0.5,
                       justifyContent: sidebarOpen ? 'flex-start' : 'center',
                       px: sidebarOpen ? 1 : 1.5,
-                      '&.Mui-selected': {
-                        bgcolor: alpha(MODULE_COLOR, 0.12),
-                        color: MODULE_COLOR,
-                        '&:hover': { bgcolor: alpha(MODULE_COLOR, 0.15) },
-                      },
-                      '&:hover': {
-                        bgcolor: darkMode ? '#151f30' : 'rgba(0,0,0,0.04)',
-                      },
                     }}
                   >
                     <ListItemIcon sx={{ minWidth: sidebarOpen ? 32 : 'auto', justifyContent: 'center' }}>
-                      <item.Icon sx={{ fontSize: 18, color: activeSection === item.id ? MODULE_COLOR : darkMode ? '#a0afc4' : 'text.secondary' }} />
+                      <item.Icon sx={{ fontSize: 18, color: activeSection === item.id ? MODULE_NAVY : darkMode ? '#a0afc4' : 'text.secondary' }} />
                     </ListItemIcon>
                     {sidebarOpen && (
                       <>
@@ -2351,7 +2326,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                           primaryTypographyProps={{
                             fontSize: '0.8rem',
                             fontWeight: activeSection === item.id ? 600 : 500,
-                            color: activeSection === item.id ? MODULE_COLOR : darkMode ? '#a0afc4' : 'text.secondary',
+                            color: activeSection === item.id ? MODULE_NAVY : darkMode ? '#a0afc4' : 'text.secondary',
                           }}
                         />
                         {badgeValue && (
@@ -2377,23 +2352,20 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
           </List>
 
           {sidebarOpen && (
-            <Typography variant="caption" sx={{ color: darkMode ? '#5d7290' : 'text.secondary', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, px: 1, display: 'block', mb: 1, mt: 2 }}>
+            <Typography variant="caption" sx={{ color: textSecondary, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, px: 1, display: 'block', mb: 1, mt: 2 }}>
               Tools
             </Typography>
           )}
-          {!sidebarOpen && <Divider sx={{ my: 1, borderColor: darkMode ? '#1e2d42' : 'rgba(0,0,0,0.08)' }} />}
+          {!sidebarOpen && <Divider sx={{ my: 1, borderColor: borderColor }} />}
           <List dense disablePadding>
             {toolsNavItems.map((item) => (
               <Tooltip key={item.id} title={!sidebarOpen ? item.label : ''} placement="right">
                 <ListItemButton
                   sx={{
-                    borderRadius: 2,
+                    ...masterDataTheme.tabs.sidebarItem(false, darkMode),
                     mb: 0.5,
                     justifyContent: sidebarOpen ? 'flex-start' : 'center',
                     px: sidebarOpen ? 1 : 1.5,
-                    '&:hover': {
-                      bgcolor: darkMode ? '#151f30' : 'rgba(0,0,0,0.04)',
-                    },
                   }}
                 >
                   <ListItemIcon sx={{ minWidth: sidebarOpen ? 32 : 'auto', justifyContent: 'center' }}>
@@ -2416,13 +2388,13 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
         </Box>
 
         {/* Sidebar Footer - System Status */}
-        <Box sx={{ p: sidebarOpen ? 2 : 1, borderTop: `1px solid ${darkMode ? '#1e2d42' : 'rgba(0,0,0,0.08)'}` }}>
+        <Box sx={{ p: sidebarOpen ? 2 : 1, borderTop: `1px solid ${borderColor}` }}>
           {sidebarOpen ? (
             <Box sx={{
               p: 1.5,
               borderRadius: 2,
               bgcolor: darkMode ? '#0f1724' : '#f8fafc',
-              border: `1px solid ${darkMode ? '#1e2d42' : 'rgba(0,0,0,0.08)'}`,
+              border: `1px solid ${borderColor}`,
             }}>
               <Stack direction="row" spacing={1.5} alignItems="center">
                 <Box
@@ -2440,10 +2412,10 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                   }}
                 />
                 <Box>
-                  <Typography variant="caption" fontWeight={600} sx={{ color: colors.text, display: 'block' }}>
+                  <Typography variant="caption" fontWeight={600} sx={{ color: textColor, display: 'block' }}>
                     Connected
                   </Typography>
-                  <Typography variant="caption" sx={{ color: darkMode ? '#5d7290' : 'text.secondary' }}>
+                  <Typography variant="caption" sx={{ color: textSecondary }}>
                     S4D/100 • PRD
                   </Typography>
                 </Box>
@@ -2480,8 +2452,8 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
           sx={{
             px: 3,
             py: 1.5,
-            borderBottom: `1px solid ${darkMode ? '#1e2d42' : 'rgba(0,0,0,0.08)'}`,
-            bgcolor: darkMode ? 'rgba(10, 16, 25, 0.8)' : 'white',
+            borderBottom: `1px solid ${borderColor}`,
+            bgcolor: darkMode ? '#0d1117' : 'white',
             backdropFilter: 'blur(20px)',
           }}
         >
@@ -2489,31 +2461,32 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
             <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
               <Link
                 component="button"
-                variant="body2"
+                underline="hover"
+                color="inherit"
                 onClick={onBack}
-                sx={{ textDecoration: 'none', color: colors.textSecondary, '&:hover': { textDecoration: 'underline' } }}
+                sx={{ cursor: 'pointer', fontSize: '0.85rem', color: textSecondary }}
               >
                 MASTER.AI
               </Link>
               <Link
                 component="button"
-                variant="body2"
+                underline="hover"
+                color="inherit"
                 onClick={onBack}
-                sx={{ textDecoration: 'none', color: colors.textSecondary, '&:hover': { textDecoration: 'underline' } }}
+                sx={{ cursor: 'pointer', fontSize: '0.85rem', color: textSecondary }}
               >
                 GL.AI
               </Link>
-              <Typography variant="body2" fontWeight={600} sx={{ color: colors.text }}>
+              <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: textColor }}>
                 {sidebarNavItems.find(item => item.id === activeSection)?.label || 'Dashboard'}
               </Typography>
             </Breadcrumbs>
 
             <Button
+              size="small"
               startIcon={<ArrowBackIcon />}
               onClick={onBack}
-              variant="outlined"
-              size="small"
-              sx={{ borderColor: 'divider' }}
+              sx={{ color: textSecondary }}
             >
               Back
             </Button>
@@ -2534,8 +2507,8 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
         PaperProps={{
           sx: {
             width: 420,
-            bgcolor: colors.paper,
-            borderLeft: `1px solid ${colors.border}`,
+            bgcolor: cardBg,
+            borderLeft: `1px solid ${borderColor}`,
           }
         }}
       >
@@ -2544,19 +2517,19 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
             {/* Drawer Header */}
             <Box sx={{
               p: 2.5,
-              borderBottom: `1px solid ${colors.border}`,
-              bgcolor: darkMode ? 'rgba(0,53,122,0.1)' : 'rgba(0,53,122,0.03)',
+              borderBottom: `1px solid ${borderColor}`,
+              bgcolor: darkMode ? alpha(MODULE_NAVY, 0.1) : alpha(MODULE_NAVY, 0.03),
             }}>
               <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                 <Stack direction="row" spacing={1.5} alignItems="center">
-                  <Avatar sx={{ width: 40, height: 40, bgcolor: alpha(MODULE_COLOR, 0.15) }}>
-                    <AIIcon sx={{ fontSize: 22, color: MODULE_COLOR }} />
+                  <Avatar sx={{ width: 40, height: 40, bgcolor: alpha(MODULE_NAVY, 0.15) }}>
+                    <AIIcon sx={{ fontSize: 22, color: MODULE_NAVY }} />
                   </Avatar>
                   <Box>
-                    <Typography variant="h6" fontWeight={700} sx={{ color: colors.text, lineHeight: 1.2 }}>
+                    <Typography variant="h6" fontWeight={700} sx={{ color: textColor, lineHeight: 1.2 }}>
                       AI Insight
                     </Typography>
-                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>
+                    <Typography variant="caption" sx={{ color: textSecondary }}>
                       Field Recommendation Evidence
                     </Typography>
                   </Box>
@@ -2568,23 +2541,23 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
             </Box>
 
             {/* Field Info */}
-            <Box sx={{ p: 2.5, borderBottom: `1px solid ${colors.border}` }}>
+            <Box sx={{ p: 2.5, borderBottom: `1px solid ${borderColor}` }}>
               <Stack spacing={2}>
                 <Box>
-                  <Typography variant="overline" sx={{ color: colors.textSecondary, fontSize: '0.65rem' }}>
+                  <Typography variant="overline" sx={{ color: textSecondary, fontSize: '0.65rem' }}>
                     Table / Field
                   </Typography>
                   <Stack direction="row" spacing={1} alignItems="center">
                     <Chip
                       label={selectedFieldForInsight.table}
                       size="small"
-                      sx={{ fontFamily: 'monospace', bgcolor: alpha('#6b7280', 0.1), color: colors.textSecondary }}
+                      sx={{ fontFamily: 'monospace', bgcolor: alpha('#6b7280', 0.1), color: textSecondary }}
                     />
-                    <Typography variant="h6" fontWeight={700} sx={{ color: MODULE_COLOR, fontFamily: 'monospace' }}>
+                    <Typography variant="h6" fontWeight={700} sx={{ color: MODULE_NAVY, fontFamily: 'monospace' }}>
                       {selectedFieldForInsight.field}
                     </Typography>
                   </Stack>
-                  <Typography variant="body2" sx={{ color: colors.text, mt: 0.5 }}>
+                  <Typography variant="body2" sx={{ color: textColor, mt: 0.5 }}>
                     {selectedFieldForInsight.fieldName}
                   </Typography>
                 </Box>
@@ -2595,10 +2568,10 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                 <Grid container spacing={2}>
                   <Grid item xs={6}>
                     <Paper elevation={0} sx={{ p: 1.5, bgcolor: alpha('#6b7280', 0.05), borderRadius: 2, border: `1px solid ${alpha('#6b7280', 0.1)}` }}>
-                      <Typography variant="overline" sx={{ color: colors.textSecondary, fontSize: '0.6rem' }}>
+                      <Typography variant="overline" sx={{ color: textSecondary, fontSize: '0.6rem' }}>
                         YCOA Default
                       </Typography>
-                      <Typography variant="h5" fontWeight={700} sx={{ color: colors.textSecondary, fontFamily: 'monospace' }}>
+                      <Typography variant="h5" fontWeight={700} sx={{ color: textSecondary, fontFamily: 'monospace' }}>
                         {selectedFieldForInsight.ycoaDefault || '—'}
                       </Typography>
                     </Paper>
@@ -2607,18 +2580,18 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                     <Paper elevation={0} sx={{
                       p: 1.5,
                       bgcolor: selectedFieldForInsight.ycoaDefault !== selectedFieldForInsight.aiRecommendation
-                        ? alpha('#3b82f6', 0.08)
+                        ? alpha(NAVY_BLUE, 0.08)
                         : alpha('#10b981', 0.08),
                       borderRadius: 2,
                       border: `1px solid ${selectedFieldForInsight.ycoaDefault !== selectedFieldForInsight.aiRecommendation
-                        ? alpha('#3b82f6', 0.2)
+                        ? alpha(NAVY_BLUE, 0.2)
                         : alpha('#10b981', 0.2)}`
                     }}>
-                      <Typography variant="overline" sx={{ color: colors.textSecondary, fontSize: '0.6rem' }}>
+                      <Typography variant="overline" sx={{ color: textSecondary, fontSize: '0.6rem' }}>
                         AI Recommendation
                       </Typography>
                       <Typography variant="h5" fontWeight={700} sx={{
-                        color: selectedFieldForInsight.ycoaDefault !== selectedFieldForInsight.aiRecommendation ? '#3b82f6' : '#10b981',
+                        color: selectedFieldForInsight.ycoaDefault !== selectedFieldForInsight.aiRecommendation ? NAVY_BLUE : '#10b981',
                         fontFamily: 'monospace'
                       }}>
                         {selectedFieldForInsight.aiRecommendation || '—'}
@@ -2630,7 +2603,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                 {/* Confidence */}
                 <Box>
                   <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.5 }}>
-                    <Typography variant="overline" sx={{ color: colors.textSecondary, fontSize: '0.65rem' }}>
+                    <Typography variant="overline" sx={{ color: textSecondary, fontSize: '0.65rem' }}>
                       Confidence Score
                     </Typography>
                     <Chip
@@ -2661,12 +2634,12 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
             </Box>
 
             {/* Rationale */}
-            <Box sx={{ p: 2.5, borderBottom: `1px solid ${colors.border}` }}>
-              <Typography variant="overline" sx={{ color: colors.textSecondary, fontSize: '0.65rem', display: 'block', mb: 1 }}>
+            <Box sx={{ p: 2.5, borderBottom: `1px solid ${borderColor}` }}>
+              <Typography variant="overline" sx={{ color: textSecondary, fontSize: '0.65rem', display: 'block', mb: 1 }}>
                 AI Rationale
               </Typography>
-              <Paper elevation={0} sx={{ p: 2, bgcolor: alpha(MODULE_COLOR, 0.05), borderRadius: 2, border: `1px solid ${alpha(MODULE_COLOR, 0.1)}` }}>
-                <Typography variant="body2" sx={{ color: colors.text, lineHeight: 1.6 }}>
+              <Paper elevation={0} sx={{ p: 2, bgcolor: alpha(MODULE_NAVY, 0.05), borderRadius: 2, border: `1px solid ${alpha(MODULE_NAVY, 0.1)}`, ...masterDataTheme.borders.cardAccent(NAVY_BLUE) }}>
+                <Typography variant="body2" sx={{ color: textColor, lineHeight: 1.6 }}>
                   {selectedFieldForInsight.rationale}
                 </Typography>
               </Paper>
@@ -2674,7 +2647,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
 
             {/* Evidence Breakdown */}
             <Box sx={{ p: 2.5, flex: 1 }}>
-              <Typography variant="overline" sx={{ color: colors.textSecondary, fontSize: '0.65rem', display: 'block', mb: 1.5 }}>
+              <Typography variant="overline" sx={{ color: textSecondary, fontSize: '0.65rem', display: 'block', mb: 1.5 }}>
                 Evidence Signals ({selectedFieldForInsight.evidence?.length || 0})
               </Typography>
               <Stack spacing={1}>
@@ -2684,9 +2657,9 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                     elevation={0}
                     sx={{
                       p: 1.5,
-                      bgcolor: colors.background,
+                      bgcolor: bgColor,
                       borderRadius: 2,
-                      border: `1px solid ${colors.border}`,
+                      border: `1px solid ${borderColor}`,
                       display: 'flex',
                       alignItems: 'center',
                       gap: 1.5,
@@ -2696,17 +2669,17 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                       width: 24,
                       height: 24,
                       borderRadius: '50%',
-                      bgcolor: alpha(MODULE_COLOR, 0.1),
+                      bgcolor: alpha(MODULE_NAVY, 0.1),
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0,
                     }}>
-                      <Typography variant="caption" fontWeight={700} sx={{ color: MODULE_COLOR }}>
+                      <Typography variant="caption" fontWeight={700} sx={{ color: MODULE_NAVY }}>
                         {index + 1}
                       </Typography>
                     </Box>
-                    <Typography variant="body2" sx={{ color: colors.text }}>
+                    <Typography variant="body2" sx={{ color: textColor }}>
                       {item}
                     </Typography>
                   </Paper>
@@ -2717,12 +2690,12 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
             {/* Governance Status Footer */}
             <Box sx={{
               p: 2,
-              borderTop: `1px solid ${colors.border}`,
-              bgcolor: colors.background,
+              borderTop: `1px solid ${borderColor}`,
+              bgcolor: bgColor,
             }}>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <Typography variant="caption" sx={{ color: colors.textSecondary }}>
+                  <Typography variant="caption" sx={{ color: textSecondary }}>
                     Status:
                   </Typography>
                   {getStatusChip(selectedFieldForInsight.status)}
@@ -2732,9 +2705,8 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                     <Button
                       size="small"
                       variant="outlined"
-                      color="error"
                       startIcon={<RejectIcon />}
-                      sx={{ fontSize: '0.75rem' }}
+                      sx={{ ...masterDataTheme.buttons.danger, fontSize: '0.75rem' }}
                     >
                       Reject
                     </Button>
@@ -2742,11 +2714,7 @@ const GLAIModule = ({ onBack, darkMode = false }) => {
                       size="small"
                       variant="contained"
                       startIcon={<ApproveIcon />}
-                      sx={{
-                        fontSize: '0.75rem',
-                        bgcolor: '#10b981',
-                        '&:hover': { bgcolor: '#059669' }
-                      }}
+                      sx={{ ...masterDataTheme.buttons.success, fontSize: '0.75rem' }}
                     >
                       Approve
                     </Button>

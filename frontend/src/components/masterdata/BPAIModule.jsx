@@ -31,6 +31,8 @@ import {
   TableHead,
   TableRow,
   Drawer,
+  Card,
+  CardContent,
 } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import {
@@ -74,16 +76,10 @@ import {
   Close as RejectIcon,
 } from '@mui/icons-material';
 
-import { MODULE_COLOR, getColors as getBrandColors } from '../../config/brandColors';
+import { masterDataTheme, MODULE_NAVY, NAVY_DARK, NAVY_BLUE, NAVY_DEEP } from './masterDataTheme';
 
 // Use consistent navy blue theme
-const BP_COLOR = MODULE_COLOR;
-
-// Get consistent colors based on dark mode - same pattern as STOX components
-const getColors = (darkMode) => ({
-  ...getBrandColors(darkMode),
-  // Additional component-specific colors if needed
-});
+const BP_COLOR = MODULE_NAVY;
 
 // Sidebar navigation items - Workflow
 const workflowNavItems = [
@@ -290,8 +286,12 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
   const [expandedRowIds, setExpandedRowIds] = useState([]);
   const [selectedFieldForInsight, setSelectedFieldForInsight] = useState(null);
 
-  // Get consistent colors based on dark mode
-  const colors = getColors(darkMode);
+  // Color variables matching AP.AI pattern
+  const bgColor = darkMode ? '#0d1117' : '#f8fafc';
+  const cardBg = darkMode ? '#161b22' : '#fff';
+  const textColor = darkMode ? '#e6edf3' : '#1e293b';
+  const textSecondary = darkMode ? '#8b949e' : '#64748b';
+  const borderColor = darkMode ? '#30363d' : '#e2e8f0';
 
   const toggleRowExpansion = (rowId) => {
     setExpandedRowIds(prev =>
@@ -324,9 +324,9 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
 
   const getStatusChip = (status) => {
     const config = {
-      auto: { color: '#10b981', label: 'Auto', bg: 'rgba(16, 185, 129, 0.1)', Icon: CheckIcon },
-      review: { color: '#f59e0b', label: 'Review', bg: 'rgba(245, 158, 11, 0.1)', Icon: WarningIcon },
-      'must-review': { color: '#ef4444', label: 'Must Review', bg: 'rgba(239, 68, 68, 0.1)', Icon: ErrorIcon },
+      auto: { color: '#10b981', label: 'Auto', bg: alpha('#10b981', 0.1), Icon: CheckIcon },
+      review: { color: '#f59e0b', label: 'Review', bg: alpha('#f59e0b', 0.1), Icon: WarningIcon },
+      'must-review': { color: '#ef4444', label: 'Must Review', bg: alpha('#ef4444', 0.1), Icon: ErrorIcon },
     };
     const { color, label, bg, Icon } = config[status] || config.review;
     return (
@@ -340,31 +340,24 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
   };
 
   const getBadgeColor = (colorName) => {
-    const colors = {
+    const badgeColors = {
       success: '#10b981',
       warning: '#f59e0b',
       error: '#ef4444',
     };
-    return colors[colorName] || colors.warning;
+    return badgeColors[colorName] || badgeColors.warning;
   };
 
   // Field status chip for field-level recommendations
   const getFieldStatusChip = (status) => {
-    const config = {
-      approved: { color: '#10b981', label: 'Approved' },
-      review: { color: '#f59e0b', label: 'Review' },
-      proposed: { color: '#3b82f6', label: 'Proposed' },
-      rejected: { color: '#ef4444', label: 'Rejected' },
-    };
-    const { color, label } = config[status] || config.review;
+    const chipStyle = masterDataTheme.chips.status[status] || masterDataTheme.chips.status.review;
+    const labelMap = { approved: 'Approved', review: 'Review', proposed: 'Proposed', rejected: 'Rejected' };
     return (
       <Chip
-        label={label}
+        label={labelMap[status] || 'Review'}
         size="small"
         sx={{
-          bgcolor: alpha(color, 0.1),
-          color: color,
-          fontWeight: 600,
+          ...chipStyle,
           fontSize: '0.65rem',
         }}
       />
@@ -378,13 +371,13 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
     return (
       <Box sx={{
         p: 2,
-        bgcolor: darkMode ? 'rgba(0,53,122,0.08)' : 'rgba(0,53,122,0.03)',
-        borderTop: `1px solid ${colors.border}`,
-        borderBottom: `1px solid ${colors.border}`,
+        bgcolor: darkMode ? alpha(MODULE_NAVY, 0.08) : alpha(MODULE_NAVY, 0.03),
+        borderTop: `1px solid ${borderColor}`,
+        borderBottom: `1px solid ${borderColor}`,
       }}>
         <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
           <AIIcon sx={{ fontSize: 18, color: BP_COLOR }} />
-          <Typography variant="subtitle2" fontWeight={600} sx={{ color: colors.text }}>
+          <Typography variant="subtitle2" fontWeight={600} sx={{ color: textColor }}>
             Field-Level AI Recommendations for {bp.name}
           </Typography>
           <Chip
@@ -394,19 +387,19 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
           />
         </Stack>
 
-        <TableContainer component={Paper} elevation={0} sx={{ bgcolor: colors.paper, border: `1px solid ${colors.border}`, borderRadius: 2 }}>
+        <TableContainer component={Paper} elevation={0} sx={{ bgcolor: cardBg, border: `1px solid ${borderColor}`, borderRadius: 2 }}>
           <Table size="small">
             <TableHead>
-              <TableRow sx={{ bgcolor: colors.background }}>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem', py: 1 }}>Table</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem', py: 1 }}>Field</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem', py: 1 }}>Field Name</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem', py: 1 }}>Source Value(s)</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem', py: 1 }}>AI Recommendation</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem', py: 1 }}>Confidence</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem', py: 1 }}>Rationale</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem', py: 1 }}>Status</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.75rem', py: 1 }}>Actions</TableCell>
+              <TableRow sx={{ bgcolor: bgColor }}>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem', py: 1 }}>Table</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem', py: 1 }}>Field</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem', py: 1 }}>Field Name</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem', py: 1 }}>Source Value(s)</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem', py: 1 }}>AI Recommendation</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem', py: 1 }}>Confidence</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem', py: 1 }}>Rationale</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem', py: 1 }}>Status</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem', py: 1 }}>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -417,20 +410,20 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                     key={field.id}
                     sx={{
                       bgcolor: needsAction ? alpha('#f59e0b', darkMode ? 0.08 : 0.03) : 'transparent',
-                      '&:hover': { bgcolor: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }
+                      '&:hover': { bgcolor: darkMode ? alpha(NAVY_BLUE, 0.08) : alpha(NAVY_BLUE, 0.04) }
                     }}
                   >
-                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.75rem', color: colors.textSecondary, py: 1 }}>
+                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8rem', color: textSecondary, py: 1 }}>
                       {field.table}
                     </TableCell>
-                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.75rem', fontWeight: 600, color: BP_COLOR, py: 1 }}>
+                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8rem', fontWeight: 600, color: BP_COLOR, py: 1 }}>
                       {field.field}
                     </TableCell>
-                    <TableCell sx={{ fontSize: '0.75rem', color: colors.text, py: 1 }}>
+                    <TableCell sx={{ fontSize: '0.8rem', color: textColor, py: 1 }}>
                       {field.fieldName}
                     </TableCell>
                     <TableCell sx={{ py: 1 }}>
-                      <Typography variant="caption" sx={{ fontFamily: 'monospace', color: colors.textSecondary, fontSize: '0.7rem' }}>
+                      <Typography variant="caption" sx={{ fontFamily: 'monospace', color: textSecondary, fontSize: '0.7rem' }}>
                         {field.sourceValue}
                       </Typography>
                     </TableCell>
@@ -463,7 +456,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                         }}
                       />
                     </TableCell>
-                    <TableCell sx={{ fontSize: '0.7rem', color: colors.textSecondary, py: 1, maxWidth: 180 }}>
+                    <TableCell sx={{ fontSize: '0.7rem', color: textSecondary, py: 1, maxWidth: 180 }}>
                       <Typography variant="caption" sx={{ display: 'block', lineHeight: 1.3 }}>
                         {field.rationale}
                       </Typography>
@@ -513,9 +506,9 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
 
   // Dashboard metrics data
   const dashboardMetrics = [
-    { label: 'Legacy Customers', value: '5,847', Icon: CustomerIcon, color: '#3b82f6' },
+    { label: 'Legacy Customers', value: '5,847', Icon: CustomerIcon, color: NAVY_BLUE },
     { label: 'Legacy Vendors', value: '3,256', Icon: VendorIcon, color: '#8b5cf6' },
-    { label: 'Proposed BPs', value: '3,847', Icon: GroupsIcon, color: BP_COLOR },
+    { label: 'Proposed BPs', value: '3,847', Icon: GroupsIcon, color: MODULE_NAVY },
     { label: 'Consolidation Rate', value: '58%', Icon: MergeIcon, color: '#10b981' },
   ];
 
@@ -525,88 +518,65 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
     { label: 'Low (<70%)', value: 147, total: 3847, color: '#ef4444' },
   ];
 
-  // Dashboard metrics styled like Inventory Health Check
+  // Dashboard metrics styled like AP.AI stat cards
   const bpDashboardMetrics = [
-    { label: 'CUSTOMERS', value: '5,847', color: '#3b82f6' },
+    { label: 'CUSTOMERS', value: '5,847', color: NAVY_BLUE },
     { label: 'VENDORS', value: '3,256', color: '#8b5cf6' },
-    { label: 'PROPOSED BPS', value: '3,847', color: '#0ea5a9' },
+    { label: 'PROPOSED BPS', value: '3,847', color: NAVY_BLUE },
     { label: 'DUPLICATES', value: '423', color: '#ef4444' },
     { label: 'CONSOLIDATION', value: '58%', color: '#10b981' },
-    { label: 'TOTAL VALUE', value: '$142.7M', color: '#00357a' },
+    { label: 'TOTAL VALUE', value: '$142.7M', color: MODULE_NAVY },
   ];
 
   // Dashboard Section
   const renderDashboard = () => (
     <Box>
-      {/* Header with icon - matching Inventory Health Check */}
-      <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1 }}>
-        <Box sx={{ width: 48, height: 48, borderRadius: 2, bgcolor: alpha('#0ea5a9', 0.15), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <PeopleIcon sx={{ fontSize: 28, color: '#0ea5a9' }} />
-        </Box>
-        <Box>
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
-              BP Migration Dashboard
+      <Paper elevation={0} sx={{ p: 2.5, borderRadius: 2, mb: 0, bgcolor: cardBg, border: `1px solid ${borderColor}` }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Box>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+              <Chip label="BP.AI" size="small" sx={{ bgcolor: BP_COLOR, color: '#fff', fontWeight: 700, fontSize: '0.7rem' }} />
+              <Typography variant="caption" sx={{ color: BP_COLOR, textTransform: 'uppercase', letterSpacing: 1 }}>
+                Migration Dashboard
+              </Typography>
+            </Stack>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+              <Typography variant="h5" fontWeight={700} sx={{ color: textColor }}>
+                BP Migration Dashboard
+              </Typography>
+              <Chip label="Demo Data" size="small" icon={<WarningIcon sx={{ fontSize: 14 }} />} sx={{ bgcolor: alpha('#f59e0b', 0.1), color: '#f59e0b', fontWeight: 600, fontSize: '0.7rem' }} />
+            </Stack>
+            <Typography variant="body2" sx={{ color: textSecondary }}>
+              Overview of Business Partner consolidation and migration readiness metrics
             </Typography>
-            <Chip label="Demo Data" size="small" icon={<WarningIcon sx={{ fontSize: 14 }} />} sx={{ bgcolor: alpha('#f59e0b', 0.1), color: '#f59e0b', fontWeight: 600, fontSize: '0.7rem' }} />
-          </Stack>
-          <Typography variant="body2" sx={{ color: colors.textSecondary }}>
-            Overview of Business Partner consolidation and migration readiness metrics
-          </Typography>
-        </Box>
-      </Stack>
+          </Box>
+        </Stack>
+      </Paper>
 
-      {/* Metrics Row - matching Inventory Health Check style */}
-      <Paper
-        elevation={0}
-        sx={{
-          mt: 3,
-          mb: 3,
-          borderRadius: 2,
-          border: `1px solid ${colors.border}`,
-          bgcolor: colors.paper,
-          overflow: 'hidden',
-        }}
-      >
-        <Grid container>
-          {bpDashboardMetrics.map((metric, index) => (
-            <Grid
-              item
-              xs={6}
-              md={2}
-              key={index}
-              sx={{
-                borderRight: index < bpDashboardMetrics.length - 1 ? `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` : 'none',
-              }}
-            >
-              <Box sx={{ p: 2 }}>
-                <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: metric.color, textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.5 }}>
+      {/* Metrics Row - matching AP.AI stat cards */}
+      <Grid container spacing={2} sx={{ mt: 1, mb: 3 }}>
+        {bpDashboardMetrics.map((metric, index) => (
+          <Grid item xs={6} md={2} key={index}>
+            <Card variant="outlined" sx={{ borderLeft: `3px solid ${metric.color}` }}>
+              <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                <Typography sx={{ fontSize: '0.7rem', color: textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>
                   {metric.label}
                 </Typography>
-                <Typography variant="h5" fontWeight={700} sx={{ color: metric.color }}>
+                <Typography variant="h4" fontWeight={700} sx={{ color: metric.color }}>
                   {metric.value}
                 </Typography>
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
-      </Paper>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
 
       {/* Insights Grid */}
       <Grid container spacing={3} sx={{ mb: 3 }}>
         {/* Consolidation Progress */}
         <Grid item xs={12} md={4}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: 3,
-              borderRadius: 3,
-              border: `1px solid ${colors.border}`,
-              bgcolor: colors.paper,
-              height: '100%',
-            }}
-          >
-            <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, color: colors.text }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 2, border: `1px solid ${borderColor}`, bgcolor: cardBg, height: '100%' }}>
+            <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, color: textColor }}>
               Consolidation Progress
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -616,7 +586,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                     width: 120,
                     height: 120,
                     borderRadius: '50%',
-                    background: `conic-gradient(${BP_COLOR} 0deg, ${BP_COLOR} ${58 * 3.6}deg, ${darkMode ? '#1e2d42' : '#e5e7eb'} ${58 * 3.6}deg)`,
+                    background: `conic-gradient(${BP_COLOR} 0deg, ${BP_COLOR} ${58 * 3.6}deg, ${borderColor} ${58 * 3.6}deg)`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -627,19 +597,19 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                       width: 100,
                       height: 100,
                       borderRadius: '50%',
-                      bgcolor: colors.paper,
+                      bgcolor: cardBg,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}
                   >
                     <Typography variant="h4" fontWeight={700} sx={{ color: BP_COLOR }}>
-                      58<Typography component="span" variant="body2" sx={{ color: colors.textSecondary }}>%</Typography>
+                      58<Typography component="span" variant="body2" sx={{ color: textSecondary }}>%</Typography>
                     </Typography>
                   </Box>
                 </Box>
               </Box>
-              <Typography variant="body2" sx={{ color: colors.textSecondary, textAlign: 'center' }}>
+              <Typography variant="body2" sx={{ color: textSecondary, textAlign: 'center' }}>
                 9,103 legacy records → 3,847 BPs
               </Typography>
             </Box>
@@ -648,19 +618,10 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
 
         {/* Confidence Distribution */}
         <Grid item xs={12} md={4}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: 3,
-              borderRadius: 3,
-              border: `1px solid ${colors.border}`,
-              bgcolor: colors.paper,
-              height: '100%',
-            }}
-          >
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 2, border: `1px solid ${borderColor}`, bgcolor: cardBg, height: '100%' }}>
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
               <BarChartIcon sx={{ color: BP_COLOR, fontSize: 20 }} />
-              <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
+              <Typography variant="subtitle1" fontWeight={600} sx={{ color: textColor }}>
                 Confidence Distribution
               </Typography>
             </Stack>
@@ -668,10 +629,10 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
               {insightsData.map((item, index) => (
                 <Box key={index}>
                   <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
-                    <Typography variant="body2" sx={{ color: colors.textSecondary }}>
+                    <Typography variant="body2" sx={{ color: textSecondary, fontSize: '0.8rem' }}>
                       {item.label}
                     </Typography>
-                    <Typography variant="body2" fontWeight={600} sx={{ color: item.color }}>
+                    <Typography variant="body2" fontWeight={600} sx={{ color: item.color, fontSize: '0.8rem' }}>
                       {item.value.toLocaleString()}
                     </Typography>
                   </Stack>
@@ -693,43 +654,34 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
 
         {/* Key Insights */}
         <Grid item xs={12} md={4}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: 3,
-              borderRadius: 3,
-              border: `1px solid ${colors.border}`,
-              bgcolor: colors.paper,
-              height: '100%',
-            }}
-          >
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 2, border: `1px solid ${borderColor}`, bgcolor: cardBg, height: '100%' }}>
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
               <AIIcon sx={{ color: BP_COLOR, fontSize: 20 }} />
-              <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
+              <Typography variant="subtitle1" fontWeight={600} sx={{ color: textColor }}>
                 AI Insights
               </Typography>
             </Stack>
             <Stack spacing={1.5}>
-              <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: darkMode ? '#0f1724' : '#f8fafc' }}>
+              <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: bgColor, borderLeft: '4px solid #10b981' }}>
                 <Stack direction="row" spacing={1} alignItems="center">
                   <MergeIcon sx={{ fontSize: 18, color: '#10b981' }} />
-                  <Typography variant="body2" sx={{ color: colors.text }}>
+                  <Typography variant="body2" sx={{ color: textColor, fontSize: '0.82rem' }}>
                     <strong>423</strong> duplicate clusters detected
                   </Typography>
                 </Stack>
               </Box>
-              <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: darkMode ? '#0f1724' : '#f8fafc' }}>
+              <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: bgColor, borderLeft: '4px solid #ef4444' }}>
                 <Stack direction="row" spacing={1} alignItems="center">
                   <BlockIcon sx={{ fontSize: 18, color: '#ef4444' }} />
-                  <Typography variant="body2" sx={{ color: colors.text }}>
+                  <Typography variant="body2" sx={{ color: textColor, fontSize: '0.82rem' }}>
                     <strong>147</strong> exclusion candidates
                   </Typography>
                 </Stack>
               </Box>
-              <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: darkMode ? '#0f1724' : '#f8fafc' }}>
+              <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: bgColor, borderLeft: `4px solid ${NAVY_BLUE}` }}>
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <SpeedIcon sx={{ fontSize: 18, color: '#3b82f6' }} />
-                  <Typography variant="body2" sx={{ color: colors.text }}>
+                  <SpeedIcon sx={{ fontSize: 18, color: NAVY_BLUE }} />
+                  <Typography variant="body2" sx={{ color: textColor, fontSize: '0.82rem' }}>
                     <strong>$142.7M</strong> total transaction value
                   </Typography>
                 </Stack>
@@ -740,38 +692,30 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
       </Grid>
 
       {/* Quick Actions */}
-      <Paper
-        elevation={0}
-        sx={{
-          borderRadius: 3,
-          border: `1px solid ${colors.border}`,
-          bgcolor: colors.paper,
-          overflow: 'hidden',
-        }}
-      >
-        <Box sx={{ p: 2, borderBottom: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}>
+      <Paper elevation={0} sx={{ borderRadius: 2, border: `1px solid ${borderColor}`, bgcolor: cardBg, overflow: 'hidden' }}>
+        <Box sx={{ p: 2, borderBottom: `1px solid ${borderColor}` }}>
           <Stack direction="row" spacing={1} alignItems="center">
             <AIIcon sx={{ color: BP_COLOR, fontSize: 20 }} />
-            <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
+            <Typography variant="subtitle1" fontWeight={600} sx={{ color: textColor }}>
               Quick Actions
             </Typography>
           </Stack>
         </Box>
         <Box sx={{ p: 2 }}>
           <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap>
-            <Button variant="outlined" size="small" startIcon={<UploadIcon />} onClick={() => setActiveSection('data-upload')} sx={{ borderColor: 'divider' }}>
+            <Button variant="outlined" size="small" startIcon={<UploadIcon />} onClick={() => setActiveSection('data-upload')} sx={masterDataTheme.buttons.secondary}>
               Upload Data
             </Button>
-            <Button variant="outlined" size="small" startIcon={<PreviewIcon />} onClick={() => setActiveSection('preview-review')} sx={{ borderColor: 'divider' }}>
+            <Button variant="outlined" size="small" startIcon={<PreviewIcon />} onClick={() => setActiveSection('preview-review')} sx={masterDataTheme.buttons.secondary}>
               Review Clusters
             </Button>
-            <Button variant="outlined" size="small" startIcon={<CreateIcon />} onClick={() => setActiveSection('create-bps')} sx={{ borderColor: 'divider' }}>
+            <Button variant="outlined" size="small" startIcon={<CreateIcon />} onClick={() => setActiveSection('create-bps')} sx={masterDataTheme.buttons.secondary}>
               Create BPs
             </Button>
-            <Button variant="outlined" size="small" startIcon={<ReportsIcon />} sx={{ borderColor: 'divider' }}>
+            <Button variant="outlined" size="small" startIcon={<ReportsIcon />} sx={masterDataTheme.buttons.secondary}>
               Generate Report
             </Button>
-            <Button variant="outlined" size="small" startIcon={<DownloadIcon />} sx={{ borderColor: 'divider' }}>
+            <Button variant="outlined" size="small" startIcon={<DownloadIcon />} sx={masterDataTheme.buttons.secondary}>
               Export Analysis
             </Button>
           </Stack>
@@ -784,7 +728,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
   const UploadCard = ({ card, type }) => {
     const isUploaded = uploadedFiles[card.id];
     const isUploading = uploading === card.id;
-    const typeColor = type === 'customer' ? '#3b82f6' : type === 'vendor' ? '#8b5cf6' : '#6b7280';
+    const typeColor = type === 'customer' ? NAVY_BLUE : type === 'vendor' ? '#8b5cf6' : '#6b7280';
 
     return (
       <Paper
@@ -794,8 +738,8 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
           p: 2,
           borderRadius: 2,
           cursor: isUploaded ? 'default' : 'pointer',
-          border: `1px solid ${isUploaded ? BP_COLOR : darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
-          bgcolor: isUploaded ? alpha(BP_COLOR, darkMode ? 0.1 : 0.05) : darkMode ? '#161b22' : 'white',
+          border: `1px solid ${isUploaded ? BP_COLOR : borderColor}`,
+          bgcolor: isUploaded ? alpha(BP_COLOR, darkMode ? 0.1 : 0.05) : cardBg,
           transition: 'all 0.2s ease',
           '&:hover': !isUploaded && {
             borderColor: BP_COLOR,
@@ -821,14 +765,14 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
           </Box>
           <Box sx={{ flex: 1 }}>
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
-              <Typography variant="body2" fontWeight={600} sx={{ color: colors.text }}>
+              <Typography variant="body2" fontWeight={600} sx={{ color: textColor, fontSize: '0.8rem' }}>
                 {card.title}
               </Typography>
               {card.required && (
                 <Chip label="Required" size="small" sx={{ height: 18, fontSize: '0.6rem', bgcolor: alpha('#ef4444', 0.1), color: '#ef4444' }} />
               )}
             </Stack>
-            <Typography variant="caption" sx={{ color: colors.textSecondary }}>
+            <Typography variant="caption" sx={{ color: textSecondary, fontSize: '0.65rem' }}>
               {card.description}
             </Typography>
             {isUploading && (
@@ -837,7 +781,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
             {isUploaded && (
               <Stack direction="row" spacing={0.5} alignItems="center" sx={{ mt: 0.5 }}>
                 <CheckIcon sx={{ fontSize: 14, color: BP_COLOR }} />
-                <Typography variant="caption" sx={{ color: BP_COLOR }}>
+                <Typography variant="caption" sx={{ color: BP_COLOR, fontSize: '0.65rem' }}>
                   {isUploaded.rows.toLocaleString()} records loaded
                 </Typography>
               </Stack>
@@ -870,9 +814,9 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
               gap: 1,
               px: 2,
               py: 1,
-              borderRadius: 3,
+              borderRadius: 2,
               bgcolor: currentStep === step.step ? alpha(BP_COLOR, 0.12) : 'transparent',
-              color: currentStep === step.step ? BP_COLOR : currentStep > step.step ? '#10b981' : darkMode ? '#5d7290' : 'text.disabled',
+              color: currentStep === step.step ? BP_COLOR : currentStep > step.step ? '#10b981' : textSecondary,
               transition: 'all 0.2s',
             }}
           >
@@ -881,7 +825,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                 width: 8,
                 height: 8,
                 borderRadius: '50%',
-                bgcolor: currentStep === step.step ? BP_COLOR : currentStep > step.step ? '#10b981' : darkMode ? '#5d7290' : '#cbd5e1',
+                bgcolor: currentStep === step.step ? BP_COLOR : currentStep > step.step ? '#10b981' : borderColor,
                 animation: currentStep === step.step ? 'pulse 1.5s infinite' : 'none',
                 '@keyframes pulse': {
                   '0%, 100%': { opacity: 1 },
@@ -889,7 +833,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                 },
               }}
             />
-            <Typography variant="body2" fontWeight={currentStep === step.step ? 600 : 500}>
+            <Typography variant="body2" fontWeight={currentStep === step.step ? 600 : 500} sx={{ fontSize: '0.8rem' }}>
               Step {step.step}: {step.label}
             </Typography>
           </Box>
@@ -899,7 +843,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                 width: 32,
                 height: 2,
                 borderRadius: 1,
-                bgcolor: currentStep > step.step ? '#10b981' : darkMode ? '#1e2d42' : '#e5e7eb',
+                bgcolor: currentStep > step.step ? '#10b981' : borderColor,
               }}
             />
           )}
@@ -911,15 +855,24 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
   // Data Upload Section
   const renderDataUpload = () => (
     <Box>
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-        <UploadIcon sx={{ color: BP_COLOR }} />
-        <Typography variant="h5" fontWeight={700} sx={{ color: darkMode ? '#e6edf3' : BP_COLOR }}>
-          Data Upload & Scope Configuration
-        </Typography>
-      </Stack>
-      <Typography variant="body2" sx={{ mb: 3, color: colors.textSecondary }}>
-        Upload customer, vendor, and transaction data to begin Business Partner consolidation analysis.
-      </Typography>
+      <Paper elevation={0} sx={{ p: 2.5, borderRadius: 2, mb: 3, bgcolor: cardBg, border: `1px solid ${borderColor}` }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Box>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+              <Chip label="BP.AI" size="small" sx={{ bgcolor: BP_COLOR, color: '#fff', fontWeight: 700, fontSize: '0.7rem' }} />
+              <Typography variant="caption" sx={{ color: BP_COLOR, textTransform: 'uppercase', letterSpacing: 1, fontSize: '0.65rem' }}>
+                Data Upload & Scope
+              </Typography>
+            </Stack>
+            <Typography variant="h5" fontWeight={700} sx={{ color: textColor }}>
+              Data Upload & Scope Configuration
+            </Typography>
+            <Typography variant="body2" sx={{ color: textSecondary, fontSize: '0.82rem' }}>
+              Upload customer, vendor, and transaction data to begin Business Partner consolidation analysis.
+            </Typography>
+          </Box>
+        </Stack>
+      </Paper>
 
       {/* Step Indicator */}
       <StepIndicator currentStep={1} />
@@ -928,12 +881,12 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
         {/* Left Column - Upload Cards */}
         <Grid item xs={12} md={7}>
           {/* Customer Master Data */}
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: `1px solid ${colors.border}`, bgcolor: colors.paper, mb: 3 }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 2, border: `1px solid ${borderColor}`, bgcolor: cardBg, mb: 3 }}>
             <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-              <Avatar sx={{ bgcolor: alpha('#3b82f6', 0.1), color: '#3b82f6' }}>
+              <Avatar sx={{ bgcolor: alpha(NAVY_BLUE, 0.1), color: NAVY_BLUE }}>
                 <CustomerIcon />
               </Avatar>
-              <Typography variant="h6" fontWeight={600} sx={{ color: colors.text }}>
+              <Typography variant="h6" fontWeight={600} sx={{ color: textColor }}>
                 Customer Master Data
               </Typography>
             </Stack>
@@ -947,12 +900,12 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
           </Paper>
 
           {/* Vendor Master Data */}
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: `1px solid ${colors.border}`, bgcolor: colors.paper, mb: 3 }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 2, border: `1px solid ${borderColor}`, bgcolor: cardBg, mb: 3 }}>
             <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
               <Avatar sx={{ bgcolor: alpha('#8b5cf6', 0.1), color: '#8b5cf6' }}>
                 <VendorIcon />
               </Avatar>
-              <Typography variant="h6" fontWeight={600} sx={{ color: colors.text }}>
+              <Typography variant="h6" fontWeight={600} sx={{ color: textColor }}>
                 Vendor Master Data
               </Typography>
             </Stack>
@@ -966,12 +919,12 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
           </Paper>
 
           {/* Transaction Data */}
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: `1px solid ${colors.border}`, bgcolor: colors.paper }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 2, border: `1px solid ${borderColor}`, bgcolor: cardBg }}>
             <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
               <Avatar sx={{ bgcolor: alpha('#f59e0b', 0.1), color: '#f59e0b' }}>
                 <FileIcon />
               </Avatar>
-              <Typography variant="h6" fontWeight={600} sx={{ color: colors.text }}>
+              <Typography variant="h6" fontWeight={600} sx={{ color: textColor }}>
                 Transaction History (12 Months)
               </Typography>
             </Stack>
@@ -988,9 +941,9 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
         {/* Right Column - Configuration */}
         <Grid item xs={12} md={5}>
           {/* Target Scope */}
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: `1px solid ${colors.border}`, bgcolor: colors.paper, mb: 3 }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 2, border: `1px solid ${borderColor}`, bgcolor: cardBg, mb: 3 }}>
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
-              <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
+              <Typography variant="subtitle1" fontWeight={600} sx={{ color: textColor }}>
                 Target Scope
               </Typography>
             </Stack>
@@ -1021,40 +974,40 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
           </Paper>
 
           {/* Migration Rules */}
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: `1px solid ${colors.border}`, bgcolor: colors.paper, mb: 3 }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 2, border: `1px solid ${borderColor}`, bgcolor: cardBg, mb: 3 }}>
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
-              <Typography variant="subtitle1" fontWeight={600} sx={{ color: colors.text }}>
+              <Typography variant="subtitle1" fontWeight={600} sx={{ color: textColor }}>
                 Migration Rules
               </Typography>
             </Stack>
             <Stack spacing={1.5}>
               <Stack direction="row" spacing={1} alignItems="center">
                 <input type="checkbox" style={{ accentColor: BP_COLOR }} />
-                <Typography variant="body2" sx={{ color: darkMode ? '#a0afc4' : 'text.secondary' }}>
+                <Typography variant="body2" sx={{ color: textSecondary, fontSize: '0.82rem' }}>
                   Include dormant partners (no activity)
                 </Typography>
               </Stack>
               <Stack direction="row" spacing={1} alignItems="center">
                 <input type="checkbox" defaultChecked style={{ accentColor: BP_COLOR }} />
-                <Typography variant="body2" sx={{ color: darkMode ? '#a0afc4' : 'text.secondary' }}>
+                <Typography variant="body2" sx={{ color: textSecondary, fontSize: '0.82rem' }}>
                   Exclude one-time partners
                 </Typography>
               </Stack>
               <Box sx={{ ml: 3 }}>
-                <Typography variant="caption" sx={{ color: darkMode ? '#5d7290' : 'text.disabled' }}>
+                <Typography variant="caption" sx={{ color: textSecondary, opacity: 0.7, fontSize: '0.65rem' }}>
                   Threshold (documents)
                 </Typography>
-                <input type="number" defaultValue={2} min={1} max={10} style={{ width: 80, padding: '6px 10px', marginTop: 4, borderRadius: 4, border: `1px solid ${darkMode ? '#1e2d42' : '#e5e7eb'}`, background: 'transparent', color: darkMode ? '#e6edf3' : 'inherit' }} />
+                <input type="number" defaultValue={2} min={1} max={10} style={{ width: 80, padding: '6px 10px', marginTop: 4, borderRadius: 4, border: `1px solid ${borderColor}`, background: 'transparent', color: darkMode ? '#e6edf3' : 'inherit' }} />
               </Box>
               <Stack direction="row" spacing={1} alignItems="center">
                 <input type="checkbox" defaultChecked style={{ accentColor: BP_COLOR }} />
-                <Typography variant="body2" sx={{ color: darkMode ? '#a0afc4' : 'text.secondary' }}>
+                <Typography variant="body2" sx={{ color: textSecondary, fontSize: '0.82rem' }}>
                   Auto-approve high confidence matches (≥90%)
                 </Typography>
               </Stack>
               <Stack direction="row" spacing={1} alignItems="center">
                 <input type="checkbox" defaultChecked style={{ accentColor: BP_COLOR }} />
-                <Typography variant="body2" sx={{ color: darkMode ? '#a0afc4' : 'text.secondary' }}>
+                <Typography variant="body2" sx={{ color: textSecondary, fontSize: '0.82rem' }}>
                   Merge customer/vendor with same Tax ID
                 </Typography>
               </Stack>
@@ -1070,15 +1023,14 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
             disabled={!uploadedFiles['kna1'] || !uploadedFiles['lfa1']}
             onClick={() => setActiveSection('preview-review')}
             sx={{
+              ...masterDataTheme.buttons.primary,
               py: 2,
-              bgcolor: BP_COLOR,
-              '&:hover': { bgcolor: alpha(BP_COLOR, 0.9) },
               '&.Mui-disabled': { bgcolor: alpha(BP_COLOR, 0.3) },
             }}
           >
             Generate BP Preview
           </Button>
-          <Typography variant="body2" sx={{ textAlign: 'center', mt: 1.5, color: Object.keys(uploadedFiles).length >= 2 ? '#10b981' : darkMode ? '#5d7290' : 'text.disabled' }}>
+          <Typography variant="body2" sx={{ textAlign: 'center', mt: 1.5, color: Object.keys(uploadedFiles).length >= 2 ? '#10b981' : textSecondary, opacity: Object.keys(uploadedFiles).length >= 2 ? 1 : 0.7, fontSize: '0.8rem' }}>
             {Object.keys(uploadedFiles).length >= 2 ? '✓ All required files uploaded • Ready for analysis' : 'Upload required files to continue'}
           </Typography>
         </Grid>
@@ -1089,72 +1041,67 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
   // Preview & Review Section
   const renderPreviewReview = () => (
     <Box>
-      {/* Header with icon - matching Inventory Health Check */}
-      <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1 }}>
-        <Box sx={{ width: 48, height: 48, borderRadius: 2, bgcolor: alpha('#0ea5a9', 0.15), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <PreviewIcon sx={{ fontSize: 28, color: '#0ea5a9' }} />
-        </Box>
-        <Box sx={{ flex: 1 }}>
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
-              BP Migration Preview
+      <Paper elevation={0} sx={{ p: 2.5, borderRadius: 2, mb: 3, bgcolor: cardBg, border: `1px solid ${borderColor}` }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Box>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+              <Chip label="BP.AI" size="small" sx={{ bgcolor: BP_COLOR, color: '#fff', fontWeight: 700, fontSize: '0.7rem' }} />
+              <Typography variant="caption" sx={{ color: BP_COLOR, textTransform: 'uppercase', letterSpacing: 1, fontSize: '0.65rem' }}>
+                Preview & Review
+              </Typography>
+            </Stack>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+              <Typography variant="h5" fontWeight={700} sx={{ color: textColor }}>
+                BP Migration Preview
+              </Typography>
+              <Chip label="Demo Data" size="small" icon={<WarningIcon sx={{ fontSize: 14 }} />} sx={{ bgcolor: alpha('#f59e0b', 0.1), color: '#f59e0b', fontWeight: 600, fontSize: '0.7rem' }} />
+            </Stack>
+            <Typography variant="body2" sx={{ color: textSecondary, fontSize: '0.82rem' }}>
+              Review proposed Business Partners before creation • Entity resolution complete
             </Typography>
-            <Chip label="Demo Data" size="small" icon={<WarningIcon sx={{ fontSize: 14 }} />} sx={{ bgcolor: alpha('#f59e0b', 0.1), color: '#f59e0b', fontWeight: 600, fontSize: '0.7rem' }} />
+          </Box>
+          <Stack direction="row" spacing={1}>
+            <IconButton sx={{ border: `1px solid ${borderColor}` }}>
+              <RefreshIcon sx={{ color: textSecondary }} />
+            </IconButton>
+            <IconButton sx={{ border: `1px solid ${borderColor}` }}>
+              <DownloadIcon sx={{ color: textSecondary }} />
+            </IconButton>
           </Stack>
-          <Typography variant="body2" sx={{ color: colors.textSecondary }}>
-            Review proposed Business Partners before creation • Entity resolution complete
-          </Typography>
-        </Box>
-        <Stack direction="row" spacing={1}>
-          <IconButton sx={{ border: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` }}>
-            <RefreshIcon />
-          </IconButton>
-          <IconButton sx={{ border: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` }}>
-            <DownloadIcon />
-          </IconButton>
         </Stack>
-      </Stack>
+      </Paper>
 
       {/* Step Indicator */}
       <StepIndicator currentStep={2} />
 
-      {/* Metrics Row - like Inventory Health Check */}
-      <Paper
-        elevation={0}
-        sx={{
-          mb: 3,
-          borderRadius: 2,
-          border: `1px solid ${colors.border}`,
-          bgcolor: colors.paper,
-          overflow: 'hidden',
-        }}
-      >
-        <Grid container>
-          {[
-            { label: 'TOTAL CLUSTERS', value: '3,847', color: '#0ea5a9' },
-            { label: 'HIGH CONF', value: '3,124', color: '#10b981' },
-            { label: 'MEDIUM', value: '576', color: '#f59e0b' },
-            { label: 'LOW', value: '147', color: '#ef4444' },
-            { label: 'DUAL ROLE', value: '892', color: '#8b5cf6' },
-            { label: 'TOTAL VALUE', value: '$142.7M', color: '#00357a' },
-          ].map((metric, index) => (
-            <Grid item xs={6} md={2} key={index} sx={{ borderRight: index < 5 ? `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` : 'none' }}>
-              <Box sx={{ p: 2 }}>
-                <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: metric.color, textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.5 }}>
+      {/* Metrics Row - matching AP.AI stat cards */}
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        {[
+          { label: 'TOTAL CLUSTERS', value: '3,847', color: NAVY_BLUE },
+          { label: 'HIGH CONF', value: '3,124', color: '#10b981' },
+          { label: 'MEDIUM', value: '576', color: '#f59e0b' },
+          { label: 'LOW', value: '147', color: '#ef4444' },
+          { label: 'DUAL ROLE', value: '892', color: '#8b5cf6' },
+          { label: 'TOTAL VALUE', value: '$142.7M', color: MODULE_NAVY },
+        ].map((metric, index) => (
+          <Grid item xs={6} md={2} key={index}>
+            <Card variant="outlined" sx={{ borderLeft: `3px solid ${metric.color}` }}>
+              <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                <Typography sx={{ fontSize: '0.7rem', color: textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>
                   {metric.label}
                 </Typography>
-                <Typography variant="h5" fontWeight={700} sx={{ color: metric.color }}>
+                <Typography variant="h4" fontWeight={700} sx={{ color: metric.color }}>
                   {metric.value}
                 </Typography>
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
-      </Paper>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
 
-      {/* Filters Row - like Inventory Health Check */}
+      {/* Filters Row */}
       <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-        <FilterIcon sx={{ color: colors.textSecondary }} />
+        <FilterIcon sx={{ color: textSecondary }} />
         <FormControl size="small" sx={{ minWidth: 100 }}>
           <InputLabel>Status</InputLabel>
           <Select defaultValue="All" label="Status">
@@ -1183,34 +1130,32 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
           </Select>
         </FormControl>
         <Box sx={{ flex: 1 }} />
-        <Typography variant="body2" sx={{ color: colors.textSecondary }}>
+        <Typography variant="body2" sx={{ color: textSecondary, fontSize: '0.8rem' }}>
           Showing {mockBPClustersWithFields.length} of {mockBPClustersWithFields.length} clusters • Click row to expand field recommendations
         </Typography>
       </Stack>
 
       {/* BP Clusters Table with Field-Level Expansion */}
-      <Paper
-        elevation={0}
-        sx={{
-          borderRadius: 3,
-          border: `1px solid ${colors.border}`,
-          bgcolor: colors.paper,
-          overflow: 'hidden',
-        }}
-      >
+      <Card sx={{ borderRadius: 2, border: `1px solid ${borderColor}`, bgcolor: cardBg, overflow: 'hidden' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1.5, bgcolor: darkMode ? '#21262d' : '#f1f5f9', borderBottom: `1px solid ${borderColor}` }}>
+          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#f87171' }} />
+          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#fbbf24' }} />
+          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#34d399' }} />
+          <Typography variant="caption" sx={{ color: textSecondary, ml: 1 }}>BP Clusters — Entity Resolution Results</Typography>
+        </Box>
         <TableContainer>
           <Table size="small">
             <TableHead>
-              <TableRow sx={{ bgcolor: colors.background }}>
+              <TableRow sx={{ bgcolor: bgColor }}>
                 <TableCell sx={{ width: 40, p: 1 }} />
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>BP Cluster ID</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>Recommended BP Name</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>Search Term</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>Sources</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>Location</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>Confidence</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>AI Fields</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600, color: colors.text, fontSize: '0.8rem' }}>Status</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>BP Cluster ID</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>Recommended BP Name</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>Search Term</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>Sources</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>Location</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>Confidence</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>AI Fields</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: textColor, fontSize: '0.8rem' }}>Status</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -1222,14 +1167,15 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                     <TableRow
                       sx={{
                         cursor: 'pointer',
+                        borderLeft: bp.status === 'must-review' ? '3px solid #ef4444' : bp.status === 'review' ? '3px solid #f59e0b' : bp.status === 'auto' ? '3px solid #10b981' : '3px solid transparent',
                         bgcolor: isExpanded
-                          ? (darkMode ? 'rgba(0,53,122,0.1)' : 'rgba(0,53,122,0.03)')
+                          ? (darkMode ? alpha(MODULE_NAVY, 0.1) : alpha(MODULE_NAVY, 0.03))
                           : bp.status === 'must-review'
-                          ? 'rgba(239, 68, 68, 0.03)'
+                          ? alpha('#ef4444', 0.03)
                           : bp.status === 'review'
-                          ? 'rgba(245, 158, 11, 0.03)'
+                          ? alpha('#f59e0b', 0.03)
                           : 'transparent',
-                        '&:hover': { bgcolor: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' },
+                        '&:hover': { bgcolor: darkMode ? alpha(NAVY_BLUE, 0.08) : alpha(NAVY_BLUE, 0.04) },
                         borderBottom: isExpanded ? 'none' : undefined,
                       }}
                       onClick={() => toggleRowExpansion(bp.id)}
@@ -1239,26 +1185,26 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                           {isExpanded ? <ExpandMoreIcon /> : <ChevronRightIcon />}
                         </IconButton>
                       </TableCell>
-                      <TableCell sx={{ fontFamily: 'monospace', color: BP_COLOR, fontWeight: 600, py: 1.5 }}>
+                      <TableCell sx={{ fontFamily: 'monospace', color: BP_COLOR, fontWeight: 600, py: 1.5, fontSize: '0.8rem' }}>
                         {bp.id}
                       </TableCell>
-                      <TableCell sx={{ fontWeight: 600, color: colors.text, py: 1.5 }}>
+                      <TableCell sx={{ fontWeight: 600, color: textColor, py: 1.5, fontSize: '0.8rem' }}>
                         {bp.name}
                       </TableCell>
-                      <TableCell sx={{ fontFamily: 'monospace', color: colors.textSecondary, fontSize: '0.75rem', py: 1.5 }}>
+                      <TableCell sx={{ fontFamily: 'monospace', color: textSecondary, fontSize: '0.8rem', py: 1.5 }}>
                         {bp.searchTerm}
                       </TableCell>
                       <TableCell sx={{ py: 1.5 }}>
                         <Stack direction="row" spacing={0.5}>
                           {bp.custCount > 0 && (
-                            <Chip icon={<CustomerIcon sx={{ fontSize: 14, color: '#3b82f6 !important' }} />} label={`${bp.custCount}`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha('#3b82f6', 0.1), color: '#3b82f6' }} />
+                            <Chip icon={<CustomerIcon sx={{ fontSize: 14, color: '#3b82f6 !important' }} />} label={`${bp.custCount}`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha(NAVY_BLUE, 0.1), color: NAVY_BLUE }} />
                           )}
                           {bp.vendCount > 0 && (
                             <Chip icon={<VendorIcon sx={{ fontSize: 14, color: '#8b5cf6 !important' }} />} label={`${bp.vendCount}`} size="small" sx={{ height: 22, fontSize: '0.65rem', bgcolor: alpha('#8b5cf6', 0.1), color: '#8b5cf6' }} />
                           )}
                         </Stack>
                       </TableCell>
-                      <TableCell sx={{ color: colors.textSecondary, fontSize: '0.8rem', py: 1.5 }}>
+                      <TableCell sx={{ color: textSecondary, fontSize: '0.8rem', py: 1.5 }}>
                         {bp.location}
                       </TableCell>
                       <TableCell align="center" sx={{ py: 1.5 }}>
@@ -1304,7 +1250,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
             </TableBody>
           </Table>
         </TableContainer>
-      </Paper>
+      </Card>
 
       {/* Proceed Button */}
       <Stack direction="row" justifyContent="flex-end" sx={{ mt: 3 }}>
@@ -1313,7 +1259,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
           size="large"
           endIcon={<ArrowForwardIcon />}
           onClick={() => setActiveSection('create-bps')}
-          sx={{ bgcolor: BP_COLOR, '&:hover': { bgcolor: alpha(BP_COLOR, 0.9) } }}
+          sx={masterDataTheme.buttons.primary}
         >
           Proceed to Create BPs
         </Button>
@@ -1324,82 +1270,95 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
   // Create BPs Section
   const renderCreateBPs = () => (
     <Box>
-      <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1 }}>
-        <Box sx={{ width: 48, height: 48, borderRadius: 2, bgcolor: alpha(BP_COLOR, 0.15), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <CreateIcon sx={{ fontSize: 28, color: BP_COLOR }} />
-        </Box>
-        <Box sx={{ flex: 1 }}>
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Typography variant="h5" fontWeight={700} sx={{ color: colors.text }}>
-              Create Business Partners
+      <Paper elevation={0} sx={{ p: 2.5, borderRadius: 2, mb: 3, bgcolor: cardBg, border: `1px solid ${borderColor}` }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Box>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+              <Chip label="BP.AI" size="small" sx={{ bgcolor: BP_COLOR, color: '#fff', fontWeight: 700, fontSize: '0.7rem' }} />
+              <Typography variant="caption" sx={{ color: BP_COLOR, textTransform: 'uppercase', letterSpacing: 1, fontSize: '0.65rem' }}>
+                Create Business Partners
+              </Typography>
+            </Stack>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+              <Typography variant="h5" fontWeight={700} sx={{ color: textColor }}>
+                Create Business Partners
+              </Typography>
+              <Chip label="Ready" size="small" icon={<CheckIcon sx={{ fontSize: 14, color: '#10b981 !important' }} />} sx={{ bgcolor: alpha('#10b981', 0.1), color: '#10b981', fontWeight: 600, fontSize: '0.7rem' }} />
+            </Stack>
+            <Typography variant="body2" sx={{ color: textSecondary, fontSize: '0.82rem' }}>
+              Execute BP creation in S/4HANA. Review final counts and initiate migration.
             </Typography>
-            <Chip label="Ready" size="small" icon={<CheckIcon sx={{ fontSize: 14, color: '#10b981 !important' }} />} sx={{ bgcolor: alpha('#10b981', 0.1), color: '#10b981', fontWeight: 600, fontSize: '0.7rem' }} />
-          </Stack>
-          <Typography variant="body2" sx={{ color: colors.textSecondary }}>
-            Execute BP creation in S/4HANA. Review final counts and initiate migration.
-          </Typography>
-        </Box>
-      </Stack>
+          </Box>
+        </Stack>
+      </Paper>
 
       {/* Step Indicator */}
       <StepIndicator currentStep={3} />
 
-      {/* Summary Stats */}
+      {/* Summary Stats - matching AP.AI Card pattern */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} md={3}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, bgcolor: alpha(BP_COLOR, 0.1), textAlign: 'center' }}>
-            <Typography variant="h3" fontWeight={700} sx={{ color: BP_COLOR }}>3,124</Typography>
-            <Typography variant="body2" sx={{ color: colors.textSecondary }}>Ready to Create</Typography>
-          </Paper>
+          <Card variant="outlined" sx={{ borderLeft: `3px solid ${BP_COLOR}` }}>
+            <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+              <Typography sx={{ fontSize: '0.7rem', color: textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Ready to Create</Typography>
+              <Typography variant="h4" fontWeight={700} sx={{ color: BP_COLOR }}>3,124</Typography>
+            </CardContent>
+          </Card>
         </Grid>
         <Grid item xs={12} md={3}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, bgcolor: alpha('#f59e0b', 0.1), textAlign: 'center' }}>
-            <Typography variant="h3" fontWeight={700} sx={{ color: '#f59e0b' }}>576</Typography>
-            <Typography variant="body2" sx={{ color: colors.textSecondary }}>Pending Review</Typography>
-          </Paper>
+          <Card variant="outlined" sx={{ borderLeft: '3px solid #f59e0b' }}>
+            <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+              <Typography sx={{ fontSize: '0.7rem', color: textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Pending Review</Typography>
+              <Typography variant="h4" fontWeight={700} sx={{ color: '#f59e0b' }}>576</Typography>
+            </CardContent>
+          </Card>
         </Grid>
         <Grid item xs={12} md={3}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, bgcolor: alpha('#ef4444', 0.1), textAlign: 'center' }}>
-            <Typography variant="h3" fontWeight={700} sx={{ color: '#ef4444' }}>147</Typography>
-            <Typography variant="body2" sx={{ color: colors.textSecondary }}>Excluded</Typography>
-          </Paper>
+          <Card variant="outlined" sx={{ borderLeft: '3px solid #ef4444' }}>
+            <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+              <Typography sx={{ fontSize: '0.7rem', color: textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Excluded</Typography>
+              <Typography variant="h4" fontWeight={700} sx={{ color: '#ef4444' }}>147</Typography>
+            </CardContent>
+          </Card>
         </Grid>
         <Grid item xs={12} md={3}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 3, bgcolor: alpha('#3b82f6', 0.1), textAlign: 'center' }}>
-            <Typography variant="h3" fontWeight={700} sx={{ color: '#3b82f6' }}>$142.7M</Typography>
-            <Typography variant="body2" sx={{ color: colors.textSecondary }}>Total Value</Typography>
-          </Paper>
+          <Card variant="outlined" sx={{ borderLeft: `3px solid ${NAVY_BLUE}` }}>
+            <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+              <Typography sx={{ fontSize: '0.7rem', color: textSecondary, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>Total Value</Typography>
+              <Typography variant="h4" fontWeight={700} sx={{ color: NAVY_BLUE }}>$142.7M</Typography>
+            </CardContent>
+          </Card>
         </Grid>
       </Grid>
 
       {/* Role Assignment Summary */}
-      <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: `1px solid ${colors.border}`, bgcolor: colors.paper, mb: 3 }}>
-        <Typography variant="h6" fontWeight={600} sx={{ mb: 2, color: colors.text }}>
+      <Paper elevation={0} sx={{ p: 3, borderRadius: 2, border: `1px solid ${borderColor}`, bgcolor: cardBg, mb: 3 }}>
+        <Typography variant="h6" fontWeight={600} sx={{ mb: 2, color: textColor }}>
           BP Role Assignment Summary
         </Typography>
         <Grid container spacing={2}>
           <Grid item xs={6} md={3}>
             <Stack direction="row" spacing={1} alignItems="center">
-              <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#3b82f6' }} />
-              <Typography variant="body2">Customer FI: 2,847</Typography>
+              <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: NAVY_BLUE }} />
+              <Typography variant="body2" sx={{ color: textColor, fontSize: '0.8rem' }}>Customer FI: 2,847</Typography>
             </Stack>
           </Grid>
           <Grid item xs={6} md={3}>
             <Stack direction="row" spacing={1} alignItems="center">
               <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#10b981' }} />
-              <Typography variant="body2">Customer Sales: 2,156</Typography>
+              <Typography variant="body2" sx={{ color: textColor, fontSize: '0.8rem' }}>Customer Sales: 2,156</Typography>
             </Stack>
           </Grid>
           <Grid item xs={6} md={3}>
             <Stack direction="row" spacing={1} alignItems="center">
               <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#8b5cf6' }} />
-              <Typography variant="body2">Vendor FI: 1,892</Typography>
+              <Typography variant="body2" sx={{ color: textColor, fontSize: '0.8rem' }}>Vendor FI: 1,892</Typography>
             </Stack>
           </Grid>
           <Grid item xs={6} md={3}>
             <Stack direction="row" spacing={1} alignItems="center">
               <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#f59e0b' }} />
-              <Typography variant="body2">Vendor Purch: 1,423</Typography>
+              <Typography variant="body2" sx={{ color: textColor, fontSize: '0.8rem' }}>Vendor Purch: 1,423</Typography>
             </Stack>
           </Grid>
         </Grid>
@@ -1407,10 +1366,10 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
 
       {/* Action Buttons */}
       <Stack direction="row" spacing={2} justifyContent="center">
-        <Button variant="outlined" startIcon={<DownloadIcon />} size="large" sx={{ borderColor: 'divider' }}>
+        <Button variant="outlined" startIcon={<DownloadIcon />} size="large" sx={masterDataTheme.buttons.ghost}>
           Export Migration Package
         </Button>
-        <Button variant="contained" startIcon={<CreateIcon />} size="large" sx={{ bgcolor: BP_COLOR, '&:hover': { bgcolor: alpha(BP_COLOR, 0.9) } }}>
+        <Button variant="contained" startIcon={<CreateIcon />} size="large" sx={masterDataTheme.buttons.primary}>
           Create 3,124 Business Partners
         </Button>
       </Stack>
@@ -1434,14 +1393,14 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
   };
 
   return (
-    <Box sx={{ display: 'flex', height: '100%', bgcolor: colors.background }}>
+    <Box sx={{ display: 'flex', height: '100%', bgcolor: bgColor }}>
       {/* Left Sidebar */}
       <Box
         sx={{
           width: sidebarOpen ? 260 : 64,
           flexShrink: 0,
-          bgcolor: darkMode ? '#0a1019' : 'white',
-          borderRight: `1px solid ${darkMode ? '#1e2d42' : 'rgba(0,0,0,0.08)'}`,
+          bgcolor: darkMode ? '#0d1117' : '#fff',
+          borderRight: `1px solid ${borderColor}`,
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
@@ -1450,7 +1409,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
         }}
       >
         {/* Sidebar Header */}
-        <Box sx={{ p: sidebarOpen ? 2 : 1, borderBottom: `1px solid ${darkMode ? '#1e2d42' : 'rgba(0,0,0,0.08)'}` }}>
+        <Box sx={{ p: sidebarOpen ? 2 : 1, borderBottom: `1px solid ${borderColor}` }}>
           <Stack direction="row" spacing={1.5} alignItems="center" justifyContent={sidebarOpen ? 'flex-start' : 'center'}>
             <IconButton
               onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -1469,7 +1428,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                 <Typography variant="subtitle1" fontWeight={700} sx={{ color: darkMode ? '#e6edf3' : BP_COLOR, lineHeight: 1.2 }}>
                   BP.AI
                 </Typography>
-                <Typography variant="caption" sx={{ color: darkMode ? '#5d7290' : 'text.secondary' }}>
+                <Typography variant="caption" sx={{ color: textSecondary, fontSize: '0.65rem' }}>
                   Business Partner Intelligence
                 </Typography>
               </Box>
@@ -1481,7 +1440,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
         <Box sx={{ flex: 1, overflow: 'auto', p: sidebarOpen ? 1.5 : 1 }}>
           {/* Workflow Section */}
           {sidebarOpen && (
-            <Typography variant="caption" sx={{ color: darkMode ? '#5d7290' : 'text.secondary', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, px: 1, display: 'block', mb: 1 }}>
+            <Typography variant="caption" sx={{ color: textSecondary, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, px: 1, display: 'block', mb: 1, fontSize: '0.65rem' }}>
               Workflow
             </Typography>
           )}
@@ -1492,22 +1451,14 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                   selected={activeSection === item.id}
                   onClick={() => setActiveSection(item.id)}
                   sx={{
-                    borderRadius: 2,
+                    ...masterDataTheme.tabs.sidebarItem(activeSection === item.id, darkMode),
                     mb: 0.5,
                     justifyContent: sidebarOpen ? 'flex-start' : 'center',
                     px: sidebarOpen ? 1 : 1.5,
-                    '&.Mui-selected': {
-                      bgcolor: alpha(BP_COLOR, 0.12),
-                      color: BP_COLOR,
-                      '&:hover': { bgcolor: alpha(BP_COLOR, 0.15) },
-                    },
-                    '&:hover': {
-                      bgcolor: darkMode ? '#151f30' : 'rgba(0,0,0,0.04)',
-                    },
                   }}
                 >
                   <ListItemIcon sx={{ minWidth: sidebarOpen ? 32 : 'auto', justifyContent: 'center' }}>
-                    <item.Icon sx={{ fontSize: 18, color: activeSection === item.id ? BP_COLOR : darkMode ? '#a0afc4' : 'text.secondary' }} />
+                    <item.Icon sx={{ fontSize: 18, color: activeSection === item.id ? BP_COLOR : textSecondary }} />
                   </ListItemIcon>
                   {sidebarOpen && (
                     <>
@@ -1516,7 +1467,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                         primaryTypographyProps={{
                           fontSize: '0.8rem',
                           fontWeight: activeSection === item.id ? 600 : 500,
-                          color: activeSection === item.id ? BP_COLOR : darkMode ? '#a0afc4' : 'text.secondary',
+                          color: activeSection === item.id ? BP_COLOR : textSecondary,
                         }}
                       />
                       {item.badge && (
@@ -1542,27 +1493,24 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
 
           {/* Analysis Section */}
           {sidebarOpen && (
-            <Typography variant="caption" sx={{ color: darkMode ? '#5d7290' : 'text.secondary', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, px: 1, display: 'block', mb: 1, mt: 2 }}>
+            <Typography variant="caption" sx={{ color: textSecondary, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, px: 1, display: 'block', mb: 1, mt: 2, fontSize: '0.65rem' }}>
               Analysis
             </Typography>
           )}
-          {!sidebarOpen && <Divider sx={{ my: 1, borderColor: darkMode ? '#1e2d42' : 'rgba(0,0,0,0.08)' }} />}
+          {!sidebarOpen && <Divider sx={{ my: 1, borderColor }} />}
           <List dense disablePadding>
             {analysisNavItems.map((item) => (
               <Tooltip key={item.id} title={!sidebarOpen ? item.label : ''} placement="right">
                 <ListItemButton
                   sx={{
-                    borderRadius: 2,
+                    ...masterDataTheme.tabs.sidebarItem(false, darkMode),
                     mb: 0.5,
                     justifyContent: sidebarOpen ? 'flex-start' : 'center',
                     px: sidebarOpen ? 1 : 1.5,
-                    '&:hover': {
-                      bgcolor: darkMode ? '#151f30' : 'rgba(0,0,0,0.04)',
-                    },
                   }}
                 >
                   <ListItemIcon sx={{ minWidth: sidebarOpen ? 32 : 'auto', justifyContent: 'center' }}>
-                    <item.Icon sx={{ fontSize: 18, color: darkMode ? '#a0afc4' : 'text.secondary' }} />
+                    <item.Icon sx={{ fontSize: 18, color: textSecondary }} />
                   </ListItemIcon>
                   {sidebarOpen && (
                     <>
@@ -1571,7 +1519,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                         primaryTypographyProps={{
                           fontSize: '0.8rem',
                           fontWeight: 500,
-                          color: darkMode ? '#a0afc4' : 'text.secondary',
+                          color: textSecondary,
                         }}
                       />
                       {item.badge && (
@@ -1597,27 +1545,24 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
 
           {/* Tools Section */}
           {sidebarOpen && (
-            <Typography variant="caption" sx={{ color: darkMode ? '#5d7290' : 'text.secondary', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, px: 1, display: 'block', mb: 1, mt: 2 }}>
+            <Typography variant="caption" sx={{ color: textSecondary, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, px: 1, display: 'block', mb: 1, mt: 2, fontSize: '0.65rem' }}>
               Tools
             </Typography>
           )}
-          {!sidebarOpen && <Divider sx={{ my: 1, borderColor: darkMode ? '#1e2d42' : 'rgba(0,0,0,0.08)' }} />}
+          {!sidebarOpen && <Divider sx={{ my: 1, borderColor }} />}
           <List dense disablePadding>
             {toolsNavItems.map((item) => (
               <Tooltip key={item.id} title={!sidebarOpen ? item.label : ''} placement="right">
                 <ListItemButton
                   sx={{
-                    borderRadius: 2,
+                    ...masterDataTheme.tabs.sidebarItem(false, darkMode),
                     mb: 0.5,
                     justifyContent: sidebarOpen ? 'flex-start' : 'center',
                     px: sidebarOpen ? 1 : 1.5,
-                    '&:hover': {
-                      bgcolor: darkMode ? '#151f30' : 'rgba(0,0,0,0.04)',
-                    },
                   }}
                 >
                   <ListItemIcon sx={{ minWidth: sidebarOpen ? 32 : 'auto', justifyContent: 'center' }}>
-                    <item.Icon sx={{ fontSize: 18, color: darkMode ? '#a0afc4' : 'text.secondary' }} />
+                    <item.Icon sx={{ fontSize: 18, color: textSecondary }} />
                   </ListItemIcon>
                   {sidebarOpen && (
                     <ListItemText
@@ -1625,7 +1570,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                       primaryTypographyProps={{
                         fontSize: '0.8rem',
                         fontWeight: 500,
-                        color: darkMode ? '#a0afc4' : 'text.secondary',
+                        color: textSecondary,
                       }}
                     />
                   )}
@@ -1636,13 +1581,13 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
         </Box>
 
         {/* Sidebar Footer - System Status */}
-        <Box sx={{ p: sidebarOpen ? 2 : 1, borderTop: `1px solid ${darkMode ? '#1e2d42' : 'rgba(0,0,0,0.08)'}` }}>
+        <Box sx={{ p: sidebarOpen ? 2 : 1, borderTop: `1px solid ${borderColor}` }}>
           {sidebarOpen ? (
             <Box sx={{
               p: 1.5,
               borderRadius: 2,
-              bgcolor: darkMode ? '#0f1724' : '#f8fafc',
-              border: `1px solid ${darkMode ? '#1e2d42' : 'rgba(0,0,0,0.08)'}`,
+              bgcolor: bgColor,
+              border: `1px solid ${borderColor}`,
             }}>
               <Stack direction="row" spacing={1.5} alignItems="center">
                 <Box
@@ -1651,7 +1596,6 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                     height: 10,
                     borderRadius: '50%',
                     bgcolor: BP_COLOR,
-                    boxShadow: `0 0 10px ${BP_COLOR}`,
                     animation: 'pulse 2s infinite',
                     '@keyframes pulse': {
                       '0%, 100%': { opacity: 1 },
@@ -1660,10 +1604,10 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                   }}
                 />
                 <Box>
-                  <Typography variant="caption" fontWeight={600} sx={{ color: colors.text, display: 'block' }}>
+                  <Typography variant="caption" fontWeight={600} sx={{ color: textColor, display: 'block', fontSize: '0.65rem' }}>
                     Ready
                   </Typography>
-                  <Typography variant="caption" sx={{ color: darkMode ? '#5d7290' : 'text.secondary' }}>
+                  <Typography variant="caption" sx={{ color: textSecondary, fontSize: '0.65rem' }}>
                     S/4HANA Migration Mode
                   </Typography>
                 </Box>
@@ -1678,7 +1622,6 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                     height: 12,
                     borderRadius: '50%',
                     bgcolor: BP_COLOR,
-                    boxShadow: `0 0 10px ${BP_COLOR}`,
                     animation: 'pulse 2s infinite',
                     '@keyframes pulse': {
                       '0%, 100%': { opacity: 1 },
@@ -1700,40 +1643,41 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
           sx={{
             px: 3,
             py: 1.5,
-            borderBottom: `1px solid ${darkMode ? '#1e2d42' : 'rgba(0,0,0,0.08)'}`,
-            bgcolor: darkMode ? 'rgba(10, 16, 25, 0.8)' : 'white',
-            backdropFilter: 'blur(20px)',
+            borderBottom: `1px solid ${borderColor}`,
+            bgcolor: darkMode ? '#0d1117' : '#fff',
+            borderRadius: 0,
           }}
         >
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
               <Link
                 component="button"
-                variant="body2"
+                underline="hover"
+                color="inherit"
                 onClick={onBack}
-                sx={{ textDecoration: 'none', color: colors.textSecondary, '&:hover': { textDecoration: 'underline' } }}
+                sx={{ cursor: 'pointer', fontSize: '0.85rem', color: textSecondary }}
               >
                 MASTER.AI
               </Link>
               <Link
                 component="button"
-                variant="body2"
+                underline="hover"
+                color="inherit"
                 onClick={onBack}
-                sx={{ textDecoration: 'none', color: colors.textSecondary, '&:hover': { textDecoration: 'underline' } }}
+                sx={{ cursor: 'pointer', fontSize: '0.85rem', color: textSecondary }}
               >
                 BP.AI
               </Link>
-              <Typography variant="body2" fontWeight={600} sx={{ color: colors.text }}>
+              <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: textColor }}>
                 {workflowNavItems.find(item => item.id === activeSection)?.label || 'Data Upload & Scope'}
               </Typography>
             </Breadcrumbs>
 
             <Button
+              size="small"
               startIcon={<ArrowBackIcon />}
               onClick={onBack}
-              variant="outlined"
-              size="small"
-              sx={{ borderColor: 'divider' }}
+              sx={{ color: textSecondary, textTransform: 'none', borderRadius: 2 }}
             >
               Back
             </Button>
@@ -1754,8 +1698,8 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
         PaperProps={{
           sx: {
             width: 420,
-            bgcolor: colors.paper,
-            borderLeft: `1px solid ${colors.border}`,
+            bgcolor: cardBg,
+            borderLeft: `1px solid ${borderColor}`,
           }
         }}
       >
@@ -1764,8 +1708,8 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
             {/* Drawer Header */}
             <Box sx={{
               p: 2.5,
-              borderBottom: `1px solid ${colors.border}`,
-              bgcolor: darkMode ? 'rgba(0,53,122,0.1)' : 'rgba(0,53,122,0.03)',
+              borderBottom: `1px solid ${borderColor}`,
+              bgcolor: darkMode ? alpha(MODULE_NAVY, 0.1) : alpha(MODULE_NAVY, 0.03),
             }}>
               <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                 <Stack direction="row" spacing={1.5} alignItems="center">
@@ -1773,52 +1717,52 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                     <AIIcon sx={{ fontSize: 22, color: BP_COLOR }} />
                   </Avatar>
                   <Box>
-                    <Typography variant="h6" fontWeight={700} sx={{ color: colors.text, lineHeight: 1.2 }}>
+                    <Typography variant="h6" fontWeight={700} sx={{ color: textColor, lineHeight: 1.2 }}>
                       AI Insight
                     </Typography>
-                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>
+                    <Typography variant="caption" sx={{ color: textSecondary, fontSize: '0.65rem' }}>
                       BP Field Recommendation Evidence
                     </Typography>
                   </Box>
                 </Stack>
                 <IconButton onClick={() => setSelectedFieldForInsight(null)} size="small">
-                  <RejectIcon sx={{ fontSize: 20 }} />
+                  <RejectIcon sx={{ fontSize: 20, color: textSecondary }} />
                 </IconButton>
               </Stack>
             </Box>
 
             {/* Field Info */}
-            <Box sx={{ p: 2.5, borderBottom: `1px solid ${colors.border}` }}>
+            <Box sx={{ p: 2.5, borderBottom: `1px solid ${borderColor}` }}>
               <Stack spacing={2}>
                 <Box>
-                  <Typography variant="overline" sx={{ color: colors.textSecondary, fontSize: '0.65rem' }}>
+                  <Typography variant="overline" sx={{ color: textSecondary, fontSize: '0.65rem' }}>
                     Table / Field
                   </Typography>
                   <Stack direction="row" spacing={1} alignItems="center">
                     <Chip
                       label={selectedFieldForInsight.table}
                       size="small"
-                      sx={{ fontFamily: 'monospace', bgcolor: alpha('#6b7280', 0.1), color: colors.textSecondary }}
+                      sx={{ fontFamily: 'monospace', bgcolor: alpha('#6b7280', 0.1), color: textSecondary, fontSize: '0.7rem' }}
                     />
                     <Typography variant="h6" fontWeight={700} sx={{ color: BP_COLOR, fontFamily: 'monospace' }}>
                       {selectedFieldForInsight.field}
                     </Typography>
                   </Stack>
-                  <Typography variant="body2" sx={{ color: colors.text, mt: 0.5 }}>
+                  <Typography variant="body2" sx={{ color: textColor, mt: 0.5, fontSize: '0.82rem' }}>
                     {selectedFieldForInsight.fieldName}
                   </Typography>
                 </Box>
 
-                <Divider />
+                <Divider sx={{ borderColor }} />
 
                 {/* Value Comparison */}
                 <Grid container spacing={2}>
                   <Grid item xs={6}>
-                    <Paper elevation={0} sx={{ p: 1.5, bgcolor: alpha('#6b7280', 0.05), borderRadius: 2, border: `1px solid ${alpha('#6b7280', 0.1)}` }}>
-                      <Typography variant="overline" sx={{ color: colors.textSecondary, fontSize: '0.6rem' }}>
+                    <Paper elevation={0} sx={{ p: 1.5, bgcolor: bgColor, borderRadius: 2, border: `1px solid ${borderColor}` }}>
+                      <Typography variant="overline" sx={{ color: textSecondary, fontSize: '0.65rem' }}>
                         Source Value(s)
                       </Typography>
-                      <Typography variant="body2" fontWeight={600} sx={{ color: colors.textSecondary, fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                      <Typography variant="body2" fontWeight={600} sx={{ color: textSecondary, fontFamily: 'monospace', fontSize: '0.8rem' }}>
                         {selectedFieldForInsight.sourceValue || '—'}
                       </Typography>
                     </Paper>
@@ -1830,7 +1774,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                       borderRadius: 2,
                       border: `1px solid ${alpha(BP_COLOR, 0.2)}`
                     }}>
-                      <Typography variant="overline" sx={{ color: colors.textSecondary, fontSize: '0.6rem' }}>
+                      <Typography variant="overline" sx={{ color: textSecondary, fontSize: '0.65rem' }}>
                         AI Recommendation
                       </Typography>
                       <Typography variant="body2" fontWeight={700} sx={{
@@ -1847,7 +1791,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                 {/* Confidence */}
                 <Box>
                   <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.5 }}>
-                    <Typography variant="overline" sx={{ color: colors.textSecondary, fontSize: '0.65rem' }}>
+                    <Typography variant="overline" sx={{ color: textSecondary, fontSize: '0.65rem' }}>
                       Confidence Score
                     </Typography>
                     <Chip
@@ -1857,6 +1801,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                         bgcolor: alpha(getConfidenceColor(selectedFieldForInsight.confidence), 0.15),
                         color: getConfidenceColor(selectedFieldForInsight.confidence),
                         fontWeight: 700,
+                        fontSize: '0.7rem',
                       }}
                     />
                   </Stack>
@@ -1878,12 +1823,12 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
             </Box>
 
             {/* Rationale */}
-            <Box sx={{ p: 2.5, borderBottom: `1px solid ${colors.border}` }}>
-              <Typography variant="overline" sx={{ color: colors.textSecondary, fontSize: '0.65rem', display: 'block', mb: 1 }}>
+            <Box sx={{ p: 2.5, borderBottom: `1px solid ${borderColor}` }}>
+              <Typography variant="overline" sx={{ color: textSecondary, fontSize: '0.65rem', display: 'block', mb: 1 }}>
                 AI Rationale
               </Typography>
-              <Paper elevation={0} sx={{ p: 2, bgcolor: alpha(BP_COLOR, 0.05), borderRadius: 2, border: `1px solid ${alpha(BP_COLOR, 0.1)}` }}>
-                <Typography variant="body2" sx={{ color: colors.text, lineHeight: 1.6 }}>
+              <Paper elevation={0} sx={{ p: 2, bgcolor: alpha(BP_COLOR, 0.05), borderRadius: 2, border: `1px solid ${alpha(BP_COLOR, 0.1)}`, borderLeft: `4px solid ${NAVY_BLUE}` }}>
+                <Typography variant="body2" sx={{ color: textColor, lineHeight: 1.6, fontSize: '0.82rem' }}>
                   {selectedFieldForInsight.rationale}
                 </Typography>
               </Paper>
@@ -1891,7 +1836,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
 
             {/* Evidence Breakdown */}
             <Box sx={{ p: 2.5, flex: 1 }}>
-              <Typography variant="overline" sx={{ color: colors.textSecondary, fontSize: '0.65rem', display: 'block', mb: 1.5 }}>
+              <Typography variant="overline" sx={{ color: textSecondary, fontSize: '0.65rem', display: 'block', mb: 1.5 }}>
                 Evidence Signals ({selectedFieldForInsight.evidence?.length || 0})
               </Typography>
               <Stack spacing={1}>
@@ -1901,9 +1846,9 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                     elevation={0}
                     sx={{
                       p: 1.5,
-                      bgcolor: colors.background,
+                      bgcolor: bgColor,
                       borderRadius: 2,
-                      border: `1px solid ${colors.border}`,
+                      border: `1px solid ${borderColor}`,
                       display: 'flex',
                       alignItems: 'center',
                       gap: 1.5,
@@ -1919,11 +1864,11 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                       justifyContent: 'center',
                       flexShrink: 0,
                     }}>
-                      <Typography variant="caption" fontWeight={700} sx={{ color: BP_COLOR }}>
+                      <Typography variant="caption" fontWeight={700} sx={{ color: BP_COLOR, fontSize: '0.65rem' }}>
                         {index + 1}
                       </Typography>
                     </Box>
-                    <Typography variant="body2" sx={{ color: colors.text }}>
+                    <Typography variant="body2" sx={{ color: textColor, fontSize: '0.82rem' }}>
                       {item}
                     </Typography>
                   </Paper>
@@ -1934,12 +1879,12 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
             {/* Governance Status Footer */}
             <Box sx={{
               p: 2,
-              borderTop: `1px solid ${colors.border}`,
-              bgcolor: colors.background,
+              borderTop: `1px solid ${borderColor}`,
+              bgcolor: bgColor,
             }}>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <Typography variant="caption" sx={{ color: colors.textSecondary }}>
+                  <Typography variant="caption" sx={{ color: textSecondary, fontSize: '0.65rem' }}>
                     Status:
                   </Typography>
                   {getFieldStatusChip(selectedFieldForInsight.status)}
@@ -1949,9 +1894,8 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                     <Button
                       size="small"
                       variant="outlined"
-                      color="error"
                       startIcon={<RejectIcon />}
-                      sx={{ fontSize: '0.75rem' }}
+                      sx={{ ...masterDataTheme.buttons.danger, fontSize: '0.75rem' }}
                     >
                       Reject
                     </Button>
@@ -1959,11 +1903,7 @@ const BPAIModule = ({ onBack, darkMode = false }) => {
                       size="small"
                       variant="contained"
                       startIcon={<ApproveIcon />}
-                      sx={{
-                        fontSize: '0.75rem',
-                        bgcolor: '#10b981',
-                        '&:hover': { bgcolor: '#059669' }
-                      }}
+                      sx={{ ...masterDataTheme.buttons.success, fontSize: '0.75rem' }}
                     >
                       Approve
                     </Button>

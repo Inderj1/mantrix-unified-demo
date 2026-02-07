@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANTRIX AP — Product Sitemap</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'JetBrains Mono', monospace; background: #060a12; min-height: 100vh; color: #e2e8f0; }
+
+        .hero { text-align: center; padding: 70px 40px 50px; position: relative; }
+        .hero::before { content: ''; position: absolute; top: -80px; left: 50%; transform: translateX(-50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, transparent 60%); }
+        .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; border: 1px solid rgba(255,255,255,0.12); border-radius: 100px; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; margin-bottom: 20px; background: rgba(255,255,255,0.03); }
+        .hero-title { font-size: 36px; font-weight: 800; margin-bottom: 14px; line-height: 1.2; }
+        .hero-title .grad { background: linear-gradient(135deg, #8b5cf6, #22d3ee, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-sub { font-size: 13px; color: #64748b; max-width: 600px; margin: 0 auto 28px; line-height: 1.8; }
+        .hero-sub strong { color: #e2e8f0; }
+
+        .section { max-width: 1400px; margin: 0 auto; padding: 50px 40px; }
+        .divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.2), transparent); max-width: 1400px; margin: 0 auto; }
+        .section-label { font-size: 9px; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; margin-bottom: 8px; }
+        .section-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+        .section-desc { font-size: 12px; color: #94a3b8; line-height: 1.9; max-width: 700px; margin-bottom: 32px; }
+        .section-desc strong { color: #e2e8f0; }
+
+        /* Scope Box */
+        .scope-box { display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: center; margin-bottom: 40px; padding: 28px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; }
+        .scope-in { }
+        .scope-in-title { font-size: 10px; font-weight: 700; color: #34d399; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .scope-out-title { font-size: 10px; font-weight: 700; color: #f87171; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .scope-item { font-size: 10px; color: #94a3b8; padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+        .scope-item::before { content: '→'; color: #475569; }
+        .scope-divider { width: 1px; height: 100%; background: rgba(255,255,255,0.06); }
+
+        /* Two-Layer Architecture */
+        .arch-container { position: relative; margin-bottom: 40px; }
+        .arch-layer { border-radius: 20px; padding: 32px; margin-bottom: 20px; position: relative; }
+        .arch-layer.pulse { background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(139, 92, 246, 0.03)); border: 1px solid rgba(139, 92, 246, 0.2); }
+        .arch-layer.ops { background: linear-gradient(135deg, rgba(34, 211, 238, 0.06), rgba(52, 211, 153, 0.03)); border: 1px solid rgba(34, 211, 238, 0.15); }
+        .arch-layer.engine { background: linear-gradient(135deg, rgba(248, 113, 113, 0.06), rgba(251, 191, 36, 0.03)); border: 1px solid rgba(248, 113, 113, 0.15); }
+        .arch-layer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .arch-layer-badge { font-size: 8px; padding: 5px 12px; border-radius: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .arch-layer-badge.pulse { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+        .arch-layer-badge.ops { background: rgba(34, 211, 238, 0.15); color: #22d3ee; }
+        .arch-layer-badge.engine { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+        .arch-layer-name { font-size: 16px; font-weight: 700; }
+        .arch-layer-name.pulse { color: #8b5cf6; }
+        .arch-layer-name.ops { color: #22d3ee; }
+        .arch-layer-name.engine { color: #f87171; }
+        .arch-layer-audience { font-size: 9px; color: #64748b; }
+        .arch-layer-desc { font-size: 11px; color: #94a3b8; line-height: 1.7; margin-bottom: 18px; }
+
+        /* Arrow between layers */
+        .arch-arrow { text-align: center; padding: 8px 0; font-size: 18px; color: #475569; }
+
+        /* Tile Cards in Layer */
+        .tile-row { display: grid; gap: 12px; }
+        .tile-row.five { grid-template-columns: repeat(5, 1fr); }
+        .tile-row.three { grid-template-columns: repeat(3, 1fr); }
+        .tile-row.two { grid-template-columns: repeat(2, 1fr); }
+        .tile-card { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; position: relative; overflow: hidden; }
+        .tile-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+        .tc-cyan::before { background: #22d3ee; }
+        .tc-green::before { background: #34d399; }
+        .tc-amber::before { background: #fbbf24; }
+        .tc-blue::before { background: #3b82f6; }
+        .tc-purple::before { background: #8b5cf6; }
+        .tc-red::before { background: #f87171; }
+        .tile-card-num { font-size: 7px; text-transform: uppercase; letter-spacing: 1px; color: #475569; font-weight: 700; margin-bottom: 6px; }
+        .tile-card-name { font-size: 11px; font-weight: 700; color: #e2e8f0; margin-bottom: 6px; }
+        .tile-card-desc { font-size: 9px; color: #64748b; line-height: 1.5; margin-bottom: 8px; }
+        .tile-card-role { display: flex; gap: 6px; flex-wrap: wrap; }
+        .tile-card-role-badge { font-size: 7px; padding: 2px 6px; border-radius: 3px; font-weight: 600; text-transform: uppercase; }
+        .role-ai { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+        .role-human { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+        .role-mgr { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+
+        /* Persona Map */
+        .persona-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+        .persona-card { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 22px; }
+        .persona-icon { font-size: 28px; margin-bottom: 12px; }
+        .persona-name { font-size: 12px; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
+        .persona-role { font-size: 9px; color: #64748b; margin-bottom: 12px; }
+        .persona-sees { font-size: 9px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 8px; }
+        .persona-tile { font-size: 9px; color: #94a3b8; padding: 3px 0; display: flex; align-items: center; gap: 6px; }
+        .persona-tile-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .dot-cyan { background: #22d3ee; }
+        .dot-green { background: #34d399; }
+        .dot-amber { background: #fbbf24; }
+        .dot-blue { background: #3b82f6; }
+        .dot-purple { background: #8b5cf6; }
+        .dot-red { background: #f87171; }
+
+        /* Document Index */
+        .doc-table { width: 100%; border-collapse: collapse; font-size: 10px; background: rgba(15, 23, 42, 0.8); border-radius: 14px; overflow: hidden; margin-bottom: 28px; }
+        .doc-table th { text-align: left; padding: 12px 14px; background: rgba(0,0,0,0.4); color: #475569; font-weight: 600; text-transform: uppercase; font-size: 8px; letter-spacing: 0.5px; }
+        .doc-table td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .doc-table tr:last-child td { border-bottom: none; }
+        .doc-file { font-weight: 600; color: #22d3ee; }
+        .doc-layer { font-size: 8px; padding: 3px 8px; border-radius: 4px; font-weight: 600; text-transform: uppercase; }
+        .doc-layer.ops { background: rgba(34, 211, 238, 0.15); color: #22d3ee; }
+        .doc-layer.pulse { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+        .doc-layer.engine { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+        .doc-layer.overview { background: rgba(255,255,255,0.06); color: #94a3b8; }
+
+        /* Data Flow */
+        .flow-box { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 28px; margin-bottom: 28px; }
+        .flow-title { font-size: 13px; font-weight: 700; color: #e2e8f0; margin-bottom: 18px; }
+        .flow-step { display: grid; grid-template-columns: 60px 1fr 200px; gap: 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .flow-step:last-child { border-bottom: none; }
+        .flow-num { font-size: 18px; font-weight: 700; color: #475569; text-align: center; }
+        .flow-event { font-size: 11px; color: #e2e8f0; font-weight: 600; }
+        .flow-event-sub { font-size: 9px; color: #64748b; margin-top: 2px; }
+        .flow-where { font-size: 9px; display: flex; align-items: center; gap: 6px; }
+        .flow-where-badge { padding: 3px 8px; border-radius: 4px; font-size: 8px; font-weight: 600; }
+
+        /* Boundary Statement */
+        .boundary { background: linear-gradient(135deg, rgba(52, 211, 153, 0.06), rgba(34, 211, 238, 0.04)); border: 1px solid rgba(52, 211, 153, 0.2); border-radius: 16px; padding: 28px; text-align: center; }
+        .boundary-title { font-size: 18px; font-weight: 700; color: #34d399; margin-bottom: 12px; }
+        .boundary-text { font-size: 12px; color: #94a3b8; line-height: 1.9; max-width: 600px; margin: 0 auto; }
+        .boundary-text strong { color: #e2e8f0; }
+    </style>
+</head>
+<body>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-badge">📐 Master Product Blueprint</div>
+        <h1 class="hero-title">
+            <span class="grad">Product Sitemap</span>
+        </h1>
+        <p class="hero-sub">
+            Every screen. Every tile. Every role. Every data flow.
+            <strong>One document to understand the entire product.</strong>
+        </p>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- PRODUCT SCOPE -->
+    <section class="section">
+        <div class="section-label" style="color: #34d399;">Product Boundary</div>
+        <div class="section-title">What Mantrix AP Does — and Doesn't Do</div>
+
+        <div class="scope-box">
+            <div class="scope-in">
+                <div class="scope-in-title">✓ In Scope</div>
+                <div class="scope-item">Invoice arrives (email, scan, EDI, portal)</div>
+                <div class="scope-item">OCR extraction + AI pre-fill</div>
+                <div class="scope-item">Line item matching to PO (6-strategy engine)</div>
+                <div class="scope-item">3-way match verification (PO / GR / Invoice)</div>
+                <div class="scope-item">Exception detection + root cause analysis</div>
+                <div class="scope-item">Human review + confirmation</div>
+                <div class="scope-item">Post to SAP (MIRO / FB60 via BAPI)</div>
+                <div class="scope-item">Park to SAP (MIR7 via BAPI)</div>
+                <div class="scope-item">Department visibility + KPIs</div>
+            </div>
+            <div class="scope-divider"></div>
+            <div>
+                <div class="scope-out-title">✕ Out of Scope</div>
+                <div class="scope-item">PO creation (ME21N) — upstream</div>
+                <div class="scope-item">Goods receipt posting (MIGO) — warehouse</div>
+                <div class="scope-item">Payment run execution (F110) — treasury</div>
+                <div class="scope-item">Bank reconciliation — finance</div>
+                <div class="scope-item">Vendor master maintenance (XK01/XK02)</div>
+                <div class="scope-item">Approval workflows for POs</div>
+                <div class="scope-item">Cash management / forecasting</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- THREE-LAYER ARCHITECTURE -->
+    <section class="section">
+        <div class="section-label" style="color: #8b5cf6;">Architecture</div>
+        <div class="section-title">Three Layers — Two Audiences — One Product</div>
+        <div class="section-desc">
+            The product has three layers. The <strong>AP clerk</strong> lives in the Operational Layer.
+            The <strong>department head</strong> lives in Enterprise Pulse. The <strong>Matching Engine</strong>
+            runs underneath both, powering every screen.
+        </div>
+
+        <div class="arch-container">
+            <!-- Layer 1: Enterprise Pulse -->
+            <div class="arch-layer pulse">
+                <div class="arch-layer-header">
+                    <div>
+                        <div class="arch-layer-badge pulse">Layer 1</div>
+                        <div class="arch-layer-name pulse">Enterprise Pulse — AP Department View</div>
+                    </div>
+                    <div class="arch-layer-audience">👤 AP Manager · Controller · CFO</div>
+                </div>
+                <div class="arch-layer-desc">
+                    AI agents continuously scan AP operations and surface KPIs, patterns, structural issues, and escalations.
+                    Department head sees the state of the entire AP operation in real time. Does not process invoices.
+                </div>
+                <div class="tile-row three">
+                    <div class="tile-card tc-purple">
+                        <div class="tile-card-num">Pulse — Dashboard</div>
+                        <div class="tile-card-name">Department KPIs</div>
+                        <div class="tile-card-desc">Real-time: invoices processed, AI-assist rate, open exceptions, cost per invoice, cash impact</div>
+                        <div class="tile-card-role"><span class="tile-card-role-badge role-ai">AI Gathers</span><span class="tile-card-role-badge role-mgr">Mgr Views</span></div>
+                    </div>
+                    <div class="tile-card tc-purple">
+                        <div class="tile-card-num">Pulse — Intelligence</div>
+                        <div class="tile-card-name">AI-Detected Patterns</div>
+                        <div class="tile-card-desc">Structural issues: GR delays at plant X, buyer exception rates, vendor pricing drift, training opportunities</div>
+                        <div class="tile-card-role"><span class="tile-card-role-badge role-ai">AI Detects</span><span class="tile-card-role-badge role-mgr">Mgr Acts</span></div>
+                    </div>
+                    <div class="tile-card tc-purple">
+                        <div class="tile-card-num">Pulse — Team</div>
+                        <div class="tile-card-name">Team Performance</div>
+                        <div class="tile-card-desc">Per-clerk: queue progress, throughput, avg time, exception handling. Workload visibility, not surveillance.</div>
+                        <div class="tile-card-role"><span class="tile-card-role-badge role-ai">AI Tracks</span><span class="tile-card-role-badge role-mgr">Mgr Supports</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arch-arrow">↕ Events flow up · Escalations flow down</div>
+
+            <!-- Layer 2: Operational -->
+            <div class="arch-layer ops">
+                <div class="arch-layer-header">
+                    <div>
+                        <div class="arch-layer-badge ops">Layer 2</div>
+                        <div class="arch-layer-name ops">Operational Tiles — AP Clerk Workbench</div>
+                    </div>
+                    <div class="arch-layer-audience">👤 AP Clerk · AP Processor</div>
+                </div>
+                <div class="arch-layer-desc">
+                    The clerk's daily workspace. Five tiles that follow the invoice lifecycle from arrival to posting.
+                    AI assists at every step. Human makes every decision.
+                </div>
+                <div class="tile-row five">
+                    <div class="tile-card tc-cyan">
+                        <div class="tile-card-num">Tile 1</div>
+                        <div class="tile-card-name">Invoice Entry</div>
+                        <div class="tile-card-desc">OCR → pre-fill → PO match → clerk reviews → confirm fields</div>
+                        <div class="tile-card-role"><span class="tile-card-role-badge role-ai">AI Pre-Fills</span><span class="tile-card-role-badge role-human">Human Verifies</span></div>
+                    </div>
+                    <div class="tile-card tc-green">
+                        <div class="tile-card-num">Tile 2</div>
+                        <div class="tile-card-name">Work Queue</div>
+                        <div class="tile-card-desc">AI-prioritized inbox ranked by financial impact. Clerk works top-down.</div>
+                        <div class="tile-card-role"><span class="tile-card-role-badge role-ai">AI Prioritizes</span><span class="tile-card-role-badge role-human">Human Processes</span></div>
+                    </div>
+                    <div class="tile-card tc-amber">
+                        <div class="tile-card-num">Tile 3</div>
+                        <div class="tile-card-name">Exception Review</div>
+                        <div class="tile-card-desc">AI root cause + precedent + evidence. Clerk decides: post, park, route, reject.</div>
+                        <div class="tile-card-role"><span class="tile-card-role-badge role-ai">AI Diagnoses</span><span class="tile-card-role-badge role-human">Human Resolves</span></div>
+                    </div>
+                    <div class="tile-card tc-blue">
+                        <div class="tile-card-num">Tile 4</div>
+                        <div class="tile-card-name">Posting Review</div>
+                        <div class="tile-card-desc">Batch of AI-prepared postings. Clerk reviews confidence, selects, confirms.</div>
+                        <div class="tile-card-role"><span class="tile-card-role-badge role-ai">AI Prepares</span><span class="tile-card-role-badge role-human">Human Confirms</span></div>
+                    </div>
+                    <div class="tile-card tc-green">
+                        <div class="tile-card-num">Tile 5</div>
+                        <div class="tile-card-name">My Status</div>
+                        <div class="tile-card-desc">My postings, parked items, vendor responses, personal stats. Clerk's home base.</div>
+                        <div class="tile-card-role"><span class="tile-card-role-badge role-ai">AI Tracks</span><span class="tile-card-role-badge role-human">Human Monitors</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arch-arrow">↕ Intelligence flows up · Data flows down</div>
+
+            <!-- Layer 3: Engine -->
+            <div class="arch-layer engine">
+                <div class="arch-layer-header">
+                    <div>
+                        <div class="arch-layer-badge engine">Layer 3</div>
+                        <div class="arch-layer-name engine">Line Item Matching Engine — Core AI</div>
+                    </div>
+                    <div class="arch-layer-audience">⚙️ Runs Behind Every Screen</div>
+                </div>
+                <div class="arch-layer-desc">
+                    The 6-strategy probabilistic matching pipeline. Reads from SAP tables (EKKO, EKPO, EKET, MATDOC, EKBE, EINA, RSEG).
+                    Writes via BAPIs (BAPI_INCOMINGINVOICE_CREATE/PARK). Powers Tile 1's pre-fill, Tile 2's scoring, Tile 3's diagnostics.
+                </div>
+                <div class="tile-row three">
+                    <div class="tile-card tc-red">
+                        <div class="tile-card-num">Engine</div>
+                        <div class="tile-card-name">6-Strategy Matcher</div>
+                        <div class="tile-card-desc">Key match → Vendor-material history → Semantic → Qty/Price proximity → GR cross-ref → Elimination</div>
+                    </div>
+                    <div class="tile-card tc-red">
+                        <div class="tile-card-num">Engine</div>
+                        <div class="tile-card-name">SAP Read Layer</div>
+                        <div class="tile-card-desc">CDS Views + OData (S/4) or RFCs + BAPIs (ECC). 16 table families. No custom ABAP.</div>
+                    </div>
+                    <div class="tile-card tc-red">
+                        <div class="tile-card-num">Engine</div>
+                        <div class="tile-card-name">SAP Write Layer</div>
+                        <div class="tile-card-desc">BAPI_INCOMINGINVOICE_CREATE (post), _PARK (park). Standard BAPIs only. Upgrade-safe.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- WHO SEES WHAT -->
+    <section class="section">
+        <div class="section-label" style="color: #fbbf24;">Role-Based Access</div>
+        <div class="section-title">Who Sees What</div>
+
+        <div class="persona-grid">
+            <div class="persona-card">
+                <div class="persona-icon">👩‍💻</div>
+                <div class="persona-name">AP Clerk</div>
+                <div class="persona-role">Sarah Chen · Daily invoice processor</div>
+                <div class="persona-sees">Sees:</div>
+                <div class="persona-tile"><span class="persona-tile-dot dot-cyan"></span>Tile 1 — Invoice Entry</div>
+                <div class="persona-tile"><span class="persona-tile-dot dot-green"></span>Tile 2 — My Work Queue</div>
+                <div class="persona-tile"><span class="persona-tile-dot dot-amber"></span>Tile 3 — Exception Review</div>
+                <div class="persona-tile"><span class="persona-tile-dot dot-blue"></span>Tile 4 — Posting Review</div>
+                <div class="persona-tile"><span class="persona-tile-dot dot-green"></span>Tile 5 — My Status</div>
+            </div>
+            <div class="persona-card">
+                <div class="persona-icon">👩‍💼</div>
+                <div class="persona-name">AP Manager</div>
+                <div class="persona-role">Maria Lopez · Oversees AP team of 8</div>
+                <div class="persona-sees">Sees:</div>
+                <div class="persona-tile"><span class="persona-tile-dot dot-purple"></span>Enterprise Pulse — Full</div>
+                <div class="persona-tile"><span class="persona-tile-dot dot-cyan"></span>Tiles 1-5 — Read-only view</div>
+                <div class="persona-tile"><span class="persona-tile-dot dot-amber"></span>Escalated exceptions queue</div>
+                <div class="persona-tile"><span class="persona-tile-dot dot-purple"></span>Team performance view</div>
+            </div>
+            <div class="persona-card">
+                <div class="persona-icon">👔</div>
+                <div class="persona-name">Controller / CFO</div>
+                <div class="persona-role">James Park · Financial oversight</div>
+                <div class="persona-sees">Sees:</div>
+                <div class="persona-tile"><span class="persona-tile-dot dot-purple"></span>Enterprise Pulse — KPIs only</div>
+                <div class="persona-tile"><span class="persona-tile-dot dot-purple"></span>Cash impact summary</div>
+                <div class="persona-tile"><span class="persona-tile-dot dot-purple"></span>Process health trends</div>
+                <div class="persona-tile"><span class="persona-tile-dot dot-purple"></span>Audit compliance view</div>
+            </div>
+            <div class="persona-card">
+                <div class="persona-icon">🔧</div>
+                <div class="persona-name">IT / SAP Basis</div>
+                <div class="persona-role">Dev Patel · System admin</div>
+                <div class="persona-sees">Sees:</div>
+                <div class="persona-tile"><span class="persona-tile-dot dot-red"></span>Engine configuration</div>
+                <div class="persona-tile"><span class="persona-tile-dot dot-red"></span>Matching thresholds</div>
+                <div class="persona-tile"><span class="persona-tile-dot dot-red"></span>BAPI connection health</div>
+                <div class="persona-tile"><span class="persona-tile-dot dot-red"></span>AI accuracy metrics</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- DATA FLOW -->
+    <section class="section">
+        <div class="section-label" style="color: #22d3ee;">Data Flow</div>
+        <div class="section-title">How an Invoice Flows Through the Product</div>
+
+        <div class="flow-box">
+            <div class="flow-title">Invoice Lifecycle — End to End</div>
+
+            <div class="flow-step">
+                <div class="flow-num">1</div>
+                <div><div class="flow-event">Invoice Arrives</div><div class="flow-event-sub">Email, scan, EDI, or vendor portal submission</div></div>
+                <div class="flow-where"><span class="flow-where-badge" style="background: rgba(34,211,238,0.15); color: #22d3ee;">Tile 1</span> Ingestion</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num">2</div>
+                <div><div class="flow-event">AI Extracts & Pre-Fills</div><div class="flow-event-sub">OCR reads PDF → extracts header + line items → pre-fills SAP fields</div></div>
+                <div class="flow-where"><span class="flow-where-badge" style="background: rgba(248,113,113,0.15); color: #f87171;">Engine</span> OCR + Pre-Fill</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num">3</div>
+                <div><div class="flow-event">6-Strategy Matching Runs</div><div class="flow-event-sub">Each invoice line matched to PO items via key → history → semantic → qty/price → GR → elimination</div></div>
+                <div class="flow-where"><span class="flow-where-badge" style="background: rgba(248,113,113,0.15); color: #f87171;">Engine</span> Core Matcher</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num">4</div>
+                <div><div class="flow-event">Invoice Enters Clerk's Queue</div><div class="flow-event-sub">Ranked by financial impact. Status: Ready / Review / Exception based on match confidence</div></div>
+                <div class="flow-where"><span class="flow-where-badge" style="background: rgba(52,211,153,0.15); color: #34d399;">Tile 2</span> Work Queue</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num">5a</div>
+                <div><div class="flow-event">High Confidence → Posting Review</div><div class="flow-event-sub">Match score ≥ 90% → joins batch posting queue with AI confidence + reasoning</div></div>
+                <div class="flow-where"><span class="flow-where-badge" style="background: rgba(59,130,246,0.15); color: #3b82f6;">Tile 4</span> Batch Post</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num">5b</div>
+                <div><div class="flow-event">Low Confidence → Exception Review</div><div class="flow-event-sub">Match score < 90% or variance detected → AI generates root cause + precedent + recommendation</div></div>
+                <div class="flow-where"><span class="flow-where-badge" style="background: rgba(251,191,36,0.15); color: #fbbf24;">Tile 3</span> Exceptions</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num">6</div>
+                <div><div class="flow-event">Clerk Decides</div><div class="flow-event-sub">Post (MIRO) · Park (MIR7) · Route to Buyer · Reject to Vendor — human clicks the button</div></div>
+                <div class="flow-where"><span class="flow-where-badge" style="background: rgba(251,191,36,0.15); color: #fbbf24;">Tile 1/3/4</span> Human Action</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num">7</div>
+                <div><div class="flow-event">BAPI Writes to SAP</div><div class="flow-event-sub">BAPI_INCOMINGINVOICE_CREATE (post) or _PARK (park) → SAP document created → audit log stored</div></div>
+                <div class="flow-where"><span class="flow-where-badge" style="background: rgba(248,113,113,0.15); color: #f87171;">Engine</span> SAP Write</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num">8</div>
+                <div><div class="flow-event">Status Updates Across Layers</div><div class="flow-event-sub">Clerk's Tile 5 shows posting. Enterprise Pulse KPIs update. Override feedback trains matching engine.</div></div>
+                <div class="flow-where"><span class="flow-where-badge" style="background: rgba(139,92,246,0.15); color: #8b5cf6;">All</span> Feedback Loop</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- DOCUMENT INDEX -->
+    <section class="section">
+        <div class="section-label" style="color: #94a3b8;">Document Index</div>
+        <div class="section-title">All Product Documents</div>
+
+        <table class="doc-table">
+            <thead><tr><th>Document</th><th>Layer</th><th>Audience</th><th>Content</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td class="doc-file">Product Sitemap</td>
+                    <td><span class="doc-layer overview">Master</span></td>
+                    <td>Everyone</td>
+                    <td>This document — architecture, roles, data flow, scope</td>
+                </tr>
+                <tr>
+                    <td class="doc-file">Operational Story Overview</td>
+                    <td><span class="doc-layer ops">Operational</span></td>
+                    <td>Product / Sales</td>
+                    <td>"Day in the Life" walkthrough, before/after, design principles</td>
+                </tr>
+                <tr>
+                    <td class="doc-file">Tile 1 — Invoice Entry</td>
+                    <td><span class="doc-layer ops">Operational</span></td>
+                    <td>AP Clerk</td>
+                    <td>Three-panel workbench, OCR pre-fill, PO matching, verify & post</td>
+                </tr>
+                <tr>
+                    <td class="doc-file">Tile 2 — Work Queue</td>
+                    <td><span class="doc-layer ops">Operational</span></td>
+                    <td>AP Clerk</td>
+                    <td>AI-prioritized inbox, financial impact ranking, batch mode</td>
+                </tr>
+                <tr>
+                    <td class="doc-file">Tile 3 — Exception Review</td>
+                    <td><span class="doc-layer ops">Operational</span></td>
+                    <td>AP Clerk</td>
+                    <td>Root cause analysis, SAP evidence, precedent, resolution actions</td>
+                </tr>
+                <tr>
+                    <td class="doc-file">Tile 4 — Posting Review</td>
+                    <td><span class="doc-layer ops">Operational</span></td>
+                    <td>AP Clerk</td>
+                    <td>Batch posting confirmation, confidence scores, audit trail</td>
+                </tr>
+                <tr>
+                    <td class="doc-file">Tile 5 — My Status</td>
+                    <td><span class="doc-layer ops">Operational</span></td>
+                    <td>AP Clerk</td>
+                    <td>Personal tracker: postings, parked items, vendor responses, stats</td>
+                </tr>
+                <tr>
+                    <td class="doc-file">Enterprise Pulse — Dept View</td>
+                    <td><span class="doc-layer pulse">Pulse</span></td>
+                    <td>AP Manager / CFO</td>
+                    <td>KPIs, AI-detected patterns, team performance, structural insights</td>
+                </tr>
+                <tr>
+                    <td class="doc-file">Line Item Matching Engine</td>
+                    <td><span class="doc-layer engine">Engine</span></td>
+                    <td>Technical / Product</td>
+                    <td>6-strategy pipeline, BAPI spec, guardrails, competitive analysis, SAP data model</td>
+                </tr>
+                <tr>
+                    <td class="doc-file">Platform Architecture Story</td>
+                    <td><span class="doc-layer overview">Master</span></td>
+                    <td>Investors / Partners</td>
+                    <td>Enterprise Pulse + Agent Framework + Agent Builder vision</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- BOUNDARY -->
+    <section class="section">
+        <div class="boundary">
+            <div class="boundary-title">Invoice Arrives → Invoice Posts</div>
+            <div class="boundary-text">
+                That's the boundary. Everything before (PO creation) and everything after (payment execution)
+                is out of scope. <strong>Mantrix AP owns the space between the mailbox and the general ledger.</strong>
+                Do one thing. Do it better than anyone.
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>

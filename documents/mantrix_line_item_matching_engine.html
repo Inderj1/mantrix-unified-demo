@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANTRIX — Line Item Matching Engine: Technical Specification</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'JetBrains Mono', monospace; background: #060a12; min-height: 100vh; color: #e2e8f0; }
+
+        .hero { text-align: center; padding: 80px 40px 50px; position: relative; }
+        .hero::before { content: ''; position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(248, 113, 113, 0.08) 0%, transparent 60%); }
+        .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; border: 1px solid rgba(248, 113, 113, 0.3); border-radius: 100px; font-size: 10px; color: #f87171; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; margin-bottom: 24px; background: rgba(248, 113, 113, 0.06); }
+        .hero-badge::before { content: ''; width: 6px; height: 6px; background: #f87171; border-radius: 50%; box-shadow: 0 0 12px rgba(248, 113, 113, 0.6); }
+        .hero-title { font-size: 36px; font-weight: 800; margin-bottom: 16px; line-height: 1.2; }
+        .hero-title .grad { background: linear-gradient(135deg, #f87171, #fbbf24, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-sub { font-size: 13px; color: #94a3b8; max-width: 700px; margin: 0 auto 32px; line-height: 1.9; }
+        .hero-sub strong { color: #e2e8f0; }
+
+        .section { max-width: 1400px; margin: 0 auto; padding: 50px 40px; }
+        .divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(248, 113, 113, 0.3), transparent); max-width: 1400px; margin: 0 auto; }
+        .section-label { font-size: 9px; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; margin-bottom: 8px; }
+        .section-label.red { color: #f87171; }
+        .section-label.amber { color: #fbbf24; }
+        .section-label.green { color: #34d399; }
+        .section-label.cyan { color: #22d3ee; }
+        .section-label.purple { color: #8b5cf6; }
+        .section-label.blue { color: #3b82f6; }
+        .section-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+        .section-desc { font-size: 12px; color: #94a3b8; line-height: 1.9; max-width: 800px; margin-bottom: 32px; }
+        .section-desc strong { color: #e2e8f0; }
+        .section-desc code { background: rgba(34, 211, 238, 0.1); padding: 1px 5px; border-radius: 3px; color: #22d3ee; font-size: 11px; }
+
+        /* Problem Statement */
+        .problem-box { background: rgba(248, 113, 113, 0.06); border: 1px solid rgba(248, 113, 113, 0.2); border-radius: 16px; padding: 28px; margin-bottom: 28px; }
+        .problem-title { font-size: 14px; font-weight: 700; color: #f87171; margin-bottom: 14px; }
+        .problem-text { font-size: 12px; color: #cbd5e1; line-height: 1.9; }
+        .problem-text strong { color: #fbbf24; }
+
+        /* Comparison Table */
+        .comp-example { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 28px; margin-bottom: 28px; overflow: hidden; }
+        .comp-title { font-size: 12px; font-weight: 700; color: #e2e8f0; margin-bottom: 16px; }
+        .comp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+        .comp-col { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 18px; }
+        .comp-col-header { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+        .comp-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 10px; }
+        .comp-row:last-child { border-bottom: none; }
+        .comp-row-label { color: #64748b; }
+        .comp-row-val { color: #e2e8f0; font-weight: 600; }
+        .comp-mismatch { background: rgba(248, 113, 113, 0.08); border: 1px solid rgba(248, 113, 113, 0.15); border-radius: 8px; padding: 14px; }
+        .comp-mismatch-title { font-size: 9px; color: #f87171; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 8px; }
+        .comp-mismatch-item { font-size: 10px; color: #94a3b8; padding: 4px 0; line-height: 1.6; }
+        .comp-mismatch-item span { color: #f87171; font-weight: 600; }
+
+        /* Solution Cards */
+        .solution-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 28px; }
+        .sol-card { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 24px; position: relative; overflow: hidden; }
+        .sol-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+        .sol-card.s1::before { background: linear-gradient(90deg, #f87171, #fbbf24); }
+        .sol-card.s2::before { background: linear-gradient(90deg, #fbbf24, #34d399); }
+        .sol-card.s3::before { background: linear-gradient(90deg, #34d399, #22d3ee); }
+        .sol-card.s4::before { background: linear-gradient(90deg, #22d3ee, #3b82f6); }
+        .sol-card.s5::before { background: linear-gradient(90deg, #3b82f6, #8b5cf6); }
+        .sol-card.s6::before { background: linear-gradient(90deg, #8b5cf6, #f87171); }
+        .sol-num { font-size: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 10px; }
+        .sol-name { font-size: 14px; font-weight: 700; color: #e2e8f0; margin-bottom: 8px; }
+        .sol-desc { font-size: 10px; color: #94a3b8; line-height: 1.8; margin-bottom: 14px; }
+        .sol-desc strong { color: #e2e8f0; }
+        .sol-table-ref { font-size: 9px; color: #22d3ee; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 4px; }
+        .sol-table-ref code { background: rgba(34, 211, 238, 0.1); padding: 2px 6px; border-radius: 3px; font-size: 8px; }
+        .sol-logic { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 12px; }
+        .sol-logic-title { font-size: 8px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 600; }
+        .sol-logic-item { font-size: 9px; color: #94a3b8; padding: 3px 0; line-height: 1.6; }
+        .sol-logic-item::before { content: '→ '; color: #475569; }
+
+        /* Matching Pipeline */
+        .pipeline { display: flex; gap: 0; margin-bottom: 28px; flex-wrap: wrap; }
+        .pipe-step { flex: 1; min-width: 180px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.06); padding: 20px; position: relative; }
+        .pipe-step:first-child { border-radius: 14px 0 0 14px; }
+        .pipe-step:last-child { border-radius: 0 14px 14px 0; }
+        .pipe-step::after { content: '→'; position: absolute; right: -10px; top: 50%; transform: translateY(-50%); color: #475569; font-size: 14px; z-index: 1; background: #060a12; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+        .pipe-step:last-child::after { display: none; }
+        .pipe-num { font-size: 7px; color: #475569; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 6px; }
+        .pipe-name { font-size: 11px; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
+        .pipe-desc { font-size: 9px; color: #64748b; line-height: 1.5; }
+        .pipe-conf { font-size: 10px; font-weight: 700; margin-top: 8px; }
+
+        /* BAPI Spec */
+        .bapi-card { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 28px; margin-bottom: 28px; }
+        .bapi-header { font-size: 13px; font-weight: 700; color: #22d3ee; margin-bottom: 4px; font-family: 'JetBrains Mono', monospace; }
+        .bapi-sub { font-size: 10px; color: #64748b; margin-bottom: 16px; }
+        .bapi-section { margin-bottom: 16px; }
+        .bapi-section-title { font-size: 9px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 6px; }
+        .bapi-field { display: grid; grid-template-columns: 200px 1fr; gap: 12px; padding: 5px 0; font-size: 10px; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        .bapi-field-name { color: #22d3ee; font-weight: 600; }
+        .bapi-field-desc { color: #94a3b8; }
+        .bapi-field-desc .required { color: #f87171; font-weight: 600; }
+        .bapi-field-desc .optional { color: #475569; }
+
+        /* Guardrails */
+        .guard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+        .guard-card { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 22px; }
+        .guard-card.hard { border-left: 3px solid #f87171; }
+        .guard-card.soft { border-left: 3px solid #fbbf24; }
+        .guard-card.audit { border-left: 3px solid #3b82f6; }
+        .guard-icon { font-size: 20px; margin-bottom: 10px; }
+        .guard-name { font-size: 12px; font-weight: 700; color: #e2e8f0; margin-bottom: 6px; }
+        .guard-text { font-size: 10px; color: #94a3b8; line-height: 1.7; }
+
+        /* Competitive */
+        .comp-table { width: 100%; border-collapse: collapse; font-size: 10px; background: rgba(15, 23, 42, 0.8); border-radius: 14px; overflow: hidden; margin-bottom: 28px; }
+        .comp-table th { text-align: left; padding: 14px; background: rgba(0,0,0,0.4); color: #475569; font-weight: 600; text-transform: uppercase; font-size: 8px; letter-spacing: 0.5px; }
+        .comp-table td { padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .comp-table tr:last-child td { border-bottom: none; }
+        .comp-table td:first-child { font-weight: 600; color: #e2e8f0; }
+        .comp-us { color: #34d399 !important; font-weight: 600 !important; }
+        .comp-them { color: #64748b !important; }
+
+        /* Key Insight */
+        .insight-box { background: linear-gradient(135deg, rgba(52, 211, 153, 0.08), rgba(34, 211, 238, 0.06)); border: 1px solid rgba(52, 211, 153, 0.2); border-radius: 16px; padding: 24px; margin-bottom: 28px; display: flex; gap: 18px; align-items: flex-start; }
+        .insight-icon { font-size: 28px; flex-shrink: 0; }
+        .insight-text { font-size: 12px; color: #cbd5e1; line-height: 1.9; }
+        .insight-text strong { color: #34d399; }
+        .insight-text em { color: #fbbf24; font-style: normal; font-weight: 600; }
+
+        /* Data Model */
+        .dm-table { width: 100%; border-collapse: collapse; font-size: 10px; background: rgba(15, 23, 42, 0.8); border-radius: 14px; overflow: hidden; margin-bottom: 28px; }
+        .dm-table th { text-align: left; padding: 12px; background: rgba(0,0,0,0.4); color: #475569; font-weight: 600; text-transform: uppercase; font-size: 8px; letter-spacing: 0.5px; }
+        .dm-table td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .dm-table tr:last-child td { border-bottom: none; }
+        .dm-table code { background: rgba(34, 211, 238, 0.1); padding: 1px 5px; border-radius: 3px; color: #22d3ee; font-size: 9px; }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════════════ HERO ═══════════════ -->
+    <section class="hero">
+        <div class="hero-badge">Crown Jewel Technical IP</div>
+        <h1 class="hero-title">
+            <span class="grad">Line Item Matching Engine</span>
+        </h1>
+        <p class="hero-sub">
+            The #1 reason AP automation fails: <strong>invoice line items don't match PO line items</strong>.
+            Vendor says "Titanium Bolts 1/4-20 x 1.5" — SAP says "Material 300045-A1."
+            Vendor sends 3 line items — PO has 7 line items across 2 account assignment categories.
+            <strong>This is where OpenText VIM and Esker both break down. This is where Mantrix wins.</strong>
+        </p>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════ THE PROBLEM ═══════════════ -->
+    <section class="section">
+        <div class="section-label red">The Problem Nobody Solves Well</div>
+        <div class="section-title">Why Line Item Matching Fails</div>
+
+        <div class="problem-box">
+            <div class="problem-title">The Real-World Scenario</div>
+            <div class="problem-text">
+                An invoice arrives from Thales Defense with 4 line items. Your PO 4500098765 has 7 line items.
+                The invoice says <strong>"Avionics Harness Assembly Lot A — 12 EA — $3,780/ea"</strong>. Your PO item 10
+                says <strong>"Material 500892-HA, 15 EA, $3,710.00."</strong> The descriptions don't match.
+                The quantities don't match (invoice says 12, PO says 15 — partial delivery). The price has a 1.9% variance.
+                The vendor's part number isn't on the invoice — they used their internal description.
+                And the vendor combined two PO lines into one invoice line because they shipped them together.
+                <br><br>
+                An AP clerk with 5 years of experience figures this out in 10 minutes by opening ME23N, checking delivery history,
+                reading the PO text, and recognizing the material from memory. <strong>Your AI needs to do the same thing — but how?</strong>
+            </div>
+        </div>
+
+        <div class="comp-example">
+            <div class="comp-title">Example: What the Invoice Says vs. What SAP Knows</div>
+            <div class="comp-grid">
+                <div class="comp-col">
+                    <div class="comp-col-header" style="color: #f87171;">📄 Invoice Line Items (OCR Output)</div>
+                    <div class="comp-row"><span class="comp-row-label">Line 1</span><span class="comp-row-val">"Avionics Harness Assembly Lot A" — 12 EA — $3,780</span></div>
+                    <div class="comp-row"><span class="comp-row-label">Line 2</span><span class="comp-row-val">"Connector Kit MIL-DTL-38999" — 12 EA — $420</span></div>
+                    <div class="comp-row"><span class="comp-row-label">Line 3</span><span class="comp-row-val">"Engineering Support Hours" — 40 HRS — $185/hr</span></div>
+                    <div class="comp-row"><span class="comp-row-label">Line 4</span><span class="comp-row-val">"Freight — Expedited" — 1 LOT — $1,240</span></div>
+                </div>
+                <div class="comp-col">
+                    <div class="comp-col-header" style="color: #22d3ee;">💾 PO 4500098765 in EKPO</div>
+                    <div class="comp-row"><span class="comp-row-label">Item 10</span><span class="comp-row-val">MAT 500892-HA · 15 EA · $3,710 · Acct Cat K</span></div>
+                    <div class="comp-row"><span class="comp-row-label">Item 20</span><span class="comp-row-val">MAT 500892-CK · 15 EA · $410 · Acct Cat K</span></div>
+                    <div class="comp-row"><span class="comp-row-label">Item 30</span><span class="comp-row-val">Service · 60 HRS · $185/hr · Acct Cat D</span></div>
+                    <div class="comp-row"><span class="comp-row-label">Item 40</span><span class="comp-row-val">MAT 500892-TB · 15 EA · $290 · Acct Cat K</span></div>
+                    <div class="comp-row"><span class="comp-row-label">Item 50</span><span class="comp-row-val">MAT 500893-SH · 10 EA · $180 · Acct Cat K</span></div>
+                    <div class="comp-row"><span class="comp-row-label">Item 60</span><span class="comp-row-val">Service · 20 HRS · $210/hr · Acct Cat D</span></div>
+                    <div class="comp-row"><span class="comp-row-label">Item 70</span><span class="comp-row-val">Freight · 1 LOT · $800 · Planned Delivery Cost</span></div>
+                </div>
+            </div>
+            <div class="comp-mismatch">
+                <div class="comp-mismatch-title">❌ Why Dumb Matching Fails Here</div>
+                <div class="comp-mismatch-item"><span>Descriptions don't match</span> — "Avionics Harness Assembly Lot A" ≠ "MAT 500892-HA"</div>
+                <div class="comp-mismatch-item"><span>Quantities don't match</span> — Invoice 12 EA, PO 15 EA (partial delivery)</div>
+                <div class="comp-mismatch-item"><span>Price variance</span> — Invoice $3,780 vs PO $3,710 (1.9%)</div>
+                <div class="comp-mismatch-item"><span>Line count doesn't match</span> — Invoice 4 lines, PO 7 lines</div>
+                <div class="comp-mismatch-item"><span>Freight mismatch</span> — Invoice $1,240 vs PO $800 (55% over, expedited)</div>
+                <div class="comp-mismatch-item"><span>Service hours partial</span> — Invoice 40 HRS vs PO 60 HRS (different rate bucket)</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════ MATCHING PIPELINE ═══════════════ -->
+    <section class="section">
+        <div class="section-label amber">Mantrix Matching Pipeline</div>
+        <div class="section-title">How Mantrix Resolves Line Items — Like a Senior AP Clerk</div>
+        <div class="section-desc">
+            An experienced AP clerk doesn't just match text strings. They reason through the data using
+            <strong>multiple resolution strategies in sequence</strong>: PO reference → vendor-material history → quantity
+            proximity → price proximity → description semantics → remaining line elimination. Mantrix does the same.
+        </div>
+
+        <div class="pipeline">
+            <div class="pipe-step">
+                <div class="pipe-num">Pass 1</div>
+                <div class="pipe-name">Exact Key Match</div>
+                <div class="pipe-desc">Invoice has PO # and line item # → direct hit. Also checks vendor part #, material #, or customer material # (EINA/EINE).</div>
+                <div class="pipe-conf" style="color: #34d399;">Resolves ~40% of lines</div>
+            </div>
+            <div class="pipe-step">
+                <div class="pipe-num">Pass 2</div>
+                <div class="pipe-name">Vendor-Material History</div>
+                <div class="pipe-desc">This vendor + this description = what material did we pay for last time? Builds a vendor→material translation dictionary from EKBE/RSEG history.</div>
+                <div class="pipe-conf" style="color: #34d399;">Resolves ~25% more</div>
+            </div>
+            <div class="pipe-step">
+                <div class="pipe-num">Pass 3</div>
+                <div class="pipe-name">Semantic + Numeric Match</div>
+                <div class="pipe-desc">AI embeds invoice description + PO short text + material description. Combines semantic similarity with qty/price proximity scoring.</div>
+                <div class="pipe-conf" style="color: #fbbf24;">Resolves ~20% more</div>
+            </div>
+            <div class="pipe-step">
+                <div class="pipe-num">Pass 4</div>
+                <div class="pipe-name">Elimination Match</div>
+                <div class="pipe-desc">Once high-confidence matches assigned, remaining invoice lines matched to remaining PO lines by process of elimination + amount fit.</div>
+                <div class="pipe-conf" style="color: #fbbf24;">Resolves ~10% more</div>
+            </div>
+            <div class="pipe-step">
+                <div class="pipe-num">Pass 5</div>
+                <div class="pipe-name">Human Review</div>
+                <div class="pipe-desc">~5% of lines can't be resolved with high confidence. AI presents top candidates to clerk with reasoning. Clerk picks. Feedback trains model.</div>
+                <div class="pipe-conf" style="color: #f87171;">~5% needs human</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════ SIX RESOLUTION STRATEGIES ═══════════════ -->
+    <section class="section">
+        <div class="section-label green">Core Resolution Strategies</div>
+        <div class="section-title">Six Ways to Resolve an Invoice Line to a PO Item</div>
+        <div class="section-desc">
+            Each strategy contributes a <strong>weighted confidence score</strong>. Mantrix combines all available signals
+            into a composite match probability for every possible invoice-line → PO-item pairing.
+        </div>
+
+        <div class="solution-grid">
+            <div class="sol-card s1">
+                <div class="sol-num" style="color: #f87171;">Strategy 1 — Weight: 30%</div>
+                <div class="sol-name">Key-Based Resolution</div>
+                <div class="sol-desc">
+                    The invoice or OCR output contains a <strong>PO number</strong> and sometimes a <strong>PO line item number</strong>.
+                    If the vendor references the PO line directly — immediate resolution. Also check for vendor material number
+                    in <code>EINA-IDNLF</code> (vendor's part #) and customer material number in <code>MARA-BISMT</code>.
+                    Many A&D vendors print SAP material numbers or PO line refs on their invoices.
+                </div>
+                <div class="sol-table-ref">
+                    <code>EKKO-EBELN</code> <code>EKPO-EBELP</code> <code>EINA-IDNLF</code> <code>EINE</code> <code>MARA-BISMT</code>
+                </div>
+                <div class="sol-logic">
+                    <div class="sol-logic-title">Resolution Logic</div>
+                    <div class="sol-logic-item">OCR extracts PO # → validate against EKKO (vendor/company code match)</div>
+                    <div class="sol-logic-item">Extract PO line # if present → direct match to EKPO-EBELP</div>
+                    <div class="sol-logic-item">Extract vendor part # → look up EINA-IDNLF for this LIFNR → get MATNR</div>
+                    <div class="sol-logic-item">If MATNR found → match to EKPO-MATNR on this PO</div>
+                    <div class="sol-logic-item">Confidence: 98% if PO+line exact. 90% if material # resolved via EINA.</div>
+                </div>
+            </div>
+
+            <div class="sol-card s2">
+                <div class="sol-num" style="color: #fbbf24;">Strategy 2 — Weight: 25%</div>
+                <div class="sol-name">Vendor-Material Translation Dictionary</div>
+                <div class="sol-desc">
+                    <strong>This is the key differentiator.</strong> Over time, Mantrix builds a dictionary:
+                    "When vendor 1000456 (Thales) says 'Avionics Harness Assembly' they mean Material 500892-HA."
+                    Built from historical <code>RSEG</code> (invoice items) + <code>EKBE</code> (PO history) where invoices were
+                    successfully posted. This is <strong>exactly what a senior AP clerk has in their head</strong>.
+                </div>
+                <div class="sol-table-ref">
+                    <code>RSEG-MATNR</code> <code>RSEG-TXZ01</code> <code>EKBE</code> <code>RBKP-LIFNR</code>
+                </div>
+                <div class="sol-logic">
+                    <div class="sol-logic-title">Resolution Logic</div>
+                    <div class="sol-logic-item">Query: For LIFNR 1000456, what MATNR was previously invoiced where RSEG-TXZ01 ≈ "Avionics Harness"?</div>
+                    <div class="sol-logic-item">Build vendor-description→material map from all RSEG records for this vendor</div>
+                    <div class="sol-logic-item">Use fuzzy text matching (Levenshtein + TF-IDF) on invoice text vs RSEG-TXZ01 history</div>
+                    <div class="sol-logic-item">If same vendor + same description = same material 5+ times → confidence 92%</div>
+                    <div class="sol-logic-item">Dictionary auto-updates with every successful posting. Self-improving.</div>
+                </div>
+            </div>
+
+            <div class="sol-card s3">
+                <div class="sol-num" style="color: #34d399;">Strategy 3 — Weight: 15%</div>
+                <div class="sol-name">Semantic Description Matching</div>
+                <div class="sol-desc">
+                    When no key and no history exists (new material, new vendor), AI uses <strong>semantic embeddings</strong> to
+                    compare invoice line text against PO item short text (<code>EKPO-TXZ01</code>), material description
+                    (<code>MAKT-MAKTX</code>), material long text, and PO item long text. Not string matching —
+                    <strong>meaning matching</strong>. "Titanium Bolts 1/4-20" matches "HEX CAP SCREW Ti 0.25-20".
+                </div>
+                <div class="sol-table-ref">
+                    <code>EKPO-TXZ01</code> <code>MAKT-MAKTX</code> <code>STXL</code> (long texts)
+                </div>
+                <div class="sol-logic">
+                    <div class="sol-logic-title">Resolution Logic</div>
+                    <div class="sol-logic-item">Generate embedding vector for invoice line text</div>
+                    <div class="sol-logic-item">Generate embedding vectors for all unmatched PO line texts (TXZ01 + MAKTX + long text)</div>
+                    <div class="sol-logic-item">Cosine similarity ranking of all PO lines against invoice line</div>
+                    <div class="sol-logic-item">Must exceed 0.72 threshold to be considered a candidate</div>
+                    <div class="sol-logic-item">Combine with qty/price proximity to boost or penalize (Strategy 4)</div>
+                </div>
+            </div>
+
+            <div class="sol-card s4">
+                <div class="sol-num" style="color: #22d3ee;">Strategy 4 — Weight: 15%</div>
+                <div class="sol-name">Quantity & Price Proximity</div>
+                <div class="sol-desc">
+                    Independent of text: <strong>what PO line has the closest quantity and unit price?</strong>
+                    Invoice says 12 EA at $3,780 — PO Item 10 says 15 EA at $3,710. That's the closest fit by both
+                    qty and price, even though description doesn't match. Also accounts for partial deliveries
+                    by checking already-invoiced qty in <code>EKBE</code>.
+                </div>
+                <div class="sol-table-ref">
+                    <code>EKPO-MENGE</code> <code>EKPO-NETPR</code> <code>EKBE-MENGE</code> (already invoiced)
+                </div>
+                <div class="sol-logic">
+                    <div class="sol-logic-title">Resolution Logic</div>
+                    <div class="sol-logic-item">For each PO line: remaining qty = EKPO-MENGE − Σ(EKBE-MENGE where BEWTP='Q')</div>
+                    <div class="sol-logic-item">Qty proximity = 1 − abs(invoice_qty − remaining_qty) / max(invoice_qty, remaining_qty)</div>
+                    <div class="sol-logic-item">Price proximity = 1 − abs(invoice_price − EKPO-NETPR) / max(invoice_price, EKPO-NETPR)</div>
+                    <div class="sol-logic-item">UOM check: EKPO-MEINS must be convertible to invoice UOM (T006 conversion table)</div>
+                    <div class="sol-logic-item">Composite = (qty_proximity × 0.5) + (price_proximity × 0.5). Must exceed 0.80.</div>
+                </div>
+            </div>
+
+            <div class="sol-card s5">
+                <div class="sol-num" style="color: #3b82f6;">Strategy 5 — Weight: 10%</div>
+                <div class="sol-name">GR Cross-Reference</div>
+                <div class="sol-desc">
+                    If a GR was posted, the <strong>GR document links material received to PO line item</strong>.
+                    Invoice qty matches GR qty → strong confirmation signal. This is the "physical truth" check:
+                    we know what arrived because someone counted it and posted MIGO.
+                </div>
+                <div class="sol-table-ref">
+                    <code>MATDOC</code> / <code>MSEG</code> <code>EKBE-BEWTP='E'</code> <code>EKET</code>
+                </div>
+                <div class="sol-logic">
+                    <div class="sol-logic-title">Resolution Logic</div>
+                    <div class="sol-logic-item">For each PO line: get GR qty from EKBE where BEWTP='E' (GR) and BWART='101'</div>
+                    <div class="sol-logic-item">If GR qty = invoice qty for a PO line → strong match signal (+15 confidence)</div>
+                    <div class="sol-logic-item">If no GR exists: check EKET-EINDT. Past delivery date + no MATDOC = GR pending</div>
+                    <div class="sol-logic-item">If multiple GRs: match to the GR document closest in date to invoice date</div>
+                    <div class="sol-logic-item">For service lines: check ESKN/ESLH (service entry sheets) instead of MATDOC</div>
+                </div>
+            </div>
+
+            <div class="sol-card s6">
+                <div class="sol-num" style="color: #8b5cf6;">Strategy 6 — Weight: 5%</div>
+                <div class="sol-name">Elimination & Constraint Satisfaction</div>
+                <div class="sol-desc">
+                    After high-confidence matches are assigned, use <strong>process of elimination</strong>.
+                    If 3 of 4 invoice lines are matched, and 1 PO line is unmatched, and the amounts roughly fit →
+                    assign. Also checks: total invoice amount ≈ sum of matched PO line amounts (sanity check).
+                </div>
+                <div class="sol-table-ref">
+                    Derived from all above strategies
+                </div>
+                <div class="sol-logic">
+                    <div class="sol-logic-title">Resolution Logic</div>
+                    <div class="sol-logic-item">Run constraint satisfaction: invoice total ≈ Σ(matched PO line amounts)</div>
+                    <div class="sol-logic-item">Unmatched invoice lines → unmatched PO lines with best amount fit</div>
+                    <div class="sol-logic-item">If remaining delta > tolerance → flag as unplanned cost (freight, misc)</div>
+                    <div class="sol-logic-item">Accounts for split lines (1 PO line → 2 invoice lines) and merged lines</div>
+                    <div class="sol-logic-item">Final confidence = weighted average of all strategies that contributed to this pairing</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════ BAPI SPEC ═══════════════ -->
+    <section class="section">
+        <div class="section-label cyan">BAPI Technical Specification</div>
+        <div class="section-title">Writing to SAP — The Exact BAPI Calls</div>
+        <div class="section-desc">
+            Once the clerk confirms, Mantrix writes to SAP via standard BAPIs. <strong>No custom ABAP. No direct table updates.</strong>
+            Here's exactly what gets passed.
+        </div>
+
+        <div class="bapi-card">
+            <div class="bapi-header">BAPI_INCOMINGINVOICE_CREATE</div>
+            <div class="bapi-sub">Primary BAPI for PO-backed invoice posting (replaces MIRO)</div>
+
+            <div class="bapi-section">
+                <div class="bapi-section-title">HeaderData (BAPI_INCINV_CREATE_HEADER)</div>
+                <div class="bapi-field"><span class="bapi-field-name">INVOICE_IND = 'X'</span><span class="bapi-field-desc"><span class="required">Required</span> — Invoice (not credit memo)</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">DOC_TYPE</span><span class="bapi-field-desc">From RBKP-BLART — 'RE' for invoice, 'KR' for vendor credit</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">DOC_DATE</span><span class="bapi-field-desc">Invoice date (from OCR)</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">PSTNG_DATE</span><span class="bapi-field-desc">Posting date (today or per policy)</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">COMP_CODE</span><span class="bapi-field-desc">Company code — derived from PO (EKKO-BUKRS)</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">CURRENCY</span><span class="bapi-field-desc">Invoice currency (from OCR, validated against EKKO-WAERS)</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">GROSS_AMOUNT</span><span class="bapi-field-desc">Total invoice amount (from OCR)</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">CALC_TAX_IND</span><span class="bapi-field-desc">'X' = calculate tax, ' ' = tax from invoice</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">REF_DOC_NO</span><span class="bapi-field-desc">Vendor's invoice number (from OCR) — for duplicate check</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">HEADER_TXT</span><span class="bapi-field-desc">AI audit text: "Mantrix AI Match Conf: 97.4 | Clerk: S.Chen"</span></div>
+            </div>
+
+            <div class="bapi-section">
+                <div class="bapi-section-title">ItemData (BAPI_INCINV_CREATE_ITEM) — Per Matched Line</div>
+                <div class="bapi-field"><span class="bapi-field-name">INVOICE_DOC_ITEM</span><span class="bapi-field-desc"><span class="required">Required</span> — Sequential: 000001, 000002...</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">PO_NUMBER</span><span class="bapi-field-desc"><span class="required">Required</span> — PO # (EKKO-EBELN)</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">PO_ITEM</span><span class="bapi-field-desc"><span class="required">Required</span> — PO line item # from matching engine (EKPO-EBELP)</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">REF_DOC</span><span class="bapi-field-desc">GR document # (MATDOC) — if GR-based IV (EKPO-WEBRE = 'X')</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">REF_DOC_YEAR</span><span class="bapi-field-desc">GR fiscal year</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">REF_DOC_IT</span><span class="bapi-field-desc">GR item # — must match EKBE entry</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">TAX_CODE</span><span class="bapi-field-desc"><span class="required">Required</span> — from EKPO-MWSKZ or AI suggestion</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">ITEM_AMOUNT</span><span class="bapi-field-desc">Net amount for this line (from OCR)</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">QUANTITY</span><span class="bapi-field-desc">Invoice qty for this line (from OCR)</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">PO_UNIT</span><span class="bapi-field-desc">Order unit — MUST match EKPO-MEINS or be UOM-convertible</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">ITEM_TEXT</span><span class="bapi-field-desc">AI audit: "Match conf 97% | Strategy: Key+History | PO line 10"</span></div>
+            </div>
+
+            <div class="bapi-section">
+                <div class="bapi-section-title">GlAccountData — For Non-PO Lines (Freight, Misc)</div>
+                <div class="bapi-field"><span class="bapi-field-name">INVOICE_DOC_ITEM</span><span class="bapi-field-desc">Sequential item number</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">GL_ACCOUNT</span><span class="bapi-field-desc">From AI suggestion based on cost type + vendor history</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">ITEM_AMOUNT</span><span class="bapi-field-desc">Unplanned cost amount</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">COSTCENTER</span><span class="bapi-field-desc">Derived from PO account assignment (EKKN-KOSTL)</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">TAX_CODE</span><span class="bapi-field-desc">Tax code for unplanned delivery cost</span></div>
+            </div>
+
+            <div class="bapi-section">
+                <div class="bapi-section-title">Critical Pre-Checks Before BAPI Call</div>
+                <div class="bapi-field"><span class="bapi-field-name">EKPO-LOEKZ = ' '</span><span class="bapi-field-desc">PO item NOT blocked/deleted</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">EKPO-ELIKZ = ' '</span><span class="bapi-field-desc">PO item NOT delivery-complete</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">EKPO-WEBRE = 'X'?</span><span class="bapi-field-desc">If GR-based IV → REF_DOC fields REQUIRED (GR doc)</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">EKBE check</span><span class="bapi-field-desc">Already-invoiced qty must not exceed PO qty + tolerance</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">UOM match</span><span class="bapi-field-desc">Invoice UOM must convert to EKPO-MEINS via T006/CUNI</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">BAPI_TRANSACTION_COMMIT</span><span class="bapi-field-desc">Call with WAIT='X' after successful BAPI return</span></div>
+            </div>
+        </div>
+
+        <div class="bapi-card">
+            <div class="bapi-header">BAPI_INCOMINGINVOICE_PARK</div>
+            <div class="bapi-sub">For clerk "Park" action — same structure as CREATE, but saves without posting to GL</div>
+            <div class="bapi-section">
+                <div class="bapi-section-title">When to Use PARK vs CREATE</div>
+                <div class="bapi-field"><span class="bapi-field-name">Confidence < threshold</span><span class="bapi-field-desc">Park if match confidence below configured threshold</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">Missing GR</span><span class="bapi-field-desc">Park if EKPO-WEBRE='X' but no GR in MATDOC/EKBE</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">Clerk selects "Park"</span><span class="bapi-field-desc">Human decision always respected — PARK preserves all AI context</span></div>
+            </div>
+        </div>
+
+        <div class="bapi-card">
+            <div class="bapi-header">Additional BAPIs in the Flow</div>
+            <div class="bapi-sub">Supporting reads and validations</div>
+            <div class="bapi-section">
+                <div class="bapi-field"><span class="bapi-field-name">BAPI_PO_GETDETAIL1</span><span class="bapi-field-desc">Read PO header + items + schedule lines + conditions</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">BAPI_PO_GETITEMS</span><span class="bapi-field-desc">Get PO line items for matching candidates</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">BAPI_GOODSMVT_GETITEMS</span><span class="bapi-field-desc">Read goods movements (GRs) for a PO item</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">BAPI_VENDOR_GETDETAIL</span><span class="bapi-field-desc">Vendor master data for validation</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">MRM_TOLERANCE_CHECK (FM)</span><span class="bapi-field-desc">Check SAP tolerance groups before posting</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">CDS: I_PurchaseOrderItemAPI01</span><span class="bapi-field-desc">S/4HANA OData for PO items (preferred over BAPI in S/4)</span></div>
+                <div class="bapi-field"><span class="bapi-field-name">CDS: I_MaterialDocumentItem</span><span class="bapi-field-desc">S/4HANA OData for material documents (GRs)</span></div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════ GUARDRAILS ═══════════════ -->
+    <section class="section">
+        <div class="section-label red">Guardrails & Hard Rules</div>
+        <div class="section-title">Rules That Cannot Be Overridden</div>
+        <div class="section-desc">
+            AI suggests. But some things are <strong>hard stops</strong> regardless of confidence score.
+        </div>
+
+        <div class="guard-grid">
+            <div class="guard-card hard">
+                <div class="guard-icon">🛑</div>
+                <div class="guard-name">No GR = No Post (if WEBRE)</div>
+                <div class="guard-text">If PO item has GR-based IV (EKPO-WEBRE='X') and no GR exists in MATDOC/EKBE, the invoice CANNOT be posted. AI can park it and explain why.</div>
+            </div>
+            <div class="guard-card hard">
+                <div class="guard-icon">🛑</div>
+                <div class="guard-name">Over-Invoice Protection</div>
+                <div class="guard-text">Invoice qty + previously invoiced qty (EKBE BEWTP='Q') cannot exceed PO qty + configured over-delivery tolerance (OMR6). Hard stop.</div>
+            </div>
+            <div class="guard-card hard">
+                <div class="guard-icon">🛑</div>
+                <div class="guard-name">Duplicate Invoice Block</div>
+                <div class="guard-text">If RBKP shows same vendor + same REF_DOC_NO + same GROSS_AMOUNT within 365 days, block. No override without manager approval.</div>
+            </div>
+            <div class="guard-card hard">
+                <div class="guard-icon">🛑</div>
+                <div class="guard-name">Blocked/Deleted PO Items</div>
+                <div class="guard-text">EKPO-LOEKZ ≠ ' ' or EKPO-ELIKZ = 'X' → cannot match to this line. AI must find an alternative or flag exception.</div>
+            </div>
+            <div class="guard-card soft">
+                <div class="guard-icon">⚠️</div>
+                <div class="guard-name">Price Tolerance (Configurable)</div>
+                <div class="guard-text">If price variance exceeds OMR6 tolerance group → soft block. AI shows variance %, contract clause, precedent. Clerk can override with reason.</div>
+            </div>
+            <div class="guard-card soft">
+                <div class="guard-icon">⚠️</div>
+                <div class="guard-name">Low Match Confidence</div>
+                <div class="guard-text">If no line-item pairing exceeds 75% confidence → don't pre-fill. Show candidate list to clerk. Never guess on line-item assignment below threshold.</div>
+            </div>
+            <div class="guard-card soft">
+                <div class="guard-icon">⚠️</div>
+                <div class="guard-name">UOM Mismatch</div>
+                <div class="guard-text">If invoice UOM cannot be converted to PO UOM via T006 → flag for clerk. "Invoice says KG, PO says LB" — AI converts if possible, else blocks.</div>
+            </div>
+            <div class="guard-card audit">
+                <div class="guard-icon">📝</div>
+                <div class="guard-name">Every Match Logged</div>
+                <div class="guard-text">For every line-item pairing, log: which strategies contributed, confidence scores, alternatives considered, and clerk's confirmation or override.</div>
+            </div>
+            <div class="guard-card audit">
+                <div class="guard-icon">📝</div>
+                <div class="guard-name">SAP Tolerance Groups</div>
+                <div class="guard-text">Read tolerance config from T169G / OMR6. Don't hardcode. Each company has different tolerances by company code, plant, and user group.</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════ COMPETITIVE ═══════════════ -->
+    <section class="section">
+        <div class="section-label purple">Competitive Analysis</div>
+        <div class="section-title">Mantrix vs. OpenText VIM vs. Esker — Line Item Matching</div>
+
+        <div class="insight-box">
+            <div class="insight-icon">💡</div>
+            <div class="insight-text">
+                <strong>Your story is fundamentally better</strong>, but for a very specific reason:
+                OpenText VIM and Esker both do <em>rule-based matching</em> — they compare extracted text to PO data
+                using configurable mapping rules and templates. They work great when invoices are structured and
+                descriptions match. They fail on the <em>messy 30%</em> — partial deliveries, merged lines,
+                description mismatches, service entries, unplanned costs. That's where AP clerks spend 80% of their time.
+                Mantrix uses <strong>probabilistic multi-strategy resolution</strong> that mimics how a human clerk reasons.
+                That's the difference between 70% automation and 95%.
+            </div>
+        </div>
+
+        <table class="comp-table">
+            <thead>
+                <tr>
+                    <th>Capability</th>
+                    <th class="comp-them">OpenText VIM</th>
+                    <th class="comp-them">Esker</th>
+                    <th class="comp-us">Mantrix</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Line-item matching approach</td>
+                    <td class="comp-them">Rule-based mapping + IDoc templates</td>
+                    <td class="comp-them">AI OCR + keyword matching to PO</td>
+                    <td class="comp-us">6-strategy probabilistic pipeline</td>
+                </tr>
+                <tr>
+                    <td>Handles description mismatch</td>
+                    <td class="comp-them">No — needs vendor to use SAP material #</td>
+                    <td class="comp-them">Partial — keyword similarity only</td>
+                    <td class="comp-us">Yes — semantic embeddings + vendor history dictionary</td>
+                </tr>
+                <tr>
+                    <td>Handles partial deliveries</td>
+                    <td class="comp-them">Basic — checks remaining qty</td>
+                    <td class="comp-them">Basic — 2/3 way match</td>
+                    <td class="comp-us">Full — EKBE remaining qty + GR cross-ref + elimination</td>
+                </tr>
+                <tr>
+                    <td>Handles merged/split lines</td>
+                    <td class="comp-them">No — 1:1 mapping only</td>
+                    <td class="comp-them">No — 1:1 mapping only</td>
+                    <td class="comp-us">Yes — N:M matching via constraint satisfaction</td>
+                </tr>
+                <tr>
+                    <td>Learns from history</td>
+                    <td class="comp-them">No — static rules</td>
+                    <td class="comp-them">Yes — ML learns over time</td>
+                    <td class="comp-us">Yes — vendor-material dictionary + override feedback</td>
+                </tr>
+                <tr>
+                    <td>Explains why match was made</td>
+                    <td class="comp-them">No — match or error code</td>
+                    <td class="comp-them">Minimal</td>
+                    <td class="comp-us">Full — "Strategy 2: Vendor history shows this desc = MAT 500892"</td>
+                </tr>
+                <tr>
+                    <td>Unplanned delivery costs</td>
+                    <td class="comp-them">Complex IDoc config required</td>
+                    <td class="comp-them">Manual GL coding</td>
+                    <td class="comp-us">Auto-detected, GL suggested from history, clerk confirms</td>
+                </tr>
+                <tr>
+                    <td>Service entry matching</td>
+                    <td class="comp-them">Supported but separate flow</td>
+                    <td class="comp-them">Limited</td>
+                    <td class="comp-us">Unified — checks ESKN/ESLH alongside material GRs</td>
+                </tr>
+                <tr>
+                    <td>SAP integration depth</td>
+                    <td class="comp-them">Deep — runs as SAP add-on</td>
+                    <td class="comp-them">Side-by-side — API integration</td>
+                    <td class="comp-us">SAP-native — reads tables, writes via BAPIs, uses CDS Views</td>
+                </tr>
+                <tr>
+                    <td>Deployment complexity</td>
+                    <td class="comp-them">6-12 month project, ABAP config, VIM tables</td>
+                    <td class="comp-them">3-6 months, cloud SaaS</td>
+                    <td class="comp-us">Configurable platform — activate, configure thresholds, go</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════ DATA MODEL ═══════════════ -->
+    <section class="section">
+        <div class="section-label blue">Complete Data Foundation</div>
+        <div class="section-title">Every SAP Table the Matching Engine Reads</div>
+
+        <table class="dm-table">
+            <thead>
+                <tr><th>Data Domain</th><th>Tables</th><th>Key Fields</th><th>Why</th></tr>
+            </thead>
+            <tbody>
+                <tr><td style="font-weight:600;color:#e2e8f0;">PO Header</td><td><code>EKKO</code></td><td>EBELN, BUKRS, LIFNR, WAERS, BSART</td><td>Validate PO exists, vendor matches, company code</td></tr>
+                <tr><td style="font-weight:600;color:#e2e8f0;">PO Items</td><td><code>EKPO</code></td><td>EBELP, MATNR, MENGE, NETPR, MEINS, TXZ01, WEBRE, LOEKZ, ELIKZ, KNTTP</td><td>THE matching target — material, qty, price, description, GR-IV flag</td></tr>
+                <tr><td style="font-weight:600;color:#e2e8f0;">PO Schedule Lines</td><td><code>EKET</code></td><td>EINDT, MENGE</td><td>Expected delivery dates and quantities</td></tr>
+                <tr><td style="font-weight:600;color:#e2e8f0;">PO History</td><td><code>EKBE</code></td><td>BEWTP, BWART, MENGE, WRBTR, BUDAT, BELNR</td><td>Already-invoiced qty (Q), GR qty (E), GR doc reference</td></tr>
+                <tr><td style="font-weight:600;color:#e2e8f0;">PO Acct Assignment</td><td><code>EKKN</code></td><td>KOSTL, AUFNR, SAKTO, PS_PSP_PNR</td><td>Cost center, WBS element, GL account for each PO line</td></tr>
+                <tr><td style="font-weight:600;color:#e2e8f0;">Material Docs (S/4)</td><td><code>MATDOC</code></td><td>BWART, MENGE, EBELN, EBELP</td><td>GR verification — movement type 101</td></tr>
+                <tr><td style="font-weight:600;color:#e2e8f0;">Material Docs (ECC)</td><td><code>MSEG</code></td><td>Same as MATDOC</td><td>ECC equivalent</td></tr>
+                <tr><td style="font-weight:600;color:#e2e8f0;">Material Master</td><td><code>MARA</code> <code>MAKT</code></td><td>MATNR, MAKTX, BISMT, MEINS</td><td>Material description, customer material #, base UOM</td></tr>
+                <tr><td style="font-weight:600;color:#e2e8f0;">Vendor Material Info</td><td><code>EINA</code> <code>EINE</code></td><td>IDNLF (vendor part #), NETPR</td><td>Vendor's part number → SAP material number translation</td></tr>
+                <tr><td style="font-weight:600;color:#e2e8f0;">Invoice History</td><td><code>RBKP</code> <code>RSEG</code></td><td>BELNR, LIFNR, XBLNR, WRBTR, MATNR, TXZ01</td><td>Duplicate check + vendor-description history dictionary</td></tr>
+                <tr><td style="font-weight:600;color:#e2e8f0;">Service Entries</td><td><code>ESKN</code> <code>ESLH</code></td><td>LBLNI, PACKNO, MENGE, TBTWR</td><td>Service entry sheets for service PO lines</td></tr>
+                <tr><td style="font-weight:600;color:#e2e8f0;">Conditions</td><td><code>KONV</code></td><td>KSCHL, KBETR</td><td>Contract pricing, escalation clauses</td></tr>
+                <tr><td style="font-weight:600;color:#e2e8f0;">Tolerances</td><td><code>T169G</code> / OMR6 config</td><td>Tolerance keys, % limits</td><td>Company-specific tolerance thresholds</td></tr>
+                <tr><td style="font-weight:600;color:#e2e8f0;">UOM Conversion</td><td><code>T006</code> <code>CUNI</code></td><td>MSEHI, UMREN, UMREZ</td><td>Convert invoice UOM to PO UOM</td></tr>
+                <tr><td style="font-weight:600;color:#e2e8f0;">Vendor Master</td><td><code>LFA1</code> <code>LFB1</code></td><td>LIFNR, NAME1, ZTERM, AKONT</td><td>Vendor validation, payment terms, recon account</td></tr>
+                <tr><td style="font-weight:600;color:#e2e8f0;">GR/IR Accruals</td><td><code>WRX</code></td><td>EBELN, EBELP, WRBTR</td><td>Expected invoice amounts from GR postings</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+</body>
+</html>

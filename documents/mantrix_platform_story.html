@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANTRIX — SAP-Native AI Agent Platform</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-deep: #060a12;
+            --bg-surface: #0a0f1a;
+            --bg-card: rgba(15, 23, 42, 0.7);
+            --border: rgba(255,255,255,0.06);
+            --border-accent: rgba(139, 92, 246, 0.3);
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #475569;
+            --purple: #8b5cf6;
+            --cyan: #22d3ee;
+            --green: #34d399;
+            --amber: #fbbf24;
+            --red: #f87171;
+            --blue: #3b82f6;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Hero ── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            border: 1px solid var(--border-accent);
+            border-radius: 100px;
+            font-size: 10px;
+            color: var(--purple);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            margin-bottom: 32px;
+            background: rgba(139, 92, 246, 0.06);
+        }
+        .hero-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--purple);
+            border-radius: 50%;
+            box-shadow: 0 0 12px rgba(139, 92, 246, 0.6);
+        }
+        .hero-title {
+            font-size: 56px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+        .hero-title .gradient {
+            background: linear-gradient(135deg, #8b5cf6, #22d3ee, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-sub {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 700px;
+            line-height: 1.8;
+            margin-bottom: 48px;
+        }
+        .hero-sub strong { color: var(--text-primary); }
+        .hero-equation {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 13px;
+            color: var(--text-muted);
+            padding: 20px 36px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: var(--bg-card);
+        }
+        .hero-eq-item { color: var(--text-secondary); font-weight: 600; }
+        .hero-eq-plus { color: var(--text-muted); font-size: 18px; }
+        .hero-eq-result { color: var(--purple); font-weight: 700; font-size: 14px; }
+
+        /* ── Section ── */
+        .section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 80px 40px;
+        }
+        .section-label {
+            font-size: 9px;
+            color: var(--purple);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .section-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+        .section-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            max-width: 700px;
+            margin-bottom: 40px;
+        }
+        .section-desc strong { color: var(--text-primary); }
+
+        /* ── Three Layers ── */
+        .layers-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 60px;
+        }
+        .layer-card {
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .layer-card:hover { border-color: rgba(255,255,255,0.12); transform: translateY(-4px); }
+        .layer-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+        }
+        .layer-card.pulse::before { background: linear-gradient(90deg, var(--purple), var(--blue)); }
+        .layer-card.agents::before { background: linear-gradient(90deg, var(--cyan), var(--green)); }
+        .layer-card.builder::before { background: linear-gradient(90deg, var(--amber), var(--red)); }
+        .layer-num {
+            font-size: 48px;
+            font-weight: 800;
+            opacity: 0.08;
+            position: absolute;
+            top: 16px;
+            right: 24px;
+        }
+        .layer-icon { font-size: 28px; margin-bottom: 16px; }
+        .layer-name { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+        .layer-tagline { font-size: 11px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6; }
+        .layer-features { list-style: none; }
+        .layer-features li {
+            font-size: 11px;
+            color: var(--text-secondary);
+            padding: 6px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            line-height: 1.5;
+        }
+        .layer-features li::before {
+            content: '→';
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        /* ── Divider ── */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ── Enterprise Pulse ── */
+        .pulse-demo {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 32px;
+            margin-bottom: 40px;
+        }
+        .pulse-strip {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .pulse-metric {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+        }
+        .pulse-metric-label { font-size: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .pulse-metric-val { font-size: 22px; font-weight: 700; }
+        .pulse-metric-sub { font-size: 9px; color: var(--text-muted); margin-top: 4px; }
+
+        .pulse-agents-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .pulse-agent {
+            background: rgba(0,0,0,0.15);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.2s;
+        }
+        .pulse-agent:hover { border-color: rgba(255,255,255,0.1); }
+        .pa-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .pa-name { font-size: 10px; font-weight: 600; }
+        .pa-status { width: 6px; height: 6px; border-radius: 50%; }
+        .pa-status.active { background: var(--green); box-shadow: 0 0 8px rgba(52, 211, 153, 0.5); }
+        .pa-status.idle { background: var(--text-muted); }
+        .pa-stat { font-size: 9px; color: var(--text-muted); line-height: 1.5; }
+
+        /* ── Agent Flow ── */
+        .flow-container { margin-bottom: 40px; }
+        .flow-row {
+            display: flex;
+            align-items: stretch;
+            gap: 0;
+            margin-bottom: 24px;
+        }
+        .flow-tile {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 24px;
+            position: relative;
+        }
+        .flow-tile:first-child { border-radius: 14px 0 0 14px; }
+        .flow-tile:last-child { border-radius: 0 14px 14px 0; }
+        .flow-tile::after {
+            content: '→';
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 16px;
+            z-index: 1;
+            background: var(--bg-deep);
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        .flow-tile:last-child::after { display: none; }
+        .ft-num {
+            font-size: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .ft-num.t1 { color: var(--cyan); }
+        .ft-num.t2 { color: var(--green); }
+        .ft-num.t3 { color: var(--amber); }
+        .ft-num.t4 { color: var(--blue); }
+        .ft-num.t5 { color: var(--red); }
+        .ft-name { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+        .ft-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .ft-agents-label { font-size: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .ft-agent-tag {
+            display: inline-block;
+            font-size: 9px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            margin: 2px 2px;
+        }
+        .ft-tcodes { font-size: 9px; color: var(--text-muted); margin-top: 10px; }
+        .ft-tcodes code {
+            background: rgba(0,0,0,0.3);
+            padding: 1px 5px;
+            border-radius: 3px;
+            color: var(--cyan);
+            font-size: 8px;
+        }
+
+        /* ── Agent Builder ── */
+        .builder-demo {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+        .builder-header {
+            padding: 20px 28px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .builder-header-dot { width: 8px; height: 8px; background: var(--amber); border-radius: 50%; box-shadow: 0 0 12px rgba(251, 191, 36, 0.5); }
+        .builder-header-text { font-size: 11px; font-weight: 600; color: var(--amber); text-transform: uppercase; letter-spacing: 1px; }
+
+        .builder-body { padding: 28px; }
+        .builder-steps {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .builder-step {
+            text-align: center;
+            padding: 20px 12px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .builder-step::after {
+            content: '→';
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        .builder-step:last-child::after { display: none; }
+        .bs-num { font-size: 24px; font-weight: 800; color: var(--amber); margin-bottom: 8px; }
+        .bs-name { font-size: 11px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+        .bs-desc { font-size: 9px; color: var(--text-muted); line-height: 1.5; }
+
+        .builder-example {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(251, 191, 36, 0.15);
+            border-radius: 14px;
+            padding: 24px;
+        }
+        .be-title { font-size: 10px; color: var(--amber); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 16px; }
+        .be-input {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .be-input-icon { color: var(--text-muted); font-size: 14px; }
+        .be-input-text { font-size: 12px; color: var(--amber); font-weight: 600; }
+        .be-input-cursor { display: inline-block; width: 2px; height: 14px; background: var(--amber); animation: blink 1s step-end infinite; margin-left: 4px; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        .be-proposal { border-left: 3px solid var(--green); padding-left: 16px; }
+        .be-proposal-title { font-size: 10px; color: var(--green); font-weight: 600; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .be-proposal-item { font-size: 11px; color: var(--text-secondary); padding: 5px 0; line-height: 1.6; }
+        .be-proposal-item strong { color: var(--text-primary); }
+        .be-proposal-item code {
+            background: rgba(0,0,0,0.3);
+            padding: 1px 5px;
+            border-radius: 3px;
+            color: var(--cyan);
+            font-size: 9px;
+        }
+
+        /* ── Pre-Built Packs ── */
+        .packs-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+        .pack-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+        .pack-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+        .pack-card.ap::before { background: linear-gradient(90deg, var(--purple), var(--cyan)); }
+        .pack-card.po::before { background: linear-gradient(90deg, var(--green), var(--cyan)); }
+        .pack-card.gr::before { background: linear-gradient(90deg, var(--amber), var(--green)); }
+        .pack-card.pay::before { background: linear-gradient(90deg, var(--blue), var(--purple)); }
+
+        .pack-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+        .pack-name { font-size: 14px; font-weight: 700; }
+        .pack-badge { font-size: 8px; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+        .pack-badge.live { background: rgba(52, 211, 153, 0.15); color: var(--green); }
+        .pack-badge.roadmap { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
+        .pack-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px; }
+        .pack-agents { display: flex; flex-wrap: wrap; gap: 6px; }
+        .pack-agent-chip {
+            font-size: 9px;
+            padding: 5px 12px;
+            border-radius: 6px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        .pack-tcodes { font-size: 9px; color: var(--text-muted); margin-top: 12px; }
+        .pack-tcodes code { color: var(--cyan); background: rgba(0,0,0,0.3); padding: 1px 4px; border-radius: 2px; font-size: 8px; }
+
+        /* ── Principles ── */
+        .principles-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+        .principle {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 24px;
+        }
+        .principle-num { font-size: 9px; color: var(--text-muted); font-weight: 600; margin-bottom: 10px; }
+        .principle-title { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+        .principle-text { font-size: 10px; color: var(--text-secondary); line-height: 1.7; }
+
+        /* ── Competitive ── */
+        .comp-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            background: var(--bg-card);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+        .comp-table th {
+            text-align: left;
+            padding: 16px;
+            background: rgba(0,0,0,0.4);
+            color: var(--text-muted);
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        .comp-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        .comp-table tr:last-child td { border-bottom: none; }
+        .comp-table td:first-child { font-weight: 600; color: var(--text-primary); }
+        .comp-us { color: var(--green) !important; font-weight: 600 !important; }
+        .comp-them { color: var(--text-muted) !important; }
+
+        /* ── Final CTA ── */
+        .final-section {
+            text-align: center;
+            padding: 100px 40px;
+            position: relative;
+        }
+        .final-section::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, transparent 60%);
+        }
+        .final-title { font-size: 32px; font-weight: 700; margin-bottom: 16px; }
+        .final-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.8; max-width: 600px; margin: 0 auto; }
+        .final-desc strong { color: var(--amber); }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════════════════════ HERO ═══════════════════════ -->
+    <section class="hero">
+        <div class="hero-badge">Platform Architecture</div>
+        <h1 class="hero-title">
+            <span class="gradient">Mantrix</span><br>
+            SAP-Native AI Agent Platform
+        </h1>
+        <p class="hero-sub">
+            Not a dashboard. Not a bot. An <strong>agent framework</strong> that reads SAP data,
+            reasons probabilistically, acts through standard BAPIs, and learns from every decision.
+            <strong>Enterprise Pulse</strong> is the brain. <strong>Agents</strong> are the hands.
+            <strong>You build the rest.</strong>
+        </p>
+        <div class="hero-equation">
+            <span class="hero-eq-item">Enterprise Pulse</span>
+            <span class="hero-eq-plus">+</span>
+            <span class="hero-eq-item">Pre-Built Agents</span>
+            <span class="hero-eq-plus">+</span>
+            <span class="hero-eq-item">Agent Builder</span>
+            <span class="hero-eq-plus">=</span>
+            <span class="hero-eq-result">Mantrix Platform</span>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════════════ THREE LAYERS ═══════════════════════ -->
+    <section class="section">
+        <div class="section-label">Architecture</div>
+        <div class="section-title">Three Layers. One Platform.</div>
+        <div class="section-desc">
+            Every enterprise SAP process follows the same pattern: <strong>data → decision → action</strong>.
+            Mantrix provides the infrastructure to automate that pattern for any T-code.
+        </div>
+
+        <div class="layers-grid">
+            <div class="layer-card pulse">
+                <div class="layer-num">01</div>
+                <div class="layer-icon">🧠</div>
+                <div class="layer-name">Enterprise Pulse</div>
+                <div class="layer-tagline">The command center. Cross-process visibility, decision queues, financial impact — in real time.</div>
+                <ul class="layer-features">
+                    <li>Unified view across all active agents</li>
+                    <li>Financial impact of every pending decision</li>
+                    <li>"What needs attention" — ranked by dollar impact</li>
+                    <li>Agent health, accuracy, and learning metrics</li>
+                    <li>Natural language search: "Why is AP slow this week?"</li>
+                    <li>Role-based views: CFO / AP Manager / Auditor / IT</li>
+                </ul>
+            </div>
+            <div class="layer-card agents">
+                <div class="layer-num">02</div>
+                <div class="layer-icon">⚡</div>
+                <div class="layer-name">AI Agent Framework</div>
+                <div class="layer-tagline">Pre-built agents that ship out of the box. Each maps to SAP transactions. Each tells a story as processes move tile to tile.</div>
+                <ul class="layer-features">
+                    <li>Agents mapped to T-codes and Fiori tiles</li>
+                    <li>Read via standard SAP APIs (CDS Views, OData, RFCs)</li>
+                    <li>Write via BAPIs — no custom ABAP</li>
+                    <li>Three-gate decision: AI Confidence → Rules → Anomaly</li>
+                    <li>Every action explained in natural language</li>
+                    <li>Closed-loop learning from every human override</li>
+                </ul>
+            </div>
+            <div class="layer-card builder">
+                <div class="layer-num">03</div>
+                <div class="layer-icon">🔧</div>
+                <div class="layer-name">Agent Builder</div>
+                <div class="layer-tagline">IT enters a T-code or Fiori tile. Mantrix analyzes the tables, BAPIs, and decision points — then proposes an agent. Configure, test, deploy.</div>
+                <ul class="layer-features">
+                    <li>Enter T-code / Fiori tile number / description</li>
+                    <li>AI maps tables, BAPIs, authorization objects</li>
+                    <li>Proposes agent capabilities and decision logic</li>
+                    <li>Configurable thresholds and business rules</li>
+                    <li>Sandbox → Test → Production deployment</li>
+                    <li>No ABAP. No custom development. No consultants.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════════════ ENTERPRISE PULSE ═══════════════════════ -->
+    <section class="section">
+        <div class="section-label">Layer 1</div>
+        <div class="section-title">Enterprise Pulse</div>
+        <div class="section-desc">
+            One screen. Every process. Every agent. Every dollar at risk.
+            This replaces the Fiori Launchpad, 6 custom reports, and the Monday morning war room.
+        </div>
+
+        <div class="pulse-demo">
+            <div class="pulse-strip">
+                <div class="pulse-metric">
+                    <div class="pulse-metric-label">Active Agents</div>
+                    <div class="pulse-metric-val" style="color: var(--green);">18</div>
+                    <div class="pulse-metric-sub">across 4 process areas</div>
+                </div>
+                <div class="pulse-metric">
+                    <div class="pulse-metric-label">Decisions Today</div>
+                    <div class="pulse-metric-val" style="color: var(--text-primary);">2,847</div>
+                    <div class="pulse-metric-sub">91% autonomous</div>
+                </div>
+                <div class="pulse-metric">
+                    <div class="pulse-metric-label">Needs Human</div>
+                    <div class="pulse-metric-val" style="color: var(--amber);">43</div>
+                    <div class="pulse-metric-sub">ranked by $ impact</div>
+                </div>
+                <div class="pulse-metric">
+                    <div class="pulse-metric-label">Cash Impact</div>
+                    <div class="pulse-metric-val" style="color: var(--blue);">$18.4M</div>
+                    <div class="pulse-metric-sub">next 7 days</div>
+                </div>
+                <div class="pulse-metric">
+                    <div class="pulse-metric-label">Accuracy</div>
+                    <div class="pulse-metric-val" style="color: var(--green);">99.8%</div>
+                    <div class="pulse-metric-sub">0 reversals today</div>
+                </div>
+            </div>
+            <div class="pulse-agents-grid">
+                <div class="pulse-agent">
+                    <div class="pa-top"><span class="pa-name" style="color: var(--cyan);">PO Create Agent</span><div class="pa-status active"></div></div>
+                    <div class="pa-stat">34 POs created today · 2 parked for approval</div>
+                </div>
+                <div class="pulse-agent">
+                    <div class="pa-top"><span class="pa-name" style="color: var(--green);">GR Post Agent</span><div class="pa-status active"></div></div>
+                    <div class="pa-stat">128 GRs posted · 12 held for qty check</div>
+                </div>
+                <div class="pulse-agent">
+                    <div class="pa-top"><span class="pa-name" style="color: var(--amber);">Invoice Match Agent</span><div class="pa-status active"></div></div>
+                    <div class="pa-stat">886 matched · 43 exceptions · 71% touchless</div>
+                </div>
+                <div class="pulse-agent">
+                    <div class="pa-top"><span class="pa-name" style="color: var(--blue);">Payment Run Agent</span><div class="pa-status active"></div></div>
+                    <div class="pa-stat">F110 scheduled 16:00 · $8.2M ready</div>
+                </div>
+                <div class="pulse-agent">
+                    <div class="pa-top"><span class="pa-name" style="color: var(--red);">Vendor Risk Agent</span><div class="pa-status active"></div></div>
+                    <div class="pa-stat">3 alerts active · Vendor ABC flagged</div>
+                </div>
+                <div class="pulse-agent">
+                    <div class="pa-top"><span class="pa-name" style="color: var(--purple);">Exception Agent</span><div class="pa-status active"></div></div>
+                    <div class="pa-stat">28/43 auto-resolved · 67% rate today</div>
+                </div>
+                <div class="pulse-agent">
+                    <div class="pa-top"><span class="pa-name" style="color: var(--cyan);">PO Change Agent</span><div class="pa-status active"></div></div>
+                    <div class="pa-stat">8 changes validated · 1 blocked (SOX)</div>
+                </div>
+                <div class="pulse-agent">
+                    <div class="pa-top"><span class="pa-name" style="color: var(--text-muted);">Asset Post Agent</span><div class="pa-status idle"></div></div>
+                    <div class="pa-stat">Custom agent · Idle until month-end</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════════════ TILE FLOW ═══════════════════════ -->
+    <section class="section">
+        <div class="section-label">Layer 2 — Procure-to-Pay Story</div>
+        <div class="section-title">The Story Moves Tile to Tile</div>
+        <div class="section-desc">
+            Each tile is a <strong>stage in a business process</strong>. Agents within each tile handle the decisions.
+            As a document flows from PO to GR to Invoice to Payment, Mantrix tracks the story end to end.
+            <strong>This is the AP Agent Pack — your first shipped story.</strong>
+        </div>
+
+        <div class="flow-container">
+            <div class="flow-row">
+                <div class="flow-tile">
+                    <div class="ft-num t1">Tile 1</div>
+                    <div class="ft-name">Intelligent Ingestion</div>
+                    <div class="ft-desc">Capture invoice, classify type, run probabilistic matching against POs/GRs</div>
+                    <div class="ft-agents-label">Agents</div>
+                    <div class="ft-agent-tag">OCR Capture</div>
+                    <div class="ft-agent-tag">Classifier</div>
+                    <div class="ft-agent-tag">PO Matcher</div>
+                    <div class="ft-agent-tag">Duplicate Detect</div>
+                    <div class="ft-tcodes"><code>MIRO</code> <code>MIR7</code> <code>FB60</code></div>
+                </div>
+                <div class="flow-tile">
+                    <div class="ft-num t2">Tile 2</div>
+                    <div class="ft-name">Exception Intelligence</div>
+                    <div class="ft-desc">Classify root cause, check precedent, auto-resolve or route with context</div>
+                    <div class="ft-agents-label">Agents</div>
+                    <div class="ft-agent-tag">Root Cause Classifier</div>
+                    <div class="ft-agent-tag">Auto-Resolver</div>
+                    <div class="ft-agent-tag">Tolerance Engine</div>
+                    <div class="ft-tcodes"><code>MRBR</code> <code>MR8M</code> <code>ME22N</code></div>
+                </div>
+                <div class="flow-tile">
+                    <div class="ft-num t3">Tile 3</div>
+                    <div class="ft-name">Autonomous Posting</div>
+                    <div class="ft-desc">Three-gate decision, dynamic thresholds, every post explained and replayable</div>
+                    <div class="ft-agents-label">Agents</div>
+                    <div class="ft-agent-tag">Posting Engine</div>
+                    <div class="ft-agent-tag">Rules Gate</div>
+                    <div class="ft-agent-tag">Anomaly Detector</div>
+                    <div class="ft-tcodes"><code>MIRO</code> <code>FB60</code> <code>BAPI_INCOMINGINVOICE_CREATE</code></div>
+                </div>
+                <div class="flow-tile">
+                    <div class="ft-num t4">Tile 4</div>
+                    <div class="ft-name">Cash Intelligence</div>
+                    <div class="ft-desc">Payment optimization, discount capture, DPO management, cash forecasting</div>
+                    <div class="ft-agents-label">Agents</div>
+                    <div class="ft-agent-tag">Payment Optimizer</div>
+                    <div class="ft-agent-tag">Discount Hunter</div>
+                    <div class="ft-agent-tag">Cash Forecaster</div>
+                    <div class="ft-tcodes"><code>F110</code> <code>FBL1N</code> <code>FK10N</code></div>
+                </div>
+                <div class="flow-tile">
+                    <div class="ft-num t5">Tile 5</div>
+                    <div class="ft-name">Vendor Intelligence</div>
+                    <div class="ft-desc">Reliability scoring, pricing drift detection, error prediction, structural alerts</div>
+                    <div class="ft-agents-label">Agents</div>
+                    <div class="ft-agent-tag">Reliability Scorer</div>
+                    <div class="ft-agent-tag">Drift Detector</div>
+                    <div class="ft-agent-tag">Error Predictor</div>
+                    <div class="ft-tcodes"><code>XK03</code> <code>FK10N</code> <code>ME2M</code></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════════════ PRE-BUILT PACKS ═══════════════════════ -->
+    <section class="section">
+        <div class="section-label">Ship Day 1</div>
+        <div class="section-title">Pre-Built Agent Packs</div>
+        <div class="section-desc">
+            Each pack ships with <strong>pre-trained agents, SAP table mappings, BAPI connectors, and default thresholds</strong>.
+            Configurable out of the box. No custom ABAP. Activate → Configure → Go Live.
+        </div>
+
+        <div class="packs-grid">
+            <div class="pack-card ap">
+                <div class="pack-header">
+                    <div class="pack-name">AP Agent Pack</div>
+                    <div class="pack-badge live">Live</div>
+                </div>
+                <div class="pack-desc">Full procure-to-pay intelligence. 5 tiles, 15 agents, end-to-end from invoice to payment.</div>
+                <div class="pack-agents">
+                    <span class="pack-agent-chip">Invoice Capture</span>
+                    <span class="pack-agent-chip">PO Matcher</span>
+                    <span class="pack-agent-chip">Exception Resolver</span>
+                    <span class="pack-agent-chip">Posting Engine</span>
+                    <span class="pack-agent-chip">Tolerance Engine</span>
+                    <span class="pack-agent-chip">Duplicate Detector</span>
+                    <span class="pack-agent-chip">Payment Optimizer</span>
+                    <span class="pack-agent-chip">Vendor Scorer</span>
+                </div>
+                <div class="pack-tcodes">T-codes: <code>MIRO</code> <code>MIR7</code> <code>FB60</code> <code>MRBR</code> <code>F110</code> <code>MR8M</code> <code>ME22N</code> <code>XK03</code></div>
+            </div>
+            <div class="pack-card po">
+                <div class="pack-header">
+                    <div class="pack-name">PO Agent Pack</div>
+                    <div class="pack-badge roadmap">Roadmap</div>
+                </div>
+                <div class="pack-desc">Purchase order lifecycle intelligence. Create, change, display, approve — with sourcing context and compliance checks.</div>
+                <div class="pack-agents">
+                    <span class="pack-agent-chip">PO Create Agent</span>
+                    <span class="pack-agent-chip">PO Change Agent</span>
+                    <span class="pack-agent-chip">PO Display Agent</span>
+                    <span class="pack-agent-chip">Approval Router</span>
+                    <span class="pack-agent-chip">Source Recommender</span>
+                    <span class="pack-agent-chip">Contract Validator</span>
+                </div>
+                <div class="pack-tcodes">T-codes: <code>ME21N</code> <code>ME22N</code> <code>ME23N</code> <code>ME29N</code> <code>ME2M</code></div>
+            </div>
+            <div class="pack-card gr">
+                <div class="pack-header">
+                    <div class="pack-name">GR Agent Pack</div>
+                    <div class="pack-badge roadmap">Roadmap</div>
+                </div>
+                <div class="pack-desc">Goods receipt intelligence. Post, reverse, return — with PO schedule awareness and quality integration.</div>
+                <div class="pack-agents">
+                    <span class="pack-agent-chip">GR Post Agent</span>
+                    <span class="pack-agent-chip">GR Reverse Agent</span>
+                    <span class="pack-agent-chip">Returns Agent</span>
+                    <span class="pack-agent-chip">QA Hold Agent</span>
+                    <span class="pack-agent-chip">Schedule Tracker</span>
+                </div>
+                <div class="pack-tcodes">T-codes: <code>MIGO</code> <code>MB03</code> <code>MMBE</code> Tables: <code>MATDOC</code> <code>MSEG</code> <code>EKET</code></div>
+            </div>
+            <div class="pack-card pay">
+                <div class="pack-header">
+                    <div class="pack-name">Payment Agent Pack</div>
+                    <div class="pack-badge roadmap">Roadmap</div>
+                </div>
+                <div class="pack-desc">Payment run intelligence. Optimize timing, capture discounts, manage cash position, prevent duplicate payments.</div>
+                <div class="pack-agents">
+                    <span class="pack-agent-chip">Payment Run Agent</span>
+                    <span class="pack-agent-chip">Discount Optimizer</span>
+                    <span class="pack-agent-chip">Cash Position Agent</span>
+                    <span class="pack-agent-chip">Duplicate Pay Guard</span>
+                </div>
+                <div class="pack-tcodes">T-codes: <code>F110</code> <code>F111</code> <code>FBL1N</code> <code>FK10N</code> <code>FF7A</code></div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════════════ AGENT BUILDER ═══════════════════════ -->
+    <section class="section">
+        <div class="section-label">Layer 3</div>
+        <div class="section-title">Agent Builder — Create Any Agent from Any T-Code</div>
+        <div class="section-desc">
+            IT enters a T-code or Fiori tile. Mantrix analyzes the underlying tables, BAPIs, authorization objects,
+            and decision points. <strong>It proposes an agent — capabilities, data sources, actions, and thresholds.</strong>
+            If it makes sense, deploy it. If it doesn't, Mantrix explains why.
+        </div>
+
+        <div class="builder-demo">
+            <div class="builder-header">
+                <div class="builder-header-dot"></div>
+                <div class="builder-header-text">Agent Builder</div>
+            </div>
+            <div class="builder-body">
+                <div class="builder-steps">
+                    <div class="builder-step">
+                        <div class="bs-num">1</div>
+                        <div class="bs-name">Input</div>
+                        <div class="bs-desc">Enter T-code, Fiori tile, or describe the process</div>
+                    </div>
+                    <div class="builder-step">
+                        <div class="bs-num">2</div>
+                        <div class="bs-name">Analyze</div>
+                        <div class="bs-desc">AI maps tables, BAPIs, auth objects, decision points</div>
+                    </div>
+                    <div class="builder-step">
+                        <div class="bs-num">3</div>
+                        <div class="bs-name">Propose</div>
+                        <div class="bs-desc">Agent blueprint with capabilities, thresholds, and data flows</div>
+                    </div>
+                    <div class="builder-step">
+                        <div class="bs-num">4</div>
+                        <div class="bs-name">Deploy</div>
+                        <div class="bs-desc">Sandbox → Test → Production. Monitor in Enterprise Pulse.</div>
+                    </div>
+                </div>
+
+                <div class="builder-example">
+                    <div class="be-title">Example — User Creates a GR Agent</div>
+                    <div class="be-input">
+                        <span class="be-input-icon">⌨</span>
+                        <span class="be-input-text">MIGO — Goods Movement</span>
+                        <span class="be-input-cursor"></span>
+                    </div>
+                    <div class="be-proposal">
+                        <div class="be-proposal-title">✓ Mantrix Proposal</div>
+                        <div class="be-proposal-item"><strong>Agent Name:</strong> Goods Receipt Post Agent</div>
+                        <div class="be-proposal-item"><strong>Read Tables:</strong> <code>EKET</code> (schedule lines), <code>MATDOC</code>/<code>MSEG</code> (movements), <code>EKPO</code> (PO items), <code>EKBE</code> (PO history), <code>MARA</code> (material master)</div>
+                        <div class="be-proposal-item"><strong>Write via:</strong> <code>BAPI_GOODSMVT_CREATE</code> (movement type 101)</div>
+                        <div class="be-proposal-item"><strong>Decisions:</strong> Auto-post GR when ASN matches PO qty within tolerance, QA inspection not required, and vendor reliability > threshold</div>
+                        <div class="be-proposal-item"><strong>Anomaly Checks:</strong> Qty > PO qty, wrong plant, material blocked, QA hold flag</div>
+                        <div class="be-proposal-item"><strong>Default Threshold:</strong> 90% confidence for standard materials, 97% for controlled substances</div>
+                        <div class="be-proposal-item"><strong>Viability:</strong> ✅ Agent viable. 4 tables readable, BAPI available, clear decision logic.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════════════ DESIGN PRINCIPLES ═══════════════════════ -->
+    <section class="section">
+        <div class="section-label">Philosophy</div>
+        <div class="section-title">Platform Design Principles</div>
+        <div class="section-desc">
+            These aren't aspirational. They're <strong>hard rules</strong> baked into every agent, every screen, every decision.
+        </div>
+
+        <div class="principles-grid">
+            <div class="principle">
+                <div class="principle-num">01</div>
+                <div class="principle-title">One Screen = One Decision</div>
+                <div class="principle-text">No clicking through 6 Fiori apps. Every screen presents a decision with context, confidence, and a recommended action.</div>
+            </div>
+            <div class="principle">
+                <div class="principle-num">02</div>
+                <div class="principle-title">AI Explains Before You Ask</div>
+                <div class="principle-text">Every autonomous action comes with a natural-language explanation. Hover = explanation, not tooltip. Auditors replay decisions like chess moves.</div>
+            </div>
+            <div class="principle">
+                <div class="principle-num">03</div>
+                <div class="principle-title">Read from SAP Truth</div>
+                <div class="principle-text">Agents read from standard SAP tables (MATDOC, EKET, EKBE, ACDOCA). No shadow databases. No data lakes. SAP is the single source of truth.</div>
+            </div>
+            <div class="principle">
+                <div class="principle-num">04</div>
+                <div class="principle-title">Act Through Standard BAPIs</div>
+                <div class="principle-text">Every write operation uses SAP standard BAPIs. No custom ABAP. No direct table updates. Upgrade-safe. Audit-safe.</div>
+            </div>
+            <div class="principle">
+                <div class="principle-num">05</div>
+                <div class="principle-title">Configurable, Not Coded</div>
+                <div class="principle-text">IT configures thresholds, rules, and agent behavior through the platform — not code. No consultants needed for changes.</div>
+            </div>
+            <div class="principle">
+                <div class="principle-num">06</div>
+                <div class="principle-title">Closed-Loop Learning</div>
+                <div class="principle-text">Every human override, every approval, every rejection trains the model. Agents get smarter. Thresholds self-adjust. The platform learns your business.</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════════════ COMPETITIVE ═══════════════════════ -->
+    <section class="section">
+        <div class="section-label">Positioning</div>
+        <div class="section-title">Why This Doesn't Exist Yet</div>
+
+        <table class="comp-table">
+            <thead>
+                <tr>
+                    <th>Capability</th>
+                    <th>SAP Native</th>
+                    <th>Celonis</th>
+                    <th>UiPath / Blue Prism</th>
+                    <th>Vic.ai / Esker</th>
+                    <th class="comp-us">Mantrix</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>SAP-native agents</td>
+                    <td class="comp-them">Joule (chat only)</td>
+                    <td class="comp-them">Process mining, no execution</td>
+                    <td class="comp-them">Screen-level RPA</td>
+                    <td class="comp-them">AP-only SaaS</td>
+                    <td class="comp-us">✓ Any T-code → agent</td>
+                </tr>
+                <tr>
+                    <td>Reads SAP tables directly</td>
+                    <td class="comp-them">Yes</td>
+                    <td class="comp-them">Extracts to external</td>
+                    <td class="comp-them">Screen scraping</td>
+                    <td class="comp-them">API extraction</td>
+                    <td class="comp-us">✓ CDS Views + OData + RFCs</td>
+                </tr>
+                <tr>
+                    <td>Writes via BAPIs</td>
+                    <td class="comp-them">Yes</td>
+                    <td class="comp-them">No write capability</td>
+                    <td class="comp-them">GUI scripting</td>
+                    <td class="comp-them">Limited</td>
+                    <td class="comp-us">✓ Standard BAPIs only</td>
+                </tr>
+                <tr>
+                    <td>Configurable agent builder</td>
+                    <td class="comp-them">No</td>
+                    <td class="comp-them">No (fixed analytics)</td>
+                    <td class="comp-them">Visual flow builder</td>
+                    <td class="comp-them">No</td>
+                    <td class="comp-us">✓ T-code → agent proposal</td>
+                </tr>
+                <tr>
+                    <td>Explains every decision</td>
+                    <td class="comp-them">No</td>
+                    <td class="comp-them">Partial</td>
+                    <td class="comp-them">No</td>
+                    <td class="comp-them">Partial</td>
+                    <td class="comp-us">✓ Full audit replay</td>
+                </tr>
+                <tr>
+                    <td>Cross-process visibility</td>
+                    <td class="comp-them">Fiori Launchpad</td>
+                    <td class="comp-them">Process cockpit</td>
+                    <td class="comp-them">Orchestration hub</td>
+                    <td class="comp-them">AP dashboard only</td>
+                    <td class="comp-us">✓ Enterprise Pulse</td>
+                </tr>
+                <tr>
+                    <td>Learns from overrides</td>
+                    <td class="comp-them">No</td>
+                    <td class="comp-them">No</td>
+                    <td class="comp-them">No</td>
+                    <td class="comp-them">Partial</td>
+                    <td class="comp-us">✓ Closed-loop per agent</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════════════ FINAL ═══════════════════════ -->
+    <section class="final-section">
+        <div class="hero-badge" style="margin-bottom: 28px;">Product Vision</div>
+        <div class="final-title">
+            Ship AP Agents Day 1.<br>
+            Build anything on Day 2.
+        </div>
+        <div class="final-desc">
+            The AP Agent Pack proves the platform. The Agent Builder scales it.
+            Every SAP customer runs <strong>hundreds of T-codes</strong> with the same
+            pattern: read data, make a decision, post a document. Mantrix turns
+            that pattern into a platform. <strong>That's a $100B TAM.</strong>
+        </div>
+    </section>
+
+</body>
+</html>

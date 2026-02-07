@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANTRIX — Enterprise Pulse: AP Department View</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'JetBrains Mono', monospace; background: #060a12; min-height: 100vh; color: #e2e8f0; }
+
+        .hero { text-align: center; padding: 80px 40px 60px; position: relative; }
+        .hero::before { content: ''; position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 60%); }
+        .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 100px; font-size: 10px; color: #8b5cf6; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; margin-bottom: 24px; background: rgba(139, 92, 246, 0.06); }
+        .hero-badge::before { content: ''; width: 6px; height: 6px; background: #8b5cf6; border-radius: 50%; box-shadow: 0 0 12px rgba(139, 92, 246, 0.6); }
+        .hero-title { font-size: 40px; font-weight: 800; margin-bottom: 16px; line-height: 1.2; }
+        .hero-title .grad { background: linear-gradient(135deg, #8b5cf6, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-sub { font-size: 14px; color: #94a3b8; max-width: 700px; margin: 0 auto 32px; line-height: 1.8; }
+        .hero-sub strong { color: #e2e8f0; }
+        .hero-audience { display: inline-flex; gap: 24px; padding: 14px 24px; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; background: rgba(15, 23, 42, 0.6); }
+        .ha-item { font-size: 10px; color: #64748b; display: flex; align-items: center; gap: 6px; }
+        .ha-item strong { color: #e2e8f0; }
+
+        .section { max-width: 1400px; margin: 0 auto; padding: 60px 40px; }
+        .divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.2), transparent); max-width: 1400px; margin: 0 auto; }
+        .section-label { font-size: 9px; color: #8b5cf6; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; margin-bottom: 8px; }
+        .section-title { font-size: 24px; font-weight: 700; margin-bottom: 12px; }
+        .section-desc { font-size: 12px; color: #94a3b8; line-height: 1.8; max-width: 700px; margin-bottom: 36px; }
+        .section-desc strong { color: #e2e8f0; }
+
+        /* KPI Strip */
+        .kpi-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 36px; }
+        .kpi-card { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 22px; position: relative; overflow: hidden; }
+        .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+        .kpi-card.purple::before { background: #8b5cf6; }
+        .kpi-card.green::before { background: #34d399; }
+        .kpi-card.amber::before { background: #fbbf24; }
+        .kpi-card.blue::before { background: #3b82f6; }
+        .kpi-card.red::before { background: #f87171; }
+        .kpi-label { font-size: 8px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .kpi-val { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .kpi-trend { font-size: 9px; display: flex; align-items: center; gap: 4px; }
+        .kpi-trend.up { color: #34d399; }
+        .kpi-trend.down { color: #f87171; }
+        .kpi-target { font-size: 8px; color: #475569; margin-top: 4px; }
+
+        /* Two-Panel Layout */
+        .two-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+        .panel { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 24px; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .panel-title { font-size: 12px; font-weight: 600; color: #e2e8f0; }
+        .panel-badge { font-size: 8px; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+        .panel-badge.live { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+        .panel-badge.ai { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+
+        /* Team Performance */
+        .team-row { display: grid; grid-template-columns: 140px 1fr 80px 80px 80px; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 10px; }
+        .team-row:last-child { border-bottom: none; }
+        .team-name { font-weight: 600; color: #e2e8f0; }
+        .team-bar { height: 6px; background: rgba(255,255,255,0.04); border-radius: 3px; overflow: hidden; }
+        .team-bar-fill { height: 100%; border-radius: 3px; }
+        .team-stat { text-align: center; font-weight: 600; }
+        .team-header { display: grid; grid-template-columns: 140px 1fr 80px 80px 80px; gap: 12px; padding: 0 0 8px; font-size: 8px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+
+        /* AI Insights */
+        .insight-card { background: rgba(0,0,0,0.2); border-radius: 10px; padding: 16px; margin-bottom: 10px; border-left: 3px solid; }
+        .insight-card.critical { border-left-color: #f87171; }
+        .insight-card.opportunity { border-left-color: #34d399; }
+        .insight-card.warning { border-left-color: #fbbf24; }
+        .insight-title { font-size: 11px; font-weight: 600; color: #e2e8f0; margin-bottom: 6px; }
+        .insight-text { font-size: 10px; color: #94a3b8; line-height: 1.6; }
+        .insight-impact { font-size: 10px; font-weight: 600; margin-top: 6px; }
+        .insight-impact.critical { color: #f87171; }
+        .insight-impact.opportunity { color: #34d399; }
+        .insight-impact.warning { color: #fbbf24; }
+
+        /* Attention Cards */
+        .attention-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+        .att-card { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 22px; position: relative; overflow: hidden; }
+        .att-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+        .att-card.urgent::before { background: #f87171; }
+        .att-card.ready::before { background: #34d399; }
+        .att-card.structural::before { background: #fbbf24; }
+        .att-tag { font-size: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 12px; display: inline-block; padding: 4px 10px; border-radius: 4px; }
+        .att-tag.urgent { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+        .att-tag.ready { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+        .att-tag.structural { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+        .att-count { font-size: 32px; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
+        .att-title { font-size: 12px; color: #cbd5e1; margin-bottom: 10px; }
+        .att-reason { font-size: 10px; color: #94a3b8; line-height: 1.6; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; }
+        .att-reason strong { color: #e2e8f0; }
+
+        /* Process Health */
+        .health-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+        .health-card { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 18px; }
+        .health-label { font-size: 8px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .health-stat { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+        .health-sub { font-size: 9px; color: #475569; }
+
+        /* Insight Banner */
+        .insight-banner { background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.08)); border: 1px solid rgba(139, 92, 246, 0.25); border-radius: 14px; padding: 22px 28px; display: flex; align-items: center; gap: 20px; margin-bottom: 28px; }
+        .insight-icon { font-size: 28px; flex-shrink: 0; }
+        .insight-banner-text { font-size: 12px; color: #cbd5e1; line-height: 1.8; }
+        .insight-banner-text strong { color: #34d399; }
+        .insight-banner-text em { color: #8b5cf6; font-style: normal; font-weight: 600; }
+
+        /* Scope */
+        .scope-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 28px; }
+        .scope-card { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 24px; }
+        .scope-title { font-size: 13px; font-weight: 700; margin-bottom: 16px; }
+        .scope-item { font-size: 10px; color: #94a3b8; padding: 6px 0; line-height: 1.6; display: flex; align-items: flex-start; gap: 8px; }
+        .scope-item::before { content: '→'; color: #475569; flex-shrink: 0; }
+    </style>
+</head>
+<body>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-badge">Enterprise Pulse</div>
+        <h1 class="hero-title">
+            <span class="grad">Enterprise Pulse</span><br>
+            AP Department View
+        </h1>
+        <p class="hero-sub">
+            The AP Department Head doesn't process invoices. They need to know:
+            <strong>What's the state of my department? Where are the bottlenecks? What's at risk?</strong>
+            Enterprise Pulse uses AI agents to gather intelligence across the entire AP operation
+            and surface what matters — in real time.
+        </p>
+        <div class="hero-audience">
+            <div class="ha-item"><strong>For:</strong> AP Manager / Controller / CFO</div>
+            <div class="ha-item"><strong>Not for:</strong> AP Clerks (they use Operational Tiles)</div>
+            <div class="ha-item"><strong>AI Role:</strong> Intelligence Gathering & KPIs</div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- KPIs -->
+    <section class="section">
+        <div class="section-label">Real-Time Department KPIs</div>
+        <div class="section-title">The Numbers That Matter</div>
+        <div class="section-desc">
+            These KPIs update in real time as AI agents process data across the AP operation.
+            <strong>No report generation. No waiting for month-end.</strong>
+        </div>
+
+        <div class="kpi-strip">
+            <div class="kpi-card purple">
+                <div class="kpi-label">Invoices Processed Today</div>
+                <div class="kpi-val" style="color: #e2e8f0;">1,248</div>
+                <div class="kpi-trend up">↑ 12% vs last week</div>
+                <div class="kpi-target">Team capacity: ~1,400/day</div>
+            </div>
+            <div class="kpi-card green">
+                <div class="kpi-label">AI-Assisted Rate</div>
+                <div class="kpi-val" style="color: #34d399;">71%</div>
+                <div class="kpi-trend up">↑ 4pts vs last month</div>
+                <div class="kpi-target">Target: 85% · Pre-Mantrix: 0%</div>
+            </div>
+            <div class="kpi-card amber">
+                <div class="kpi-label">Open Exceptions</div>
+                <div class="kpi-val" style="color: #fbbf24;">43</div>
+                <div class="kpi-trend up">↓ 18 from yesterday</div>
+                <div class="kpi-target">$6.7M total cash impact</div>
+            </div>
+            <div class="kpi-card blue">
+                <div class="kpi-label">Cost per Invoice</div>
+                <div class="kpi-val" style="color: #3b82f6;">$3.82</div>
+                <div class="kpi-trend up">↓ $1.40 from last quarter</div>
+                <div class="kpi-target">Target: $2.50 · Industry: $12.30</div>
+            </div>
+            <div class="kpi-card red">
+                <div class="kpi-label">Cash Impact Next 7 Days</div>
+                <div class="kpi-val" style="color: #f87171;">$18.4M</div>
+                <div class="kpi-trend" style="color: #94a3b8;">3 payment runs scheduled</div>
+                <div class="kpi-target">2 early-pay discounts capturable</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Attention Items -->
+    <section class="section">
+        <div class="section-label">AI Agent Findings</div>
+        <div class="section-title">What Needs Your Attention Today</div>
+        <div class="section-desc">
+            AI agents continuously scan AP operations and <strong>surface the 3 highest-impact items</strong>.
+            These aren't alerts — they're <strong>briefings with root cause and recommended next steps</strong>.
+        </div>
+
+        <div class="attention-grid">
+            <div class="att-card urgent">
+                <div class="att-tag urgent">Blocking Payment</div>
+                <div class="att-count">12</div>
+                <div class="att-title">invoices blocking $2.1M payment run</div>
+                <div class="att-reason"><strong>Root cause:</strong> PO delivery dates (EKET) passed for Plant 3100 — no GR in MATDOC. Vendor delivery accuracy +1.2 days avg. GRs expected by tomorrow.</div>
+            </div>
+            <div class="att-card ready">
+                <div class="att-tag ready">Efficiency Opportunity</div>
+                <div class="att-count">3</div>
+                <div class="att-title">early-pay discounts capturable this week</div>
+                <div class="att-reason"><strong>Savings:</strong> $18,200 available if 3 invoices (Thales, Northrop, Raytheon) paid within 2/10 Net 30 window. All matched and ready.</div>
+            </div>
+            <div class="att-card structural">
+                <div class="att-tag structural">Structural Issue</div>
+                <div class="att-count">31%</div>
+                <div class="att-title">of all errors trace to Vendor ABC</div>
+                <div class="att-reason"><strong>Pattern:</strong> Freight pricing drift 4.8% over 6 invoices. Buyer J. Martinez has 12% PO exception rate (team avg 3%). Two separate issues compounding.</div>
+            </div>
+        </div>
+
+        <!-- Insight Banner -->
+        <div class="insight-banner">
+            <div class="insight-icon">💡</div>
+            <div class="insight-banner-text">
+                If GR posting delays at Plant 3100 reduce by <strong>1 day</strong>, your department's AI-assisted rate
+                improves to <em>78%</em> and <strong>$4.2M in working capital</strong> is released.
+                This is your highest-leverage operational improvement this quarter.
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Team + AI Insights -->
+    <section class="section">
+        <div class="section-label">Department Intelligence</div>
+        <div class="section-title">Team Performance & AI Insights</div>
+
+        <div class="two-panel">
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Team Performance — Today</div>
+                    <div class="panel-badge live">Live</div>
+                </div>
+                <div class="team-header">
+                    <div>Clerk</div>
+                    <div>Queue Progress</div>
+                    <div style="text-align:center;">Processed</div>
+                    <div style="text-align:center;">Exceptions</div>
+                    <div style="text-align:center;">Avg Time</div>
+                </div>
+                <div class="team-row">
+                    <div class="team-name">Sarah Chen</div>
+                    <div class="team-bar"><div class="team-bar-fill" style="width: 92%; background: #34d399;"></div></div>
+                    <div class="team-stat" style="color: #34d399;">43/47</div>
+                    <div class="team-stat">4 resolved</div>
+                    <div class="team-stat" style="color: #34d399;">78s</div>
+                </div>
+                <div class="team-row">
+                    <div class="team-name">Mike Rodriguez</div>
+                    <div class="team-bar"><div class="team-bar-fill" style="width: 74%; background: #34d399;"></div></div>
+                    <div class="team-stat" style="color: #34d399;">35/47</div>
+                    <div class="team-stat">2 resolved</div>
+                    <div class="team-stat">94s</div>
+                </div>
+                <div class="team-row">
+                    <div class="team-name">Lisa Park</div>
+                    <div class="team-bar"><div class="team-bar-fill" style="width: 68%; background: #fbbf24;"></div></div>
+                    <div class="team-stat" style="color: #fbbf24;">28/41</div>
+                    <div class="team-stat">6 pending</div>
+                    <div class="team-stat" style="color: #fbbf24;">112s</div>
+                </div>
+                <div class="team-row">
+                    <div class="team-name">Tom Wilson</div>
+                    <div class="team-bar"><div class="team-bar-fill" style="width: 52%; background: #fbbf24;"></div></div>
+                    <div class="team-stat" style="color: #fbbf24;">22/42</div>
+                    <div class="team-stat">3 pending</div>
+                    <div class="team-stat">118s</div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">AI-Detected Insights</div>
+                    <div class="panel-badge ai">AI Agents</div>
+                </div>
+                <div class="insight-card critical">
+                    <div class="insight-title">Plant 3100 GR Delays — Chronic Pattern</div>
+                    <div class="insight-text">AI detected systematic GR posting lag: 4.2 days avg vs 1.1 day company avg. Causes 22% of all exceptions. Warehouse receiving understaffed.</div>
+                    <div class="insight-impact critical">Impact: $4.2M working capital · 11% AI-assist rate loss</div>
+                </div>
+                <div class="insight-card warning">
+                    <div class="insight-title">Buyer J. Martinez — Exception Pattern</div>
+                    <div class="insight-text">12% PO exception rate (team avg 3%). Primary cause: incorrect pricing on manual PO entries. 4 PO corrections needed this month.</div>
+                    <div class="insight-impact warning">Impact: $890K delayed · 18 hrs AP staff time/month</div>
+                </div>
+                <div class="insight-card opportunity">
+                    <div class="insight-title">Lisa Park — Training Opportunity</div>
+                    <div class="insight-text">AI notices Lisa's exception resolution time is 2.1x team average. She may benefit from training on the contract escalation workflow used by top performers.</div>
+                    <div class="insight-impact opportunity">Potential: 30% improvement in her exception handling</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Process Health -->
+    <section class="section">
+        <div class="section-label">Process Health</div>
+        <div class="section-title">AP Process Health — Last 30 Days</div>
+
+        <div class="health-grid">
+            <div class="health-card">
+                <div class="health-label">Invoices / Day</div>
+                <div class="health-stat" style="color: #e2e8f0;">1,248</div>
+                <div class="health-sub">↑ 15% vs prior month</div>
+            </div>
+            <div class="health-card">
+                <div class="health-label">First-Pass Post Rate</div>
+                <div class="health-stat" style="color: #34d399;">82%</div>
+                <div class="health-sub">↑ from 58% pre-Mantrix</div>
+            </div>
+            <div class="health-card">
+                <div class="health-label">Exception Aging</div>
+                <div class="health-stat" style="color: #fbbf24;">1.8 days</div>
+                <div class="health-sub">↓ from 5.2 days pre-Mantrix</div>
+            </div>
+            <div class="health-card">
+                <div class="health-label">AI Recommendation Acceptance</div>
+                <div class="health-stat" style="color: #8b5cf6;">87%</div>
+                <div class="health-sub">Clerks follow AI rec 87% of the time</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Scope Definition -->
+    <section class="section">
+        <div class="section-label">Scope</div>
+        <div class="section-title">What Enterprise Pulse Does vs. What Operational Tiles Do</div>
+
+        <div class="scope-grid">
+            <div class="scope-card">
+                <div class="scope-title" style="color: #8b5cf6;">Enterprise Pulse (Department Head)</div>
+                <div class="scope-item">Real-time department KPIs — no report generation needed</div>
+                <div class="scope-item">AI-detected patterns, structural issues, and opportunities</div>
+                <div class="scope-item">Team performance visibility — workload, throughput, aging</div>
+                <div class="scope-item">Cash impact forecasting — 7/30/60 day outflow view</div>
+                <div class="scope-item">Vendor risk intelligence — pricing drift, reliability trends</div>
+                <div class="scope-item">Recommendations for operational improvements (GR delays, buyer training)</div>
+                <div class="scope-item">Audit-ready compliance dashboards</div>
+            </div>
+            <div class="scope-card">
+                <div class="scope-title" style="color: #fbbf24;">Operational Tiles (AP Clerk)</div>
+                <div class="scope-item">Invoice entry with AI pre-fill and verification</div>
+                <div class="scope-item">Smart work queue — prioritized by financial impact</div>
+                <div class="scope-item">Exception review with AI root cause analysis</div>
+                <div class="scope-item">Batch posting review and confirmation</div>
+                <div class="scope-item">Every decision made by the human, not the AI</div>
+                <div class="scope-item">AI recommendations clearly labeled and editable</div>
+                <div class="scope-item">Override feedback improves future AI accuracy</div>
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>
