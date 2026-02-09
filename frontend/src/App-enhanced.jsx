@@ -189,6 +189,8 @@ import MaintenanceScheduler from './components/routeai/MaintenanceScheduler';
 import TraxxAILanding from './components/TraxxAILanding';
 import MasterDataLanding from './components/masterdata/MasterDataLanding';
 import MantrixAPLanding from './components/mantrixap/MantrixAPLanding';
+import MantrixAPHome from './components/mantrixap/MantrixAPHome';
+import MantrixAPMonitor from './components/mantrixap/MantrixAPMonitor';
 import KitControlTower from './components/traxxai/KitControlTower';
 import WhoMustActNow from './components/traxxai/WhoMustActNow';
 import LogisticsEconomics from './components/traxxai/LogisticsEconomics';
@@ -695,6 +697,10 @@ function App() {
                       setCoreAIView('masterdata');
                     } else if (moduleId === 'mantrixap') {
                       setCoreAIView('mantrixap');
+                    } else if (moduleId === 'mantrixap-workbench') {
+                      setCoreAIView('mantrixap-workbench');
+                    } else if (moduleId === 'mantrixap-monitor') {
+                      setCoreAIView('mantrixap-monitor');
                     }
                   }} />
                 </Box>
@@ -1304,7 +1310,17 @@ function App() {
               </Fade>
               <Fade in={coreAIView === 'mantrixap'} timeout={300}>
                 <Box sx={{ display: coreAIView === 'mantrixap' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
-                  <MantrixAPLanding darkMode={darkMode} onBack={() => setCoreAIView('landing')} />
+                  <MantrixAPHome darkMode={darkMode} onBack={() => setCoreAIView('landing')} onNavigate={(view) => setCoreAIView(view)} />
+                </Box>
+              </Fade>
+              <Fade in={coreAIView === 'mantrixap-workbench'} timeout={300}>
+                <Box sx={{ display: coreAIView === 'mantrixap-workbench' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
+                  <MantrixAPLanding darkMode={darkMode} onBack={() => setCoreAIView('mantrixap')} />
+                </Box>
+              </Fade>
+              <Fade in={coreAIView === 'mantrixap-monitor'} timeout={300}>
+                <Box sx={{ display: coreAIView === 'mantrixap-monitor' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
+                  <MantrixAPMonitor darkMode={darkMode} onBack={() => setCoreAIView('mantrixap')} />
                 </Box>
               </Fade>
             </Box>

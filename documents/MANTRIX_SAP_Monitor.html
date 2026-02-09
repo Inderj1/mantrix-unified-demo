@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MANTRIX AP — SAP Monitor · Thales DSI</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+:root{
+--bg:#F6F7FB;--surface:#FFF;--s2:#F0F1F6;--s3:#E8EAF0;
+--brd:#E0E3EB;--brd2:#CDD1DC;--brdL:#ECEEF4;
+--t:#111827;--t2:#374151;--t3:#6B7280;--t4:#9CA3AF;
+--teal:#0D9488;--tealBg:rgba(13,148,136,.06);--tealBr:rgba(13,148,136,.18);
+--blue:#2563EB;--blueBg:rgba(37,99,235,.06);--blueBr:rgba(37,99,235,.15);
+--amber:#D97706;--amberBg:rgba(217,119,6,.07);--amberBr:rgba(217,119,6,.15);
+--red:#DC2626;--redBg:rgba(220,38,38,.06);--redBr:rgba(220,38,38,.12);
+--green:#059669;--greenBg:rgba(5,150,105,.06);--greenBr:rgba(5,150,105,.15);
+--purple:#7C3AED;--purpleBg:rgba(124,58,237,.06);--purpleBr:rgba(124,58,237,.12);
+--orange:#EA580C;--orangeBg:rgba(234,88,12,.06);--orangeBr:rgba(234,88,12,.15);
+--slate:#475569;--slateBg:rgba(71,85,105,.06);--slateBr:rgba(71,85,105,.15);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);line-height:1.5;-webkit-font-smoothing:antialiased;font-size:12px}
+.m{font-family:'IBM Plex Mono',monospace}
+
+/* NAV */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:48px;background:var(--surface);border-bottom:1px solid var(--brd);position:sticky;top:0;z-index:100}
+.nav-l{display:flex;align-items:center;gap:20px}
+.logo{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:var(--teal);letter-spacing:.5px}
+.logo span{color:var(--t4);font-weight:400}
+.tabs{display:flex;gap:2px}
+.tab{font-size:11px;padding:6px 14px;border-radius:7px;color:var(--t3);font-weight:500;cursor:pointer;transition:.15s;border:1px solid transparent;user-select:none}
+.tab:hover{background:var(--s2);color:var(--t2)}
+.tab.on{background:var(--tealBg);color:var(--teal);font-weight:600;border-color:var(--tealBr)}
+.nav-r{display:flex;align-items:center;gap:10px}
+.org{font-size:10px;color:var(--t3)}
+.av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--blue));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+.ap-link{font-family:'IBM Plex Mono',monospace;font-size:9px;padding:4px 10px;border-radius:5px;border:1px solid var(--tealBr);color:var(--teal);font-weight:600;background:var(--tealBg);cursor:pointer;text-decoration:none}
+.refresh-btn{font-family:'IBM Plex Mono',monospace;font-size:8px;padding:4px 10px;border-radius:5px;border:1px solid var(--brd);color:var(--t3);background:var(--surface);cursor:pointer;font-weight:600;display:flex;align-items:center;gap:4px}
+.refresh-btn:hover{border-color:var(--tealBr);color:var(--teal)}
+.refresh-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}
+
+/* ═══ KPI STRIP — STRONG ═══ */
+.kpi-strip{display:grid;grid-template-columns:repeat(8,1fr);gap:0;background:var(--surface);border-bottom:2px solid var(--brd)}
+.kpi-card{padding:14px 12px;text-align:center;border-right:1px solid var(--brdL);position:relative}
+.kpi-card:last-child{border-right:none}
+.kpi-card.highlight{background:var(--greenBg)}
+.kpi-card.warn{background:var(--amberBg)}
+.kpi-card.bad{background:var(--redBg)}
+.kpi-val{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:700;line-height:1.2}
+.kpi-val.green{color:var(--green)}.kpi-val.amber{color:var(--amber)}.kpi-val.red{color:var(--red)}.kpi-val.teal{color:var(--teal)}.kpi-val.blue{color:var(--blue)}
+.kpi-label{font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--t4);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-top:2px}
+.kpi-sub{font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--t3);margin-top:1px}
+.kpi-delta{font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px;position:absolute;top:6px;right:6px}
+.kpi-delta.up{background:var(--greenBg);color:var(--green)}
+.kpi-delta.dn{background:var(--redBg);color:var(--red)}
+
+/* TABS */
+.mon-tabs{display:flex;gap:0;padding:0 20px;background:var(--surface);border-bottom:1px solid var(--brd)}
+.mon-tab{font-size:11px;padding:10px 16px;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;font-weight:500}
+.mon-tab.on{color:var(--t);border-bottom-color:var(--teal);font-weight:600}
+.mon-tab .nt{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;border-radius:100px;font-size:8px;font-weight:700;margin-left:4px;padding:0 4px;font-family:'IBM Plex Mono',monospace}
+.mon-p{display:none;animation:fi .2s ease}.mon-p.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ═══ POSTED TABLE — THE MAIN EVENT ═══ */
+.tbl-wrap{padding:0;overflow-x:auto;background:var(--surface)}
+.tbl{width:100%;border-collapse:collapse;font-size:10px}
+.tbl th{font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--t4);text-transform:uppercase;letter-spacing:.8px;font-weight:600;padding:8px 8px;text-align:left;border-bottom:2px solid var(--brd);background:var(--s2);position:sticky;top:0;z-index:2;white-space:nowrap}
+.tbl th.r{text-align:right}
+.tbl td{padding:7px 8px;border-bottom:1px solid var(--brdL);vertical-align:middle;font-size:10px}
+.tbl tr:hover{background:rgba(13,148,136,.02)}
+.tbl td.m{font-family:'IBM Plex Mono',monospace}
+.tbl td.r{text-align:right}
+.tbl tr.posted{border-left:3px solid var(--green)}
+.tbl tr.queued{border-left:3px solid var(--blue);background:var(--blueBg)}
+.tbl tr.parked{border-left:3px solid var(--amber)}
+.tbl tr.failed{border-left:3px solid var(--red);background:var(--redBg)}
+
+/* Status badges */
+.st{font-family:'IBM Plex Mono',monospace;font-size:7px;font-weight:700;padding:3px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.st.posted{background:var(--greenBg);color:var(--green);border:1px solid var(--greenBr)}
+.st.queued{background:var(--blueBg);color:var(--blue);border:1px solid var(--blueBr)}
+.st.parked{background:var(--amberBg);color:var(--amber);border:1px solid var(--amberBr)}
+.st.failed{background:var(--redBg);color:var(--red);border:1px solid var(--redBr)}
+.st-dot{width:5px;height:5px;border-radius:50%}
+.st-dot.posted{background:var(--green)}.st-dot.queued{background:var(--blue);animation:pulse 1s infinite}.st-dot.parked{background:var(--amber)}.st-dot.failed{background:var(--red)}
+/* Auto badge */
+.auto-b{font-family:'IBM Plex Mono',monospace;font-size:6px;font-weight:700;padding:1px 4px;border-radius:2px;background:var(--tealBg);color:var(--teal);border:1px solid var(--tealBr);margin-left:4px}
+/* SAP doc link */
+.sap-doc{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;color:var(--teal);cursor:pointer;text-decoration:none}
+.sap-doc:hover{text-decoration:underline}
+/* Vendor cell */
+.vn{font-weight:600;font-size:10px}.vn-sub{font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--t4)}
+/* Amount cells */
+.amt{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:10px}
+.amt-s{font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--t4)}
+/* Variance */
+.var-ok{color:var(--green);font-weight:600}.var-w{color:var(--amber);font-weight:600}.var-e{color:var(--red);font-weight:600}
+/* Payment */
+.pay{font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500}
+.pay.disc{color:var(--green)}.pay.soon{color:var(--amber)}.pay.norm{color:var(--t3)}
+/* Time cell */
+.tm-cell{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--t3)}.tm-speed{font-size:7px;color:var(--t4)}
+/* Pending text */
+.pend{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--blue);font-style:italic}
+.park-doc{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--amber);font-weight:600}
+/* Owner badge in table */
+.ow{font-family:'IBM Plex Mono',monospace;font-size:7px;font-weight:600;padding:2px 5px;border-radius:3px}
+
+/* ═══ 3-WAY MATCH DETAIL SECTION ═══ */
+.match-detail{background:var(--surface);border:1px solid var(--brd);border-radius:8px;margin:8px 20px;overflow:hidden}
+.match-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--s2);cursor:pointer;border-bottom:1px solid var(--brd)}
+.match-hdr:hover{background:var(--s3)}
+.match-title{font-size:12px;font-weight:700}
+.match-sub{font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--t4)}
+.match-body{display:none;padding:14px}.match-body.open{display:block;animation:fi .2s}
+.three-way{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+.tw-card{background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:12px;text-align:center}
+.tw-card.ok{border-color:var(--greenBr);background:var(--greenBg)}
+.tw-icon{font-size:20px;margin-bottom:4px}
+.tw-label{font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--t4);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:4px}
+.tw-val{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700}
+.tw-sub{font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--t3);margin-top:2px}
+.tw-link{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--teal);font-weight:600;margin-top:4px;cursor:pointer}
+
+/* Line detail in match */
+.ld-tbl{width:100%;border-collapse:collapse;font-size:9px;margin-top:10px}
+.ld-tbl th{font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--t4);text-transform:uppercase;letter-spacing:.5px;font-weight:600;padding:6px;text-align:left;border-bottom:2px solid var(--brd);background:var(--s2)}
+.ld-tbl td{padding:5px 6px;border-bottom:1px solid var(--brdL)}
+.ld-tbl tr{border-left:3px solid var(--green)}
+.ld-check{color:var(--green);font-weight:700}
+
+/* ═══ FAILED DETAIL ═══ */
+.fail-card{background:var(--surface);border:1px solid var(--redBr);border-radius:8px;margin:8px 20px;overflow:hidden}
+.fail-hdr{padding:10px 14px;background:var(--redBg);border-bottom:1px solid var(--redBr);display:flex;align-items:center;justify-content:space-between}
+.fail-title{font-size:12px;font-weight:700;color:var(--red)}
+.fail-body{padding:14px}
+.fail-err{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--red);padding:8px 12px;background:var(--redBg);border:1px solid var(--redBr);border-radius:6px;margin-bottom:8px}
+.fail-human{font-size:11px;color:var(--t2);line-height:1.7;margin-bottom:8px;padding:8px;background:var(--amberBg);border-radius:6px;border-left:3px solid var(--amber)}
+.fail-human strong{color:var(--t)}
+.fail-ai{font-size:10px;color:var(--t3);line-height:1.6;padding:8px;background:var(--s2);border-radius:6px;margin-bottom:8px}
+.fail-acts{display:flex;gap:4px}
+.fail-btn{font-family:'IBM Plex Mono',monospace;font-size:8px;padding:6px 12px;border-radius:5px;border:1px solid var(--brd);background:var(--surface);color:var(--t3);cursor:pointer;font-weight:600}
+.fail-btn:hover{border-color:var(--tealBr);color:var(--teal);background:var(--tealBg)}
+.fail-btn.primary{background:var(--tealBg);border-color:var(--tealBr);color:var(--teal)}
+
+/* ═══ ACTIVITY LOG ═══ */
+.log-wrap{padding:12px 20px}
+.log-entry{display:grid;grid-template-columns:80px 70px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid var(--brdL);font-size:10px;align-items:start}
+.log-time{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--t3);font-weight:600}
+.log-type{font-family:'IBM Plex Mono',monospace;font-size:7px;font-weight:700;padding:3px 6px;border-radius:3px;text-align:center;white-space:nowrap}
+.log-type.posted{background:var(--greenBg);color:var(--green)}.log-type.auto{background:var(--tealBg);color:var(--teal)}.log-type.queued{background:var(--blueBg);color:var(--blue)}.log-type.parked{background:var(--amberBg);color:var(--amber)}.log-type.failed{background:var(--redBg);color:var(--red)}.log-type.gr{background:var(--purpleBg);color:var(--purple)}.log-type.ingest{background:var(--slateBg);color:var(--slate)}
+.log-msg{color:var(--t2);line-height:1.5}.log-msg strong{color:var(--t)}
+.log-doc{font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--teal);font-weight:600}
+.log-val{font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700}
+
+/* ═══ ERROR GUIDE ═══ */
+.err-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:12px 20px}
+.err-card{background:var(--surface);border:1px solid var(--brd);border-radius:8px;padding:10px 12px}
+.err-code{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;color:var(--red)}
+.err-sap{font-size:9px;color:var(--t3);margin-top:2px}
+.err-human{font-size:10px;color:var(--t2);margin-top:4px;font-weight:500}
+.err-action{font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--teal);margin-top:4px;font-weight:600}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--t);color:#fff;padding:12px 20px;border-radius:8px;font-size:11px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.15);transform:translateY(100px);opacity:0;transition:.3s;z-index:200}
+.toast.show{transform:none;opacity:1}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+<div class="nav-l">
+    <div class="logo">MANTRIX <span>AP</span></div>
+    <div class="tabs">
+        <div class="tab on">◉ SAP Monitor</div>
+    </div>
+</div>
+<div class="nav-r">
+    <a class="ap-link">← AP Workbench</a>
+    <div class="refresh-btn" onclick="toast('Refreshed — 2 new events')"><div class="refresh-dot"></div>Auto-refresh 30s</div>
+    <div class="org">Thales DSI · Sarah Chen</div>
+    <div class="av">SC</div>
+</div>
+</nav>
+
+<!-- ═══ KPI STRIP ═══ -->
+<div class="kpi-strip">
+    <div class="kpi-card highlight">
+        <div class="kpi-delta up">+3 vs avg</div>
+        <div class="kpi-val green">28</div>
+        <div class="kpi-label">Posted Today</div>
+        <div class="kpi-sub">of 61 received</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-val teal">$2.85M</div>
+        <div class="kpi-label">Value Posted</div>
+        <div class="kpi-sub">$2,847,690</div>
+    </div>
+    <div class="kpi-card highlight">
+        <div class="kpi-delta up">↑ 8%</div>
+        <div class="kpi-val green">72%</div>
+        <div class="kpi-label">Straight-Through</div>
+        <div class="kpi-sub">No human touch</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-val teal">2.4s</div>
+        <div class="kpi-label">Avg Post Time</div>
+        <div class="kpi-sub">BAPI round-trip</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-val blue">2</div>
+        <div class="kpi-label">Queued</div>
+        <div class="kpi-sub">Submitting now</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-val amber">4</div>
+        <div class="kpi-label">Parked</div>
+        <div class="kpi-sub">Awaiting action</div>
+    </div>
+    <div class="kpi-card bad">
+        <div class="kpi-val red">1</div>
+        <div class="kpi-label">Failed</div>
+        <div class="kpi-sub">Needs attention</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-delta up">↓ 2.1d</div>
+        <div class="kpi-val green">3.8d</div>
+        <div class="kpi-label">Avg Cycle Time</div>
+        <div class="kpi-sub">Invoice → Posted</div>
+    </div>
+</div>
+
+<!-- TABS -->
+<div class="mon-tabs">
+    <div class="mon-tab on" onclick="monT('posted',this)">Posted <span class="nt" style="background:var(--greenBg);color:var(--green)">28</span></div>
+    <div class="mon-tab" onclick="monT('queued',this)">Queued <span class="nt" style="background:var(--blueBg);color:var(--blue)">2</span></div>
+    <div class="mon-tab" onclick="monT('parked',this)">Parked <span class="nt" style="background:var(--amberBg);color:var(--amber)">4</span></div>
+    <div class="mon-tab" onclick="monT('failed',this)">Failed <span class="nt" style="background:var(--redBg);color:var(--red)">1</span></div>
+    <div class="mon-tab" onclick="monT('log',this)">Activity Log</div>
+    <div class="mon-tab" onclick="monT('errors',this)">Error Guide</div>
+</div>
+
+<!-- ═══ POSTED ═══ -->
+<div class="mon-p on" id="P-posted">
+<div class="tbl-wrap">
+<table class="tbl">
+<thead><tr>
+<th>Status</th>
+<th>SAP Doc # (BELNR)</th>
+<th>FY</th>
+<th>Post Date</th>
+<th>Vendor</th>
+<th>Invoice Ref (XBLNR)</th>
+<th>PO Number</th>
+<th class="r">PO Value</th>
+<th class="r">Inv Value</th>
+<th class="r">Variance</th>
+<th>GR Reference</th>
+<th>Payment Due</th>
+<th>Posted At</th>
+</tr></thead>
+<tbody>
+<tr class="posted" onclick="toggleMatch('M1',this)">
+    <td><span class="st posted"><span class="st-dot posted"></span>POSTED</span></td>
+    <td><span class="sap-doc">5105002341</span></td>
+    <td class="m" style="color:var(--t3)">2026</td>
+    <td class="m">02/08</td>
+    <td><div class="vn">Safran Electronics</div><div class="vn-sub">0000198450 · 6 lines</div></td>
+    <td class="m" style="font-weight:600">INV-2026-4501</td>
+    <td class="m" style="color:var(--blue);font-weight:600">4500087200</td>
+    <td class="r"><span class="amt">$128,400</span></td>
+    <td class="r"><span class="amt">$128,400</span></td>
+    <td class="r"><span class="var-ok m">$0 (0%)</span></td>
+    <td><span class="gr-ref" style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--green);font-weight:600">5000441200</span></td>
+    <td><span class="pay disc">Mar 05 💰 2%</span></td>
+    <td><span class="tm-cell">8:15 AM</span><span class="auto-b">AUTO</span><br><span class="tm-speed">2.1s</span></td>
+</tr>
+<tr class="posted" onclick="toggleMatch('M2',this)">
+    <td><span class="st posted"><span class="st-dot posted"></span>POSTED</span></td>
+    <td><span class="sap-doc">5105002342</span></td>
+    <td class="m" style="color:var(--t3)">2026</td>
+    <td class="m">02/08</td>
+    <td><div class="vn">TE Connectivity</div><div class="vn-sub">0000187600 · 3 lines</div></td>
+    <td class="m" style="font-weight:600">INV-2026-4502</td>
+    <td class="m" style="color:var(--blue);font-weight:600">4500087215</td>
+    <td class="r"><span class="amt">$18,200</span></td>
+    <td class="r"><span class="amt">$18,200</span></td>
+    <td class="r"><span class="var-ok m">$0 (0%)</span></td>
+    <td><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--green);font-weight:600">5000441250</span></td>
+    <td><span class="pay norm">Mar 06</span></td>
+    <td><span class="tm-cell">8:18 AM</span><span class="auto-b">AUTO</span><br><span class="tm-speed">1.8s</span></td>
+</tr>
+<tr class="posted" onclick="toggleMatch('M3',this)">
+    <td><span class="st posted"><span class="st-dot posted"></span>POSTED</span></td>
+    <td><span class="sap-doc">5105002343</span></td>
+    <td class="m" style="color:var(--t3)">2026</td>
+    <td class="m">02/08</td>
+    <td><div class="vn">Curtiss-Wright</div><div class="vn-sub">0000195400 · 5 lines</div></td>
+    <td class="m" style="font-weight:600">INV-2026-4507</td>
+    <td class="m" style="color:var(--blue);font-weight:600">4500087195</td>
+    <td class="r"><span class="amt">$45,600</span></td>
+    <td class="r"><span class="amt">$45,600</span></td>
+    <td class="r"><span class="var-ok m">$0 (0%)</span></td>
+    <td><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--green);font-weight:600">5000441220</span></td>
+    <td><span class="pay norm">Mar 10</span></td>
+    <td><span class="tm-cell">8:22 AM</span><br><span class="tm-speed">2.4s</span></td>
+</tr>
+<tr class="posted" onclick="toggleMatch('M4',this)">
+    <td><span class="st posted"><span class="st-dot posted"></span>POSTED</span></td>
+    <td><span class="sap-doc">5105002344</span></td>
+    <td class="m" style="color:var(--t3)">2026</td>
+    <td class="m">02/08</td>
+    <td><div class="vn">Mercury Systems</div><div class="vn-sub">0000203100 · 24 lines</div></td>
+    <td class="m" style="font-weight:600">INV-2026-4503</td>
+    <td class="m" style="color:var(--blue);font-weight:600">4500087180</td>
+    <td class="r"><span class="amt">$343,285</span></td>
+    <td class="r"><span class="amt">$342,600</span></td>
+    <td class="r"><span class="var-ok m">-$685 (0.2%)</span></td>
+    <td><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--green);font-weight:600">5000441260</span></td>
+    <td><span class="pay norm">Mar 18</span></td>
+    <td><span class="tm-cell">8:35 AM</span><br><span class="tm-speed">3.1s</span></td>
+</tr>
+<tr class="posted">
+    <td><span class="st posted"><span class="st-dot posted"></span>POSTED</span></td>
+    <td><span class="sap-doc">5105002345</span></td>
+    <td class="m" style="color:var(--t3)">2026</td>
+    <td class="m">02/08</td>
+    <td><div class="vn">Cintas Corporation</div><div class="vn-sub">0000142800 · 1 line · Non-PO</div></td>
+    <td class="m" style="font-weight:600">INV-2026-4509</td>
+    <td class="m" style="color:var(--t4)">— Non-PO</td>
+    <td class="r"><span class="amt-s">—</span></td>
+    <td class="r"><span class="amt">$1,850</span></td>
+    <td class="r"><span class="m" style="color:var(--t4)">—</span></td>
+    <td><span style="font-size:9px;color:var(--t4)">— No GR</span></td>
+    <td><span class="pay norm">Mar 03</span></td>
+    <td><span class="tm-cell">8:40 AM</span><span class="auto-b">AUTO</span><br><span class="tm-speed">1.6s</span></td>
+</tr>
+<tr class="posted">
+    <td><span class="st posted"><span class="st-dot posted"></span>POSTED</span></td>
+    <td><span class="sap-doc">5105002346</span></td>
+    <td class="m" style="color:var(--t3)">2026</td>
+    <td class="m">02/08</td>
+    <td><div class="vn">Honeywell Aerospace</div><div class="vn-sub">0000188900 · 3 lines · Was parked</div></td>
+    <td class="m" style="font-weight:600">INV-2026-4480</td>
+    <td class="m" style="color:var(--blue);font-weight:600">4500087160</td>
+    <td class="r"><span class="amt">$94,200</span></td>
+    <td class="r"><span class="amt">$94,200</span></td>
+    <td class="r"><span class="var-ok m">$0 (0%)</span></td>
+    <td><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--green);font-weight:600">5000441310</span></td>
+    <td><span class="pay soon">Feb 20 ⚠</span></td>
+    <td><span class="tm-cell">9:04 AM</span><br><span class="tm-speed">2.8s · Unparked</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<!-- 3-Way Match Detail — Safran (expandable) -->
+<div class="match-detail" id="M1" style="display:none">
+<div class="match-hdr" onclick="document.getElementById('M1').style.display='none'">
+    <div><div class="match-title">✓ 3-Way Match Verified — Safran INV-2026-4501</div><div class="match-sub">SAP Doc 5105002341 · Posted 8:15 AM · 6/6 lines exact</div></div>
+    <span style="font-size:10px;color:var(--t4)">✕ Close</span>
+</div>
+<div class="match-body open">
+    <div class="three-way">
+        <div class="tw-card ok">
+            <div class="tw-icon">📄</div>
+            <div class="tw-label">Invoice</div>
+            <div class="tw-val">$128,400</div>
+            <div class="tw-sub">INV-2026-4501</div>
+            <div class="tw-sub">6 lines · Feb 3, 2026</div>
+            <div class="tw-link">View PDF →</div>
+        </div>
+        <div class="tw-card ok">
+            <div class="tw-icon">📋</div>
+            <div class="tw-label">Purchase Order</div>
+            <div class="tw-val">$128,400</div>
+            <div class="tw-sub">PO 4500087200</div>
+            <div class="tw-sub">6 items · Created Oct 15, 2025</div>
+            <div class="tw-link">View in ME23N →</div>
+        </div>
+        <div class="tw-card ok">
+            <div class="tw-icon">📦</div>
+            <div class="tw-label">Goods Receipt</div>
+            <div class="tw-val">$128,400</div>
+            <div class="tw-sub">GR 5000441200</div>
+            <div class="tw-sub">6 items · Received Jan 28, 2026</div>
+            <div class="tw-link">View in MIGO →</div>
+        </div>
+    </div>
+    <div style="text-align:center;padding:6px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--green);font-weight:700">✓ INVOICE = PO = GR → 3-Way Match Confirmed → MIRO Doc 5105002341</div>
+    <table class="ld-tbl">
+    <thead><tr><th>Line</th><th>Material</th><th>Description</th><th style="text-align:right">PO Qty</th><th style="text-align:right">GR Qty</th><th style="text-align:right">Inv Qty</th><th style="text-align:right">PO Price</th><th style="text-align:right">Inv Price</th><th>Match</th></tr></thead>
+    <tbody>
+    <tr><td class="m">10</td><td class="m">INU-4000</td><td>Inertial Nav Unit</td><td class="m r">2 EA</td><td class="m r">2 EA</td><td class="m r">2 EA</td><td class="m r">$34,200</td><td class="m r">$34,200</td><td class="ld-check">✓</td></tr>
+    <tr><td class="m">20</td><td class="m">RLG-580</td><td>Ring Laser Gyro</td><td class="m r">4 EA</td><td class="m r">4 EA</td><td class="m r">4 EA</td><td class="m r">$12,600</td><td class="m r">$12,600</td><td class="ld-check">✓</td></tr>
+    <tr><td class="m">30</td><td class="m">NAV-900</td><td>Navigation Computer</td><td class="m r">2 EA</td><td class="m r">2 EA</td><td class="m r">2 EA</td><td class="m r">$18,400</td><td class="m r">$18,400</td><td class="ld-check">✓</td></tr>
+    <tr><td class="m">40</td><td class="m">SU-200</td><td>AHRS Sensor Unit</td><td class="m r">6 EA</td><td class="m r">6 EA</td><td class="m r">6 EA</td><td class="m r">$4,200</td><td class="m r">$4,200</td><td class="ld-check">✓</td></tr>
+    <tr><td class="m">50</td><td class="m">GA-100</td><td>GPS Antenna Module</td><td class="m r">8 EA</td><td class="m r">8 EA</td><td class="m r">8 EA</td><td class="m r">$1,800</td><td class="m r">$1,800</td><td class="ld-check">✓</td></tr>
+    <tr><td class="m">60</td><td class="m">ITK-50</td><td>Integration Test Kit</td><td class="m r">2 EA</td><td class="m r">2 EA</td><td class="m r">2 EA</td><td class="m r">$2,100</td><td class="m r">$2,100</td><td class="ld-check">✓</td></tr>
+    </tbody>
+    </table>
+</div>
+</div>
+
+<div style="padding:8px 20px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--t4);border-top:1px solid var(--brd)">Showing 6 of 28 posted · Click any row to expand 3-way match detail</div>
+</div>
+
+<!-- ═══ QUEUED ═══ -->
+<div class="mon-p" id="P-queued">
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Status</th><th>SAP Doc</th><th>Vendor</th><th>Invoice Ref</th><th>PO</th><th class="r">Value</th><th>Lines</th><th>Submitted</th></tr></thead>
+<tbody>
+<tr class="queued"><td><span class="st queued"><span class="st-dot queued"></span>QUEUED</span></td><td><span class="pend">Pending...</span></td><td><div class="vn">BAE Systems</div><div class="vn-sub">38 of 42 lines</div></td><td class="m" style="font-weight:600">INV-2026-4504</td><td class="m" style="color:var(--blue);font-weight:600">4500087190</td><td class="r"><span class="amt">$515,600</span></td><td class="m">38</td><td><span class="tm-cell">9:15 AM · 2s ago</span></td></tr>
+<tr class="queued"><td><span class="st queued"><span class="st-dot queued"></span>QUEUED</span></td><td><span class="pend">Pending...</span></td><td><div class="vn">Leonardo DRS</div><div class="vn-sub">86 of 98 lines</div></td><td class="m" style="font-weight:600">INV-2026-4506</td><td class="m" style="color:var(--blue);font-weight:600">4500087220</td><td class="r"><span class="amt">$1,111,000</span></td><td class="m">86</td><td><span class="tm-cell">9:14 AM · 3s ago</span></td></tr>
+</tbody></table></div>
+</div>
+
+<!-- ═══ PARKED ═══ -->
+<div class="mon-p" id="P-parked">
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Status</th><th>Park Doc</th><th>Vendor</th><th>Invoice Ref</th><th>PO</th><th class="r">Value</th><th>Lines</th><th>Reason</th><th>Owner</th></tr></thead>
+<tbody>
+<tr class="parked"><td><span class="st parked"><span class="st-dot parked"></span>PARKED</span></td><td><span class="park-doc">P-5105002350</span></td><td><div class="vn">Leonardo DRS</div><div class="vn-sub">5 lines · GR pending</div></td><td class="m" style="font-weight:600">INV-2026-4498</td><td class="m" style="color:var(--blue)">4500087220</td><td class="r"><span class="amt">$87,400</span></td><td class="m">5</td><td>Hold — GR overdue 2d</td><td><span class="ow" style="background:var(--slateBg);color:var(--slate)">⏸ Time</span></td></tr>
+<tr class="parked"><td><span class="st parked"><span class="st-dot parked"></span>PARKED</span></td><td><span class="park-doc">P-5105002351</span></td><td><div class="vn">BAE Systems</div><div class="vn-sub">4 lines · price var</div></td><td class="m" style="font-weight:600">INV-2026-4504</td><td class="m" style="color:var(--blue)">4500087190</td><td class="r"><span class="amt">$52,200</span></td><td class="m">4</td><td>Price +6.2%</td><td><span class="ow" style="background:var(--blueBg);color:var(--blue)">→ Buyer</span></td></tr>
+<tr class="parked"><td><span class="st parked"><span class="st-dot parked"></span>PARKED</span></td><td><span class="park-doc">P-5105002352</span></td><td><div class="vn">L3Harris</div><div class="vn-sub">2 lines · qty mismatch</div></td><td class="m" style="font-weight:600">INV-2026-4505</td><td class="m" style="color:var(--blue)">4500087205</td><td class="r"><span class="amt">$18,600</span></td><td class="m">2</td><td>Qty: 24 vs GR 18</td><td><span class="ow" style="background:var(--amberBg);color:var(--amber)">🏭 GR/Ops</span></td></tr>
+<tr class="parked"><td><span class="st parked"><span class="st-dot parked"></span>PARKED</span></td><td><span class="park-doc">P-5105002353</span></td><td><div class="vn">Kaman Aerospace</div><div class="vn-sub">1 line · exp vs cap</div></td><td class="m" style="font-weight:600">INV-2026-4513</td><td class="m" style="color:var(--t4)">— Non-PO</td><td class="r"><span class="amt">$8,400</span></td><td class="m">1</td><td>Expense vs Capital</td><td><span class="ow" style="background:var(--purpleBg);color:var(--purple)">↑ Controller</span></td></tr>
+</tbody></table></div>
+</div>
+
+<!-- ═══ FAILED ═══ -->
+<div class="mon-p" id="P-failed">
+<div class="fail-card">
+<div class="fail-hdr">
+    <div class="fail-title">✗ Amphenol Aerospace INV-2026-4510 · 15 lines · $67,200</div>
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--red)">Failed 9:12 AM</span>
+</div>
+<div class="fail-body">
+    <div class="fail-err">SAP Error F5 201 — Company code 1000: Posting period 002 2026 is not open</div>
+    <div class="fail-human">
+        <strong>⚠ Translation:</strong> Posting period February 2026 has not been opened in SAP (transaction OB52). This is a <strong>system configuration issue</strong>, not an invoice error. All 15 lines matched perfectly with GR 5000441290 and PO 4500087210.
+    </div>
+    <div class="fail-ai">
+        <strong>🤖 AI Assessment:</strong> 3rd invoice blocked by period closure today. Finance team likely needs to run period-open job. Similar delay occurred Feb 1 (resolved by 10:00 AM). Expected resolution: within 2 hours. Invoice will post with zero changes once period opens.
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px">
+        <div style="padding:6px;background:var(--s2);border-radius:5px;text-align:center"><div style="font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--t4);text-transform:uppercase;font-weight:600">PO</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--blue)">4500087210</div></div>
+        <div style="padding:6px;background:var(--s2);border-radius:5px;text-align:center"><div style="font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--t4);text-transform:uppercase;font-weight:600">GR</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--green)">5000441290</div></div>
+        <div style="padding:6px;background:var(--s2);border-radius:5px;text-align:center"><div style="font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--t4);text-transform:uppercase;font-weight:600">Match</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--green)">15/15 ✓</div></div>
+    </div>
+    <div class="fail-acts">
+        <div class="fail-btn primary" onclick="toast('⏸ Held — auto-retry when period opens')">⏸ Hold + Auto-Retry</div>
+        <div class="fail-btn" onclick="toast('📧 Finance team notified')">Notify Finance</div>
+        <div class="fail-btn" onclick="toast('↑ Escalated')">Escalate</div>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- ═══ ACTIVITY LOG ═══ -->
+<div class="mon-p" id="P-log">
+<div class="log-wrap">
+<div class="log-entry"><div class="log-time">9:15 AM</div><div class="log-type queued">QUEUED</div><div class="log-msg"><strong>BAE Systems</strong> 38 of 42 lines submitted via BAPI_INCOMINGINVOICE_CREATE <span class="log-val">$515,600</span></div></div>
+<div class="log-entry"><div class="log-time">9:14 AM</div><div class="log-type queued">QUEUED</div><div class="log-msg"><strong>Leonardo DRS</strong> 86 of 98 lines submitted via BAPI <span class="log-val">$1,111,000</span></div></div>
+<div class="log-entry"><div class="log-time">9:12 AM</div><div class="log-type failed">FAILED</div><div class="log-msg"><strong>Amphenol</strong> F5 201 — period not open. 15/15 matched. Queued for auto-retry. <span class="log-val">$67,200</span></div></div>
+<div class="log-entry"><div class="log-time">9:04 AM</div><div class="log-type posted">POSTED</div><div class="log-msg"><strong>Honeywell</strong> 3 parked lines unparked — GR 5000441310 posted 7:58 AM → <span class="log-doc">Doc 5105002346</span> <span class="log-val">$94,200</span></div></div>
+<div class="log-entry"><div class="log-time">8:48 AM</div><div class="log-type queued">SUBMITTED</div><div class="log-msg"><strong>Amphenol</strong> 15 lines submitted via BAPI_INCOMINGINVOICE_CREATE</div></div>
+<div class="log-entry"><div class="log-time">8:45 AM</div><div class="log-type parked">PARKED</div><div class="log-msg"><strong>BAE Systems</strong> 4 variance lines parked, routed to buyer Dupont → <span class="log-doc">P-5105002351</span> <span class="log-val">$52,200</span></div></div>
+<div class="log-entry"><div class="log-time">8:40 AM</div><div class="log-type auto">AUTO-POST</div><div class="log-msg"><strong>Cintas</strong> Non-PO, AI coded GL 62100 / CC 4200. Trust ≥95% → <span class="log-doc">Doc 5105002345</span> <span class="log-val">$1,850</span></div></div>
+<div class="log-entry"><div class="log-time">8:35 AM</div><div class="log-type posted">POSTED</div><div class="log-msg"><strong>Mercury Systems</strong> 24 lines, 0.2% KONV within tolerance → <span class="log-doc">Doc 5105002344</span> <span class="log-val">$342,600</span></div></div>
+<div class="log-entry"><div class="log-time">8:22 AM</div><div class="log-type posted">POSTED</div><div class="log-msg"><strong>Curtiss-Wright</strong> 5 lines exact match → <span class="log-doc">Doc 5105002343</span> <span class="log-val">$45,600</span></div></div>
+<div class="log-entry"><div class="log-time">8:18 AM</div><div class="log-type auto">AUTO-POST</div><div class="log-msg"><strong>TE Connectivity</strong> 3 lines, trust 99.1% → <span class="log-doc">Doc 5105002342</span> <span class="log-val">$18,200</span></div></div>
+<div class="log-entry"><div class="log-time">8:15 AM</div><div class="log-type auto">AUTO-POST</div><div class="log-msg"><strong>Safran</strong> 6 lines, trust 98.2% → <span class="log-doc">Doc 5105002341</span> <span class="log-val">$128,400</span></div></div>
+<div class="log-entry"><div class="log-time">7:58 AM</div><div class="log-type gr">GR DETECTED</div><div class="log-msg">Movement 101 for <strong>Honeywell</strong> PO 4500087160 → 3 parked lines now eligible for posting</div></div>
+<div class="log-entry"><div class="log-time">6:00 AM</div><div class="log-type ingest">INGESTION</div><div class="log-msg"><strong>61 invoices</strong> received (34 email, 18 EDI, 9 portal). OCR + AI verification started.</div></div>
+</div>
+</div>
+
+<!-- ═══ ERROR GUIDE ═══ -->
+<div class="mon-p" id="P-errors">
+<div style="padding:12px 20px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--t4);font-weight:600;text-transform:uppercase;letter-spacing:1px">SAP Error Translation Guide — Common BAPI Failures</div>
+<div class="err-grid">
+<div class="err-card"><div class="err-code">F5 201 — Period Not Open</div><div class="err-sap">Company code XXXX: Posting period MMM YYYY is not open</div><div class="err-human">Fiscal period hasn't been opened in OB52. System issue, not invoice error.</div><div class="err-action">→ Hold + Auto-retry · Notify Finance</div></div>
+<div class="err-card"><div class="err-code">M8889 — Tolerance Exceeded</div><div class="err-sap">Variance exceeds tolerance limits for company code</div><div class="err-human">Invoice amount exceeds configured tolerance vs PO/GR.</div><div class="err-action">→ Re-check in Workbench · Route to Buyer if PO wrong</div></div>
+<div class="err-card"><div class="err-code">FK087 — Vendor Blocked</div><div class="err-sap">Payment block is set for vendor XXXXXXX</div><div class="err-human">Vendor has an active payment block in master data.</div><div class="err-action">→ Escalate to AP Manager · Do NOT retry</div></div>
+<div class="err-card"><div class="err-code">M8147 — GR Quantity Differs</div><div class="err-sap">GR quantity has been changed since verification</div><div class="err-human">Someone modified the GR after you reviewed the invoice.</div><div class="err-action">→ Re-open in Workbench · AI will re-verify</div></div>
+<div class="err-card"><div class="err-code">M8045 — Document Locked</div><div class="err-sap">Document is locked by another user</div><div class="err-human">Another SAP session has the document open.</div><div class="err-action">→ Auto-retry in 60s · Usually self-resolves</div></div>
+<div class="err-card"><div class="err-code">M8460 — Already Entered</div><div class="err-sap">Invoice XXXXXXX already entered for vendor</div><div class="err-human">This exact invoice reference was already posted.</div><div class="err-action">→ Reject as duplicate · Log for audit</div></div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function monT(t,el){document.querySelectorAll('.mon-tab').forEach(e=>e.classList.remove('on'));document.querySelectorAll('.mon-p').forEach(e=>e.classList.remove('on'));el.classList.add('on');document.getElementById('P-'+t).classList.add('on')}
+function toggleMatch(id,row){
+    const el=document.getElementById(id);
+    if(!el)return;
+    // Hide all other match details
+    document.querySelectorAll('.match-detail').forEach(m=>{if(m.id!==id)m.style.display='none'});
+    el.style.display=el.style.display==='none'?'block':'none';
+    // Insert after the clicked row
+    if(el.style.display==='block'){row.parentElement.insertBefore(el.parentElement||el,row.nextSibling)}
+}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+</script>
+</body>
+</html>
