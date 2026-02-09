@@ -48,6 +48,7 @@ export const workbenchData = {
     amount: '$128,400.00',
     channel: 'edi',
     isNonPO: false,
+    editAll: true,
     evidence: [
       { label: 'Vendor #', value: '0000198450', ok: true },
       { label: 'Vendor', value: 'Safran Electronics', ok: true },
@@ -93,6 +94,7 @@ export const workbenchData = {
     amount: '$573,300.00',
     channel: 'email',
     isNonPO: false,
+    editAll: true,
     evidence: [
       { label: 'Vendor #', value: '0000201340', ok: true },
       { label: 'Currency', value: 'USD', ok: true },
@@ -132,7 +134,7 @@ export const workbenchData = {
     approval: { needed: true, reason: 'Price variance >5% on 4 PO lines + 2 unplanned GL lines.', who: 'J.M. Dupont (Buyer) + P. Moreau (CC Owner)' },
     submit: { label: 'Submit 38 PO + 1 GL for Approval', variant: 'approval' },
     actions: [
-      { label: 'Route 4 Price → Buyer Dupont', variant: 'buyer', icon: 'route' },
+      { label: 'Route 4 Price → Buyer Dupont', variant: 'buyer', icon: 'route', location: '→ Procurement' },
     ],
     reasonOptions: null,
     aiRec: '38 PO clean + 1 GL freight ok. 4 price variance → buyer. 1 GL handling at 82% → CC approval.',
@@ -145,6 +147,7 @@ export const workbenchData = {
     amount: '$91,800.00',
     channel: 'email',
     isNonPO: false,
+    editAll: true,
     evidence: [
       { label: 'Vendor #', value: '0000199870', ok: true },
       { label: 'Currency', value: 'USD', ok: true },
@@ -181,8 +184,8 @@ export const workbenchData = {
     approval: { needed: false, reason: '6 PO matched. 2 GR pending. 1 GL freight AI-coded 94%.' },
     submit: { label: 'Submit 6 PO + 1 GL to SAP', variant: 'go' },
     actions: [
-      { label: 'Send 2 → GR/Ops Bordeaux', variant: 'gr', icon: 'gr' },
-      { label: 'Hold — AI Watch GR', variant: 'hold', icon: 'hold' },
+      { label: 'Send 2 → GR/Ops Bordeaux', variant: 'gr', icon: 'gr', location: '→ Warehouse' },
+      { label: 'Hold — AI Watch GR', variant: 'hold', icon: 'hold', location: '→ AI Monitor' },
     ],
     reasonOptions: null,
     aiRec: 'Post 6 PO ($62,400) + 1 GL freight ($2,500). Route 2 qty mismatch — separate BOL-93101.',
@@ -195,6 +198,7 @@ export const workbenchData = {
     amount: '$18,200.00',
     channel: 'portal',
     isNonPO: false,
+    editAll: true,
     evidence: [
       { label: 'Vendor #', value: '0000187600', ok: true },
       { label: 'Currency', value: 'USD', ok: true },
@@ -232,6 +236,7 @@ export const workbenchData = {
     amount: '$194,800.00',
     channel: 'email',
     isNonPO: false,
+    editAll: false,
     evidence: [
       { label: 'Vendor #', value: '0000200100', ok: true },
       { label: 'DUPLICATE OF', value: 'Doc 5105002320', ok: false },
@@ -256,8 +261,8 @@ export const workbenchData = {
     approval: { needed: false, reason: 'Duplicate — rejection.' },
     submit: { label: '— Cannot Post', variant: 'disabled' },
     actions: [
-      { label: 'Reject Duplicate', variant: 'reject', icon: 'reject' },
-      { label: 'Escalate', variant: 'escalate', icon: 'escalate' },
+      { label: 'Reject Duplicate', variant: 'reject', icon: 'reject', location: '→ Audit' },
+      { label: 'Escalate', variant: 'escalate', icon: 'escalate', location: '→ AP Lead' },
     ],
     reasonOptions: ['Duplicate', 'Vendor error', 'Other'],
     aiRec: 'Confirmed duplicate. Reject.',
@@ -270,6 +275,7 @@ export const workbenchData = {
     amount: '$86,400.00',
     channel: 'portal',
     isNonPO: false,
+    editAll: false,
     evidence: [
       { label: 'Vendor #', value: '0000208500', ok: true },
       { label: 'Bill To', value: 'Thales AVS (2000)', ok: false },
@@ -294,7 +300,7 @@ export const workbenchData = {
     approval: { needed: false, reason: 'Return — no approval.' },
     submit: { label: '— Cannot Post', variant: 'disabled' },
     actions: [
-      { label: 'Return to Supplier', variant: 'supplier', icon: 'supplier' },
+      { label: 'Return to Supplier', variant: 'supplier', icon: 'supplier', location: '→ Vendor' },
     ],
     reasonOptions: ['Wrong entity', 'Other'],
     aiRec: 'Wrong entity. Reissue to DSI.',
@@ -307,6 +313,7 @@ export const workbenchData = {
     amount: '$1,850.00',
     channel: 'email',
     isNonPO: true,
+    editAll: true,
     evidence: [
       { label: 'Vendor #', value: '0000142800', ok: true },
       { label: 'Vendor', value: 'Cintas', ok: true },
@@ -341,6 +348,7 @@ export const workbenchData = {
     amount: '$3,240.00',
     channel: 'email',
     isNonPO: true,
+    editAll: true,
     evidence: [
       { label: 'Vendor #', value: '0000156200', ok: true },
       { label: 'Vendor', value: 'Grainger', ok: true },
@@ -379,6 +387,7 @@ export const workbenchData = {
     amount: '$22,400.00',
     channel: 'portal',
     isNonPO: true,
+    editAll: true,
     evidence: [
       { label: 'Vendor #', value: '0000175400', ok: true },
       { label: 'Vendor', value: 'Kaman Aerospace', ok: true },

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Box, Typography, Chip, Avatar, Stack, Button, Breadcrumbs, Link, Paper,
-  LinearProgress, Collapse, Tooltip, IconButton,
+  LinearProgress, Collapse, Tooltip, IconButton, Select, MenuItem, Snackbar, Alert,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
@@ -35,6 +35,10 @@ import {
   ZoomOut as ZoomOutIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
+  Add as AddIcon,
+  Remove as RemoveIcon,
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon,
 } from '@mui/icons-material';
 import { MODULE_COLOR } from '../../config/brandColors';
 import { MODULE_NAVY, NAVY_BLUE, apTheme } from './apTheme';
@@ -95,6 +99,8 @@ const MantrixAPLanding = ({ onBack, darkMode = false }) => {
   const [myWorkSubTab, setMyWorkSubTab] = useState('flight');
   const [expandedThreads, setExpandedThreads] = useState({});
   const [analysisOpen, setAnalysisOpen] = useState(true);
+  const [leftPanelOpen, setLeftPanelOpen] = useState(true);
+  const [toast, setToast] = useState({ open: false, message: '' });
 
   const bgColor = darkMode ? '#0d1117' : '#f8fafc';
   const cardBg = darkMode ? '#161b22' : '#fff';
@@ -348,7 +354,51 @@ const MantrixAPLanding = ({ onBack, darkMode = false }) => {
     const chColor = channelColors[wb.channel] || '#64748b';
     const chLabel = wb.channel === 'edi' ? 'EDI / IDOC' : wb.channel === 'portal' ? 'SUPPLIER PORTAL' : 'EMAIL / OCR';
 
-    // Build DataGrid columns — reduced from 16 to 9
+    // Editable input style
+    const editInputSx = {
+      fontSize: '0.75rem', border: `1px solid ${alpha('#059669', 0.3)}`, borderRadius: 3,
+      bgcolor: alpha('#059669', 0.04), color: '#059669', padding: '2px 4px',
+      outline: 'none', width: '100%', fontFamily: 'inherit',
+    };
+    // MUI Select styled to match teal editable theme
+    const muiSelectSx = {
+      fontSize: '0.75rem', fontWeight: 600, color: '#059669', fontFamily: 'inherit',
+      height: 24, minWidth: 0, width: '100%',
+      bgcolor: alpha('#059669', 0.04),
+      border: `1px solid ${alpha('#059669', 0.3)}`, borderRadius: '3px',
+      '& .MuiSelect-select': { py: '2px', px: '4px', pr: '20px !important', fontSize: '0.75rem' },
+      '& .MuiSelect-icon': { color: alpha('#059669', 0.6), fontSize: 16, right: 1 },
+      '&:hover': { borderColor: alpha('#059669', 0.5) },
+      '& fieldset': { border: 'none' },
+    };
+    const muiMenuProps = {
+      PaperProps: {
+        sx: {
+          bgcolor: cardBg, border: `1px solid ${alpha('#059669', 0.2)}`, borderRadius: '6px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)', mt: 0.5,
+          '& .MuiMenuItem-root': {
+            fontSize: '0.75rem', color: '#059669', fontWeight: 500, py: 0.5, px: 1.2, minHeight: 28,
+            '&:hover': { bgcolor: alpha('#059669', 0.06) },
+            '&.Mui-selected': { bgcolor: alpha('#059669', 0.1), fontWeight: 700, '&:hover': { bgcolor: alpha('#059669', 0.14) } },
+          },
+        },
+      },
+    };
+    const canEdit = wb.editAll;
+
+    // Helper: editable cell renderer
+    const editableInput = (value) => canEdit
+      ? <Box component="input" defaultValue={value} sx={editInputSx} />
+      : <Typography sx={{ fontSize: '0.8rem', color: textColor }}>{value}</Typography>;
+
+    // Determine line-type summary for toolbar label
+    const hasPO = wb.lines.some(l => l.lineType === 'po');
+    const hasGL = wb.lines.some(l => l.lineType === 'gl');
+    const hasBOL = wb.lines.some(l => l.bol && l.bol !== '—');
+    const lineTypeLabel = hasPO && hasGL ? 'Mixed PO + GL' : hasPO ? 'PO Lines' : 'GL Lines';
+    const bolLabel = hasBOL ? ' · BOL / Delivery' : '';
+
+    // Build DataGrid columns — full 15 columns
     const columns = [
       { field: 'idx', headerName: '#', width: 36, sortable: false, renderCell: (p) => <Typography sx={{ fontSize: '0.8rem', color: textSecondary }}>{p.value}</Typography> },
       { field: 'lineType', headerName: 'Type', width: 60, sortable: false, renderCell: (p) => (
@@ -358,15 +408,47 @@ const MantrixAPLanding = ({ onBack, darkMode = false }) => {
           border: `1px solid ${p.value === 'gl' ? alpha('#7c3aed', 0.2) : alpha('#2563eb', 0.2)}`,
         }} />
       )},
-      { field: 'desc', headerName: 'Description', flex: 1, minWidth: 160, sortable: false },
-      { field: 'col2', headerName: 'PO# / GL', width: 100, sortable: false, renderCell: (p) => (
-        <Typography sx={{ fontSize: '0.8rem', color: p.row.lineType === 'gl' ? '#7c3aed' : textColor }}>{p.value}</Typography>
-      )},
-      { field: 'qty', headerName: 'Qty', width: 50, type: 'number', sortable: false },
-      { field: 'price', headerName: 'Price', width: 90, sortable: false, align: 'right', headerAlign: 'right' },
-      { field: 'amount', headerName: 'Amount', width: 100, sortable: false, align: 'right', headerAlign: 'right', renderCell: (p) => (
-        <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: textColor }}>{p.value}</Typography>
-      )},
+      { field: 'desc', headerName: 'Description', flex: 1, minWidth: 160, sortable: false, renderCell: (p) => editableInput(p.value) },
+      { field: 'col2', headerName: 'PO# / GL', width: 100, sortable: false, renderCell: (p) => canEdit
+        ? <Box component="input" defaultValue={p.value} sx={editInputSx} />
+        : <Typography sx={{ fontSize: '0.8rem', color: p.row.lineType === 'gl' ? '#7c3aed' : textColor }}>{p.value}</Typography>
+      },
+      { field: 'col3', headerName: 'PO Itm / Cost Ctr', width: 80, sortable: false, renderCell: (p) => {
+        // PO lines: read-only always; GL lines: editable if canEdit
+        if (p.row.lineType === 'po' || !canEdit) return <Typography sx={{ fontSize: '0.8rem', color: textSecondary }}>{p.value}</Typography>;
+        return <Box component="input" defaultValue={p.value} sx={editInputSx} />;
+      }},
+      { field: 'col4', headerName: 'Material / Profit Ctr', width: 95, sortable: false, renderCell: (p) => {
+        if (!canEdit) return <Typography sx={{ fontSize: '0.8rem', color: textSecondary }}>{p.value}</Typography>;
+        // PO lines: dropdown select; GL lines: editable input
+        if (p.row.lineType === 'po') {
+          return (
+            <Select defaultValue={p.value} size="small" variant="outlined" MenuProps={muiMenuProps} sx={muiSelectSx}>
+              {[p.value, 'ALT-001', 'ALT-002'].map((opt) => (
+                <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+              ))}
+            </Select>
+          );
+        }
+        return <Box component="input" defaultValue={p.value} sx={editInputSx} />;
+      }},
+      { field: 'qty', headerName: 'Qty', width: 50, type: 'number', sortable: false, renderCell: (p) => editableInput(p.value) },
+      { field: 'uom', headerName: 'UoM', width: 45, sortable: false, renderCell: (p) => editableInput(p.value) },
+      { field: 'price', headerName: 'Price', width: 90, sortable: false, align: 'right', headerAlign: 'right', renderCell: (p) => editableInput(p.value) },
+      { field: 'amount', headerName: 'Amount', width: 100, sortable: false, align: 'right', headerAlign: 'right', renderCell: (p) => canEdit
+        ? <Box component="input" defaultValue={p.value} sx={editInputSx} />
+        : <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: textColor }}>{p.value}</Typography>
+      },
+      { field: 'tax', headerName: 'Tax', width: 50, sortable: false, renderCell: (p) => canEdit
+        ? (
+          <Select defaultValue={p.value} size="small" variant="outlined" MenuProps={muiMenuProps} sx={muiSelectSx}>
+            {['V0', 'V1'].map((opt) => (
+              <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+            ))}
+          </Select>
+        )
+        : <Typography sx={{ fontSize: '0.8rem', color: textSecondary }}>{p.value}</Typography>
+      },
       { field: 'grOrConf', headerName: 'GR / Conf.', width: 90, sortable: false, renderCell: (p) => {
         const isGL = p.row.lineType === 'gl';
         const val = p.value;
@@ -386,6 +468,8 @@ const MantrixAPLanding = ({ onBack, darkMode = false }) => {
           : apTheme.chips.lineMatch.exception;
         return <Chip label={p.value} size="small" sx={{ height: 20, fontSize: '0.55rem', ...chipStyle }} />;
       }},
+      { field: 'bol', headerName: 'BOL #', width: 75, sortable: false, renderCell: (p) => editableInput(p.value) },
+      { field: 'delNote', headerName: 'Del. Note', width: 80, sortable: false, renderCell: (p) => editableInput(p.value) },
     ];
 
     const rows = wb.lines.map((line, i) => ({ id: i, idx: i + 1, ...line }));
@@ -485,6 +569,15 @@ const MantrixAPLanding = ({ onBack, darkMode = false }) => {
                   '& .MuiButton-startIcon': { mr: 0.3 },
                 }}>
                   {act.label}
+                  {act.location && (
+                    <Box component="span" sx={{
+                      ml: 0.6, fontSize: '0.55rem', fontWeight: 700, px: 0.5, py: 0.1,
+                      borderRadius: 0.8, bgcolor: alpha(style.color, 0.1),
+                      color: style.color, letterSpacing: 0.3,
+                    }}>
+                      {act.location}
+                    </Box>
+                  )}
                 </Button>
               );
             })}
@@ -511,10 +604,16 @@ const MantrixAPLanding = ({ onBack, darkMode = false }) => {
         </Box>
 
         {/* ── MAIN: 2-column — Left (PDF + Extracted Data) | Right (Headers + Grid + Analysis) ── */}
-        <Box sx={{ display: 'grid', gridTemplateColumns: '340px 1fr', gap: 0, flex: 1, overflow: 'hidden', border: `1px solid ${borderColor}`, borderRadius: '0 0 8px 8px' }}>
+        <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden', border: `1px solid ${borderColor}`, borderRadius: '0 0 8px 8px' }}>
 
-          {/* LEFT — PDF Viewer + Extracted Data */}
-          <Box sx={{ bgcolor: cardBg, borderRight: `1px solid ${borderColor}`, display: 'flex', flexDirection: 'column', overflowY: 'auto', '&::-webkit-scrollbar': { width: 4 }, '&::-webkit-scrollbar-thumb': { bgcolor: alpha(MODULE_NAVY, 0.15), borderRadius: 2 } }}>
+          {/* LEFT — PDF Viewer + Extracted Data (collapsible) */}
+          <Box sx={{
+            width: leftPanelOpen ? 340 : 0, minWidth: leftPanelOpen ? 340 : 0,
+            transition: 'width 0.2s ease, min-width 0.2s ease',
+            overflow: 'hidden', position: 'relative',
+            bgcolor: cardBg, borderRight: leftPanelOpen ? `1px solid ${borderColor}` : 'none',
+          }}>
+            <Box sx={{ width: 340, display: 'flex', flexDirection: 'column', overflowY: 'auto', height: '100%', '&::-webkit-scrollbar': { width: 4 }, '&::-webkit-scrollbar-thumb': { bgcolor: alpha(MODULE_NAVY, 0.15), borderRadius: 2 } }}>
             {/* Channel badge */}
             <Box sx={{ textAlign: 'center', py: 0.6, borderBottom: `1px solid ${alpha(borderColor, 0.5)}` }}>
               <Chip icon={channelIcons[wb.channel]} label={chLabel} size="small" sx={{ height: 22, fontSize: '0.6rem', fontWeight: 600, bgcolor: alpha(chColor, 0.08), color: chColor, border: `1px solid ${alpha(chColor, 0.2)}`, '& .MuiChip-icon': { color: chColor, fontSize: 14 } }} />
@@ -608,20 +707,84 @@ const MantrixAPLanding = ({ onBack, darkMode = false }) => {
                 ))}
               </Box>
             </Box>
+            </Box>
+          </Box>
+
+          {/* Toggle button — collapse/expand left panel */}
+          <Box
+            onClick={() => setLeftPanelOpen(!leftPanelOpen)}
+            sx={{
+              width: 20, minWidth: 20, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', bgcolor: surfaceBg, borderRight: `1px solid ${borderColor}`,
+              '&:hover': { bgcolor: alpha(MODULE_NAVY, 0.06) },
+              transition: 'background 0.15s',
+            }}
+          >
+            {leftPanelOpen
+              ? <ChevronLeftIcon sx={{ fontSize: 16, color: textSecondary }} />
+              : <ChevronRightIcon sx={{ fontSize: 16, color: textSecondary }} />
+            }
           </Box>
 
           {/* RIGHT — Headers + DataGrid + Analysis & Posting */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: cardBg }}>
-            {/* Header fields — compact inline row */}
-            <Typography sx={{ px: 1.5, py: 0.5, borderBottom: `1px solid ${borderColor}`, bgcolor: darkMode ? 'rgba(0,0,0,0.08)' : alpha(MODULE_NAVY, 0.02), fontSize: '0.75rem', lineHeight: 1.8 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: cardBg, flex: 1 }}>
+            {/* Header fields — editable inline row */}
+            <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 0.5, px: 1.5, py: 0.5, borderBottom: `1px solid ${borderColor}`, bgcolor: darkMode ? 'rgba(0,0,0,0.08)' : alpha(MODULE_NAVY, 0.02) }}>
               {wb.headerFields.map((hf, i) => (
                 <React.Fragment key={i}>
-                  {i > 0 && <Typography component="span" sx={{ mx: 0.8, color: alpha(borderColor, 0.8), fontSize: '0.7rem' }}>|</Typography>}
-                  <Typography component="span" sx={{ fontSize: '0.6rem', color: textSecondary, textTransform: 'uppercase', letterSpacing: 0.3, fontWeight: 600, mr: 0.4 }}>{hf.label}</Typography>
-                  <Typography component="span" sx={{ fontSize: '0.75rem', fontWeight: 600, color: hf.locked ? textSecondary : textColor }}>{hf.value}</Typography>
+                  {i > 0 && <Typography component="span" sx={{ mx: 0.3, color: alpha(borderColor, 0.8), fontSize: '0.7rem' }}>|</Typography>}
+                  <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.4 }}>
+                    <Typography component="span" sx={{ fontSize: '0.6rem', color: textSecondary, textTransform: 'uppercase', letterSpacing: 0.3, fontWeight: 600 }}>{hf.label}</Typography>
+                    <Box
+                      component="input"
+                      defaultValue={hf.value}
+                      readOnly={!!hf.locked}
+                      sx={{
+                        fontSize: '0.75rem', fontWeight: 600, fontFamily: 'inherit',
+                        border: hf.locked ? `1px solid ${alpha(borderColor, 0.5)}` : `1px solid ${alpha('#059669', 0.3)}`,
+                        borderRadius: 1, padding: '1px 6px', outline: 'none',
+                        bgcolor: hf.locked ? alpha(borderColor, 0.08) : alpha('#059669', 0.04),
+                        color: hf.locked ? textSecondary : textColor,
+                        width: hf.value.length > 12 ? 120 : hf.value.length > 8 ? 95 : 75,
+                        cursor: hf.locked ? 'default' : 'text',
+                      }}
+                    />
+                  </Box>
                 </React.Fragment>
               ))}
-            </Typography>
+            </Box>
+
+            {/* Verdict chips row */}
+            {wb.verdicts && wb.verdicts.length > 0 && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, px: 1.5, py: 0.4, borderBottom: `1px solid ${alpha(borderColor, 0.5)}`, bgcolor: alpha(surfaceBg, 0.5) }}>
+                {wb.verdicts.map((v, i) => {
+                  let bg, fg;
+                  if (v.status === 'ok') { bg = alpha('#059669', 0.08); fg = '#059669'; }
+                  else if (v.status === 'warning') { bg = alpha('#d97706', 0.08); fg = '#d97706'; }
+                  else if (v.status === 'info') { bg = alpha('#7c3aed', 0.08); fg = '#7c3aed'; }
+                  else { bg = alpha('#dc2626', 0.08); fg = '#dc2626'; }
+                  return <Chip key={i} label={v.text} size="small" sx={{ height: 22, fontSize: '0.6rem', fontWeight: 500, bgcolor: bg, color: fg, border: `1px solid ${alpha(fg, 0.15)}` }} />;
+                })}
+              </Box>
+            )}
+
+            {/* Grid toolbar */}
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 1.5, py: 0.4, borderBottom: `1px solid ${alpha(borderColor, 0.5)}` }}>
+              <Typography sx={{ fontSize: '0.7rem', color: textSecondary, fontWeight: 600 }}>
+                Invoice Lines — {lineTypeLabel}{bolLabel}
+              </Typography>
+              <Stack direction="row" spacing={0.5}>
+                <Button size="small" onClick={() => setToast({ open: true, message: 'New PO line added to grid' })} startIcon={<AddIcon sx={{ fontSize: 12 }} />} sx={{ fontSize: '0.6rem', textTransform: 'none', fontWeight: 600, color: '#059669', borderRadius: 1, px: 0.8, py: 0.15, minWidth: 0, '&:hover': { bgcolor: alpha('#059669', 0.06) } }}>
+                  PO Line
+                </Button>
+                <Button size="small" onClick={() => setToast({ open: true, message: 'New GL line added to grid' })} startIcon={<AddIcon sx={{ fontSize: 12 }} />} sx={{ fontSize: '0.6rem', textTransform: 'none', fontWeight: 600, color: '#7c3aed', borderRadius: 1, px: 0.8, py: 0.15, minWidth: 0, '&:hover': { bgcolor: alpha('#7c3aed', 0.06) } }}>
+                  GL Line
+                </Button>
+                <Button size="small" onClick={() => setToast({ open: true, message: 'Select a line to remove' })} startIcon={<RemoveIcon sx={{ fontSize: 12 }} />} sx={{ fontSize: '0.6rem', textTransform: 'none', fontWeight: 600, color: '#dc2626', borderRadius: 1, px: 0.8, py: 0.15, minWidth: 0, '&:hover': { bgcolor: alpha('#dc2626', 0.06) } }}>
+                  Remove
+                </Button>
+              </Stack>
+            </Box>
 
             {/* DataGrid */}
             <Box sx={{ flex: 1, overflow: 'auto' }}>
@@ -1035,6 +1198,18 @@ const MantrixAPLanding = ({ onBack, darkMode = false }) => {
       {activeTab === 'inbox' && renderInbox()}
       {activeTab === 'workbench' && renderWorkbench()}
       {activeTab === 'mywork' && renderMyWork()}
+
+      {/* Toast notifications */}
+      <Snackbar
+        open={toast.open}
+        autoHideDuration={2000}
+        onClose={() => setToast({ open: false, message: '' })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setToast({ open: false, message: '' })} severity="info" variant="filled" sx={{ fontSize: '0.8rem', bgcolor: MODULE_NAVY }}>
+          {toast.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
