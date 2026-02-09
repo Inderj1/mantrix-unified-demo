@@ -214,6 +214,70 @@ export const apTheme = {
       unmatched: { bgcolor: alpha('#64748b', 0.12), color: '#64748b', fontWeight: 600 },
       unplanned: { bgcolor: alpha('#7c3aed', 0.12), color: '#7c3aed', fontWeight: 600 },
     },
+    // V2 — DP Document lifecycle status chips
+    dpDocStatus: {
+      ingested:   { bgcolor: alpha('#64748b', 0.12), color: '#475569', border: '1px solid', borderColor: alpha('#64748b', 0.2), fontWeight: 600 },
+      extracted:  { bgcolor: alpha(NAVY_BLUE, 0.12), color: '#1565c0', border: '1px solid', borderColor: alpha('#1565c0', 0.2), fontWeight: 600 },
+      classified: { bgcolor: alpha('#7c3aed', 0.12), color: '#7c3aed', border: '1px solid', borderColor: alpha('#7c3aed', 0.2), fontWeight: 600 },
+      matched:    { bgcolor: alpha('#0891b2', 0.12), color: '#0891b2', border: '1px solid', borderColor: alpha('#0891b2', 0.2), fontWeight: 600 },
+      ready:      { bgcolor: alpha('#10b981', 0.12), color: '#059669', border: '1px solid', borderColor: alpha('#059669', 0.2), fontWeight: 600 },
+      posted:     { bgcolor: alpha('#059669', 0.15), color: '#047857', border: '1px solid', borderColor: alpha('#047857', 0.2), fontWeight: 600 },
+    },
+    // My Work status chips
+    myWorkStatus: {
+      ready:     { bgcolor: alpha('#10b981', 0.12), color: '#059669', fontWeight: 600 },
+      hold:      { bgcolor: alpha('#64748b', 0.12), color: '#475569', fontWeight: 600 },
+      supplier:  { bgcolor: alpha('#ea580c', 0.12), color: '#ea580c', fontWeight: 600 },
+      buyer:     { bgcolor: alpha('#2563eb', 0.12), color: '#2563eb', fontWeight: 600 },
+      gr:        { bgcolor: alpha('#d97706', 0.12), color: '#d97706', fontWeight: 600 },
+      escalated: { bgcolor: alpha('#7c3aed', 0.12), color: '#7c3aed', fontWeight: 600 },
+      approval:  { bgcolor: alpha('#d97706', 0.12), color: '#d97706', fontWeight: 600 },
+    },
+    // V2 — Autopilot status chips
+    autopilot: {
+      'auto-approved':  { bgcolor: alpha('#10b981', 0.12), color: '#059669', border: '1px solid', borderColor: alpha('#059669', 0.2), fontWeight: 600 },
+      'human-override': { bgcolor: alpha('#f59e0b', 0.12), color: '#d97706', border: '1px solid', borderColor: alpha('#d97706', 0.2), fontWeight: 600 },
+      'pending':        { bgcolor: alpha('#64748b', 0.12), color: '#475569', border: '1px solid', borderColor: alpha('#64748b', 0.2), fontWeight: 600 },
+      'eligible':       { bgcolor: alpha(NAVY_BLUE, 0.12), color: '#1565c0', border: '1px solid', borderColor: alpha('#1565c0', 0.2), fontWeight: 600 },
+    },
+    // V2 — Ingestion channel chips
+    channel: {
+      email:  { bgcolor: alpha(NAVY_BLUE, 0.12), color: '#1565c0', fontWeight: 600 },
+      scan:   { bgcolor: alpha('#7c3aed', 0.12), color: '#7c3aed', fontWeight: 600 },
+      edi:    { bgcolor: alpha('#059669', 0.12), color: '#059669', fontWeight: 600 },
+      portal: { bgcolor: alpha('#d97706', 0.12), color: '#d97706', fontWeight: 600 },
+    },
+    // V2 — Exception severity chips
+    exceptionSeverity: {
+      high:   { bgcolor: alpha('#ef4444', 0.12), color: '#dc2626', border: '1px solid', borderColor: alpha('#dc2626', 0.2), fontWeight: 700 },
+      medium: { bgcolor: alpha('#f59e0b', 0.12), color: '#d97706', border: '1px solid', borderColor: alpha('#d97706', 0.2), fontWeight: 700 },
+      low:    { bgcolor: alpha('#64748b', 0.12), color: '#475569', border: '1px solid', borderColor: alpha('#64748b', 0.2), fontWeight: 700 },
+    },
+    // V2 — Financial impact chips
+    financialImpact: {
+      high:   { bgcolor: alpha('#ef4444', 0.1), color: '#dc2626', fontWeight: 600 },
+      medium: { bgcolor: alpha('#f59e0b', 0.1), color: '#d97706', fontWeight: 600 },
+      low:    { bgcolor: alpha('#64748b', 0.1), color: '#64748b', fontWeight: 600 },
+    },
+    // V2 — Vendor reliability tier chips
+    vendorReliability: {
+      gold:   { bgcolor: alpha('#f59e0b', 0.15), color: '#b45309', border: '1px solid', borderColor: alpha('#b45309', 0.2), fontWeight: 700 },
+      silver: { bgcolor: alpha('#64748b', 0.15), color: '#475569', border: '1px solid', borderColor: alpha('#475569', 0.2), fontWeight: 700 },
+      bronze: { bgcolor: alpha('#d97706', 0.12), color: '#92400e', border: '1px solid', borderColor: alpha('#92400e', 0.2), fontWeight: 700 },
+    },
+    // V2 — Compliance status chips
+    compliance: {
+      compliant: { bgcolor: alpha('#10b981', 0.12), color: '#059669', fontWeight: 600 },
+      warning:   { bgcolor: alpha('#f59e0b', 0.12), color: '#d97706', fontWeight: 600 },
+      violation: { bgcolor: alpha('#ef4444', 0.12), color: '#dc2626', fontWeight: 600 },
+    },
+    // V2 — Audit trail action type chips
+    auditAction: {
+      autopilot: { bgcolor: alpha('#10b981', 0.1), color: '#059669', fontWeight: 600 },
+      exception: { bgcolor: alpha('#ef4444', 0.1), color: '#dc2626', fontWeight: 600 },
+      override:  { bgcolor: alpha('#f59e0b', 0.1), color: '#d97706', fontWeight: 600 },
+      manual:    { bgcolor: alpha(NAVY_BLUE, 0.1), color: '#1565c0', fontWeight: 600 },
+    },
   },
 
   // Card styles (matching ordlyTheme)
@@ -276,6 +340,22 @@ export const apTheme = {
     if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
     if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
     return `$${value.toFixed(2)}`;
+  },
+
+  // Confidence level helper
+  getConfidenceLevel: (score) => {
+    if (score == null) return 'parked';
+    if (score >= 90) return 'high';
+    if (score >= 60) return 'med';
+    return 'low';
+  },
+
+  // Confidence color helper
+  getConfidenceColor: (score) => {
+    if (score == null) return '#94a3b8';
+    if (score >= 90) return '#059669';
+    if (score >= 60) return '#d97706';
+    return '#dc2626';
   },
 };
 

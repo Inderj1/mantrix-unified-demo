@@ -1,24 +1,75 @@
 #!/bin/bash
 
-# Mantrix Unified DI - EC2 Setup Script
-# For t3.medium (2 vCPU, 4GB RAM) - ~$30/month
-# Run once on fresh Ubuntu 22.04 EC2 instance
+# Mantrix Unified DI - EC2/GCP Instance Setup Script
+# For t3.medium / e2-medium (2 vCPU, 4GB RAM) - ~$30/month
+# Run once on fresh Ubuntu 22.04 instance
+#
+# Usage:
+#   sudo ./deploy.sh                   # Setup for sandbox (default)
+#   sudo ./deploy.sh --target sandbox  # Setup for sandbox
+#   sudo ./deploy.sh --target drinkaz  # Setup for drinkaz
 
 set -e
 
-echo "🚀 Mantrix EC2 Setup - t3.medium"
-echo "================================="
+# Default target
+TARGET="sandbox"
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --target)
+            TARGET="$2"
+            shift 2
+            ;;
+        -h|--help)
+            echo "Usage: sudo $0 [OPTIONS]"
+            echo ""
+            echo "Options:"
+            echo "  --target ENV  Target environment: sandbox (default), drinkaz"
+            echo "  -h, --help    Show this help message"
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
+done
+
+# Environment configuration
+case "$TARGET" in
+    sandbox)
+        DOMAIN="sandbox.cloudmantra.ai"
+        APP_DIR="/opt"
+        BACKEND_DIR="/opt/backend"
+        FRONTEND_DIR="/var/www/html"
+        ;;
+    drinkaz)
+        DOMAIN="drinkaz-mantrix.cloudmantra.ai"
+        APP_DIR="/opt/mantrix"
+        BACKEND_DIR="/opt/mantrix/backend"
+        FRONTEND_DIR="/opt/mantrix/frontend/dist"
+        ;;
+    *)
+        echo "Unknown target: ${TARGET}. Use 'sandbox' or 'drinkaz'."
+        exit 1
+        ;;
+esac
+
+echo ""
+echo "============================================================="
+echo "  Mantrix Instance Setup - ${TARGET}"
+echo "  Domain: ${DOMAIN}"
+echo "============================================================="
 
 # Check if running as root
 if [ "$EUID" -ne 0 ]; then
-    echo "❌ Please run with sudo: sudo ./deploy.sh"
+    echo "Please run with sudo: sudo ./deploy.sh --target ${TARGET}"
     exit 1
 fi
 
-APP_DIR="/opt/mantrix"
-
 echo ""
-echo "📦 Step 1/6: Installing system dependencies..."
+echo "Step 1/6: Installing system dependencies..."
 apt-get update
 apt-get install -y \
     docker.io \
@@ -27,39 +78,37 @@ apt-get install -y \
     git \
     curl \
     htop \
-    ufw
+    ufw \
+    certbot \
+    python3-certbot-nginx
 
 echo ""
-echo "🔥 Step 2/6: Configuring firewall..."
+echo "Step 2/6: Configuring firewall..."
 ufw allow 22/tcp    # SSH
 ufw allow 80/tcp    # HTTP
 ufw allow 443/tcp   # HTTPS
 ufw --force enable
 
 echo ""
-echo "🐳 Step 3/6: Setting up Docker..."
+echo "Step 3/6: Setting up Docker..."
 systemctl start docker
 systemctl enable docker
 usermod -aG docker ubuntu || true
+usermod -aG docker inder || true
 
 echo ""
-echo "📁 Step 4/6: Setting up application directory..."
-mkdir -p $APP_DIR
+echo "Step 4/6: Setting up application directories..."
+mkdir -p "${BACKEND_DIR}"
+mkdir -p "${FRONTEND_DIR}"
 
-# Copy application files
-if [ -f "docker-compose.yml" ]; then
-    echo "Copying application files..."
-    cp -r . $APP_DIR/
-    cd $APP_DIR
-else
-    echo "❌ Run this script from your application directory"
-    exit 1
+if [ "$TARGET" = "sandbox" ]; then
+    mkdir -p /opt/logs
 fi
 
 echo ""
-echo "🔧 Step 5/6: Creating environment configuration..."
-if [ ! -f .env ]; then
-    cat > .env <<EOF
+echo "Step 5/6: Creating environment configuration..."
+if [ ! -f "${BACKEND_DIR}/.env" ]; then
+    cat > "${BACKEND_DIR}/.env" <<EOF
 # Database Configuration
 POSTGRES_USER=mantrix_user
 POSTGRES_PASSWORD=$(openssl rand -base64 32)
@@ -73,40 +122,52 @@ NODE_ENV=production
 JWT_SECRET=$(openssl rand -base64 64)
 
 # Domain
-DOMAIN=mantrix.cloudmantra.ai
+DOMAIN=${DOMAIN}
 EOF
-    chmod 600 .env
-    echo "✅ Created .env with secure passwords"
-    echo "📝 Passwords saved to .env (keep this safe!)"
+    chmod 600 "${BACKEND_DIR}/.env"
+    echo "Created .env with secure passwords"
 else
-    echo "✅ .env already exists"
+    echo ".env already exists"
 fi
 
 echo ""
-echo "🌐 Step 6/6: Configuring Nginx reverse proxy..."
-cat > /etc/nginx/sites-available/mantrix <<'NGINX_CONFIG'
+echo "Step 6/6: Configuring Nginx..."
+
+cat > /etc/nginx/sites-available/mantrix <<NGINX_CONFIG
 server {
-    listen 80 default_server;
-    server_name _;
+    root ${FRONTEND_DIR};
+    index index.html;
 
-    client_max_body_size 50M;
+    server_name ${DOMAIN} _;
 
+    client_max_body_size 100M;
+
+    # Frontend
     location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
-
-        # Timeouts
-        proxy_connect_timeout 60s;
-        proxy_send_timeout 60s;
-        proxy_read_timeout 60s;
+        try_files \$uri \$uri/ /index.html;
     }
+
+    # API proxy
+    location /api/ {
+        proxy_pass http://127.0.0.1:8000/api/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_read_timeout 300s;
+        proxy_connect_timeout 75s;
+    }
+
+    location /assets {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml;
 }
 NGINX_CONFIG
 
@@ -118,29 +179,19 @@ systemctl restart nginx
 systemctl enable nginx
 
 echo ""
-echo "🐳 Starting Docker containers..."
-docker-compose up -d --build
-
+echo "============================================================="
+echo "  SETUP COMPLETE - ${TARGET}"
+echo "============================================================="
 echo ""
-echo "⏳ Waiting for services to start..."
-sleep 15
-
+echo "  Access: http://$(curl -s ifconfig.me)"
 echo ""
-echo "✅ SETUP COMPLETE!"
-echo "=================="
+echo "  Next steps:"
+echo "    1. Deploy code:  ./start_prod.sh --target ${TARGET}"
+echo "    2. Setup SSL:    sudo certbot --nginx -d ${DOMAIN}"
 echo ""
-echo "🌐 Access your app: http://$(curl -s ifconfig.me)"
-echo ""
-echo "📊 Useful Commands:"
-echo "   docker-compose ps              # Check status"
-echo "   docker-compose logs -f         # View logs"
-echo "   docker-compose restart         # Restart all"
-echo "   docker-compose down            # Stop all"
-echo ""
-echo "🔄 To update/redeploy:"
-echo "   cd $APP_DIR"
-echo "   git pull"
-echo "   docker-compose up -d --build"
-echo ""
-echo "💾 Data persists in Docker volumes even after restart"
+echo "  Useful commands:"
+echo "    ./start_prod.sh --target ${TARGET}          # Deploy"
+echo "    ./stop_prod.sh --target ${TARGET}           # Stop"
+echo "    tail -f /tmp/uvicorn.log                    # Backend logs"
+echo "============================================================="
 echo ""

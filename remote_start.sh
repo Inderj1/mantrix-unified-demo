@@ -5,9 +5,9 @@
 # Starts backend and frontend services on the production server
 #
 # Usage:
-#   ./remote_start.sh              # Start all services
-#   ./remote_start.sh --backend    # Start backend only
-#   ./remote_start.sh --frontend   # Start frontend only
+#   ./remote_start.sh                        # Start all services (auto-detect environment)
+#   ./remote_start.sh --backend              # Start backend only
+#   ./remote_start.sh --frontend             # Start frontend only
 #
 
 # Colors for output
@@ -18,11 +18,23 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-# Application directories
-APP_DIR="/opt/mantrix"
-BACKEND_DIR="${APP_DIR}/backend"
-FRONTEND_DIR="${APP_DIR}/frontend"
-LOG_DIR="${APP_DIR}/logs"
+# Auto-detect environment based on directory structure
+if [ -d "/opt/backend" ] && [ -d "/var/www/html" ]; then
+    # Sandbox layout
+    BACKEND_DIR="/opt/backend"
+    FRONTEND_DIR="/var/www/html"
+    LOG_DIR="/opt/logs"
+    ENV_NAME="sandbox"
+elif [ -d "/opt/mantrix/backend" ]; then
+    # Drinkaz layout
+    BACKEND_DIR="/opt/mantrix/backend"
+    FRONTEND_DIR="/opt/mantrix/frontend/dist"
+    LOG_DIR="/opt/mantrix/logs"
+    ENV_NAME="drinkaz"
+else
+    echo -e "${RED}Could not auto-detect environment. Expected /opt/backend or /opt/mantrix/backend${NC}"
+    exit 1
+fi
 
 # Create log directory
 mkdir -p "${LOG_DIR}"
@@ -62,6 +74,10 @@ echo -e "${CYAN}"
 echo "============================================================="
 echo "         MANTRIX PRODUCTION - STARTING SERVICES              "
 echo "============================================================="
+echo "  Environment: ${ENV_NAME}"
+echo "  Backend:     ${BACKEND_DIR}"
+echo "  Frontend:    ${FRONTEND_DIR}"
+echo "============================================================="
 echo -e "${NC}"
 
 # Get external IP
@@ -89,7 +105,7 @@ if [ "$START_BACKEND" = true ]; then
     source venv/bin/activate
     nohup python -m uvicorn src.main:app --host 0.0.0.0 --port 8000 > "${LOG_DIR}/backend.log" 2>&1 &
     BACKEND_PID=$!
-    echo $BACKEND_PID > "${APP_DIR}/.backend.pid"
+    echo $BACKEND_PID > "${LOG_DIR}/.backend.pid"
 
     echo -e "  Backend PID: ${BACKEND_PID}"
     echo -e "  Log file: ${LOG_DIR}/backend.log"
@@ -152,7 +168,8 @@ echo -e "\n${GREEN}"
 echo "============================================================="
 echo "              PRODUCTION SERVICES STARTED                    "
 echo "============================================================="
-echo "  Server IP: ${EXTERNAL_IP}"
+echo "  Environment: ${ENV_NAME}"
+echo "  Server IP:   ${EXTERNAL_IP}"
 echo "-------------------------------------------------------------"
 if [ "$START_BACKEND" = true ]; then
 echo "  Backend API: http://${EXTERNAL_IP}:8000"
@@ -164,6 +181,5 @@ echo "  Frontend:    http://${EXTERNAL_IP}"
 fi
 echo "-------------------------------------------------------------"
 echo "  View backend logs:  tail -f ${LOG_DIR}/backend.log"
-echo "  Stop services:      ./remote_stop.sh"
 echo "============================================================="
 echo -e "${NC}"

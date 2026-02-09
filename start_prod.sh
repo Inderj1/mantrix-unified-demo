@@ -2,14 +2,16 @@
 #
 # Mantrix Production Deployment Script
 # =====================================
-# Deploys and starts the application on GCP instance
+# Deploys and starts the application on a GCP instance
 #
 # Usage:
-#   ./start_prod.sh              # Full deploy: sync files + restart services
-#   ./start_prod.sh --restart    # Restart services only (no file sync)
-#   ./start_prod.sh --sync       # Sync files only (no restart)
-#   ./start_prod.sh --backend    # Deploy and restart backend only
-#   ./start_prod.sh --frontend   # Deploy and restart frontend only
+#   ./start_prod.sh                        # Deploy to sandbox (default)
+#   ./start_prod.sh --target sandbox       # Deploy to sandbox
+#   ./start_prod.sh --target drinkaz       # Deploy to drinkaz
+#   ./start_prod.sh --restart              # Restart services only (no file sync)
+#   ./start_prod.sh --sync                 # Sync files only (no restart)
+#   ./start_prod.sh --backend              # Deploy and restart backend only
+#   ./start_prod.sh --frontend             # Deploy and restart frontend only
 #
 
 set -e
@@ -22,16 +24,8 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-# GCP Configuration
-GCP_INSTANCE="mantrix-drinkaz-new-vm"
-GCP_ZONE="us-central1-a"
-GCP_USER="inder"
-REMOTE_APP_DIR="/opt/mantrix"
-
-# Local directories
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BACKEND_DIR="${PROJECT_ROOT}/backend"
-FRONTEND_DIR="${PROJECT_ROOT}/frontend"
+# Default target
+TARGET="sandbox"
 
 # Default options
 SYNC_FILES=true
@@ -42,6 +36,10 @@ DEPLOY_FRONTEND=true
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
+        --target)
+            TARGET="$2"
+            shift 2
+            ;;
         --restart)
             SYNC_FILES=false
             shift
@@ -62,6 +60,7 @@ while [[ $# -gt 0 ]]; do
             echo "Usage: $0 [OPTIONS]"
             echo ""
             echo "Options:"
+            echo "  --target ENV  Target environment: sandbox (default), drinkaz"
             echo "  --restart     Restart services only (skip file sync)"
             echo "  --sync        Sync files only (skip restart)"
             echo "  --backend     Deploy backend only"
@@ -76,13 +75,45 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+# ============================================================
+# Target Environment Configuration
+# ============================================================
+GCP_ZONE="us-central1-a"
+GCP_USER="inder"
+
+case "$TARGET" in
+    sandbox)
+        GCP_INSTANCE="mantrix-sandbox-vm"
+        REMOTE_BACKEND_DIR="/opt/backend"
+        REMOTE_FRONTEND_DIR="/var/www/html"
+        DOMAIN="sandbox.cloudmantra.ai"
+        ;;
+    drinkaz)
+        GCP_INSTANCE="mantrix-drinkaz-new-vm"
+        REMOTE_BACKEND_DIR="/opt/mantrix/backend"
+        REMOTE_FRONTEND_DIR="/opt/mantrix/frontend/dist"
+        DOMAIN="drinkaz-mantrix.cloudmantra.ai"
+        ;;
+    *)
+        echo -e "${RED}Unknown target: ${TARGET}. Use 'sandbox' or 'drinkaz'.${NC}"
+        exit 1
+        ;;
+esac
+
+# Local directories
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BACKEND_DIR="${PROJECT_ROOT}/backend"
+FRONTEND_DIR="${PROJECT_ROOT}/frontend"
+
 echo -e "${CYAN}"
 echo "============================================================="
 echo "         MANTRIX PRODUCTION DEPLOYMENT                       "
 echo "============================================================="
+echo "  Target:   ${TARGET} (${DOMAIN})"
 echo "  Instance: ${GCP_INSTANCE}"
 echo "  Zone:     ${GCP_ZONE}"
-echo "  Remote:   ${REMOTE_APP_DIR}"
+echo "  Backend:  ${REMOTE_BACKEND_DIR}"
+echo "  Frontend: ${REMOTE_FRONTEND_DIR}"
 echo "============================================================="
 echo -e "${NC}"
 
@@ -102,18 +133,6 @@ ssh_cmd() {
 
     echo -e "${RED}  SSH command failed after $max_attempts attempts${NC}"
     return 1
-}
-
-# Function to sync files via SCP
-sync_files() {
-    local src=$1
-    local dest=$2
-    local name=$3
-
-    echo -e "  Syncing ${name}..."
-    gcloud compute scp --zone=${GCP_ZONE} --recurse "$src" ${GCP_USER}@${GCP_INSTANCE}:/tmp/sync_temp 2>/dev/null
-    ssh_cmd "sudo rm -rf ${dest} && sudo mv /tmp/sync_temp ${dest} && sudo chown -R ${GCP_USER}:${GCP_USER} ${dest}"
-    echo -e "  ${GREEN}${name} synced${NC}"
 }
 
 # ============================================================
@@ -146,13 +165,13 @@ if [ "$SYNC_FILES" = true ]; then
         # Sync backend src directory
         echo -e "  Syncing backend/src..."
         gcloud compute scp --zone=${GCP_ZONE} --recurse "${BACKEND_DIR}/src" ${GCP_USER}@${GCP_INSTANCE}:/tmp/src_new 2>/dev/null
-        ssh_cmd "sudo rm -rf ${REMOTE_APP_DIR}/backend/src && sudo mv /tmp/src_new ${REMOTE_APP_DIR}/backend/src && sudo chown -R ${GCP_USER}:${GCP_USER} ${REMOTE_APP_DIR}/backend/src"
+        ssh_cmd "sudo rm -rf ${REMOTE_BACKEND_DIR}/src && sudo mv /tmp/src_new ${REMOTE_BACKEND_DIR}/src && sudo chown -R ${GCP_USER}:${GCP_USER} ${REMOTE_BACKEND_DIR}/src"
         echo -e "  ${GREEN}Backend source synced${NC}"
 
         # Sync requirements if changed
         if [ -f "${BACKEND_DIR}/requirements.txt" ]; then
             gcloud compute scp --zone=${GCP_ZONE} "${BACKEND_DIR}/requirements.txt" ${GCP_USER}@${GCP_INSTANCE}:/tmp/requirements.txt 2>/dev/null
-            ssh_cmd "sudo mv /tmp/requirements.txt ${REMOTE_APP_DIR}/backend/requirements.txt"
+            ssh_cmd "sudo mv /tmp/requirements.txt ${REMOTE_BACKEND_DIR}/requirements.txt"
             echo -e "  ${GREEN}Requirements synced${NC}"
         fi
     fi
@@ -167,11 +186,11 @@ if [ "$SYNC_FILES" = true ]; then
             echo -e "${YELLOW}  Frontend build skipped (run 'npm run build' manually if needed)${NC}"
         }
 
-        # Sync frontend dist if it exists
+        # Sync frontend dist
         if [ -d "${FRONTEND_DIR}/dist" ]; then
             gcloud compute scp --zone=${GCP_ZONE} --recurse "${FRONTEND_DIR}/dist" ${GCP_USER}@${GCP_INSTANCE}:/tmp/dist_new 2>/dev/null
-            ssh_cmd "sudo rm -rf ${REMOTE_APP_DIR}/frontend/dist && sudo mv /tmp/dist_new ${REMOTE_APP_DIR}/frontend/dist && sudo chown -R ${GCP_USER}:${GCP_USER} ${REMOTE_APP_DIR}/frontend/dist"
-            echo -e "  ${GREEN}Frontend dist synced${NC}"
+            ssh_cmd "sudo rm -rf ${REMOTE_FRONTEND_DIR}/* && sudo cp -r /tmp/dist_new/* ${REMOTE_FRONTEND_DIR}/ && sudo chown -R www-data:www-data ${REMOTE_FRONTEND_DIR} && rm -rf /tmp/dist_new"
+            echo -e "  ${GREEN}Frontend dist synced to ${REMOTE_FRONTEND_DIR}${NC}"
         fi
 
         cd "${PROJECT_ROOT}"
@@ -193,9 +212,9 @@ if [ "$RESTART_SERVICES" = true ]; then
     fi
 
     if [ "$DEPLOY_FRONTEND" = true ]; then
-        echo -e "  Stopping frontend..."
-        ssh_cmd "sudo pkill -f 'nginx' 2>/dev/null || true; sudo pkill -f 'node' 2>/dev/null || true"
-        echo -e "  ${GREEN}Frontend stopped${NC}"
+        echo -e "  Reloading nginx..."
+        ssh_cmd "sudo nginx -s reload 2>/dev/null || sudo systemctl restart nginx 2>/dev/null || true"
+        echo -e "  ${GREEN}Nginx reloaded${NC}"
     fi
 
     sleep 2
@@ -211,7 +230,7 @@ if [ "$RESTART_SERVICES" = true ]; then
 
     if [ "$DEPLOY_BACKEND" = true ]; then
         echo -e "  Starting backend..."
-        ssh_cmd "cd ${REMOTE_APP_DIR}/backend && source venv/bin/activate && nohup python -m uvicorn src.main:app --host 0.0.0.0 --port 8000 > /tmp/uvicorn.log 2>&1 &"
+        ssh_cmd "cd ${REMOTE_BACKEND_DIR} && source venv/bin/activate && nohup python -m uvicorn src.main:app --host 0.0.0.0 --port 8000 > /tmp/uvicorn.log 2>&1 &"
         sleep 5
 
         # Verify backend started
@@ -224,9 +243,9 @@ if [ "$RESTART_SERVICES" = true ]; then
     fi
 
     if [ "$DEPLOY_FRONTEND" = true ]; then
-        echo -e "  Starting nginx..."
+        echo -e "  Ensuring nginx is running..."
         ssh_cmd "sudo systemctl start nginx 2>/dev/null || sudo service nginx start 2>/dev/null || true"
-        echo -e "  ${GREEN}Nginx started${NC}"
+        echo -e "  ${GREEN}Nginx running${NC}"
     fi
 else
     echo -e "\n${YELLOW}[4/4] Skipping service start${NC}"
@@ -237,9 +256,10 @@ fi
 # ============================================================
 echo -e "\n${GREEN}"
 echo "============================================================="
-echo "              PRODUCTION DEPLOYMENT COMPLETE                 "
+echo "              DEPLOYMENT COMPLETE                            "
 echo "============================================================="
-echo "  Instance:   ${GCP_INSTANCE}"
+echo "  Target:      ${TARGET} (${DOMAIN})"
+echo "  Instance:    ${GCP_INSTANCE}"
 echo "  External IP: ${EXTERNAL_IP}"
 echo "-------------------------------------------------------------"
 if [ "$DEPLOY_BACKEND" = true ]; then
@@ -247,10 +267,10 @@ echo "  Backend API: http://${EXTERNAL_IP}:8000"
 echo "  API Health:  http://${EXTERNAL_IP}:8000/api/v1/health"
 fi
 if [ "$DEPLOY_FRONTEND" = true ]; then
-echo "  Frontend:    http://${EXTERNAL_IP}"
+echo "  Frontend:    https://${DOMAIN}"
 fi
 echo "-------------------------------------------------------------"
 echo "  View logs:   gcloud compute ssh ${GCP_INSTANCE} --zone=${GCP_ZONE} --command='tail -f /tmp/uvicorn.log'"
-echo "  Stop:        ./stop_prod.sh"
+echo "  Stop:        ./stop_prod.sh --target ${TARGET}"
 echo "============================================================="
 echo -e "${NC}"

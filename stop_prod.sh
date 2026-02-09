@@ -2,12 +2,14 @@
 #
 # Mantrix Production Stop Script
 # ===============================
-# Stops services on GCP production instance
+# Stops services on a GCP production instance
 #
 # Usage:
-#   ./stop_prod.sh              # Stop all services
-#   ./stop_prod.sh --backend    # Stop backend only
-#   ./stop_prod.sh --frontend   # Stop frontend only
+#   ./stop_prod.sh                        # Stop sandbox (default)
+#   ./stop_prod.sh --target sandbox       # Stop sandbox
+#   ./stop_prod.sh --target drinkaz       # Stop drinkaz
+#   ./stop_prod.sh --backend              # Stop backend only
+#   ./stop_prod.sh --frontend             # Stop frontend only
 #
 
 # Colors for output
@@ -18,10 +20,8 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-# GCP Configuration
-GCP_INSTANCE="mantrix-drinkaz-new-vm"
-GCP_ZONE="us-central1-a"
-GCP_USER="inder"
+# Default target
+TARGET="sandbox"
 
 # Default options
 STOP_BACKEND=true
@@ -30,6 +30,10 @@ STOP_FRONTEND=true
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
+        --target)
+            TARGET="$2"
+            shift 2
+            ;;
         --backend)
             STOP_FRONTEND=false
             shift
@@ -42,6 +46,7 @@ while [[ $# -gt 0 ]]; do
             echo "Usage: $0 [OPTIONS]"
             echo ""
             echo "Options:"
+            echo "  --target ENV  Target environment: sandbox (default), drinkaz"
             echo "  --backend     Stop backend only"
             echo "  --frontend    Stop frontend only"
             echo "  -h, --help    Show this help message"
@@ -54,10 +59,32 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+# ============================================================
+# Target Environment Configuration
+# ============================================================
+GCP_ZONE="us-central1-a"
+GCP_USER="inder"
+
+case "$TARGET" in
+    sandbox)
+        GCP_INSTANCE="mantrix-sandbox-vm"
+        DOMAIN="sandbox.cloudmantra.ai"
+        ;;
+    drinkaz)
+        GCP_INSTANCE="mantrix-drinkaz-new-vm"
+        DOMAIN="drinkaz-mantrix.cloudmantra.ai"
+        ;;
+    *)
+        echo -e "${RED}Unknown target: ${TARGET}. Use 'sandbox' or 'drinkaz'.${NC}"
+        exit 1
+        ;;
+esac
+
 echo -e "${CYAN}"
 echo "============================================================="
 echo "         STOPPING MANTRIX PRODUCTION SERVICES                "
 echo "============================================================="
+echo "  Target:   ${TARGET} (${DOMAIN})"
 echo "  Instance: ${GCP_INSTANCE}"
 echo "  Zone:     ${GCP_ZONE}"
 echo "============================================================="
@@ -128,6 +155,7 @@ echo -e "\n${GREEN}"
 echo "============================================================="
 echo "           PRODUCTION SERVICES STOPPED                       "
 echo "============================================================="
+echo "  Target:    ${TARGET} (${DOMAIN})"
 if [ "$STOP_BACKEND" = true ]; then
 echo "  Backend:   stopped"
 fi
@@ -135,6 +163,6 @@ if [ "$STOP_FRONTEND" = true ]; then
 echo "  Frontend:  stopped"
 fi
 echo "-------------------------------------------------------------"
-echo "  To restart: ./start_prod.sh"
+echo "  To restart: ./start_prod.sh --target ${TARGET}"
 echo "============================================================="
 echo -e "${NC}"
