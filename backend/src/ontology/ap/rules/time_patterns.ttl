@@ -1,0 +1,40 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+ap:rule_time_patterns a mantrix:BusinessRule ;
+    rdfs:label "Time/Date Patterns" ;
+    rdfs:comment "How to interpret and calculate with date fields in AP." ;
+    mantrix:ruleDefinition """Key date fields in AP:
+
+EBAN.BADAT → PR creation date (start of P2P)
+EKKO.AEDAT → PO creation/change date
+MATDOC.BUDAT → GR posting date
+RBKP.BLDAT → Invoice date (FROM vendor — date on their document)
+RBKP.BUDAT → Invoice posting date (when AP clerk entered it in SAP)
+RBKP.ZFBDT → Baseline date (for due date calculation)
+RBKP.DUE_DATE → Calculated due date (Axis AI enriched)
+ACDOCA.BUDAT → Posting date in FI
+ACDOCA.AUGDT → Clearing/payment date
+REGUH.ZALDT → Payment execution date
+
+Cycle time formulas (BigQuery syntax):
+  PR-to-PO = DATE_DIFF(EKKO.AEDAT, EBAN.BADAT, DAY)
+  PO-to-GR = DATE_DIFF(MATDOC.BUDAT, EKKO.AEDAT, DAY)
+  GR-to-Invoice = DATE_DIFF(RBKP.BUDAT, MATDOC.BUDAT, DAY)
+  Invoice-to-Payment = DATE_DIFF(ACDOCA.AUGDT, RBKP.BUDAT, DAY)
+  Days Overdue = DATE_DIFF(CURRENT_DATE(), RBKP.DUE_DATE, DAY)
+  Days vs Due = ACDOCA.AUGDT - RBKP.DUE_DATE (negative=early, positive=late)
+
+Time bucketing:
+  DATE_TRUNC(date, MONTH) → monthly
+  DATE_TRUNC(date, QUARTER) → quarterly
+  DATE_TRUNC(date, YEAR) → yearly
+
+Relative time filters:
+  'this month' → BUDAT >= DATE_TRUNC(CURRENT_DATE(), MONTH)
+  'last 30 days' → BUDAT >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)
+  'this quarter' → BUDAT >= DATE_TRUNC(CURRENT_DATE(), QUARTER)
+  'YTD' → BUDAT >= DATE_TRUNC(CURRENT_DATE(), YEAR)""" .

@@ -1,0 +1,51 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: T052_PaymentTerms — Payment Terms Configuration
+# ============================================================================
+# CRITICAL config table. Defines due date calculation and discount terms.
+# DUE_DATE = ZFBDT + ZTAG3 (net days). DISC_DATE = ZFBDT + ZTAG1.
+# ZPRZ1 = discount percentage for early payment.
+# Used to calculate when invoices are due and discount eligibility.
+# ============================================================================
+
+ap:T052_PaymentTerms a owl:Class ;
+    rdfs:label "T052_PaymentTerms" ;
+    rdfs:comment "Payment terms configuration. Defines due date calculation (net days), discount periods, and discount percentages. DUE_DATE = RBKP.ZFBDT + T052.ZTAG3. DISC_DATE = RBKP.ZFBDT + T052.ZTAG1." ;
+    bq:table "T052_PaymentTerms" ; bq:primaryKey "ZTERM" ;
+    skos:altLabel "payment terms" , "terms" , "net days" , "discount terms" , "T052" , "due date" ;
+    mantrix:sapTable "T052" ;
+    mantrix:businessRule "DUE_DATE = baseline_date (ZFBDT) + ZTAG3 (net days). DISC_DUE_DATE = ZFBDT + ZTAG1 (discount days 1). DISC_PCT = ZPRZ1. Second discount: ZFBDT + ZTAG2, ZPRZ2." ;
+    mantrix:relatedConcepts "RBKP_InvoiceHeaders, LFA1_Suppliers, EKKO_POHeaders" .
+
+# --- Columns ---
+ap:T052_ZTERM a owl:DatatypeProperty ; rdfs:label "Payment Terms Key" ; bq:column "ZTERM" ; bq:type "STRING" ; rdfs:comment "Payment terms key (e.g., 'Z030' = net 30, 'Z210' = 2% 10 net 30)." .
+ap:T052_TEXT1 a owl:DatatypeProperty ; rdfs:label "Description" ; bq:column "TEXT1" ; bq:type "STRING" ; rdfs:comment "Human-readable payment terms description." .
+ap:T052_ZTAG1 a owl:DatatypeProperty ; rdfs:label "Discount Days 1" ; bq:column "ZTAG1" ; bq:type "INTEGER" ; rdfs:comment "Number of days for first discount period. DISC_DUE_DATE = ZFBDT + ZTAG1." .
+ap:T052_ZPRZ1 a owl:DatatypeProperty ; rdfs:label "Discount % 1" ; bq:column "ZPRZ1" ; bq:type "FLOAT" ; rdfs:comment "Discount percentage for first period (e.g., 2.0 = 2%). DISC_AMOUNT = RMWWR * ZPRZ1 / 100." .
+ap:T052_ZTAG2 a owl:DatatypeProperty ; rdfs:label "Discount Days 2" ; bq:column "ZTAG2" ; bq:type "INTEGER" ; rdfs:comment "Number of days for second discount period (smaller discount)." .
+ap:T052_ZPRZ2 a owl:DatatypeProperty ; rdfs:label "Discount % 2" ; bq:column "ZPRZ2" ; bq:type "FLOAT" ; rdfs:comment "Discount percentage for second period." .
+ap:T052_ZTAG3 a owl:DatatypeProperty ; rdfs:label "Net Days" ; bq:column "ZTAG3" ; bq:type "INTEGER" ; rdfs:comment "CRITICAL: Net payment days. DUE_DATE = ZFBDT + ZTAG3. This determines when invoice is due." .
+
+# --- Example Questions & SQL ---
+ap:T052_q1 mantrix:exampleQuestion "All payment terms with their due dates" ;
+    mantrix:exampleSQL "SELECT ZTERM, TEXT1, ZTAG1 as disc1_days, ZPRZ1 as disc1_pct, ZTAG2 as disc2_days, ZPRZ2 as disc2_pct, ZTAG3 as net_days FROM T052_PaymentTerms ORDER BY ZTAG3" .
+ap:T052_q2 mantrix:exampleQuestion "Calculate due date for all open invoices" ;
+    mantrix:exampleSQL "SELECT r.BELNR, r.LIFNR, r.RMWWR, r.ZFBDT, t.ZTAG3, DATE_ADD(r.ZFBDT, INTERVAL t.ZTAG3 DAY) as calculated_due_date, r.DUE_DATE as axis_due_date FROM RBKP_InvoiceHeaders r JOIN T052_PaymentTerms t ON r.ZTERM = t.ZTERM WHERE r.RBSTAT = '5'" .
+ap:T052_q3 mantrix:exampleQuestion "Payment terms offering early pay discount" ;
+    mantrix:exampleSQL "SELECT ZTERM, TEXT1, ZTAG1, ZPRZ1, ZTAG3 FROM T052_PaymentTerms WHERE ZPRZ1 > 0 ORDER BY ZPRZ1 DESC" .
+ap:T052_q4 mantrix:exampleQuestion "Potential discount amount across all open invoices" ;
+    mantrix:exampleSQL "SELECT SUM(r.RMWWR * t.ZPRZ1 / 100) as total_potential_discount, COUNT(*) as eligible_invoices FROM RBKP_InvoiceHeaders r JOIN T052_PaymentTerms t ON r.ZTERM = t.ZTERM WHERE t.ZPRZ1 > 0 AND r.RBSTAT = '5' AND DATE_ADD(r.ZFBDT, INTERVAL t.ZTAG1 DAY) >= CURRENT_DATE()" .
+
+# --- Edge Cases ---
+ap:T052_edge1 mantrix:edgeCases "ZTERM can be set at 3 levels: vendor master (LFA1.ZTERM), PO header (EKKO.ZTERM), invoice (RBKP.ZTERM). Invoice-level wins if set." .
+ap:T052_edge2 mantrix:edgeCases "ZTAG1=0 and ZPRZ1=0 means no early payment discount available." .
+ap:T052_edge3 mantrix:edgeCases "'2% 10 net 30' means: ZTAG1=10, ZPRZ1=2.0, ZTAG3=30. Pay within 10 days to get 2% off, otherwise pay full by day 30." .
+ap:T052_edge4 mantrix:edgeCases "RBKP.DUE_DATE and RBKP.DISC_DUE_DATE are Axis AI pre-computed from ZFBDT + T052 values. Use these for convenience." .

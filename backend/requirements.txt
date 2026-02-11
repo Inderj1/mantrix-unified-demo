@@ -6,6 +6,7 @@ anthropic
 openai
 google-cloud-bigquery
 weaviate-client
+rdflib
 pymongo
 redis
 psycopg2-binary

@@ -1,0 +1,32 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# AP Metric: GR-to-Invoice Cycle Time
+# ============================================================================
+
+ap:metric_gr_to_invoice_cycle_time a mantrix:Metric ;
+    rdfs:label "GR-to-Invoice Cycle Time" ;
+    rdfs:comment "Average days from goods receipt to invoice posting. Measures vendor invoicing speed and AP processing efficiency. Long gaps create GR/IR accruals." ;
+    skos:altLabel "receipt to invoice time" , "GR to IR" , "GR to invoice" ;
+    mantrix:category "cycle_time" ;
+    mantrix:unit "days" ;
+    mantrix:direction "lower_is_better" ;
+    mantrix:benchmark "3-5 days (best-in-class), 10-15 days (average)" ;
+    mantrix:sqlFormula "AVG(DATE_DIFF(r.BUDAT, g.BUDAT, DAY))" ;
+    mantrix:sourceTables "MATDOC_GoodsReceipts, RBKP_InvoiceHeaders, RSEG_InvoiceItems" ;
+    mantrix:dimensions "vendor, plant, material_group" ;
+    mantrix:exampleQuestion "Average GR to invoice cycle time" ;
+    mantrix:exampleSQL """SELECT
+  AVG(DATE_DIFF(h.BUDAT, g.BUDAT, DAY)) as avg_days
+FROM RSEG_InvoiceItems r
+JOIN RBKP_InvoiceHeaders h ON r.BELNR = h.BELNR AND r.GJAHR = h.GJAHR
+JOIN MATDOC_GoodsReceipts g ON r.EBELN = g.EBELN AND r.EBELP = g.EBELP
+WHERE g.BWART = '101' AND h.RBSTAT = '5'""" ;
+    mantrix:edgeCases "Only applies to 3-way match items (WEPOS=true). 2-way match items have no GR to compare." .

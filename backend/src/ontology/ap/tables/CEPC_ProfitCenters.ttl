@@ -1,0 +1,39 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: CEPC_ProfitCenters — Profit Center Master
+# ============================================================================
+# Organizational unit for profitability reporting. Groups cost centers
+# into business units. Used for segment reporting and P&L by business area.
+# ============================================================================
+
+ap:CEPC_ProfitCenters a owl:Class ;
+    rdfs:label "CEPC_ProfitCenters" ;
+    rdfs:comment "Profit center master. One row per profit center. Used for profitability reporting and segment analysis. Groups cost centers into business units." ;
+    bq:table "CEPC_ProfitCenters" ; bq:primaryKey "PRCTR" ;
+    skos:altLabel "profit center" , "business unit" , "PRCTR" , "CEPC" , "segment" ;
+    mantrix:sapTable "CEPC + CEPCT (descriptions)" ;
+    mantrix:relatedConcepts "CSKS_CostCenters, ACDOCA_UniversalJournal, EKKN_AcctAssignment" .
+
+# --- Columns ---
+ap:CEPC_PRCTR a owl:DatatypeProperty ; rdfs:label "Profit Center" ; bq:column "PRCTR" ; bq:type "STRING" .
+ap:CEPC_KTEXT a owl:DatatypeProperty ; rdfs:label "Description" ; bq:column "KTEXT" ; bq:type "STRING" .
+ap:CEPC_BUKRS a owl:DatatypeProperty ; rdfs:label "Company Code" ; bq:column "BUKRS" ; bq:type "STRING" ; bq:foreignKey "T001_CompanyCodes.BUKRS" .
+ap:CEPC_SEGMENT a owl:DatatypeProperty ; rdfs:label "Segment" ; bq:column "SEGMENT" ; bq:type "STRING" ; rdfs:comment "Reporting segment. Used for IFRS segment reporting." .
+
+# --- Example Questions & SQL ---
+ap:CEPC_q1 mantrix:exampleQuestion "Spend by profit center" ;
+    mantrix:exampleSQL "SELECT a.PRCTR, p.KTEXT, SUM(ABS(a.HSL)) as spend FROM ACDOCA_UniversalJournal a JOIN CEPC_ProfitCenters p ON a.PRCTR = p.PRCTR WHERE a.KOART = 'K' AND a.RLDNR = '0L' GROUP BY a.PRCTR, p.KTEXT ORDER BY spend DESC" .
+ap:CEPC_q2 mantrix:exampleQuestion "Spend by segment" ;
+    mantrix:exampleSQL "SELECT p.SEGMENT, SUM(ABS(a.HSL)) as spend FROM ACDOCA_UniversalJournal a JOIN CEPC_ProfitCenters p ON a.PRCTR = p.PRCTR WHERE a.KOART = 'K' AND a.RLDNR = '0L' GROUP BY p.SEGMENT ORDER BY spend DESC" .
+
+# --- Edge Cases ---
+ap:CEPC_edge1 mantrix:edgeCases "SEGMENT is used for IFRS 8 segment reporting. Links profit center to external reporting segment." .
+ap:CEPC_edge2 mantrix:edgeCases "ACDOCA has both PRCTR (from document) and SEGMENT fields. Use CEPC to get profit center details." .

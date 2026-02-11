@@ -1,0 +1,25 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# Query Type: Find / List / Show
+# ============================================================================
+
+ap:query_find_list a mantrix:QueryType ;
+    rdfs:label "Find / List / Show" ;
+    rdfs:comment "Retrieval queries that return a list of records matching criteria. The most common query type. Pattern: SELECT columns FROM table WHERE filters ORDER BY sort." ;
+    mantrix:triggerPhrases "show me, list, find, get, what are, which, display, give me" ;
+    mantrix:sqlPattern """SELECT [relevant_columns]
+FROM [primary_table]
+[JOIN dimension_tables ON keys]
+WHERE [user_filters]
+ORDER BY [sort_column] [ASC|DESC]
+[LIMIT N]""" ;
+    mantrix:examples """
+'show blocked invoices' → SELECT FROM RBKP WHERE ZLSPR IS NOT NULL
+'list open items for vendor X' → SELECT FROM ACDOCA WHERE AUGBL IS NULL AND LIFNR = X
+'find POs over $100k' → SELECT FROM EKKO JOIN EKPO WHERE NETWR > 100000
+'get invoices due this week' → SELECT FROM RBKP WHERE DUE_DATE BETWEEN today AND today+7""" .

@@ -1,0 +1,36 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# AP Metric: Duplicate Invoice Rate
+# ============================================================================
+
+ap:metric_duplicate_invoice_rate a mantrix:Metric ;
+    rdfs:label "Duplicate Invoice Rate" ;
+    rdfs:comment "Percentage of invoices flagged as potential duplicates. Duplicate payments are a major source of financial loss in AP. Monitoring prevents overpayment." ;
+    skos:altLabel "duplicate rate" , "duplicate detection rate" , "double payment risk" ;
+    mantrix:category "quality" ;
+    mantrix:unit "percent" ;
+    mantrix:direction "lower_is_better" ;
+    mantrix:benchmark "<1% (best-in-class), 2-5% (average)" ;
+    mantrix:sqlFormula "COUNT(DISTINCT CANDIDATE_BELNR WHERE RISK_LEVEL='high') * 100.0 / total_invoices" ;
+    mantrix:sourceTables "DUPLICATE_RISK, RBKP_InvoiceHeaders" ;
+    mantrix:dimensions "vendor, risk_level" ;
+    mantrix:exampleQuestion "What is our duplicate invoice rate?" ;
+    mantrix:exampleSQL """SELECT
+  COUNT(DISTINCT d.CANDIDATE_BELNR) * 100.0 / (SELECT COUNT(*) FROM RBKP_InvoiceHeaders WHERE RBSTAT = '5') as dup_rate
+FROM DUPLICATE_RISK d WHERE d.RISK_LEVEL = 'high'""" ;
+    mantrix:exampleQuestion "Potential duplicate exposure in dollars" ;
+    mantrix:exampleSQL """SELECT
+  d.RISK_LEVEL, COUNT(*) as pairs,
+  SUM(r.RMWWR) as potential_exposure
+FROM DUPLICATE_RISK d
+JOIN RBKP_InvoiceHeaders r ON d.CANDIDATE_BELNR = r.BELNR
+GROUP BY d.RISK_LEVEL""" ;
+    mantrix:edgeCases "High-risk duplicates should be reviewed before payment. Some are false positives (recurring invoices, installments)." .

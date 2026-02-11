@@ -1,0 +1,26 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# Query Type: KPI / Trend
+# ============================================================================
+
+ap:query_kpi_trend a mantrix:QueryType ;
+    rdfs:label "KPI / Trend" ;
+    rdfs:comment "Aggregation queries that calculate metrics over time. Pattern: SELECT date_bucket, AGG(measure) GROUP BY date_bucket ORDER BY date_bucket." ;
+    mantrix:triggerPhrases "trend, over time, by month, by quarter, KPI, metric, how has, performance, rate, percentage" ;
+    mantrix:sqlPattern """SELECT DATE_TRUNC([date_column], [MONTH|QUARTER|YEAR]) as period,
+  [AGG_FUNCTION]([measure]) as metric_value,
+  COUNT(*) as volume
+FROM [table]
+WHERE [filters]
+GROUP BY period
+ORDER BY period""" ;
+    mantrix:examples """
+'DPO trend' → DPO calculation grouped by month
+'invoice volume trend' → COUNT(*) from RBKP grouped by month
+'on-time payment trend' → COUNTIF(PAYMENT_TIMING IN ('on_time','early'))/COUNT(*) by quarter
+'touchless rate by quarter' → match pass rate grouped by quarter""" .

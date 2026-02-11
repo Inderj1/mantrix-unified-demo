@@ -1,0 +1,29 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# Join Path: Full PO Lifecycle (PR → PO → GR → Invoice → Payment)
+# ============================================================================
+
+ap:join_po_full_lifecycle a mantrix:JoinPath ;
+    rdfs:label "Full PO Lifecycle" ;
+    rdfs:comment "Complete procure-to-pay chain: PR → PO Header → PO Item → GR → Invoice → Payment. The master join for end-to-end P2P analysis." ;
+    mantrix:joinSQL """SELECT
+  e.BANFN as pr_number, e.BADAT as pr_date,
+  k.EBELN as po_number, k.AEDAT as po_date, k.LIFNR,
+  p.EBELP as po_item, p.TXZ01, p.MENGE as po_qty, p.NETWR as po_value,
+  g.MBLNR as gr_doc, g.BUDAT as gr_date, g.MENGE as gr_qty,
+  r.BELNR as inv_doc, h.BUDAT as inv_date, r.MENGE as inv_qty, r.WRBTR as inv_amount,
+  a.AUGBL as payment_doc, a.AUGDT as payment_date
+FROM EBAN_PurchaseReqs e
+JOIN EKKO_POHeaders k ON e.EBELN = k.EBELN
+JOIN EKPO_POItems p ON k.EBELN = p.EBELN
+LEFT JOIN MATDOC_GoodsReceipts g ON p.EBELN = g.EBELN AND p.EBELP = g.EBELP AND g.BWART = '101'
+LEFT JOIN RSEG_InvoiceItems r ON p.EBELN = r.EBELN AND p.EBELP = r.EBELP
+LEFT JOIN RBKP_InvoiceHeaders h ON r.BELNR = h.BELNR AND r.GJAHR = h.GJAHR
+LEFT JOIN ACDOCA_UniversalJournal a ON h.BELNR = a.BELNR AND h.GJAHR = a.GJAHR AND a.KOART = 'K' AND a.RLDNR = '0L'
+WHERE p.LOEKZ IS NULL""" ;
+    mantrix:answersQuestions "End-to-end cycle time, bottleneck analysis, process compliance, where is my order" .

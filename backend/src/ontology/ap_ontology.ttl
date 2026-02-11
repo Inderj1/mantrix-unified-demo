@@ -1,0 +1,898 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+
+# ============================================================================
+# Axis AI — Accounts Payable Ontology (RDF/OWL)
+# Version: 2.0.0
+# Source: raw/Accounts Payable Axis AI/ YAMLs + BigQuery BQ schemas
+# Target: 25 SAP S/4HANA BigQuery replica tables
+# Coverage: ~90% of AP user questions
+# ============================================================================
+
+ap:APOntology a owl:Ontology ;
+    rdfs:label "Axis AI Accounts Payable Ontology" ;
+    rdfs:comment "Comprehensive semantic ontology for AP intelligence — maps natural language queries to 25 SAP BigQuery tables, 20+ AP metrics, and P2P business rules" ;
+    owl:versionInfo "2.0" .
+
+# ============================================================================
+# ANNOTATION PROPERTIES
+# ============================================================================
+
+ap:sapTable a owl:AnnotationProperty ;
+    rdfs:label "SAP BigQuery Table" ;
+    rdfs:comment "BigQuery table name mirroring SAP source table" .
+
+ap:sapField a owl:AnnotationProperty ;
+    rdfs:label "SAP Field" ;
+    rdfs:comment "SAP technical field name" .
+
+ap:bqColumn a owl:AnnotationProperty ;
+    rdfs:label "BigQuery Column" ;
+    rdfs:comment "Column name in BigQuery table" .
+
+ap:joinPath a owl:AnnotationProperty ;
+    rdfs:label "Join Path" ;
+    rdfs:comment "SQL join condition between tables" .
+
+ap:sqlFormula a owl:AnnotationProperty ;
+    rdfs:label "SQL Formula" ;
+    rdfs:comment "BigQuery SQL formula for computing this metric" .
+
+ap:direction a owl:AnnotationProperty ;
+    rdfs:label "Direction" ;
+    rdfs:comment "Whether higher or lower is better for a metric" .
+
+ap:benchmark a owl:AnnotationProperty ;
+    rdfs:label "Benchmark" ;
+    rdfs:comment "Industry benchmark value" .
+
+ap:unit a owl:AnnotationProperty ;
+    rdfs:label "Unit" ;
+    rdfs:comment "Unit of measure (days, percent, currency, count)" .
+
+# ============================================================================
+# CLASSES — Master Data (5 BQ tables)
+# ============================================================================
+
+ap:Supplier a owl:Class ;
+    rdfs:label "Supplier" ;
+    rdfs:comment "Business partner from whom goods/services are procured and payments made. Central master for vendor identification, payment terms, blocking status, and bank details." ;
+    ap:sapTable "LFA1_Suppliers" ;
+    ap:sapField "LIFNR" ;
+    skos:altLabel "vendor" , "payee" , "creditor" , "business partner" , "supplier master" , "BP" ;
+    skos:note "S/4HANA uses BUT000 (Business Partner); ECC uses LFA1. BQ table: LFA1_Suppliers. Key field: LIFNR. Join to transactions via LIFNR across EKKO, RBKP, ACDOCA, REGUH." .
+
+ap:Material a owl:Class ;
+    rdfs:label "Material" ;
+    rdfs:comment "Tangible good or stock-keeping unit procured via purchase orders. Contains material type, group, description, valuation class, and pricing." ;
+    ap:sapTable "MARA_Materials" ;
+    ap:sapField "MATNR" ;
+    skos:altLabel "item" , "SKU" , "part" , "component" , "product" ;
+    skos:note "BQ table: MARA_Materials. Key: MATNR. Join to PO items: EKPO.MATNR, Invoice items: RSEG.MATNR, GR: MATDOC.MATNR." .
+
+ap:Service a owl:Class ;
+    rdfs:label "Service" ;
+    rdfs:comment "Non-tangible procurement line entered via service entry sheets (SES). Used for consulting, maintenance, professional services." ;
+    skos:altLabel "service line" , "service item" , "SES item" ;
+    skos:note "Service POs have EKPO.PSTYP = 9. Confirmed via ESSR service entry sheets." .
+
+ap:GLAccount a owl:Class ;
+    rdfs:label "GL Account" ;
+    rdfs:comment "General ledger account for expense or balance sheet postings in the AP subledger. Determines P&L classification and cost allocation." ;
+    ap:sapTable "GL_Accounts" , "SKA1_GLAccounts" ;
+    ap:sapField "SAKNR" , "RACCT" ;
+    skos:altLabel "expense account" , "cost account" , "GL" , "general ledger account" , "ledger account" ;
+    skos:note "Two BQ tables: GL_Accounts (descriptions), SKA1_GLAccounts (chart of accounts). Join via SAKTO/RACCT to EKKN, RSEG, ACDOCA." .
+
+ap:CostObject a owl:Class ;
+    rdfs:label "Cost Object" ;
+    rdfs:comment "Controlling object to which costs are assigned — cost center, internal order, WBS element, asset, profit center, or segment. Determines managerial reporting dimensions." ;
+    skos:altLabel "cost assignment" , "account assignment" , "charge to" .
+
+ap:CostCenter a owl:Class ;
+    rdfs:subClassOf ap:CostObject ;
+    rdfs:label "Cost Center" ;
+    rdfs:comment "Organizational unit that incurs costs within a controlling area. Used for departmental cost tracking." ;
+    ap:sapTable "CSKS_CostCenters" ;
+    ap:sapField "KOSTL" ;
+    skos:altLabel "cost center" , "KOSTL" , "department" , "CC" ;
+    skos:note "BQ table: CSKS_CostCenters. Fields: KOSTL, DESCRIPTION, BUKRS, RESPONSIBLE_PERSON, HIERARCHY_AREA." .
+
+ap:ProfitCenter a owl:Class ;
+    rdfs:subClassOf ap:CostObject ;
+    rdfs:label "Profit Center" ;
+    rdfs:comment "Organizational unit for profit responsibility tracking. Links to segment reporting." ;
+    ap:sapTable "CEPC_ProfitCenters" ;
+    ap:sapField "PRCTR" ;
+    skos:altLabel "profit center" , "PRCTR" , "PC" .
+
+ap:CompanyCode a owl:Class ;
+    rdfs:label "Company Code" ;
+    rdfs:comment "Legal entity within an enterprise for financial reporting. Each company code has its own balance sheet and P&L." ;
+    ap:sapTable "T001_CompanyCodes" ;
+    ap:sapField "BUKRS" ;
+    skos:altLabel "company" , "legal entity" , "BUKRS" , "entity" ;
+    skos:note "BQ table: T001_CompanyCodes. Fields: BUKRS, BUTXT (name), WAERS (currency), LAND1 (country), ADRNR." .
+
+ap:Plant a owl:Class ;
+    rdfs:label "Plant" ;
+    rdfs:comment "Manufacturing or distribution facility where goods are received and stored." ;
+    ap:sapTable "T001W_Plants" ;
+    ap:sapField "WERKS" ;
+    skos:altLabel "facility" , "site" , "WERKS" , "location" ;
+    skos:note "BQ table: T001W_Plants. Fields: WERKS, NAME1, STRAS, ORT01, LAND1, REGIO." .
+
+ap:PurchasingOrg a owl:Class ;
+    rdfs:label "Purchasing Organization" ;
+    rdfs:comment "Organizational unit responsible for procurement activities and vendor negotiations." ;
+    ap:sapTable "T024E_PurchasingOrgs" ;
+    ap:sapField "EKORG" ;
+    skos:altLabel "purchasing org" , "procurement org" , "EKORG" , "buying org" .
+
+ap:PaymentTerms a owl:Class ;
+    rdfs:label "Payment Terms" ;
+    rdfs:comment "Terms governing when payment is due and available discounts. Defines net days, discount days, and discount percentages." ;
+    ap:sapTable "T052_PaymentTerms" ;
+    ap:sapField "ZTERM" ;
+    skos:altLabel "payment terms" , "net terms" , "ZTERM" , "terms" , "2/10 net 30" ;
+    skos:note "BQ table: T052_PaymentTerms. Fields: ZTERM, ZTAG1 (disc days 1), ZPRZ1 (disc % 1), ZTAG2, ZPRZ2, ZTAG3 (net days), ZFAEL (due date), TEXT1." .
+
+ap:VendorBank a owl:Class ;
+    rdfs:label "Vendor Bank Details" ;
+    rdfs:comment "Bank account details for vendor payment execution — routing, account number, IBAN." ;
+    ap:sapTable "LFBK_VendorBanks" ;
+    skos:altLabel "bank details" , "vendor bank" , "bank account" ;
+    skos:note "BQ table: LFBK_VendorBanks. Fields: LIFNR, BANKS (country), BANKL (routing), BANKN (account), IBAN, SWIFT, BKREF." .
+
+# ============================================================================
+# CLASSES — Procurement Objects (5 BQ tables)
+# ============================================================================
+
+ap:PurchaseRequisition a owl:Class ;
+    rdfs:label "Purchase Requisition" ;
+    rdfs:comment "Internal request to procure goods or services, preceding a purchase order. Created by end users or MRP, approved via release strategy." ;
+    ap:sapTable "EBAN_PurchaseReqs" ;
+    ap:sapField "BANFN" ;
+    skos:altLabel "PR" , "req" , "requisition" , "purchase request" ;
+    skos:note "BQ table: EBAN_PurchaseReqs. Key: BANFN+BNFPO. Fields: AFNAM (requester), WERKS, MATNR, MENGE, LFDAT, FRGST (release status), BADAT (created), EBELN (linked PO)." .
+
+ap:PurchaseOrder a owl:Class ;
+    rdfs:label "Purchase Order" ;
+    rdfs:comment "Legally binding commitment to procure goods/services from a supplier at agreed terms. Header contains supplier, payment terms, currency. Items contain material, qty, price." ;
+    ap:sapTable "EKKO_POHeaders" ;
+    ap:sapField "EBELN" ;
+    skos:altLabel "PO" , "order" , "purchase order" , "procurement order" ;
+    skos:note "BQ table: EKKO_POHeaders. Key: EBELN. Critical fields: LIFNR, BUKRS, BSART (doc type), EKORG, EKGRP, WAERS, ZTERM, AEDAT (created), INCO1. Join EKKO.EBELN = EKPO.EBELN for items." .
+
+ap:PurchaseOrderItem a owl:Class ;
+    rdfs:label "Purchase Order Item" ;
+    rdfs:comment "Line item within a PO specifying material/service, quantity, unit price, plant, item category, GR/IR indicators, and tolerance keys." ;
+    ap:sapTable "EKPO_POItems" ;
+    ap:sapField "EBELN+EBELP" ;
+    skos:altLabel "PO item" , "PO line" , "order line" , "line item" ;
+    skos:note "BQ table: EKPO_POItems. Key: EBELN+EBELP. Fields: MATNR, TXZ01 (short text), MENGE, MEINS, NETPR, NETWR, WERKS, PSTYP (item cat: 0=std, 9=service), KNTTP (acct assign cat), WEPOS (GR indicator), WEBRE (IR indicator), ELIKZ (delivery complete), EREKZ (final invoice), LOEKZ (deletion), MATKL (material group)." .
+
+ap:POAccountAssignment a owl:Class ;
+    rdfs:label "PO Account Assignment" ;
+    rdfs:comment "Cost allocation for a PO item — GL account, cost center, internal order, WBS element, asset, profit center." ;
+    ap:sapTable "EKKN_AcctAssignment" ;
+    ap:sapField "EBELN+EBELP+ZEKKN" ;
+    skos:altLabel "account assignment" , "cost allocation" , "EKKN" ;
+    skos:note "BQ table: EKKN_AcctAssignment. Key: EBELN+EBELP+ZEKKN. Fields: SAKTO (GL), KOSTL (CC), AUFNR (order), PS_PSP_PNR (WBS), ANLN1 (asset), PRCTR (PC), GSBER (biz area), FISTL (funds center)." .
+
+ap:POHistory a owl:Class ;
+    rdfs:label "PO History" ;
+    rdfs:comment "History of GR/IR events against a PO item. VGABE determines event type: 1=GR, 2=IR, 3=IR reversal, 4=GR reversal." ;
+    ap:sapTable "EKBE_POHistory" ;
+    ap:sapField "EBELN+EBELP+VGABE" ;
+    skos:altLabel "PO history" , "purchase order history" , "EKBE" ;
+    skos:note "BQ table: EKBE_POHistory. Key: EBELN+EBELP+VGABE+GJAHR+BELNR+BUZEI. Fields: VGABE (1=GR,2=IR,3=IR rev,4=GR rev,5=invoicing plan,6=GR adj,E=ERS,Q=QI), BELNR, GJAHR, BUDAT, MENGE, DMBTR, WAERS, AREWR (GR/IR clearing), SHKZG (D/C), BEWTP." .
+
+ap:POCommitment a owl:Class ;
+    rdfs:label "PO Commitment" ;
+    rdfs:comment "Uncommitted PO value = EKPO.NETWR minus sum of GR/IR values from EKBE. Derived entity — not stored in a single table." ;
+    skos:altLabel "commitment" , "open PO" , "outstanding PO" , "committed spend" , "uncommitted balance" ;
+    skos:note "Derived: commitment_value = EKPO.NETWR - MAX(SUM(EKBE.DMBTR WHERE VGABE='1'), SUM(EKBE.DMBTR WHERE VGABE IN ('2','3')))" .
+
+# ============================================================================
+# CLASSES — Logistics Execution (1 BQ table)
+# ============================================================================
+
+ap:GoodsReceipt a owl:Class ;
+    rdfs:label "Goods Receipt" ;
+    rdfs:comment "Logistics event confirming physical receipt of goods against a PO at a plant/storage location. Movement type 101=GR, 102=reversal, 122=return." ;
+    ap:sapTable "MATDOC_GoodsReceipts" ;
+    ap:sapField "MBLNR+MJAHR+ZEILE" ;
+    skos:altLabel "GR" , "receipt" , "MIGO" , "material document" , "receiving" , "goods receipt" ;
+    skos:note "BQ table: MATDOC_GoodsReceipts. Key: MBLNR+MJAHR+ZEILE. Fields: BWART (mvmt type: 101=GR, 102=rev, 103=blocked, 104=rev blocked, 122=return, 161=production), MATNR, WERKS, LGORT, MENGE, MEINS, DMBTR, BUDAT, EBELN, EBELP, SMBLN (reversal doc), SMBLP." .
+
+ap:ServiceEntrySheet a owl:Class ;
+    rdfs:label "Service Entry Sheet" ;
+    rdfs:comment "Acceptance confirmation for services rendered against a service PO line (PSTYP=9). Equivalent of GR for services." ;
+    skos:altLabel "SES" , "service entry" , "service acceptance" , "service confirmation" ;
+    skos:note "SAP tables ESSR (header), ESLH (lines). No dedicated BQ table yet — service GRs tracked via EKBE VGABE='1' for service PO items." .
+
+# ============================================================================
+# CLASSES — AP / Invoice Objects (2 BQ tables + 2 derived)
+# ============================================================================
+
+ap:SupplierInvoice a owl:Class ;
+    rdfs:label "Supplier Invoice" ;
+    rdfs:comment "Supplier's claim for payment. Posted via logistics IV (MIRO) or direct FI (FB60). Creates vendor liability. Header has supplier, dates, amounts, payment terms, block status." ;
+    ap:sapTable "RBKP_InvoiceHeaders" ;
+    ap:sapField "BELNR+GJAHR" ;
+    skos:altLabel "MIRO" , "invoice" , "IR" , "vendor bill" , "bill" , "AP invoice" , "incoming invoice" ;
+    skos:note "BQ table: RBKP_InvoiceHeaders. Key: BELNR+GJAHR. Fields: BUKRS, LIFNR, BLDAT (invoice date), BUDAT (posting date), ZFBDT (baseline), XBLNR (vendor ref), RMWWR (gross amt), WMWST1 (tax), WAERS, ZTERM, ZLSCH (pay method), ZLSPR (pay block), BLART (RE=inv, KG=credit), RBSTAT (5=posted, 1=parked), BKTXT." .
+
+ap:InvoiceLine a owl:Class ;
+    rdfs:label "Invoice Line Item" ;
+    rdfs:comment "Individual line on a supplier invoice. References PO/item for PO-based lines, or GL account for non-PO lines. Contains amount, quantity, tax code." ;
+    ap:sapTable "RSEG_InvoiceItems" ;
+    ap:sapField "BELNR+GJAHR+BUZEI" ;
+    skos:altLabel "invoice item" , "invoice line item" , "RSEG item" ;
+    skos:note "BQ table: RSEG_InvoiceItems. Key: BELNR+GJAHR+BUZEI. Fields: EBELN (PO), EBELP (PO item), MATNR, MENGE, WRBTR (doc currency amt), DMBTR (local currency), SAKTO (GL), KOSTL (CC), MWSKZ (tax code), BWKEY, WERKS." .
+
+ap:APOpenItem a owl:Class ;
+    rdfs:label "AP Open Item" ;
+    rdfs:comment "Unpaid (uncleared) vendor line item in the AP subledger. AUGBL IS NULL means open. AUGBL populated means cleared. Contains aging, due date, payment block status." ;
+    ap:sapTable "ACDOCA_UniversalJournal" ;
+    ap:sapField "RLDNR+RBUKRS+GJAHR+BELNR+DOCLN" ;
+    skos:altLabel "open item" , "payable" , "outstanding invoice" , "unpaid invoice" , "vendor liability" , "accounts payable" ;
+    skos:note "BQ table: ACDOCA_UniversalJournal (S/4 universal journal). Key: RLDNR+RBUKRS+GJAHR+BELNR+DOCLN. Filter: KOART='K' (vendor). AUGBL IS NULL = open. Fields: RACCT, LIFNR, BUDAT, BLDAT, ZFBDT, HSL (local amt), WSL (doc amt), RHCUR, RWCUR, AUGBL (clearing doc), AUGDT (clearing date), ZLSPR, ZLSCH, KOSTL, AUFNR, PS_PSP_PNR, PRCTR, SEGMENT, BLART, BSCHL, EBELN, EBELP, RLDNR (0L=leading)." .
+
+ap:InvoiceMatchCase a owl:Class ;
+    rdfs:label "Invoice Match Case" ;
+    rdfs:comment "Result of matching PO line + GR event + invoice line. Records match type (2-way/3-way), result, variances, tolerance status, and exception reasons." ;
+    ap:sapTable "MATCH_CASES" ;
+    skos:altLabel "match result" , "matching exception" , "three way match" , "3WM" , "three-way match" , "2WM" ;
+    skos:note "BQ table: MATCH_CASES. Derived entity joining RSEG (invoice) ↔ EKPO (PO) ↔ MATDOC (GR). Fields: INVOICE_DOC, PO_NUMBER, PO_ITEM, MATCH_TYPE (2way/3way), MATCH_RESULT (passed/failed_qty/failed_price/failed_gr_missing), PO_QTY, PO_PRICE, GR_QTY, INVOICE_QTY, INVOICE_PRICE, QTY_VARIANCE, PRICE_VARIANCE, TOLERANCE_KEY, WITHIN_TOLERANCE, EXCEPTION_REASONS." .
+
+ap:DuplicateRisk a owl:Class ;
+    rdfs:label "Duplicate Risk" ;
+    rdfs:comment "Potential duplicate invoice flagged by fuzzy matching on supplier + invoice number + amount + date within configurable window." ;
+    ap:sapTable "DUPLICATE_RISK" ;
+    skos:altLabel "duplicate invoice" , "duplicate check" , "double payment risk" ;
+    skos:note "BQ table: DUPLICATE_RISK. Fields: ORIGINAL_INVOICE, CANDIDATE_DUPLICATE, LIFNR, SIMILARITY_SCORE (0-1), MATCH_FIELDS (supplier/amount/date/reference), RISK_LEVEL (low/medium/high/confirmed), AMOUNT_DIFF, DATE_DIFF_DAYS." .
+
+# ============================================================================
+# CLASSES — Payments & Cash (2 BQ tables)
+# ============================================================================
+
+ap:Payment a owl:Class ;
+    rdfs:label "Payment" ;
+    rdfs:comment "Payment event settling one or more AP open items. Generated by automatic payment run (F110) or manual posting (F-53/FBZ1). Contains payment method, bank, amount." ;
+    ap:sapTable "REGUH_PaymentHeaders" ;
+    ap:sapField "LAUFD+LAUFI+ZBUKR+LIFNR" ;
+    skos:altLabel "remittance" , "settlement" , "F110 run" , "payment run" , "disbursement" , "manual payment" ;
+    skos:note "BQ table: REGUH_PaymentHeaders. Key: LAUFD+LAUFI+ZBUKR+LIFNR+KESSION. Fields: LAUFD (run date), LAUFI (run ID), ZBUKR (paying co code), LIFNR, RZAWE (pay method: C=check, T=wire, E=ACH), HBKID (house bank), HKTID (account), RWBTR (amount), WAERS, ZALDT (payment date), VBLNR (payment doc), KIDNO (reference)." .
+
+ap:PaymentItem a owl:Class ;
+    rdfs:label "Payment Item" ;
+    rdfs:comment "Individual invoice settled within a payment run. Links payment to specific invoice documents." ;
+    ap:sapTable "REGUP_PaymentItems" ;
+    ap:sapField "LAUFD+LAUFI+ZBUKR+LIFNR+BUKRS+BELNR+GJAHR+BUZEI" ;
+    skos:altLabel "payment detail" , "payment line" , "payment item" ;
+    skos:note "BQ table: REGUP_PaymentItems. Fields: BUKRS (invoice co code), BELNR (invoice doc), GJAHR, BUZEI, DMBTR (local amt paid), WRBTR (doc amt paid), SKNTO (cash discount taken), ZBFIX (fixed pay date flag)." .
+
+ap:ClearingEvent a owl:Class ;
+    rdfs:label "Clearing Event" ;
+    rdfs:comment "Accounting event that clears an open item against a payment, credit memo, or offsetting document. AUGBL and AUGDT are populated on the cleared item." ;
+    skos:altLabel "clearing" , "settlement link" , "reconciliation event" ;
+    skos:note "Derived from ACDOCA: JOIN original item (AUGBL populated) to clearing doc (ACDOCA.BELNR = AUGBL). Clearing type: payment, credit_memo, write_off, netting, manual." .
+
+# ============================================================================
+# CLASSES — Exceptions / Controls
+# ============================================================================
+
+ap:PaymentBlock a owl:Class ;
+    rdfs:label "Payment Block" ;
+    rdfs:comment "Hold on a vendor invoice preventing selection by automatic payment program (F110). Block key in ZLSPR field." ;
+    skos:altLabel "payment hold" , "pay block" , "payment stop" ;
+    skos:note "Block keys: A=free for payment, B=manual block, R=invoice verification, space=no block. Check RBKP.ZLSPR or ACDOCA.ZLSPR." .
+
+ap:InvoiceBlock a owl:Class ;
+    rdfs:label "Invoice Block" ;
+    rdfs:comment "Block preventing invoice posting or payment due to matching failure, tolerance breach, or manual hold." ;
+    skos:altLabel "invoice hold" , "posting block" , "verification block" ;
+    skos:note "Subtypes: quantity_variance, price_variance, gr_missing, tolerance_exceeded, manual_block, quality_block. Resolution: open → resolved → escalated → cancelled." .
+
+ap:ExceptionReason a owl:Class ;
+    rdfs:label "Exception Reason" ;
+    rdfs:comment "Standardized reason code for invoice/payment exceptions used in analytics and recommendations." ;
+    skos:altLabel "hold reason" , "block reason" , "exception code" ;
+    skos:note "Categories: matching, compliance, approval, data_quality, system, manual. Each reason has a recommended_action from Axis AI." .
+
+# ============================================================================
+# CLASSES — Reconciliation & KPI (2 BQ tables)
+# ============================================================================
+
+ap:GRIRBalance a owl:Class ;
+    rdfs:label "GR/IR Balance" ;
+    rdfs:comment "GR/IR clearing account balance per PO item. GR_VALUE minus IR_VALUE = DELTA. Positive delta = received not invoiced. Aging tracked." ;
+    ap:sapTable "GRIR_Reconciliation" ;
+    skos:altLabel "GR/IR" , "GRIR" , "accrual" , "goods receipt invoice receipt" , "GRIR clearing" ;
+    skos:note "BQ table: GRIR_Reconciliation. Fields: EBELN, EBELP, LIFNR, WERKS, GR_VALUE, IR_VALUE, DELTA, GR_COUNT, IR_COUNT, LAST_ACTIVITY, AGING_DAYS, AGING_BUCKET (current/1-30/31-60/61-90/90+), STATUS." .
+
+ap:KPISummary a owl:Class ;
+    rdfs:label "KPI Summary" ;
+    rdfs:comment "Pre-computed AP key performance indicators with benchmark comparisons." ;
+    ap:sapTable "KPI_Summary" ;
+    skos:altLabel "KPI" , "metrics summary" , "dashboard metrics" , "scorecard" ;
+    skos:note "BQ table: KPI_Summary. Fields: KPI (name), VALUE (float), BENCHMARK (string)." .
+
+# ============================================================================
+# OBJECT PROPERTIES (Relationships / Graph Edges)
+# Each relationship includes the SQL join path as annotation
+# ============================================================================
+
+ap:suppliesTo a owl:ObjectProperty ;
+    rdfs:label "supplies to" ;
+    rdfs:domain ap:Supplier ;
+    rdfs:range ap:PurchaseOrder ;
+    rdfs:comment "Supplier has one or more POs" ;
+    ap:joinPath "LFA1_Suppliers.LIFNR = EKKO_POHeaders.LIFNR" ;
+    skos:note "Questions: 'Which POs does vendor X have?', 'How much ordered from supplier Y?', 'Show all orders for this vendor'" .
+
+ap:containsItem a owl:ObjectProperty ;
+    rdfs:label "contains item" ;
+    rdfs:domain ap:PurchaseOrder ;
+    rdfs:range ap:PurchaseOrderItem ;
+    rdfs:comment "PO header contains line items" ;
+    ap:joinPath "EKKO_POHeaders.EBELN = EKPO_POItems.EBELN" .
+
+ap:hasAccountAssignment a owl:ObjectProperty ;
+    rdfs:label "has account assignment" ;
+    rdfs:domain ap:PurchaseOrderItem ;
+    rdfs:range ap:POAccountAssignment ;
+    rdfs:comment "PO item charged to cost objects and GL accounts" ;
+    ap:joinPath "EKPO_POItems.EBELN = EKKN_AcctAssignment.EBELN AND EKPO_POItems.EBELP = EKKN_AcctAssignment.EBELP" ;
+    skos:note "Questions: 'What cost center is this PO charged to?', 'Show PO spend by profit center'" .
+
+ap:hasHistory a owl:ObjectProperty ;
+    rdfs:label "has history" ;
+    rdfs:domain ap:PurchaseOrderItem ;
+    rdfs:range ap:POHistory ;
+    rdfs:comment "PO item has GR/IR history events in EKBE" ;
+    ap:joinPath "EKPO_POItems.EBELN = EKBE_POHistory.EBELN AND EKPO_POItems.EBELP = EKBE_POHistory.EBELP" .
+
+ap:receivedBy a owl:ObjectProperty ;
+    rdfs:label "received by" ;
+    rdfs:domain ap:PurchaseOrderItem ;
+    rdfs:range ap:GoodsReceipt ;
+    rdfs:comment "PO item partially or fully received via goods receipt" ;
+    ap:joinPath "EKPO_POItems.EBELN = MATDOC_GoodsReceipts.EBELN AND EKPO_POItems.EBELP = MATDOC_GoodsReceipts.EBELP AND MATDOC_GoodsReceipts.BWART = '101'" ;
+    skos:note "Questions: 'Has this PO been received?', 'GR vs PO quantity', 'What is GR status?'" .
+
+ap:invoicedBy a owl:ObjectProperty ;
+    rdfs:label "invoiced by" ;
+    rdfs:domain ap:PurchaseOrderItem ;
+    rdfs:range ap:InvoiceLine ;
+    rdfs:comment "PO item billed by supplier invoice line" ;
+    ap:joinPath "EKPO_POItems.EBELN = RSEG_InvoiceItems.EBELN AND EKPO_POItems.EBELP = RSEG_InvoiceItems.EBELP" ;
+    skos:note "Questions: 'Has PO been invoiced?', 'What invoices reference this PO?', 'PO vs invoice variance'" .
+
+ap:hasInvoiceHeader a owl:ObjectProperty ;
+    rdfs:label "has invoice header" ;
+    rdfs:domain ap:InvoiceLine ;
+    rdfs:range ap:SupplierInvoice ;
+    rdfs:comment "Invoice line belongs to invoice header" ;
+    ap:joinPath "RSEG_InvoiceItems.BELNR = RBKP_InvoiceHeaders.BELNR AND RSEG_InvoiceItems.GJAHR = RBKP_InvoiceHeaders.GJAHR" .
+
+ap:createsLiability a owl:ObjectProperty ;
+    rdfs:label "creates liability" ;
+    rdfs:domain ap:SupplierInvoice ;
+    rdfs:range ap:APOpenItem ;
+    rdfs:comment "Invoice posting creates vendor open item in ACDOCA" ;
+    ap:joinPath "RBKP_InvoiceHeaders.BELNR = ACDOCA_UniversalJournal.BELNR AND RBKP_InvoiceHeaders.GJAHR = ACDOCA_UniversalJournal.GJAHR AND ACDOCA_UniversalJournal.KOART = 'K'" ;
+    skos:note "Questions: 'Is this invoice still unpaid?', 'Open balance?', 'When is it due?'" .
+
+ap:settledBy a owl:ObjectProperty ;
+    rdfs:label "settled by" ;
+    rdfs:domain ap:APOpenItem ;
+    rdfs:range ap:Payment ;
+    rdfs:comment "Open item cleared by payment — via clearing doc or payment run" ;
+    ap:joinPath "ACDOCA_UniversalJournal.AUGBL = ACDOCA_UniversalJournal.BELNR (clearing doc) OR REGUP_PaymentItems.BELNR = ACDOCA_UniversalJournal.BELNR" ;
+    skos:note "Questions: 'How was this paid?', 'Which invoices in this payment run?', 'Was vendor paid on time?'" .
+
+ap:containsPaymentItem a owl:ObjectProperty ;
+    rdfs:label "contains payment item" ;
+    rdfs:domain ap:Payment ;
+    rdfs:range ap:PaymentItem ;
+    rdfs:comment "Payment run contains individual invoice settlements" ;
+    ap:joinPath "REGUH_PaymentHeaders.LAUFD = REGUP_PaymentItems.LAUFD AND REGUH_PaymentHeaders.LAUFI = REGUP_PaymentItems.LAUFI AND REGUH_PaymentHeaders.ZBUKR = REGUP_PaymentItems.ZBUKR AND REGUH_PaymentHeaders.LIFNR = REGUP_PaymentItems.LIFNR" .
+
+ap:generatesClearing a owl:ObjectProperty ;
+    rdfs:label "generates clearing" ;
+    rdfs:domain ap:Payment ;
+    rdfs:range ap:ClearingEvent ;
+    rdfs:comment "Payment generates clearing entries linking to settled invoices" .
+
+ap:matchedBy a owl:ObjectProperty ;
+    rdfs:label "matched by" ;
+    rdfs:domain ap:SupplierInvoice ;
+    rdfs:range ap:InvoiceMatchCase ;
+    rdfs:comment "Invoice validated by 2-way or 3-way matching engine" ;
+    skos:note "Questions: 'Did invoice pass 3-way match?', 'What are match exceptions?'" .
+
+ap:hasException a owl:ObjectProperty ;
+    rdfs:label "has exception" ;
+    rdfs:domain ap:InvoiceMatchCase ;
+    rdfs:range ap:ExceptionReason ;
+    rdfs:comment "Match failure produces one or more exception reasons" ;
+    skos:note "Questions: 'Why is this invoice blocked?', 'Root cause of hold?'" .
+
+ap:convertedTo a owl:ObjectProperty ;
+    rdfs:label "converted to" ;
+    rdfs:domain ap:PurchaseRequisition ;
+    rdfs:range ap:PurchaseOrder ;
+    rdfs:comment "PR converted into PO" ;
+    ap:joinPath "EBAN_PurchaseReqs.EBELN = EKPO_POItems.EBELN" ;
+    skos:note "Questions: 'Which PO from this PR?', 'PR to PO cycle time'" .
+
+ap:hasDuplicateRisk a owl:ObjectProperty ;
+    rdfs:label "has duplicate risk" ;
+    rdfs:domain ap:SupplierInvoice ;
+    rdfs:range ap:DuplicateRisk ;
+    rdfs:comment "Invoice flagged as potential duplicate" ;
+    skos:note "Questions: 'Is this duplicate?', 'Show duplicate risk invoices'" .
+
+ap:reconcilesGRIR a owl:ObjectProperty ;
+    rdfs:label "reconciles GR/IR" ;
+    rdfs:domain ap:GoodsReceipt ;
+    rdfs:range ap:SupplierInvoice ;
+    rdfs:comment "GR and Invoice reconcile via PO item on GR/IR clearing account" ;
+    ap:joinPath "MATDOC_GoodsReceipts.EBELN = RSEG_InvoiceItems.EBELN AND MATDOC_GoodsReceipts.EBELP = RSEG_InvoiceItems.EBELP" ;
+    skos:note "Questions: 'What is in GR/IR?', 'POs with GR but no invoice?', 'GR/IR aging'" .
+
+ap:belongsToCompanyCode a owl:ObjectProperty ;
+    rdfs:label "belongs to company code" ;
+    rdfs:domain owl:Thing ;
+    rdfs:range ap:CompanyCode ;
+    rdfs:comment "Entity belongs to a company code" ;
+    ap:joinPath "*.BUKRS = T001_CompanyCodes.BUKRS" .
+
+ap:locatedAtPlant a owl:ObjectProperty ;
+    rdfs:label "located at plant" ;
+    rdfs:domain owl:Thing ;
+    rdfs:range ap:Plant ;
+    rdfs:comment "Activity occurs at a plant" ;
+    ap:joinPath "*.WERKS = T001W_Plants.WERKS" .
+
+ap:hasBankDetails a owl:ObjectProperty ;
+    rdfs:label "has bank details" ;
+    rdfs:domain ap:Supplier ;
+    rdfs:range ap:VendorBank ;
+    rdfs:comment "Supplier bank account for payment execution" ;
+    ap:joinPath "LFA1_Suppliers.LIFNR = LFBK_VendorBanks.LIFNR" .
+
+ap:hasPaymentTerms a owl:ObjectProperty ;
+    rdfs:label "has payment terms" ;
+    rdfs:domain owl:Thing ;
+    rdfs:range ap:PaymentTerms ;
+    rdfs:comment "Entity uses payment terms" ;
+    ap:joinPath "*.ZTERM = T052_PaymentTerms.ZTERM" .
+
+ap:chargedToGL a owl:ObjectProperty ;
+    rdfs:label "charged to GL" ;
+    rdfs:domain owl:Thing ;
+    rdfs:range ap:GLAccount ;
+    rdfs:comment "Transaction posted to a GL account" ;
+    ap:joinPath "*.SAKTO = GL_Accounts.GL_ACCOUNT OR *.RACCT = SKA1_GLAccounts.SAKNR" .
+
+ap:chargedToCostCenter a owl:ObjectProperty ;
+    rdfs:label "charged to cost center" ;
+    rdfs:domain owl:Thing ;
+    rdfs:range ap:CostCenter ;
+    rdfs:comment "Cost allocated to a cost center" ;
+    ap:joinPath "*.KOSTL = CSKS_CostCenters.KOSTL" .
+
+ap:chargedToProfitCenter a owl:ObjectProperty ;
+    rdfs:label "charged to profit center" ;
+    rdfs:domain owl:Thing ;
+    rdfs:range ap:ProfitCenter ;
+    rdfs:comment "Revenue/cost allocated to a profit center" ;
+    ap:joinPath "*.PRCTR = CEPC_ProfitCenters.PRCTR" .
+
+ap:forMaterial a owl:ObjectProperty ;
+    rdfs:label "for material" ;
+    rdfs:domain owl:Thing ;
+    rdfs:range ap:Material ;
+    rdfs:comment "Transaction involves a material" ;
+    ap:joinPath "*.MATNR = MARA_Materials.MATNR" .
+
+ap:forSupplier a owl:ObjectProperty ;
+    rdfs:label "for supplier" ;
+    rdfs:domain owl:Thing ;
+    rdfs:range ap:Supplier ;
+    rdfs:comment "Transaction involves a supplier" ;
+    ap:joinPath "*.LIFNR = LFA1_Suppliers.LIFNR" .
+
+# ============================================================================
+# DATATYPE PROPERTIES — Per-Table Column Mappings
+# ============================================================================
+
+# --- LFA1_Suppliers columns ---
+ap:supplierID a owl:DatatypeProperty ; rdfs:label "Supplier ID" ; rdfs:domain ap:Supplier ; rdfs:range xsd:string ; ap:bqColumn "LIFNR" ; rdfs:comment "SAP vendor number (LIFNR)" .
+ap:supplierName a owl:DatatypeProperty ; rdfs:label "Supplier Name" ; rdfs:domain ap:Supplier ; rdfs:range xsd:string ; ap:bqColumn "NAME1" .
+ap:supplierCountry a owl:DatatypeProperty ; rdfs:label "Supplier Country" ; rdfs:domain ap:Supplier ; rdfs:range xsd:string ; ap:bqColumn "LAND1" .
+ap:supplierCity a owl:DatatypeProperty ; rdfs:label "Supplier City" ; rdfs:domain ap:Supplier ; rdfs:range xsd:string ; ap:bqColumn "ORT01" .
+ap:supplierPostalCode a owl:DatatypeProperty ; rdfs:label "Postal Code" ; rdfs:domain ap:Supplier ; rdfs:range xsd:string ; ap:bqColumn "PSTLZ" .
+ap:supplierTaxID a owl:DatatypeProperty ; rdfs:label "Tax ID" ; rdfs:domain ap:Supplier ; rdfs:range xsd:string ; ap:bqColumn "STCD1" .
+ap:reconAccount a owl:DatatypeProperty ; rdfs:label "Reconciliation Account" ; rdfs:domain ap:Supplier ; rdfs:range xsd:string ; ap:bqColumn "AKONT" ; rdfs:comment "GL recon account linking subledger to GL" .
+ap:supplierPaymentTerms a owl:DatatypeProperty ; rdfs:label "Default Payment Terms" ; rdfs:domain ap:Supplier ; rdfs:range xsd:string ; ap:bqColumn "ZTERM" .
+ap:supplierPaymentMethod a owl:DatatypeProperty ; rdfs:label "Payment Method" ; rdfs:domain ap:Supplier ; rdfs:range xsd:string ; ap:bqColumn "ZWELS" .
+ap:postingBlock a owl:DatatypeProperty ; rdfs:label "Posting Block" ; rdfs:domain ap:Supplier ; rdfs:range xsd:boolean ; ap:bqColumn "SPERR" .
+ap:supplierPaymentBlock a owl:DatatypeProperty ; rdfs:label "Vendor Payment Block" ; rdfs:domain ap:Supplier ; rdfs:range xsd:boolean ; ap:bqColumn "ZAHLS" .
+ap:purchasingBlock a owl:DatatypeProperty ; rdfs:label "Purchasing Block" ; rdfs:domain ap:Supplier ; rdfs:range xsd:boolean ; ap:bqColumn "SPERM" .
+ap:riskScore a owl:DatatypeProperty ; rdfs:label "Risk Score" ; rdfs:domain ap:Supplier ; rdfs:range xsd:float ; rdfs:comment "Axis AI computed vendor risk score 0-100 (derived)" .
+
+# --- EKKO_POHeaders columns ---
+ap:poNumber a owl:DatatypeProperty ; rdfs:label "PO Number" ; rdfs:domain ap:PurchaseOrder ; rdfs:range xsd:string ; ap:bqColumn "EBELN" .
+ap:poCompanyCode a owl:DatatypeProperty ; rdfs:label "PO Company Code" ; rdfs:domain ap:PurchaseOrder ; rdfs:range xsd:string ; ap:bqColumn "BUKRS" .
+ap:poDocType a owl:DatatypeProperty ; rdfs:label "PO Document Type" ; rdfs:domain ap:PurchaseOrder ; rdfs:range xsd:string ; ap:bqColumn "BSART" .
+ap:poCreatedDate a owl:DatatypeProperty ; rdfs:label "PO Created Date" ; rdfs:domain ap:PurchaseOrder ; rdfs:range xsd:date ; ap:bqColumn "AEDAT" .
+ap:poIncoterms a owl:DatatypeProperty ; rdfs:label "Incoterms" ; rdfs:domain ap:PurchaseOrder ; rdfs:range xsd:string ; ap:bqColumn "INCO1" .
+
+# --- EKPO_POItems columns ---
+ap:poItemNumber a owl:DatatypeProperty ; rdfs:label "PO Item Number" ; rdfs:domain ap:PurchaseOrderItem ; rdfs:range xsd:string ; ap:bqColumn "EBELP" .
+ap:netPrice a owl:DatatypeProperty ; rdfs:label "Net Price" ; rdfs:domain ap:PurchaseOrderItem ; rdfs:range xsd:decimal ; ap:bqColumn "NETPR" .
+ap:netValue a owl:DatatypeProperty ; rdfs:label "Net Value" ; rdfs:domain ap:PurchaseOrderItem ; rdfs:range xsd:decimal ; ap:bqColumn "NETWR" .
+ap:itemCategory a owl:DatatypeProperty ; rdfs:label "Item Category" ; rdfs:domain ap:PurchaseOrderItem ; rdfs:range xsd:string ; ap:bqColumn "PSTYP" ; rdfs:comment "0=standard, 9=service" .
+ap:grIndicator a owl:DatatypeProperty ; rdfs:label "GR Indicator" ; rdfs:domain ap:PurchaseOrderItem ; rdfs:range xsd:boolean ; ap:bqColumn "WEPOS" ; rdfs:comment "GR expected? Drives 2-way vs 3-way match" .
+ap:irIndicator a owl:DatatypeProperty ; rdfs:label "IR Indicator" ; rdfs:domain ap:PurchaseOrderItem ; rdfs:range xsd:boolean ; ap:bqColumn "WEBRE" .
+ap:deliveryComplete a owl:DatatypeProperty ; rdfs:label "Delivery Complete" ; rdfs:domain ap:PurchaseOrderItem ; rdfs:range xsd:boolean ; ap:bqColumn "ELIKZ" .
+ap:finalInvoice a owl:DatatypeProperty ; rdfs:label "Final Invoice" ; rdfs:domain ap:PurchaseOrderItem ; rdfs:range xsd:boolean ; ap:bqColumn "EREKZ" .
+ap:deletionFlag a owl:DatatypeProperty ; rdfs:label "Deletion Flag" ; rdfs:domain ap:PurchaseOrderItem ; rdfs:range xsd:string ; ap:bqColumn "LOEKZ" .
+ap:materialGroup a owl:DatatypeProperty ; rdfs:label "Material Group" ; rdfs:domain ap:PurchaseOrderItem ; rdfs:range xsd:string ; ap:bqColumn "MATKL" .
+
+# --- RBKP_InvoiceHeaders columns ---
+ap:invoiceDocNumber a owl:DatatypeProperty ; rdfs:label "Invoice Doc Number" ; rdfs:domain ap:SupplierInvoice ; rdfs:range xsd:string ; ap:bqColumn "BELNR" .
+ap:grossAmount a owl:DatatypeProperty ; rdfs:label "Gross Amount" ; rdfs:domain ap:SupplierInvoice ; rdfs:range xsd:decimal ; ap:bqColumn "RMWWR" .
+ap:taxAmount a owl:DatatypeProperty ; rdfs:label "Tax Amount" ; rdfs:domain ap:SupplierInvoice ; rdfs:range xsd:decimal ; ap:bqColumn "WMWST1" .
+ap:invoiceDate a owl:DatatypeProperty ; rdfs:label "Invoice Date" ; rdfs:domain ap:SupplierInvoice ; rdfs:range xsd:date ; ap:bqColumn "BLDAT" .
+ap:baselineDate a owl:DatatypeProperty ; rdfs:label "Baseline Date" ; rdfs:domain ap:SupplierInvoice ; rdfs:range xsd:date ; ap:bqColumn "ZFBDT" .
+ap:vendorInvoiceRef a owl:DatatypeProperty ; rdfs:label "Vendor Invoice Reference" ; rdfs:domain ap:SupplierInvoice ; rdfs:range xsd:string ; ap:bqColumn "XBLNR" .
+ap:invoiceStatus a owl:DatatypeProperty ; rdfs:label "Invoice Status" ; rdfs:domain ap:SupplierInvoice ; rdfs:range xsd:string ; ap:bqColumn "RBSTAT" ; rdfs:comment "5=posted, 1=parked, 2=saved incomplete" .
+
+# --- ACDOCA columns ---
+ap:accountType a owl:DatatypeProperty ; rdfs:label "Account Type" ; rdfs:domain ap:APOpenItem ; rdfs:range xsd:string ; ap:bqColumn "KOART" ; rdfs:comment "K=vendor, S=GL, D=customer" .
+ap:clearingDoc a owl:DatatypeProperty ; rdfs:label "Clearing Document" ; rdfs:domain ap:APOpenItem ; rdfs:range xsd:string ; ap:bqColumn "AUGBL" .
+ap:clearingDate a owl:DatatypeProperty ; rdfs:label "Clearing Date" ; rdfs:domain ap:APOpenItem ; rdfs:range xsd:date ; ap:bqColumn "AUGDT" .
+ap:localAmount a owl:DatatypeProperty ; rdfs:label "Local Currency Amount" ; rdfs:domain ap:APOpenItem ; rdfs:range xsd:decimal ; ap:bqColumn "HSL" .
+ap:docAmount a owl:DatatypeProperty ; rdfs:label "Document Currency Amount" ; rdfs:domain ap:APOpenItem ; rdfs:range xsd:decimal ; ap:bqColumn "WSL" .
+ap:postingKey a owl:DatatypeProperty ; rdfs:label "Posting Key" ; rdfs:domain ap:APOpenItem ; rdfs:range xsd:string ; ap:bqColumn "BSCHL" .
+ap:ledger a owl:DatatypeProperty ; rdfs:label "Ledger" ; rdfs:domain ap:APOpenItem ; rdfs:range xsd:string ; ap:bqColumn "RLDNR" ; rdfs:comment "0L = leading ledger" .
+
+# --- MATDOC columns ---
+ap:materialDocNumber a owl:DatatypeProperty ; rdfs:label "Material Doc Number" ; rdfs:domain ap:GoodsReceipt ; rdfs:range xsd:string ; ap:bqColumn "MBLNR" .
+ap:movementType a owl:DatatypeProperty ; rdfs:label "Movement Type" ; rdfs:domain ap:GoodsReceipt ; rdfs:range xsd:string ; ap:bqColumn "BWART" ; rdfs:comment "101=GR, 102=reversal, 103=blocked, 122=return, 161=production" .
+ap:reversalDoc a owl:DatatypeProperty ; rdfs:label "Reversal Document" ; rdfs:domain ap:GoodsReceipt ; rdfs:range xsd:string ; ap:bqColumn "SMBLN" .
+
+# --- Shared properties ---
+ap:postingDate a owl:DatatypeProperty ; rdfs:label "Posting Date" ; rdfs:domain owl:Thing ; rdfs:range xsd:date ; ap:bqColumn "BUDAT" .
+ap:fiscalYear a owl:DatatypeProperty ; rdfs:label "Fiscal Year" ; rdfs:domain owl:Thing ; rdfs:range xsd:string ; ap:bqColumn "GJAHR" .
+ap:currency a owl:DatatypeProperty ; rdfs:label "Currency" ; rdfs:domain owl:Thing ; rdfs:range xsd:string ; ap:bqColumn "WAERS" .
+ap:quantity a owl:DatatypeProperty ; rdfs:label "Quantity" ; rdfs:domain owl:Thing ; rdfs:range xsd:decimal ; ap:bqColumn "MENGE" .
+ap:amount a owl:DatatypeProperty ; rdfs:label "Amount (Local)" ; rdfs:domain owl:Thing ; rdfs:range xsd:decimal ; ap:bqColumn "DMBTR" .
+ap:docCurrencyAmount a owl:DatatypeProperty ; rdfs:label "Amount (Doc Currency)" ; rdfs:domain owl:Thing ; rdfs:range xsd:decimal ; ap:bqColumn "WRBTR" .
+ap:paymentBlock a owl:DatatypeProperty ; rdfs:label "Payment Block Key" ; rdfs:domain owl:Thing ; rdfs:range xsd:string ; ap:bqColumn "ZLSPR" .
+ap:paymentMethod a owl:DatatypeProperty ; rdfs:label "Payment Method" ; rdfs:domain owl:Thing ; rdfs:range xsd:string ; ap:bqColumn "ZLSCH" .
+ap:documentType a owl:DatatypeProperty ; rdfs:label "Document Type" ; rdfs:domain owl:Thing ; rdfs:range xsd:string ; ap:bqColumn "BLART" .
+ap:companyCode a owl:DatatypeProperty ; rdfs:label "Company Code" ; rdfs:domain owl:Thing ; rdfs:range xsd:string ; ap:bqColumn "BUKRS" .
+
+# ============================================================================
+# SKOS — AP METRICS (20+ with SQL formulas)
+# ============================================================================
+
+# --- Cycle Time Metrics ---
+
+ap:prToPoCycleTime a skos:Concept ;
+    rdfs:label "PR to PO Cycle Time" ;
+    skos:altLabel "requisition to order time" , "procurement lead time" ;
+    skos:definition "Average days from purchase requisition creation to PO creation" ;
+    ap:unit "days" ;
+    ap:direction "lower_is_better" ;
+    ap:sqlFormula "AVG(DATE_DIFF(EKKO.AEDAT, EBAN.BADAT, DAY)) WHERE EBAN.EBELN IS NOT NULL" ;
+    ap:benchmark "good: <3 days, average: 3-7, poor: >7" .
+
+ap:poToGrCycleTime a skos:Concept ;
+    rdfs:label "PO to GR Cycle Time" ;
+    skos:altLabel "delivery lead time" , "receipt cycle time" ;
+    skos:definition "Average days from PO creation to first goods receipt" ;
+    ap:unit "days" ;
+    ap:direction "lower_is_better" ;
+    ap:sqlFormula "AVG(DATE_DIFF(MIN(MATDOC.BUDAT), EKKO.AEDAT, DAY)) per PO item" .
+
+ap:grToInvoiceCycleTime a skos:Concept ;
+    rdfs:label "GR to Invoice Posting Cycle Time" ;
+    skos:altLabel "receipt to invoice time" , "invoice lag" ;
+    skos:definition "Average days from goods receipt to invoice posting" ;
+    ap:unit "days" ;
+    ap:direction "lower_is_better" ;
+    ap:sqlFormula "AVG(DATE_DIFF(RBKP.BUDAT, first_GR_date, DAY))" ;
+    ap:benchmark "good: <2, average: 2-5, poor: >5" .
+
+ap:invoiceToPaymentCycleTime a skos:Concept ;
+    rdfs:label "Invoice to Payment Cycle Time" ;
+    skos:altLabel "payment cycle time" , "processing time" , "invoice to pay" , "I2P cycle" ;
+    skos:definition "Average days from invoice posting to payment clearing" ;
+    ap:unit "days" ;
+    ap:direction "lower_is_better" ;
+    ap:sqlFormula "AVG(DATE_DIFF(ACDOCA.AUGDT, RBKP.BUDAT, DAY)) WHERE KOART='K' AND AUGBL IS NOT NULL" .
+
+ap:endToEndCycleTime a skos:Concept ;
+    rdfs:label "End-to-End P2P Cycle Time" ;
+    skos:altLabel "procure to pay time" , "total cycle time" , "P2P lead time" ;
+    skos:definition "Total days from requisition to payment — full PR→PO→GR→Invoice→Payment chain" ;
+    ap:unit "days" ;
+    ap:direction "lower_is_better" ;
+    ap:sqlFormula "AVG(DATE_DIFF(clearing_date, EBAN.BADAT, DAY))" .
+
+ap:touchlessRate a skos:Concept ;
+    rdfs:label "Touchless Processing Rate" ;
+    skos:altLabel "straight through rate" , "STP rate" , "no touch rate" , "automation rate" ;
+    skos:definition "Percentage of invoices processed without human intervention — no manual block, no workflow, no exception resolution, no manual GL override" ;
+    ap:unit "percent" ;
+    ap:direction "higher_is_better" ;
+    ap:sqlFormula "COUNT(invoices with no manual intervention) / COUNT(all invoices) * 100" ;
+    ap:benchmark "world_class: >90%, good: 70-90%, average: 40-70%, poor: <40%" .
+
+# --- Working Capital Metrics ---
+
+ap:daysPayableOutstanding a skos:Concept ;
+    rdfs:label "Days Payable Outstanding" ;
+    skos:altLabel "DPO" , "days payables" , "payables days" , "days payable" ;
+    skos:definition "Average number of days to pay suppliers. Higher preserves cash but may strain relationships." ;
+    ap:unit "days" ;
+    ap:direction "context_dependent" ;
+    ap:sqlFormula "(SUM(HSL WHERE KOART='K' AND AUGBL IS NULL) / SUM(total_spend_in_period)) * days_in_period" ;
+    ap:benchmark "industry median: ~45 days" .
+
+ap:grirAging a skos:Concept ;
+    rdfs:label "GR/IR Aging & Balance" ;
+    skos:altLabel "GRIR balance" , "accrual balance" , "goods receipt invoice receipt balance" , "GR/IR balance" ;
+    skos:definition "Outstanding GR/IR clearing account balance per PO item. Positive = GR > IR (received not invoiced). Items >90 days should be investigated." ;
+    ap:unit "currency" ;
+    ap:direction "lower_is_better" ;
+    ap:sqlFormula "SUM(GR_VALUE) - SUM(IR_VALUE) FROM GRIR_Reconciliation grouped by AGING_BUCKET" .
+
+ap:discountCaptureRate a skos:Concept ;
+    rdfs:label "Early Payment Discount Capture Rate" ;
+    skos:altLabel "discount rate" , "early pay discount" , "cash discount utilization" , "discount capture" ;
+    skos:definition "Percentage of available early payment discounts actually captured by paying within discount period" ;
+    ap:unit "percent" ;
+    ap:direction "higher_is_better" ;
+    ap:sqlFormula "COUNT(invoices paid within discount period) / COUNT(invoices with discount terms) * 100" ;
+    ap:benchmark "good: >95%, average: 80-95%, poor: <80%" .
+
+ap:discountLeakage a skos:Concept ;
+    rdfs:label "Discount Leakage" ;
+    skos:altLabel "missed discount" , "lost discount" , "discount opportunity cost" ;
+    skos:definition "Dollar value of early payment discounts missed because payment was after discount deadline" ;
+    ap:unit "currency" ;
+    ap:direction "lower_is_better" ;
+    ap:sqlFormula "SUM(invoice_gross * discount_pct) WHERE payment_date > discount_due_date" .
+
+ap:paymentTimingVsDue a skos:Concept ;
+    rdfs:label "Payment Timing vs Due Date" ;
+    skos:altLabel "early late payment" , "payment punctuality" , "on time payment rate" ;
+    skos:definition "Distribution of payment timing relative to due dates. Negative=early, Zero=on time, Positive=late" ;
+    ap:unit "days" ;
+    ap:sqlFormula "payment_date - due_date; on_time_rate = COUNT(payment_date <= due_date) / COUNT(all) * 100" .
+
+# --- Quality / Exception Metrics ---
+
+ap:threeWayMatchRate a skos:Concept ;
+    rdfs:label "3-Way Match Pass Rate" ;
+    skos:altLabel "match rate" , "first pass match" , "matching success rate" , "3WM rate" ;
+    skos:definition "Percentage of PO-based invoices passing 3-way match (PO↔GR↔Invoice) on first attempt without exceptions" ;
+    ap:unit "percent" ;
+    ap:direction "higher_is_better" ;
+    ap:sqlFormula "COUNT(MATCH_RESULT='passed') / COUNT(*) * 100 FROM MATCH_CASES" ;
+    ap:benchmark "world_class: >95%, good: 85-95%, average: 70-85%, poor: <70%" .
+
+ap:invoiceBlockRate a skos:Concept ;
+    rdfs:label "Invoice Block Rate by Reason" ;
+    skos:altLabel "hold rate" , "exception rate" , "block distribution" , "block rate" ;
+    skos:definition "Percentage of invoices blocked, broken down by exception reason (qty variance, price variance, GR missing, manual)" ;
+    ap:unit "percent" ;
+    ap:direction "lower_is_better" ;
+    ap:sqlFormula "COUNT(blocked invoices with reason X) / COUNT(all invoices) * 100" .
+
+ap:duplicateInvoiceRate a skos:Concept ;
+    rdfs:label "Duplicate Invoice Rate" ;
+    skos:altLabel "duplicate rate" , "double pay risk rate" , "duplicate detection rate" ;
+    skos:definition "Percentage of invoices flagged by duplicate detection engine" ;
+    ap:unit "percent" ;
+    ap:direction "lower_is_better" ;
+    ap:sqlFormula "COUNT(DISTINCT ORIGINAL_INVOICE FROM DUPLICATE_RISK) / COUNT(DISTINCT BELNR FROM RBKP) * 100" ;
+    ap:benchmark "good: <1%, concerning: 1-3%, poor: >3%" .
+
+ap:invoiceAccuracy a skos:Concept ;
+    rdfs:label "Invoice Accuracy Rate" ;
+    skos:altLabel "price qty variance rate" , "invoice error rate" ;
+    skos:definition "Percentage of invoices with no price or quantity variances against PO" ;
+    ap:unit "percent" ;
+    ap:direction "higher_is_better" .
+
+# --- Vendor Performance Metrics ---
+
+ap:invoiceRejectionRate a skos:Concept ;
+    rdfs:label "Invoice Rejection Rate" ;
+    skos:altLabel "vendor invoice error rate" , "supplier quality" ;
+    skos:definition "Rate at which a vendor's invoices are rejected or require credit memo correction" ;
+    ap:unit "percent" ;
+    ap:direction "lower_is_better" .
+
+ap:disputeRate a skos:Concept ;
+    rdfs:label "Vendor Dispute Rate" ;
+    skos:altLabel "dispute frequency" , "invoice dispute rate" ;
+    skos:definition "Percentage of invoices entering a dispute process per vendor" ;
+    ap:unit "percent" ;
+    ap:direction "lower_is_better" .
+
+ap:avgResolutionTime a skos:Concept ;
+    rdfs:label "Average Exception Resolution Time" ;
+    skos:altLabel "resolution cycle" , "hold resolution time" , "exception aging" ;
+    skos:definition "Average days to resolve an invoice hold or payment block" ;
+    ap:unit "days" ;
+    ap:direction "lower_is_better" ;
+    ap:benchmark "good: <3, average: 3-7, poor: >7" .
+
+# --- Volume / Productivity Metrics ---
+
+ap:invoicesProcessedPerFTE a skos:Concept ;
+    rdfs:label "Invoices Processed per FTE" ;
+    skos:altLabel "AP productivity" , "throughput per head" ;
+    skos:definition "Number of invoices processed per full-time AP team member per period" ;
+    ap:unit "count" ;
+    ap:direction "higher_is_better" ;
+    ap:benchmark "world_class: >20000/yr, good: 10000-20000, average: 5000-10000" .
+
+ap:invoiceVolume a skos:Concept ;
+    rdfs:label "Invoice Volume" ;
+    skos:altLabel "invoice count" , "AP volume" ;
+    skos:definition "Total number of invoices processed per period" ;
+    ap:unit "count" ;
+    ap:sqlFormula "COUNT(DISTINCT BELNR) FROM RBKP_InvoiceHeaders WHERE BUDAT BETWEEN start AND end" .
+
+ap:paymentVolume a skos:Concept ;
+    rdfs:label "Payment Volume & Value" ;
+    skos:altLabel "disbursement volume" , "payment count" , "total payments" ;
+    skos:definition "Count and total value of payments per period" ;
+    ap:unit "count_and_currency" ;
+    ap:sqlFormula "COUNT(DISTINCT VBLNR), SUM(RWBTR) FROM REGUH_PaymentHeaders" .
+
+ap:openAPBalance a skos:Concept ;
+    rdfs:label "Open AP Balance" ;
+    skos:altLabel "total payables" , "outstanding AP" , "AP liability" , "open payables" ;
+    skos:definition "Total outstanding (uncleared) AP balance across all vendors" ;
+    ap:unit "currency" ;
+    ap:sqlFormula "SUM(HSL) FROM ACDOCA_UniversalJournal WHERE KOART='K' AND AUGBL IS NULL AND RLDNR='0L'" .
+
+# ============================================================================
+# SKOS — AP Term Disambiguations (from semantic_dictionary.yaml)
+# ============================================================================
+
+ap:TermBill a skos:Concept ;
+    rdfs:label "bill" ;
+    skos:definition "In AP context, 'bill' means a supplier invoice (vendor claim for payment). NOT an AR bill." ;
+    skos:broader ap:SupplierInvoice ;
+    skos:example "'Pay this bill' → process supplier invoice payment" , "'Unpaid bills' → open AP items" .
+
+ap:TermPaid a skos:Concept ;
+    rdfs:label "paid" ;
+    skos:definition "Two meanings: (1) accounting_cleared — AUGBL populated, invoice cleared; (2) bank_executed — cash disbursed, bank statement matched. Clarify: 'cleared in accounting or money left the bank?'" ;
+    skos:broader ap:ClearingEvent .
+
+ap:TermOpen a skos:Concept ;
+    rdfs:label "open" ;
+    skos:definition "Item NOT cleared — vendor liability still outstanding (AUGBL IS NULL in ACDOCA, or record in BSIK for ECC). Do not confuse with 'open PO' or 'open GR/IR'." ;
+    skos:broader ap:APOpenItem .
+
+ap:TermOverdue a skos:Concept ;
+    rdfs:label "overdue" ;
+    skos:definition "Open item where today > calculated due date (due_date = ZFBDT + net days from ZTERM/T052.ZTAG3) AND clearing_status = 'open'" ;
+    skos:broader ap:APOpenItem .
+
+ap:TermBlocked a skos:Concept ;
+    rdfs:label "blocked" ;
+    skos:definition "Three meanings: (1) payment_blocked — ZLSPR set, invoice cannot be selected by F110; (2) posting_blocked — invoice parked/held; (3) vendor_blocked — supplier master has posting/payment block." ;
+    skos:broader ap:PaymentBlock .
+
+ap:TermGRMissing a skos:Concept ;
+    rdfs:label "GR missing" ;
+    skos:definition "PO-based invoice exists but no corresponding goods receipt for the referenced PO item. Prevents 3-way match." ;
+    skos:broader ap:InvoiceMatchCase .
+
+ap:TermThreeWayMatch a skos:Concept ;
+    rdfs:label "three way match" ;
+    skos:altLabel "3-way match" , "3WM" , "three-way" , "matching" ;
+    skos:definition "Alignment check between PO (agreed price/qty), GR (received qty), and Invoice (billed price/qty). All must align within tolerances." .
+
+ap:TermTwoWayMatch a skos:Concept ;
+    rdfs:label "two way match" ;
+    skos:altLabel "2-way match" , "2WM" ;
+    skos:definition "PO↔Invoice match only — no GR required (EKPO.WEPOS = false)." .
+
+ap:TermCreditMemo a skos:Concept ;
+    rdfs:label "credit memo" ;
+    skos:altLabel "credit note" , "vendor credit" ;
+    skos:definition "Negative invoice from vendor reducing amount owed. Document type KG in SAP." ;
+    skos:broader ap:SupplierInvoice .
+
+ap:TermDebitMemo a skos:Concept ;
+    rdfs:label "debit memo" ;
+    skos:definition "Document issued TO the vendor requesting a credit for overcharge." ;
+    skos:broader ap:SupplierInvoice .
+
+ap:TermGRIR a skos:Concept ;
+    rdfs:label "GR/IR" ;
+    skos:altLabel "goods receipt invoice receipt" , "GRIR clearing" , "accrual" ;
+    skos:definition "GR/IR clearing account balance represents accrued but uninvoiced liabilities. Positive = received but not invoiced." ;
+    skos:broader ap:GRIRBalance .
+
+ap:TermPaymentRun a skos:Concept ;
+    rdfs:label "payment run" ;
+    skos:altLabel "F110" , "auto pay" , "automatic payment" , "pay run" ;
+    skos:definition "SAP automatic payment program (F110) selecting open items by due date and payment method." ;
+    skos:broader ap:Payment .
+
+ap:TermParked a skos:Concept ;
+    rdfs:label "parked" ;
+    skos:definition "Invoice saved but not posted (RBSTAT=1). Does not create open item until posted. Not same as 'posted but blocked'." ;
+    skos:broader ap:SupplierInvoice .
+
+ap:TermCleared a skos:Concept ;
+    rdfs:label "cleared" ;
+    skos:altLabel "settled" , "reconciled" , "knocked off" , "applied" ;
+    skos:definition "Open item matched against offsetting document (payment, credit memo, write-off). AUGBL populated." ;
+    skos:broader ap:ClearingEvent .
+
+ap:TermVariance a skos:Concept ;
+    rdfs:label "variance" ;
+    skos:definition "Three types: (1) price_variance — invoice price vs PO price; (2) quantity_variance — invoice qty vs GR/PO qty; (3) amount_variance — total invoice vs expected." .
+
+ap:TermTolerance a skos:Concept ;
+    rdfs:label "tolerance" ;
+    skos:definition "Configured thresholds (absolute and percentage) determining whether a variance triggers an invoice block. SAP config: T169G, T169P, transaction OMR6." .
+
+ap:TermEarlyPayDiscount a skos:Concept ;
+    rdfs:label "early payment discount" ;
+    skos:altLabel "cash discount" , "prompt payment discount" , "2/10 net 30" , "discount terms" ;
+    skos:definition "Discount for paying before net due date. E.g., 2/10 net 30 = 2% if paid within 10 days. SAP config: T052 ZPRZ1/ZTAG1." .
+
+# ============================================================================
+# COMMON JOIN PATHS (Multi-Table Queries)
+# ============================================================================
+
+ap:JoinPath_PO_Full_Lifecycle a skos:Concept ;
+    rdfs:label "PO Full Lifecycle Join" ;
+    skos:definition """Full P2P join path:
+EKKO.EBELN = EKPO.EBELN (PO header→items)
+→ EKPO.EBELN+EBELP = EKBE.EBELN+EBELP (PO→history)
+→ EKBE(VGABE='1') → MATDOC via BELNR+GJAHR (GR docs)
+→ EKBE(VGABE='2') → RSEG via BELNR+GJAHR (Invoice docs)
+→ RSEG.BELNR+GJAHR = RBKP.BELNR+GJAHR (invoice items→header)
+→ RBKP → ACDOCA via BELNR+GJAHR+BUKRS (FI posting)
+→ ACDOCA.AUGBL → payment clearing doc""" .
+
+ap:JoinPath_Open_Items_With_PO a skos:Concept ;
+    rdfs:label "Open Items with PO Detail" ;
+    skos:definition """Open AP items with originating PO and GR info:
+ACDOCA(KOART='K', AUGBL IS NULL) → open items
+→ ACDOCA.EBELN+EBELP → EKPO (PO detail)
+→ EKPO.EBELN+EBELP → EKBE (GR history)""" .
+
+ap:JoinPath_Vendor_Payment_History a skos:Concept ;
+    rdfs:label "Vendor Payment History" ;
+    skos:definition """All payments to a vendor with invoice details:
+REGUH.LIFNR = filter vendor
+→ REGUH → REGUP (invoices in payment)
+→ REGUP.BELNR+GJAHR → RBKP (invoice header)
+→ REGUH.VBLNR → ACDOCA (payment FI doc)""" .

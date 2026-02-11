@@ -1,0 +1,29 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# Semantic Term: Bill / Invoice
+# ============================================================================
+# Disambiguates "bill" and "invoice" in AP context.
+# Users say "bill" but SAP calls it "invoice" (RBKP/RSEG).
+# ============================================================================
+
+ap:term_bill a mantrix:SemanticTerm ;
+    rdfs:label "bill" ;
+    rdfs:comment "In AP context, 'bill' always means supplier invoice (RBKP_InvoiceHeaders). Users commonly say 'bill' when they mean vendor invoice." ;
+    skos:altLabel "invoice" , "vendor bill" , "supplier invoice" , "incoming invoice" , "AP invoice" ;
+    mantrix:canonicalEntity "RBKP_InvoiceHeaders" ;
+    mantrix:disambiguation "bill = RBKP_InvoiceHeaders. NOT a customer billing document. NOT a bill of materials (BOM)." ;
+    mantrix:userIntentMap "'show me the bills' → query RBKP_InvoiceHeaders. 'unpaid bills' → ACDOCA WHERE AUGBL IS NULL. 'bill from vendor X' → RBKP WHERE LIFNR = X." .
+
+ap:term_invoice a mantrix:SemanticTerm ;
+    rdfs:label "invoice" ;
+    rdfs:comment "Supplier's claim for payment. The core document in AP. Posted via MIRO or FB60." ;
+    skos:altLabel "bill" , "IR" , "MIRO" , "vendor invoice" ;
+    mantrix:canonicalEntity "RBKP_InvoiceHeaders" ;
+    mantrix:disambiguation "In AP: invoice = RBKP header + RSEG line items. In AR: invoice = customer billing doc (different module)." ;
+    mantrix:relatedTerms "credit memo, debit memo, parked invoice, blocked invoice" .

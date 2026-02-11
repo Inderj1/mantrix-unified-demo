@@ -1,0 +1,16 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix copa: <http://mantrix.ai/ontology/copa#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+copa:metric_average_selling_price a mantrix:Metric ;
+    rdfs:label "Average Selling Price" ;
+    rdfs:comment "Net sales divided by quantity sold. Unit-level pricing." ;
+    skos:altLabel "ASP" , "avg price" , "unit price" , "price per unit" ;
+    mantrix:sqlFormula "SUM(Net_Sales) / NULLIF(SUM(Inv_Quantity), 0)" ;
+    mantrix:exampleQuestion "ASP by brand" ;
+    mantrix:exampleSQL "SELECT Brand, SUM(Net_Sales) / NULLIF(SUM(Inv_Quantity), 0) as asp FROM dataset_25m_table GROUP BY Brand ORDER BY asp DESC" ;
+    mantrix:exampleQuestion "ASP trend over time" ;
+    mantrix:exampleSQL "SELECT DATE_TRUNC(Posting_Date, MONTH) as month, SUM(Net_Sales) / NULLIF(SUM(Inv_Quantity), 0) as asp FROM dataset_25m_table GROUP BY month ORDER BY month" .

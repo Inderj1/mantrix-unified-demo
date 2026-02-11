@@ -1,0 +1,58 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: EBAN_PurchaseReqs — Purchase Requisitions
+# ============================================================================
+# Internal request for procurement. The START of the P2P process.
+# Created by MRP, users, or projects. Approved through release strategy.
+# Converted to PO by buyer. PR-to-PO cycle time is a key KPI.
+# ============================================================================
+
+ap:EBAN_PurchaseReqs a owl:Class ;
+    rdfs:label "EBAN_PurchaseReqs" ;
+    rdfs:comment "Purchase requisition items. One row per PR line item. Starting point of procure-to-pay. FRGST tracks release/approval status. EBELN populated when converted to PO." ;
+    bq:table "EBAN_PurchaseReqs" ; bq:primaryKey "BANFN, BNFPO" ;
+    skos:altLabel "PR" , "purchase requisition" , "requisition" , "BANF" , "request" , "ME51N" ;
+    mantrix:sapTable "EBAN" ; mantrix:sapTransaction "ME51N (create PR), ME53N (display PR)" ;
+    mantrix:relatedConcepts "EKPO_POItems, EKKO_POHeaders, MARA_Materials, T001W_Plants" .
+
+# --- Columns ---
+ap:EBAN_BANFN a owl:DatatypeProperty ; rdfs:label "PR Number" ; bq:column "BANFN" ; bq:type "STRING" ; rdfs:comment "Purchase requisition number." .
+ap:EBAN_BNFPO a owl:DatatypeProperty ; rdfs:label "PR Item" ; bq:column "BNFPO" ; bq:type "STRING" ; rdfs:comment "PR item number (10, 20, 30...)." .
+ap:EBAN_MATNR a owl:DatatypeProperty ; rdfs:label "Material" ; bq:column "MATNR" ; bq:type "STRING" ; bq:foreignKey "MARA_Materials.MATNR" .
+ap:EBAN_TXZ01 a owl:DatatypeProperty ; rdfs:label "Short Text" ; bq:column "TXZ01" ; bq:type "STRING" ; rdfs:comment "Item description. Free text for non-material items." .
+ap:EBAN_MENGE a owl:DatatypeProperty ; rdfs:label "Quantity" ; bq:column "MENGE" ; bq:type "FLOAT" .
+ap:EBAN_MEINS a owl:DatatypeProperty ; rdfs:label "Unit of Measure" ; bq:column "MEINS" ; bq:type "STRING" .
+ap:EBAN_WERKS a owl:DatatypeProperty ; rdfs:label "Plant" ; bq:column "WERKS" ; bq:type "STRING" ; bq:foreignKey "T001W_Plants.WERKS" .
+ap:EBAN_AFNAM a owl:DatatypeProperty ; rdfs:label "Requisitioner" ; bq:column "AFNAM" ; bq:type "STRING" ; rdfs:comment "Name of person who created the requisition." .
+ap:EBAN_BADAT a owl:DatatypeProperty ; rdfs:label "PR Date" ; bq:column "BADAT" ; bq:type "DATE" ; rdfs:comment "Date PR was created. Used for PR-to-PO cycle time." .
+ap:EBAN_LFDAT a owl:DatatypeProperty ; rdfs:label "Delivery Date" ; bq:column "LFDAT" ; bq:type "DATE" ; rdfs:comment "Requested delivery date." .
+ap:EBAN_FRGST a owl:DatatypeProperty ; rdfs:label "Release Status" ; bq:column "FRGST" ; bq:type "STRING" ; rdfs:comment "Release/approval status of the PR." .
+ap:EBAN_EBELN a owl:DatatypeProperty ; rdfs:label "PO Number" ; bq:column "EBELN" ; bq:type "INTEGER" ; bq:foreignKey "EKKO_POHeaders.EBELN" ; rdfs:comment "PO created from this PR. NULL = not yet converted to PO." .
+ap:EBAN_BUKRS a owl:DatatypeProperty ; rdfs:label "Company Code" ; bq:column "BUKRS" ; bq:type "STRING" ; bq:foreignKey "T001_CompanyCodes.BUKRS" .
+
+# --- Join Paths ---
+ap:EBAN_join_EKPO a mantrix:joinPath ; rdfs:label "PR → PO Item" ; rdfs:comment "EBAN.EBELN = EKPO.EBELN (when PR is converted to PO)" .
+ap:EBAN_join_MARA a mantrix:joinPath ; rdfs:label "PR → Material" ; rdfs:comment "EBAN.MATNR = MARA.MATNR" .
+
+# --- Example Questions & SQL ---
+ap:EBAN_q1 mantrix:exampleQuestion "Open PRs not yet converted to PO" ;
+    mantrix:exampleSQL "SELECT BANFN, BNFPO, TXZ01, MENGE, BADAT, LFDAT, AFNAM FROM EBAN_PurchaseReqs WHERE EBELN IS NULL ORDER BY BADAT" .
+ap:EBAN_q2 mantrix:exampleQuestion "PR to PO cycle time" ;
+    mantrix:exampleSQL "SELECT AVG(DATE_DIFF(k.AEDAT, e.BADAT, DAY)) as avg_pr_to_po_days FROM EBAN_PurchaseReqs e JOIN EKKO_POHeaders k ON e.EBELN = k.EBELN WHERE e.EBELN IS NOT NULL" .
+ap:EBAN_q3 mantrix:exampleQuestion "PRs by requisitioner" ;
+    mantrix:exampleSQL "SELECT AFNAM, COUNT(*) as pr_count, SUM(MENGE) as total_qty FROM EBAN_PurchaseReqs GROUP BY AFNAM ORDER BY pr_count DESC" .
+ap:EBAN_q4 mantrix:exampleQuestion "PRs pending approval" ;
+    mantrix:exampleSQL "SELECT BANFN, BNFPO, TXZ01, MENGE, BADAT, FRGST FROM EBAN_PurchaseReqs WHERE EBELN IS NULL AND FRGST != 'X' ORDER BY BADAT" .
+
+# --- Edge Cases ---
+ap:EBAN_edge1 mantrix:edgeCases "EBELN populated means PR was converted to PO. NULL means still pending or rejected." .
+ap:EBAN_edge2 mantrix:edgeCases "FRGST tracks release strategy status. Exact values are customer-specific (configured in release strategy)." .
+ap:EBAN_edge3 mantrix:edgeCases "PR-to-PO cycle time = EKKO.AEDAT (PO date) - EBAN.BADAT (PR date). Only for PRs where EBELN IS NOT NULL." .

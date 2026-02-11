@@ -1,0 +1,50 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# AP Metric: Discount Leakage
+# ============================================================================
+
+ap:metric_discount_leakage a mantrix:Metric ;
+    rdfs:label "Discount Leakage" ;
+    rdfs:comment "Dollar amount of early payment discounts that were available but NOT captured. Direct profit impact — every dollar of leakage is lost margin." ;
+    skos:altLabel "missed discount" , "lost discount" , "discount loss" ;
+    mantrix:category "working_capital" ;
+    mantrix:unit "currency" ;
+    mantrix:direction "lower_is_better" ;
+    mantrix:benchmark "$0 (ideal), <0.5% of AP spend (acceptable)" ;
+    mantrix:sqlFormula "SUM(DISCOUNT_AMOUNT) WHERE DISCOUNT_CAPTURED = false AND DISCOUNT_AMOUNT > 0" ;
+    mantrix:sourceTables "ACDOCA_UniversalJournal, RBKP_InvoiceHeaders" ;
+    mantrix:dimensions "vendor, company_code, reason" ;
+    mantrix:exampleQuestion "How much discount leakage do we have?" ;
+    mantrix:exampleSQL """SELECT
+  SUM(DISCOUNT_AMOUNT) as total_leakage,
+  COUNT(*) as missed_count
+FROM ACDOCA_UniversalJournal
+WHERE KOART = 'K' AND RLDNR = '0L' AND AUGBL IS NOT NULL
+  AND DISCOUNT_CAPTURED = false AND DISCOUNT_AMOUNT > 0""" ;
+    mantrix:exampleQuestion "Discount leakage by vendor" ;
+    mantrix:exampleSQL """SELECT a.LIFNR, s.NAME1,
+  SUM(a.DISCOUNT_AMOUNT) as leakage, COUNT(*) as missed_count
+FROM ACDOCA_UniversalJournal a
+JOIN LFA1_Suppliers s ON a.LIFNR = s.LIFNR
+WHERE a.KOART = 'K' AND a.RLDNR = '0L' AND a.AUGBL IS NOT NULL
+  AND a.DISCOUNT_CAPTURED = false AND a.DISCOUNT_AMOUNT > 0
+GROUP BY a.LIFNR, s.NAME1 ORDER BY leakage DESC LIMIT 10""" ;
+    mantrix:exampleQuestion "Invoices at risk of missing discount (approaching deadline)" ;
+    mantrix:exampleSQL """SELECT r.BELNR, r.LIFNR, s.NAME1, r.RMWWR, r.DISC_DUE_DATE, r.DISC_AMOUNT,
+  DATE_DIFF(r.DISC_DUE_DATE, CURRENT_DATE(), DAY) as days_remaining
+FROM RBKP_InvoiceHeaders r
+JOIN LFA1_Suppliers s ON r.LIFNR = s.LIFNR
+JOIN ACDOCA_UniversalJournal a ON r.BELNR = a.BELNR AND r.GJAHR = a.GJAHR
+WHERE a.KOART = 'K' AND a.RLDNR = '0L' AND a.AUGBL IS NULL
+  AND r.DISC_AMOUNT > 0 AND r.DISC_DUE_DATE >= CURRENT_DATE()
+  AND r.DISC_DUE_DATE <= DATE_ADD(CURRENT_DATE(), INTERVAL 5 DAY)
+ORDER BY r.DISC_AMOUNT DESC""" ;
+    mantrix:edgeCases "Root causes: blocked invoices, late GR, approval delays, payment run scheduling. Combine with block analysis for root cause." .

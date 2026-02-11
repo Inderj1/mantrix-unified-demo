@@ -1,0 +1,20 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix copa: <http://mantrix.ai/ontology/copa#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+copa:dim_time_period a mantrix:Dimension ;
+    rdfs:label "Time Period" ;
+    rdfs:comment "Time dimension based on Posting_Date. Supports daily, monthly, quarterly, yearly aggregation and YTD/QTD/MTD filters." ;
+    skos:altLabel "period" , "date" , "fiscal period" , "time" ;
+    mantrix:bqColumns "Posting_Date" ;
+    mantrix:disambiguation """Time period shortcuts:
+  'this month' / MTD → Posting_Date >= DATE_TRUNC(CURRENT_DATE(), MONTH)
+  'this quarter' / QTD → Posting_Date >= DATE_TRUNC(CURRENT_DATE(), QUARTER)
+  'this year' / YTD → Posting_Date >= DATE_TRUNC(CURRENT_DATE(), YEAR)
+  'last year' → EXTRACT(YEAR FROM Posting_Date) = EXTRACT(YEAR FROM CURRENT_DATE()) - 1
+  'Q1' → EXTRACT(QUARTER FROM Posting_Date) = 1
+  YoY comparison → use LAG() or self-join on same month/quarter prior year""" ;
+    mantrix:exampleSQL "SELECT DATE_TRUNC(Posting_Date, MONTH) as month, SUM(Gross_Revenue) as revenue FROM dataset_25m_table GROUP BY month ORDER BY month" .

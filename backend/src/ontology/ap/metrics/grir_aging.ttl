@@ -1,0 +1,37 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# AP Metric: GR/IR Aging
+# ============================================================================
+
+ap:metric_grir_aging a mantrix:Metric ;
+    rdfs:label "GR/IR Aging" ;
+    rdfs:comment "Total value and aging of unmatched GR/IR clearing account balances. Measures accrual accuracy and period-end close readiness. Stale GR/IR = balance sheet risk." ;
+    skos:altLabel "GR/IR balance" , "accrual aging" , "clearing account aging" , "GRIR" ;
+    mantrix:category "working_capital" ;
+    mantrix:unit "currency" ;
+    mantrix:direction "lower_is_better" ;
+    mantrix:benchmark "<2% of total AP spend in GR/IR open balance" ;
+    mantrix:sqlFormula "SUM(ABS(DELTA)) WHERE DELTA != 0" ;
+    mantrix:sourceTables "GRIR_Reconciliation" ;
+    mantrix:dimensions "vendor, plant, aging_bucket" ;
+    mantrix:exampleQuestion "Total GR/IR open balance" ;
+    mantrix:exampleSQL """SELECT
+  SUM(ABS(DELTA)) as total_open,
+  SUM(CASE WHEN DELTA > 0 THEN DELTA ELSE 0 END) as gr_over_ir,
+  SUM(CASE WHEN DELTA < 0 THEN ABS(DELTA) ELSE 0 END) as ir_over_gr,
+  COUNT(*) as open_items
+FROM GRIR_Reconciliation WHERE DELTA != 0""" ;
+    mantrix:exampleQuestion "GR/IR aging by bucket" ;
+    mantrix:exampleSQL """SELECT AGING_BUCKET,
+  COUNT(*) as items, SUM(ABS(DELTA)) as balance
+FROM GRIR_Reconciliation WHERE DELTA != 0
+GROUP BY AGING_BUCKET ORDER BY AGING_BUCKET""" ;
+    mantrix:edgeCases "GR/IR 90+ days old is a red flag for period-end close. Usually requires write-off or vendor follow-up." .

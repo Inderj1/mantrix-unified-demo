@@ -1,0 +1,22 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# Semantic Term: Blocked
+# ============================================================================
+
+ap:term_blocked a mantrix:SemanticTerm ;
+    rdfs:label "blocked" ;
+    rdfs:comment "Invoice or vendor has a payment block preventing F110 from selecting it for payment. Multiple block types exist at invoice level (ZLSPR) and vendor level (ZAHLS)." ;
+    skos:altLabel "payment blocked" , "held" , "on hold" , "frozen" ;
+    mantrix:disambiguation """Three levels of 'blocked':
+1. Invoice block (RBKP.ZLSPR): B=manual block, R=IV verification block
+2. Vendor payment block (LFA1.ZAHLS): vendor-level payment block
+3. Vendor posting block (LFA1.SPERR): cannot post new invoices
+'blocked invoices' usually means RBKP.ZLSPR IS NOT NULL AND ZLSPR != '' AND ZLSPR != 'A'""" ;
+    mantrix:canonicalFilter "RBKP.ZLSPR IS NOT NULL AND RBKP.ZLSPR != '' AND RBKP.ZLSPR != 'A'" ;
+    mantrix:relatedTerms "payment block, posting block, purchasing block, hold" .

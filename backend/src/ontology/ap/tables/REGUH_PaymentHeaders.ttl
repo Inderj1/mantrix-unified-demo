@@ -1,0 +1,62 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: REGUH_PaymentHeaders — Payment Run Headers
+# ============================================================================
+# Output of SAP F110 automatic payment run. Each row is one payment
+# instruction (one vendor payment). Contains payment method, bank, amount,
+# payment date. REGUH is the HEADER — one row per vendor per run.
+# ============================================================================
+
+ap:REGUH_PaymentHeaders a owl:Class ;
+    rdfs:label "REGUH_PaymentHeaders" ;
+    rdfs:comment "Payment run header table. Each row = one payment instruction for one vendor from F110 payment run. Contains payment method, house bank, amount, and payment date." ;
+    bq:table "REGUH_PaymentHeaders" ; bq:primaryKey "LAUFD, LAUFI, ZBUKR, LIFNR" ;
+    skos:altLabel "payment run" , "F110" , "payment" , "disbursement" , "outgoing payment" , "payment header" ;
+    mantrix:sapTable "REGUH" ; mantrix:sapTransaction "F110 (automatic payment program)" ;
+    mantrix:relatedConcepts "REGUP_PaymentItems, ACDOCA_UniversalJournal, LFA1_Suppliers, RBKP_InvoiceHeaders, LFBK_VendorBanks" .
+
+# --- Columns ---
+ap:REGUH_LAUFD a owl:DatatypeProperty ; rdfs:label "Run Date" ; bq:column "LAUFD" ; bq:type "DATE" ; rdfs:comment "Payment run date. Part of composite key identifying the payment run." .
+ap:REGUH_LAUFI a owl:DatatypeProperty ; rdfs:label "Run ID" ; bq:column "LAUFI" ; bq:type "STRING" ; rdfs:comment "Payment run identification (e.g., '001', '002'). Multiple runs possible per day." .
+ap:REGUH_ZBUKR a owl:DatatypeProperty ; rdfs:label "Paying Company Code" ; bq:column "ZBUKR" ; bq:type "STRING" ; bq:foreignKey "T001_CompanyCodes.BUKRS" .
+ap:REGUH_LIFNR a owl:DatatypeProperty ; rdfs:label "Vendor" ; bq:column "LIFNR" ; bq:type "INTEGER" ; bq:foreignKey "LFA1_Suppliers.LIFNR" .
+ap:REGUH_RZAWE a owl:DatatypeProperty ; rdfs:label "Payment Method" ; bq:column "RZAWE" ; bq:type "STRING" ; rdfs:comment "Payment method used for this vendor." ;
+    mantrix:valueMap "C=Check, T=Wire transfer, E=ACH/Electronic, W=Bank transfer" .
+ap:REGUH_HBKID a owl:DatatypeProperty ; rdfs:label "House Bank" ; bq:column "HBKID" ; bq:type "STRING" ; rdfs:comment "House bank ID used for payment." .
+ap:REGUH_HKTID a owl:DatatypeProperty ; rdfs:label "Account ID" ; bq:column "HKTID" ; bq:type "STRING" ; rdfs:comment "Account ID within house bank." .
+ap:REGUH_RWBTR a owl:DatatypeProperty ; rdfs:label "Payment Amount" ; bq:column "RWBTR" ; bq:type "FLOAT" ; rdfs:comment "Total payment amount to vendor in payment currency." .
+ap:REGUH_WAERS a owl:DatatypeProperty ; rdfs:label "Currency" ; bq:column "WAERS" ; bq:type "STRING" .
+ap:REGUH_ZALDT a owl:DatatypeProperty ; rdfs:label "Payment Date" ; bq:column "ZALDT" ; bq:type "DATE" ; rdfs:comment "Date payment is scheduled/executed. Used for cash flow forecasting." .
+ap:REGUH_VBLNR a owl:DatatypeProperty ; rdfs:label "Payment Doc Number" ; bq:column "VBLNR" ; bq:type "INTEGER" ; rdfs:comment "Payment document number created by the run. Links to ACDOCA.BELNR for the clearing entry." .
+ap:REGUH_KIDNO a owl:DatatypeProperty ; rdfs:label "Payment Reference" ; bq:column "KIDNO" ; bq:type "STRING" ; rdfs:comment "Customer/vendor payment reference number." .
+
+# --- Join Paths ---
+ap:REGUH_join_REGUP a mantrix:joinPath ; rdfs:label "Payment Header → Payment Items" ; rdfs:comment "REGUH.LAUFD = REGUP.LAUFD AND REGUH.LAUFI = REGUP.LAUFI AND REGUH.ZBUKR = REGUP.ZBUKR AND REGUH.LIFNR = REGUP.LIFNR" .
+ap:REGUH_join_LFA1 a mantrix:joinPath ; rdfs:label "Payment → Vendor" ; rdfs:comment "REGUH.LIFNR = LFA1.LIFNR" .
+ap:REGUH_join_ACDOCA a mantrix:joinPath ; rdfs:label "Payment → FI Document" ; rdfs:comment "REGUH.VBLNR = ACDOCA.BELNR (payment clearing document)" .
+
+# --- Example Questions & SQL ---
+ap:REGUH_q1 mantrix:exampleQuestion "Total payments this month" ;
+    mantrix:exampleSQL "SELECT COUNT(*) as payment_count, SUM(RWBTR) as total_paid, WAERS FROM REGUH_PaymentHeaders WHERE ZALDT >= DATE_TRUNC(CURRENT_DATE(), MONTH) GROUP BY WAERS" .
+ap:REGUH_q2 mantrix:exampleQuestion "Payments by method (check vs wire vs ACH)" ;
+    mantrix:exampleSQL "SELECT RZAWE, COUNT(*) as count, SUM(RWBTR) as total FROM REGUH_PaymentHeaders WHERE ZALDT >= DATE_TRUNC(CURRENT_DATE(), QUARTER) GROUP BY RZAWE ORDER BY total DESC" .
+ap:REGUH_q3 mantrix:exampleQuestion "Top 10 vendors by payment volume" ;
+    mantrix:exampleSQL "SELECT h.LIFNR, s.NAME1, COUNT(*) as payments, SUM(h.RWBTR) as total_paid FROM REGUH_PaymentHeaders h JOIN LFA1_Suppliers s ON h.LIFNR = s.LIFNR GROUP BY h.LIFNR, s.NAME1 ORDER BY total_paid DESC LIMIT 10" .
+ap:REGUH_q4 mantrix:exampleQuestion "Payment runs last 7 days" ;
+    mantrix:exampleSQL "SELECT LAUFD, LAUFI, ZBUKR, COUNT(DISTINCT LIFNR) as vendors, SUM(RWBTR) as total FROM REGUH_PaymentHeaders WHERE LAUFD >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY) GROUP BY LAUFD, LAUFI, ZBUKR ORDER BY LAUFD DESC" .
+ap:REGUH_q5 mantrix:exampleQuestion "Cash outflow forecast next 30 days" ;
+    mantrix:exampleSQL "SELECT DATE_TRUNC(ZALDT, WEEK) as week, SUM(RWBTR) as outflow FROM REGUH_PaymentHeaders WHERE ZALDT BETWEEN CURRENT_DATE() AND DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY) GROUP BY week ORDER BY week" .
+
+# --- Edge Cases ---
+ap:REGUH_edge1 mantrix:edgeCases "LAUFD + LAUFI together identify the payment run. Multiple runs can happen on the same day with different LAUFI values." .
+ap:REGUH_edge2 mantrix:edgeCases "VBLNR is the payment document created in FI. This is the AUGBL (clearing doc) in ACDOCA that clears the vendor open items." .
+ap:REGUH_edge3 mantrix:edgeCases "One REGUH row = one payment to one vendor. The REGUP items show which invoices were included in that payment." .
+ap:REGUH_edge4 mantrix:edgeCases "RZAWE payment method comes from vendor master (LFA1.ZWELS) or can be overridden per invoice (RBKP.ZLSCH)." .

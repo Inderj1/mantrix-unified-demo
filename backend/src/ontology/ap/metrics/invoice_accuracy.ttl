@@ -1,0 +1,33 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+ap:metric_invoice_accuracy a mantrix:Metric ;
+    rdfs:label "Invoice Accuracy Rate" ;
+    rdfs:comment "Percentage of invoices that match PO without variance. Measures vendor billing accuracy and PO correctness." ;
+    skos:altLabel "invoice accuracy" , "billing accuracy" , "error-free rate" ;
+    mantrix:category "quality" ;
+    mantrix:unit "percent" ;
+    mantrix:direction "higher_is_better" ;
+    mantrix:benchmark "95%+ (best-in-class), 80-90% (average)" ;
+    mantrix:sqlFormula "COUNTIF(QTY_VARIANCE = 0 AND PRICE_VARIANCE = 0) * 100.0 / COUNT(*)" ;
+    mantrix:sourceTables "MATCH_CASES" ;
+    mantrix:dimensions "vendor, material_group" ;
+    mantrix:exampleQuestion "Invoice accuracy rate" ;
+    mantrix:exampleSQL """SELECT
+  COUNTIF(QTY_VARIANCE = 0 AND PRICE_VARIANCE = 0) * 100.0 / COUNT(*) as accuracy_rate
+FROM MATCH_CASES""" ;
+    mantrix:exampleQuestion "Vendors with worst invoice accuracy" ;
+    mantrix:exampleSQL """SELECT k.LIFNR, s.NAME1,
+  COUNTIF(m.QTY_VARIANCE = 0 AND m.PRICE_VARIANCE = 0) * 100.0 / COUNT(*) as accuracy_pct,
+  COUNT(*) as total
+FROM MATCH_CASES m
+JOIN EKKO_POHeaders k ON m.PO_EBELN = k.EBELN
+JOIN LFA1_Suppliers s ON k.LIFNR = s.LIFNR
+GROUP BY k.LIFNR, s.NAME1 HAVING total >= 10
+ORDER BY accuracy_pct ASC LIMIT 10""" .

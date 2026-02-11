@@ -1,0 +1,26 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# Semantic Terms: Open / Outstanding / Overdue
+# ============================================================================
+
+ap:term_open a mantrix:SemanticTerm ;
+    rdfs:label "open" ;
+    rdfs:comment "Unpaid invoice. In SAP: ACDOCA.AUGBL IS NULL. Open items are vendor liabilities on the balance sheet." ;
+    skos:altLabel "outstanding" , "unpaid" , "pending" , "due" ;
+    mantrix:canonicalFilter "ACDOCA.AUGBL IS NULL AND ACDOCA.KOART = 'K' AND ACDOCA.RLDNR = '0L'" ;
+    mantrix:disambiguation "'open invoices' → ACDOCA WHERE AUGBL IS NULL. 'open balance' → SUM(ABS(HSL)) WHERE AUGBL IS NULL. 'open POs' = different (EKPO not fully delivered)." ;
+    mantrix:relatedTerms "overdue, paid, cleared, aging" .
+
+ap:term_overdue a mantrix:SemanticTerm ;
+    rdfs:label "overdue" ;
+    rdfs:comment "Open invoice past its due date. AUGBL IS NULL AND due_date < today. Overdue = open + late." ;
+    skos:altLabel "past due" , "late" , "delinquent" ;
+    mantrix:canonicalFilter "ACDOCA.AUGBL IS NULL AND RBKP.DUE_DATE < CURRENT_DATE()" ;
+    mantrix:disambiguation "'overdue invoices' → ACDOCA WHERE AUGBL IS NULL joined with RBKP WHERE DUE_DATE < CURRENT_DATE(). 'how overdue' → DATE_DIFF(CURRENT_DATE(), DUE_DATE, DAY)." ;
+    mantrix:relatedTerms "open, aging, due date" .

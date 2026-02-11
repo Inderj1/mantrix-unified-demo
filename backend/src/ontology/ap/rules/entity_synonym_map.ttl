@@ -1,0 +1,28 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+ap:rule_entity_synonym_map a mantrix:BusinessRule ;
+    rdfs:label "Entity Synonym Map" ;
+    rdfs:comment "Maps natural language terms to SAP tables and entities for NLU disambiguation." ;
+    mantrix:ruleDefinition """Entity synonym mapping for AP:
+  vendor, supplier, creditor → LFA1_Suppliers (LIFNR)
+  invoice, bill, IR → RBKP_InvoiceHeaders (BELNR)
+  PO, purchase order, order → EKKO_POHeaders + EKPO_POItems (EBELN)
+  PR, requisition, request → EBAN_PurchaseReqs (BANFN)
+  GR, goods receipt, delivery, receipt → MATDOC_GoodsReceipts (MBLNR)
+  payment, disbursement, pay run → REGUH_PaymentHeaders + REGUP_PaymentItems
+  material, part, item → MARA_Materials (MATNR)
+  cost center, department → CSKS_CostCenters (KOSTL)
+  GL account, account → SKA1_GLAccounts (SAKNR)
+  company code, entity → T001_CompanyCodes (BUKRS)
+  plant, factory, warehouse → T001W_Plants (WERKS)
+
+Action verb mapping:
+  paid, settled → ACDOCA WHERE AUGBL IS NOT NULL
+  open, unpaid, outstanding → ACDOCA WHERE AUGBL IS NULL
+  blocked, held → RBKP WHERE ZLSPR NOT IN (NULL, '', 'A')
+  overdue, past due → open + DUE_DATE < today
+  parked → RBKP WHERE RBSTAT = '1'""" .

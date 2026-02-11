@@ -2,26 +2,19 @@
 
 GROSS_MARGIN_EXAMPLES = [
     {
-        "question": "What's the total revenue for the last 2 years",
-        "sql": """SELECT 
-    EXTRACT(YEAR FROM Posting_Date) as year,
-    ROUND(SUM(COALESCE(Gross_Revenue, 0)), 2) as total_revenue
+        "question": "Show me all my customers profit margin",
+        "sql": """SELECT
+    Sold_to_Name AS customer_name,
+    '$' || to_char(ROUND(SUM(COALESCE(Gross_Revenue, 0)), 2), 'FM999,999,999.00') AS total_revenue,
+    '$' || to_char(ROUND(SUM(COALESCE(Total_COGS, 0)), 2), 'FM999,999,999.00') AS total_cogs,
+    '$' || to_char(ROUND(SUM(COALESCE(Gross_Revenue, 0)) - SUM(COALESCE(Total_COGS, 0)), 2), 'FM999,999,999.00') AS gross_profit,
+    to_char(ROUND(SAFE_DIVIDE(SUM(COALESCE(Gross_Revenue, 0)) - SUM(COALESCE(Total_COGS, 0)), SUM(COALESCE(Gross_Revenue, 0))) * 100, 2), 'FM999.00') || '%' AS profit_margin_pct
 FROM {table}
-WHERE Posting_Date >= DATE_SUB(CURRENT_DATE(), INTERVAL 2 YEAR)
-GROUP BY year
-ORDER BY year DESC""",
-        "explanation": "Calculate total revenue by year using Gross_Revenue column (NOT GL_Amount_in_CC)"
-    },
-    {
-        "question": "Show revenue by month",
-        "sql": """SELECT 
-    DATE_TRUNC(Posting_Date, MONTH) as month,
-    ROUND(SUM(COALESCE(Gross_Revenue, 0)), 2) as monthly_revenue
-FROM {table}
-WHERE Posting_Date >= DATE_SUB(CURRENT_DATE(), INTERVAL 12 MONTH)
-GROUP BY month
-ORDER BY month DESC""",
-        "explanation": "Monthly revenue using Gross_Revenue - NEVER use GL_Amount_in_CC for revenue"
+WHERE Sold_to_Name IS NOT NULL
+GROUP BY Sold_to_Name
+HAVING SUM(COALESCE(Gross_Revenue, 0)) > 0
+ORDER BY SUM(COALESCE(Gross_Revenue, 0)) - SUM(COALESCE(Total_COGS, 0)) DESC""",
+        "explanation": "Customer profit margin using ONLY Gross_Revenue and Total_COGS columns. NEVER use Pallet_Revenue_Net, Promotional_Allowances, or Freight_Allowance - those columns do NOT exist."
     },
     {
         "question": "Calculate gross margin by customer",
@@ -161,6 +154,28 @@ GROUP BY Sales_Region
 HAVING SUM(COALESCE(Gross_Revenue, 0)) > 0
 ORDER BY Avg_Gross_Margin_Pct DESC""",
         "explanation": "Gross margin by sales region using proper revenue columns. Note: Only 4 regions exist (APAC, NA, EMEA, LATAM)"
+    },
+    {
+        "question": "What's the total revenue for the last 2 years",
+        "sql": """SELECT
+    EXTRACT(YEAR FROM Posting_Date) as year,
+    ROUND(SUM(COALESCE(Gross_Revenue, 0)), 2) as total_revenue
+FROM {table}
+WHERE Posting_Date >= DATE_SUB(CURRENT_DATE(), INTERVAL 2 YEAR)
+GROUP BY year
+ORDER BY year DESC""",
+        "explanation": "Calculate total revenue by year using Gross_Revenue column (NOT GL_Amount_in_CC)"
+    },
+    {
+        "question": "Show revenue by month",
+        "sql": """SELECT
+    DATE_TRUNC(Posting_Date, MONTH) as month,
+    ROUND(SUM(COALESCE(Gross_Revenue, 0)), 2) as monthly_revenue
+FROM {table}
+WHERE Posting_Date >= DATE_SUB(CURRENT_DATE(), INTERVAL 12 MONTH)
+GROUP BY month
+ORDER BY month DESC""",
+        "explanation": "Monthly revenue using Gross_Revenue - NEVER use GL_Amount_in_CC for revenue"
     }
 ]
 

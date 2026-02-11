@@ -1,0 +1,32 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix copa: <http://mantrix.ai/ontology/copa#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# COPA Measures: Revenue (Gross Sales, Gross Revenue, Net Sales)
+# ============================================================================
+
+copa:measure_gross_sales a mantrix:Measure ;
+    rdfs:label "Gross Sales" ;
+    rdfs:comment "Total gross sales before any deductions. The top-line number." ;
+    skos:altLabel "gross revenue" , "total sales" , "top line" ;
+    mantrix:bqColumn "Gross_Sales" ;
+    mantrix:aggregation "SUM" .
+
+copa:measure_gross_revenue a mantrix:Measure ;
+    rdfs:label "Gross Revenue" ;
+    rdfs:comment "Gross revenue amount. May differ from Gross_Sales by specific adjustments." ;
+    skos:altLabel "revenue" , "turnover" ;
+    mantrix:bqColumn "Gross_Revenue" ;
+    mantrix:aggregation "SUM" .
+
+copa:measure_net_sales a mantrix:Measure ;
+    rdfs:label "Net Sales" ;
+    rdfs:comment "Net sales after deductions (discounts, returns, allowances). Use for margin calculations." ;
+    skos:altLabel "net revenue" , "net sales" ;
+    mantrix:bqColumn "Net_Sales" ;
+    mantrix:aggregation "SUM" ;
+    mantrix:edgeCases "Net_Sales = Gross_Sales - deductions. Always use Net_Sales (not Gross) for margin % calculations." .

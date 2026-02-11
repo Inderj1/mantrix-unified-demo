@@ -1,0 +1,45 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# AP Metric: Days Payable Outstanding (DPO)
+# ============================================================================
+
+ap:metric_dpo a mantrix:Metric ;
+    rdfs:label "Days Payable Outstanding" ;
+    rdfs:comment "Average number of days a company takes to pay its suppliers. DPO = (AP Balance / Total AP Spend) * 365. Key working capital metric — higher DPO means more cash retained but may damage supplier relationships." ;
+    skos:altLabel "DPO" , "days to pay" , "payment days" , "payable days" ;
+    mantrix:category "working_capital" ;
+    mantrix:unit "days" ;
+    mantrix:direction "balanced" ;
+    mantrix:benchmark "30-45 days (typical), 60+ days (aggressive), <20 days (paying too fast)" ;
+    mantrix:sqlFormula "(open_ap_balance / total_annual_spend) * 365" ;
+    mantrix:sourceTables "ACDOCA_UniversalJournal" ;
+    mantrix:dimensions "company_code, vendor, segment" ;
+    mantrix:exampleQuestion "What is our DPO?" ;
+    mantrix:exampleSQL """SELECT
+  (SUM(CASE WHEN AUGBL IS NULL THEN ABS(HSL) ELSE 0 END) /
+   NULLIF(SUM(ABS(HSL)), 0)) * 365 as DPO
+FROM ACDOCA_UniversalJournal
+WHERE KOART = 'K' AND RLDNR = '0L'""" ;
+    mantrix:exampleQuestion "DPO by company code" ;
+    mantrix:exampleSQL """SELECT RBUKRS,
+  (SUM(CASE WHEN AUGBL IS NULL THEN ABS(HSL) ELSE 0 END) /
+   NULLIF(SUM(ABS(HSL)), 0)) * 365 as DPO
+FROM ACDOCA_UniversalJournal
+WHERE KOART = 'K' AND RLDNR = '0L'
+GROUP BY RBUKRS ORDER BY DPO DESC""" ;
+    mantrix:exampleQuestion "DPO trend by quarter" ;
+    mantrix:exampleSQL """SELECT DATE_TRUNC(BUDAT, QUARTER) as quarter,
+  (SUM(CASE WHEN AUGBL IS NULL THEN ABS(HSL) ELSE 0 END) /
+   NULLIF(SUM(ABS(HSL)), 0)) * 365 as DPO
+FROM ACDOCA_UniversalJournal
+WHERE KOART = 'K' AND RLDNR = '0L'
+GROUP BY quarter ORDER BY quarter""" ;
+    mantrix:edgeCases "DPO is a BALANCE metric — not 'lower is better'. Too low = paying too fast (cash drain). Too high = damaging vendor relationships. Target depends on industry and strategy." .

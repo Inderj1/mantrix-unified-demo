@@ -1,0 +1,40 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# AP Metric: 3-Way Match Pass Rate
+# ============================================================================
+
+ap:metric_three_way_match_rate a mantrix:Metric ;
+    rdfs:label "3-Way Match Pass Rate" ;
+    rdfs:comment "Percentage of PO-based invoices that pass 3-way match (PO qty/price = GR qty = Invoice qty/price). High pass rate = clean data + reliable suppliers + accurate receiving." ;
+    skos:altLabel "match rate" , "first-pass match rate" , "auto-match rate" , "3-way match" ;
+    mantrix:category "quality" ;
+    mantrix:unit "percent" ;
+    mantrix:direction "higher_is_better" ;
+    mantrix:benchmark "85-95% (best-in-class), 60-75% (average)" ;
+    mantrix:sqlFormula "COUNTIF(MATCH_RESULT = 'pass') * 100.0 / COUNT(*)" ;
+    mantrix:sourceTables "MATCH_CASES" ;
+    mantrix:dimensions "vendor, material_group, plant, match_type" ;
+    mantrix:exampleQuestion "What is our 3-way match rate?" ;
+    mantrix:exampleSQL """SELECT
+  COUNTIF(MATCH_RESULT = 'pass') * 100.0 / COUNT(*) as pass_rate,
+  COUNTIF(MATCH_RESULT = 'fail') * 100.0 / COUNT(*) as fail_rate,
+  COUNT(*) as total_matches
+FROM MATCH_CASES WHERE MATCH_TYPE = '3_way'""" ;
+    mantrix:exampleQuestion "Match rate by vendor" ;
+    mantrix:exampleSQL """SELECT m.PO_EBELN, k.LIFNR, s.NAME1,
+  COUNTIF(m.MATCH_RESULT = 'pass') * 100.0 / COUNT(*) as pass_rate,
+  COUNT(*) as matches
+FROM MATCH_CASES m
+JOIN EKKO_POHeaders k ON m.PO_EBELN = k.EBELN
+JOIN LFA1_Suppliers s ON k.LIFNR = s.LIFNR
+GROUP BY m.PO_EBELN, k.LIFNR, s.NAME1
+HAVING matches >= 5 ORDER BY pass_rate ASC""" ;
+    mantrix:edgeCases "Separate 2-way and 3-way match rates. 2-way items (WEPOS=false) have no GR check so typically higher pass rate." .

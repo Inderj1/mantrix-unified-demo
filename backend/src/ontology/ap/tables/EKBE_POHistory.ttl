@@ -1,0 +1,68 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . @prefix owl: <http://www.w3.org/2002/07/owl#> . @prefix xsd: <http://www.w3.org/2001/XMLSchema#> . @prefix skos: <http://www.w3.org/2004/02/skos/core#> . @prefix ap: <http://mantrix.ai/ontology/ap#> . @prefix bq: <http://mantrix.ai/ontology/bigquery#> . @prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: EKBE_POHistory — PO History (GR/IR Events)
+# ============================================================================
+# CRITICAL table for GR/IR reconciliation. Each row is a GR or IR event
+# against a PO item. VGABE determines the event type.
+# This is where you calculate: GR value, IR value, GR/IR balance, commitment.
+# ============================================================================
+
+ap:EKBE_POHistory a owl:Class ;
+    rdfs:label "EKBE_POHistory" ;
+    rdfs:comment "Purchase order history. Each row = one GR or IR event against a PO item. VGABE column determines event type. CRITICAL for GR/IR reconciliation and PO commitment tracking." ;
+    bq:table "EKBE_POHistory" ; bq:primaryKey "EBELN, EBELP, VGABE, GJAHR, BELNR, BUZEI" ;
+    skos:altLabel "PO history" , "purchase order history" , "EKBE" , "GR/IR history" ;
+    mantrix:sapTable "EKBE" ;
+    mantrix:relatedConcepts "EKPO_POItems, MATDOC_GoodsReceipts, RSEG_InvoiceItems, GRIR_Reconciliation" .
+
+# --- Columns ---
+ap:EKBE_EBELN a owl:DatatypeProperty ; rdfs:label "PO Number" ; bq:column "EBELN" ; bq:type "INTEGER" ; bq:foreignKey "EKPO_POItems.EBELN" .
+ap:EKBE_EBELP a owl:DatatypeProperty ; rdfs:label "PO Item" ; bq:column "EBELP" ; bq:type "STRING" ; bq:foreignKey "EKPO_POItems.EBELP" .
+ap:EKBE_ZEKKN a owl:DatatypeProperty ; rdfs:label "Acct Assignment Seq" ; bq:column "ZEKKN" ; bq:type "STRING" .
+ap:EKBE_VGABE a owl:DatatypeProperty ; rdfs:label "Transaction Type" ; bq:column "VGABE" ; bq:type "STRING" ;
+    rdfs:comment "THE KEY FIELD — determines what type of event this is." ;
+    mantrix:valueMap "1=Goods receipt, 2=Invoice receipt, 3=Invoice receipt reversal, 4=Goods receipt reversal, 5=Invoice from invoicing plan, 6=GR adjustment, E=Evaluated receipt settlement (ERS), Q=Quality inspection" .
+ap:EKBE_GJAHR a owl:DatatypeProperty ; rdfs:label "Fiscal Year" ; bq:column "GJAHR" ; bq:type "INTEGER" .
+ap:EKBE_BELNR a owl:DatatypeProperty ; rdfs:label "Reference Doc" ; bq:column "BELNR" ; bq:type "INTEGER" ; rdfs:comment "Reference document. For VGABE=1: MATDOC.MBLNR. For VGABE=2: RSEG.BELNR." .
+ap:EKBE_BUZEI a owl:DatatypeProperty ; rdfs:label "Reference Item" ; bq:column "BUZEI" ; bq:type "STRING" .
+ap:EKBE_BUDAT a owl:DatatypeProperty ; rdfs:label "Posting Date" ; bq:column "BUDAT" ; bq:type "DATE" .
+ap:EKBE_MENGE a owl:DatatypeProperty ; rdfs:label "Quantity" ; bq:column "MENGE" ; bq:type "FLOAT" .
+ap:EKBE_DMBTR a owl:DatatypeProperty ; rdfs:label "Amount (Local)" ; bq:column "DMBTR" ; bq:type "FLOAT" ; rdfs:comment "Amount in local currency. Use for GR/IR value summation." .
+ap:EKBE_WAERS a owl:DatatypeProperty ; rdfs:label "Currency" ; bq:column "WAERS" ; bq:type "STRING" .
+ap:EKBE_AREWR a owl:DatatypeProperty ; rdfs:label "GR/IR Clearing Value" ; bq:column "AREWR" ; bq:type "FLOAT" ; rdfs:comment "GR/IR clearing account value. Used in automatic GR/IR clearing." .
+ap:EKBE_SHKZG a owl:DatatypeProperty ; rdfs:label "Debit/Credit" ; bq:column "SHKZG" ; bq:type "STRING" ; mantrix:valueMap "S=Debit (positive), H=Credit (negative)" .
+ap:EKBE_BEWTP a owl:DatatypeProperty ; rdfs:label "Valuation Type" ; bq:column "BEWTP" ; bq:type "STRING" .
+
+# --- GR/IR Reconciliation SQL (THE key use case) ---
+ap:EKBE_grir_formula mantrix:exampleQuestion "GR/IR balance per PO item" ;
+    mantrix:exampleSQL """SELECT
+  EBELN, EBELP,
+  SUM(CASE WHEN VGABE = '1' THEN DMBTR ELSE 0 END) as GR_VALUE,
+  SUM(CASE WHEN VGABE IN ('2','3') THEN DMBTR ELSE 0 END) as IR_VALUE,
+  SUM(CASE WHEN VGABE = '1' THEN DMBTR ELSE 0 END) - SUM(CASE WHEN VGABE IN ('2','3') THEN DMBTR ELSE 0 END) as GRIR_DELTA,
+  SUM(CASE WHEN VGABE = '1' THEN MENGE ELSE 0 END) as GR_QTY,
+  SUM(CASE WHEN VGABE = '2' THEN MENGE ELSE 0 END) as IR_QTY
+FROM EKBE_POHistory
+GROUP BY EBELN, EBELP
+HAVING GR_VALUE != IR_VALUE""" .
+
+ap:EKBE_q2 mantrix:exampleQuestion "PO items with GR but no invoice" ;
+    mantrix:exampleSQL """SELECT DISTINCT e1.EBELN, e1.EBELP, e1.DMBTR as gr_value
+FROM EKBE_POHistory e1
+LEFT JOIN EKBE_POHistory e2 ON e1.EBELN = e2.EBELN AND e1.EBELP = e2.EBELP AND e2.VGABE = '2'
+WHERE e1.VGABE = '1' AND e2.EBELN IS NULL""" .
+
+ap:EKBE_q3 mantrix:exampleQuestion "PO commitment (uncommitted value)" ;
+    mantrix:exampleSQL """SELECT p.EBELN, p.EBELP, p.NETWR as ordered_value,
+  COALESCE(SUM(CASE WHEN e.VGABE = '1' THEN e.DMBTR END), 0) as gr_value,
+  COALESCE(SUM(CASE WHEN e.VGABE IN ('2','3') THEN e.DMBTR END), 0) as ir_value,
+  p.NETWR - GREATEST(COALESCE(SUM(CASE WHEN e.VGABE='1' THEN e.DMBTR END),0), COALESCE(SUM(CASE WHEN e.VGABE IN ('2','3') THEN e.DMBTR END),0)) as commitment
+FROM EKPO_POItems p LEFT JOIN EKBE_POHistory e ON p.EBELN = e.EBELN AND p.EBELP = e.EBELP
+WHERE p.LOEKZ IS NULL GROUP BY p.EBELN, p.EBELP, p.NETWR HAVING commitment > 0""" .
+
+# --- Edge Cases ---
+ap:EKBE_edge1 mantrix:edgeCases "VGABE='3' is IR reversal (reduces IR value). Include in IR calculation: SUM WHERE VGABE IN ('2','3')." .
+ap:EKBE_edge2 mantrix:edgeCases "VGABE='E' (ERS) means auto-invoicing at GR time. Both GR and IR happen simultaneously." .
+ap:EKBE_edge3 mantrix:edgeCases "For GR reversal (VGABE='4'), the DMBTR is negative. Subtract from GR total." .
+ap:EKBE_edge4 mantrix:edgeCases "BELNR links to: MATDOC.MBLNR when VGABE='1' (GR), RSEG.BELNR when VGABE='2' (IR)." .

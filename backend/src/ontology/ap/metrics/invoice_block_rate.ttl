@@ -1,0 +1,36 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# AP Metric: Invoice Block Rate
+# ============================================================================
+
+ap:metric_invoice_block_rate a mantrix:Metric ;
+    rdfs:label "Invoice Block Rate" ;
+    rdfs:comment "Percentage of invoices that are payment-blocked. Blocked invoices cannot be selected by F110 payment run. High block rate = process issues, matching failures, or manual review bottleneck." ;
+    skos:altLabel "block rate" , "blocked invoices" , "payment block rate" ;
+    mantrix:category "quality" ;
+    mantrix:unit "percent" ;
+    mantrix:direction "lower_is_better" ;
+    mantrix:benchmark "<10% (best-in-class), 15-25% (average)" ;
+    mantrix:sqlFormula "COUNTIF(ZLSPR IS NOT NULL AND ZLSPR != '' AND ZLSPR != 'A') * 100.0 / COUNT(*)" ;
+    mantrix:sourceTables "RBKP_InvoiceHeaders" ;
+    mantrix:dimensions "vendor, block_code, company_code" ;
+    mantrix:exampleQuestion "What percentage of invoices are blocked?" ;
+    mantrix:exampleSQL """SELECT
+  COUNTIF(ZLSPR IS NOT NULL AND ZLSPR != '' AND ZLSPR != 'A') * 100.0 / COUNT(*) as block_rate,
+  COUNT(*) as total_invoices,
+  COUNTIF(ZLSPR IS NOT NULL AND ZLSPR != '' AND ZLSPR != 'A') as blocked_count
+FROM RBKP_InvoiceHeaders WHERE RBSTAT = '5'""" ;
+    mantrix:exampleQuestion "Blocked invoices by reason" ;
+    mantrix:exampleSQL """SELECT ZLSPR, BLOCK_SCENARIO, COUNT(*) as count, SUM(RMWWR) as total_amount
+FROM RBKP_InvoiceHeaders
+WHERE RBSTAT = '5' AND ZLSPR IS NOT NULL AND ZLSPR != '' AND ZLSPR != 'A'
+GROUP BY ZLSPR, BLOCK_SCENARIO ORDER BY count DESC""" ;
+    mantrix:edgeCases "ZLSPR='A' means FREE for payment (not blocked). NULL or '' means no block set. 'B'=manual block, 'R'=IV verification block." .

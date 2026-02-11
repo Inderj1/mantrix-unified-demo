@@ -1,0 +1,43 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix copa: <http://mantrix.ai/ontology/copa#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# COPA Relationships (within flat table — GROUP BY patterns)
+# ============================================================================
+
+copa:rel_customer_to_product a mantrix:Relationship ;
+    rdfs:label "Customer × Product" ;
+    rdfs:comment "Cross-dimension: what products does each customer buy? GROUP BY Sold_to_Name, Material_Name." ;
+    mantrix:exampleSQL "SELECT Sold_to_Name, Material_Name, SUM(Net_Sales) as revenue FROM dataset_25m_table GROUP BY Sold_to_Name, Material_Name ORDER BY revenue DESC" .
+
+copa:rel_product_to_region a mantrix:Relationship ;
+    rdfs:label "Product × Region" ;
+    rdfs:comment "Cross-dimension: product performance by geography." ;
+    mantrix:exampleSQL "SELECT Material_Name, Region, SUM(Net_Sales) as revenue, SUM(Inv_Quantity) as units FROM dataset_25m_table GROUP BY Material_Name, Region" .
+
+copa:rel_brand_to_customer a mantrix:Relationship ;
+    rdfs:label "Brand × Customer" ;
+    rdfs:comment "Which customers buy which brands." ;
+    mantrix:exampleSQL "SELECT Brand, Sold_to_Name, SUM(Net_Sales) as revenue FROM dataset_25m_table GROUP BY Brand, Sold_to_Name ORDER BY revenue DESC" .
+
+copa:rel_customer_to_region a mantrix:Relationship ;
+    rdfs:label "Customer × Region" ;
+    rdfs:comment "Customer revenue by geography." ;
+    mantrix:exampleSQL "SELECT Sold_to_Name, Region, SUM(Net_Sales) as revenue FROM dataset_25m_table GROUP BY Sold_to_Name, Region" .
+
+copa:rel_time_analysis a mantrix:Relationship ;
+    rdfs:label "Time-Series Analysis Patterns" ;
+    rdfs:comment "Common time-based analysis patterns for COPA." ;
+    mantrix:exampleSQL """-- YoY comparison
+SELECT
+  EXTRACT(YEAR FROM Posting_Date) as year,
+  EXTRACT(MONTH FROM Posting_Date) as month,
+  SUM(Net_Sales) as revenue,
+  LAG(SUM(Net_Sales)) OVER (PARTITION BY EXTRACT(MONTH FROM Posting_Date) ORDER BY EXTRACT(YEAR FROM Posting_Date)) as prev_year,
+  (SUM(Net_Sales) - LAG(SUM(Net_Sales)) OVER (PARTITION BY EXTRACT(MONTH FROM Posting_Date) ORDER BY EXTRACT(YEAR FROM Posting_Date))) /
+  NULLIF(LAG(SUM(Net_Sales)) OVER (PARTITION BY EXTRACT(MONTH FROM Posting_Date) ORDER BY EXTRACT(YEAR FROM Posting_Date)), 0) * 100 as yoy_pct
+FROM dataset_25m_table
+GROUP BY year, month ORDER BY year, month""" .

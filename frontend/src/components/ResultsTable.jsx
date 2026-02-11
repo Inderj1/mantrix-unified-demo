@@ -116,6 +116,9 @@ function ResultsTable({ results }) {
     );
   }
 
+  // Column name patterns that should never get comma formatting (IDs, document numbers, codes)
+  const ID_COLUMN_PATTERN = /(_id|_number|_code|_key|document|order|invoice|delivery|shipment|billing|ebeln|ebelp|vbeln|posnr|kunnr|lifnr|matnr|bukrs|belnr|gjahr|buzei|banfn|bnfpo|mblnr|kostl|prctr|sakto|saknr|hkont|laufd|laufi|augbl|augdt|aedat|erdat|cpudt|budat|bldat|xblnr|zuonr|sgtxt|awkey|racct|werks|ekorg|ekgrp|waers|zterm|mandt|spras|zeile|kdauf|vgbel|vgpos|bsart|lfart|abgru|statu|wbstk|gbstk|lfgsk|lsstk)$/i;
+
   // Generate columns from the first row
   const columns = Object.keys(results[0]).map((key) => ({
     field: key,
@@ -127,7 +130,12 @@ function ResultsTable({ results }) {
       if (value === null || value === undefined) return '-';
       if (typeof value === 'boolean') return value ? 'Yes' : 'No';
       if (typeof value === 'number') {
-        if (Number.isInteger(value)) return value.toLocaleString();
+        if (Number.isInteger(value)) {
+          if (value >= 1900 && value <= 2099) return String(value);
+          // Don't add comma separators for ID/document/order number columns
+          if (ID_COLUMN_PATTERN.test(key)) return String(value);
+          return value.toLocaleString();
+        }
         return value.toFixed(2);
       }
       return String(value);

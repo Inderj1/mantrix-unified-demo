@@ -1,0 +1,49 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: LFBK_VendorBanks — Vendor Bank Details
+# ============================================================================
+# Vendor bank account information for payment processing.
+# Links vendor to their bank details (routing, account number).
+# Used by F110 payment run to determine where to send payment.
+# ============================================================================
+
+ap:LFBK_VendorBanks a owl:Class ;
+    rdfs:label "LFBK_VendorBanks" ;
+    rdfs:comment "Vendor bank details. One row per bank account per vendor. Used by F110 payment program to determine payment routing." ;
+    bq:table "LFBK_VendorBanks" ; bq:primaryKey "LIFNR, BANKS, BANKL, BANKN" ;
+    skos:altLabel "vendor bank" , "bank details" , "bank account" , "LFBK" ;
+    mantrix:sapTable "LFBK" ;
+    mantrix:relatedConcepts "LFA1_Suppliers, REGUH_PaymentHeaders" .
+
+# --- Columns ---
+ap:LFBK_LIFNR a owl:DatatypeProperty ; rdfs:label "Vendor" ; bq:column "LIFNR" ; bq:type "INTEGER" ; bq:foreignKey "LFA1_Suppliers.LIFNR" .
+ap:LFBK_BANKS a owl:DatatypeProperty ; rdfs:label "Bank Country" ; bq:column "BANKS" ; bq:type "STRING" ; rdfs:comment "Country key of the bank." .
+ap:LFBK_BANKL a owl:DatatypeProperty ; rdfs:label "Bank Key" ; bq:column "BANKL" ; bq:type "STRING" ; rdfs:comment "Bank routing number / sort code." .
+ap:LFBK_BANKN a owl:DatatypeProperty ; rdfs:label "Bank Account" ; bq:column "BANKN" ; bq:type "STRING" ; rdfs:comment "Bank account number." .
+ap:LFBK_BKONT a owl:DatatypeProperty ; rdfs:label "Bank Control Key" ; bq:column "BKONT" ; bq:type "STRING" ; rdfs:comment "Bank control key for check digit validation." .
+ap:LFBK_KOINH a owl:DatatypeProperty ; rdfs:label "Account Holder" ; bq:column "KOINH" ; bq:type "STRING" ; rdfs:comment "Name of account holder. May differ from vendor name." .
+ap:LFBK_BVTYP a owl:DatatypeProperty ; rdfs:label "Partner Bank Type" ; bq:column "BVTYP" ; bq:type "STRING" ; rdfs:comment "Partner bank type identifier. Used when vendor has multiple bank accounts." .
+
+# --- Join Paths ---
+ap:LFBK_join_LFA1 a mantrix:joinPath ; rdfs:label "Bank Details → Vendor" ; rdfs:comment "LFBK.LIFNR = LFA1.LIFNR" .
+
+# --- Example Questions & SQL ---
+ap:LFBK_q1 mantrix:exampleQuestion "Vendors with multiple bank accounts" ;
+    mantrix:exampleSQL "SELECT LIFNR, COUNT(*) as bank_count FROM LFBK_VendorBanks GROUP BY LIFNR HAVING bank_count > 1" .
+ap:LFBK_q2 mantrix:exampleQuestion "Bank details for vendor 1000001" ;
+    mantrix:exampleSQL "SELECT b.LIFNR, s.NAME1, b.BANKS, b.BANKL, b.BANKN, b.KOINH, b.BVTYP FROM LFBK_VendorBanks b JOIN LFA1_Suppliers s ON b.LIFNR = s.LIFNR WHERE b.LIFNR = 1000001" .
+ap:LFBK_q3 mantrix:exampleQuestion "Vendors where account holder differs from vendor name" ;
+    mantrix:exampleSQL "SELECT b.LIFNR, s.NAME1 as vendor_name, b.KOINH as account_holder FROM LFBK_VendorBanks b JOIN LFA1_Suppliers s ON b.LIFNR = s.LIFNR WHERE b.KOINH IS NOT NULL AND b.KOINH != s.NAME1" .
+
+# --- Edge Cases ---
+ap:LFBK_edge1 mantrix:edgeCases "Vendors can have multiple bank accounts (different BVTYP). The payment method on the invoice determines which bank account is used." .
+ap:LFBK_edge2 mantrix:edgeCases "KOINH different from vendor NAME1 could indicate a payment fraud risk — flag for review." .
+ap:LFBK_edge3 mantrix:edgeCases "Bank details are sensitive data. Access control and masking apply." .

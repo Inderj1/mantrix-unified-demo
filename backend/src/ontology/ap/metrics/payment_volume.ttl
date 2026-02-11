@@ -1,0 +1,28 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+ap:metric_payment_volume a mantrix:Metric ;
+    rdfs:label "Payment Volume" ;
+    rdfs:comment "Total count and value of payments made. Tracks cash outflows and payment run effectiveness." ;
+    skos:altLabel "payments made" , "disbursements" , "cash outflow" ;
+    mantrix:category "productivity" ;
+    mantrix:unit "count_and_currency" ;
+    mantrix:direction "informational" ;
+    mantrix:sourceTables "REGUH_PaymentHeaders" ;
+    mantrix:dimensions "company_code, payment_method, vendor" ;
+    mantrix:exampleQuestion "Payment volume this month" ;
+    mantrix:exampleSQL """SELECT COUNT(*) as payments, SUM(RWBTR) as total_paid,
+  COUNT(DISTINCT LIFNR) as vendors_paid
+FROM REGUH_PaymentHeaders
+WHERE ZALDT >= DATE_TRUNC(CURRENT_DATE(), MONTH)""" ;
+    mantrix:exampleQuestion "Payment volume by method" ;
+    mantrix:exampleSQL """SELECT RZAWE, COUNT(*) as count, SUM(RWBTR) as total
+FROM REGUH_PaymentHeaders
+WHERE ZALDT >= DATE_TRUNC(CURRENT_DATE(), QUARTER)
+GROUP BY RZAWE ORDER BY total DESC""" .

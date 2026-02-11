@@ -1,0 +1,13 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix copa: <http://mantrix.ai/ontology/copa#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+copa:metric_operating_income a mantrix:Metric ;
+    rdfs:label "Operating Income" ;
+    rdfs:comment "Net sales minus total COGS. Proxy for EBIT in COPA." ;
+    skos:altLabel "operating profit" , "EBIT" , "operating earnings" ;
+    mantrix:sqlFormula "SUM(Net_Sales) - SUM(Total_COGS)" ;
+    mantrix:exampleSQL "SELECT SUM(Net_Sales) - SUM(Total_COGS) as operating_income FROM dataset_25m_table" .

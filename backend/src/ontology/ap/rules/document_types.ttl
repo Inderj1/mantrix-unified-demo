@@ -1,0 +1,26 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# Business Rule: Document Types (BLART)
+# ============================================================================
+
+ap:rule_document_types a mantrix:BusinessRule ;
+    rdfs:label "Document Types" ;
+    rdfs:comment "BLART field in RBKP and ACDOCA determines the document type." ;
+    mantrix:ruleDefinition """BLART document types in AP:
+- 'RE' → Incoming invoice (standard vendor invoice — the primary document type)
+- 'KG' → Vendor credit memo (reduces amount owed)
+- 'KR' → Vendor invoice (net posting — used for specific country versions)
+- 'KA' → Vendor document (general)
+- 'KZ' → Payment document (created by F110)
+
+For invoice queries: BLART = 'RE'
+For credit memos: BLART = 'KG'
+For payments: BLART = 'KZ'
+
+RBKP.BLART = invoice document type
+ACDOCA.BLART = FI posting document type""" .

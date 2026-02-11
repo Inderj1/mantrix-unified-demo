@@ -1,0 +1,14 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix copa: <http://mantrix.ai/ontology/copa#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+copa:metric_profit_per_unit a mantrix:Metric ;
+    rdfs:label "Profit per Unit" ;
+    rdfs:comment "Sales margin divided by quantity. Unit-level profitability." ;
+    skos:altLabel "margin per unit" , "unit profitability" , "per unit profit" ;
+    mantrix:sqlFormula "SUM(Sales_Margin_of_Net_Sales) / NULLIF(SUM(Inv_Quantity), 0)" ;
+    mantrix:exampleQuestion "Profit per unit by product" ;
+    mantrix:exampleSQL "SELECT Material_Name, SUM(Sales_Margin_of_Net_Sales) / NULLIF(SUM(Inv_Quantity), 0) as profit_per_unit, SUM(Inv_Quantity) as units FROM dataset_25m_table GROUP BY Material_Name HAVING SUM(Inv_Quantity) > 0 ORDER BY profit_per_unit DESC LIMIT 20" .

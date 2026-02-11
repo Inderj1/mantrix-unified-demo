@@ -1,0 +1,17 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix copa: <http://mantrix.ai/ontology/copa#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+copa:metric_contribution_margin a mantrix:Metric ;
+    rdfs:label "Contribution Margin" ;
+    rdfs:comment "Net sales minus variable costs (Ingredients + Packaging + Incoming_Freight)." ;
+    skos:altLabel "CM" , "variable margin" , "contribution profit" ;
+    mantrix:sqlFormula "SUM(Net_Sales) - SUM(Ingredients) - SUM(Packaging) - SUM(Incoming_Freight)" ;
+    mantrix:exampleQuestion "Contribution margin by product" ;
+    mantrix:exampleSQL """SELECT Material_Name,
+  SUM(Net_Sales) - SUM(Ingredients) - SUM(Packaging) - SUM(Incoming_Freight) as contribution_margin,
+  (SUM(Net_Sales) - SUM(Ingredients) - SUM(Packaging) - SUM(Incoming_Freight)) / NULLIF(SUM(Net_Sales), 0) * 100 as cm_pct
+FROM dataset_25m_table GROUP BY Material_Name ORDER BY contribution_margin DESC LIMIT 20""" .

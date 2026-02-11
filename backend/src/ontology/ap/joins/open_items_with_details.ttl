@@ -1,0 +1,27 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# Join Path: Open Items with Full Details
+# ============================================================================
+
+ap:join_open_items_with_details a mantrix:JoinPath ;
+    rdfs:label "Open Items with Details" ;
+    rdfs:comment "All open (unpaid) AP items enriched with vendor name, invoice details, PO reference, due date, aging, and block status." ;
+    mantrix:joinSQL """SELECT
+  a.BELNR, a.GJAHR, a.LIFNR, s.NAME1 as vendor_name,
+  ABS(a.HSL) as amount, a.RHCUR as currency,
+  a.BUDAT as posting_date, a.BLDAT as doc_date,
+  r.XBLNR as vendor_ref, r.ZLSPR as block_code, r.BLOCK_SCENARIO,
+  r.DUE_DATE, r.DISC_DUE_DATE, r.DISC_AMOUNT,
+  DATE_DIFF(CURRENT_DATE(), r.DUE_DATE, DAY) as days_overdue,
+  a.EBELN as po_number, a.EBELP as po_item,
+  a.KOSTL as cost_center, a.PRCTR as profit_center
+FROM ACDOCA_UniversalJournal a
+JOIN LFA1_Suppliers s ON a.LIFNR = s.LIFNR
+LEFT JOIN RBKP_InvoiceHeaders r ON a.BELNR = r.BELNR AND a.GJAHR = r.GJAHR
+WHERE a.KOART = 'K' AND a.RLDNR = '0L' AND a.AUGBL IS NULL""" ;
+    mantrix:answersQuestions "Open balance, overdue items, blocked invoices, aging report, vendor statement, what do we owe" .

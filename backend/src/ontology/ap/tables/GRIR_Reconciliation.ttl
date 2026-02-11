@@ -1,0 +1,60 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: GRIR_Reconciliation — GR/IR Clearing Account Balance
+# ============================================================================
+# Axis AI pre-computed table. Summarizes GR/IR balance per PO item.
+# GR/IR clearing account (typically GL 239999) sits between GR posting and
+# IR posting. DELTA = GR_VALUE - IR_VALUE. DELTA > 0 means goods received
+# but not yet invoiced. DELTA < 0 means invoiced but goods not received.
+# This is THE key balance sheet reconciliation for AP.
+# ============================================================================
+
+ap:GRIR_Reconciliation a owl:Class ;
+    rdfs:label "GRIR_Reconciliation" ;
+    rdfs:comment "Pre-computed GR/IR clearing account reconciliation. One row per PO item. Shows GR value, IR value, delta, aging, and status. DELTA != 0 means the GR/IR clearing account has an open balance." ;
+    bq:table "GRIR_Reconciliation" ; bq:primaryKey "EBELN, EBELP" ;
+    skos:altLabel "GR/IR" , "GRIR" , "GR/IR clearing" , "goods receipt invoice receipt" , "accrual" , "GR/IR reconciliation" ;
+    mantrix:sapTable "Derived from EKBE_POHistory" ;
+    mantrix:businessRule "DELTA > 0: accrued liability (received, not invoiced). DELTA < 0: prepayment risk (invoiced, not received). DELTA = 0: fully matched." ;
+    mantrix:relatedConcepts "EKBE_POHistory, EKPO_POItems, MATDOC_GoodsReceipts, RSEG_InvoiceItems, LFA1_Suppliers" .
+
+# --- Columns ---
+ap:GRIR_EBELN a owl:DatatypeProperty ; rdfs:label "PO Number" ; bq:column "EBELN" ; bq:type "INTEGER" ; bq:foreignKey "EKPO_POItems.EBELN" .
+ap:GRIR_EBELP a owl:DatatypeProperty ; rdfs:label "PO Item" ; bq:column "EBELP" ; bq:type "STRING" ; bq:foreignKey "EKPO_POItems.EBELP" .
+ap:GRIR_LIFNR a owl:DatatypeProperty ; rdfs:label "Vendor" ; bq:column "LIFNR" ; bq:type "INTEGER" ; bq:foreignKey "LFA1_Suppliers.LIFNR" .
+ap:GRIR_WERKS a owl:DatatypeProperty ; rdfs:label "Plant" ; bq:column "WERKS" ; bq:type "STRING" ; bq:foreignKey "T001W_Plants.WERKS" .
+ap:GRIR_GR_VALUE a owl:DatatypeProperty ; rdfs:label "GR Value" ; bq:column "GR_VALUE" ; bq:type "FLOAT" ; rdfs:comment "Total goods receipt value from EKBE VGABE='1'." .
+ap:GRIR_IR_VALUE a owl:DatatypeProperty ; rdfs:label "IR Value" ; bq:column "IR_VALUE" ; bq:type "FLOAT" ; rdfs:comment "Total invoice receipt value from EKBE VGABE IN ('2','3')." .
+ap:GRIR_DELTA a owl:DatatypeProperty ; rdfs:label "GR/IR Delta" ; bq:column "DELTA" ; bq:type "FLOAT" ; rdfs:comment "GR_VALUE - IR_VALUE. Positive = accrual. Negative = over-invoiced. Zero = matched." .
+ap:GRIR_GR_COUNT a owl:DatatypeProperty ; rdfs:label "GR Count" ; bq:column "GR_COUNT" ; bq:type "INTEGER" .
+ap:GRIR_IR_COUNT a owl:DatatypeProperty ; rdfs:label "IR Count" ; bq:column "IR_COUNT" ; bq:type "INTEGER" .
+ap:GRIR_LAST_ACTIVITY a owl:DatatypeProperty ; rdfs:label "Last Activity" ; bq:column "LAST_ACTIVITY" ; bq:type "DATE" ; rdfs:comment "Date of most recent GR or IR posting." .
+ap:GRIR_AGING_DAYS a owl:DatatypeProperty ; rdfs:label "Aging Days" ; bq:column "AGING_DAYS" ; bq:type "INTEGER" ; rdfs:comment "Days since last activity. High aging = stale balance needing attention." .
+ap:GRIR_AGING_BUCKET a owl:DatatypeProperty ; rdfs:label "Aging Bucket" ; bq:column "AGING_BUCKET" ; bq:type "STRING" ; rdfs:comment "Aging bucket: 0-30, 31-60, 61-90, 90+." .
+ap:GRIR_STATUS a owl:DatatypeProperty ; rdfs:label "Status" ; bq:column "STATUS" ; bq:type "STRING" ; rdfs:comment "matched, gr_only, ir_only, partial_match." .
+
+# --- Example Questions & SQL ---
+ap:GRIR_q1 mantrix:exampleQuestion "Total GR/IR open balance" ;
+    mantrix:exampleSQL "SELECT SUM(ABS(DELTA)) as total_open_balance, SUM(CASE WHEN DELTA > 0 THEN DELTA ELSE 0 END) as accrued, SUM(CASE WHEN DELTA < 0 THEN ABS(DELTA) ELSE 0 END) as over_invoiced FROM GRIR_Reconciliation WHERE STATUS != 'matched'" .
+ap:GRIR_q2 mantrix:exampleQuestion "GR/IR aging by bucket" ;
+    mantrix:exampleSQL "SELECT AGING_BUCKET, COUNT(*) as items, SUM(ABS(DELTA)) as balance FROM GRIR_Reconciliation WHERE DELTA != 0 GROUP BY AGING_BUCKET ORDER BY AGING_BUCKET" .
+ap:GRIR_q3 mantrix:exampleQuestion "PO items with GR but no invoice (accrued)" ;
+    mantrix:exampleSQL "SELECT g.EBELN, g.EBELP, s.NAME1, g.GR_VALUE, g.DELTA, g.AGING_DAYS FROM GRIR_Reconciliation g JOIN LFA1_Suppliers s ON g.LIFNR = s.LIFNR WHERE g.STATUS = 'gr_only' ORDER BY g.DELTA DESC" .
+ap:GRIR_q4 mantrix:exampleQuestion "Vendors with largest GR/IR imbalance" ;
+    mantrix:exampleSQL "SELECT g.LIFNR, s.NAME1, SUM(ABS(g.DELTA)) as total_delta, COUNT(*) as items FROM GRIR_Reconciliation g JOIN LFA1_Suppliers s ON g.LIFNR = s.LIFNR WHERE g.DELTA != 0 GROUP BY g.LIFNR, s.NAME1 ORDER BY total_delta DESC LIMIT 10" .
+ap:GRIR_q5 mantrix:exampleQuestion "Stale GR/IR items over 90 days" ;
+    mantrix:exampleSQL "SELECT EBELN, EBELP, LIFNR, GR_VALUE, IR_VALUE, DELTA, AGING_DAYS, STATUS FROM GRIR_Reconciliation WHERE AGING_DAYS > 90 AND DELTA != 0 ORDER BY ABS(DELTA) DESC" .
+
+# --- Edge Cases ---
+ap:GRIR_edge1 mantrix:edgeCases "DELTA > 0 (GR > IR) = goods received but not invoiced. This represents an ACCRUED LIABILITY on the balance sheet." .
+ap:GRIR_edge2 mantrix:edgeCases "DELTA < 0 (IR > GR) = invoiced more than received. Could be service items (WEPOS=false) or over-invoicing." .
+ap:GRIR_edge3 mantrix:edgeCases "This is an Axis AI derived table. Source data comes from EKBE_POHistory. For raw data, use EKBE with VGABE filters." .
+ap:GRIR_edge4 mantrix:edgeCases "GR/IR clearing account balance directly impacts the balance sheet. Period-end close requires reviewing and clearing stale items." .

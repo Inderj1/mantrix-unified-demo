@@ -1,0 +1,27 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+ap:rule_vgabe_codes a mantrix:BusinessRule ;
+    rdfs:label "VGABE Transaction Codes" ;
+    rdfs:comment "EKBE.VGABE is THE key field for GR/IR reconciliation." ;
+    mantrix:ruleDefinition """EKBE.VGABE transaction types:
+- '1' → Goods receipt (GR) — credit to GR/IR clearing, debit to inventory
+- '2' → Invoice receipt (IR) — debit to GR/IR clearing, credit to vendor
+- '3' → Invoice receipt REVERSAL — reduces IR total
+- '4' → Goods receipt REVERSAL — reduces GR total (DMBTR is negative)
+- '5' → Invoice from invoicing plan
+- '6' → GR adjustment
+- 'E' → Evaluated Receipt Settlement (ERS) — auto-invoice at GR time
+- 'Q' → Quality inspection
+
+GR/IR reconciliation formula:
+  GR_VALUE = SUM(DMBTR WHERE VGABE = '1')
+  IR_VALUE = SUM(DMBTR WHERE VGABE IN ('2','3'))
+  DELTA = GR_VALUE - IR_VALUE
+
+BELNR references:
+  VGABE='1' → BELNR = MATDOC.MBLNR (material doc)
+  VGABE='2' → BELNR = RSEG.BELNR (invoice doc)""" .

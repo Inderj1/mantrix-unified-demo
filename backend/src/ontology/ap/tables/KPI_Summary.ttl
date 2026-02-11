@@ -1,0 +1,39 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: KPI_Summary — AP KPI Summary Table
+# ============================================================================
+# Axis AI pre-computed summary table. One row per KPI. Contains current
+# value and industry benchmark. Quick lookup for dashboard and trend views.
+# ============================================================================
+
+ap:KPI_Summary a owl:Class ;
+    rdfs:label "KPI_Summary" ;
+    rdfs:comment "Pre-computed AP KPI summary. One row per metric. Contains current value and benchmark for quick lookup. Source for AP dashboard tiles." ;
+    bq:table "KPI_Summary" ; bq:primaryKey "KPI" ;
+    skos:altLabel "KPI" , "metric" , "dashboard" , "scorecard" , "benchmark" ;
+    mantrix:relatedConcepts "ACDOCA_UniversalJournal, RBKP_InvoiceHeaders, EKBE_POHistory, MATCH_CASES" .
+
+# --- Columns ---
+ap:KPI_KPI a owl:DatatypeProperty ; rdfs:label "KPI Name" ; bq:column "KPI" ; bq:type "STRING" ; rdfs:comment "KPI identifier (e.g., 'DPO', 'touchless_rate', 'on_time_payment_rate')." .
+ap:KPI_VALUE a owl:DatatypeProperty ; rdfs:label "Current Value" ; bq:column "VALUE" ; bq:type "FLOAT" ; rdfs:comment "Current KPI value." .
+ap:KPI_BENCHMARK a owl:DatatypeProperty ; rdfs:label "Benchmark" ; bq:column "BENCHMARK" ; bq:type "FLOAT" ; rdfs:comment "Industry benchmark for comparison." .
+
+# --- Example Questions & SQL ---
+ap:KPI_q1 mantrix:exampleQuestion "Show all AP KPIs vs benchmark" ;
+    mantrix:exampleSQL "SELECT KPI, VALUE, BENCHMARK, VALUE - BENCHMARK as vs_benchmark FROM KPI_Summary ORDER BY KPI" .
+ap:KPI_q2 mantrix:exampleQuestion "KPIs performing below benchmark" ;
+    mantrix:exampleSQL "SELECT KPI, VALUE, BENCHMARK FROM KPI_Summary WHERE VALUE < BENCHMARK" .
+ap:KPI_q3 mantrix:exampleQuestion "What is our DPO?" ;
+    mantrix:exampleSQL "SELECT VALUE as DPO, BENCHMARK as industry_benchmark FROM KPI_Summary WHERE KPI = 'DPO'" .
+
+# --- Edge Cases ---
+ap:KPI_edge1 mantrix:edgeCases "This is an Axis AI derived summary table. For detailed KPI calculations, use the source tables directly (ACDOCA, RBKP, EKBE, etc.)." .
+ap:KPI_edge2 mantrix:edgeCases "VALUES may be percentages (0-100) or absolute numbers. Check the KPI name to determine the unit." .

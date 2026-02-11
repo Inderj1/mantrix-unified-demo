@@ -1,0 +1,411 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix copa: <http://mantrix.ai/ontology/copa#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+# ============================================================================
+# Mantrix — COPA / Profitability Analysis Ontology (RDF/OWL)
+# Version: 1.0.0
+# Source: BigQuery dataset_25m_table schema
+# Domain: CO-PA (Controlling - Profitability Analysis)
+# ============================================================================
+
+copa:COPAOntology a owl:Ontology ;
+    rdfs:label "Mantrix COPA Profitability Analysis Ontology" ;
+    rdfs:comment "Ontology for SAP CO-PA profitability data — customers, products, regions, P&L metrics" ;
+    owl:versionInfo "1.0" .
+
+# ============================================================================
+# CLASSES — Dimensions
+# ============================================================================
+
+copa:Customer a owl:Class ;
+    rdfs:label "Customer" ;
+    rdfs:comment "Sold-to party who purchases goods — identified by Sold_to_Number" ;
+    ap:bqTable "dataset_25m_table" ;
+    skos:altLabel "client" , "buyer" , "sold-to" , "account" , "customer master" .
+
+copa:Payer a owl:Class ;
+    rdfs:label "Payer" ;
+    rdfs:comment "Parent company / payer entity responsible for payment" ;
+    skos:altLabel "payer" , "parent company" , "paying party" , "bill-to" .
+
+copa:Product a owl:Class ;
+    rdfs:label "Product" ;
+    rdfs:comment "Material / SKU identified by Material_Number with brand hierarchy" ;
+    skos:altLabel "material" , "SKU" , "item" , "article" , "product master" .
+
+copa:Brand a owl:Class ;
+    rdfs:label "Brand" ;
+    rdfs:comment "Product brand grouping within the portfolio" ;
+    skos:altLabel "brand" , "product line" , "brand family" .
+
+copa:Region a owl:Class ;
+    rdfs:label "Region" ;
+    rdfs:comment "Geographic sales region for territory analysis" ;
+    skos:altLabel "territory" , "area" , "geography" , "sales region" .
+
+copa:SalesOrganization a owl:Class ;
+    rdfs:label "Sales Organization" ;
+    rdfs:comment "SAP sales organization responsible for distribution" ;
+    skos:altLabel "sales org" , "distribution channel" .
+
+copa:CompanyCode a owl:Class ;
+    rdfs:label "Company Code" ;
+    rdfs:comment "Legal entity for financial reporting" ;
+    skos:altLabel "company" , "legal entity" , "BUKRS" .
+
+copa:GLAccount a owl:Class ;
+    rdfs:label "GL Account" ;
+    rdfs:comment "General ledger account for P&L classification" ;
+    skos:altLabel "GL" , "account" , "ledger account" , "expense account" .
+
+copa:CostCenter a owl:Class ;
+    rdfs:label "Cost Center" ;
+    rdfs:comment "Organizational unit that incurs costs" ;
+    skos:altLabel "cost center" , "KOSTL" , "department" .
+
+copa:ProfitCenter a owl:Class ;
+    rdfs:label "Profit Center" ;
+    rdfs:comment "Organizational unit for profit responsibility" ;
+    skos:altLabel "profit center" , "PRCTR" .
+
+copa:FiscalPeriod a owl:Class ;
+    rdfs:label "Fiscal Period" ;
+    rdfs:comment "Fiscal year/month/quarter for time-based analysis" ;
+    skos:altLabel "period" , "fiscal period" , "posting period" .
+
+copa:SalesTransaction a owl:Class ;
+    rdfs:label "Sales Transaction" ;
+    rdfs:comment "Individual COPA line item with revenue, cost, and margin components" ;
+    skos:altLabel "transaction" , "COPA line" , "sales record" , "P&L line" .
+
+copa:SalesOrder a owl:Class ;
+    rdfs:label "Sales Order" ;
+    rdfs:comment "Customer sales order document" ;
+    skos:altLabel "order" , "SO" , "sales document" .
+
+# ============================================================================
+# OBJECT PROPERTIES (Relationships)
+# ============================================================================
+
+copa:soldTo a owl:ObjectProperty ;
+    rdfs:label "sold to" ;
+    rdfs:domain copa:SalesTransaction ;
+    rdfs:range copa:Customer ;
+    rdfs:comment "Transaction sold to a customer" .
+
+copa:paidBy a owl:ObjectProperty ;
+    rdfs:label "paid by" ;
+    rdfs:domain copa:SalesTransaction ;
+    rdfs:range copa:Payer ;
+    rdfs:comment "Transaction paid by a payer entity" .
+
+copa:forProduct a owl:ObjectProperty ;
+    rdfs:label "for product" ;
+    rdfs:domain copa:SalesTransaction ;
+    rdfs:range copa:Product ;
+    rdfs:comment "Transaction involves a product/material" .
+
+copa:belongsToBrand a owl:ObjectProperty ;
+    rdfs:label "belongs to brand" ;
+    rdfs:domain copa:Product ;
+    rdfs:range copa:Brand ;
+    rdfs:comment "Product is part of a brand" .
+
+copa:inRegion a owl:ObjectProperty ;
+    rdfs:label "in region" ;
+    rdfs:domain copa:SalesTransaction ;
+    rdfs:range copa:Region ;
+    rdfs:comment "Transaction occurred in a geographic region" .
+
+copa:inPeriod a owl:ObjectProperty ;
+    rdfs:label "in period" ;
+    rdfs:domain copa:SalesTransaction ;
+    rdfs:range copa:FiscalPeriod ;
+    rdfs:comment "Transaction posted in a fiscal period" .
+
+copa:fromSalesOrder a owl:ObjectProperty ;
+    rdfs:label "from sales order" ;
+    rdfs:domain copa:SalesTransaction ;
+    rdfs:range copa:SalesOrder ;
+    rdfs:comment "Transaction originated from a sales order" .
+
+copa:inCompanyCode a owl:ObjectProperty ;
+    rdfs:label "in company code" ;
+    rdfs:domain copa:SalesTransaction ;
+    rdfs:range copa:CompanyCode ;
+    rdfs:comment "Transaction belongs to a company code" .
+
+copa:chargedToGL a owl:ObjectProperty ;
+    rdfs:label "charged to GL" ;
+    rdfs:domain copa:SalesTransaction ;
+    rdfs:range copa:GLAccount ;
+    rdfs:comment "Transaction posted to a GL account" .
+
+copa:chargedToCostCenter a owl:ObjectProperty ;
+    rdfs:label "charged to cost center" ;
+    rdfs:domain copa:SalesTransaction ;
+    rdfs:range copa:CostCenter ;
+    rdfs:comment "Cost allocated to a cost center" .
+
+copa:chargedToProfitCenter a owl:ObjectProperty ;
+    rdfs:label "charged to profit center" ;
+    rdfs:domain copa:SalesTransaction ;
+    rdfs:range copa:ProfitCenter ;
+    rdfs:comment "Revenue/cost allocated to a profit center" .
+
+copa:customerInRegion a owl:ObjectProperty ;
+    rdfs:label "customer in region" ;
+    rdfs:domain copa:Customer ;
+    rdfs:range copa:Region ;
+    rdfs:comment "Customer is located in a region" .
+
+# ============================================================================
+# DATATYPE PROPERTIES — Dimension Attributes
+# ============================================================================
+
+copa:soldToNumber a owl:DatatypeProperty ;
+    rdfs:label "Sold-to Number" ;
+    rdfs:domain copa:Customer ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Customer ID (Sold_to_Number)" .
+
+copa:soldToName a owl:DatatypeProperty ;
+    rdfs:label "Sold-to Name" ;
+    rdfs:domain copa:Customer ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Customer name (Sold_to_Name)" .
+
+copa:payerName a owl:DatatypeProperty ;
+    rdfs:label "Payer Name" ;
+    rdfs:domain copa:Payer ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Payer/parent company name (Payer_Name)" .
+
+copa:materialNumber a owl:DatatypeProperty ;
+    rdfs:label "Material Number" ;
+    rdfs:domain copa:Product ;
+    rdfs:range xsd:string ;
+    rdfs:comment "SAP material number (Material_Number)" .
+
+copa:materialName a owl:DatatypeProperty ;
+    rdfs:label "Material Name" ;
+    rdfs:domain copa:Product ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Material description (Material_Name)" .
+
+copa:brandName a owl:DatatypeProperty ;
+    rdfs:label "Brand Name" ;
+    rdfs:domain copa:Brand ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Brand name (Brand)" .
+
+copa:regionName a owl:DatatypeProperty ;
+    rdfs:label "Region Name" ;
+    rdfs:domain copa:Region ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Geographic region name (Region)" .
+
+copa:postingDate a owl:DatatypeProperty ;
+    rdfs:label "Posting Date" ;
+    rdfs:domain copa:SalesTransaction ;
+    rdfs:range xsd:date ;
+    rdfs:comment "Accounting posting date (Posting_Date)" .
+
+copa:salesOrder a owl:DatatypeProperty ;
+    rdfs:label "Sales Order Number" ;
+    rdfs:domain copa:SalesOrder ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Sales order document number (Sales_Order)" .
+
+# ============================================================================
+# DATATYPE PROPERTIES — Financial Measures (Pre-aggregated P&L columns)
+# ============================================================================
+
+copa:grossSales a owl:DatatypeProperty ;
+    rdfs:label "Gross Sales" ;
+    rdfs:domain copa:SalesTransaction ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "Total gross sales before deductions (Gross_Sales)" ;
+    skos:altLabel "gross revenue" , "total sales" .
+
+copa:grossRevenue a owl:DatatypeProperty ;
+    rdfs:label "Gross Revenue" ;
+    rdfs:domain copa:SalesTransaction ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "Gross revenue (Gross_Revenue)" ;
+    skos:altLabel "revenue" , "top line" , "turnover" .
+
+copa:netSales a owl:DatatypeProperty ;
+    rdfs:label "Net Sales" ;
+    rdfs:domain copa:SalesTransaction ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "Net sales after deductions (Net_Sales)" ;
+    skos:altLabel "net revenue" .
+
+copa:cogs a owl:DatatypeProperty ;
+    rdfs:label "Cost of Goods Sold" ;
+    rdfs:domain copa:SalesTransaction ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "Direct cost of goods sold (Cogs)" ;
+    skos:altLabel "COGS" , "cost of sales" , "direct costs" .
+
+copa:totalCOGS a owl:DatatypeProperty ;
+    rdfs:label "Total COGS" ;
+    rdfs:domain copa:SalesTransaction ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "Total cost of goods sold including all components (Total_COGS)" .
+
+copa:ingredients a owl:DatatypeProperty ;
+    rdfs:label "Ingredients Cost" ;
+    rdfs:domain copa:SalesTransaction ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "Raw material / ingredients cost (Ingredients)" .
+
+copa:packaging a owl:DatatypeProperty ;
+    rdfs:label "Packaging Cost" ;
+    rdfs:domain copa:SalesTransaction ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "Packaging material cost (Packaging)" .
+
+copa:incomingFreight a owl:DatatypeProperty ;
+    rdfs:label "Incoming Freight" ;
+    rdfs:domain copa:SalesTransaction ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "Inbound freight and logistics (Incoming_Freight)" .
+
+copa:salesMarginOfNetSales a owl:DatatypeProperty ;
+    rdfs:label "Sales Margin of Net Sales" ;
+    rdfs:domain copa:SalesTransaction ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "Profit margin on net sales (Sales_Margin_of_Net_Sales)" .
+
+copa:invQuantity a owl:DatatypeProperty ;
+    rdfs:label "Invoice Quantity" ;
+    rdfs:domain copa:SalesTransaction ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "Invoiced quantity (Inv_Quantity)" ;
+    skos:altLabel "quantity" , "units sold" , "volume" .
+
+# ============================================================================
+# ANNOTATION PROPERTY
+# ============================================================================
+
+copa:bqColumn a owl:AnnotationProperty ;
+    rdfs:label "BigQuery Column" ;
+    rdfs:comment "Column name in dataset_25m_table" .
+
+# ============================================================================
+# SKOS — P&L Metric Concepts with Synonyms
+# ============================================================================
+
+copa:RevenueMetric a skos:Concept ;
+    rdfs:label "Revenue" ;
+    skos:altLabel "sales" , "top line" , "turnover" , "gross sales" , "net sales" , "total revenue" ;
+    skos:definition "Sum of Gross_Revenue or Net_Sales from dataset_25m_table" .
+
+copa:COGSMetric a skos:Concept ;
+    rdfs:label "Cost of Goods Sold" ;
+    skos:altLabel "COGS" , "cost of sales" , "direct costs" , "cost of revenue" , "COS" ;
+    skos:definition "Sum of Cogs or Total_COGS — direct costs attributable to goods sold" .
+
+copa:GrossMarginMetric a skos:Concept ;
+    rdfs:label "Gross Margin" ;
+    skos:altLabel "gross profit" , "GM" , "gross income" , "GPM" ;
+    skos:definition "Gross_Revenue minus Cogs — measures production profitability" .
+
+copa:GrossMarginPctMetric a skos:Concept ;
+    rdfs:label "Gross Margin %" ;
+    skos:altLabel "gross margin percentage" , "GM%" , "gross profit margin" , "GPM%" ;
+    skos:definition "(Gross_Revenue - Cogs) / Gross_Revenue * 100" .
+
+copa:NetMarginMetric a skos:Concept ;
+    rdfs:label "Net Margin" ;
+    skos:altLabel "net profit margin" , "profit margin" , "net margin %" , "NPM" ;
+    skos:definition "Sales_Margin_of_Net_Sales / Net_Sales * 100" .
+
+copa:OperatingIncomeMetric a skos:Concept ;
+    rdfs:label "Operating Income" ;
+    skos:altLabel "operating profit" , "EBIT" , "earnings before interest and tax" , "operating earnings" ;
+    skos:definition "Net_Sales minus Total_COGS" .
+
+copa:ContributionMarginMetric a skos:Concept ;
+    rdfs:label "Contribution Margin" ;
+    skos:altLabel "CM" , "variable margin" , "contribution profit" ;
+    skos:definition "Net_Sales minus variable costs (Ingredients + Packaging + Incoming_Freight)" .
+
+copa:ProfitPerUnitMetric a skos:Concept ;
+    rdfs:label "Profit per Unit" ;
+    skos:altLabel "margin per unit" , "unit profitability" , "per unit profit" ;
+    skos:definition "Sales_Margin_of_Net_Sales / Inv_Quantity" .
+
+copa:RevenuePerCustomerMetric a skos:Concept ;
+    rdfs:label "Revenue per Customer" ;
+    skos:altLabel "ARPC" , "average revenue per customer" , "customer revenue" ;
+    skos:definition "SUM(Gross_Revenue) / COUNT(DISTINCT Sold_to_Name)" .
+
+copa:AverageOrderValueMetric a skos:Concept ;
+    rdfs:label "Average Order Value" ;
+    skos:altLabel "AOV" , "avg order size" , "order value" ;
+    skos:definition "SUM(Net_Sales) / COUNT(DISTINCT Sales_Order)" .
+
+copa:AveragePriceMetric a skos:Concept ;
+    rdfs:label "Average Price" ;
+    skos:altLabel "avg selling price" , "ASP" , "unit price" ;
+    skos:definition "Net_Sales / Inv_Quantity" .
+
+# ============================================================================
+# SKOS — Time Period Synonyms
+# ============================================================================
+
+copa:YearToDate a skos:Concept ;
+    rdfs:label "Year to Date" ;
+    skos:altLabel "YTD" , "this year" , "year to date" ;
+    skos:definition "From January 1st to current date" .
+
+copa:MonthToDate a skos:Concept ;
+    rdfs:label "Month to Date" ;
+    skos:altLabel "MTD" , "this month" , "month to date" ;
+    skos:definition "From 1st of current month to current date" .
+
+copa:QuarterToDate a skos:Concept ;
+    rdfs:label "Quarter to Date" ;
+    skos:altLabel "QTD" , "this quarter" , "quarter to date" ;
+    skos:definition "From 1st day of current quarter to current date" .
+
+copa:YearOverYear a skos:Concept ;
+    rdfs:label "Year over Year" ;
+    skos:altLabel "YoY" , "vs last year" , "year-over-year" , "annual comparison" ;
+    skos:definition "Comparison of current period to same period in prior year" .
+
+copa:MonthOverMonth a skos:Concept ;
+    rdfs:label "Month over Month" ;
+    skos:altLabel "MoM" , "vs last month" , "month-over-month" , "monthly comparison" ;
+    skos:definition "Comparison of current month to prior month" .
+
+# ============================================================================
+# SKOS — Dimension Synonyms
+# ============================================================================
+
+copa:CustomerDimension a skos:Concept ;
+    rdfs:label "Customer" ;
+    skos:altLabel "client" , "buyer" , "account" , "sold-to party" ;
+    skos:definition "Customer dimension — Sold_to_Name / Sold_to_Number in dataset_25m_table" .
+
+copa:ProductDimension a skos:Concept ;
+    rdfs:label "Product" ;
+    skos:altLabel "material" , "SKU" , "item" , "article" ;
+    skos:definition "Product dimension — Material_Name / Material_Number in dataset_25m_table" .
+
+copa:RegionDimension a skos:Concept ;
+    rdfs:label "Region" ;
+    skos:altLabel "territory" , "area" , "geography" , "market" ;
+    skos:definition "Geographic region dimension in dataset_25m_table" .
+
+copa:BrandDimension a skos:Concept ;
+    rdfs:label "Brand" ;
+    skos:altLabel "product line" , "brand family" , "product brand" ;
+    skos:definition "Brand dimension in dataset_25m_table" .

@@ -1,0 +1,39 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: T001W_Plants — Plant Master
+# ============================================================================
+# Manufacturing/logistics organizational unit. Each plant is a physical
+# location (factory, warehouse, distribution center). Linked to a company code.
+# Used for GR analysis, PO delivery point, and spend by location.
+# ============================================================================
+
+ap:T001W_Plants a owl:Class ;
+    rdfs:label "T001W_Plants" ;
+    rdfs:comment "Plant master. One row per plant. Physical location for goods receipt and inventory. Linked to company code." ;
+    bq:table "T001W_Plants" ; bq:primaryKey "WERKS" ;
+    skos:altLabel "plant" , "factory" , "warehouse" , "location" , "T001W" ;
+    mantrix:sapTable "T001W" ;
+    mantrix:relatedConcepts "EKPO_POItems, MATDOC_GoodsReceipts, RSEG_InvoiceItems, T001_CompanyCodes" .
+
+# --- Columns ---
+ap:T001W_WERKS a owl:DatatypeProperty ; rdfs:label "Plant" ; bq:column "WERKS" ; bq:type "STRING" .
+ap:T001W_NAME1 a owl:DatatypeProperty ; rdfs:label "Plant Name" ; bq:column "NAME1" ; bq:type "STRING" .
+ap:T001W_BUKRS a owl:DatatypeProperty ; rdfs:label "Company Code" ; bq:column "BUKRS" ; bq:type "STRING" ; bq:foreignKey "T001_CompanyCodes.BUKRS" .
+ap:T001W_LAND1 a owl:DatatypeProperty ; rdfs:label "Country" ; bq:column "LAND1" ; bq:type "STRING" .
+
+# --- Example Questions & SQL ---
+ap:T001W_q1 mantrix:exampleQuestion "GR volume by plant" ;
+    mantrix:exampleSQL "SELECT g.WERKS, w.NAME1, COUNT(*) as gr_count, SUM(g.DMBTR) as gr_value FROM MATDOC_GoodsReceipts g JOIN T001W_Plants w ON g.WERKS = w.WERKS WHERE g.BWART = '101' GROUP BY g.WERKS, w.NAME1 ORDER BY gr_value DESC" .
+ap:T001W_q2 mantrix:exampleQuestion "PO spend by plant" ;
+    mantrix:exampleSQL "SELECT p.WERKS, w.NAME1, SUM(p.NETWR) as total_spend FROM EKPO_POItems p JOIN T001W_Plants w ON p.WERKS = w.WERKS WHERE p.LOEKZ IS NULL GROUP BY p.WERKS, w.NAME1 ORDER BY total_spend DESC" .
+
+# --- Edge Cases ---
+ap:T001W_edge1 mantrix:edgeCases "One company code can have many plants. Use T001W.BUKRS to find which company code a plant belongs to." .

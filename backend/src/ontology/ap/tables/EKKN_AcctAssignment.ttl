@@ -1,0 +1,54 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: EKKN_AcctAssignment — PO Account Assignment
+# ============================================================================
+# Each row assigns a PO item to a cost object (cost center, order, WBS,
+# asset). Controls where the expense is posted in FI/CO when GR or IR occurs.
+# Multiple account assignments per PO item possible (split assignment).
+# ============================================================================
+
+ap:EKKN_AcctAssignment a owl:Class ;
+    rdfs:label "EKKN_AcctAssignment" ;
+    rdfs:comment "PO account assignment. Maps PO items to cost objects (cost center, internal order, WBS element, asset). Controls expense posting. Multiple assignments per PO item possible." ;
+    bq:table "EKKN_AcctAssignment" ; bq:primaryKey "EBELN, EBELP, ZEKKN" ;
+    skos:altLabel "account assignment" , "cost assignment" , "EKKN" , "PO accounting" ;
+    mantrix:sapTable "EKKN" ;
+    mantrix:relatedConcepts "EKPO_POItems, CSKS_CostCenters, CEPC_ProfitCenters, SKA1_GLAccounts" .
+
+# --- Columns ---
+ap:EKKN_EBELN a owl:DatatypeProperty ; rdfs:label "PO Number" ; bq:column "EBELN" ; bq:type "INTEGER" ; bq:foreignKey "EKPO_POItems.EBELN" .
+ap:EKKN_EBELP a owl:DatatypeProperty ; rdfs:label "PO Item" ; bq:column "EBELP" ; bq:type "STRING" ; bq:foreignKey "EKPO_POItems.EBELP" .
+ap:EKKN_ZEKKN a owl:DatatypeProperty ; rdfs:label "Sequence Number" ; bq:column "ZEKKN" ; bq:type "STRING" ; rdfs:comment "Sequential number for multiple account assignments on same PO item." .
+ap:EKKN_SAKTO a owl:DatatypeProperty ; rdfs:label "GL Account" ; bq:column "SAKTO" ; bq:type "STRING" ; bq:foreignKey "SKA1_GLAccounts.SAKNR" ; rdfs:comment "GL account for expense posting." .
+ap:EKKN_KOSTL a owl:DatatypeProperty ; rdfs:label "Cost Center" ; bq:column "KOSTL" ; bq:type "STRING" ; bq:foreignKey "CSKS_CostCenters.KOSTL" ; rdfs:comment "Cost center assignment. Populated when EKPO.KNTTP = 'K'." .
+ap:EKKN_AUFNR a owl:DatatypeProperty ; rdfs:label "Internal Order" ; bq:column "AUFNR" ; bq:type "STRING" ; rdfs:comment "Internal order number. Populated when EKPO.KNTTP = 'F'." .
+ap:EKKN_PS_PSP_PNR a owl:DatatypeProperty ; rdfs:label "WBS Element" ; bq:column "PS_PSP_PNR" ; bq:type "STRING" ; rdfs:comment "WBS element for project assignment. Populated when EKPO.KNTTP = 'P'." .
+ap:EKKN_ANLN1 a owl:DatatypeProperty ; rdfs:label "Asset Number" ; bq:column "ANLN1" ; bq:type "STRING" ; rdfs:comment "Asset number. Populated when EKPO.KNTTP = 'A'." .
+ap:EKKN_PRCTR a owl:DatatypeProperty ; rdfs:label "Profit Center" ; bq:column "PRCTR" ; bq:type "STRING" ; bq:foreignKey "CEPC_ProfitCenters.PRCTR" .
+ap:EKKN_GSBER a owl:DatatypeProperty ; rdfs:label "Business Area" ; bq:column "GSBER" ; bq:type "STRING" .
+
+# --- Join Paths ---
+ap:EKKN_join_EKPO a mantrix:joinPath ; rdfs:label "Acct Assignment → PO Item" ; rdfs:comment "EKKN.EBELN = EKPO.EBELN AND EKKN.EBELP = EKPO.EBELP" .
+ap:EKKN_join_CSKS a mantrix:joinPath ; rdfs:label "Acct Assignment → Cost Center" ; rdfs:comment "EKKN.KOSTL = CSKS.KOSTL" .
+ap:EKKN_join_CEPC a mantrix:joinPath ; rdfs:label "Acct Assignment → Profit Center" ; rdfs:comment "EKKN.PRCTR = CEPC.PRCTR" .
+
+# --- Example Questions & SQL ---
+ap:EKKN_q1 mantrix:exampleQuestion "PO spend by cost center" ;
+    mantrix:exampleSQL "SELECT k.KOSTL, c.KTEXT, SUM(p.NETWR) as total_spend, COUNT(*) as items FROM EKKN_AcctAssignment k JOIN EKPO_POItems p ON k.EBELN = p.EBELN AND k.EBELP = p.EBELP JOIN CSKS_CostCenters c ON k.KOSTL = c.KOSTL WHERE p.LOEKZ IS NULL GROUP BY k.KOSTL, c.KTEXT ORDER BY total_spend DESC" .
+ap:EKKN_q2 mantrix:exampleQuestion "PO items assigned to a specific project" ;
+    mantrix:exampleSQL "SELECT k.EBELN, k.EBELP, p.TXZ01, p.NETWR, k.PS_PSP_PNR FROM EKKN_AcctAssignment k JOIN EKPO_POItems p ON k.EBELN = p.EBELN AND k.EBELP = p.EBELP WHERE k.PS_PSP_PNR = 'WBS-001'" .
+ap:EKKN_q3 mantrix:exampleQuestion "Spend by GL account from POs" ;
+    mantrix:exampleSQL "SELECT k.SAKTO, s.TXT50, SUM(p.NETWR) as total FROM EKKN_AcctAssignment k JOIN EKPO_POItems p ON k.EBELN = p.EBELN AND k.EBELP = p.EBELP JOIN SKA1_GLAccounts s ON k.SAKTO = s.SAKNR WHERE p.LOEKZ IS NULL GROUP BY k.SAKTO, s.TXT50 ORDER BY total DESC" .
+
+# --- Edge Cases ---
+ap:EKKN_edge1 mantrix:edgeCases "ZEKKN > 01 means multiple account assignments on same PO item (split assignment). Each assignment gets a portion of the PO value." .
+ap:EKKN_edge2 mantrix:edgeCases "If EKPO.KNTTP is blank (stock item), EKKN may not exist — the posting goes to inventory GL accounts automatically." .
+ap:EKKN_edge3 mantrix:edgeCases "EKKN.KOSTL is the PLANNED cost center. The actual posting may differ if changed during GR or invoice." .

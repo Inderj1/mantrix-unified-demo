@@ -1,0 +1,41 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix copa: <http://mantrix.ai/ontology/copa#> .
+@prefix csg: <http://mantrix.ai/ontology/csg#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# Shared Annotation Properties — used across all ontology files
+# ============================================================================
+
+bq:table a owl:AnnotationProperty ; rdfs:label "BigQuery Table" ; rdfs:comment "BigQuery table name in the dataset" .
+bq:column a owl:AnnotationProperty ; rdfs:label "BigQuery Column" ; rdfs:comment "Column name in BigQuery table" .
+bq:type a owl:AnnotationProperty ; rdfs:label "BigQuery Type" ; rdfs:comment "BigQuery column data type (STRING, INTEGER, FLOAT, DATE, BOOLEAN)" .
+bq:primaryKey a owl:AnnotationProperty ; rdfs:label "Primary Key" ; rdfs:comment "Primary key column(s) of the BigQuery table" .
+bq:foreignKey a owl:AnnotationProperty ; rdfs:label "Foreign Key" ; rdfs:comment "Foreign key reference to another table.column" .
+
+mantrix:sapField a owl:AnnotationProperty ; rdfs:label "SAP Field" ; rdfs:comment "SAP technical field name" .
+mantrix:sapTable a owl:AnnotationProperty ; rdfs:label "SAP Source Table" ; rdfs:comment "SAP source table name" .
+mantrix:sapTransaction a owl:AnnotationProperty ; rdfs:label "SAP Transaction" ; rdfs:comment "SAP transaction code" .
+mantrix:joinPath a owl:AnnotationProperty ; rdfs:label "Join Path" ; rdfs:comment "SQL join condition between tables" .
+mantrix:joinSQL a owl:AnnotationProperty ; rdfs:label "Join SQL" ; rdfs:comment "Exact BigQuery SQL for joining this entity" .
+mantrix:sqlFormula a owl:AnnotationProperty ; rdfs:label "SQL Formula" ; rdfs:comment "BigQuery SQL formula for computing this metric" .
+mantrix:direction a owl:AnnotationProperty ; rdfs:label "Direction" ; rdfs:comment "Whether higher or lower is better for a metric" .
+mantrix:benchmark a owl:AnnotationProperty ; rdfs:label "Benchmark" ; rdfs:comment "Industry benchmark value" .
+mantrix:unit a owl:AnnotationProperty ; rdfs:label "Unit" ; rdfs:comment "Unit of measure (days, percent, currency, count)" .
+mantrix:exampleQuestion a owl:AnnotationProperty ; rdfs:label "Example Question" ; rdfs:comment "Example natural language question this concept answers" .
+mantrix:exampleSQL a owl:AnnotationProperty ; rdfs:label "Example SQL" ; rdfs:comment "Example BigQuery SQL query" .
+mantrix:businessRule a owl:AnnotationProperty ; rdfs:label "Business Rule" ; rdfs:comment "Business rule or constraint" .
+mantrix:edgeCases a owl:AnnotationProperty ; rdfs:label "Edge Cases" ; rdfs:comment "Known edge cases or gotchas" .
+mantrix:relatedConcepts a owl:AnnotationProperty ; rdfs:label "Related Concepts" ; rdfs:comment "Other concepts frequently used together" .
+mantrix:sliceDimensions a owl:AnnotationProperty ; rdfs:label "Slice Dimensions" ; rdfs:comment "Dimensions this metric can be sliced/grouped by" .
+mantrix:timeGrains a owl:AnnotationProperty ; rdfs:label "Time Grains" ; rdfs:comment "Supported time aggregation levels" .
+mantrix:clarificationPrompt a owl:AnnotationProperty ; rdfs:label "Clarification Prompt" ; rdfs:comment "Question to ask user when term is ambiguous" .
+mantrix:notToConfuseWith a owl:AnnotationProperty ; rdfs:label "Not To Confuse With" ; rdfs:comment "Similar terms that should not be confused" .
+mantrix:sensitivity a owl:AnnotationProperty ; rdfs:label "Data Sensitivity" ; rdfs:comment "Data sensitivity level (public, internal, restricted)" .
+mantrix:valueMap a owl:AnnotationProperty ; rdfs:label "Value Map" ; rdfs:comment "Mapping of code values to human-readable descriptions" .

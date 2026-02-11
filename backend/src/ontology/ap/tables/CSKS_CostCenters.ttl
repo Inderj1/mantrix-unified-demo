@@ -1,0 +1,41 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: CSKS_CostCenters — Cost Center Master
+# ============================================================================
+# Organizational unit for internal cost tracking. Each cost center belongs
+# to a company code and profit center. Used for spend allocation and
+# budget analysis.
+# ============================================================================
+
+ap:CSKS_CostCenters a owl:Class ;
+    rdfs:label "CSKS_CostCenters" ;
+    rdfs:comment "Cost center master. One row per cost center. Used for internal cost allocation and spend-by-department analysis. Links to profit center." ;
+    bq:table "CSKS_CostCenters" ; bq:primaryKey "KOSTL" ;
+    skos:altLabel "cost center" , "department" , "KOSTL" , "CSKS" ;
+    mantrix:sapTable "CSKS + CSKT (descriptions)" ;
+    mantrix:relatedConcepts "ACDOCA_UniversalJournal, EKKN_AcctAssignment, RSEG_InvoiceItems, CEPC_ProfitCenters" .
+
+# --- Columns ---
+ap:CSKS_KOSTL a owl:DatatypeProperty ; rdfs:label "Cost Center" ; bq:column "KOSTL" ; bq:type "STRING" .
+ap:CSKS_KTEXT a owl:DatatypeProperty ; rdfs:label "Description" ; bq:column "KTEXT" ; bq:type "STRING" .
+ap:CSKS_BUKRS a owl:DatatypeProperty ; rdfs:label "Company Code" ; bq:column "BUKRS" ; bq:type "STRING" ; bq:foreignKey "T001_CompanyCodes.BUKRS" .
+ap:CSKS_PRCTR a owl:DatatypeProperty ; rdfs:label "Profit Center" ; bq:column "PRCTR" ; bq:type "STRING" ; bq:foreignKey "CEPC_ProfitCenters.PRCTR" .
+ap:CSKS_VERAK a owl:DatatypeProperty ; rdfs:label "Responsible Person" ; bq:column "VERAK" ; bq:type "STRING" ; rdfs:comment "Person responsible for this cost center." .
+
+# --- Example Questions & SQL ---
+ap:CSKS_q1 mantrix:exampleQuestion "Spend by cost center this quarter" ;
+    mantrix:exampleSQL "SELECT a.KOSTL, c.KTEXT, SUM(ABS(a.HSL)) as spend FROM ACDOCA_UniversalJournal a JOIN CSKS_CostCenters c ON a.KOSTL = c.KOSTL WHERE a.KOART = 'K' AND a.RLDNR = '0L' AND a.BUDAT >= DATE_TRUNC(CURRENT_DATE(), QUARTER) GROUP BY a.KOSTL, c.KTEXT ORDER BY spend DESC" .
+ap:CSKS_q2 mantrix:exampleQuestion "Cost centers by profit center" ;
+    mantrix:exampleSQL "SELECT c.PRCTR, p.KTEXT as profit_center_name, COUNT(*) as cost_centers, GROUP_CONCAT(c.KOSTL) as cost_center_list FROM CSKS_CostCenters c JOIN CEPC_ProfitCenters p ON c.PRCTR = p.PRCTR GROUP BY c.PRCTR, p.KTEXT" .
+
+# --- Edge Cases ---
+ap:CSKS_edge1 mantrix:edgeCases "ACDOCA.KOSTL, EKKN.KOSTL, and RSEG.KOSTL all reference cost centers. Use CSKS for the description." .
+ap:CSKS_edge2 mantrix:edgeCases "Each cost center belongs to exactly one profit center (PRCTR). Profit center hierarchy is in CEPC." .

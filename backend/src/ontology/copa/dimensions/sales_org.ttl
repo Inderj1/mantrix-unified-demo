@@ -1,0 +1,13 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix copa: <http://mantrix.ai/ontology/copa#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+copa:dim_sales_org a mantrix:Dimension ;
+    rdfs:label "Sales Organization" ;
+    rdfs:comment "SAP sales organization. Responsible for sales and distribution activities." ;
+    skos:altLabel "sales org" , "distribution channel" ;
+    mantrix:bqColumns "Sales_Organization" ;
+    mantrix:exampleSQL "SELECT Sales_Organization, SUM(Net_Sales) as revenue FROM dataset_25m_table GROUP BY Sales_Organization" .

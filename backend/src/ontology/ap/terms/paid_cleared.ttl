@@ -1,0 +1,25 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# Semantic Terms: Paid / Cleared
+# ============================================================================
+
+ap:term_paid a mantrix:SemanticTerm ;
+    rdfs:label "paid" ;
+    rdfs:comment "Invoice has been paid/cleared. In SAP: ACDOCA.AUGBL IS NOT NULL. The clearing document (AUGBL) is the payment document." ;
+    skos:altLabel "cleared" , "settled" , "disbursed" , "remitted" ;
+    mantrix:canonicalFilter "ACDOCA.AUGBL IS NOT NULL AND ACDOCA.KOART = 'K'" ;
+    mantrix:disambiguation "'paid invoices' → ACDOCA WHERE AUGBL IS NOT NULL. 'when was it paid' → check AUGDT (clearing date)." ;
+    mantrix:relatedTerms "open, outstanding, cleared, payment run" .
+
+ap:term_cleared a mantrix:SemanticTerm ;
+    rdfs:label "cleared" ;
+    rdfs:comment "Same as 'paid' in AP context. AUGBL populated = cleared. AUGDT = clearing date. The clearing doc is typically the F110 payment document." ;
+    skos:altLabel "paid" , "settled" , "matched" ;
+    mantrix:canonicalFilter "ACDOCA.AUGBL IS NOT NULL" ;
+    mantrix:disambiguation "In AP: cleared = paid. In GL: cleared = offset by another posting. In GR/IR: cleared = GR and IR matched." .

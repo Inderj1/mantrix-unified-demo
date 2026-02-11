@@ -1,0 +1,85 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: RBKP_InvoiceHeaders — Supplier Invoice Headers
+# ============================================================================
+# Business: Supplier's claim for payment. Posted via MIRO (logistics invoice
+# verification) or FB60 (direct FI posting). Creates vendor liability.
+# This is the CORE invoice table in AP.
+# ============================================================================
+
+ap:RBKP_InvoiceHeaders a owl:Class ;
+    rdfs:label "RBKP_InvoiceHeaders" ;
+    rdfs:comment "Supplier invoice header table. One row per invoice document. Contains vendor, dates, amounts, payment terms, block status, and Axis AI enrichment columns." ;
+    bq:table "RBKP_InvoiceHeaders" ;
+    bq:primaryKey "BELNR, GJAHR" ;
+    skos:altLabel "MIRO" , "invoice" , "IR" , "vendor bill" , "bill" , "AP invoice" , "incoming invoice" ;
+    mantrix:sapTable "RBKP" ;
+    mantrix:sapTransaction "MIR4 (display invoice), MIRO (post invoice), FB60 (direct FI invoice)" ;
+    mantrix:relatedConcepts "RSEG_InvoiceItems, ACDOCA_UniversalJournal, LFA1_Suppliers, MATCH_CASES, DUPLICATE_RISK, EKPO_POItems" .
+
+# --- Columns ---
+ap:RBKP_BELNR a owl:DatatypeProperty ; rdfs:label "Invoice Doc Number" ; bq:column "BELNR" ; bq:type "INTEGER" ; rdfs:comment "Invoice document number. Part of composite key with GJAHR." .
+ap:RBKP_GJAHR a owl:DatatypeProperty ; rdfs:label "Fiscal Year" ; bq:column "GJAHR" ; bq:type "INTEGER" ; rdfs:comment "Fiscal year of invoice posting." .
+ap:RBKP_BUKRS a owl:DatatypeProperty ; rdfs:label "Company Code" ; bq:column "BUKRS" ; bq:type "STRING" ; bq:foreignKey "T001_CompanyCodes.BUKRS" .
+ap:RBKP_LIFNR a owl:DatatypeProperty ; rdfs:label "Supplier" ; bq:column "LIFNR" ; bq:type "INTEGER" ; bq:foreignKey "LFA1_Suppliers.LIFNR" .
+ap:RBKP_BLDAT a owl:DatatypeProperty ; rdfs:label "Invoice Date" ; bq:column "BLDAT" ; bq:type "DATE" ; rdfs:comment "Invoice date FROM the vendor (date on vendor's invoice document)." .
+ap:RBKP_BUDAT a owl:DatatypeProperty ; rdfs:label "Posting Date" ; bq:column "BUDAT" ; bq:type "DATE" ; rdfs:comment "Date invoice was posted in SAP. Used for cycle time calculations." .
+ap:RBKP_ZFBDT a owl:DatatypeProperty ; rdfs:label "Baseline Date" ; bq:column "ZFBDT" ; bq:type "DATE" ; rdfs:comment "Baseline date for payment terms calculation. DUE_DATE = ZFBDT + net_days. DISC_DUE_DATE = ZFBDT + discount_days." .
+ap:RBKP_XBLNR a owl:DatatypeProperty ; rdfs:label "Vendor Invoice Ref" ; bq:column "XBLNR" ; bq:type "STRING" ; rdfs:comment "Vendor's own invoice reference number. Used for duplicate detection and vendor communication." .
+ap:RBKP_RMWWR a owl:DatatypeProperty ; rdfs:label "Gross Amount" ; bq:column "RMWWR" ; bq:type "FLOAT" ; rdfs:comment "Total gross invoice amount in document currency." .
+ap:RBKP_WMWST1 a owl:DatatypeProperty ; rdfs:label "Tax Amount" ; bq:column "WMWST1" ; bq:type "FLOAT" ; rdfs:comment "Tax amount on the invoice." .
+ap:RBKP_WAERS a owl:DatatypeProperty ; rdfs:label "Currency" ; bq:column "WAERS" ; bq:type "STRING" .
+ap:RBKP_ZTERM a owl:DatatypeProperty ; rdfs:label "Payment Terms" ; bq:column "ZTERM" ; bq:type "STRING" ; rdfs:comment "Payment terms on this invoice. May differ from PO or vendor master." ; bq:foreignKey "T052_PaymentTerms.ZTERM" .
+ap:RBKP_ZLSCH a owl:DatatypeProperty ; rdfs:label "Payment Method" ; bq:column "ZLSCH" ; bq:type "STRING" ; rdfs:comment "Payment method. C=check, T=wire, E=ACH." .
+ap:RBKP_ZLSPR a owl:DatatypeProperty ; rdfs:label "Payment Block" ; bq:column "ZLSPR" ; bq:type "STRING" ; rdfs:comment "Payment block key. CRITICAL: A=free, B=manual block, R=invoice verification block, space/null=no block. Prevents F110 selection." ;
+    mantrix:valueMap "A=Free for payment, B=Manual block, R=Invoice verification block, (empty)=No block" .
+ap:RBKP_BLART a owl:DatatypeProperty ; rdfs:label "Document Type" ; bq:column "BLART" ; bq:type "STRING" ; rdfs:comment "Invoice document type." ;
+    mantrix:valueMap "RE=Incoming invoice, KG=Vendor credit memo, KR=Vendor invoice (net), KA=Vendor document" .
+ap:RBKP_RBSTAT a owl:DatatypeProperty ; rdfs:label "Invoice Status" ; bq:column "RBSTAT" ; bq:type "STRING" ; rdfs:comment "Invoice processing status." ;
+    mantrix:valueMap "5=Posted (creates open item), 1=Parked (no open item yet), 2=Saved incomplete" .
+ap:RBKP_BKTXT a owl:DatatypeProperty ; rdfs:label "Header Text" ; bq:column "BKTXT" ; bq:type "STRING" ; rdfs:comment "Free-text header description." .
+
+# --- Axis AI Enriched Columns ---
+ap:RBKP_DUE_DATE a owl:DatatypeProperty ; rdfs:label "Due Date" ; bq:column "DUE_DATE" ; bq:type "DATE" ; rdfs:comment "Calculated: ZFBDT + T052.ZTAG3 (net days). Pre-computed by Axis AI." .
+ap:RBKP_DISC_DUE_DATE a owl:DatatypeProperty ; rdfs:label "Discount Due Date" ; bq:column "DISC_DUE_DATE" ; bq:type "DATE" ; rdfs:comment "Calculated: ZFBDT + T052.ZTAG1. Last date to capture early payment discount." .
+ap:RBKP_DISC_AMOUNT a owl:DatatypeProperty ; rdfs:label "Discount Amount" ; bq:column "DISC_AMOUNT" ; bq:type "FLOAT" ; rdfs:comment "Dollar amount of early payment discount available = RMWWR * T052.ZPRZ1 / 100." .
+ap:RBKP_BLOCK_SCENARIO a owl:DatatypeProperty ; rdfs:label "Block Scenario" ; bq:column "BLOCK_SCENARIO" ; bq:type "STRING" ; rdfs:comment "Axis AI classification of why invoice is blocked." .
+ap:RBKP_PRICE_SCENARIO a owl:DatatypeProperty ; rdfs:label "Price Scenario" ; bq:column "PRICE_SCENARIO" ; bq:type "STRING" ; rdfs:comment "Axis AI price variance scenario classification." .
+ap:RBKP_QTY_SCENARIO a owl:DatatypeProperty ; rdfs:label "Qty Scenario" ; bq:column "QTY_SCENARIO" ; bq:type "STRING" ; rdfs:comment "Axis AI quantity variance scenario classification." .
+ap:RBKP_HAS_GR a owl:DatatypeProperty ; rdfs:label "Has GR" ; bq:column "HAS_GR" ; bq:type "BOOLEAN" ; rdfs:comment "Whether goods receipt exists for PO-based invoice lines." .
+ap:RBKP_INV_TYPE a owl:DatatypeProperty ; rdfs:label "Invoice Type" ; bq:column "INV_TYPE" ; bq:type "STRING" ; rdfs:comment "Axis AI classification: po_based, non_po, credit_memo, etc." .
+
+# --- Join Paths ---
+ap:RBKP_join_RSEG a mantrix:joinPath ; rdfs:label "Invoice → Line Items" ; rdfs:comment "RBKP.BELNR = RSEG.BELNR AND RBKP.GJAHR = RSEG.GJAHR" .
+ap:RBKP_join_ACDOCA a mantrix:joinPath ; rdfs:label "Invoice → FI Posting" ; rdfs:comment "RBKP.BELNR = ACDOCA.BELNR AND RBKP.GJAHR = ACDOCA.GJAHR AND ACDOCA.KOART = 'K'" .
+ap:RBKP_join_LFA1 a mantrix:joinPath ; rdfs:label "Invoice → Supplier" ; rdfs:comment "RBKP.LIFNR = LFA1_Suppliers.LIFNR" .
+ap:RBKP_join_MATCH a mantrix:joinPath ; rdfs:label "Invoice → Match Cases" ; rdfs:comment "RBKP.BELNR = MATCH_CASES.INVOICE_BELNR AND RBKP.GJAHR = MATCH_CASES.INVOICE_GJAHR" .
+ap:RBKP_join_DUP a mantrix:joinPath ; rdfs:label "Invoice → Duplicate Risk" ; rdfs:comment "RBKP.BELNR = DUPLICATE_RISK.ORIGINAL_BELNR OR RBKP.BELNR = DUPLICATE_RISK.CANDIDATE_BELNR" .
+
+# --- Example Questions & SQL ---
+ap:RBKP_q1 mantrix:exampleQuestion "Show blocked invoices for vendor X" ;
+    mantrix:exampleSQL "SELECT BELNR, GJAHR, RMWWR, ZLSPR, BLOCK_SCENARIO, BUDAT FROM RBKP_InvoiceHeaders WHERE LIFNR = 1000001 AND ZLSPR IS NOT NULL AND ZLSPR != '' AND ZLSPR != 'A'" .
+ap:RBKP_q2 mantrix:exampleQuestion "Invoices due next week over $50k" ;
+    mantrix:exampleSQL "SELECT BELNR, LIFNR, RMWWR, DUE_DATE, ZLSPR FROM RBKP_InvoiceHeaders WHERE DUE_DATE BETWEEN DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY) AND DATE_ADD(CURRENT_DATE(), INTERVAL 7 DAY) AND RMWWR > 50000 ORDER BY DUE_DATE" .
+ap:RBKP_q3 mantrix:exampleQuestion "Parked invoices over 5 days old" ;
+    mantrix:exampleSQL "SELECT BELNR, LIFNR, RMWWR, BUDAT, DATE_DIFF(CURRENT_DATE(), BUDAT, DAY) as days_parked FROM RBKP_InvoiceHeaders WHERE RBSTAT = '1' AND DATE_DIFF(CURRENT_DATE(), BUDAT, DAY) > 5" .
+ap:RBKP_q4 mantrix:exampleQuestion "Credit memos this month" ;
+    mantrix:exampleSQL "SELECT BELNR, LIFNR, RMWWR, BUDAT, XBLNR FROM RBKP_InvoiceHeaders WHERE BLART = 'KG' AND BUDAT >= DATE_TRUNC(CURRENT_DATE(), MONTH)" .
+ap:RBKP_q5 mantrix:exampleQuestion "Invoices at risk of missing discount" ;
+    mantrix:exampleSQL "SELECT BELNR, LIFNR, RMWWR, DISC_DUE_DATE, DISC_AMOUNT, ZLSPR FROM RBKP_InvoiceHeaders WHERE DISC_DUE_DATE BETWEEN CURRENT_DATE() AND DATE_ADD(CURRENT_DATE(), INTERVAL 3 DAY) AND DISC_AMOUNT > 0 AND RBSTAT = '5'" .
+ap:RBKP_q6 mantrix:exampleQuestion "Invoice volume by month" ;
+    mantrix:exampleSQL "SELECT DATE_TRUNC(BUDAT, MONTH) as month, COUNT(*) as invoice_count, SUM(RMWWR) as total_amount FROM RBKP_InvoiceHeaders WHERE RBSTAT = '5' GROUP BY month ORDER BY month" .
+
+# --- Edge Cases ---
+ap:RBKP_edge1 mantrix:edgeCases "BLDAT (invoice date from vendor) vs BUDAT (posting date in SAP) — these are DIFFERENT. BLDAT is what vendor printed. BUDAT is when AP clerk posted it." .
+ap:RBKP_edge2 mantrix:edgeCases "RBSTAT='1' (parked) does NOT create an open item or liability. Only RBSTAT='5' (posted) creates an ACDOCA entry." .
+ap:RBKP_edge3 mantrix:edgeCases "ZLSPR block key: empty/null means NOT blocked. 'A' means 'free for payment' (explicitly cleared). 'B' and 'R' are actual blocks." .
+ap:RBKP_edge4 mantrix:edgeCases "DUE_DATE, DISC_DUE_DATE, DISC_AMOUNT, BLOCK_SCENARIO, INV_TYPE are Axis AI enriched columns — NOT from SAP." .

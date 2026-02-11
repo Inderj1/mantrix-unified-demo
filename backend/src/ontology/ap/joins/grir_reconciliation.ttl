@@ -1,0 +1,27 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# Join Path: GR/IR Reconciliation from Raw EKBE
+# ============================================================================
+
+ap:join_grir_reconciliation a mantrix:JoinPath ;
+    rdfs:label "GR/IR Reconciliation (Raw)" ;
+    rdfs:comment "Calculate GR/IR balance directly from EKBE_POHistory using VGABE codes. Alternative to pre-computed GRIR_Reconciliation table." ;
+    mantrix:joinSQL """SELECT
+  e.EBELN, e.EBELP, p.TXZ01,
+  SUM(CASE WHEN e.VGABE = '1' THEN e.DMBTR ELSE 0 END) as GR_VALUE,
+  SUM(CASE WHEN e.VGABE IN ('2','3') THEN e.DMBTR ELSE 0 END) as IR_VALUE,
+  SUM(CASE WHEN e.VGABE = '1' THEN e.DMBTR ELSE 0 END) -
+  SUM(CASE WHEN e.VGABE IN ('2','3') THEN e.DMBTR ELSE 0 END) as DELTA,
+  SUM(CASE WHEN e.VGABE = '1' THEN e.MENGE ELSE 0 END) as GR_QTY,
+  SUM(CASE WHEN e.VGABE = '2' THEN e.MENGE ELSE 0 END) as IR_QTY,
+  MAX(e.BUDAT) as last_activity
+FROM EKBE_POHistory e
+JOIN EKPO_POItems p ON e.EBELN = p.EBELN AND e.EBELP = p.EBELP
+GROUP BY e.EBELN, e.EBELP, p.TXZ01
+HAVING DELTA != 0""" ;
+    mantrix:answersQuestions "GR/IR balance, accruals, unmatched receipts, period-end reconciliation" .

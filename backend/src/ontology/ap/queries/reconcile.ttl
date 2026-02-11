@@ -1,0 +1,25 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# Query Type: Reconcile
+# ============================================================================
+
+ap:query_reconcile a mantrix:QueryType ;
+    rdfs:label "Reconcile" ;
+    rdfs:comment "Comparison queries that verify two sides balance. Identifies mismatches between expected and actual values. Common for GR/IR, vendor statements, AP to GL." ;
+    mantrix:triggerPhrases "reconcile, compare, balance, match, verify, check against, discrepancy" ;
+    mantrix:sqlPattern """SELECT entity_key,
+  SUM(side_A) as expected,
+  SUM(side_B) as actual,
+  SUM(side_A) - SUM(side_B) as difference
+FROM [joined_tables]
+GROUP BY entity_key
+HAVING difference != 0""" ;
+    mantrix:examples """
+'reconcile GR/IR' → Compare EKBE VGABE=1 total vs VGABE=2 total per PO item
+'vendor statement reconciliation' → Compare vendor's claimed balance vs ACDOCA open balance
+'AP to GL reconciliation' → Compare SUM of AP subledger (KOART=K) vs GL account balance for AP control account""" .

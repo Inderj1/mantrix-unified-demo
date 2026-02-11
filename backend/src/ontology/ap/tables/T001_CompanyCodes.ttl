@@ -1,0 +1,41 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: T001_CompanyCodes — Company Code Master
+# ============================================================================
+# SAP organizational unit for financial reporting. Each company code is a
+# separate legal entity with its own balance sheet and P&L.
+# Dimension table used across all AP queries for company code filtering.
+# ============================================================================
+
+ap:T001_CompanyCodes a owl:Class ;
+    rdfs:label "T001_CompanyCodes" ;
+    rdfs:comment "Company code master. One row per company code. Each company code is a legal entity with its own financial statements. Used for filtering and grouping across all AP tables." ;
+    bq:table "T001_CompanyCodes" ; bq:primaryKey "BUKRS" ;
+    skos:altLabel "company code" , "company" , "entity" , "legal entity" , "T001" ;
+    mantrix:sapTable "T001" ;
+    mantrix:relatedConcepts "RBKP_InvoiceHeaders, EKKO_POHeaders, LFA1_Suppliers, ACDOCA_UniversalJournal" .
+
+# --- Columns ---
+ap:T001_BUKRS a owl:DatatypeProperty ; rdfs:label "Company Code" ; bq:column "BUKRS" ; bq:type "STRING" .
+ap:T001_BUTXT a owl:DatatypeProperty ; rdfs:label "Company Name" ; bq:column "BUTXT" ; bq:type "STRING" .
+ap:T001_WAERS a owl:DatatypeProperty ; rdfs:label "Local Currency" ; bq:column "WAERS" ; bq:type "STRING" ; rdfs:comment "Company code currency. All HSL amounts in ACDOCA are in this currency." .
+ap:T001_LAND1 a owl:DatatypeProperty ; rdfs:label "Country" ; bq:column "LAND1" ; bq:type "STRING" .
+ap:T001_KTOPL a owl:DatatypeProperty ; rdfs:label "Chart of Accounts" ; bq:column "KTOPL" ; bq:type "STRING" ; rdfs:comment "Chart of accounts used by this company code. Determines GL account structure." .
+
+# --- Example Questions & SQL ---
+ap:T001_q1 mantrix:exampleQuestion "List all company codes" ;
+    mantrix:exampleSQL "SELECT BUKRS, BUTXT, WAERS, LAND1, KTOPL FROM T001_CompanyCodes ORDER BY BUKRS" .
+ap:T001_q2 mantrix:exampleQuestion "AP balance by company code" ;
+    mantrix:exampleSQL "SELECT a.RBUKRS, t.BUTXT, SUM(ABS(a.HSL)) as open_balance FROM ACDOCA_UniversalJournal a JOIN T001_CompanyCodes t ON a.RBUKRS = t.BUKRS WHERE a.KOART = 'K' AND a.AUGBL IS NULL AND a.RLDNR = '0L' GROUP BY a.RBUKRS, t.BUTXT ORDER BY open_balance DESC" .
+
+# --- Edge Cases ---
+ap:T001_edge1 mantrix:edgeCases "BUKRS appears as BUKRS in most tables but RBUKRS in ACDOCA. Same field, different alias." .
+ap:T001_edge2 mantrix:edgeCases "Multi-currency environment: WAERS is the LOCAL currency. Foreign currency invoices will have different RWCUR in ACDOCA." .

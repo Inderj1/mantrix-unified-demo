@@ -1,0 +1,38 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# AP Metric: Invoice-to-Payment Cycle Time
+# ============================================================================
+
+ap:metric_invoice_to_payment_cycle_time a mantrix:Metric ;
+    rdfs:label "Invoice-to-Payment Cycle Time" ;
+    rdfs:comment "Average days from invoice posting to payment clearing. Measures AP processing speed and payment efficiency." ;
+    skos:altLabel "invoice to pay" , "posting to payment" , "I2P" , "payment processing time" ;
+    mantrix:category "cycle_time" ;
+    mantrix:unit "days" ;
+    mantrix:direction "lower_is_better" ;
+    mantrix:benchmark "15-20 days (best-in-class), 30-45 days (average)" ;
+    mantrix:sqlFormula "AVG(DATE_DIFF(AUGDT, BUDAT, DAY))" ;
+    mantrix:sourceTables "ACDOCA_UniversalJournal" ;
+    mantrix:dimensions "vendor, company_code, payment_method" ;
+    mantrix:exampleQuestion "Average invoice to payment time" ;
+    mantrix:exampleSQL """SELECT
+  AVG(DATE_DIFF(AUGDT, BUDAT, DAY)) as avg_days,
+  APPROX_QUANTILES(DATE_DIFF(AUGDT, BUDAT, DAY), 100)[OFFSET(50)] as median_days
+FROM ACDOCA_UniversalJournal
+WHERE KOART = 'K' AND RLDNR = '0L' AND AUGBL IS NOT NULL""" ;
+    mantrix:exampleQuestion "Invoice to payment time by vendor" ;
+    mantrix:exampleSQL """SELECT a.LIFNR, s.NAME1,
+  AVG(DATE_DIFF(a.AUGDT, a.BUDAT, DAY)) as avg_days, COUNT(*) as invoices
+FROM ACDOCA_UniversalJournal a
+JOIN LFA1_Suppliers s ON a.LIFNR = s.LIFNR
+WHERE a.KOART = 'K' AND a.RLDNR = '0L' AND a.AUGBL IS NOT NULL
+GROUP BY a.LIFNR, s.NAME1 ORDER BY avg_days DESC""" ;
+    mantrix:edgeCases "Only include cleared items (AUGBL IS NOT NULL). AUGDT is clearing date, BUDAT is posting date." .

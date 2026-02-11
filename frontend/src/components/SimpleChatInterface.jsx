@@ -1802,7 +1802,15 @@ const SimpleChatInterface = ({ darkMode = false }) => {
                                           lowerKey.includes('sold_to') ||
                                           lowerKey.includes('bill_to') ||
                                           lowerKey.includes('ship_to') ||
-                                          lowerKey.includes('payer');
+                                          lowerKey.includes('payer') ||
+                                          lowerKey.includes('order') ||
+                                          lowerKey.includes('document') ||
+                                          lowerKey.includes('invoice') ||
+                                          lowerKey.includes('delivery') ||
+                                          lowerKey.includes('shipment') ||
+                                          lowerKey.includes('billing') ||
+                                          lowerKey === 'po' ||
+                                          /^(ebeln|ebelp|vbeln|posnr|kunnr|lifnr|matnr|bukrs|belnr|gjahr|buzei|banfn|bnfpo|mblnr|kostl|prctr|saknr|werks|ekorg|mandt|zeile|kdauf|vgbel|vgpos)$/i.test(lowerKey);
 
                         // Check if numeric - could be number type or a numeric string from BigQuery
                         // But exclude ID columns even if they contain only digits
@@ -1846,6 +1854,29 @@ const SimpleChatInterface = ({ darkMode = false }) => {
 
                         const isAmount = !isQuantity && (hasCurrencyKeyword || looksLikeCurrency);
                         const isFirstColumn = index === 0;
+
+                        // Detect date columns
+                        const isDate = lowerKey.includes('date') || lowerKey.includes('created') || lowerKey.includes('updated') || lowerKey.includes('posted') || lowerKey.includes('time');
+
+                        // Detect year columns
+                        const isYear = lowerKey.includes('year') || lowerKey === 'fy' || lowerKey === 'gjahr';
+
+                        // Detect status/boolean columns
+                        const isStatus = lowerKey.includes('status') || lowerKey.includes('block') || lowerKey.includes('flag') || lowerKey.includes('state') || lowerKey.includes('active') || lowerKey.includes('type');
+
+                        // Alignment rules:
+                        // - IDs, names, text → left
+                        // - Amounts, quantities, other numbers → right
+                        // - Dates, years, statuses → center
+                        const getAlignment = () => {
+                          if (isYear) return 'center';
+                          if (isDate) return 'center';
+                          if (isStatus && !isNumeric) return 'center';
+                          if (isIdColumn || isFirstColumn) return 'left';
+                          if (isNumeric) return 'right';
+                          return 'left';
+                        };
+                        const colAlign = getAlignment();
 
                         // Determine the appropriate icon for this column
                         const getColumnIcon = () => {
@@ -1919,12 +1950,12 @@ const SimpleChatInterface = ({ darkMode = false }) => {
                           field: key,
                           headerName: headerLabel,
                           flex: 1,
-                          minWidth: 150,
+                          minWidth: isDate ? 120 : (isYear ? 90 : (isStatus ? 110 : 150)),
                           type: isNumeric ? 'number' : 'string',
-                          align: isFirstColumn ? 'left' : (isNumeric ? 'right' : 'left'),
-                          headerAlign: isFirstColumn ? 'left' : (isNumeric ? 'right' : 'left'),
+                          align: colAlign,
+                          headerAlign: colAlign,
                           renderHeader: () => (
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, justifyContent: colAlign === 'center' ? 'center' : colAlign === 'right' ? 'flex-end' : 'flex-start', width: '100%' }}>
                               {columnIcon}
                               <span style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '0.75rem' }}>
                                 {headerLabel}
@@ -1941,6 +1972,38 @@ const SimpleChatInterface = ({ darkMode = false }) => {
                               // Convert to number if it's a numeric string
                               const numValue = typeof params.value === 'number' ? params.value : parseFloat(params.value);
                               const isValidNumber = !isNaN(numValue) && isFinite(numValue);
+
+                              // Style year columns — centered, no commas
+                              if (isYear && isValidNumber) {
+                                return (
+                                  <span style={{ fontFamily: 'monospace', fontWeight: 600, fontSize: '0.8rem', color: darkMode ? '#e6edf3' : '#1e293b' }}>
+                                    {String(Math.round(numValue))}
+                                  </span>
+                                );
+                              }
+
+                              // Style date columns — centered, muted
+                              if (isDate) {
+                                return (
+                                  <span style={{ fontSize: '0.8rem', color: darkMode ? '#8b949e' : '#64748b' }}>
+                                    {String(params.value)}
+                                  </span>
+                                );
+                              }
+
+                              // Style status columns — centered chip-like
+                              if (isStatus && !isNumeric) {
+                                const val = String(params.value);
+                                const isBlocked = val.toLowerCase().includes('block');
+                                return (
+                                  <span style={{
+                                    fontSize: '0.75rem', fontWeight: 600,
+                                    color: isBlocked ? '#dc2626' : (darkMode ? '#8b949e' : '#64748b'),
+                                  }}>
+                                    {val}
+                                  </span>
+                                );
+                              }
 
                               // Style ID columns with primary color and monospace font
                               if (isIdColumn) {
@@ -1979,9 +2042,11 @@ const SimpleChatInterface = ({ darkMode = false }) => {
 
                               // Style other numeric values
                               if (isNumeric && isValidNumber) {
+                                // Don't add comma separators for year-like values (1900-2099)
+                                const isYearLike = Number.isInteger(numValue) && numValue >= 1900 && numValue <= 2099;
                                 return (
                                   <span style={{ fontFamily: 'monospace' }}>
-                                    {numValue.toLocaleString('en-US')}
+                                    {isYearLike ? String(numValue) : numValue.toLocaleString('en-US')}
                                   </span>
                                 );
                               }
@@ -2041,7 +2106,12 @@ const SimpleChatInterface = ({ darkMode = false }) => {
                               fontSize: '0.8rem',
                               color: colors.text,
                               borderColor: colors.border,
+                              borderRight: `1px solid ${darkMode ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
                               py: 1,
+                              '&:last-child': { borderRight: 'none' },
+                              '&:first-of-type': {
+                                borderRight: `2px solid ${darkMode ? 'rgba(77,158,255,0.15)' : 'rgba(0,53,122,0.12)'}`,
+                              },
                             },
                             '& .MuiDataGrid-columnHeaders': {
                               bgcolor: darkMode ? '#21262d' : '#f8fafc',
@@ -2053,6 +2123,11 @@ const SimpleChatInterface = ({ darkMode = false }) => {
                             '& .MuiDataGrid-columnHeader': {
                               bgcolor: darkMode ? '#21262d' : '#f8fafc',
                               color: colors.text,
+                              borderRight: `1px solid ${darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                              '&:last-child': { borderRight: 'none' },
+                              '&:first-of-type': {
+                                borderRight: `2px solid ${darkMode ? 'rgba(77,158,255,0.15)' : 'rgba(0,53,122,0.12)'}`,
+                              },
                             },
                             '& .MuiDataGrid-columnHeaderTitle': {
                               color: colors.text,

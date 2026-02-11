@@ -1,0 +1,32 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# AP Metric: End-to-End P2P Cycle Time
+# ============================================================================
+
+ap:metric_end_to_end_cycle_time a mantrix:Metric ;
+    rdfs:label "End-to-End P2P Cycle Time" ;
+    rdfs:comment "Total days from PR creation to final payment. The full procure-to-pay cycle. Sum of PR→PO + PO→GR + GR→Invoice + Invoice→Payment." ;
+    skos:altLabel "P2P cycle time" , "procure to pay time" , "total cycle time" , "end to end" ;
+    mantrix:category "cycle_time" ;
+    mantrix:unit "days" ;
+    mantrix:direction "lower_is_better" ;
+    mantrix:benchmark "30-45 days (best-in-class), 60-90 days (average)" ;
+    mantrix:sqlFormula "AVG(DATE_DIFF(a.AUGDT, e.BADAT, DAY))" ;
+    mantrix:sourceTables "EBAN_PurchaseReqs, EKKO_POHeaders, ACDOCA_UniversalJournal" ;
+    mantrix:dimensions "vendor, company_code, plant" ;
+    mantrix:exampleQuestion "End-to-end P2P cycle time" ;
+    mantrix:exampleSQL """SELECT
+  AVG(DATE_DIFF(a.AUGDT, e.BADAT, DAY)) as avg_e2e_days
+FROM EBAN_PurchaseReqs e
+JOIN EKKO_POHeaders k ON e.EBELN = k.EBELN
+JOIN ACDOCA_UniversalJournal a ON k.EBELN = a.EBELN
+WHERE a.KOART = 'K' AND a.RLDNR = '0L' AND a.AUGBL IS NOT NULL AND e.EBELN IS NOT NULL""" ;
+    mantrix:edgeCases "Not all invoices originate from PRs. This metric only applies to the PR→PO→GR→Invoice→Payment path." .

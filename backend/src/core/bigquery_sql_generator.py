@@ -291,37 +291,109 @@ class BigQuerySQLGenerator:
             return all_columns
 
     def _identify_relevant_tables(self, query: str) -> List[str]:
-        """Identify relevant tables based on query keywords"""
+        """Identify relevant tables based on query domain.
+
+        Three domains:
+        1. COPA/Finance → dataset_25m_table (revenue, margin, profit, cost, P&L, customers)
+        2. Sales Orders → sales_order_cockpit_export (orders, delivery, shipment)
+        3. AP → All other tables (invoices, vendors, payments, POs, purchasing)
+        """
         query_lower = query.lower()
         all_tables = self.list_tables()
 
-        # Define keyword mappings - only for allowed tables
-        table_keywords = {
-            "dataset_25m_table": ["customer", "client", "buyer", "sold", "name", "sales", "revenue", "margin", "product", "material", "brand", "gross", "net", "profit", "transaction", "p&l", "p & l", "profit and loss", "income statement", "income", "gl", "account", "cogs", "cost of goods", "operating", "ebit", "ebitda", "quarter", "fiscal", "financial"],
-            "sales_order_cockpit_export": ["sales order", "order", "delivery", "shipment", "ship"],
-        }
+        # --- Domain keyword definitions ---
+
+        # COPA / Finance keywords → dataset_25m_table
+        copa_keywords = [
+            "customer", "client", "buyer", "sold", "payer", "distributor",
+            "revenue", "sales", "margin", "profit", "gross", "net", "income",
+            "p&l", "p & l", "profit and loss", "income statement", "financial",
+            "cogs", "cost of goods", "cost of sales", "operating", "ebit", "ebitda",
+            "gl", "g/l", "account", "fiscal", "quarter", "brand", "material",
+            "product", "sku", "transaction", "freight", "ingredient", "packaging",
+        ]
+
+        # Sales Order keywords → sales_order_cockpit_export
+        sales_keywords = [
+            "sales order", "order status", "delivery", "shipment", "ship",
+            "order backlog", "open order", "order fulfillment",
+        ]
+
+        # AP keywords → AP tables (RBKP, RSEG, EKKO, EKPO, LFA1, REGUH, etc.)
+        ap_keywords = [
+            "invoice", "vendor", "supplier", "payment", "purchase order", "po ",
+            "purchasing", "accounts payable", "a/p", "ap ", "overdue", "aging",
+            "gr/ir", "grir", "goods receipt", "blocked", "discount", "cash outflow",
+            "duplicate", "workflow", "approval", "bank", "tax", "accrual",
+            "liability", "company code", "cost center", "profit center",
+            "payment term", "dpo", "days payable",
+        ]
+
+        # AP table group (everything except COPA/Sales)
+        copa_tables = {"dataset_25m_table", "sales_order_cockpit_export"}
+        ap_tables = [t for t in all_tables if t not in copa_tables]
+
+        # --- Determine domain ---
+        is_copa = any(kw in query_lower for kw in copa_keywords)
+        is_sales = any(kw in query_lower for kw in sales_keywords)
+        is_ap = any(kw in query_lower for kw in ap_keywords)
 
         relevant_tables = []
-        for table in all_tables:
-            table_lower = table.lower()
 
-            # Check if table name matches query keywords
-            keywords = table_keywords.get(table, [])
-            if any(keyword in query_lower for keyword in keywords):
-                relevant_tables.append(table)
-            # Also check if query mentions table name directly
-            elif any(word in table_lower for word in query_lower.split()):
-                relevant_tables.append(table)
+        # COPA/Finance queries → always include dataset_25m_table first
+        if is_copa and "dataset_25m_table" in all_tables:
+            relevant_tables.append("dataset_25m_table")
 
-        # Default to transaction_data if nothing found
+        # Sales order queries → include sales_order_cockpit_export
+        if is_sales and "sales_order_cockpit_export" in all_tables:
+            relevant_tables.append("sales_order_cockpit_export")
+
+        # AP queries → pick relevant AP tables by keyword matching
+        if is_ap:
+            # Map AP tables to their keywords for fine-grained selection
+            ap_table_keywords = {
+                "RBKP_InvoiceHeaders": ["invoice", "blocked", "approval", "workflow", "posting", "overdue", "aging", "due date", "duplicate"],
+                "RSEG_InvoiceItems": ["invoice", "line item", "price variance", "quantity mismatch", "tax", "material"],
+                "EKKO_POHeaders": ["purchase order", "po ", "purchasing", "budget"],
+                "EKPO_POItems": ["purchase order", "po ", "po item", "material", "price"],
+                "EKBE_POHistory": ["goods receipt", "gr/ir", "grir", "received", "invoiced"],
+                "EKKN_AcctAssignment": ["cost center", "profit center", "account assignment", "capital", "expenditure"],
+                "LFA1_Suppliers": ["vendor", "supplier", "bank", "created"],
+                "LFBK_VendorBanks": ["bank", "bank detail"],
+                "REGUH_PaymentHeaders": ["payment", "cash outflow", "scheduled", "paid"],
+                "REGUP_PaymentItems": ["payment", "paid", "early", "late", "discount"],
+                "MATDOC_GoodsReceipts": ["goods receipt", "gr/ir", "grir", "received"],
+                "GRIR_Reconciliation": ["gr/ir", "grir", "reconcil", "accrual"],
+                "T052_PaymentTerms": ["payment term", "terms"],
+                "T001_CompanyCodes": ["company code", "company"],
+                "T001W_Plants": ["plant"],
+                "T024E_PurchasingOrgs": ["purchasing org"],
+                "CSKS_CostCenters": ["cost center"],
+                "CEPC_ProfitCenters": ["profit center"],
+                "SKA1_GLAccounts": ["g/l account", "gl account"],
+                "MARA_Materials": ["material", "material group"],
+                "ACDOCA_UniversalJournal": ["journal", "universal", "accounting", "liability", "foreign currency"],
+                "EBAN_PurchaseReqs": ["requisition", "purchase req"],
+                "KPI_Summary": ["kpi", "summary", "metric"],
+                "DUPLICATE_RISK": ["duplicate"],
+                "MATCH_CASES": ["match", "matching"],
+            }
+            for table in ap_tables:
+                if table in relevant_tables:
+                    continue
+                keywords = ap_table_keywords.get(table, [])
+                if any(kw in query_lower for kw in keywords):
+                    relevant_tables.append(table)
+
+        # If nothing matched, default to dataset_25m_table
         if not relevant_tables:
-            if "transaction_data" in all_tables:
-                relevant_tables = ["transaction_data"]
+            if "dataset_25m_table" in all_tables:
+                relevant_tables = ["dataset_25m_table"]
             else:
-                # Take first 3 tables
                 relevant_tables = all_tables[:3]
 
-        return relevant_tables[:5]  # Limit to 5 tables
+        logger.info(f"Table selection: copa={is_copa}, sales={is_sales}, ap={is_ap}, tables={relevant_tables[:5]}")
+        return relevant_tables[:5]
 
     def _fix_current_date_queries(self, sql: str) -> str:
         """Remove CURRENT_DATE() based filtering since data has fixed date range.
@@ -1258,6 +1330,22 @@ class BigQuerySQLGenerator:
             - NEVER use Gross_Revenue column at all - use Gross_Sales instead (Gross_Revenue produces WRONG negative values)
             - For "top-down P&L": Show Revenue (SUM(Gross_Sales)), COGS (SUM(Total_COGS)), Gross Profit, then detail cost categories using GL_Account_Description
 
+            PROFIT MARGIN QUERIES:
+            - Customer profit margin: GROUP BY Sold_to_Number, Sold_to_Name, use SUM(Gross_Sales) and SUM(Total_COGS)
+            - Profit Margin % = SAFE_DIVIDE(SUM(Gross_Sales) - SUM(Total_COGS), SUM(Gross_Sales)) * 100
+            - Always add HAVING SUM(Gross_Sales) > 0 to avoid division by zero rows
+            - Example:
+              SELECT Sold_to_Number, Sold_to_Name,
+                ROUND(SUM(Gross_Sales), 2) AS total_revenue,
+                ROUND(SUM(Total_COGS), 2) AS total_cogs,
+                ROUND(SUM(Gross_Sales) - SUM(Total_COGS), 2) AS gross_profit,
+                ROUND(SAFE_DIVIDE(SUM(Gross_Sales) - SUM(Total_COGS), SUM(Gross_Sales)) * 100, 2) AS profit_margin_pct
+              FROM `{self.project_id}.{self.dataset_id}.dataset_25m_table`
+              WHERE Sold_to_Name IS NOT NULL
+              GROUP BY 1, 2
+              HAVING SUM(Gross_Sales) > 0
+              ORDER BY gross_profit DESC
+
             FREIGHT QUERIES:
             - Freight In: Use `Incoming_Freight` column (SUM(Incoming_Freight))
             - Freight Out: Use `Outgoing_Freight` column or `TL_Delivery_Costs` column
@@ -1675,20 +1763,37 @@ class BigQuerySQLGenerator:
 
         # Check if it's already formatted (has $ or %)
         if str_value.startswith('$') or str_value.endswith('%'):
+            # Fix double %% even in pre-formatted values
+            if '%%' in str_value:
+                str_value = str_value.replace('%%', '%')
             return str_value
 
         column_lower = column_name.lower()
 
+        # SAP field names - always preserve as-is (never add commas or $)
+        import re
+        sap_fields = re.compile(
+            r'^(lifnr|belnr|ebeln|ebelp|bukrs|gjahr|matnr|werks|ekorg|banfn|bnfpo|'
+            r'mblnr|vbeln|posnr|kunnr|kostl|prctr|saknr|hkont|augbl|augdt|aedat|'
+            r'erdat|cpudt|budat|bldat|xblnr|zuonr|awkey|racct|ekgrp|waers|zterm|'
+            r'mandt|spras|zeile|kdauf|vgbel|vgpos|bsart|lfart|statu|reguh|regup)$',
+            re.IGNORECASE
+        )
+        if sap_fields.match(column_lower):
+            return str_value
+
         # ID/Code/Year columns - preserve as-is (don't format as numbers)
+        # Use word-boundary-aware checks for short keywords to avoid false matches
         preserve_keywords = [
-            'customer', 'id', 'code', 'sku', 'material', 'product_code',
-            'order', 'document', 'reference', 'key', 'number', 'no',
+            'customer', '_id', 'code', 'sku', 'material', 'product_code',
+            'order', 'document', 'reference', '_key', '_number', '_no',
             'account', 'gl_', 'segment', 'channel', 'region', 'territory',
-            'year', 'month', 'date', 'period', 'fiscal', 'calendar',
-            'quarter', 'week', 'day', 'hour', 'time', 'timestamp',
-            'name', 'description', 'category', 'type', 'status',
-            'product', 'item', 'brand', 'vendor', 'supplier', 'distributor',
-            'employee', 'user', 'manager', 'owner', 'created', 'modified'
+            'year', 'fiscal_year', 'fiscal_month', 'fiscal_period', 'calendar_year',
+            'posting_date', 'invoice_date', 'due_date', 'payment_date',
+            'created_date', 'modified_date',
+            'name', 'description', 'category', '_type', '_status',
+            'product', 'brand', 'supplier', 'distributor',
+            'employee', 'manager', 'owner'
         ]
         for kw in preserve_keywords:
             if kw in column_lower:
@@ -1703,15 +1808,18 @@ class BigQuerySQLGenerator:
             return str_value  # Return as-is if not a number
 
         # Currency columns - format as $X,XXX.XX
+        # NOTE: 'total' removed to avoid matching total_invoices, total_vendors etc.
+        # Quantity keywords (checked first) override currency for count-like columns.
         currency_keywords = [
             'revenue', 'sales', 'cost', 'margin', 'price', 'amount',
-            'total', 'gross', 'net', 'profit', 'expense', 'fee',
+            'gross', 'net', 'profit', 'expense', 'fee',
             'cogs', 'cogm', 'cos', 'value', 'income', 'earning',
             'payment', 'charge', 'discount', 'rebate', 'allowance',
             'difference', 'delta', 'variance', 'budget', 'actual',
             'spend', 'expenditure', 'liability', 'asset', 'balance',
-            'debit', 'credit', 'invoice', 'billing', 'freight',
-            'shipping', 'handling', 'tax', 'duty', 'tariff'
+            'debit', 'credit', 'freight', 'outflow', 'accrual',
+            'shipping', 'handling', 'tax', 'duty', 'tariff',
+            'invoice_amount', 'billing_amount',
         ]
 
         # Percentage columns - already formatted or need % suffix
@@ -1725,8 +1833,16 @@ class BigQuerySQLGenerator:
         # Quantity columns - just add comma separators, no decimals
         quantity_keywords = [
             'count', 'quantity', 'qty', 'units', 'items', 'rows',
-            'number', 'num_', '_num', 'total_count', 'sold', 'ordered',
-            'shipped', 'delivered', 'cases', 'volume'
+            'num_', '_num', 'total_count', 'sold', 'ordered',
+            'shipped', 'delivered', 'cases', 'volume',
+            'total_invoices', 'total_vendors', 'total_pos', 'total_orders',
+            'invoices_processed', 'invoices_above', 'invoices_below',
+            'matched_lines', 'po_lines', 'line_items',
+            '_processed', '_matched', 'num_invoices', 'num_vendors',
+            'invoice_count', 'vendor_count', 'order_count', 'po_count',
+            'days_late', 'days_early', 'days_to_', 'processing_days',
+            'cycle_days', 'avg_days', 'min_days', 'max_days',
+            'cycle_time', 'processing_time'
         ]
 
         # Priority order: percentage -> quantity -> currency
@@ -1782,6 +1898,63 @@ class BigQuerySQLGenerator:
 
         return str_value
 
+    def _clean_value(self, value: Any, column_name: str) -> Any:
+        """Pre-process cleanup for known formatting issues before _format_value."""
+        if value is None:
+            return None
+
+        str_value = str(value)
+        column_lower = column_name.lower()
+
+        # 1. Fix relativedelta serialization: "relativedelta(days=+45)" → 45
+        if 'relativedelta' in str_value:
+            import re
+            match = re.search(r'days=\+?(-?\d+)', str_value)
+            if match:
+                return int(match.group(1))
+            # Try months
+            match = re.search(r'months=\+?(-?\d+)', str_value)
+            if match:
+                return int(match.group(1))
+            return str_value
+
+        # 2. Fix double %% → single %
+        if '%%' in str_value:
+            str_value = str_value.replace('%%', '%')
+
+        # 3. Remove $ from count/quantity columns (SQL sometimes incorrectly adds it)
+        count_indicators = ['count', 'qty', 'quantity', 'units', 'items', 'num_invoices',
+                           'num_vendors', 'num_orders', 'total_invoices', 'total_vendors',
+                           'total_pos', 'total_orders', 'invoice_count', 'vendor_count',
+                           'order_count', 'po_count', 'num_', '_count',
+                           'invoices_processed', 'invoices_above', 'invoices_below',
+                           'matched_lines', 'po_lines', 'line_items', '_processed']
+        is_count_col = any(ind in column_lower for ind in count_indicators)
+        if is_count_col and str_value.startswith('$'):
+            str_value = str_value[1:].strip()
+            # Try to convert to integer if it's a whole number
+            try:
+                clean = str_value.replace(',', '')
+                num = float(clean)
+                if num == int(num):
+                    return f"{int(num):,}"
+                return str_value
+            except (ValueError, TypeError):
+                pass
+
+        # 4. Round excessive decimals in raw numeric strings
+        if str_value and not str_value.startswith('$') and '%' not in str_value:
+            try:
+                clean = str_value.replace(',', '')
+                num = float(clean)
+                # If more than 2 decimal places, round to 2
+                if '.' in clean and len(clean.split('.')[1]) > 2:
+                    return round(num, 2)
+            except (ValueError, TypeError):
+                pass
+
+        return str_value
+
     def _format_results(self, results: List[Dict[str, Any]], columns: List[str]) -> List[Dict[str, Any]]:
         """Format all result values based on column names."""
         if not results:
@@ -1792,7 +1965,9 @@ class BigQuerySQLGenerator:
             formatted_row = {}
             for col in columns:
                 value = row.get(col)
-                formatted_row[col] = self._format_value(value, col)
+                # Pre-process cleanup first, then format
+                cleaned = self._clean_value(value, col)
+                formatted_row[col] = self._format_value(cleaned, col)
             formatted_results.append(formatted_row)
 
         return formatted_results

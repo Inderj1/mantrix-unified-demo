@@ -1,0 +1,105 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: ACDOCA_UniversalJournal — THE Single Source of Truth
+# ============================================================================
+# THE most important table in S/4HANA. Single source of truth for ALL
+# FI/CO/ML postings. Replaces BKPF/BSEG/BSIK/BSAK/FAGLFLEXA from ECC.
+# For AP: filter KOART='K' (vendor account type).
+# AUGBL IS NULL = open item. AUGBL populated = cleared/paid.
+# RLDNR='0L' = leading ledger (use this for most queries).
+# ============================================================================
+
+ap:ACDOCA_UniversalJournal a owl:Class ;
+    rdfs:label "ACDOCA_UniversalJournal" ;
+    rdfs:comment "Universal journal — single source of truth for all financial postings in S/4HANA. For AP analysis: filter KOART='K'. Open items: AUGBL IS NULL. Cleared: AUGBL populated. Leading ledger: RLDNR='0L'." ;
+    bq:table "ACDOCA_UniversalJournal" ;
+    bq:primaryKey "RLDNR, RBUKRS, GJAHR, BELNR, DOCLN" ;
+    skos:altLabel "open item" , "payable" , "outstanding invoice" , "unpaid invoice" , "vendor liability" , "accounts payable" , "AP subledger" ;
+    mantrix:sapTable "ACDOCA" ;
+    mantrix:businessRule "ALWAYS filter KOART='K' for AP queries. ALWAYS filter RLDNR='0L' for leading ledger unless user asks about parallel ledger." ;
+    mantrix:relatedConcepts "RBKP_InvoiceHeaders, LFA1_Suppliers, REGUH_PaymentHeaders, T001_CompanyCodes, CSKS_CostCenters, CEPC_ProfitCenters, EKPO_POItems" .
+
+# --- Core Key Columns ---
+ap:ACDOCA_RLDNR a owl:DatatypeProperty ; rdfs:label "Ledger" ; bq:column "RLDNR" ; bq:type "STRING" ; rdfs:comment "Ledger ID. '0L'=leading ledger (DEFAULT for all queries). '2L'=local GAAP. Always filter RLDNR='0L' unless asked otherwise." .
+ap:ACDOCA_RBUKRS a owl:DatatypeProperty ; rdfs:label "Company Code" ; bq:column "RBUKRS" ; bq:type "STRING" ; bq:foreignKey "T001_CompanyCodes.BUKRS" .
+ap:ACDOCA_GJAHR a owl:DatatypeProperty ; rdfs:label "Fiscal Year" ; bq:column "GJAHR" ; bq:type "INTEGER" .
+ap:ACDOCA_BELNR a owl:DatatypeProperty ; rdfs:label "Document Number" ; bq:column "BELNR" ; bq:type "INTEGER" ; rdfs:comment "FI document number. Matches RBKP.BELNR for invoice postings." .
+ap:ACDOCA_DOCLN a owl:DatatypeProperty ; rdfs:label "Line Item" ; bq:column "DOCLN" ; bq:type "INTEGER" .
+
+# --- Account & Vendor ---
+ap:ACDOCA_RACCT a owl:DatatypeProperty ; rdfs:label "GL Account" ; bq:column "RACCT" ; bq:type "STRING" ; rdfs:comment "GL account number." ; bq:foreignKey "SKA1_GLAccounts.SAKNR" .
+ap:ACDOCA_LIFNR a owl:DatatypeProperty ; rdfs:label "Vendor" ; bq:column "LIFNR" ; bq:type "INTEGER" ; rdfs:comment "Vendor number. Populated when KOART='K'." ; bq:foreignKey "LFA1_Suppliers.LIFNR" .
+ap:ACDOCA_KOART a owl:DatatypeProperty ; rdfs:label "Account Type" ; bq:column "KOART" ; bq:type "STRING" ; rdfs:comment "Account type. CRITICAL filter for AP." ; mantrix:valueMap "K=Vendor (AP), S=GL account, D=Customer (AR), A=Asset, M=Material" .
+
+# --- Dates ---
+ap:ACDOCA_BUDAT a owl:DatatypeProperty ; rdfs:label "Posting Date" ; bq:column "BUDAT" ; bq:type "DATE" .
+ap:ACDOCA_BLDAT a owl:DatatypeProperty ; rdfs:label "Document Date" ; bq:column "BLDAT" ; bq:type "DATE" .
+ap:ACDOCA_ZFBDT a owl:DatatypeProperty ; rdfs:label "Baseline Date" ; bq:column "ZFBDT" ; bq:type "DATE" ; rdfs:comment "Baseline date for due date calc. DUE_DATE = ZFBDT + net_days from T052." .
+
+# --- Amounts ---
+ap:ACDOCA_HSL a owl:DatatypeProperty ; rdfs:label "Local Currency Amount" ; bq:column "HSL" ; bq:type "FLOAT" ; rdfs:comment "Amount in local (company code) currency. Vendor invoices are NEGATIVE (credit). Payments are POSITIVE (debit). Use ABS() for display." .
+ap:ACDOCA_WSL a owl:DatatypeProperty ; rdfs:label "Doc Currency Amount" ; bq:column "WSL" ; bq:type "FLOAT" ; rdfs:comment "Amount in document currency." .
+ap:ACDOCA_RHCUR a owl:DatatypeProperty ; rdfs:label "Local Currency" ; bq:column "RHCUR" ; bq:type "STRING" .
+ap:ACDOCA_RWCUR a owl:DatatypeProperty ; rdfs:label "Doc Currency" ; bq:column "RWCUR" ; bq:type "STRING" .
+
+# --- Clearing (MOST CRITICAL for AP) ---
+ap:ACDOCA_AUGBL a owl:DatatypeProperty ; rdfs:label "Clearing Document" ; bq:column "AUGBL" ; bq:type "INTEGER" ; rdfs:comment "CRITICAL: NULL = item is OPEN (unpaid). Populated = item is CLEARED (paid). The clearing doc number is the payment document." .
+ap:ACDOCA_AUGDT a owl:DatatypeProperty ; rdfs:label "Clearing Date" ; bq:column "AUGDT" ; bq:type "DATE" ; rdfs:comment "Date item was cleared/paid. Used for cycle time: AUGDT - BUDAT = invoice-to-payment days." .
+
+# --- Block & Payment ---
+ap:ACDOCA_ZLSPR a owl:DatatypeProperty ; rdfs:label "Payment Block" ; bq:column "ZLSPR" ; bq:type "STRING" ; rdfs:comment "Payment block key on this line item." .
+ap:ACDOCA_ZLSCH a owl:DatatypeProperty ; rdfs:label "Payment Method" ; bq:column "ZLSCH" ; bq:type "STRING" .
+
+# --- Cost Allocation ---
+ap:ACDOCA_KOSTL a owl:DatatypeProperty ; rdfs:label "Cost Center" ; bq:column "KOSTL" ; bq:type "STRING" ; bq:foreignKey "CSKS_CostCenters.KOSTL" .
+ap:ACDOCA_PRCTR a owl:DatatypeProperty ; rdfs:label "Profit Center" ; bq:column "PRCTR" ; bq:type "STRING" ; bq:foreignKey "CEPC_ProfitCenters.PRCTR" .
+ap:ACDOCA_SEGMENT a owl:DatatypeProperty ; rdfs:label "Segment" ; bq:column "SEGMENT" ; bq:type "STRING" .
+
+# --- Document Classification ---
+ap:ACDOCA_BLART a owl:DatatypeProperty ; rdfs:label "Document Type" ; bq:column "BLART" ; bq:type "STRING" ; mantrix:valueMap "RE=Invoice, KG=Credit memo, KZ=Payment, KR=Vendor invoice net" .
+ap:ACDOCA_BSCHL a owl:DatatypeProperty ; rdfs:label "Posting Key" ; bq:column "BSCHL" ; bq:type "INTEGER" ; mantrix:valueMap "21=Vendor credit, 25=Outgoing payment, 31=Vendor invoice, 34=Vendor credit posting, 40=Debit GL, 50=Credit GL" .
+
+# --- PO Reference ---
+ap:ACDOCA_EBELN a owl:DatatypeProperty ; rdfs:label "PO Number" ; bq:column "EBELN" ; bq:type "INTEGER" ; bq:foreignKey "EKPO_POItems.EBELN" .
+ap:ACDOCA_EBELP a owl:DatatypeProperty ; rdfs:label "PO Item" ; bq:column "EBELP" ; bq:type "STRING" ; bq:foreignKey "EKPO_POItems.EBELP" .
+
+# --- Axis AI Enriched ---
+ap:ACDOCA_CLEARING_STATUS a owl:DatatypeProperty ; rdfs:label "Clearing Status" ; bq:column "CLEARING_STATUS" ; bq:type "STRING" ; rdfs:comment "Axis AI derived: 'open', 'cleared', 'partially_cleared'." .
+ap:ACDOCA_PAYMENT_TIMING a owl:DatatypeProperty ; rdfs:label "Payment Timing" ; bq:column "PAYMENT_TIMING" ; bq:type "STRING" ; rdfs:comment "Axis AI derived: 'early', 'on_time', 'late'." .
+ap:ACDOCA_DAYS_VS_DUE a owl:DatatypeProperty ; rdfs:label "Days vs Due" ; bq:column "DAYS_VS_DUE" ; bq:type "INTEGER" ; rdfs:comment "payment_date - due_date. Negative=early, 0=on time, Positive=late." .
+ap:ACDOCA_DISCOUNT_CAPTURED a owl:DatatypeProperty ; rdfs:label "Discount Captured" ; bq:column "DISCOUNT_CAPTURED" ; bq:type "BOOLEAN" ; rdfs:comment "Was early payment discount captured on this item?" .
+ap:ACDOCA_DISCOUNT_AMOUNT a owl:DatatypeProperty ; rdfs:label "Discount Amount" ; bq:column "DISCOUNT_AMOUNT" ; bq:type "FLOAT" ; rdfs:comment "Discount amount available/taken on this item." .
+
+# --- Example Questions & SQL ---
+ap:ACDOCA_q1 mantrix:exampleQuestion "Total open AP balance" ;
+    mantrix:exampleSQL "SELECT SUM(ABS(HSL)) as open_balance FROM ACDOCA_UniversalJournal WHERE KOART = 'K' AND AUGBL IS NULL AND RLDNR = '0L'" .
+ap:ACDOCA_q2 mantrix:exampleQuestion "Open items by vendor" ;
+    mantrix:exampleSQL "SELECT a.LIFNR, s.NAME1, COUNT(*) as open_items, SUM(ABS(a.HSL)) as open_balance FROM ACDOCA_UniversalJournal a JOIN LFA1_Suppliers s ON a.LIFNR = s.LIFNR WHERE a.KOART = 'K' AND a.AUGBL IS NULL AND a.RLDNR = '0L' GROUP BY a.LIFNR, s.NAME1 ORDER BY open_balance DESC" .
+ap:ACDOCA_q3 mantrix:exampleQuestion "Overdue items" ;
+    mantrix:exampleSQL "SELECT a.BELNR, a.LIFNR, s.NAME1, ABS(a.HSL) as amount, a.ZFBDT, DATE_DIFF(CURRENT_DATE(), a.ZFBDT, DAY) as days_overdue FROM ACDOCA_UniversalJournal a JOIN LFA1_Suppliers s ON a.LIFNR = s.LIFNR WHERE a.KOART = 'K' AND a.AUGBL IS NULL AND a.RLDNR = '0L' AND a.ZFBDT < CURRENT_DATE() ORDER BY days_overdue DESC" .
+ap:ACDOCA_q4 mantrix:exampleQuestion "When was invoice X paid?" ;
+    mantrix:exampleSQL "SELECT BELNR, AUGBL as payment_doc, AUGDT as payment_date, ABS(HSL) as amount, CLEARING_STATUS, PAYMENT_TIMING FROM ACDOCA_UniversalJournal WHERE BELNR = 5100000001 AND KOART = 'K' AND RLDNR = '0L'" .
+ap:ACDOCA_q5 mantrix:exampleQuestion "On-time payment rate" ;
+    mantrix:exampleSQL "SELECT COUNTIF(PAYMENT_TIMING = 'on_time' OR PAYMENT_TIMING = 'early') * 100.0 / COUNT(*) as on_time_pct FROM ACDOCA_UniversalJournal WHERE KOART = 'K' AND AUGBL IS NOT NULL AND RLDNR = '0L'" .
+ap:ACDOCA_q6 mantrix:exampleQuestion "AP aging by bucket" ;
+    mantrix:exampleSQL "SELECT CASE WHEN DATE_DIFF(CURRENT_DATE(), ZFBDT, DAY) <= 30 THEN '0-30' WHEN DATE_DIFF(CURRENT_DATE(), ZFBDT, DAY) <= 60 THEN '31-60' WHEN DATE_DIFF(CURRENT_DATE(), ZFBDT, DAY) <= 90 THEN '61-90' ELSE '90+' END as aging_bucket, COUNT(*) as items, SUM(ABS(HSL)) as balance FROM ACDOCA_UniversalJournal WHERE KOART = 'K' AND AUGBL IS NULL AND RLDNR = '0L' GROUP BY aging_bucket ORDER BY aging_bucket" .
+ap:ACDOCA_q7 mantrix:exampleQuestion "Spend by cost center this quarter" ;
+    mantrix:exampleSQL "SELECT a.KOSTL, c.KTEXT, SUM(ABS(a.HSL)) as spend FROM ACDOCA_UniversalJournal a JOIN CSKS_CostCenters c ON a.KOSTL = c.KOSTL WHERE a.KOART = 'K' AND a.RLDNR = '0L' AND a.BUDAT >= DATE_TRUNC(CURRENT_DATE(), QUARTER) GROUP BY a.KOSTL, c.KTEXT ORDER BY spend DESC" .
+ap:ACDOCA_q8 mantrix:exampleQuestion "Days Payable Outstanding" ;
+    mantrix:exampleSQL "SELECT (SUM(CASE WHEN AUGBL IS NULL THEN ABS(HSL) ELSE 0 END) / NULLIF(SUM(ABS(HSL)), 0)) * 365 as DPO FROM ACDOCA_UniversalJournal WHERE KOART = 'K' AND RLDNR = '0L'" .
+
+# --- Edge Cases ---
+ap:ACDOCA_edge1 mantrix:edgeCases "HSL for vendor invoices is NEGATIVE (credit to vendor). Use ABS(HSL) for display. Payments are POSITIVE (debit to vendor)." .
+ap:ACDOCA_edge2 mantrix:edgeCases "ALWAYS filter RLDNR='0L' unless user explicitly asks about a parallel ledger." .
+ap:ACDOCA_edge3 mantrix:edgeCases "AUGBL IS NULL means OPEN. AUGBL populated means CLEARED. There is no 'partially cleared' in standard SAP — partial payments create residual items." .
+ap:ACDOCA_edge4 mantrix:edgeCases "CLEARING_STATUS, PAYMENT_TIMING, DAYS_VS_DUE, DISCOUNT_CAPTURED, DISCOUNT_AMOUNT are Axis AI enriched columns — NOT from SAP." .
+ap:ACDOCA_edge5 mantrix:edgeCases "Due date is NOT stored directly. Calculate: ZFBDT + T052.ZTAG3. Or use Axis AI enriched RBKP.DUE_DATE." .
+ap:ACDOCA_edge6 mantrix:edgeCases "In ECC, open items are in BSIK and cleared items in BSAK. In S/4HANA, both are in ACDOCA distinguished by AUGBL." .

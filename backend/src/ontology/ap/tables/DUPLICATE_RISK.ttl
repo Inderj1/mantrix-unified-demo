@@ -1,0 +1,51 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: DUPLICATE_RISK — Duplicate Invoice Detection
+# ============================================================================
+# Axis AI pre-computed table. Each row is a pair of invoices flagged as
+# potential duplicates. Comparison based on amount, date, vendor ref,
+# and other fields. SIMILARITY_SCORE and RISK_LEVEL help prioritize review.
+# ============================================================================
+
+ap:DUPLICATE_RISK a owl:Class ;
+    rdfs:label "DUPLICATE_RISK" ;
+    rdfs:comment "Duplicate invoice risk detection. Each row = one pair of potentially duplicate invoices. Compares amount, date, vendor reference, and other fields. Pre-computed by Axis AI." ;
+    bq:table "DUPLICATE_RISK" ; bq:primaryKey "ORIGINAL_BELNR, CANDIDATE_BELNR" ;
+    skos:altLabel "duplicate" , "duplicate invoice" , "duplicate detection" , "duplicate risk" , "double payment" ;
+    mantrix:businessRule "RISK_LEVEL='high' means strong match on 3+ fields. 'medium' means 2 fields match. Always review high-risk before payment." ;
+    mantrix:relatedConcepts "RBKP_InvoiceHeaders, LFA1_Suppliers" .
+
+# --- Columns ---
+ap:DUP_ORIGINAL_BELNR a owl:DatatypeProperty ; rdfs:label "Original Invoice" ; bq:column "ORIGINAL_BELNR" ; bq:type "INTEGER" ; bq:foreignKey "RBKP_InvoiceHeaders.BELNR" .
+ap:DUP_ORIGINAL_XBLNR a owl:DatatypeProperty ; rdfs:label "Original Vendor Ref" ; bq:column "ORIGINAL_XBLNR" ; bq:type "STRING" ; rdfs:comment "Vendor's invoice reference on the original." .
+ap:DUP_CANDIDATE_BELNR a owl:DatatypeProperty ; rdfs:label "Candidate Invoice" ; bq:column "CANDIDATE_BELNR" ; bq:type "INTEGER" ; bq:foreignKey "RBKP_InvoiceHeaders.BELNR" .
+ap:DUP_LIFNR a owl:DatatypeProperty ; rdfs:label "Vendor" ; bq:column "LIFNR" ; bq:type "INTEGER" ; bq:foreignKey "LFA1_Suppliers.LIFNR" .
+ap:DUP_AMOUNT_MATCH a owl:DatatypeProperty ; rdfs:label "Amount Match" ; bq:column "AMOUNT_MATCH" ; bq:type "BOOLEAN" ; rdfs:comment "True if invoice amounts are identical or within threshold." .
+ap:DUP_DATE_MATCH a owl:DatatypeProperty ; rdfs:label "Date Match" ; bq:column "DATE_MATCH" ; bq:type "BOOLEAN" ; rdfs:comment "True if invoice dates are within threshold window." .
+ap:DUP_REF_MATCH a owl:DatatypeProperty ; rdfs:label "Reference Match" ; bq:column "REF_MATCH" ; bq:type "BOOLEAN" ; rdfs:comment "True if vendor reference numbers match or are similar." .
+ap:DUP_SIMILARITY_SCORE a owl:DatatypeProperty ; rdfs:label "Similarity Score" ; bq:column "SIMILARITY_SCORE" ; bq:type "FLOAT" ; rdfs:comment "0.0 to 1.0. Higher = more likely duplicate." .
+ap:DUP_RISK_LEVEL a owl:DatatypeProperty ; rdfs:label "Risk Level" ; bq:column "RISK_LEVEL" ; bq:type "STRING" ;
+    mantrix:valueMap "high=3+ fields match (likely duplicate), medium=2 fields match (review needed), low=1 field match (unlikely)" .
+ap:DUP_MATCH_FIELDS a owl:DatatypeProperty ; rdfs:label "Matching Fields" ; bq:column "MATCH_FIELDS" ; bq:type "STRING" ; rdfs:comment "Comma-separated list of fields that matched: amount, date, ref, vendor, po." .
+
+# --- Example Questions & SQL ---
+ap:DUP_q1 mantrix:exampleQuestion "High-risk duplicate invoices" ;
+    mantrix:exampleSQL "SELECT d.ORIGINAL_BELNR, d.CANDIDATE_BELNR, d.LIFNR, s.NAME1, d.SIMILARITY_SCORE, d.MATCH_FIELDS, r1.RMWWR as original_amount, r2.RMWWR as candidate_amount FROM DUPLICATE_RISK d JOIN LFA1_Suppliers s ON d.LIFNR = s.LIFNR JOIN RBKP_InvoiceHeaders r1 ON d.ORIGINAL_BELNR = r1.BELNR JOIN RBKP_InvoiceHeaders r2 ON d.CANDIDATE_BELNR = r2.BELNR WHERE d.RISK_LEVEL = 'high'" .
+ap:DUP_q2 mantrix:exampleQuestion "Duplicate risk summary" ;
+    mantrix:exampleSQL "SELECT RISK_LEVEL, COUNT(*) as pairs, SUM(r.RMWWR) as potential_exposure FROM DUPLICATE_RISK d JOIN RBKP_InvoiceHeaders r ON d.CANDIDATE_BELNR = r.BELNR GROUP BY RISK_LEVEL" .
+ap:DUP_q3 mantrix:exampleQuestion "Vendors with most duplicate flags" ;
+    mantrix:exampleSQL "SELECT d.LIFNR, s.NAME1, COUNT(*) as dup_count, SUM(CASE WHEN d.RISK_LEVEL = 'high' THEN 1 ELSE 0 END) as high_risk FROM DUPLICATE_RISK d JOIN LFA1_Suppliers s ON d.LIFNR = s.LIFNR GROUP BY d.LIFNR, s.NAME1 ORDER BY dup_count DESC LIMIT 10" .
+
+# --- Edge Cases ---
+ap:DUP_edge1 mantrix:edgeCases "Same vendor + same amount + same date = high risk. But could be legitimate if different POs or different materials." .
+ap:DUP_edge2 mantrix:edgeCases "REF_MATCH uses fuzzy matching — 'INV-001' and 'INV001' would match. Exact XBLNR comparison is not sufficient." .
+ap:DUP_edge3 mantrix:edgeCases "This is an Axis AI derived table. Only invoices with RBSTAT='5' (posted) are checked." .
+ap:DUP_edge4 mantrix:edgeCases "Credit memos (BLART='KG') should be excluded from duplicate checks — they are intentional reversals." .

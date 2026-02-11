@@ -1,0 +1,28 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# Join Path: Cost Allocation (Spend by Cost Object)
+# ============================================================================
+
+ap:join_cost_allocation a mantrix:JoinPath ;
+    rdfs:label "Cost Allocation" ;
+    rdfs:comment "Maps AP spend to cost objects: GL account, cost center, profit center, segment. For spend analytics and budget analysis." ;
+    mantrix:joinSQL """SELECT
+  a.LIFNR, s.NAME1 as vendor,
+  a.RACCT, gl.TXT50 as gl_description, gl.PNL_BUCKET,
+  a.KOSTL, cc.KTEXT as cost_center_name,
+  a.PRCTR, pc.KTEXT as profit_center_name,
+  a.SEGMENT,
+  SUM(ABS(a.HSL)) as spend
+FROM ACDOCA_UniversalJournal a
+JOIN LFA1_Suppliers s ON a.LIFNR = s.LIFNR
+LEFT JOIN SKA1_GLAccounts gl ON a.RACCT = gl.SAKNR
+LEFT JOIN CSKS_CostCenters cc ON a.KOSTL = cc.KOSTL
+LEFT JOIN CEPC_ProfitCenters pc ON a.PRCTR = pc.PRCTR
+WHERE a.KOART = 'K' AND a.RLDNR = '0L'
+GROUP BY a.LIFNR, s.NAME1, a.RACCT, gl.TXT50, gl.PNL_BUCKET, a.KOSTL, cc.KTEXT, a.PRCTR, pc.KTEXT, a.SEGMENT""" ;
+    mantrix:answersQuestions "Spend by cost center, spend by GL account, spend by profit center, spend by segment, budget vs actual" .

@@ -1,0 +1,22 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# Semantic Term: Payment Run
+# ============================================================================
+
+ap:term_payment_run a mantrix:SemanticTerm ;
+    rdfs:label "payment run" ;
+    rdfs:comment "SAP F110 automatic payment program. Selects due/eligible invoices, groups by vendor, creates payment documents, and generates payment media (checks, wires, ACH)." ;
+    skos:altLabel "F110" , "payment proposal" , "auto pay" , "disbursement run" ;
+    mantrix:canonicalEntity "REGUH_PaymentHeaders, REGUP_PaymentItems" ;
+    mantrix:disambiguation """Payment run process:
+1. F110 selects open items where: due date <= run date, no payment block, vendor not blocked
+2. Creates payment proposal (REGUH = header per vendor, REGUP = items per invoice)
+3. On execution: creates payment documents (VBLNR), clears open items (sets AUGBL in ACDOCA)
+4. Generates payment media (check print, wire file, ACH file)""" ;
+    mantrix:relatedTerms "REGUH, REGUP, F110, blocked, due date, clearing" .

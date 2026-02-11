@@ -591,6 +591,13 @@ Rules:
     - Net Profit: Calculate as (Net_Sales - Total_COS)
     - Fiscal Year: Data is typically for previous year (2024), not current year
     - GL Accounts: 6-digit range (400000-700000), not 4-digit ranges like 4000-4999
+    - PROFIT MARGIN %: ALWAYS calculate as (SUM(Gross_Revenue) - SUM(Total_COGS)) / NULLIF(SUM(Gross_Revenue), 0) * 100. Never invent alternative formulas.
+    - CUSTOMER PROFIT MARGIN: Group by Sold_to_Name (or Customer), use SUM(COALESCE(Gross_Revenue, 0)) and SUM(COALESCE(Total_COGS, 0)). Add HAVING SUM(Gross_Revenue) > 0 to avoid division by zero.
+    - COLUMN WHITELIST for P&L queries:
+      * Revenue columns: Gross_Revenue, Net_Sales, Gross_Sales, Revenue
+      * Cost columns: Total_COGS, Cogs, Total_COS
+      * Pre-calculated margins: Sales_Margin_of_Net_Sales, Sales_Margin_of_Gross_Sales
+    - NEVER HALLUCINATE COLUMNS: Only use columns from the provided schema. Specifically, these columns DO NOT EXIST and must NEVER be used: Pallet_Revenue_Net, Promotional_Allowances, Freight_Allowance, Net_Revenue, Revenue_Adjustments. If unsure whether a column exists, use only the whitelisted columns above.
 15. CRITICAL: When generating queries for revenue, margin, profitability, cost analysis:
     - ALWAYS use the appropriate revenue columns (Gross_Revenue, Net_Sales, Gross_Sales) NOT GL_Amount_in_CC
     - Use Total_COGS for cost of goods sold, not manual calculations
@@ -759,7 +766,37 @@ Rules:
 
     -- User asks: "customers at dallas plant"
     WHERE LOWER(plant) = LOWER('Dallas')
-    ```"""
+    ```
+
+20. CRITICAL - FORMATTING CORRECTNESS RULES:
+
+    **Percentage formatting** - NEVER use FORMAT with %% (causes double percent signs):
+    ❌ WRONG: FORMAT('%.2f%%', value)  -- Produces "45.00%%" (double percent)
+    ✅ CORRECT: to_char(ROUND(value, 2), 'FM999.00') || '%'  -- Produces "45.00%"
+
+    **Decimal precision** - ALWAYS ROUND calculated values to 2 decimal places:
+    ❌ WRONG: SUM(amount) / COUNT(*)  -- May produce 12345.6789012
+    ✅ CORRECT: ROUND(SUM(amount) / NULLIF(COUNT(*), 0), 2)
+
+    **Date differences** - Use DATE_DIFF for day calculations, NOT INTERVAL arithmetic:
+    ❌ WRONG: invoice_date - payment_date  -- May return 'relativedelta(days=+45)'
+    ✅ CORRECT: DATE_DIFF(payment_date, invoice_date, DAY) AS days_to_pay
+    ✅ CORRECT: TIMESTAMP_DIFF(end_ts, start_ts, DAY) AS processing_days
+
+    **ID/Document columns** - NEVER apply FORMAT or to_char to ID columns:
+    ❌ WRONG: to_char(LIFNR, 'FM999,999,999') -- Adds commas to vendor number
+    ❌ WRONG: FORMAT('%d', EBELN) -- Formats PO number
+    ✅ CORRECT: CAST(LIFNR AS STRING) AS vendor_number -- Plain string, no commas
+    ✅ CORRECT: EBELN AS po_number -- Return as-is
+
+    ID columns include: LIFNR, BELNR, EBELN, EBELP, BUKRS, GJAHR, MATNR, WERKS, EKORG,
+    BANFN, MBLNR, VBELN, KOSTL, PRCTR, SAKNR, HKONT, AUGBL, and any column ending in
+    _number, _code, _id, _key, _no
+
+    **Count/Quantity columns** - NEVER prefix with $ sign:
+    ❌ WRONG: '$' || to_char(COUNT(*), 'FM999,999,999') AS invoice_count
+    ✅ CORRECT: COUNT(*) AS invoice_count
+    ✅ CORRECT: to_char(COUNT(*), 'FM999,999,999') AS invoice_count  -- commas OK, no $"""
 
         # Add financial context if provided
         if financial_context:
@@ -1245,9 +1282,12 @@ Return a JSON object with:
             relevant_examples.extend([q for q in FINANCIAL_ANALYSIS_QUERIES if 'contribution' in q['question'].lower()][:1])
         
         # ALWAYS check if this is a gross margin/profit query and add those examples too
-        if any(term in query_lower for term in ['gross margin', 'gross profit', 'margin', 'profit', 'cogs']):
-            # Add gross margin examples
-            relevant_examples.extend(GROSS_MARGIN_EXAMPLES[:2])  # Customer and product margin examples
+        if any(term in query_lower for term in ['margin', 'profit margin']):
+            # Margin/profit margin queries: use customer & product margin examples (indices 0-2)
+            relevant_examples.extend(GROSS_MARGIN_EXAMPLES[:3])
+        elif any(term in query_lower for term in ['gross profit', 'profit', 'cogs', 'gross margin']):
+            # General profit/COGS queries: use gross margin examples
+            relevant_examples.extend(GROSS_MARGIN_EXAMPLES[1:3])
         
         # If we have examples, return them (up to 3)
         if relevant_examples:

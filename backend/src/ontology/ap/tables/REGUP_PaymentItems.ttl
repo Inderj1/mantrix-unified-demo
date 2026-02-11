@@ -1,0 +1,56 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: REGUP_PaymentItems — Payment Run Line Items
+# ============================================================================
+# Each row maps a payment (REGUH header) to a specific invoice item that
+# was paid. Links payment to individual open items that were cleared.
+# Key for "which invoices were included in payment X?"
+# ============================================================================
+
+ap:REGUP_PaymentItems a owl:Class ;
+    rdfs:label "REGUP_PaymentItems" ;
+    rdfs:comment "Payment run line items. Each row = one invoice item cleared by a payment run. Links REGUH payment header to RBKP/ACDOCA open items that were paid." ;
+    bq:table "REGUP_PaymentItems" ; bq:primaryKey "LAUFD, LAUFI, ZBUKR, LIFNR, VBLNR, BUKRS, BELNR, GJAHR, BUZEI" ;
+    skos:altLabel "payment item" , "payment detail" , "paid invoice" , "clearing item" ;
+    mantrix:sapTable "REGUP" ;
+    mantrix:relatedConcepts "REGUH_PaymentHeaders, RBKP_InvoiceHeaders, ACDOCA_UniversalJournal" .
+
+# --- Columns ---
+ap:REGUP_LAUFD a owl:DatatypeProperty ; rdfs:label "Run Date" ; bq:column "LAUFD" ; bq:type "DATE" ; bq:foreignKey "REGUH_PaymentHeaders.LAUFD" .
+ap:REGUP_LAUFI a owl:DatatypeProperty ; rdfs:label "Run ID" ; bq:column "LAUFI" ; bq:type "STRING" ; bq:foreignKey "REGUH_PaymentHeaders.LAUFI" .
+ap:REGUP_ZBUKR a owl:DatatypeProperty ; rdfs:label "Paying Company Code" ; bq:column "ZBUKR" ; bq:type "STRING" .
+ap:REGUP_LIFNR a owl:DatatypeProperty ; rdfs:label "Vendor" ; bq:column "LIFNR" ; bq:type "INTEGER" ; bq:foreignKey "LFA1_Suppliers.LIFNR" .
+ap:REGUP_VBLNR a owl:DatatypeProperty ; rdfs:label "Payment Doc" ; bq:column "VBLNR" ; bq:type "INTEGER" ; rdfs:comment "Payment document number. Same as REGUH.VBLNR." .
+ap:REGUP_BUKRS a owl:DatatypeProperty ; rdfs:label "Company Code" ; bq:column "BUKRS" ; bq:type "STRING" ; rdfs:comment "Company code of the invoice being paid." .
+ap:REGUP_BELNR a owl:DatatypeProperty ; rdfs:label "Invoice Doc Number" ; bq:column "BELNR" ; bq:type "INTEGER" ; bq:foreignKey "RBKP_InvoiceHeaders.BELNR" ; rdfs:comment "The invoice document that was paid." .
+ap:REGUP_GJAHR a owl:DatatypeProperty ; rdfs:label "Fiscal Year" ; bq:column "GJAHR" ; bq:type "INTEGER" ; bq:foreignKey "RBKP_InvoiceHeaders.GJAHR" .
+ap:REGUP_BUZEI a owl:DatatypeProperty ; rdfs:label "Line Item" ; bq:column "BUZEI" ; bq:type "STRING" .
+ap:REGUP_DMBTR a owl:DatatypeProperty ; rdfs:label "Amount (Local)" ; bq:column "DMBTR" ; bq:type "FLOAT" ; rdfs:comment "Amount paid in local currency." .
+ap:REGUP_WRBTR a owl:DatatypeProperty ; rdfs:label "Amount (Doc Currency)" ; bq:column "WRBTR" ; bq:type "FLOAT" .
+ap:REGUP_SKNTO a owl:DatatypeProperty ; rdfs:label "Discount Taken" ; bq:column "SKNTO" ; bq:type "FLOAT" ; rdfs:comment "Cash discount amount taken on this item. If > 0, early pay discount was captured." .
+ap:REGUP_ZBFIX a owl:DatatypeProperty ; rdfs:label "Fixed Payment Date" ; bq:column "ZBFIX" ; bq:type "BOOLEAN" ; rdfs:comment "Whether a fixed payment date was specified." .
+
+# --- Join Paths ---
+ap:REGUP_join_REGUH a mantrix:joinPath ; rdfs:label "Payment Item → Payment Header" ; rdfs:comment "REGUP.LAUFD = REGUH.LAUFD AND REGUP.LAUFI = REGUH.LAUFI AND REGUP.ZBUKR = REGUH.ZBUKR AND REGUP.LIFNR = REGUH.LIFNR" .
+ap:REGUP_join_RBKP a mantrix:joinPath ; rdfs:label "Payment Item → Invoice" ; rdfs:comment "REGUP.BELNR = RBKP.BELNR AND REGUP.GJAHR = RBKP.GJAHR" .
+
+# --- Example Questions & SQL ---
+ap:REGUP_q1 mantrix:exampleQuestion "Which invoices were included in a specific payment?" ;
+    mantrix:exampleSQL "SELECT p.BELNR, p.GJAHR, p.DMBTR, p.SKNTO, r.RMWWR as invoice_total, r.XBLNR as vendor_ref FROM REGUP_PaymentItems p JOIN RBKP_InvoiceHeaders r ON p.BELNR = r.BELNR AND p.GJAHR = r.GJAHR WHERE p.VBLNR = 1400000001" .
+ap:REGUP_q2 mantrix:exampleQuestion "Total discounts captured this quarter" ;
+    mantrix:exampleSQL "SELECT SUM(SKNTO) as total_discount_taken, COUNT(CASE WHEN SKNTO > 0 THEN 1 END) as items_with_discount, COUNT(*) as total_items FROM REGUP_PaymentItems WHERE LAUFD >= DATE_TRUNC(CURRENT_DATE(), QUARTER)" .
+ap:REGUP_q3 mantrix:exampleQuestion "Payment details for vendor 1000001" ;
+    mantrix:exampleSQL "SELECT p.LAUFD, p.VBLNR, p.BELNR, p.DMBTR, p.SKNTO, h.RZAWE, h.RWBTR as payment_total FROM REGUP_PaymentItems p JOIN REGUH_PaymentHeaders h ON p.LAUFD = h.LAUFD AND p.LAUFI = h.LAUFI AND p.ZBUKR = h.ZBUKR AND p.LIFNR = h.LIFNR WHERE p.LIFNR = 1000001 ORDER BY p.LAUFD DESC" .
+
+# --- Edge Cases ---
+ap:REGUP_edge1 mantrix:edgeCases "SKNTO > 0 means early payment discount was captured. Use this to calculate discount capture rate." .
+ap:REGUP_edge2 mantrix:edgeCases "One REGUH payment can include multiple REGUP items (multiple invoices paid in one payment)." .
+ap:REGUP_edge3 mantrix:edgeCases "BELNR in REGUP refers to the INVOICE being paid, not the payment document. VBLNR is the payment document." .

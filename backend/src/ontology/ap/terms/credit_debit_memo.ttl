@@ -1,0 +1,25 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# Semantic Terms: Credit Memo / Debit Memo
+# ============================================================================
+
+ap:term_credit_memo a mantrix:SemanticTerm ;
+    rdfs:label "credit memo" ;
+    rdfs:comment "Vendor-issued document reducing the amount owed. Reverses or reduces a previous invoice. RBKP.BLART = 'KG'." ;
+    skos:altLabel "credit note" , "CN" , "vendor credit" , "credit" ;
+    mantrix:canonicalFilter "RBKP.BLART = 'KG'" ;
+    mantrix:disambiguation "Credit memo REDUCES vendor liability. Debit memo INCREASES it. 'Credit' in AP = we owe LESS to vendor." ;
+    mantrix:relatedTerms "debit memo, invoice, reversal" .
+
+ap:term_debit_memo a mantrix:SemanticTerm ;
+    rdfs:label "debit memo" ;
+    rdfs:comment "Company-issued document charging the vendor (e.g., for returns, quality issues). Reduces what we owe or creates a receivable from vendor." ;
+    skos:altLabel "debit note" , "DN" , "vendor charge" ;
+    mantrix:disambiguation "Debit memo = we are charging the vendor. Creates a debit to vendor account. Different from credit memo direction." ;
+    mantrix:relatedTerms "credit memo, return, quality reject" .

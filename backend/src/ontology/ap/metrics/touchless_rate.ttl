@@ -1,0 +1,40 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# AP Metric: Touchless Invoice Processing Rate
+# ============================================================================
+
+ap:metric_touchless_rate a mantrix:Metric ;
+    rdfs:label "Touchless Invoice Processing Rate" ;
+    rdfs:comment "Percentage of invoices processed without manual intervention — posted, matched, and paid automatically. The GOLD STANDARD AP automation metric." ;
+    skos:altLabel "straight-through processing" , "STP rate" , "auto-processing rate" , "no-touch rate" , "touchless" ;
+    mantrix:category "productivity" ;
+    mantrix:unit "percent" ;
+    mantrix:direction "higher_is_better" ;
+    mantrix:benchmark "50-60% (best-in-class), 20-30% (average), <10% (lagging)" ;
+    mantrix:sqlFormula "COUNTIF(match_pass AND no_block AND auto_paid) * 100.0 / COUNT(*)" ;
+    mantrix:sourceTables "RBKP_InvoiceHeaders, MATCH_CASES, ACDOCA_UniversalJournal" ;
+    mantrix:dimensions "vendor, company_code, invoice_type" ;
+    mantrix:exampleQuestion "What is our touchless processing rate?" ;
+    mantrix:exampleSQL """SELECT
+  COUNTIF(m.MATCH_RESULT = 'pass' AND (r.ZLSPR IS NULL OR r.ZLSPR = '' OR r.ZLSPR = 'A')) * 100.0 / COUNT(*) as touchless_rate
+FROM RBKP_InvoiceHeaders r
+LEFT JOIN MATCH_CASES m ON r.BELNR = m.INVOICE_BELNR AND r.GJAHR = m.INVOICE_GJAHR
+WHERE r.RBSTAT = '5' AND r.BLART = 'RE'""" ;
+    mantrix:exampleQuestion "Touchless rate by vendor" ;
+    mantrix:exampleSQL """SELECT r.LIFNR, s.NAME1,
+  COUNTIF(m.MATCH_RESULT = 'pass' AND (r.ZLSPR IS NULL OR r.ZLSPR = '' OR r.ZLSPR = 'A')) * 100.0 / COUNT(*) as touchless_pct,
+  COUNT(*) as total_invoices
+FROM RBKP_InvoiceHeaders r
+LEFT JOIN MATCH_CASES m ON r.BELNR = m.INVOICE_BELNR AND r.GJAHR = m.INVOICE_GJAHR
+JOIN LFA1_Suppliers s ON r.LIFNR = s.LIFNR
+WHERE r.RBSTAT = '5' AND r.BLART = 'RE'
+GROUP BY r.LIFNR, s.NAME1 HAVING total_invoices >= 10 ORDER BY touchless_pct DESC""" ;
+    mantrix:edgeCases "Touchless = match passed + no payment block + auto-cleared. Definition varies by organization. Non-PO invoices are never touchless by this definition." .

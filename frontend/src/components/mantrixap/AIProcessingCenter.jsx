@@ -942,12 +942,12 @@ const ExtractionPanelSection = ({ darkMode, cardBg, textColor, textSecondary, bo
           <SmartToyIcon sx={{ fontSize: 18, color: TILE_COLOR }} />
           <Box>
             <Typography sx={{ fontSize: '0.82rem', fontWeight: 600, color: textColor }}>
-              {invoice ? `${invoice.vendor} — ${invoice.invoiceNum}` : 'Thales Defense & Security — INV-2026-045231'}
+              {invoice ? `${invoice.vendor} — ${invoice.invoiceNum}` : 'Krones Inc — VND-INV-004231'}
             </Typography>
             <Typography variant="caption" sx={{ color: textSecondary, fontSize: '0.68rem' }}>
               {invoice
                 ? `${invoice.dpDoc} · ${invoice.poRef ? `PO ${invoice.poRef} · ` : ''}${invoice.channel?.charAt(0).toUpperCase() + invoice.channel?.slice(1)} channel · ${activeFields.length} fields extracted`
-                : `DP-2026-001452 · PO 4500098765 · Email channel · ${activeFields.length} fields extracted`
+                : `DP-2026-001452 · PO 3900051320 · Email channel · ${activeFields.length} fields extracted`
               }
             </Typography>
           </Box>
@@ -1751,7 +1751,7 @@ const InvoiceDetailView = ({ invoice, darkMode, onBack, onBackToList, onNavigate
     { label: 'PO Reference', extracted: invoice.poRef || 'Non-PO', sap: invoice.poRef ? 'EKKO/EKPO — PO Match' : null, source: 'ai', conf: invoice.poConf },
     { label: 'Payment Terms', extracted: 'Net 30', sap: 'LFB1 — Net 30', source: 'database', conf: 99 },
     { label: 'Currency', extracted: 'USD', sap: 'T001 — USD', source: 'database', conf: 99 },
-    { label: 'Company Code', extracted: '1000', sap: 'T001 — 1000', source: 'database', conf: 99 },
+    { label: 'Company Code', extracted: 'ABUS', sap: 'T001 — ABUS', source: 'database', conf: 99 },
     { label: 'Channel', extracted: invoice.channel?.charAt(0).toUpperCase() + invoice.channel?.slice(1), sap: null, source: 'extracted', conf: 99 },
   ];
 

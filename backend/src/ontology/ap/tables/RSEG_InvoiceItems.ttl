@@ -1,0 +1,77 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: RSEG_InvoiceItems — Invoice Line Items
+# ============================================================================
+# Each row is one line item on a supplier invoice. Links invoice to PO item,
+# material, quantity, amount, GL account, and cost center.
+# Together with RBKP (header), this is the full invoice document.
+# CRITICAL for 3-way match: compare RSEG qty/price against EKPO and MATDOC.
+# ============================================================================
+
+ap:RSEG_InvoiceItems a owl:Class ;
+    rdfs:label "RSEG_InvoiceItems" ;
+    rdfs:comment "Invoice line items. One row per invoice line. Links to PO item for matching. Contains invoiced quantity, amount, GL account, and cost center. Used with RBKP header for full invoice details." ;
+    bq:table "RSEG_InvoiceItems" ; bq:primaryKey "BELNR, GJAHR, BUZEI" ;
+    skos:altLabel "invoice line" , "invoice item" , "RSEG" , "IR line" , "invoice detail" ;
+    mantrix:sapTable "RSEG" ; mantrix:sapTransaction "MIR4 (display invoice items)" ;
+    mantrix:relatedConcepts "RBKP_InvoiceHeaders, EKPO_POItems, MATDOC_GoodsReceipts, EKBE_POHistory, MARA_Materials, SKA1_GLAccounts, CSKS_CostCenters" .
+
+# --- Columns ---
+ap:RSEG_BELNR a owl:DatatypeProperty ; rdfs:label "Invoice Doc Number" ; bq:column "BELNR" ; bq:type "INTEGER" ; bq:foreignKey "RBKP_InvoiceHeaders.BELNR" .
+ap:RSEG_GJAHR a owl:DatatypeProperty ; rdfs:label "Fiscal Year" ; bq:column "GJAHR" ; bq:type "INTEGER" ; bq:foreignKey "RBKP_InvoiceHeaders.GJAHR" .
+ap:RSEG_BUZEI a owl:DatatypeProperty ; rdfs:label "Line Item" ; bq:column "BUZEI" ; bq:type "STRING" ; rdfs:comment "Invoice line item number within document." .
+ap:RSEG_EBELN a owl:DatatypeProperty ; rdfs:label "PO Number" ; bq:column "EBELN" ; bq:type "INTEGER" ; bq:foreignKey "EKPO_POItems.EBELN" ; rdfs:comment "Referenced PO. NULL for non-PO invoices (direct FI posting)." .
+ap:RSEG_EBELP a owl:DatatypeProperty ; rdfs:label "PO Item" ; bq:column "EBELP" ; bq:type "STRING" ; bq:foreignKey "EKPO_POItems.EBELP" .
+ap:RSEG_MATNR a owl:DatatypeProperty ; rdfs:label "Material" ; bq:column "MATNR" ; bq:type "STRING" ; bq:foreignKey "MARA_Materials.MATNR" .
+ap:RSEG_MENGE a owl:DatatypeProperty ; rdfs:label "Quantity" ; bq:column "MENGE" ; bq:type "FLOAT" ; rdfs:comment "Invoiced quantity. Compare against EKPO.MENGE (ordered) and MATDOC.MENGE (received) for 3-way match." .
+ap:RSEG_WRBTR a owl:DatatypeProperty ; rdfs:label "Amount (Doc Currency)" ; bq:column "WRBTR" ; bq:type "FLOAT" ; rdfs:comment "Amount in document currency." .
+ap:RSEG_DMBTR a owl:DatatypeProperty ; rdfs:label "Amount (Local Currency)" ; bq:column "DMBTR" ; bq:type "FLOAT" ; rdfs:comment "Amount in local (company code) currency." .
+ap:RSEG_SAKTO a owl:DatatypeProperty ; rdfs:label "GL Account" ; bq:column "SAKTO" ; bq:type "STRING" ; bq:foreignKey "SKA1_GLAccounts.SAKNR" ; rdfs:comment "GL account for expense posting." .
+ap:RSEG_KOSTL a owl:DatatypeProperty ; rdfs:label "Cost Center" ; bq:column "KOSTL" ; bq:type "STRING" ; bq:foreignKey "CSKS_CostCenters.KOSTL" .
+ap:RSEG_MWSKZ a owl:DatatypeProperty ; rdfs:label "Tax Code" ; bq:column "MWSKZ" ; bq:type "STRING" ; rdfs:comment "Tax code for this line item." .
+ap:RSEG_WERKS a owl:DatatypeProperty ; rdfs:label "Plant" ; bq:column "WERKS" ; bq:type "STRING" ; bq:foreignKey "T001W_Plants.WERKS" .
+
+# --- Join Paths ---
+ap:RSEG_join_RBKP a mantrix:joinPath ; rdfs:label "Line Items → Invoice Header" ; rdfs:comment "RSEG.BELNR = RBKP.BELNR AND RSEG.GJAHR = RBKP.GJAHR" .
+ap:RSEG_join_EKPO a mantrix:joinPath ; rdfs:label "Line Items → PO Item" ; rdfs:comment "RSEG.EBELN = EKPO.EBELN AND RSEG.EBELP = EKPO.EBELP" .
+ap:RSEG_join_MATDOC a mantrix:joinPath ; rdfs:label "Line Items → Goods Receipt" ; rdfs:comment "RSEG.EBELN = MATDOC.EBELN AND RSEG.EBELP = MATDOC.EBELP AND MATDOC.BWART = '101'" .
+ap:RSEG_join_EKBE a mantrix:joinPath ; rdfs:label "Line Items → PO History" ; rdfs:comment "RSEG.EBELN = EKBE.EBELN AND RSEG.EBELP = EKBE.EBELP AND EKBE.VGABE = '2'" .
+
+# --- Example Questions & SQL ---
+ap:RSEG_q1 mantrix:exampleQuestion "Invoice lines for PO 4500001234" ;
+    mantrix:exampleSQL "SELECT r.BELNR, r.BUZEI, r.EBELN, r.EBELP, r.MENGE, r.WRBTR, r.SAKTO, r.KOSTL FROM RSEG_InvoiceItems r WHERE r.EBELN = 4500001234" .
+ap:RSEG_q2 mantrix:exampleQuestion "3-way match comparison for an invoice" ;
+    mantrix:exampleSQL """SELECT r.BELNR, r.BUZEI, r.EBELN, r.EBELP,
+  p.MENGE as po_qty, p.NETPR as po_price,
+  g.MENGE as gr_qty,
+  r.MENGE as inv_qty, r.WRBTR / NULLIF(r.MENGE, 0) as inv_price,
+  r.MENGE - p.MENGE as qty_variance,
+  (r.WRBTR / NULLIF(r.MENGE, 0)) - p.NETPR as price_variance
+FROM RSEG_InvoiceItems r
+JOIN EKPO_POItems p ON r.EBELN = p.EBELN AND r.EBELP = p.EBELP
+LEFT JOIN MATDOC_GoodsReceipts g ON r.EBELN = g.EBELN AND r.EBELP = g.EBELP AND g.BWART = '101'
+WHERE r.BELNR = 5100000001""" .
+ap:RSEG_q3 mantrix:exampleQuestion "Spend by GL account from invoices" ;
+    mantrix:exampleSQL "SELECT r.SAKTO, s.TXT50, SUM(r.DMBTR) as total_spend FROM RSEG_InvoiceItems r JOIN SKA1_GLAccounts s ON r.SAKTO = s.SAKNR GROUP BY r.SAKTO, s.TXT50 ORDER BY total_spend DESC" .
+ap:RSEG_q4 mantrix:exampleQuestion "Non-PO invoice lines (maverick spend)" ;
+    mantrix:exampleSQL "SELECT r.BELNR, r.GJAHR, r.BUZEI, r.WRBTR, r.SAKTO, r.KOSTL, h.LIFNR, h.BUDAT FROM RSEG_InvoiceItems r JOIN RBKP_InvoiceHeaders h ON r.BELNR = h.BELNR AND r.GJAHR = h.GJAHR WHERE r.EBELN IS NULL" .
+ap:RSEG_q5 mantrix:exampleQuestion "Invoice lines with quantity over-delivery" ;
+    mantrix:exampleSQL """SELECT r.BELNR, r.BUZEI, r.EBELN, r.EBELP, p.MENGE as ordered, r.MENGE as invoiced,
+  r.MENGE - p.MENGE as over_qty
+FROM RSEG_InvoiceItems r
+JOIN EKPO_POItems p ON r.EBELN = p.EBELN AND r.EBELP = p.EBELP
+WHERE r.MENGE > p.MENGE""" .
+
+# --- Edge Cases ---
+ap:RSEG_edge1 mantrix:edgeCases "EBELN IS NULL means non-PO invoice (maverick/direct). These bypass 3-way matching entirely." .
+ap:RSEG_edge2 mantrix:edgeCases "For 3-way match: RSEG.MENGE vs EKPO.MENGE (qty check) AND RSEG.WRBTR/RSEG.MENGE vs EKPO.NETPR (price check) AND MATDOC.MENGE (GR check)." .
+ap:RSEG_edge3 mantrix:edgeCases "One invoice (RBKP) can have multiple RSEG lines referencing different POs. Sum RSEG.WRBTR = RBKP.RMWWR." .
+ap:RSEG_edge4 mantrix:edgeCases "RSEG.SAKTO is the expense GL account. For PO-based items, this comes from the PO account assignment (EKKN.SAKTO)." .

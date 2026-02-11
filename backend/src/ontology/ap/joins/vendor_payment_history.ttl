@@ -1,0 +1,24 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# Join Path: Vendor Payment History
+# ============================================================================
+
+ap:join_vendor_payment_history a mantrix:JoinPath ;
+    rdfs:label "Vendor Payment History" ;
+    rdfs:comment "Complete payment history for a vendor: invoices received, amounts paid, payment dates, methods, and discount capture." ;
+    mantrix:joinSQL """SELECT
+  s.LIFNR, s.NAME1,
+  h.LAUFD as run_date, h.RZAWE as payment_method,
+  h.VBLNR as payment_doc, h.RWBTR as payment_amount,
+  p.BELNR as invoice_doc, p.DMBTR as invoice_paid, p.SKNTO as discount_taken,
+  r.XBLNR as vendor_ref, r.RMWWR as invoice_total, r.BUDAT as invoice_date
+FROM REGUH_PaymentHeaders h
+JOIN REGUP_PaymentItems p ON h.LAUFD = p.LAUFD AND h.LAUFI = p.LAUFI AND h.ZBUKR = p.ZBUKR AND h.LIFNR = p.LIFNR
+JOIN LFA1_Suppliers s ON h.LIFNR = s.LIFNR
+LEFT JOIN RBKP_InvoiceHeaders r ON p.BELNR = r.BELNR AND p.GJAHR = r.GJAHR""" ;
+    mantrix:answersQuestions "When was vendor X paid, payment history, which invoices were in a payment, discount captured" .

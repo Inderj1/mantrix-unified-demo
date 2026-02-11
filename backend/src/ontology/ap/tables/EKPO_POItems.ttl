@@ -1,0 +1,59 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . @prefix owl: <http://www.w3.org/2002/07/owl#> . @prefix xsd: <http://www.w3.org/2001/XMLSchema#> . @prefix skos: <http://www.w3.org/2004/02/skos/core#> . @prefix ap: <http://mantrix.ai/ontology/ap#> . @prefix bq: <http://mantrix.ai/ontology/bigquery#> . @prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: EKPO_POItems — Purchase Order Line Items
+# ============================================================================
+# Each PO item specifies material/service, quantity, unit price, plant,
+# item category, GR/IR indicators, and tolerance keys.
+# WEPOS (GR indicator) is CRITICAL — determines 2-way vs 3-way matching.
+# ============================================================================
+
+ap:EKPO_POItems a owl:Class ;
+    rdfs:label "EKPO_POItems" ;
+    rdfs:comment "Purchase order line items. Each row is one PO line. Contains material, qty, price, plant, and matching control indicators." ;
+    bq:table "EKPO_POItems" ; bq:primaryKey "EBELN, EBELP" ;
+    skos:altLabel "PO item" , "PO line" , "order line" , "line item" ;
+    mantrix:sapTable "EKPO" ;
+    mantrix:relatedConcepts "EKKO_POHeaders, EKKN_AcctAssignment, EKBE_POHistory, RSEG_InvoiceItems, MATDOC_GoodsReceipts, MARA_Materials" .
+
+# --- Columns ---
+ap:EKPO_EBELN a owl:DatatypeProperty ; rdfs:label "PO Number" ; bq:column "EBELN" ; bq:type "INTEGER" ; bq:foreignKey "EKKO_POHeaders.EBELN" .
+ap:EKPO_EBELP a owl:DatatypeProperty ; rdfs:label "Item Number" ; bq:column "EBELP" ; bq:type "STRING" ; rdfs:comment "PO item number (10, 20, 30...)." .
+ap:EKPO_MATNR a owl:DatatypeProperty ; rdfs:label "Material" ; bq:column "MATNR" ; bq:type "STRING" ; bq:foreignKey "MARA_Materials.MATNR" ; rdfs:comment "Material number. NULL for service/text items." .
+ap:EKPO_TXZ01 a owl:DatatypeProperty ; rdfs:label "Short Text" ; bq:column "TXZ01" ; bq:type "STRING" ; rdfs:comment "Item short text/description. Searchable." .
+ap:EKPO_MENGE a owl:DatatypeProperty ; rdfs:label "Quantity" ; bq:column "MENGE" ; bq:type "FLOAT" ; rdfs:comment "Order quantity." .
+ap:EKPO_MEINS a owl:DatatypeProperty ; rdfs:label "Unit of Measure" ; bq:column "MEINS" ; bq:type "STRING" .
+ap:EKPO_NETPR a owl:DatatypeProperty ; rdfs:label "Net Price" ; bq:column "NETPR" ; bq:type "FLOAT" ; rdfs:comment "Net price per unit. Used for 3-way match price comparison." .
+ap:EKPO_NETWR a owl:DatatypeProperty ; rdfs:label "Net Value" ; bq:column "NETWR" ; bq:type "FLOAT" ; rdfs:comment "Total net value = NETPR * MENGE. The PO commitment value." .
+ap:EKPO_WERKS a owl:DatatypeProperty ; rdfs:label "Plant" ; bq:column "WERKS" ; bq:type "STRING" ; bq:foreignKey "T001W_Plants.WERKS" .
+ap:EKPO_LGORT a owl:DatatypeProperty ; rdfs:label "Storage Location" ; bq:column "LGORT" ; bq:type "STRING" .
+ap:EKPO_PSTYP a owl:DatatypeProperty ; rdfs:label "Item Category" ; bq:column "PSTYP" ; bq:type "STRING" ; rdfs:comment "Item category type." ; mantrix:valueMap "0=Standard, 2=Consignment, 3=Subcontracting, 7=Stock transfer, 9=Service" .
+ap:EKPO_KNTTP a owl:DatatypeProperty ; rdfs:label "Account Assignment Cat" ; bq:column "KNTTP" ; bq:type "STRING" ; mantrix:valueMap "K=Cost center, F=Order, P=Project/WBS, A=Asset, (blank)=Stock" .
+ap:EKPO_WEPOS a owl:DatatypeProperty ; rdfs:label "GR Indicator" ; bq:column "WEPOS" ; bq:type "BOOLEAN" ; rdfs:comment "CRITICAL: GR expected? true=3-way match required (PO+GR+Invoice). false=2-way match (PO+Invoice only, no GR needed)." .
+ap:EKPO_WEBRE a owl:DatatypeProperty ; rdfs:label "IR Indicator" ; bq:column "WEBRE" ; bq:type "BOOLEAN" ; rdfs:comment "Invoice receipt expected? Controls whether GR-based IV is required." .
+ap:EKPO_ELIKZ a owl:DatatypeProperty ; rdfs:label "Delivery Complete" ; bq:column "ELIKZ" ; bq:type "BOOLEAN" ; rdfs:comment "true = no more deliveries expected. PO item is closed for GR." .
+ap:EKPO_EREKZ a owl:DatatypeProperty ; rdfs:label "Final Invoice" ; bq:column "EREKZ" ; bq:type "BOOLEAN" ; rdfs:comment "true = final invoice posted. PO item closed for invoicing." .
+ap:EKPO_LOEKZ a owl:DatatypeProperty ; rdfs:label "Deletion Flag" ; bq:column "LOEKZ" ; bq:type "STRING" ; rdfs:comment "L=deleted. S=blocked. Exclude LOEKZ='L' items from active queries." .
+ap:EKPO_MATKL a owl:DatatypeProperty ; rdfs:label "Material Group" ; bq:column "MATKL" ; bq:type "STRING" ; rdfs:comment "Material group for spend category analysis." .
+ap:EKPO_TOLPR a owl:DatatypeProperty ; rdfs:label "Tolerance Key" ; bq:column "TOLPR" ; bq:type "STRING" ; rdfs:comment "Tolerance key for price variance. Links to T169G config." .
+
+# --- Join Paths ---
+ap:EKPO_join_EKKO a mantrix:joinPath ; rdfs:label "Items → PO Header" ; rdfs:comment "EKPO.EBELN = EKKO.EBELN" .
+ap:EKPO_join_EKKN a mantrix:joinPath ; rdfs:label "Items → Acct Assignment" ; rdfs:comment "EKPO.EBELN = EKKN.EBELN AND EKPO.EBELP = EKKN.EBELP" .
+ap:EKPO_join_EKBE a mantrix:joinPath ; rdfs:label "Items → PO History" ; rdfs:comment "EKPO.EBELN = EKBE.EBELN AND EKPO.EBELP = EKBE.EBELP" .
+ap:EKPO_join_RSEG a mantrix:joinPath ; rdfs:label "Items → Invoice Lines" ; rdfs:comment "EKPO.EBELN = RSEG.EBELN AND EKPO.EBELP = RSEG.EBELP" .
+ap:EKPO_join_MATDOC a mantrix:joinPath ; rdfs:label "Items → Goods Receipts" ; rdfs:comment "EKPO.EBELN = MATDOC.EBELN AND EKPO.EBELP = MATDOC.EBELP WHERE MATDOC.BWART = '101'" .
+
+# --- Example Questions & SQL ---
+ap:EKPO_q1 mantrix:exampleQuestion "PO items with no goods receipt" ;
+    mantrix:exampleSQL "SELECT i.EBELN, i.EBELP, i.TXZ01, i.MENGE, i.NETWR FROM EKPO_POItems i LEFT JOIN MATDOC_GoodsReceipts g ON i.EBELN = g.EBELN AND i.EBELP = g.EBELP AND g.BWART = '101' WHERE g.MBLNR IS NULL AND i.WEPOS = true AND i.LOEKZ IS NULL AND i.ELIKZ = false" .
+ap:EKPO_q2 mantrix:exampleQuestion "Spend by material group" ;
+    mantrix:exampleSQL "SELECT MATKL, SUM(NETWR) as total_value, COUNT(*) as items FROM EKPO_POItems WHERE LOEKZ IS NULL GROUP BY MATKL ORDER BY total_value DESC" .
+ap:EKPO_q3 mantrix:exampleQuestion "Service PO items" ;
+    mantrix:exampleSQL "SELECT EBELN, EBELP, TXZ01, NETWR FROM EKPO_POItems WHERE PSTYP = '9'" .
+
+# --- Edge Cases ---
+ap:EKPO_edge1 mantrix:edgeCases "WEPOS=true → 3-way match required. WEPOS=false → 2-way match. This is the SINGLE most important field for matching logic." .
+ap:EKPO_edge2 mantrix:edgeCases "LOEKZ='L' means DELETED — exclude from all active queries. LOEKZ='S' means blocked but not deleted." .
+ap:EKPO_edge3 mantrix:edgeCases "NETWR = NETPR * MENGE. But for framework POs, actual spend is tracked in EKBE, not NETWR." .
+ap:EKPO_edge4 mantrix:edgeCases "KNTTP blank = stock item (inventory). K=cost center assignment. This changes the GL posting." .

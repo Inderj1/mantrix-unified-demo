@@ -1,0 +1,21 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix copa: <http://mantrix.ai/ontology/copa#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+copa:metric_gross_margin a mantrix:Metric ;
+    rdfs:label "Gross Margin" ;
+    rdfs:comment "Revenue minus COGS. Measures production profitability." ;
+    skos:altLabel "gross profit" , "GM" , "gross income" ;
+    mantrix:sqlFormula "SUM(Gross_Revenue) - SUM(Cogs)" ;
+    mantrix:exampleSQL "SELECT SUM(Gross_Revenue) - SUM(Cogs) as gross_margin FROM dataset_25m_table" .
+
+copa:metric_gross_margin_pct a mantrix:Metric ;
+    rdfs:label "Gross Margin %" ;
+    rdfs:comment "Gross margin as percentage of revenue." ;
+    skos:altLabel "GM%" , "gross profit margin" , "GPM" ;
+    mantrix:sqlFormula "(SUM(Gross_Revenue) - SUM(Cogs)) / NULLIF(SUM(Gross_Revenue), 0) * 100" ;
+    mantrix:exampleQuestion "Gross margin % by brand" ;
+    mantrix:exampleSQL "SELECT Brand, (SUM(Gross_Revenue) - SUM(Cogs)) / NULLIF(SUM(Gross_Revenue), 0) * 100 as gm_pct FROM dataset_25m_table GROUP BY Brand ORDER BY gm_pct DESC" .

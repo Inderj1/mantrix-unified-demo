@@ -193,6 +193,8 @@ const EnhancedChatMessage = ({ message, aiConfig }) => {
                 if (isAmount) {
                   return `$${params.value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                 }
+                // Don't add comma separators for year-like values (1900-2099)
+                if (Number.isInteger(params.value) && params.value >= 1900 && params.value <= 2099) return String(params.value);
                 return params.value.toLocaleString('en-US');
               }
               return params.value || '';

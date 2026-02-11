@@ -1,0 +1,40 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: SKA1_GLAccounts — GL Account Master
+# ============================================================================
+# General ledger account master data. Defines the chart of accounts structure.
+# Used for expense categorization, P&L classification, and spend analysis.
+# ============================================================================
+
+ap:SKA1_GLAccounts a owl:Class ;
+    rdfs:label "SKA1_GLAccounts" ;
+    rdfs:comment "GL account master. One row per GL account. Contains account description, type, functional area, and P&L classification. Used for expense categorization and financial reporting." ;
+    bq:table "SKA1_GLAccounts" ; bq:primaryKey "SAKNR" ;
+    skos:altLabel "GL account" , "general ledger" , "account" , "expense account" , "SKA1" ;
+    mantrix:sapTable "SKA1 + SKAT (descriptions)" ;
+    mantrix:relatedConcepts "ACDOCA_UniversalJournal, EKKN_AcctAssignment, RSEG_InvoiceItems" .
+
+# --- Columns ---
+ap:SKA1_SAKNR a owl:DatatypeProperty ; rdfs:label "GL Account" ; bq:column "SAKNR" ; bq:type "STRING" .
+ap:SKA1_TXT50 a owl:DatatypeProperty ; rdfs:label "GL Account Description" ; bq:column "TXT50" ; bq:type "STRING" .
+ap:SKA1_KTOKS a owl:DatatypeProperty ; rdfs:label "Account Group" ; bq:column "KTOKS" ; bq:type "STRING" ; rdfs:comment "GL account group. Determines number range and field status." .
+ap:SKA1_FUNC_AREA a owl:DatatypeProperty ; rdfs:label "Functional Area" ; bq:column "FUNC_AREA" ; bq:type "STRING" ; rdfs:comment "Functional area for government/public sector reporting." .
+ap:SKA1_PNL_BUCKET a owl:DatatypeProperty ; rdfs:label "P&L Bucket" ; bq:column "PNL_BUCKET" ; bq:type "STRING" ; rdfs:comment "Axis AI classification: COGS, SGA, R&D, Other, Balance Sheet." .
+
+# --- Example Questions & SQL ---
+ap:SKA1_q1 mantrix:exampleQuestion "Spend by GL account" ;
+    mantrix:exampleSQL "SELECT a.RACCT, s.TXT50, s.PNL_BUCKET, SUM(ABS(a.HSL)) as spend FROM ACDOCA_UniversalJournal a JOIN SKA1_GLAccounts s ON a.RACCT = s.SAKNR WHERE a.KOART = 'K' AND a.RLDNR = '0L' GROUP BY a.RACCT, s.TXT50, s.PNL_BUCKET ORDER BY spend DESC" .
+ap:SKA1_q2 mantrix:exampleQuestion "Spend by P&L bucket" ;
+    mantrix:exampleSQL "SELECT s.PNL_BUCKET, SUM(ABS(a.HSL)) as spend FROM ACDOCA_UniversalJournal a JOIN SKA1_GLAccounts s ON a.RACCT = s.SAKNR WHERE a.KOART = 'K' AND a.RLDNR = '0L' AND a.BUDAT >= DATE_TRUNC(CURRENT_DATE(), YEAR) GROUP BY s.PNL_BUCKET ORDER BY spend DESC" .
+
+# --- Edge Cases ---
+ap:SKA1_edge1 mantrix:edgeCases "PNL_BUCKET is an Axis AI enriched field. Not from SAP. Used for simplified P&L classification." .
+ap:SKA1_edge2 mantrix:edgeCases "ACDOCA.RACCT is the GL account field. EKKN.SAKTO and RSEG.SAKTO also reference GL accounts." .

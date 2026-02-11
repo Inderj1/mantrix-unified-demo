@@ -1,0 +1,49 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . @prefix owl: <http://www.w3.org/2002/07/owl#> . @prefix xsd: <http://www.w3.org/2001/XMLSchema#> . @prefix skos: <http://www.w3.org/2004/02/skos/core#> . @prefix ap: <http://mantrix.ai/ontology/ap#> . @prefix bq: <http://mantrix.ai/ontology/bigquery#> . @prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: MATDOC_GoodsReceipts — Material Documents (GR)
+# ============================================================================
+# Goods receipt / material movement documents. S/4HANA MATDOC replaces
+# ECC MKPF+MSEG. BWART (movement type) determines the type of event.
+# ============================================================================
+
+ap:MATDOC_GoodsReceipts a owl:Class ;
+    rdfs:label "MATDOC_GoodsReceipts" ;
+    rdfs:comment "Material document table for goods receipts and movements. One row per material movement line item. BWART determines movement type." ;
+    bq:table "MATDOC_GoodsReceipts" ; bq:primaryKey "MBLNR, MJAHR, ZEILE" ;
+    skos:altLabel "GR" , "receipt" , "goods receipt" , "MIGO" , "material document" , "receiving" ;
+    mantrix:sapTable "MATDOC" ; mantrix:sapTransaction "MIGO (post GR), MB03 (display)" ;
+    mantrix:relatedConcepts "EKPO_POItems, EKBE_POHistory, RSEG_InvoiceItems, MARA_Materials, T001W_Plants" .
+
+# --- Columns ---
+ap:MATDOC_MBLNR a owl:DatatypeProperty ; rdfs:label "Material Doc Number" ; bq:column "MBLNR" ; bq:type "INTEGER" .
+ap:MATDOC_MJAHR a owl:DatatypeProperty ; rdfs:label "Year" ; bq:column "MJAHR" ; bq:type "INTEGER" .
+ap:MATDOC_ZEILE a owl:DatatypeProperty ; rdfs:label "Item" ; bq:column "ZEILE" ; bq:type "STRING" .
+ap:MATDOC_BWART a owl:DatatypeProperty ; rdfs:label "Movement Type" ; bq:column "BWART" ; bq:type "STRING" ;
+    mantrix:valueMap "101=GR against PO, 102=GR reversal, 103=GR into blocked stock, 104=Rev from blocked, 105=Release blocked to unrestricted, 122=Return to vendor, 161=GR for production order" .
+ap:MATDOC_MATNR a owl:DatatypeProperty ; rdfs:label "Material" ; bq:column "MATNR" ; bq:type "STRING" ; bq:foreignKey "MARA_Materials.MATNR" .
+ap:MATDOC_WERKS a owl:DatatypeProperty ; rdfs:label "Plant" ; bq:column "WERKS" ; bq:type "STRING" ; bq:foreignKey "T001W_Plants.WERKS" .
+ap:MATDOC_LGORT a owl:DatatypeProperty ; rdfs:label "Storage Location" ; bq:column "LGORT" ; bq:type "STRING" .
+ap:MATDOC_MENGE a owl:DatatypeProperty ; rdfs:label "Quantity" ; bq:column "MENGE" ; bq:type "FLOAT" .
+ap:MATDOC_MEINS a owl:DatatypeProperty ; rdfs:label "UoM" ; bq:column "MEINS" ; bq:type "STRING" .
+ap:MATDOC_DMBTR a owl:DatatypeProperty ; rdfs:label "Amount (Local)" ; bq:column "DMBTR" ; bq:type "FLOAT" .
+ap:MATDOC_BUDAT a owl:DatatypeProperty ; rdfs:label "Posting Date" ; bq:column "BUDAT" ; bq:type "DATE" ; rdfs:comment "GR posting date. Used for PO-to-GR and GR-to-Invoice cycle time." .
+ap:MATDOC_EBELN a owl:DatatypeProperty ; rdfs:label "PO Number" ; bq:column "EBELN" ; bq:type "INTEGER" ; bq:foreignKey "EKPO_POItems.EBELN" .
+ap:MATDOC_EBELP a owl:DatatypeProperty ; rdfs:label "PO Item" ; bq:column "EBELP" ; bq:type "STRING" ; bq:foreignKey "EKPO_POItems.EBELP" .
+ap:MATDOC_SMBLN a owl:DatatypeProperty ; rdfs:label "Reversal Doc" ; bq:column "SMBLN" ; bq:type "INTEGER" ; rdfs:comment "If this is a reversal (102), this points to the original doc. If original was reversed, this points to the reversal." .
+ap:MATDOC_SMBLP a owl:DatatypeProperty ; rdfs:label "Reversal Item" ; bq:column "SMBLP" ; bq:type "STRING" .
+ap:MATDOC_LIFNR a owl:DatatypeProperty ; rdfs:label "Supplier" ; bq:column "LIFNR" ; bq:type "INTEGER" ; bq:foreignKey "LFA1_Suppliers.LIFNR" .
+ap:MATDOC_BUKRS a owl:DatatypeProperty ; rdfs:label "Company Code" ; bq:column "BUKRS" ; bq:type "STRING" .
+
+# --- Example Questions & SQL ---
+ap:MATDOC_q1 mantrix:exampleQuestion "GR volume this month by plant" ;
+    mantrix:exampleSQL "SELECT WERKS, COUNT(*) as gr_count, SUM(MENGE) as total_qty, SUM(DMBTR) as total_value FROM MATDOC_GoodsReceipts WHERE BWART = '101' AND BUDAT >= DATE_TRUNC(CURRENT_DATE(), MONTH) GROUP BY WERKS" .
+ap:MATDOC_q2 mantrix:exampleQuestion "PO items without goods receipt" ;
+    mantrix:exampleSQL "SELECT p.EBELN, p.EBELP, p.TXZ01, p.MENGE as ordered_qty FROM EKPO_POItems p LEFT JOIN MATDOC_GoodsReceipts g ON p.EBELN = g.EBELN AND p.EBELP = g.EBELP AND g.BWART = '101' WHERE g.MBLNR IS NULL AND p.WEPOS = true AND p.ELIKZ = false AND p.LOEKZ IS NULL" .
+ap:MATDOC_q3 mantrix:exampleQuestion "GR reversals this quarter" ;
+    mantrix:exampleSQL "SELECT MBLNR, EBELN, EBELP, MENGE, DMBTR, BUDAT, SMBLN as reversed_doc FROM MATDOC_GoodsReceipts WHERE BWART = '102' AND BUDAT >= DATE_TRUNC(CURRENT_DATE(), QUARTER)" .
+
+# --- Edge Cases ---
+ap:MATDOC_edge1 mantrix:edgeCases "BWART='101' is the standard GR. Always filter for this when counting goods receipts. Include '103' if you want blocked stock GRs." .
+ap:MATDOC_edge2 mantrix:edgeCases "SMBLN populated means this doc was reversed (or is itself a reversal). Exclude reversed GRs from active counts." .
+ap:MATDOC_edge3 mantrix:edgeCases "For 3-way match: compare MATDOC.MENGE (received qty) against RSEG.MENGE (invoiced qty) and EKPO.MENGE (ordered qty)." .

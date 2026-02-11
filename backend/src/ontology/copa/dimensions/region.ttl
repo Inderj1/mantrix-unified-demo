@@ -1,0 +1,18 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix copa: <http://mantrix.ai/ontology/copa#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+copa:dim_region a mantrix:Dimension ;
+    rdfs:label "Region" ;
+    rdfs:comment "Geographic region dimension for territory and market analysis." ;
+    skos:altLabel "territory" , "area" , "geography" , "market" , "sales region" ;
+    mantrix:bqColumns "Region" ;
+    mantrix:exampleQuestion "Revenue by region" ;
+    mantrix:exampleSQL "SELECT Region, SUM(Gross_Revenue) as revenue, SUM(Inv_Quantity) as units FROM dataset_25m_table GROUP BY Region ORDER BY revenue DESC" ;
+    mantrix:exampleQuestion "Region profitability comparison" ;
+    mantrix:exampleSQL """SELECT Region, SUM(Net_Sales) as net, SUM(Cogs) as cogs,
+  (SUM(Net_Sales) - SUM(Cogs)) / NULLIF(SUM(Net_Sales), 0) * 100 as margin_pct
+FROM dataset_25m_table GROUP BY Region ORDER BY margin_pct DESC""" .

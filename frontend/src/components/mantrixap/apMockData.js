@@ -1,6 +1,7 @@
 /**
  * MANTRIX AP — Centralized Mock Data
  * All static data extracted from the 6 op_*.html product story files
+ * Data sourced from Arizona Beverages BigQuery dataset
  */
 
 // ============ OVERVIEW / LANDING ============
@@ -63,12 +64,12 @@ export const timelineEvents = [
     time: '8:00 AM',
     title: '47 invoices waiting, already prioritized',
     heading: 'Opens Work Queue',
-    description: 'Sarah opens Mantrix and sees her queue. AI has already sorted everything by financial impact. The $312K Lockheed Martin exception (blocking a payment run) is at the top, not buried. 31 invoices are flagged "Ready to Post" with 94+ confidence.',
+    description: 'Sarah opens Mantrix and sees her queue. AI has already sorted everything by financial impact. The $312K US Bottlers Machinery exception (blocking a payment run) is at the top, not buried. 31 invoices are flagged "Ready to Post" with 94+ confidence.',
     tileColor: '#00357a',
   },
   {
     time: '8:05 AM',
-    title: 'Lockheed Martin price variance — AI already diagnosed it',
+    title: 'US Bottlers Machinery price variance — AI already diagnosed it',
     heading: 'Handles Top Exception',
     description: 'Sarah clicks the exception. Instead of opening ME23N, MB03, MRBR — Mantrix shows her everything on one screen: root cause is contract escalation, variance 2.04% within 3% clause, seen 18 times before, all approved. She clicks "Approve & Post." 3 minutes, not 45.',
     result: '$312,500 invoice posted → $2.1M payment run unblocked',
@@ -139,14 +140,14 @@ export const designPrinciples = [
 // ============ TILE 1: INVOICE ENTRY ============
 
 export const invoiceList = [
-  { id: 1, invoiceNum: 'INV-2026-045231', vendor: 'Thales Defense', date: '02/04/2026', amount: '$45,200.00', poRef: '4500098765', type: 'PO-Backed', matchType: '3-Way Match', aiScore: 97.4, scoreLevel: 'high', status: 'matched', aiHint: 'Full match — 0.3% variance within tolerance' },
-  { id: 2, invoiceNum: 'INV-2026-045232', vendor: 'Northrop Grumman', date: '02/04/2026', amount: '$234,000.00', poRef: '4500098234', type: 'PO-Backed', matchType: '3-Way Match', aiScore: 95.8, scoreLevel: 'high', status: 'matched', aiHint: 'Exact match — vendor 94 reliability' },
-  { id: 3, invoiceNum: 'INV-2026-045233', vendor: 'Lockheed Martin', date: '02/04/2026', amount: '$312,500.00', poRef: '4500087654', type: 'PO-Backed', matchType: 'Price Variance', aiScore: 42, scoreLevel: 'low', status: 'exception', aiHint: 'Price variance 2.04% — contract escalation clause' },
-  { id: 4, invoiceNum: 'INV-GR-44120', vendor: 'Grainger Inc', date: '02/04/2026', amount: '$1,840.00', poRef: '—', type: 'Non-PO', matchType: 'GL Coded', aiScore: 96.1, scoreLevel: 'high', status: 'matched', aiHint: 'Matches 14 prior invoices — GL 54200/CC1000' },
-  { id: 5, invoiceNum: 'INV-FS-9920', vendor: 'Fastenal Company', date: '02/04/2026', amount: '$8,750.00', poRef: '4500099012', type: 'Service Entry', matchType: 'Partial GR', aiScore: 72, scoreLevel: 'mid', status: 'review', aiHint: '35/50 EA received — remaining expected today' },
-  { id: 6, invoiceNum: 'INV-ABC-2241', vendor: 'ABC Industrial Supply', date: '02/03/2026', amount: '$8,420.00', poRef: '4500091234', type: 'PO-Backed', matchType: 'Freight Issue', aiScore: 68, scoreLevel: 'mid', status: 'review', aiHint: 'Freight 4.8% above contract — drift pattern' },
-  { id: 7, invoiceNum: 'INV-OD-22104', vendor: 'Office Depot', date: '02/04/2026', amount: '$342.00', poRef: '—', type: 'Non-PO', matchType: 'GL Coded', aiScore: 98.2, scoreLevel: 'high', status: 'matched', aiHint: 'Recurring vendor — exact GL pattern match' },
-  { id: 8, invoiceNum: 'INV-2026-045234', vendor: 'BAE Systems', date: '02/03/2026', amount: '$156,000.00', poRef: '4500098200', type: 'PO-Backed', matchType: 'Missing SES', aiScore: null, scoreLevel: 'parked', status: 'parked', aiHint: 'Service PO — no entry sheet in ML81N yet' },
+  { id: 1, invoiceNum: 'VND-INV-004231', vendor: 'Krones Inc', date: '02/04/2026', amount: '$45,200.00', poRef: '3900051320', type: 'PO-Backed', matchType: '3-Way Match', aiScore: 97.4, scoreLevel: 'high', status: 'matched', aiHint: 'Full match — 0.3% variance within tolerance' },
+  { id: 2, invoiceNum: 'VND-INV-004232', vendor: 'Process Tech Sales and Service', date: '02/04/2026', amount: '$234,000.00', poRef: '3900051366', type: 'PO-Backed', matchType: '3-Way Match', aiScore: 95.8, scoreLevel: 'high', status: 'matched', aiHint: 'Exact match — vendor 94 reliability' },
+  { id: 3, invoiceNum: 'VND-INV-004233', vendor: 'US Bottlers Machinery Co', date: '02/04/2026', amount: '$312,500.00', poRef: '3900049229', type: 'PO-Backed', matchType: 'Price Variance', aiScore: 42, scoreLevel: 'low', status: 'exception', aiHint: 'Price variance 2.04% — contract escalation clause' },
+  { id: 4, invoiceNum: 'VND-INV-004120', vendor: 'Radwell International Inc', date: '02/04/2026', amount: '$1,840.00', poRef: '—', type: 'Non-PO', matchType: 'GL Coded', aiScore: 96.1, scoreLevel: 'high', status: 'matched', aiHint: 'Matches 14 prior invoices — GL 54200/CC1000' },
+  { id: 5, invoiceNum: 'VND-INV-009920', vendor: 'Avenel Truck & Equipment', date: '02/04/2026', amount: '$8,750.00', poRef: '3900051500', type: 'Service Entry', matchType: 'Partial GR', aiScore: 72, scoreLevel: 'mid', status: 'review', aiHint: '35/50 EA received — remaining expected today' },
+  { id: 6, invoiceNum: 'VND-INV-002241', vendor: 'New Jersey American Water', date: '02/03/2026', amount: '$8,420.00', poRef: '3900051510', type: 'PO-Backed', matchType: 'Freight Issue', aiScore: 68, scoreLevel: 'mid', status: 'review', aiHint: 'Freight 4.8% above contract — drift pattern' },
+  { id: 7, invoiceNum: 'VND-INV-022104', vendor: 'US Bottlers Machinery (Non-PO)', date: '02/04/2026', amount: '$342.00', poRef: '—', type: 'Non-PO', matchType: 'GL Coded', aiScore: 98.2, scoreLevel: 'high', status: 'matched', aiHint: 'Recurring vendor — exact GL pattern match' },
+  { id: 8, invoiceNum: 'VND-INV-004234', vendor: 'US Bottlers Machinery Co', date: '02/03/2026', amount: '$156,000.00', poRef: '3900049250', type: 'PO-Backed', matchType: 'Missing SES', aiScore: null, scoreLevel: 'parked', status: 'parked', aiHint: 'Service PO — no entry sheet in ML81N yet' },
 ];
 
 export const workflowSteps = [
@@ -158,18 +159,18 @@ export const workflowSteps = [
 ];
 
 export const invoiceFields = [
-  { label: 'Invoice #', value: 'INV-2026-045231', aiFilled: true },
-  { label: 'Vendor', value: 'Thales Defense', aiFilled: true },
+  { label: 'Invoice #', value: 'VND-INV-004231', aiFilled: true },
+  { label: 'Vendor', value: 'Krones Inc', aiFilled: true },
   { label: 'Date', value: '02/04/2026', aiFilled: true },
   { label: 'Amount', value: '$45,200.00', aiFilled: true },
-  { label: 'PO Ref', value: '4500098765', aiFilled: true },
-  { label: 'Terms', value: 'Net 30', editable: true },
+  { label: 'PO Ref', value: '3900051320', aiFilled: true },
+  { label: 'Terms', value: 'Z001 — Net 30', editable: true },
 ];
 
 export const matchDetails = [
   { label: 'Price', value: '$45,200 vs PO $45,065 (Δ 0.3%)', status: 'pass' },
   { label: 'Quantity', value: '100 EA = 100 EA (exact)', status: 'pass' },
-  { label: 'GR Status', value: 'GR 5000045678 posted 02/03', status: 'pass' },
+  { label: 'GR Status', value: 'GR 4900000200 posted 02/03', status: 'pass' },
   { label: 'Duplicates', value: 'None found (checked 2,340)', status: 'pass' },
   { label: 'Vendor Score', value: '96.8 reliability', status: 'pass' },
 ];
@@ -239,12 +240,12 @@ export const queueStats = [
 ];
 
 export const queueItems = [
-  { id: 1, score: 42, scoreLevel: 'low', vendor: 'Lockheed Martin', detail: 'INV-LM-8834 · PO 4500087654 · Stuck 4 days', amount: '$312,500', type: 'PO-Backed\nPrice Variance', status: 'exception', aiHint: 'PO price wrong — buyer needs to correct ME22N' },
-  { id: 2, score: 68, scoreLevel: 'mid', vendor: 'ABC Industrial Supply', detail: 'INV-ABC-2241 · PO 4500091234 · Freight variance', amount: '$8,420', type: 'PO-Backed\nFreight Issue', status: 'review', aiHint: 'Freight 4.8% above contract — drift pattern detected' },
-  { id: 3, score: 97, scoreLevel: 'high', vendor: 'Thales Defense', detail: 'INV-2026-045231 · PO 4500098765 · 3-way match', amount: '$45,200', type: 'PO-Backed\n3-Way Match', status: 'ready', aiHint: 'Full match — 0.3% variance within tolerance' },
-  { id: 4, score: 96, scoreLevel: 'high', vendor: 'Grainger Inc', detail: 'INV-GR-44120 · Non-PO · Office Supplies', amount: '$1,840', type: 'Non-PO\nGL 54200', status: 'ready', aiHint: 'Matches 14 prior invoices — GL/CC suggested' },
-  { id: 5, score: 72, scoreLevel: 'mid', vendor: 'Fastenal Company', detail: 'INV-FS-9920 · PO 4500099012 · Partial GR', amount: '$8,750', type: 'Service Entry\nPartial GR', status: 'review', aiHint: '35/50 EA received — remaining expected today per EKET' },
-  { id: 6, score: null, scoreLevel: 'parked', vendor: 'TechParts International', detail: 'INV-TP-1102 · Parked 02/04 · Waiting on buyer', amount: '$24,500', type: 'PO-Backed\nAwaiting Info', status: 'parked', aiHint: 'Buyer J. Martinez notified — no response yet' },
+  { id: 1, score: 42, scoreLevel: 'low', vendor: 'US Bottlers Machinery Co', detail: 'VND-INV-004233 · PO 3900049229 · Stuck 4 days', amount: '$312,500', type: 'PO-Backed\nPrice Variance', status: 'exception', aiHint: 'PO price wrong — buyer needs to correct ME22N' },
+  { id: 2, score: 68, scoreLevel: 'mid', vendor: 'New Jersey American Water', detail: 'VND-INV-002241 · PO 3900051510 · Freight variance', amount: '$8,420', type: 'PO-Backed\nFreight Issue', status: 'review', aiHint: 'Freight 4.8% above contract — drift pattern detected' },
+  { id: 3, score: 97, scoreLevel: 'high', vendor: 'Krones Inc', detail: 'VND-INV-004231 · PO 3900051320 · 3-way match', amount: '$45,200', type: 'PO-Backed\n3-Way Match', status: 'ready', aiHint: 'Full match — 0.3% variance within tolerance' },
+  { id: 4, score: 96, scoreLevel: 'high', vendor: 'Radwell International Inc', detail: 'VND-INV-004120 · Non-PO · Packaging Supplies', amount: '$1,840', type: 'Non-PO\nGL 54200', status: 'ready', aiHint: 'Matches 14 prior invoices — GL/CC suggested' },
+  { id: 5, score: 72, scoreLevel: 'mid', vendor: 'Avenel Truck & Equipment', detail: 'VND-INV-009920 · PO 3900051500 · Partial GR', amount: '$8,750', type: 'Service Entry\nPartial GR', status: 'review', aiHint: '35/50 EA received — remaining expected today per EKET' },
+  { id: 6, score: null, scoreLevel: 'parked', vendor: 'UDMC', detail: 'VND-INV-001102 · Parked 02/04 · Waiting on buyer', amount: '$24,500', type: 'PO-Backed\nAwaiting Info', status: 'parked', aiHint: 'Buyer J. Martinez notified — no response yet' },
 ];
 
 export const priorityFactors = [
@@ -307,11 +308,11 @@ export const batchSummary = [
 ];
 
 export const postingQueue = [
-  { id: 1, vendor: 'Thales Defense', detail: 'INV-2026-045231 · PO 4500098765', amount: '$45,200', matchType: '3-Way Match', confidence: 97.4, reason: 'Full match · 0.3% variance', action: 'MIRO', checked: true },
-  { id: 2, vendor: 'Northrop Grumman', detail: 'INV-NG-7781 · PO 4500098234', amount: '$234,000', matchType: '3-Way Match', confidence: 95.8, reason: 'Exact match · vendor 94 reliability', action: 'MIRO', checked: true },
-  { id: 3, vendor: 'Fastenal Company', detail: 'INV-FS-9918 · SES 1000023456', amount: '$8,750', matchType: 'Service Entry', confidence: 94.8, reason: 'ESKN/ESLH confirmed', action: 'MIRO', checked: true },
-  { id: 4, vendor: 'Grainger Inc', detail: 'INV-GR-44120 · Non-PO', amount: '$1,840', matchType: 'Non-PO', confidence: 96.1, reason: 'GL 54200/CC1000 · matches 14 prior', action: 'FB60', checked: true },
-  { id: 5, vendor: 'Office Depot', detail: 'INV-OD-22104 · Non-PO', amount: '$342', matchType: 'Non-PO', confidence: 98.2, reason: 'Recurring vendor · exact GL pattern', action: 'FB60', checked: true },
+  { id: 1, vendor: 'Krones Inc', detail: 'VND-INV-004231 · PO 3900051320', amount: '$45,200', matchType: '3-Way Match', confidence: 97.4, reason: 'Full match · 0.3% variance', action: 'MIRO', checked: true },
+  { id: 2, vendor: 'Process Tech Sales and Service', detail: 'VND-INV-004232 · PO 3900051366', amount: '$234,000', matchType: '3-Way Match', confidence: 95.8, reason: 'Exact match · vendor 94 reliability', action: 'MIRO', checked: true },
+  { id: 3, vendor: 'Avenel Truck & Equipment', detail: 'VND-INV-009920 · SES 1000023456', amount: '$8,750', matchType: 'Service Entry', confidence: 94.8, reason: 'ESKN/ESLH confirmed', action: 'MIRO', checked: true },
+  { id: 4, vendor: 'Radwell International Inc', detail: 'VND-INV-004120 · Non-PO', amount: '$1,840', matchType: 'Non-PO', confidence: 96.1, reason: 'GL 54200/CC1000 · matches 14 prior', action: 'FB60', checked: true },
+  { id: 5, vendor: 'US Bottlers Machinery (Non-PO)', detail: 'VND-INV-022104 · Non-PO', amount: '$342', matchType: 'Non-PO', confidence: 98.2, reason: 'Recurring vendor · exact GL pattern', action: 'FB60', checked: true },
 ];
 
 export const confirmationDetails = [
@@ -349,13 +350,13 @@ export const dailySummary = [
 ];
 
 export const statusInvoices = [
-  { id: 1, hasNotif: true, vendor: 'Thales Defense & Security', detail: 'INV-2026-8834 · PO 4500098765', amount: '$45,200', status: 'updated', statusLabel: 'GR POSTED', parkedReason: 'Missing GR (WEBRE)', days: 3, aiUpdate: 'GR 5001234567 posted today — ready to re-process' },
-  { id: 2, hasNotif: true, vendor: 'Lockheed Martin', detail: 'INV-2026-9102 · PO 4500099012', amount: '$312,500', status: 'routed', statusLabel: 'ROUTED', parkedReason: 'Price variance → Buyer J. Martinez', days: 1, aiUpdate: 'Buyer responded: "Approved — contract escalation"' },
-  { id: 3, hasNotif: false, vendor: 'Raytheon Technologies', detail: 'INV-2026-8801 · PO 4500097890', amount: '$87,300', status: 'parked', statusLabel: 'PARKED', parkedReason: 'Partial GR — 80 of 120 units received', days: 5, aiUpdate: 'EKET shows delivery 2/7 — likely tomorrow' },
-  { id: 4, hasNotif: true, vendor: 'Northrop Grumman', detail: 'INV-2026-8790 · Non-PO', amount: '$4,200', status: 'routed', statusLabel: 'ROUTED', parkedReason: 'Non-PO > $2,500 → Mgr approval', days: 2, aiUpdate: 'Manager approved — ready to post as FB60' },
-  { id: 5, hasNotif: false, vendor: 'Grainger', detail: 'INV-2026-9230 · PO 4500098432', amount: '$1,840', status: 'parked', statusLabel: 'PARKED', parkedReason: 'UOM mismatch — invoice KG, PO LB', days: 1, aiUpdate: 'Converted: 50 KG = 110.23 LB. Within tolerance.' },
-  { id: 6, hasNotif: false, vendor: 'Allied Signal', detail: 'INV-2026-8712 · PO 4500096501', amount: '$23,400', status: 'parked', statusLabel: 'PARKED', parkedReason: 'Vendor on payment hold (LFB1 block)', days: 8, aiUpdate: 'No change — vendor still blocked' },
-  { id: 7, hasNotif: false, vendor: 'BAE Systems', detail: 'INV-2026-8905 · PO 4500098200', amount: '$156,000', status: 'parked', statusLabel: 'PARKED', parkedReason: 'Missing SES — service PO, no entry sheet', days: 4, aiUpdate: 'SES not yet created in ML81N' },
+  { id: 1, hasNotif: true, vendor: 'Krones Inc', detail: 'VND-INV-008834 · PO 3900051320', amount: '$45,200', status: 'updated', statusLabel: 'GR POSTED', parkedReason: 'Missing GR (WEBRE)', days: 3, aiUpdate: 'GR 4900000200 posted today — ready to re-process' },
+  { id: 2, hasNotif: true, vendor: 'US Bottlers Machinery Co', detail: 'VND-INV-009102 · PO 3900049229', amount: '$312,500', status: 'routed', statusLabel: 'ROUTED', parkedReason: 'Price variance → Buyer J. Martinez', days: 1, aiUpdate: 'Buyer responded: "Approved — contract escalation"' },
+  { id: 3, hasNotif: false, vendor: 'Arctic Falls Spring Water', detail: 'VND-INV-008801 · PO 3900051520', amount: '$87,300', status: 'parked', statusLabel: 'PARKED', parkedReason: 'Partial GR — 80 of 120 units received', days: 5, aiUpdate: 'EKET shows delivery 2/7 — likely tomorrow' },
+  { id: 4, hasNotif: true, vendor: 'Process Tech Sales and Service', detail: 'VND-INV-008790 · Non-PO', amount: '$4,200', status: 'routed', statusLabel: 'ROUTED', parkedReason: 'Non-PO > $2,500 → Mgr approval', days: 2, aiUpdate: 'Manager approved — ready to post as FB60' },
+  { id: 5, hasNotif: false, vendor: 'Radwell International', detail: 'VND-INV-009230 · PO 3900051530', amount: '$1,840', status: 'parked', statusLabel: 'PARKED', parkedReason: 'UOM mismatch — invoice KG, PO LB', days: 1, aiUpdate: 'Converted: 50 KG = 110.23 LB. Within tolerance.' },
+  { id: 6, hasNotif: false, vendor: 'Motion Industries Inc', detail: 'VND-INV-008712 · PO 3900051540', amount: '$23,400', status: 'parked', statusLabel: 'PARKED', parkedReason: 'Vendor on payment hold (LFB1 block)', days: 8, aiUpdate: 'No change — vendor still blocked' },
+  { id: 7, hasNotif: false, vendor: 'US Bottlers Machinery Co', detail: 'VND-INV-008905 · PO 3900049250', amount: '$156,000', status: 'parked', statusLabel: 'PARKED', parkedReason: 'Missing SES — service PO, no entry sheet', days: 4, aiUpdate: 'SES not yet created in ML81N' },
 ];
 
 export const statusDetectionFeatures = [
@@ -409,47 +410,47 @@ export const guardrailDefs = [
 
 // Line items for invoices — keyed by invoice id
 export const invoiceLineItems = {
-  // INV-2026-045231 — Thales Defense (id: 1) — clean 3-way match
+  // VND-INV-004231 — Krones Inc (id: 1) — clean 3-way match
   1: [
-    { lineNum: 1, description: 'Radar Module Assembly RM-200', qty: 40, unit: 'EA', unitPrice: 680.00, amount: 27200.00, poLine: 10, matchStatus: 'matched', matchStrategy: 'key-based', confidence: 98.5, grRef: 'GR-5000045678' },
-    { lineNum: 2, description: 'Power Supply Unit PSU-12V', qty: 40, unit: 'EA', unitPrice: 245.00, amount: 9800.00, poLine: 20, matchStatus: 'matched', matchStrategy: 'key-based', confidence: 97.8, grRef: 'GR-5000045678' },
-    { lineNum: 3, description: 'Cable Harness CH-RDR-4M', qty: 80, unit: 'EA', unitPrice: 52.50, amount: 4200.00, poLine: 30, matchStatus: 'matched', matchStrategy: 'vendor-material', confidence: 96.2, grRef: 'GR-5000045678' },
-    { lineNum: 4, description: 'Shipping & Handling', qty: 1, unit: 'LS', unitPrice: 4000.00, amount: 4000.00, poLine: 40, matchStatus: 'matched', matchStrategy: 'elimination', confidence: 94.1, grRef: 'GR-5000045678' },
+    { lineNum: 1, description: 'AZ LEMON 24PK 15OZ CAN', qty: 40, unit: 'EA', unitPrice: 680.00, amount: 27200.00, poLine: 10, matchStatus: 'matched', matchStrategy: 'key-based', confidence: 98.5, grRef: 'GR-4900000200' },
+    { lineNum: 2, description: 'AZ GREEN 24PK 15OZ CAN', qty: 40, unit: 'EA', unitPrice: 245.00, amount: 9800.00, poLine: 20, matchStatus: 'matched', matchStrategy: 'key-based', confidence: 97.8, grRef: 'GR-4900000200' },
+    { lineNum: 3, description: 'AZ PEACH 24PK 15OZ CAN', qty: 80, unit: 'EA', unitPrice: 52.50, amount: 4200.00, poLine: 30, matchStatus: 'matched', matchStrategy: 'vendor-material', confidence: 96.2, grRef: 'GR-4900000200' },
+    { lineNum: 4, description: 'Shipping & Handling', qty: 1, unit: 'LS', unitPrice: 4000.00, amount: 4000.00, poLine: 40, matchStatus: 'matched', matchStrategy: 'elimination', confidence: 94.1, grRef: 'GR-4900000200' },
   ],
-  // INV-2026-045233 — Lockheed Martin (id: 3) — price variance on line 2
+  // VND-INV-004233 — US Bottlers Machinery (id: 3) — price variance on line 2
   3: [
-    { lineNum: 1, description: 'Avionics Control Unit ACU-500', qty: 10, unit: 'EA', unitPrice: 18750.00, amount: 187500.00, poLine: 10, matchStatus: 'matched', matchStrategy: 'key-based', confidence: 97.2, grRef: 'GR-5000044501' },
-    { lineNum: 2, description: 'Flight Computer FC-MK4', qty: 5, unit: 'EA', unitPrice: 22500.00, amount: 112500.00, poLine: 20, matchStatus: 'exception', matchStrategy: 'key-based', confidence: 42.0, grRef: 'GR-5000044501' },
-    { lineNum: 3, description: 'Integration Test Kit ITK-AV', qty: 1, unit: 'LS', unitPrice: 12500.00, amount: 12500.00, poLine: 30, matchStatus: 'matched', matchStrategy: 'semantic', confidence: 91.5, grRef: 'GR-5000044501' },
+    { lineNum: 1, description: 'HB ARNOLD PALMER SPIKED (4X6) 24PK 12OZ', qty: 10, unit: 'EA', unitPrice: 18750.00, amount: 187500.00, poLine: 10, matchStatus: 'matched', matchStrategy: 'key-based', confidence: 97.2, grRef: 'GR-4900000210' },
+    { lineNum: 2, description: 'AZ HARD GREEN TEA 24PK 12OZ CAN SLEEK', qty: 5, unit: 'EA', unitPrice: 22500.00, amount: 112500.00, poLine: 20, matchStatus: 'exception', matchStrategy: 'key-based', confidence: 42.0, grRef: 'GR-4900000210' },
+    { lineNum: 3, description: 'AZ HARD LEMON TEA 24PK 12OZ CAN SLEEK', qty: 1, unit: 'LS', unitPrice: 12500.00, amount: 12500.00, poLine: 30, matchStatus: 'matched', matchStrategy: 'semantic', confidence: 91.5, grRef: 'GR-4900000210' },
   ],
-  // INV-FS-9920 — Fastenal (id: 5) — partial delivery, qty mismatch on line 3
+  // VND-INV-009920 — Avenel Truck & Equipment (id: 5) — partial delivery, qty mismatch on line 3
   5: [
-    { lineNum: 1, description: 'Hex Bolt M10x40 Grade 8.8', qty: 500, unit: 'EA', unitPrice: 2.80, amount: 1400.00, poLine: 10, matchStatus: 'matched', matchStrategy: 'key-based', confidence: 99.1, grRef: 'GR-5000046200' },
-    { lineNum: 2, description: 'Lock Washer M10 SS304', qty: 500, unit: 'EA', unitPrice: 1.20, amount: 600.00, poLine: 20, matchStatus: 'matched', matchStrategy: 'vendor-material', confidence: 96.8, grRef: 'GR-5000046200' },
-    { lineNum: 3, description: 'Flange Nut M10 Zinc', qty: 500, unit: 'EA', unitPrice: 1.90, amount: 950.00, poLine: 30, matchStatus: 'partial', matchStrategy: 'qty-price', confidence: 68.0, grRef: 'GR-5000046200' },
-    { lineNum: 4, description: 'Flat Washer M10 USS', qty: 350, unit: 'EA', unitPrice: 0.85, amount: 297.50, poLine: 40, matchStatus: 'partial', matchStrategy: 'key-based', confidence: 72.4, grRef: null },
+    { lineNum: 1, description: 'Shrink Wrap Film 18" Roll', qty: 500, unit: 'EA', unitPrice: 2.80, amount: 1400.00, poLine: 10, matchStatus: 'matched', matchStrategy: 'key-based', confidence: 99.1, grRef: 'GR-4900000260' },
+    { lineNum: 2, description: 'Label Adhesive Industrial 5gal', qty: 500, unit: 'EA', unitPrice: 1.20, amount: 600.00, poLine: 20, matchStatus: 'matched', matchStrategy: 'vendor-material', confidence: 96.8, grRef: 'GR-4900000260' },
+    { lineNum: 3, description: 'Pallet Corner Protectors', qty: 500, unit: 'EA', unitPrice: 1.90, amount: 950.00, poLine: 30, matchStatus: 'partial', matchStrategy: 'qty-price', confidence: 68.0, grRef: 'GR-4900000260' },
+    { lineNum: 4, description: 'Stretch Band Wrap 20"', qty: 350, unit: 'EA', unitPrice: 0.85, amount: 297.50, poLine: 40, matchStatus: 'partial', matchStrategy: 'key-based', confidence: 72.4, grRef: null },
     { lineNum: 5, description: 'Expedited Freight Surcharge', qty: 1, unit: 'LS', unitPrice: 5502.50, amount: 5502.50, poLine: null, matchStatus: 'unplanned', matchStrategy: 'elimination', confidence: 35.0, grRef: null },
   ],
 };
 
 // PO line items — keyed by PO reference
 export const poLineItems = {
-  '4500098765': [
-    { lineNum: 10, material: '300100', description: 'Radar Module Assembly RM-200', qty: 40, unit: 'EA', unitPrice: 680.00, amount: 27200.00, grQty: 40, grDate: '02/03/2026' },
-    { lineNum: 20, material: '300101', description: 'Power Supply Unit PSU-12V', qty: 40, unit: 'EA', unitPrice: 245.00, amount: 9800.00, grQty: 40, grDate: '02/03/2026' },
-    { lineNum: 30, material: '300102', description: 'Cable Harness CH-RDR-4M', qty: 80, unit: 'EA', unitPrice: 52.50, amount: 4200.00, grQty: 80, grDate: '02/03/2026' },
+  '3900051320': [
+    { lineNum: 10, material: '1000910', description: 'AZ LEMON 24PK 15OZ CAN', qty: 40, unit: 'EA', unitPrice: 680.00, amount: 27200.00, grQty: 40, grDate: '02/03/2026' },
+    { lineNum: 20, material: '1000912', description: 'AZ GREEN 24PK 15OZ CAN', qty: 40, unit: 'EA', unitPrice: 245.00, amount: 9800.00, grQty: 40, grDate: '02/03/2026' },
+    { lineNum: 30, material: '1000913', description: 'AZ PEACH 24PK 15OZ CAN', qty: 80, unit: 'EA', unitPrice: 52.50, amount: 4200.00, grQty: 80, grDate: '02/03/2026' },
     { lineNum: 40, material: '900001', description: 'Shipping & Handling', qty: 1, unit: 'LS', unitPrice: 4000.00, amount: 4000.00, grQty: 1, grDate: '02/03/2026' },
   ],
-  '4500087654': [
-    { lineNum: 10, material: '400500', description: 'Avionics Control Unit ACU-500', qty: 10, unit: 'EA', unitPrice: 18750.00, amount: 187500.00, grQty: 10, grDate: '02/01/2026' },
-    { lineNum: 20, material: '400501', description: 'Flight Computer FC-MK4', qty: 5, unit: 'EA', unitPrice: 22000.00, amount: 110000.00, grQty: 5, grDate: '02/01/2026' },
-    { lineNum: 30, material: '400502', description: 'Integration Test Kit ITK-AV', qty: 1, unit: 'LS', unitPrice: 12500.00, amount: 12500.00, grQty: 1, grDate: '02/01/2026' },
+  '3900049229': [
+    { lineNum: 10, material: '1001535', description: 'HB ARNOLD PALMER SPIKED (4X6) 24PK 12OZ', qty: 10, unit: 'EA', unitPrice: 18750.00, amount: 187500.00, grQty: 10, grDate: '02/01/2026' },
+    { lineNum: 20, material: '1000953', description: 'AZ HARD GREEN TEA 24PK 12OZ CAN SLEEK', qty: 5, unit: 'EA', unitPrice: 22000.00, amount: 110000.00, grQty: 5, grDate: '02/01/2026' },
+    { lineNum: 30, material: '1000951', description: 'AZ HARD LEMON TEA 24PK 12OZ CAN SLEEK', qty: 1, unit: 'LS', unitPrice: 12500.00, amount: 12500.00, grQty: 1, grDate: '02/01/2026' },
   ],
-  '4500099012': [
-    { lineNum: 10, material: '500200', description: 'Hex Bolt M10x40 Gr 8.8', qty: 500, unit: 'EA', unitPrice: 2.80, amount: 1400.00, grQty: 500, grDate: '02/02/2026' },
-    { lineNum: 20, material: '500201', description: 'Lock Washer M10 SS304', qty: 500, unit: 'EA', unitPrice: 1.20, amount: 600.00, grQty: 500, grDate: '02/02/2026' },
-    { lineNum: 30, material: '500202', description: 'Flange Nut M10 Zinc Plated', qty: 750, unit: 'EA', unitPrice: 1.90, amount: 1425.00, grQty: 500, grDate: '02/02/2026' },
-    { lineNum: 40, material: '500203', description: 'Flat Washer M10 USS', qty: 500, unit: 'EA', unitPrice: 0.85, amount: 425.00, grQty: 350, grDate: '02/02/2026' },
+  '3900051500': [
+    { lineNum: 10, material: '500200', description: 'Shrink Wrap Film 18" Roll', qty: 500, unit: 'EA', unitPrice: 2.80, amount: 1400.00, grQty: 500, grDate: '02/02/2026' },
+    { lineNum: 20, material: '500201', description: 'Label Adhesive Industrial 5gal', qty: 500, unit: 'EA', unitPrice: 1.20, amount: 600.00, grQty: 500, grDate: '02/02/2026' },
+    { lineNum: 30, material: '500202', description: 'Pallet Corner Protectors', qty: 750, unit: 'EA', unitPrice: 1.90, amount: 1425.00, grQty: 500, grDate: '02/02/2026' },
+    { lineNum: 40, material: '500203', description: 'Stretch Band Wrap 20"', qty: 500, unit: 'EA', unitPrice: 0.85, amount: 425.00, grQty: 350, grDate: '02/02/2026' },
   ],
 };
 
@@ -477,13 +478,13 @@ export const lineMatchResults = {
 
 // Exception line details — for ExceptionReview line-level table
 export const exceptionLineDetails = {
-  // Lockheed Martin — INV-2026-045233 (id: 3)
+  // US Bottlers Machinery — VND-INV-004233 (id: 3)
   3: [
     { lineNum: 1, exceptionType: null, field: null, invoiceVal: '$18,750.00', poVal: '$18,750.00', variance: '0%', aiSuggestion: 'Exact match — no action needed' },
     { lineNum: 2, exceptionType: 'Price Variance', field: 'Unit Price', invoiceVal: '$22,500.00', poVal: '$22,000.00', variance: '+2.27%', aiSuggestion: 'Contract escalation clause ZPR0 allows up to 3% — approve' },
     { lineNum: 3, exceptionType: null, field: null, invoiceVal: '$12,500.00', poVal: '$12,500.00', variance: '0%', aiSuggestion: 'Exact match — no action needed' },
   ],
-  // Fastenal — INV-FS-9920 (id: 5)
+  // Avenel Truck & Equipment — VND-INV-009920 (id: 5)
   5: [
     { lineNum: 1, exceptionType: null, field: null, invoiceVal: '500 EA', poVal: '500 EA', variance: '0%', aiSuggestion: 'Exact match' },
     { lineNum: 2, exceptionType: null, field: null, invoiceVal: '500 EA', poVal: '500 EA', variance: '0%', aiSuggestion: 'Exact match' },

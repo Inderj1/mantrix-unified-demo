@@ -1,0 +1,40 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+ap:rule_amount_patterns a mantrix:BusinessRule ;
+    rdfs:label "Amount Field Patterns" ;
+    rdfs:comment "How to interpret amounts across AP tables. Critical: ACDOCA.HSL is NEGATIVE for vendor invoices." ;
+    mantrix:ruleDefinition """Amount fields and sign conventions:
+
+ACDOCA (Universal Journal):
+  HSL = local currency amount
+  - Vendor invoices: HSL is NEGATIVE (credit to vendor)
+  - Payments: HSL is POSITIVE (debit to vendor)
+  - ALWAYS use ABS(HSL) for display
+  WSL = document currency amount
+
+RBKP (Invoice Header):
+  RMWWR = gross invoice amount (always positive)
+  WMWST1 = tax amount
+
+RSEG (Invoice Item):
+  WRBTR = doc currency amount (positive)
+  DMBTR = local currency amount (positive)
+
+EKPO (PO Item):
+  NETPR = unit price
+  NETWR = total value = NETPR * MENGE
+
+EKBE (PO History):
+  DMBTR = local currency amount
+  SHKZG = 'S' (debit/positive) or 'H' (credit/negative)
+
+REGUH (Payment):
+  RWBTR = total payment amount (positive)
+
+Currency fields:
+  RHCUR / WAERS = local currency
+  RWCUR = document currency""" .

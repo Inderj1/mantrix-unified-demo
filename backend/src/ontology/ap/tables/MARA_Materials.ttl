@@ -1,0 +1,47 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: MARA_Materials — Material Master
+# ============================================================================
+# Material master data. One row per material. Contains material type,
+# material group, UoM, valuation class, and prices.
+# Dimension table for spend analysis and material-based reporting.
+# ============================================================================
+
+ap:MARA_Materials a owl:Class ;
+    rdfs:label "MARA_Materials" ;
+    rdfs:comment "Material master. One row per material number. Contains material description, type, group, UoM, and valuation data. Used for spend categorization and material-based analysis." ;
+    bq:table "MARA_Materials" ; bq:primaryKey "MATNR" ;
+    skos:altLabel "material" , "material master" , "MARA" , "part" , "item" ;
+    mantrix:sapTable "MARA + MAKT (descriptions)" ; mantrix:sapTransaction "MM03 (display material)" ;
+    mantrix:relatedConcepts "EKPO_POItems, RSEG_InvoiceItems, MATDOC_GoodsReceipts" .
+
+# --- Columns ---
+ap:MARA_MATNR a owl:DatatypeProperty ; rdfs:label "Material Number" ; bq:column "MATNR" ; bq:type "STRING" ; rdfs:comment "Unique material identifier." .
+ap:MARA_MAKTX a owl:DatatypeProperty ; rdfs:label "Material Description" ; bq:column "MAKTX" ; bq:type "STRING" ; rdfs:comment "Material description text. Searchable." .
+ap:MARA_MTART a owl:DatatypeProperty ; rdfs:label "Material Type" ; bq:column "MTART" ; bq:type "STRING" ;
+    mantrix:valueMap "ROH=Raw material, HALB=Semi-finished, FERT=Finished, HIBE=Operating supplies, DIEN=Service, NLAG=Non-stock" .
+ap:MARA_MATKL a owl:DatatypeProperty ; rdfs:label "Material Group" ; bq:column "MATKL" ; bq:type "STRING" ; rdfs:comment "Material group for spend categorization." .
+ap:MARA_MEINS a owl:DatatypeProperty ; rdfs:label "Base UoM" ; bq:column "MEINS" ; bq:type "STRING" .
+ap:MARA_BKLAS a owl:DatatypeProperty ; rdfs:label "Valuation Class" ; bq:column "BKLAS" ; bq:type "STRING" ; rdfs:comment "Determines GL account for inventory posting." .
+ap:MARA_STPRS a owl:DatatypeProperty ; rdfs:label "Standard Price" ; bq:column "STPRS" ; bq:type "FLOAT" ; rdfs:comment "Standard price per unit. Used for standard cost variance analysis." .
+ap:MARA_VERPR a owl:DatatypeProperty ; rdfs:label "Moving Avg Price" ; bq:column "VERPR" ; bq:type "FLOAT" ; rdfs:comment "Moving average price. Updated with each GR." .
+
+# --- Example Questions & SQL ---
+ap:MARA_q1 mantrix:exampleQuestion "Top materials by PO spend" ;
+    mantrix:exampleSQL "SELECT m.MATNR, m.MAKTX, m.MATKL, SUM(p.NETWR) as total_spend, COUNT(*) as po_items FROM MARA_Materials m JOIN EKPO_POItems p ON m.MATNR = p.MATNR WHERE p.LOEKZ IS NULL GROUP BY m.MATNR, m.MAKTX, m.MATKL ORDER BY total_spend DESC LIMIT 20" .
+ap:MARA_q2 mantrix:exampleQuestion "Materials by type" ;
+    mantrix:exampleSQL "SELECT MTART, COUNT(*) as material_count FROM MARA_Materials GROUP BY MTART ORDER BY material_count DESC" .
+ap:MARA_q3 mantrix:exampleQuestion "Material price variance (standard vs moving avg)" ;
+    mantrix:exampleSQL "SELECT MATNR, MAKTX, STPRS, VERPR, VERPR - STPRS as variance, (VERPR - STPRS) / NULLIF(STPRS, 0) * 100 as variance_pct FROM MARA_Materials WHERE STPRS > 0 AND ABS(VERPR - STPRS) / NULLIF(STPRS, 0) > 0.1 ORDER BY ABS(variance_pct) DESC" .
+
+# --- Edge Cases ---
+ap:MARA_edge1 mantrix:edgeCases "Service items (MTART='DIEN') typically don't have MATNR in EKPO — the PO uses free text (TXZ01) instead." .
+ap:MARA_edge2 mantrix:edgeCases "STPRS is standard price (S price control). VERPR is moving average price (V price control). Only one is active per material." .

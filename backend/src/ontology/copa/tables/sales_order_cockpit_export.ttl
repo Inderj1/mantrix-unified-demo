@@ -1,0 +1,166 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix copa: <http://mantrix.ai/ontology/copa#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: sales_order_cockpit_export — Sales Order Cockpit
+# ============================================================================
+# End-to-end sales order lifecycle table. Each row represents a sales order
+# line item with full document flow: order → delivery → billing.
+# Contains order status, delivery status, billing status, customer/ship-to
+# parties, material info, quantities, pricing, and KPI flags (OTIF, late
+# delivery, backorder, fill rate).
+# Joins to dataset_25m_table via LTRIM(Sales_Order_KDAUF, '0') = SalesDocument_VBELN.
+# ============================================================================
+
+copa:sales_order_cockpit_export a owl:Class ;
+    rdfs:label "sales_order_cockpit_export" ;
+    rdfs:comment "Sales order cockpit table. One row per order line item with full document flow: order, delivery, billing. Contains customer parties (sold-to, ship-to, bill-to, payer at both header and item level), material info, quantities, pricing, delivery dates, shipment details, and KPI flags (OTIF, on-time, in-full, backorder, fill rate)." ;
+    bq:table "sales_order_cockpit_export" ;
+    bq:primaryKey "SalesDocument_VBELN, Item_POSNR" ;
+    skos:altLabel "sales order" , "order" , "cockpit" , "delivery" , "shipment" , "OTC" , "order-to-cash" , "fulfillment" ;
+    mantrix:sapTable "VBAK/VBAP/LIKP/LIPS/VBRK/VBRP (composite)" ;
+    mantrix:sapTransaction "VA03 (display order), VL03N (display delivery), VF03 (display billing)" ;
+    mantrix:relatedConcepts "dataset_25m_table" ;
+    mantrix:businessRule "Join to COPA via LTRIM(dataset_25m_table.Sales_Order_KDAUF, '0') = sales_order_cockpit_export.SalesDocument_VBELN. Direct equality will NOT work due to leading zeros in COPA." .
+
+# --- Order Identification ---
+copa:soc_SalesDocument_VBELN a owl:DatatypeProperty ; rdfs:label "Sales Document Number" ; bq:column "SalesDocument_VBELN" ; bq:type "STRING" ; rdfs:comment "Sales order number (without leading zeros). Primary key part 1. Join to COPA via LTRIM(Sales_Order_KDAUF, '0')." .
+copa:soc_Item_POSNR a owl:DatatypeProperty ; rdfs:label "Item Number" ; bq:column "Item_POSNR" ; bq:type "STRING" ; rdfs:comment "Sales order item number. Primary key part 2." .
+copa:soc_SalesDocumentType_AUART a owl:DatatypeProperty ; rdfs:label "Document Type" ; bq:column "SalesDocumentType_AUART" ; bq:type "STRING" ; rdfs:comment "Sales document type (OR=Standard, RE=Return, ZOR=Custom)." ; mantrix:valueMap "OR=Standard Order, RE=Return, CR=Credit Memo, DR=Debit Memo" .
+copa:soc_DocumentCategory_VBTYP a owl:DatatypeProperty ; rdfs:label "Document Category" ; bq:column "DocumentCategory_VBTYP" ; bq:type "STRING" ; rdfs:comment "Document category code." .
+copa:soc_DocumentDate_AUDAT a owl:DatatypeProperty ; rdfs:label "Document Date" ; bq:column "DocumentDate_AUDAT" ; bq:type "DATE" ; rdfs:comment "Sales order document date." .
+copa:soc_Header_Creation_Date a owl:DatatypeProperty ; rdfs:label "Header Creation Date" ; bq:column "Header_Creation_Date" ; bq:type "DATE" ; rdfs:comment "Sales order header creation date." .
+copa:soc_CreationDate_ERDAT a owl:DatatypeProperty ; rdfs:label "Item Creation Date" ; bq:column "CreationDate_ERDAT" ; bq:type "DATE" ; rdfs:comment "Sales order item creation date." .
+copa:soc_CustomerPurchaseOrderNumber_BSTNK a owl:DatatypeProperty ; rdfs:label "Customer PO Number" ; bq:column "CustomerPurchaseOrderNumber_BSTNK" ; bq:type "STRING" ; rdfs:comment "Customer's purchase order number." .
+
+# --- Customer Parties (Item Level) ---
+copa:soc_SoldToParty_KUNNR a owl:DatatypeProperty ; rdfs:label "Sold-To Party" ; bq:column "SoldToParty_KUNNR" ; bq:type "STRING" ; rdfs:comment "Sold-to party customer number. Key customer ID for join to COPA via Customer field." .
+copa:soc_SoldToPartyItemName_KUNNR a owl:DatatypeProperty ; rdfs:label "Sold-To Party Item Name" ; bq:column "SoldToPartyItemName_KUNNR" ; bq:type "STRING" .
+copa:soc_ShipToPartyItem_KUNNR a owl:DatatypeProperty ; rdfs:label "Ship-To Party" ; bq:column "ShipToPartyItem_KUNNR" ; bq:type "STRING" .
+copa:soc_ShipToPartyItemName_KUNNR a owl:DatatypeProperty ; rdfs:label "Ship-To Party Name" ; bq:column "ShipToPartyItemName_KUNNR" ; bq:type "STRING" .
+copa:soc_BillToPartyItem_KUNNR a owl:DatatypeProperty ; rdfs:label "Bill-To Party" ; bq:column "BillToPartyItem_KUNNR" ; bq:type "STRING" .
+copa:soc_PayerItem_KUNNR a owl:DatatypeProperty ; rdfs:label "Payer" ; bq:column "PayerItem_KUNNR" ; bq:type "STRING" .
+
+# --- Customer Parties (Header Level) ---
+copa:soc_SoldToPartyHeaderName_KUNNR a owl:DatatypeProperty ; rdfs:label "Sold-To Party Header Name" ; bq:column "SoldToPartyHeaderName_KUNNR" ; bq:type "STRING" .
+copa:soc_ShipToPartyHeaderName_KUNNR a owl:DatatypeProperty ; rdfs:label "Ship-To Party Header Name" ; bq:column "ShipToPartyHeaderName_KUNNR" ; bq:type "STRING" .
+copa:soc_PayerHeaderName_KUNNR a owl:DatatypeProperty ; rdfs:label "Payer Header Name" ; bq:column "PayerHeaderName_KUNNR" ; bq:type "STRING" .
+
+# --- Customer Details ---
+copa:soc_CustomerNumber a owl:DatatypeProperty ; rdfs:label "Customer Number" ; bq:column "CustomerNumber" ; bq:type "STRING" .
+copa:soc_CustomerName1 a owl:DatatypeProperty ; rdfs:label "Customer Name" ; bq:column "CustomerName1" ; bq:type "STRING" ; rdfs:comment "Primary customer name." .
+copa:soc_City a owl:DatatypeProperty ; rdfs:label "City" ; bq:column "City" ; bq:type "STRING" .
+copa:soc_Country a owl:DatatypeProperty ; rdfs:label "Country" ; bq:column "Country" ; bq:type "STRING" .
+copa:soc_CustomerRegion a owl:DatatypeProperty ; rdfs:label "Customer Region" ; bq:column "CustomerRegion" ; bq:type "STRING" .
+copa:soc_Sales_District_Region a owl:DatatypeProperty ; rdfs:label "Sales District Region" ; bq:column "Sales_District_Region" ; bq:type "STRING" .
+
+# --- Material / Product ---
+copa:soc_MaterialNumber a owl:DatatypeProperty ; rdfs:label "Material Number" ; bq:column "MaterialNumber" ; bq:type "STRING" ; rdfs:comment "Material number. Join to COPA via Material_Number." .
+copa:soc_MaterialDescription a owl:DatatypeProperty ; rdfs:label "Material Description" ; bq:column "MaterialDescription" ; bq:type "STRING" .
+copa:soc_MaterialType a owl:DatatypeProperty ; rdfs:label "Material Type" ; bq:column "MaterialType" ; bq:type "STRING" .
+copa:soc_Materialgroup_Matkl a owl:DatatypeProperty ; rdfs:label "Material Group" ; bq:column "Materialgroup_Matkl" ; bq:type "STRING" .
+copa:soc_Brand a owl:DatatypeProperty ; rdfs:label "Brand" ; bq:column "Brand" ; bq:type "STRING" .
+copa:soc_ProductCategory a owl:DatatypeProperty ; rdfs:label "Product Category" ; bq:column "ProductCategory" ; bq:type "STRING" .
+copa:soc_Division a owl:DatatypeProperty ; rdfs:label "Division" ; bq:column "Division" ; bq:type "STRING" .
+
+# --- Sales Organization ---
+copa:soc_SalesOrganization a owl:DatatypeProperty ; rdfs:label "Sales Organization" ; bq:column "SalesOrganization" ; bq:type "STRING" .
+copa:soc_DistributionChannel a owl:DatatypeProperty ; rdfs:label "Distribution Channel" ; bq:column "DistributionChannel" ; bq:type "STRING" .
+copa:soc_ShippingLocation a owl:DatatypeProperty ; rdfs:label "Shipping Location" ; bq:column "ShippingLocation" ; bq:type "STRING" .
+
+# --- Order Quantities & Pricing ---
+copa:soc_SalesOrderQty a owl:DatatypeProperty ; rdfs:label "Sales Order Qty" ; bq:column "SalesOrderQty" ; bq:type "NUMERIC" ; rdfs:comment "Ordered quantity." .
+copa:soc_SalesOrderNetPrice a owl:DatatypeProperty ; rdfs:label "Sales Order Net Price" ; bq:column "SalesOrderNetPrice" ; bq:type "NUMERIC" .
+copa:soc_SalesOrderNetValue a owl:DatatypeProperty ; rdfs:label "Sales Order Net Value" ; bq:column "SalesOrderNetValue" ; bq:type "NUMERIC" ; rdfs:comment "Total net value of the sales order." .
+copa:soc_SalesOrderValue a owl:DatatypeProperty ; rdfs:label "Sales Order Value" ; bq:column "SalesOrderValue" ; bq:type "NUMERIC" .
+copa:soc_ListPrice a owl:DatatypeProperty ; rdfs:label "List Price" ; bq:column "ListPrice" ; bq:type "NUMERIC" .
+copa:soc_AdjustedPrice a owl:DatatypeProperty ; rdfs:label "Adjusted Price" ; bq:column "AdjustedPrice" ; bq:type "NUMERIC" .
+copa:soc_InterCompanyPrice a owl:DatatypeProperty ; rdfs:label "InterCompany Price" ; bq:column "InterCompanyPrice" ; bq:type "NUMERIC" .
+copa:soc_Discount a owl:DatatypeProperty ; rdfs:label "Discount" ; bq:column "Discount" ; bq:type "NUMERIC" .
+copa:soc_ConfirmedOrderQuantity_BMENG a owl:DatatypeProperty ; rdfs:label "Confirmed Order Qty" ; bq:column "ConfirmedOrderQuantity_BMENG" ; bq:type "NUMERIC" .
+
+# --- Delivery ---
+copa:soc_Delivery_VBELN a owl:DatatypeProperty ; rdfs:label "Delivery Number" ; bq:column "Delivery_VBELN" ; bq:type "STRING" .
+copa:soc_DeliveryType_LFART a owl:DatatypeProperty ; rdfs:label "Delivery Type" ; bq:column "DeliveryType_LFART" ; bq:type "STRING" .
+copa:soc_Delivery_Creation_Date a owl:DatatypeProperty ; rdfs:label "Delivery Creation Date" ; bq:column "Delivery_Creation_Date" ; bq:type "DATE" .
+copa:soc_DeliveryDate_LFDAT a owl:DatatypeProperty ; rdfs:label "Delivery Date" ; bq:column "DeliveryDate_LFDAT" ; bq:type "DATE" ; rdfs:comment "Planned delivery date." .
+copa:soc_Requesteddeliverydate_VDATU a owl:DatatypeProperty ; rdfs:label "Requested Delivery Date" ; bq:column "Requesteddeliverydate_VDATU" ; bq:type "DATE" .
+copa:soc_ActualGoodsMovementDate_WADAT_IST a owl:DatatypeProperty ; rdfs:label "Actual Goods Movement Date" ; bq:column "ActualGoodsMovementDate_WADAT_IST" ; bq:type "DATE" ; rdfs:comment "PGI date — actual goods issue." .
+copa:soc_ActualQuantityDelivered_LFIMG a owl:DatatypeProperty ; rdfs:label "Delivered Qty (Sales Units)" ; bq:column "ActualQuantityDelivered_InSalesUnits_LFIMG" ; bq:type "NUMERIC" .
+copa:soc_OPEN_DELIVERY_QTY a owl:DatatypeProperty ; rdfs:label "Open Delivery Qty" ; bq:column "OPEN_DELIVERY_QTY" ; bq:type "NUMERIC" .
+copa:soc_Delivery_Block_Status a owl:DatatypeProperty ; rdfs:label "Delivery Block Status" ; bq:column "Delivery_Block_Status" ; bq:type "STRING" .
+
+# --- Billing ---
+copa:soc_BillingDocument_VBELN a owl:DatatypeProperty ; rdfs:label "Billing Document" ; bq:column "BillingDocument_VBELN" ; bq:type "STRING" .
+copa:soc_BillingDate_FKDAT a owl:DatatypeProperty ; rdfs:label "Billing Date" ; bq:column "BillingDate_FKDAT" ; bq:type "DATE" .
+copa:soc_BillingNetValue a owl:DatatypeProperty ; rdfs:label "Billing Net Value" ; bq:column "BillingNetValue" ; bq:type "NUMERIC" .
+copa:soc_BilledQty a owl:DatatypeProperty ; rdfs:label "Billed Qty" ; bq:column "BilledQty" ; bq:type "NUMERIC" .
+copa:soc_TaxAmount_MWSBK a owl:DatatypeProperty ; rdfs:label "Tax Amount" ; bq:column "TaxAmount_MWSBK" ; bq:type "NUMERIC" .
+copa:soc_Rebate a owl:DatatypeProperty ; rdfs:label "Rebate" ; bq:column "Rebate" ; bq:type "NUMERIC" .
+
+# --- Shipment ---
+copa:soc_Shipment_Number a owl:DatatypeProperty ; rdfs:label "Shipment Number" ; bq:column "Shipment_Number" ; bq:type "STRING" .
+copa:soc_Shipment_Type a owl:DatatypeProperty ; rdfs:label "Shipment Type" ; bq:column "Shipment_Type" ; bq:type "STRING" .
+copa:soc_Shipment_Type_Desc a owl:DatatypeProperty ; rdfs:label "Shipment Type Description" ; bq:column "Shipment_Type_Desc" ; bq:type "STRING" .
+copa:soc_SalesOrder_Route a owl:DatatypeProperty ; rdfs:label "Route" ; bq:column "SalesOrder_Route" ; bq:type "STRING" .
+
+# --- Status Fields ---
+copa:soc_SalesOrderDeliveryStatus_LFGSK a owl:DatatypeProperty ; rdfs:label "Order Delivery Status" ; bq:column "SalesOrderDeliveryStatus_LFGSK" ; bq:type "STRING" .
+copa:soc_OverallBillingStatus_LSSTK a owl:DatatypeProperty ; rdfs:label "Overall Billing Status" ; bq:column "OverallBillingStatus_LSSTK" ; bq:type "STRING" .
+copa:soc_SalesOrderProcessingStatus_GBSTK a owl:DatatypeProperty ; rdfs:label "Order Processing Status" ; bq:column "SalesOrderProcessingStatus_GBSTK" ; bq:type "STRING" .
+copa:soc_GoodsMovementStatus_WBSTK a owl:DatatypeProperty ; rdfs:label "Goods Movement Status" ; bq:column "GoodsMovementStatus_WBSTK" ; bq:type "STRING" .
+copa:soc_OverallProcessingStatus_GBSTA a owl:DatatypeProperty ; rdfs:label "Overall Processing Status" ; bq:column "OverallProcessingStatus_GBSTA" ; bq:type "STRING" .
+copa:soc_RejectionReason_ABGRU a owl:DatatypeProperty ; rdfs:label "Rejection Reason" ; bq:column "RejectionReason_ABGRU" ; bq:type "STRING" .
+copa:soc_BlockedSalesOrder a owl:DatatypeProperty ; rdfs:label "Blocked Sales Order" ; bq:column "BlockedSalesOrder" ; bq:type "STRING" .
+
+# --- KPI Flags ---
+copa:soc_OnTimeDelivery a owl:DatatypeProperty ; rdfs:label "On-Time Delivery" ; bq:column "OnTimeDelivery" ; bq:type "STRING" ; rdfs:comment "Flag: Y/N whether delivery was on time." .
+copa:soc_InFullDelivery a owl:DatatypeProperty ; rdfs:label "In-Full Delivery" ; bq:column "InFullDelivery" ; bq:type "STRING" ; rdfs:comment "Flag: Y/N whether full quantity was delivered." .
+copa:soc_OTIF a owl:DatatypeProperty ; rdfs:label "OTIF" ; bq:column "OTIF" ; bq:type "STRING" ; rdfs:comment "On-Time In-Full flag. Y only if both on-time AND in-full." .
+copa:soc_LateDeliveries a owl:DatatypeProperty ; rdfs:label "Late Deliveries" ; bq:column "LateDeliveries" ; bq:type "STRING" ; rdfs:comment "Flag for late delivery." .
+copa:soc_BackOrder a owl:DatatypeProperty ; rdfs:label "Back Order" ; bq:column "BackOrder" ; bq:type "STRING" ; rdfs:comment "Flag for backordered items." .
+copa:soc_OpenOrder a owl:DatatypeProperty ; rdfs:label "Open Order" ; bq:column "OpenOrder" ; bq:type "STRING" .
+copa:soc_ReturnOrder a owl:DatatypeProperty ; rdfs:label "Return Order" ; bq:column "ReturnOrder" ; bq:type "STRING" .
+copa:soc_CanceledOrder a owl:DatatypeProperty ; rdfs:label "Canceled Order" ; bq:column "CanceledOrder" ; bq:type "STRING" .
+copa:soc_FillRatePercent a owl:DatatypeProperty ; rdfs:label "Fill Rate %" ; bq:column "FillRatePercent" ; bq:type "NUMERIC" ; rdfs:comment "Order fill rate percentage." .
+copa:soc_OrderCycleTimeInDays a owl:DatatypeProperty ; rdfs:label "Order Cycle Time (Days)" ; bq:column "OrderCycleTimeInDays" ; bq:type "INTEGER" ; rdfs:comment "Days from order creation to delivery." .
+
+# --- Aggregate Counts ---
+copa:soc_TotalOrders a owl:DatatypeProperty ; rdfs:label "Total Orders" ; bq:column "TotalOrders" ; bq:type "INTEGER" .
+copa:soc_TotalOrderItems a owl:DatatypeProperty ; rdfs:label "Total Order Items" ; bq:column "TotalOrderItems" ; bq:type "INTEGER" .
+copa:soc_TotalDeliveries a owl:DatatypeProperty ; rdfs:label "Total Deliveries" ; bq:column "TotalDeliveries" ; bq:type "INTEGER" .
+copa:soc_Open_QTY a owl:DatatypeProperty ; rdfs:label "Open Qty" ; bq:column "Open_QTY" ; bq:type "NUMERIC" .
+
+# --- Weight & Volume ---
+copa:soc_GrossWeight_BRGEW a owl:DatatypeProperty ; rdfs:label "Gross Weight" ; bq:column "GrossWeight_BRGEW" ; bq:type "NUMERIC" .
+copa:soc_NetWeight_NTGEW a owl:DatatypeProperty ; rdfs:label "Net Weight" ; bq:column "NetWeight_NTGEW" ; bq:type "NUMERIC" .
+copa:soc_Volume_VOLUM a owl:DatatypeProperty ; rdfs:label "Volume" ; bq:column "Volume_VOLUM" ; bq:type "NUMERIC" .
+
+# --- Join Paths ---
+copa:soc_join_dataset25m a mantrix:joinPath ; rdfs:label "Sales Order → COPA" ; rdfs:comment "LTRIM(dataset_25m_table.Sales_Order_KDAUF, '0') = sales_order_cockpit_export.SalesDocument_VBELN. CRITICAL: Must use LTRIM to strip leading zeros from COPA side." .
+copa:soc_join_dataset25m_customer a mantrix:joinPath ; rdfs:label "Sales Order → COPA (by customer)" ; rdfs:comment "sales_order_cockpit_export.SoldToParty_KUNNR = dataset_25m_table.Customer" .
+copa:soc_join_dataset25m_material a mantrix:joinPath ; rdfs:label "Sales Order → COPA (by material)" ; rdfs:comment "sales_order_cockpit_export.MaterialNumber = dataset_25m_table.Material_Number" .
+
+# --- Example Questions & SQL ---
+copa:soc_q1 mantrix:exampleQuestion "Show all open sales orders" ;
+    mantrix:exampleSQL "SELECT SalesDocument_VBELN, Item_POSNR, SoldToPartyHeaderName_KUNNR, MaterialDescription, SalesOrderQty, Open_QTY, Requesteddeliverydate_VDATU FROM sales_order_cockpit_export WHERE OpenOrder = 'Y' ORDER BY Requesteddeliverydate_VDATU" .
+copa:soc_q2 mantrix:exampleQuestion "OTIF rate by customer" ;
+    mantrix:exampleSQL "SELECT SoldToPartyHeaderName_KUNNR as customer, COUNT(*) as total_lines, COUNTIF(OTIF = 'Y') as otif_lines, ROUND(COUNTIF(OTIF = 'Y') / COUNT(*) * 100, 2) as otif_pct FROM sales_order_cockpit_export GROUP BY SoldToPartyHeaderName_KUNNR ORDER BY total_lines DESC" .
+copa:soc_q3 mantrix:exampleQuestion "Late deliveries this month" ;
+    mantrix:exampleSQL "SELECT SalesDocument_VBELN, Delivery_VBELN, SoldToPartyHeaderName_KUNNR, MaterialDescription, Requesteddeliverydate_VDATU, ActualGoodsMovementDate_WADAT_IST, OrderCycleTimeInDays FROM sales_order_cockpit_export WHERE LateDeliveries = 'Y' AND ActualGoodsMovementDate_WADAT_IST >= DATE_TRUNC(CURRENT_DATE(), MONTH)" .
+copa:soc_q4 mantrix:exampleQuestion "Sales order value by customer" ;
+    mantrix:exampleSQL "SELECT SoldToPartyHeaderName_KUNNR as customer, COUNT(DISTINCT SalesDocument_VBELN) as order_count, ROUND(SUM(SalesOrderNetValue), 2) as total_value, ROUND(SUM(BillingNetValue), 2) as billed_value FROM sales_order_cockpit_export GROUP BY SoldToPartyHeaderName_KUNNR ORDER BY total_value DESC LIMIT 20" .
+copa:soc_q5 mantrix:exampleQuestion "Backorder analysis by product" ;
+    mantrix:exampleSQL "SELECT MaterialDescription, Brand, COUNT(*) as backorder_lines, SUM(Open_QTY) as total_open_qty, SUM(SalesOrderValue) as backorder_value FROM sales_order_cockpit_export WHERE BackOrder = 'Y' GROUP BY MaterialDescription, Brand ORDER BY backorder_value DESC" .
+
+# --- Edge Cases ---
+copa:soc_edge1 mantrix:edgeCases "SalesDocument_VBELN has NO leading zeros, but COPA Sales_Order_KDAUF HAS leading zeros. Must use LTRIM for joins. Direct equality will match < 0.01% of records." .
+copa:soc_edge2 mantrix:edgeCases "Customer parties exist at both header and item level. Header-level parties (SoldToPartyHeaderName_KUNNR) are consistent across items; item-level parties can differ for multi-ship-to orders." .
+copa:soc_edge3 mantrix:edgeCases "KPI flags (OTIF, OnTimeDelivery, InFullDelivery, LateDeliveries, BackOrder) are STRING 'Y'/'N', not booleans. Use = 'Y' for filtering, COUNTIF(flag = 'Y') for aggregation." .
+copa:soc_edge4 mantrix:edgeCases "BillingNetValue and SalesOrderNetValue may differ due to partial billing, returns, or pricing adjustments." .

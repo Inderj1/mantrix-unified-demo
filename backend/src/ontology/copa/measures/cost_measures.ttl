@@ -1,0 +1,43 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix copa: <http://mantrix.ai/ontology/copa#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# COPA Measures: Cost (COGS, Ingredients, Packaging, Freight)
+# ============================================================================
+
+copa:measure_cogs a mantrix:Measure ;
+    rdfs:label "Cost of Goods Sold" ;
+    rdfs:comment "Direct cost of goods sold." ;
+    skos:altLabel "COGS" , "cost of sales" , "direct costs" , "COS" ;
+    mantrix:bqColumn "Cogs" ;
+    mantrix:aggregation "SUM" .
+
+copa:measure_total_cogs a mantrix:Measure ;
+    rdfs:label "Total COGS" ;
+    rdfs:comment "Total cost of goods sold including all cost components (ingredients + packaging + freight + other)." ;
+    mantrix:bqColumn "Total_COGS" ;
+    mantrix:aggregation "SUM" .
+
+copa:measure_ingredients a mantrix:Measure ;
+    rdfs:label "Ingredients Cost" ;
+    rdfs:comment "Raw material / ingredients cost component." ;
+    skos:altLabel "raw materials" , "ingredients" ;
+    mantrix:bqColumn "Ingredients" ;
+    mantrix:aggregation "SUM" .
+
+copa:measure_packaging a mantrix:Measure ;
+    rdfs:label "Packaging Cost" ;
+    rdfs:comment "Packaging material cost component." ;
+    mantrix:bqColumn "Packaging" ;
+    mantrix:aggregation "SUM" .
+
+copa:measure_incoming_freight a mantrix:Measure ;
+    rdfs:label "Incoming Freight" ;
+    rdfs:comment "Inbound freight and logistics cost." ;
+    skos:altLabel "freight" , "logistics cost" , "shipping cost" ;
+    mantrix:bqColumn "Incoming_Freight" ;
+    mantrix:aggregation "SUM" .

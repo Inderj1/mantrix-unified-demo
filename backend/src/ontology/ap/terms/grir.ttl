@@ -1,0 +1,22 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# Semantic Term: GR/IR (Goods Receipt / Invoice Receipt)
+# ============================================================================
+
+ap:term_grir a mantrix:SemanticTerm ;
+    rdfs:label "GR/IR" ;
+    rdfs:comment "Goods Receipt / Invoice Receipt clearing account. The bridge between receiving goods and receiving the invoice. DELTA = GR_VALUE - IR_VALUE. When GR and IR are equal, the clearing account balance is zero." ;
+    skos:altLabel "GRIR" , "GR/IR clearing" , "goods receipt invoice receipt" , "accrual" , "clearing account" ;
+    mantrix:canonicalEntity "GRIR_Reconciliation" ;
+    mantrix:disambiguation """GR/IR is a BALANCE SHEET account:
+- GR posted, no IR yet → DELTA > 0 → accrued liability (we received goods, owe money)
+- IR posted, no GR yet → DELTA < 0 → prepayment risk
+- GR = IR → DELTA = 0 → fully matched
+Source data: EKBE_POHistory with VGABE codes. Pre-computed: GRIR_Reconciliation table.""" ;
+    mantrix:relatedTerms "goods receipt, invoice receipt, accrual, clearing, period-end close" .

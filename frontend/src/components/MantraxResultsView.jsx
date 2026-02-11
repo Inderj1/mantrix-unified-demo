@@ -189,8 +189,11 @@ const MantraxResultsView = ({ query, sql, results, metadata, onClose }) => {
         return `$${parseFloat(value).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
       case 'percentage':
         return `${(parseFloat(value) * 100).toFixed(2)}%`;
-      case 'number':
-        return parseFloat(value).toLocaleString('en-US');
+      case 'number': {
+        const num = parseFloat(value);
+        if (Number.isInteger(num) && num >= 1900 && num <= 2099) return String(num);
+        return num.toLocaleString('en-US');
+      }
       case 'date':
         return new Date(value).toLocaleDateString();
       default:

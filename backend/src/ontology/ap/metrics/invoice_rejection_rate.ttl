@@ -1,0 +1,25 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+ap:metric_invoice_rejection_rate a mantrix:Metric ;
+    rdfs:label "Invoice Rejection Rate" ;
+    rdfs:comment "Percentage of invoices rejected (returned to vendor or reversed). High rejection = vendor data quality issues." ;
+    skos:altLabel "rejection rate" , "returned invoices" , "credit memo rate" ;
+    mantrix:category "quality" ;
+    mantrix:unit "percent" ;
+    mantrix:direction "lower_is_better" ;
+    mantrix:benchmark "<2% (best-in-class), 5-10% (average)" ;
+    mantrix:sourceTables "RBKP_InvoiceHeaders" ;
+    mantrix:dimensions "vendor, company_code" ;
+    mantrix:exampleQuestion "Invoice rejection/credit memo rate" ;
+    mantrix:exampleSQL """SELECT
+  COUNTIF(BLART = 'KG') * 100.0 / NULLIF(COUNTIF(BLART = 'RE'), 0) as credit_memo_rate,
+  COUNTIF(BLART = 'KG') as credit_memos,
+  COUNTIF(BLART = 'RE') as invoices
+FROM RBKP_InvoiceHeaders WHERE RBSTAT = '5'""" .

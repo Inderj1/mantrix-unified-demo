@@ -1,0 +1,14 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+ap:term_parked a mantrix:SemanticTerm ;
+    rdfs:label "parked" ;
+    rdfs:comment "Invoice saved but not yet posted. RBKP.RBSTAT = '1'. Parked invoices do NOT create an open item or vendor liability. They need to be posted (RBSTAT='5') to become payable." ;
+    skos:altLabel "saved" , "draft" , "not posted" , "preliminary" ;
+    mantrix:canonicalFilter "RBKP.RBSTAT = '1'" ;
+    mantrix:disambiguation "'parked' = saved but no accounting entry yet. 'posted' = RBSTAT='5', creates ACDOCA entry. Parked invoices are in RBKP but NOT in ACDOCA." ;
+    mantrix:relatedTerms "posted, RBSTAT, invoice status" .

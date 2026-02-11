@@ -1,0 +1,39 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# AP Metric: On-Time Payment Rate
+# ============================================================================
+
+ap:metric_payment_timing a mantrix:Metric ;
+    rdfs:label "On-Time Payment Rate" ;
+    rdfs:comment "Percentage of invoices paid on or before due date. Key vendor relationship metric. Late payments damage supplier trust and may incur penalties." ;
+    skos:altLabel "on-time payment" , "payment timeliness" , "OTP rate" , "late payment rate" ;
+    mantrix:category "vendor_performance" ;
+    mantrix:unit "percent" ;
+    mantrix:direction "higher_is_better" ;
+    mantrix:benchmark "90-95% (best-in-class), 70-80% (average)" ;
+    mantrix:sqlFormula "COUNTIF(PAYMENT_TIMING IN ('on_time','early')) * 100.0 / COUNT(*)" ;
+    mantrix:sourceTables "ACDOCA_UniversalJournal" ;
+    mantrix:dimensions "vendor, company_code, payment_method" ;
+    mantrix:exampleQuestion "What is our on-time payment rate?" ;
+    mantrix:exampleSQL """SELECT
+  COUNTIF(PAYMENT_TIMING = 'on_time' OR PAYMENT_TIMING = 'early') * 100.0 / COUNT(*) as on_time_pct,
+  COUNTIF(PAYMENT_TIMING = 'early') * 100.0 / COUNT(*) as early_pct,
+  COUNTIF(PAYMENT_TIMING = 'late') * 100.0 / COUNT(*) as late_pct
+FROM ACDOCA_UniversalJournal
+WHERE KOART = 'K' AND RLDNR = '0L' AND AUGBL IS NOT NULL""" ;
+    mantrix:exampleQuestion "Payment timing distribution" ;
+    mantrix:exampleSQL """SELECT PAYMENT_TIMING, COUNT(*) as count,
+  SUM(ABS(HSL)) as total_amount,
+  AVG(DAYS_VS_DUE) as avg_days_vs_due
+FROM ACDOCA_UniversalJournal
+WHERE KOART = 'K' AND RLDNR = '0L' AND AUGBL IS NOT NULL
+GROUP BY PAYMENT_TIMING""" ;
+    mantrix:edgeCases "PAYMENT_TIMING and DAYS_VS_DUE are Axis AI enriched. DAYS_VS_DUE: negative=early, 0=on time, positive=late." .

@@ -1,0 +1,32 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: T024E_PurchasingOrgs — Purchasing Organizations
+# ============================================================================
+# Organizational unit responsible for procurement activities.
+# Linked to company code. Used for buyer group analysis and PO filtering.
+# ============================================================================
+
+ap:T024E_PurchasingOrgs a owl:Class ;
+    rdfs:label "T024E_PurchasingOrgs" ;
+    rdfs:comment "Purchasing organization master. One row per purchasing org. Responsible for procurement activities within a company code." ;
+    bq:table "T024E_PurchasingOrgs" ; bq:primaryKey "EKORG" ;
+    skos:altLabel "purchasing org" , "procurement org" , "EKORG" , "T024E" ;
+    mantrix:sapTable "T024E" ;
+    mantrix:relatedConcepts "EKKO_POHeaders, T001_CompanyCodes" .
+
+# --- Columns ---
+ap:T024E_EKORG a owl:DatatypeProperty ; rdfs:label "Purchasing Org" ; bq:column "EKORG" ; bq:type "STRING" .
+ap:T024E_EKOTX a owl:DatatypeProperty ; rdfs:label "Description" ; bq:column "EKOTX" ; bq:type "STRING" .
+ap:T024E_BUKRS a owl:DatatypeProperty ; rdfs:label "Company Code" ; bq:column "BUKRS" ; bq:type "STRING" ; bq:foreignKey "T001_CompanyCodes.BUKRS" .
+
+# --- Example Questions & SQL ---
+ap:T024E_q1 mantrix:exampleQuestion "PO volume by purchasing org" ;
+    mantrix:exampleSQL "SELECT k.EKORG, e.EKOTX, COUNT(DISTINCT k.EBELN) as po_count, SUM(p.NETWR) as total_value FROM EKKO_POHeaders k JOIN T024E_PurchasingOrgs e ON k.EKORG = e.EKORG JOIN EKPO_POItems p ON k.EBELN = p.EBELN WHERE p.LOEKZ IS NULL GROUP BY k.EKORG, e.EKOTX ORDER BY total_value DESC" .

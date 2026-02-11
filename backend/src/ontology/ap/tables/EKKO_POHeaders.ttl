@@ -1,0 +1,61 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: EKKO_POHeaders — Purchase Order Headers
+# ============================================================================
+# Business: Legally binding commitment to procure goods/services from a supplier.
+# Header contains supplier, payment terms, currency, purchasing org.
+# Items are in EKPO_POItems joined via EBELN.
+# ============================================================================
+
+ap:EKKO_POHeaders a owl:Class ;
+    rdfs:label "EKKO_POHeaders" ;
+    rdfs:comment "Purchase order header table. One row per PO. Contains supplier, company code, doc type, payment terms, incoterms, and total target value." ;
+    bq:table "EKKO_POHeaders" ;
+    bq:primaryKey "EBELN" ;
+    skos:altLabel "PO" , "order" , "purchase order" , "procurement order" ;
+    mantrix:sapTable "EKKO" ;
+    mantrix:sapTransaction "ME23N (display PO)" ;
+    mantrix:relatedConcepts "EKPO_POItems, LFA1_Suppliers, EKKN_AcctAssignment, EKBE_POHistory, EBAN_PurchaseReqs" .
+
+# --- Columns ---
+ap:EKKO_EBELN a owl:DatatypeProperty ; rdfs:label "PO Number" ; bq:column "EBELN" ; bq:type "INTEGER" ; rdfs:comment "Purchase order number. Primary key. Join to EKPO, EKBE, EKKN, RSEG, MATDOC via EBELN." ; mantrix:sapField "EBELN" .
+ap:EKKO_BUKRS a owl:DatatypeProperty ; rdfs:label "Company Code" ; bq:column "BUKRS" ; bq:type "STRING" ; rdfs:comment "Company code owning this PO." ; bq:foreignKey "T001_CompanyCodes.BUKRS" .
+ap:EKKO_BSART a owl:DatatypeProperty ; rdfs:label "Document Type" ; bq:column "BSART" ; bq:type "STRING" ; rdfs:comment "PO document type." ; mantrix:valueMap "NB=Standard PO, FO=Framework Order, UB=Stock Transfer, ZNB=Custom Standard" .
+ap:EKKO_LIFNR a owl:DatatypeProperty ; rdfs:label "Supplier" ; bq:column "LIFNR" ; bq:type "INTEGER" ; rdfs:comment "Vendor number." ; bq:foreignKey "LFA1_Suppliers.LIFNR" .
+ap:EKKO_EKORG a owl:DatatypeProperty ; rdfs:label "Purchasing Org" ; bq:column "EKORG" ; bq:type "STRING" ; rdfs:comment "Purchasing organization responsible for this PO." ; bq:foreignKey "T024E_PurchasingOrgs.EKORG" .
+ap:EKKO_EKGRP a owl:DatatypeProperty ; rdfs:label "Purchasing Group" ; bq:column "EKGRP" ; bq:type "STRING" ; rdfs:comment "Purchasing group (buyer group) responsible." .
+ap:EKKO_WAERS a owl:DatatypeProperty ; rdfs:label "Currency" ; bq:column "WAERS" ; bq:type "STRING" ; rdfs:comment "PO currency (document currency)." .
+ap:EKKO_ZTERM a owl:DatatypeProperty ; rdfs:label "Payment Terms" ; bq:column "ZTERM" ; bq:type "STRING" ; rdfs:comment "Payment terms on PO. May differ from vendor master default." ; bq:foreignKey "T052_PaymentTerms.ZTERM" .
+ap:EKKO_INCO1 a owl:DatatypeProperty ; rdfs:label "Incoterms" ; bq:column "INCO1" ; bq:type "STRING" ; rdfs:comment "Incoterms (FOB, CIF, EXW, etc.)." .
+ap:EKKO_AEDAT a owl:DatatypeProperty ; rdfs:label "Created Date" ; bq:column "AEDAT" ; bq:type "DATE" ; rdfs:comment "PO creation date. Used for PR-to-PO cycle time calculation." .
+ap:EKKO_KTWRT a owl:DatatypeProperty ; rdfs:label "Target Value" ; bq:column "KTWRT" ; bq:type "FLOAT" ; rdfs:comment "Target value for framework/blanket POs. NULL for standard POs." .
+
+# --- Join Paths ---
+ap:EKKO_join_EKPO a mantrix:joinPath ; rdfs:label "PO → Items" ; rdfs:comment "EKKO_POHeaders.EBELN = EKPO_POItems.EBELN" .
+ap:EKKO_join_LFA1 a mantrix:joinPath ; rdfs:label "PO → Supplier" ; rdfs:comment "EKKO_POHeaders.LIFNR = LFA1_Suppliers.LIFNR" .
+ap:EKKO_join_EBAN a mantrix:joinPath ; rdfs:label "PO ← PR" ; rdfs:comment "EBAN_PurchaseReqs.EBELN = EKKO_POHeaders.EBELN (PR converted to this PO)" .
+ap:EKKO_join_T001 a mantrix:joinPath ; rdfs:label "PO → Company" ; rdfs:comment "EKKO_POHeaders.BUKRS = T001_CompanyCodes.BUKRS" .
+ap:EKKO_join_T052 a mantrix:joinPath ; rdfs:label "PO → Payment Terms" ; rdfs:comment "EKKO_POHeaders.ZTERM = T052_PaymentTerms.ZTERM" .
+
+# --- Example Questions & SQL ---
+ap:EKKO_q1 mantrix:exampleQuestion "Show all POs for vendor X" ;
+    mantrix:exampleSQL "SELECT h.EBELN, h.AEDAT, h.BSART, h.WAERS, SUM(i.NETWR) as total_value FROM EKKO_POHeaders h JOIN EKPO_POItems i ON h.EBELN = i.EBELN WHERE h.LIFNR = 1000001 GROUP BY h.EBELN, h.AEDAT, h.BSART, h.WAERS" .
+ap:EKKO_q2 mantrix:exampleQuestion "POs created this month" ;
+    mantrix:exampleSQL "SELECT EBELN, LIFNR, AEDAT, BSART FROM EKKO_POHeaders WHERE AEDAT >= DATE_TRUNC(CURRENT_DATE(), MONTH)" .
+ap:EKKO_q3 mantrix:exampleQuestion "Total PO value by company code" ;
+    mantrix:exampleSQL "SELECT h.BUKRS, t.BUTXT, COUNT(DISTINCT h.EBELN) as po_count, SUM(i.NETWR) as total_value FROM EKKO_POHeaders h JOIN EKPO_POItems i ON h.EBELN = i.EBELN JOIN T001_CompanyCodes t ON h.BUKRS = t.BUKRS GROUP BY h.BUKRS, t.BUTXT" .
+ap:EKKO_q4 mantrix:exampleQuestion "Framework orders with remaining value" ;
+    mantrix:exampleSQL "SELECT EBELN, LIFNR, KTWRT as target_value, AEDAT FROM EKKO_POHeaders WHERE BSART = 'FO' AND KTWRT > 0" .
+
+# --- Edge Cases ---
+ap:EKKO_edge1 mantrix:edgeCases "KTWRT (target value) is only populated for framework/blanket POs (BSART='FO'). For standard POs, total value = SUM(EKPO.NETWR)." .
+ap:EKKO_edge2 mantrix:edgeCases "ZTERM on PO can OVERRIDE the vendor master default. Always check PO-level ZTERM first, then fall back to LFA1.ZTERM." .
+ap:EKKO_edge3 mantrix:edgeCases "AEDAT is creation date, not last changed date. For change history, check CDHDR/CDPOS (not in BQ)." .

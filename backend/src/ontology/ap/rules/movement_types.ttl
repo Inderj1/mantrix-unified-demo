@@ -1,0 +1,26 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# Business Rule: Movement Types (BWART)
+# ============================================================================
+
+ap:rule_movement_types a mantrix:BusinessRule ;
+    rdfs:label "Movement Types (BWART)" ;
+    rdfs:comment "MATDOC.BWART determines the type of goods movement." ;
+    mantrix:ruleDefinition """BWART movement types in MATDOC_GoodsReceipts:
+- '101' → Goods receipt against PO (THE standard GR — use this for matching)
+- '102' → GR reversal (cancellation of a 101)
+- '103' → GR into blocked stock (quality inspection required)
+- '104' → Release from blocked stock reversal
+- '105' → Release from blocked to unrestricted
+- '122' → Return to vendor
+- '161' → GR for production order (not AP-relevant)
+
+For AP/matching queries: ALWAYS filter BWART = '101'
+For GR reversals: BWART = '102'
+For returns: BWART = '122'
+To count net GRs: BWART = '101' AND SMBLN IS NULL (exclude reversed)""" .

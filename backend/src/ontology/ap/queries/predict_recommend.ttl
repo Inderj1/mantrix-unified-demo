@@ -1,0 +1,15 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+ap:query_predict_recommend a mantrix:QueryType ;
+    rdfs:label "Predict / Recommend" ;
+    rdfs:comment "Forward-looking queries. Cash flow forecasting, risk identification, optimization recommendations. Combine historical data with current state." ;
+    mantrix:triggerPhrases "predict, forecast, recommend, optimize, what if, should we, risk, will, expect" ;
+    mantrix:examples """
+'cash outflow forecast' → SUM open items by DUE_DATE bucket for next 30/60/90 days
+'which discounts should we prioritize' → ORDER BY DISC_AMOUNT DESC WHERE DISC_DUE_DATE approaching
+'vendor risk assessment' → Combine block rate + rejection rate + late delivery for each vendor
+'which invoices to unblock first' → ORDER BY amount DESC, days_blocked DESC""" .

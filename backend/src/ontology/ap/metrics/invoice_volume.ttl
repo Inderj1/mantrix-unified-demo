@@ -1,0 +1,36 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# AP Metric: Invoice Volume
+# ============================================================================
+
+ap:metric_invoice_volume a mantrix:Metric ;
+    rdfs:label "Invoice Volume" ;
+    rdfs:comment "Total count and value of invoices processed. Base metric for workload planning, staffing, and automation ROI calculations." ;
+    skos:altLabel "invoice count" , "invoices processed" , "AP volume" ;
+    mantrix:category "productivity" ;
+    mantrix:unit "count" ;
+    mantrix:direction "informational" ;
+    mantrix:sourceTables "RBKP_InvoiceHeaders" ;
+    mantrix:dimensions "company_code, vendor, month, invoice_type" ;
+    mantrix:exampleQuestion "Invoice volume this month" ;
+    mantrix:exampleSQL """SELECT COUNT(*) as invoice_count, SUM(RMWWR) as total_amount
+FROM RBKP_InvoiceHeaders
+WHERE RBSTAT = '5' AND BUDAT >= DATE_TRUNC(CURRENT_DATE(), MONTH)""" ;
+    mantrix:exampleQuestion "Invoice volume trend by month" ;
+    mantrix:exampleSQL """SELECT DATE_TRUNC(BUDAT, MONTH) as month,
+  COUNT(*) as invoice_count, SUM(RMWWR) as total_amount,
+  AVG(RMWWR) as avg_invoice_value
+FROM RBKP_InvoiceHeaders WHERE RBSTAT = '5'
+GROUP BY month ORDER BY month""" ;
+    mantrix:exampleQuestion "Invoice volume by type" ;
+    mantrix:exampleSQL """SELECT INV_TYPE, COUNT(*) as count, SUM(RMWWR) as total
+FROM RBKP_InvoiceHeaders WHERE RBSTAT = '5'
+GROUP BY INV_TYPE ORDER BY count DESC""" .

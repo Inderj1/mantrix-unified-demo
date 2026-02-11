@@ -1,0 +1,21 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix copa: <http://mantrix.ai/ontology/copa#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+copa:term_cogs a mantrix:SemanticTerm ;
+    rdfs:label "COGS" ;
+    skos:altLabel "cost of goods sold" , "cost of sales" , "direct costs" , "COS" ;
+    mantrix:disambiguation "'COGS' → SUM(Cogs) for basic COGS. SUM(Total_COGS) for all-inclusive cost. Total_COGS includes Ingredients + Packaging + Incoming_Freight + other." .
+
+copa:term_cost a mantrix:SemanticTerm ;
+    rdfs:label "cost" ;
+    skos:altLabel "expense" , "spend" ;
+    mantrix:disambiguation """In COPA, 'cost' usually means COGS components:
+  'ingredients cost' → SUM(Ingredients)
+  'packaging cost' → SUM(Packaging)
+  'freight cost' → SUM(Incoming_Freight)
+  'total cost' → SUM(Total_COGS)
+  NOT operating expenses (SGA, R&D) — those are not in COPA.""" .

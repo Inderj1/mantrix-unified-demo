@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   Box, Typography, Chip, Avatar, Stack, Button, Breadcrumbs, Link, Paper,
   LinearProgress, Collapse, Tooltip, IconButton, Select, MenuItem, Snackbar, Alert,
+  TextField, InputAdornment,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
@@ -30,7 +31,6 @@ import {
   LocalShipping as LocalShippingIcon,
   PictureAsPdf as PdfIcon,
   OpenInNew as OpenInNewIcon,
-  Fullscreen as FullscreenIcon,
   ZoomIn as ZoomInIcon,
   ZoomOut as ZoomOutIcon,
   ExpandMore as ExpandMoreIcon,
@@ -39,6 +39,9 @@ import {
   Remove as RemoveIcon,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
+  Search as SearchIcon,
+  CallSplit as CallSplitIcon,
+  FiberManualRecord as DotIcon,
 } from '@mui/icons-material';
 import { MODULE_COLOR } from '../../config/brandColors';
 import { MODULE_NAVY, NAVY_BLUE, apTheme } from './apTheme';
@@ -92,7 +95,7 @@ const fmtAmt = (v) => {
   return v.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 });
 };
 
-const MantrixAPLanding = ({ onBack, darkMode = false }) => {
+const MantrixAPLanding = ({ onBack, onNavigate, darkMode = false }) => {
   const [activeTab, setActiveTab] = useState('inbox');
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [activeChannel, setActiveChannel] = useState('all');
@@ -101,6 +104,10 @@ const MantrixAPLanding = ({ onBack, darkMode = false }) => {
   const [analysisOpen, setAnalysisOpen] = useState(true);
   const [leftPanelOpen, setLeftPanelOpen] = useState(true);
   const [toast, setToast] = useState({ open: false, message: '' });
+  const [activeTypeFilter, setActiveTypeFilter] = useState('all');
+  const [activeStatusFilter, setActiveStatusFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [pdfZoom, setPdfZoom] = useState(1);
 
   const bgColor = darkMode ? '#0d1117' : '#f8fafc';
   const cardBg = darkMode ? '#161b22' : '#fff';
@@ -120,9 +127,31 @@ const MantrixAPLanding = ({ onBack, darkMode = false }) => {
   // INBOX TAB
   // ═══════════════════════════════════════════════════════
   const renderInbox = () => {
-    const filtered = activeChannel === 'all'
+    const statusMap = { g: 'ready', a: 'review', r: 'exception' };
+    let filtered = activeChannel === 'all'
       ? inboxInvoices
       : inboxInvoices.filter(inv => inv.channel === activeChannel);
+    if (activeTypeFilter !== 'all') filtered = filtered.filter(inv => inv.type === activeTypeFilter);
+    if (activeStatusFilter !== 'all') filtered = filtered.filter(inv => inv.status === statusMap[activeStatusFilter]);
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      filtered = filtered.filter(inv =>
+        (inv.vendor && inv.vendor.toLowerCase().includes(q)) ||
+        (inv.invoiceNum && inv.invoiceNum.toLowerCase().includes(q)) ||
+        (inv.poRef && inv.poRef.toLowerCase().includes(q))
+      );
+    }
+
+    // Counts for filter chips (before type/status/search filters, but after channel filter)
+    const channelFiltered = activeChannel === 'all'
+      ? inboxInvoices
+      : inboxInvoices.filter(inv => inv.channel === activeChannel);
+    const totalCount = channelFiltered.length;
+    const poCount = channelFiltered.filter(inv => inv.type === 'po').length;
+    const nonPoCount = channelFiltered.filter(inv => inv.type === 'nonpo').length;
+    const greenCount = channelFiltered.filter(inv => inv.status === 'ready').length;
+    const amberCount = channelFiltered.filter(inv => inv.status === 'review').length;
+    const redCount = channelFiltered.filter(inv => inv.status === 'exception').length;
 
     // Unified DataGrid columns — merged PO + Non-PO
     const inboxColumns = [
@@ -131,7 +160,7 @@ const MantrixAPLanding = ({ onBack, darkMode = false }) => {
         renderCell: (p) => {
           const chipStyle = apTheme.chips.invoiceStatus[p.value] || {};
           const label = p.value.charAt(0).toUpperCase() + p.value.slice(1);
-          return <Chip label={label} size="small" sx={{ height: 22, fontSize: '0.6rem', ...chipStyle }} />;
+          return <Chip label={label} size="small" className={p.value === 'processing' ? 'status-dot' : ''} sx={{ height: 22, fontSize: '0.6rem', ...chipStyle }} />;
         },
       },
       {
@@ -307,32 +336,153 @@ const MantrixAPLanding = ({ onBack, darkMode = false }) => {
           })}
         </Box>
 
-        {/* Unified Inbox DataGrid */}
-        <Box sx={{ height: 480 }}>
-          <DataGrid
-            rows={inboxRows}
-            columns={inboxColumns}
-            density="compact"
-            hideFooter
-            disableColumnMenu
-            disableSelectionOnClick
-            onRowClick={(params) => {
-              if (params.row.status === 'processing') return;
-              setSelectedInvoice(params.row.id);
-              setActiveTab('workbench');
+        {/* Filter Chip Bar + Search */}
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5, gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+            {[
+              { key: 'all', label: `All ${totalCount}`, type: true },
+              { key: 'po', label: `PO ${poCount}`, type: true },
+              { key: 'nonpo', label: `Non-PO ${nonPoCount}`, type: true },
+            ].map((chip) => {
+              const isActive = activeTypeFilter === chip.key;
+              return (
+                <Chip
+                  key={chip.key}
+                  label={chip.label}
+                  size="small"
+                  onClick={() => { setActiveTypeFilter(chip.key); if (chip.key !== 'all') setActiveStatusFilter('all'); }}
+                  sx={{
+                    height: 24, fontSize: '11px', fontFamily: "'IBM Plex Mono', monospace", fontWeight: 600, cursor: 'pointer',
+                    ...(isActive
+                      ? { bgcolor: alpha(MODULE_NAVY, 0.12), color: MODULE_NAVY, border: `1px solid ${alpha(MODULE_NAVY, 0.3)}` }
+                      : { bgcolor: 'transparent', color: '#64748b', border: `1px solid #cbd5e1` }),
+                    '&:hover': { bgcolor: alpha(MODULE_NAVY, 0.06) },
+                  }}
+                />
+              );
+            })}
+            <Box sx={{ width: 1, height: 16, bgcolor: '#e2e8f0', mx: 0.5 }} />
+            {[
+              { key: 'g', color: '#059669', count: greenCount },
+              { key: 'a', color: '#d97706', count: amberCount },
+              { key: 'r', color: '#dc2626', count: redCount },
+            ].map((dot) => {
+              const isActive = activeStatusFilter === dot.key;
+              return (
+                <Chip
+                  key={dot.key}
+                  icon={<DotIcon sx={{ fontSize: 9, color: `${dot.color} !important` }} />}
+                  label={dot.count}
+                  size="small"
+                  onClick={() => setActiveStatusFilter(activeStatusFilter === dot.key ? 'all' : dot.key)}
+                  sx={{
+                    height: 24, fontSize: '11px', fontFamily: "'IBM Plex Mono', monospace", fontWeight: 600, cursor: 'pointer',
+                    '& .MuiChip-icon': { ml: '4px', mr: '-2px' },
+                    ...(isActive
+                      ? { bgcolor: alpha(dot.color, 0.12), color: dot.color, border: `1px solid ${alpha(dot.color, 0.3)}` }
+                      : { bgcolor: 'transparent', color: '#64748b', border: `1px solid #cbd5e1` }),
+                    '&:hover': { bgcolor: alpha(dot.color, 0.08) },
+                  }}
+                />
+              );
+            })}
+          </Box>
+          <TextField
+            size="small"
+            placeholder="Search vendor, PO, invoice..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ fontSize: 16, color: '#94a3b8' }} />
+                </InputAdornment>
+              ),
             }}
-            getRowClassName={(params) => params.row.status === 'processing' ? 'processing-row' : ''}
             sx={{
-              ...apTheme.getDataGridSx({ darkMode, clickable: true }),
-              '& .processing-row': { opacity: 0.55, cursor: 'default' },
-              '& .MuiDataGrid-row': {
-                cursor: 'pointer',
-                '&:hover': { bgcolor: darkMode ? '#21262d' : alpha(NAVY_BLUE, 0.08) },
+              width: 220,
+              '& .MuiOutlinedInput-root': {
+                fontFamily: "'IBM Plex Mono', monospace", fontSize: '11px', color: '#475569',
+                height: 30,
+                '& fieldset': { borderColor: '#cbd5e1' },
+                '&:hover fieldset': { borderColor: alpha(NAVY_BLUE, 0.4) },
+                '&.Mui-focused fieldset': { borderColor: NAVY_BLUE },
               },
-              '& .processing-row:hover': { cursor: 'default' },
             }}
           />
         </Box>
+
+        {/* Inbox DataGrid(s) with section labels */}
+        {(() => {
+          const inboxGridSx = {
+            ...apTheme.getDataGridSx({ darkMode, clickable: true }),
+            '& .processing-row': {
+              opacity: 0.55, cursor: 'default',
+              '& .MuiDataGrid-cell .status-dot': {
+                animation: 'pulse 2s ease-in-out infinite',
+              },
+            },
+            '@keyframes pulse': { '0%,100%': { opacity: 0.4 }, '50%': { opacity: 1 } },
+            '& .MuiDataGrid-row': {
+              cursor: 'pointer',
+              '&:hover': { bgcolor: darkMode ? '#21262d' : alpha(NAVY_BLUE, 0.08) },
+            },
+            '& .processing-row:hover': { cursor: 'default' },
+          };
+          const gridRowClick = (params) => {
+            if (params.row.status === 'processing') return;
+            setSelectedInvoice(params.row.id);
+            setActiveTab('workbench');
+          };
+          const gridRowClass = (params) => params.row.status === 'processing' ? 'processing-row' : '';
+
+          const sectionLabelSx = {
+            bgcolor: darkMode ? '#21262d' : '#f1f5f9',
+            fontFamily: "'IBM Plex Mono', monospace",
+            fontSize: '10px', textTransform: 'uppercase', letterSpacing: 1.5,
+            fontWeight: 600, color: '#94a3b8',
+            py: 0.75, px: 3,
+            borderBottom: `1px solid ${borderColor}`,
+          };
+
+          // Show two groups when viewing all types and no search/status filter active
+          const showSections = activeTypeFilter === 'all' && !searchQuery.trim() && activeStatusFilter === 'all';
+
+          if (showSections) {
+            const poRows = filtered.filter(inv => inv.type === 'po').map(inv => ({ id: inv.id, ...inv }));
+            const nonPoRows = filtered.filter(inv => inv.type === 'nonpo').map(inv => ({ id: inv.id, ...inv }));
+            const poH = Math.max(180, Math.min(350, poRows.length * 52 + 56));
+            const npH = Math.max(130, Math.min(250, nonPoRows.length * 52 + 56));
+            return (
+              <Box>
+                <Typography sx={sectionLabelSx}>PO-Based Invoices</Typography>
+                <Box sx={{ height: poH }}>
+                  <DataGrid rows={poRows} columns={inboxColumns} density="compact" hideFooter disableColumnMenu disableSelectionOnClick onRowClick={gridRowClick} getRowClassName={gridRowClass} sx={inboxGridSx} />
+                </Box>
+                <Typography sx={{ ...sectionLabelSx, mt: 0.5 }}>Non-PO Invoices</Typography>
+                <Box sx={{ height: npH }}>
+                  <DataGrid rows={nonPoRows} columns={inboxColumns} density="compact" hideFooter disableColumnMenu disableSelectionOnClick onRowClick={gridRowClick} getRowClassName={gridRowClass} sx={inboxGridSx} />
+                </Box>
+              </Box>
+            );
+          }
+
+          return (
+            <Box sx={{ height: 480 }}>
+              <DataGrid
+                rows={inboxRows}
+                columns={inboxColumns}
+                density="compact"
+                hideFooter
+                disableColumnMenu
+                disableSelectionOnClick
+                onRowClick={gridRowClick}
+                getRowClassName={gridRowClass}
+                sx={inboxGridSx}
+              />
+            </Box>
+          );
+        })()}
       </Box>
     );
   };
@@ -413,10 +563,28 @@ const MantrixAPLanding = ({ onBack, darkMode = false }) => {
         ? <Box component="input" defaultValue={p.value} sx={editInputSx} />
         : <Typography sx={{ fontSize: '0.8rem', color: p.row.lineType === 'gl' ? '#7c3aed' : textColor }}>{p.value}</Typography>
       },
-      { field: 'col3', headerName: 'PO Itm / Cost Ctr', width: 80, sortable: false, renderCell: (p) => {
+      { field: 'col3', headerName: 'PO Itm / Cost Ctr', width: 100, sortable: false, renderCell: (p) => {
         // PO lines: read-only always; GL lines: editable if canEdit
         if (p.row.lineType === 'po' || !canEdit) return <Typography sx={{ fontSize: '0.8rem', color: textSecondary }}>{p.value}</Typography>;
-        return <Box component="input" defaultValue={p.value} sx={editInputSx} />;
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3, width: '100%' }}>
+            <Box component="input" defaultValue={p.value} sx={{ ...editInputSx, flex: 1, minWidth: 0 }} />
+            <Tooltip title="Split cost allocation" arrow>
+              <IconButton
+                size="small"
+                onClick={(e) => { e.stopPropagation(); setToast({ open: true, message: 'Split: enter allocation %' }); }}
+                sx={{
+                  width: 18, height: 18, p: 0,
+                  border: `1px dashed ${alpha(NAVY_BLUE, 0.3)}`,
+                  bgcolor: 'transparent', color: alpha(NAVY_BLUE, 0.5),
+                  '&:hover': { color: NAVY_BLUE, bgcolor: alpha(NAVY_BLUE, 0.06), borderColor: NAVY_BLUE },
+                }}
+              >
+                <CallSplitIcon sx={{ fontSize: 12 }} />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        );
       }},
       { field: 'col4', headerName: 'Material / Profit Ctr', width: 95, sortable: false, renderCell: (p) => {
         if (!canEdit) return <Typography sx={{ fontSize: '0.8rem', color: textSecondary }}>{p.value}</Typography>;
@@ -630,63 +798,82 @@ const MantrixAPLanding = ({ onBack, darkMode = false }) => {
                   </Typography>
                 </Stack>
                 <Stack direction="row" spacing={0}>
-                  <Tooltip title="Zoom in">
-                    <IconButton size="small" sx={{ color: '#64748b', p: 0.3 }}>
+                  <Tooltip title={`Zoom in (${Math.round(pdfZoom * 100)}%)`}>
+                    <IconButton size="small" onClick={() => setPdfZoom(z => Math.min(z + 0.15, 2))} sx={{ color: '#64748b', p: 0.3, '&:hover': { color: NAVY_BLUE } }}>
                       <ZoomInIcon sx={{ fontSize: 15 }} />
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title="Zoom out">
-                    <IconButton size="small" sx={{ color: '#64748b', p: 0.3 }}>
+                  <Tooltip title={`Zoom out (${Math.round(pdfZoom * 100)}%)`}>
+                    <IconButton size="small" onClick={() => setPdfZoom(z => Math.max(z - 0.15, 0.5))} sx={{ color: '#64748b', p: 0.3, '&:hover': { color: NAVY_BLUE } }}>
                       <ZoomOutIcon sx={{ fontSize: 15 }} />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Open in new tab">
-                    <IconButton size="small" sx={{ color: '#64748b', p: 0.3 }}>
+                    <IconButton size="small" onClick={() => window.open(wb.pdfFile, '_blank')} sx={{ color: '#64748b', p: 0.3, '&:hover': { color: NAVY_BLUE } }}>
                       <OpenInNewIcon sx={{ fontSize: 14 }} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Fullscreen">
-                    <IconButton size="small" sx={{ color: '#64748b', p: 0.3 }}>
-                      <FullscreenIcon sx={{ fontSize: 16 }} />
                     </IconButton>
                   </Tooltip>
                 </Stack>
               </Box>
-              {/* PDF Document Body */}
-              <Box sx={{ bgcolor: darkMode ? '#1a1f2e' : '#f8f9fa', display: 'flex', flexDirection: 'column', alignItems: 'center', overflow: 'hidden', position: 'relative', minHeight: 280 }}>
-                {/* Simulated PDF page */}
-                <Box sx={{ width: '90%', mt: 1.5, mx: 'auto', bgcolor: darkMode ? '#252a36' : '#fff', borderRadius: 0.5, boxShadow: darkMode ? '0 1px 4px rgba(0,0,0,0.3)' : '0 1px 4px rgba(0,0,0,0.1)', p: 2, overflow: 'hidden' }}>
-                  {/* Header area */}
-                  <Box sx={{ mb: 1.5, pb: 1, borderBottom: `1px solid ${alpha(borderColor, 0.3)}` }}>
-                    <Box sx={{ width: '45%', height: 8, bgcolor: alpha(MODULE_NAVY, 0.15), borderRadius: 0.5, mb: 0.8 }} />
-                    <Box sx={{ width: '65%', height: 5, bgcolor: alpha(textSecondary, 0.08), borderRadius: 0.5, mb: 0.4 }} />
-                    <Box sx={{ width: '55%', height: 5, bgcolor: alpha(textSecondary, 0.08), borderRadius: 0.5 }} />
-                  </Box>
-                  {/* Table-like area */}
-                  <Box sx={{ mb: 1.5 }}>
-                    <Box sx={{ display: 'flex', gap: 0.5, mb: 0.5 }}>
-                      <Box sx={{ flex: 2, height: 6, bgcolor: alpha(MODULE_NAVY, 0.1), borderRadius: 0.3 }} />
-                      <Box sx={{ flex: 1, height: 6, bgcolor: alpha(MODULE_NAVY, 0.1), borderRadius: 0.3 }} />
-                      <Box sx={{ flex: 1, height: 6, bgcolor: alpha(MODULE_NAVY, 0.1), borderRadius: 0.3 }} />
+              {/* PDF Document Body — rendered mock invoice */}
+              <Box sx={{ bgcolor: '#fff', overflow: 'auto', position: 'relative', minHeight: 280, maxHeight: 420, flex: 1 }}>
+                <Box sx={{ transform: `scale(${pdfZoom})`, transformOrigin: 'top center', transition: 'transform 0.2s ease', p: 2.5, fontFamily: '"Courier New", monospace', color: '#1e293b', fontSize: '0.7rem', lineHeight: 1.6 }}>
+                  {/* Invoice Header */}
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2, pb: 1.5, borderBottom: '2px solid #1e293b' }}>
+                    <Box>
+                      <Typography sx={{ fontSize: '0.9rem', fontWeight: 700, fontFamily: 'inherit', color: '#1e293b' }}>{wb.vendor}</Typography>
+                      <Typography sx={{ fontSize: '0.6rem', fontFamily: 'inherit', color: '#64748b' }}>
+                        {wb.evidence?.find(e => e.label === 'Vendor #')?.value && `Vendor # ${wb.evidence.find(e => e.label === 'Vendor #').value}`}
+                      </Typography>
                     </Box>
-                    {[1,2,3,4,5,6].map(r => (
-                      <Box key={r} sx={{ display: 'flex', gap: 0.5, mb: 0.4 }}>
-                        <Box sx={{ flex: 2, height: 5, bgcolor: alpha(textSecondary, 0.06), borderRadius: 0.3 }} />
-                        <Box sx={{ flex: 1, height: 5, bgcolor: alpha(textSecondary, 0.06), borderRadius: 0.3 }} />
-                        <Box sx={{ flex: 1, height: 5, bgcolor: alpha(textSecondary, 0.06), borderRadius: 0.3 }} />
+                    <Box sx={{ textAlign: 'right' }}>
+                      <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, fontFamily: 'inherit', color: '#1e293b', textTransform: 'uppercase' }}>INVOICE</Typography>
+                      <Typography sx={{ fontSize: '0.65rem', fontFamily: 'inherit', color: '#475569' }}>{wb.meta.split(' · ')[0]}</Typography>
+                    </Box>
+                  </Box>
+                  {/* Invoice Details */}
+                  <Box sx={{ display: 'flex', gap: 4, mb: 2 }}>
+                    {wb.headerFields?.slice(0, 5).map((f, i) => (
+                      <Box key={i}>
+                        <Typography sx={{ fontSize: '0.55rem', fontFamily: 'inherit', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 }}>{f.label}</Typography>
+                        <Typography sx={{ fontSize: '0.65rem', fontFamily: 'inherit', fontWeight: 600, color: '#1e293b' }}>{f.value}</Typography>
                       </Box>
                     ))}
                   </Box>
-                  {/* Body text lines */}
-                  {[1,2,3,4].map(l => (
-                    <Box key={l} sx={{ width: `${65 + Math.random() * 30}%`, height: 4, bgcolor: alpha(textSecondary, 0.06), borderRadius: 0.3, mb: 0.4 }} />
-                  ))}
-                  {/* Footer area */}
-                  <Box sx={{ mt: 1.5, pt: 1, borderTop: `1px solid ${alpha(borderColor, 0.2)}` }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5 }}>
-                      <Box sx={{ width: '25%', height: 5, bgcolor: alpha(textSecondary, 0.08), borderRadius: 0.3 }} />
-                      <Box sx={{ width: '15%', height: 5, bgcolor: alpha(MODULE_NAVY, 0.12), borderRadius: 0.3 }} />
+                  {/* Line Items Table */}
+                  <Box component="table" sx={{ width: '100%', borderCollapse: 'collapse', mt: 1, '& th': { fontSize: '0.55rem', fontFamily: 'inherit', color: '#64748b', textTransform: 'uppercase', letterSpacing: 0.5, textAlign: 'left', pb: 0.5, borderBottom: '1px solid #cbd5e1' }, '& td': { fontSize: '0.6rem', fontFamily: 'inherit', py: 0.4, borderBottom: '1px solid #e2e8f0' } }}>
+                    <thead>
+                      <tr><th>#</th><th>Description</th><th>Material</th><th style={{ textAlign: 'right' }}>Qty</th><th>UoM</th><th style={{ textAlign: 'right' }}>Unit Price</th><th style={{ textAlign: 'right' }}>Amount</th></tr>
+                    </thead>
+                    <tbody>
+                      {wb.lines?.slice(0, 8).map((ln, i) => (
+                        <tr key={i}>
+                          <td style={{ color: '#94a3b8' }}>{(i + 1) * 10}</td>
+                          <td>{ln.desc}</td>
+                          <td style={{ color: '#64748b' }}>{ln.col4 || '-'}</td>
+                          <td style={{ textAlign: 'right' }}>{ln.qty}</td>
+                          <td>{ln.uom}</td>
+                          <td style={{ textAlign: 'right' }}>{ln.price}</td>
+                          <td style={{ textAlign: 'right', fontWeight: 600 }}>{ln.amount}</td>
+                        </tr>
+                      ))}
+                      {wb.lines?.length > 8 && (
+                        <tr><td colSpan={7} style={{ color: '#94a3b8', fontStyle: 'italic', textAlign: 'center' }}>... {wb.lines.length - 8} more line items</td></tr>
+                      )}
+                    </tbody>
+                  </Box>
+                  {/* Total */}
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1.5, pt: 1, borderTop: '2px solid #1e293b' }}>
+                    <Box sx={{ textAlign: 'right' }}>
+                      <Typography sx={{ fontSize: '0.55rem', fontFamily: 'inherit', color: '#64748b', textTransform: 'uppercase' }}>Total Due</Typography>
+                      <Typography sx={{ fontSize: '0.85rem', fontFamily: 'inherit', fontWeight: 700, color: '#1e293b' }}>${wb.amount}</Typography>
                     </Box>
+                  </Box>
+                  {/* Footer */}
+                  <Box sx={{ mt: 2, pt: 1, borderTop: '1px solid #e2e8f0' }}>
+                    <Typography sx={{ fontSize: '0.5rem', fontFamily: 'inherit', color: '#94a3b8', textAlign: 'center' }}>
+                      Terms: {wb.headerFields?.find(f => f.label === 'Terms')?.value || 'NET 30'} · Payment due upon receipt · {wb.evidence?.find(e => e.label === 'Currency')?.value || 'USD'}
+                    </Typography>
                   </Box>
                 </Box>
               </Box>
@@ -865,6 +1052,25 @@ const MantrixAPLanding = ({ onBack, darkMode = false }) => {
                       </Box>
                     </Box>
                   </Box>
+                  {/* Action Legend Bar */}
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '3px', px: 1.5, pb: 1 }}>
+                    {[
+                      { label: '✔ Post', color: '#059669' },
+                      { label: '← Supplier', color: '#ea580c' },
+                      { label: '→ Buyer', color: '#2563eb' },
+                      { label: '🏭 GR', color: '#d97706' },
+                      { label: '⏸ Hold', color: '#475569' },
+                      { label: '↑ Esc', color: '#7c3aed' },
+                      { label: '✗ Rej', color: '#dc2626' },
+                    ].map((a) => (
+                      <Chip key={a.label} label={a.label} size="small" sx={{
+                        height: 18, fontSize: '9px', fontWeight: 600,
+                        bgcolor: alpha(a.color, 0.1), color: a.color,
+                        border: `1px solid ${alpha(a.color, 0.2)}`,
+                        '& .MuiChip-label': { px: 0.6 },
+                      }} />
+                    ))}
+                  </Box>
                 </Collapse>
               </Box>
             )}
@@ -1039,7 +1245,7 @@ const MantrixAPLanding = ({ onBack, darkMode = false }) => {
               }}>
                 <Chip label="NEW" size="small" sx={{ height: 20, fontSize: '0.55rem', fontWeight: 700, bgcolor: '#059669', color: '#fff', mt: 0.2 }} />
                 <Typography sx={{ fontSize: '0.75rem', color: textColor }}>
-                  <strong>GR Posted:</strong> Honeywell — 3 lines ready $94,200
+                  <strong>GR Posted:</strong> Federal Express — 3 lines ready $94,200
                 </Typography>
               </Box>
 
@@ -1151,7 +1357,27 @@ const MantrixAPLanding = ({ onBack, darkMode = false }) => {
               Accounts Payable Intelligence — AI-Driven Invoice Processing
             </Typography>
           </Box>
-          <Button size="small" startIcon={<ArrowBackIcon />} onClick={onBack} sx={{ color: textSecondary, textTransform: 'none', fontSize: '0.8rem' }}>Back</Button>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => onNavigate ? onNavigate('mantrixap-monitor') : setToast({ open: true, message: 'Navigate to SAP Monitor' })}
+              sx={{
+                fontFamily: "'IBM Plex Mono', monospace", fontSize: '10px', textTransform: 'none', fontWeight: 600,
+                color: NAVY_BLUE, borderColor: alpha(NAVY_BLUE, 0.3), borderRadius: 1.5, px: 1.5, py: 0.3,
+                '&:hover': { bgcolor: alpha(NAVY_BLUE, 0.08), borderColor: NAVY_BLUE },
+              }}
+            >
+              ◉ SAP Monitor
+            </Button>
+            <Box sx={{ width: 1, height: 20, bgcolor: borderColor }} />
+            <Typography sx={{ fontSize: '10px', color: textSecondary, fontFamily: "'IBM Plex Mono', monospace", whiteSpace: 'nowrap' }}>
+              ABUS · Sarah Chen
+            </Typography>
+            <Avatar sx={{ width: 28, height: 28, background: 'linear-gradient(135deg, #059669, #1976d2)', fontSize: '10px', fontWeight: 700 }}>
+              SC
+            </Avatar>
+          </Stack>
         </Box>
       </Paper>
 
@@ -1204,7 +1430,7 @@ const MantrixAPLanding = ({ onBack, darkMode = false }) => {
         open={toast.open}
         autoHideDuration={2000}
         onClose={() => setToast({ open: false, message: '' })}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
         <Alert onClose={() => setToast({ open: false, message: '' })} severity="info" variant="filled" sx={{ fontSize: '0.8rem', bgcolor: MODULE_NAVY }}>
           {toast.message}

@@ -1,0 +1,31 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+ap:rule_due_date_calculation a mantrix:BusinessRule ;
+    rdfs:label "Due Date Calculation" ;
+    rdfs:comment "How invoice due dates are calculated in SAP." ;
+    mantrix:ruleDefinition """Due date calculation:
+  DUE_DATE = RBKP.ZFBDT + T052.ZTAG3
+
+Where:
+  ZFBDT = Baseline date for payment terms (usually = invoice date BLDAT)
+  ZTAG3 = Net payment days from T052 payment terms
+  ZTAG1 = Discount period 1 days
+  ZPRZ1 = Discount percentage 1
+
+Example: Terms "2/10 net 30" (ZTERM = 'Z210')
+  ZTAG1 = 10, ZPRZ1 = 2.0, ZTAG3 = 30
+  DISC_DUE_DATE = ZFBDT + 10 days
+  DUE_DATE = ZFBDT + 30 days
+  DISC_AMOUNT = RMWWR * 2.0 / 100
+
+Payment terms hierarchy (which terms apply):
+  1. Invoice level: RBKP.ZTERM (if set, wins)
+  2. PO level: EKKO.ZTERM
+  3. Vendor master: LFA1.ZTERM (default)
+
+IMPORTANT: RBKP.DUE_DATE and RBKP.DISC_DUE_DATE are Axis AI pre-computed.
+Use these for convenience instead of calculating manually.""" .

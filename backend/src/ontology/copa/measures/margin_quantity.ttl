@@ -1,0 +1,25 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix copa: <http://mantrix.ai/ontology/copa#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# COPA Measures: Margin and Quantity
+# ============================================================================
+
+copa:measure_sales_margin a mantrix:Measure ;
+    rdfs:label "Sales Margin" ;
+    rdfs:comment "Profit margin on net sales. Pre-calculated in source data." ;
+    skos:altLabel "margin" , "profit margin" , "net margin" ;
+    mantrix:bqColumn "Sales_Margin_of_Net_Sales" ;
+    mantrix:aggregation "SUM" .
+
+copa:measure_inv_quantity a mantrix:Measure ;
+    rdfs:label "Invoice Quantity" ;
+    rdfs:comment "Number of units invoiced/sold. Use for volume analysis, ASP calculation, and unit economics." ;
+    skos:altLabel "quantity" , "units" , "volume" , "units sold" ;
+    mantrix:bqColumn "Inv_Quantity" ;
+    mantrix:aggregation "SUM" ;
+    mantrix:edgeCases "Can be negative for returns/credit memos. Filter Inv_Quantity > 0 for pure sales volume." .

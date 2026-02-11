@@ -1,0 +1,46 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# AP Metric: Open AP Balance
+# ============================================================================
+
+ap:metric_open_ap_balance a mantrix:Metric ;
+    rdfs:label "Open AP Balance" ;
+    rdfs:comment "Total outstanding accounts payable balance — sum of all unpaid vendor invoices. Key balance sheet liability figure. AUGBL IS NULL = open." ;
+    skos:altLabel "AP balance" , "outstanding payables" , "unpaid invoices" , "vendor liability" ;
+    mantrix:category "working_capital" ;
+    mantrix:unit "currency" ;
+    mantrix:direction "informational" ;
+    mantrix:sourceTables "ACDOCA_UniversalJournal" ;
+    mantrix:dimensions "vendor, company_code, aging_bucket" ;
+    mantrix:exampleQuestion "Total open AP balance" ;
+    mantrix:exampleSQL """SELECT SUM(ABS(HSL)) as open_balance, COUNT(*) as open_items
+FROM ACDOCA_UniversalJournal
+WHERE KOART = 'K' AND AUGBL IS NULL AND RLDNR = '0L'""" ;
+    mantrix:exampleQuestion "Open AP by vendor" ;
+    mantrix:exampleSQL """SELECT a.LIFNR, s.NAME1,
+  SUM(ABS(a.HSL)) as open_balance, COUNT(*) as open_items
+FROM ACDOCA_UniversalJournal a
+JOIN LFA1_Suppliers s ON a.LIFNR = s.LIFNR
+WHERE a.KOART = 'K' AND a.AUGBL IS NULL AND a.RLDNR = '0L'
+GROUP BY a.LIFNR, s.NAME1 ORDER BY open_balance DESC""" ;
+    mantrix:exampleQuestion "AP aging analysis" ;
+    mantrix:exampleSQL """SELECT
+  CASE
+    WHEN DATE_DIFF(CURRENT_DATE(), ZFBDT, DAY) <= 30 THEN '0-30 days'
+    WHEN DATE_DIFF(CURRENT_DATE(), ZFBDT, DAY) <= 60 THEN '31-60 days'
+    WHEN DATE_DIFF(CURRENT_DATE(), ZFBDT, DAY) <= 90 THEN '61-90 days'
+    ELSE '90+ days'
+  END as aging_bucket,
+  COUNT(*) as items, SUM(ABS(HSL)) as balance
+FROM ACDOCA_UniversalJournal
+WHERE KOART = 'K' AND AUGBL IS NULL AND RLDNR = '0L'
+GROUP BY aging_bucket ORDER BY aging_bucket""" ;
+    mantrix:edgeCases "HSL for vendor invoices is NEGATIVE (credit). Use ABS(HSL) for display. Payments are POSITIVE (debit)." .

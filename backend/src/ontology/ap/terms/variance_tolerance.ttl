@@ -1,0 +1,29 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+ap:term_variance a mantrix:SemanticTerm ;
+    rdfs:label "variance" ;
+    rdfs:comment "Difference between expected (PO) and actual (invoice/GR) values. Quantity variance = invoice qty - PO/GR qty. Price variance = invoice price - PO price." ;
+    skos:altLabel "discrepancy" , "difference" , "mismatch" , "deviation" ;
+    mantrix:canonicalEntity "MATCH_CASES (QTY_VARIANCE, PRICE_VARIANCE)" ;
+    mantrix:disambiguation "Qty variance: over-delivery (positive) or under-delivery (negative). Price variance: overcharge (positive) or undercharge (negative)." ;
+    mantrix:relatedTerms "tolerance, match, exception, blocked" .
+
+ap:term_tolerance a mantrix:SemanticTerm ;
+    rdfs:label "tolerance" ;
+    rdfs:comment "Acceptable variance range. If variance is within tolerance, match passes. If outside tolerance, invoice is blocked. Configured in T169G via EKPO.TOLPR tolerance key." ;
+    skos:altLabel "threshold" , "acceptable range" , "tolerance limit" ;
+    mantrix:disambiguation "Tolerance is a PERCENTAGE or ABSOLUTE amount. Example: 5% price tolerance means invoice price can be up to 5% above PO price without blocking." ;
+    mantrix:relatedTerms "variance, matching, T169G, exception" .
+
+ap:term_early_pay_discount a mantrix:SemanticTerm ;
+    rdfs:label "early payment discount" ;
+    rdfs:comment "Cash discount for paying before the discount deadline. Terms like '2/10 net 30' mean 2% discount if paid within 10 days. ZFBDT + T052.ZTAG1 = discount deadline." ;
+    skos:altLabel "cash discount" , "prompt pay discount" , "early pay" , "2/10 net 30" , "discount" ;
+    mantrix:canonicalEntity "T052_PaymentTerms (ZTAG1, ZPRZ1), RBKP.DISC_DUE_DATE, RBKP.DISC_AMOUNT" ;
+    mantrix:disambiguation "'discount' in AP = early payment discount (T052). NOT a volume discount or trade discount. Disc amount = RMWWR * ZPRZ1 / 100." ;
+    mantrix:relatedTerms "payment terms, T052, discount capture rate, discount leakage" .

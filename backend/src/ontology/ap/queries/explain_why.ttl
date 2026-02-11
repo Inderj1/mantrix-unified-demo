@@ -1,0 +1,30 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# Query Type: Explain Why
+# ============================================================================
+
+ap:query_explain_why a mantrix:QueryType ;
+    rdfs:label "Explain Why" ;
+    rdfs:comment "Root cause analysis queries. User wants to understand WHY something happened. Requires joining multiple tables to trace the causal chain." ;
+    mantrix:triggerPhrases "why is, why was, explain, what caused, reason for, root cause" ;
+    mantrix:sqlPattern """-- Requires multi-table investigation
+-- Step 1: Find the item in question
+-- Step 2: Check related tables for causes
+-- Step 3: Present the chain of events""" ;
+    mantrix:examples """
+'why is invoice X blocked?' →
+  1. Check RBKP.ZLSPR (block code)
+  2. Check MATCH_CASES for match result
+  3. Check MATDOC for GR status
+  4. Present: 'Blocked because GR missing for PO item Y'
+
+'why wasn't vendor X paid?' →
+  1. Check ACDOCA for open items (AUGBL IS NULL)
+  2. Check RBKP for block codes
+  3. Check LFA1 for vendor blocks (ZAHLS, SPERR)
+  4. Present: 'Vendor has payment block ZAHLS=A and invoice has ZLSPR=R'""" .

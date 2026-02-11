@@ -1,0 +1,63 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: MATCH_CASES — Invoice Match Results
+# ============================================================================
+# Axis AI pre-computed table. One row per invoice-line-to-PO-item match.
+# Shows the 3-way match result (PO qty/price vs GR qty vs Invoice qty/price),
+# quantity and price variances, and exception reasons.
+# CRITICAL for understanding WHY an invoice is blocked.
+# ============================================================================
+
+ap:MATCH_CASES a owl:Class ;
+    rdfs:label "MATCH_CASES" ;
+    rdfs:comment "Invoice matching results. One row per invoice line matched to PO item. Shows 3-way match outcome, variances, and exception reasons. Pre-computed by Axis AI." ;
+    bq:table "MATCH_CASES" ; bq:primaryKey "INVOICE_BELNR, INVOICE_GJAHR, INVOICE_BUZEI" ;
+    skos:altLabel "match result" , "3-way match" , "invoice match" , "matching" , "exception" , "variance" ;
+    mantrix:businessRule "MATCH_RESULT='pass' means no variance. 'fail' means variance exceeds tolerance. 'warning' means within tolerance but flagged." ;
+    mantrix:relatedConcepts "RBKP_InvoiceHeaders, RSEG_InvoiceItems, EKPO_POItems, MATDOC_GoodsReceipts, EKBE_POHistory" .
+
+# --- Columns ---
+ap:MATCH_INVOICE_BELNR a owl:DatatypeProperty ; rdfs:label "Invoice Doc" ; bq:column "INVOICE_BELNR" ; bq:type "INTEGER" ; bq:foreignKey "RBKP_InvoiceHeaders.BELNR" .
+ap:MATCH_INVOICE_GJAHR a owl:DatatypeProperty ; rdfs:label "Invoice Year" ; bq:column "INVOICE_GJAHR" ; bq:type "INTEGER" ; bq:foreignKey "RBKP_InvoiceHeaders.GJAHR" .
+ap:MATCH_INVOICE_BUZEI a owl:DatatypeProperty ; rdfs:label "Invoice Line" ; bq:column "INVOICE_BUZEI" ; bq:type "STRING" .
+ap:MATCH_PO_EBELN a owl:DatatypeProperty ; rdfs:label "PO Number" ; bq:column "PO_EBELN" ; bq:type "INTEGER" ; bq:foreignKey "EKPO_POItems.EBELN" .
+ap:MATCH_PO_EBELP a owl:DatatypeProperty ; rdfs:label "PO Item" ; bq:column "PO_EBELP" ; bq:type "STRING" ; bq:foreignKey "EKPO_POItems.EBELP" .
+ap:MATCH_MATCH_TYPE a owl:DatatypeProperty ; rdfs:label "Match Type" ; bq:column "MATCH_TYPE" ; bq:type "STRING" ; rdfs:comment "2-way (PO+Invoice) or 3-way (PO+GR+Invoice). Determined by EKPO.WEPOS." ;
+    mantrix:valueMap "2_way=PO vs Invoice only, 3_way=PO vs GR vs Invoice" .
+ap:MATCH_MATCH_RESULT a owl:DatatypeProperty ; rdfs:label "Match Result" ; bq:column "MATCH_RESULT" ; bq:type "STRING" ;
+    mantrix:valueMap "pass=All checks passed, fail=Variance exceeds tolerance, warning=Within tolerance but flagged" .
+ap:MATCH_PO_QTY a owl:DatatypeProperty ; rdfs:label "PO Quantity" ; bq:column "PO_QTY" ; bq:type "FLOAT" .
+ap:MATCH_PO_UNIT_PRICE a owl:DatatypeProperty ; rdfs:label "PO Unit Price" ; bq:column "PO_UNIT_PRICE" ; bq:type "FLOAT" .
+ap:MATCH_GR_QTY a owl:DatatypeProperty ; rdfs:label "GR Quantity" ; bq:column "GR_QTY" ; bq:type "FLOAT" ; rdfs:comment "Goods receipt quantity. NULL for 2-way match items." .
+ap:MATCH_INV_QTY a owl:DatatypeProperty ; rdfs:label "Invoice Quantity" ; bq:column "INV_QTY" ; bq:type "FLOAT" .
+ap:MATCH_INV_UNIT_PRICE a owl:DatatypeProperty ; rdfs:label "Invoice Unit Price" ; bq:column "INV_UNIT_PRICE" ; bq:type "FLOAT" .
+ap:MATCH_QTY_VARIANCE a owl:DatatypeProperty ; rdfs:label "Quantity Variance" ; bq:column "QTY_VARIANCE" ; bq:type "FLOAT" ; rdfs:comment "INV_QTY - GR_QTY (3-way) or INV_QTY - PO_QTY (2-way). Positive = over-delivery." .
+ap:MATCH_PRICE_VARIANCE a owl:DatatypeProperty ; rdfs:label "Price Variance" ; bq:column "PRICE_VARIANCE" ; bq:type "FLOAT" ; rdfs:comment "INV_UNIT_PRICE - PO_UNIT_PRICE. Positive = overcharge." .
+ap:MATCH_EXCEPTION_REASONS a owl:DatatypeProperty ; rdfs:label "Exception Reasons" ; bq:column "EXCEPTION_REASONS" ; bq:type "STRING" ; rdfs:comment "Comma-separated list of why match failed: qty_over, qty_under, price_over, price_under, gr_missing." .
+ap:MATCH_TOLERANCE_KEY a owl:DatatypeProperty ; rdfs:label "Tolerance Key" ; bq:column "TOLERANCE_KEY" ; bq:type "STRING" ; rdfs:comment "Tolerance key from EKPO.TOLPR. Links to T169G for tolerance percentages." .
+
+# --- Example Questions & SQL ---
+ap:MATCH_q1 mantrix:exampleQuestion "Invoices failing 3-way match" ;
+    mantrix:exampleSQL "SELECT m.INVOICE_BELNR, m.PO_EBELN, m.PO_EBELP, m.MATCH_TYPE, m.MATCH_RESULT, m.QTY_VARIANCE, m.PRICE_VARIANCE, m.EXCEPTION_REASONS, h.RMWWR, h.LIFNR FROM MATCH_CASES m JOIN RBKP_InvoiceHeaders h ON m.INVOICE_BELNR = h.BELNR AND m.INVOICE_GJAHR = h.GJAHR WHERE m.MATCH_RESULT = 'fail'" .
+ap:MATCH_q2 mantrix:exampleQuestion "Most common match exception reasons" ;
+    mantrix:exampleSQL "SELECT EXCEPTION_REASONS, COUNT(*) as count FROM MATCH_CASES WHERE MATCH_RESULT = 'fail' GROUP BY EXCEPTION_REASONS ORDER BY count DESC" .
+ap:MATCH_q3 mantrix:exampleQuestion "Price variance distribution" ;
+    mantrix:exampleSQL "SELECT CASE WHEN ABS(PRICE_VARIANCE) = 0 THEN 'exact' WHEN ABS(PRICE_VARIANCE) < 1 THEN '<$1' WHEN ABS(PRICE_VARIANCE) < 10 THEN '$1-$10' WHEN ABS(PRICE_VARIANCE) < 100 THEN '$10-$100' ELSE '>$100' END as variance_bucket, COUNT(*) as count FROM MATCH_CASES GROUP BY variance_bucket" .
+ap:MATCH_q4 mantrix:exampleQuestion "3-way match pass rate" ;
+    mantrix:exampleSQL "SELECT MATCH_TYPE, COUNTIF(MATCH_RESULT = 'pass') * 100.0 / COUNT(*) as pass_rate, COUNT(*) as total FROM MATCH_CASES GROUP BY MATCH_TYPE" .
+ap:MATCH_q5 mantrix:exampleQuestion "Invoice lines with GR missing" ;
+    mantrix:exampleSQL "SELECT m.INVOICE_BELNR, m.PO_EBELN, m.PO_EBELP, m.INV_QTY, m.INV_UNIT_PRICE, h.LIFNR, s.NAME1 FROM MATCH_CASES m JOIN RBKP_InvoiceHeaders h ON m.INVOICE_BELNR = h.BELNR AND m.INVOICE_GJAHR = h.GJAHR JOIN LFA1_Suppliers s ON h.LIFNR = s.LIFNR WHERE m.EXCEPTION_REASONS LIKE '%gr_missing%'" .
+
+# --- Edge Cases ---
+ap:MATCH_edge1 mantrix:edgeCases "MATCH_TYPE is determined by EKPO.WEPOS: true → 3_way, false → 2_way. Service items (PSTYP=9) are typically 2-way." .
+ap:MATCH_edge2 mantrix:edgeCases "GR_QTY is NULL for 2-way match items (no GR expected). Don't compare GR for these." .
+ap:MATCH_edge3 mantrix:edgeCases "EXCEPTION_REASONS is a comma-separated string. Use LIKE '%reason%' for filtering." .
+ap:MATCH_edge4 mantrix:edgeCases "This is an Axis AI derived table. Source data: RSEG (invoice), EKPO (PO), MATDOC/EKBE (GR)." .

@@ -1,0 +1,43 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# AP Metric: PR-to-PO Cycle Time
+# ============================================================================
+
+ap:metric_pr_to_po_cycle_time a mantrix:Metric ;
+    rdfs:label "PR-to-PO Cycle Time" ;
+    rdfs:comment "Average number of days from purchase requisition creation to purchase order creation. Measures procurement efficiency and approval speed." ;
+    skos:altLabel "requisition to order time" , "PR processing time" , "req to PO" ;
+    mantrix:category "cycle_time" ;
+    mantrix:unit "days" ;
+    mantrix:direction "lower_is_better" ;
+    mantrix:benchmark "3-5 days (best-in-class), 7-10 days (average)" ;
+    mantrix:sqlFormula "AVG(DATE_DIFF(k.AEDAT, e.BADAT, DAY))" ;
+    mantrix:sourceTables "EBAN_PurchaseReqs, EKKO_POHeaders" ;
+    mantrix:dimensions "plant, purchasing_org, material_group, requisitioner" ;
+    mantrix:exampleQuestion "What is our average PR to PO cycle time?" ;
+    mantrix:exampleSQL """SELECT
+  AVG(DATE_DIFF(k.AEDAT, e.BADAT, DAY)) as avg_days,
+  APPROX_QUANTILES(DATE_DIFF(k.AEDAT, e.BADAT, DAY), 100)[OFFSET(50)] as median_days,
+  MIN(DATE_DIFF(k.AEDAT, e.BADAT, DAY)) as min_days,
+  MAX(DATE_DIFF(k.AEDAT, e.BADAT, DAY)) as max_days
+FROM EBAN_PurchaseReqs e
+JOIN EKKO_POHeaders k ON e.EBELN = k.EBELN
+WHERE e.EBELN IS NOT NULL""" ;
+    mantrix:exampleQuestion "PR to PO cycle time trend by month" ;
+    mantrix:exampleSQL """SELECT
+  DATE_TRUNC(k.AEDAT, MONTH) as month,
+  AVG(DATE_DIFF(k.AEDAT, e.BADAT, DAY)) as avg_days,
+  COUNT(*) as pr_count
+FROM EBAN_PurchaseReqs e
+JOIN EKKO_POHeaders k ON e.EBELN = k.EBELN
+WHERE e.EBELN IS NOT NULL
+GROUP BY month ORDER BY month""" ;
+    mantrix:edgeCases "Only include PRs that have been converted to POs (EBAN.EBELN IS NOT NULL). Exclude cancelled/deleted PRs." .

@@ -1,0 +1,22 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix copa: <http://mantrix.ai/ontology/copa#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+copa:term_margin a mantrix:SemanticTerm ;
+    rdfs:label "margin" ;
+    skos:altLabel "profit" , "profit margin" , "profitability" ;
+    mantrix:disambiguation """'margin' in COPA:
+  'gross margin' → SUM(Gross_Revenue) - SUM(Cogs)
+  'gross margin %' → (revenue - cogs) / revenue * 100
+  'net margin' → SUM(Sales_Margin_of_Net_Sales) / SUM(Net_Sales) * 100
+  'contribution margin' → Net_Sales - Ingredients - Packaging - Freight
+  'margin per unit' → margin / SUM(Inv_Quantity)
+  If unqualified, 'margin' typically means gross margin.""" .
+
+copa:term_profitability a mantrix:SemanticTerm ;
+    rdfs:label "profitability" ;
+    skos:altLabel "profit" , "profitable" , "P&L" ;
+    mantrix:disambiguation "'profitability' queries need both revenue AND cost. Show Net_Sales, COGS, and Margin together. 'most profitable' → ORDER BY margin DESC. 'least profitable' → ORDER BY margin ASC." .

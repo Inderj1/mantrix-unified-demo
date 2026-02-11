@@ -1,0 +1,33 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# Join Path: Invoice Match Validation (Full 3-Way Comparison)
+# ============================================================================
+
+ap:join_invoice_match_validation a mantrix:JoinPath ;
+    rdfs:label "Invoice Match Validation" ;
+    rdfs:comment "Full 3-way comparison: PO (ordered) vs GR (received) vs Invoice (billed). Shows qty and price at each stage with variance calculations." ;
+    mantrix:joinSQL """SELECT
+  r.BELNR as invoice_doc, r.BUZEI as inv_line,
+  r.EBELN as po_number, r.EBELP as po_item,
+  p.MENGE as po_qty, p.NETPR as po_unit_price, p.NETWR as po_value,
+  g.MENGE as gr_qty, g.DMBTR as gr_value,
+  r.MENGE as inv_qty, r.WRBTR as inv_amount,
+  r.WRBTR / NULLIF(r.MENGE, 0) as inv_unit_price,
+  r.MENGE - p.MENGE as qty_var_vs_po,
+  r.MENGE - COALESCE(g.MENGE, 0) as qty_var_vs_gr,
+  (r.WRBTR / NULLIF(r.MENGE, 0)) - p.NETPR as price_variance,
+  p.WEPOS as gr_required,
+  CASE WHEN g.MBLNR IS NULL AND p.WEPOS = true THEN 'GR_MISSING'
+       WHEN ABS(r.MENGE - COALESCE(g.MENGE, p.MENGE)) > 0 THEN 'QTY_MISMATCH'
+       WHEN ABS((r.WRBTR / NULLIF(r.MENGE, 0)) - p.NETPR) > 0 THEN 'PRICE_MISMATCH'
+       ELSE 'MATCH_OK' END as match_status
+FROM RSEG_InvoiceItems r
+JOIN EKPO_POItems p ON r.EBELN = p.EBELN AND r.EBELP = p.EBELP
+LEFT JOIN MATDOC_GoodsReceipts g ON r.EBELN = g.EBELN AND r.EBELP = g.EBELP AND g.BWART = '101'
+WHERE r.EBELN IS NOT NULL""" ;
+    mantrix:answersQuestions "Why is invoice blocked, match status, qty variance, price variance, GR missing" .

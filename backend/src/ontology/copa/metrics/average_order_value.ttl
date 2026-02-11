@@ -1,0 +1,13 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix copa: <http://mantrix.ai/ontology/copa#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+copa:metric_average_order_value a mantrix:Metric ;
+    rdfs:label "Average Order Value" ;
+    rdfs:comment "Average net sales per sales order." ;
+    skos:altLabel "AOV" , "avg order size" , "order value" ;
+    mantrix:sqlFormula "SUM(Net_Sales) / COUNT(DISTINCT Sales_Order)" ;
+    mantrix:exampleSQL "SELECT SUM(Net_Sales) / COUNT(DISTINCT Sales_Order) as aov FROM dataset_25m_table" .

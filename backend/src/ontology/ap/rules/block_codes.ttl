@@ -1,0 +1,26 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# Business Rule: Payment Block Codes
+# ============================================================================
+
+ap:rule_block_codes a mantrix:BusinessRule ;
+    rdfs:label "Payment Block Codes" ;
+    rdfs:comment "How to interpret ZLSPR (payment block) field across tables." ;
+    mantrix:ruleDefinition """RBKP.ZLSPR / ACDOCA.ZLSPR payment block codes:
+- NULL or '' → No block set (payable by F110)
+- 'A' → Free for payment (explicitly released — payable)
+- 'B' → Manual block (set by AP clerk — needs manual release)
+- 'R' → Invoice verification block (auto-set by matching failure — needs resolution)
+
+LFA1 vendor-level blocks:
+- LFA1.SPERR → Posting block (cannot post new invoices)
+- LFA1.ZAHLS → Payment block (F110 will not select this vendor)
+- LFA1.SPERM → Purchasing block (cannot create POs)
+
+IMPORTANT: ZLSPR='A' is NOT a block — it means explicitly released. Filter for blocks:
+WHERE ZLSPR IS NOT NULL AND ZLSPR != '' AND ZLSPR != 'A'""" .

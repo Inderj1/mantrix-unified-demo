@@ -1,0 +1,20 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+ap:rule_posting_keys a mantrix:BusinessRule ;
+    rdfs:label "Posting Keys (BSCHL)" ;
+    rdfs:comment "ACDOCA.BSCHL determines debit/credit and account type." ;
+    mantrix:ruleDefinition """BSCHL posting keys for AP:
+- 21 → Vendor credit (invoice posting — creates liability)
+- 25 → Outgoing payment (clears the liability)
+- 31 → Vendor invoice (alternative to 21)
+- 34 → Vendor credit posting
+- 40 → Debit GL account (expense side of invoice)
+- 50 → Credit GL account
+
+For AP liability: BSCHL IN (21, 31) = invoice posted
+For payments: BSCHL = 25
+For expense analysis: BSCHL = 40 (debit side)""" .

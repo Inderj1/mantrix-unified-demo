@@ -215,10 +215,10 @@ async def health_check():
         "version": "0.1.0"
     }
     
-    # Check BigQuery
+    # Check BigQuery (use SQL generator to respect allowed_tables filtering)
     try:
-        bq = get_bq_client()
-        tables = bq.list_tables()
+        generator = get_sql_generator()
+        tables = generator.list_tables()
         health_status["bigquery"] = f"connected ({len(tables)} tables)"
     except Exception as e:
         health_status["bigquery"] = f"error: {str(e)}"

@@ -1,0 +1,81 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix copa: <http://mantrix.ai/ontology/copa#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: dataset_25m_table — COPA Profitability Analysis
+# ============================================================================
+# THE single COPA table with 25M+ rows. Each row is one CO-PA line item
+# (sales transaction). Contains dimensions (customer, product, region, brand)
+# and measures (gross sales, net sales, COGS, margin).
+# This is a FLAT denormalized table — no joins needed for COPA queries.
+# ============================================================================
+
+copa:dataset_25m_table a owl:Class ;
+    rdfs:label "dataset_25m_table" ;
+    rdfs:comment "COPA profitability analysis table. 25M+ rows. Each row = one CO-PA line item with customer, product, region dimensions and P&L measures. Flat denormalized structure — self-contained for all profitability queries." ;
+    bq:table "dataset_25m_table" ;
+    bq:primaryKey "Sales_Order, Material_Number, Posting_Date" ;
+    skos:altLabel "COPA" , "CO-PA" , "profitability" , "P&L" , "margin analysis" , "sales analytics" ;
+    mantrix:sapTable "CE1xxxx / CE2xxxx (operating concern tables)" ;
+    mantrix:businessRule "This is a FLAT table — no joins needed. All dimensions and measures in one table. Use GROUP BY for aggregations." .
+
+# --- Dimension Columns ---
+copa:col_Sold_to_Number a owl:DatatypeProperty ; rdfs:label "Customer ID" ; bq:column "Sold_to_Number" ; bq:type "STRING" ; rdfs:comment "Sold-to customer number." .
+copa:col_Sold_to_Name a owl:DatatypeProperty ; rdfs:label "Customer Name" ; bq:column "Sold_to_Name" ; bq:type "STRING" .
+copa:col_Payer_Name a owl:DatatypeProperty ; rdfs:label "Payer Name" ; bq:column "Payer_Name" ; bq:type "STRING" ; rdfs:comment "Parent company/payer entity." .
+copa:col_Material_Number a owl:DatatypeProperty ; rdfs:label "Material Number" ; bq:column "Material_Number" ; bq:type "STRING" .
+copa:col_Material_Name a owl:DatatypeProperty ; rdfs:label "Material Name" ; bq:column "Material_Name" ; bq:type "STRING" .
+copa:col_Brand a owl:DatatypeProperty ; rdfs:label "Brand" ; bq:column "Brand" ; bq:type "STRING" .
+copa:col_Region a owl:DatatypeProperty ; rdfs:label "Region" ; bq:column "Region" ; bq:type "STRING" .
+copa:col_Sales_Order a owl:DatatypeProperty ; rdfs:label "Sales Order" ; bq:column "Sales_Order" ; bq:type "STRING" .
+copa:col_Posting_Date a owl:DatatypeProperty ; rdfs:label "Posting Date" ; bq:column "Posting_Date" ; bq:type "DATE" .
+copa:col_Company_Code a owl:DatatypeProperty ; rdfs:label "Company Code" ; bq:column "Company_Code" ; bq:type "STRING" .
+copa:col_GL_Account a owl:DatatypeProperty ; rdfs:label "GL Account" ; bq:column "GL_Account" ; bq:type "STRING" .
+copa:col_Cost_Center a owl:DatatypeProperty ; rdfs:label "Cost Center" ; bq:column "Cost_Center" ; bq:type "STRING" .
+copa:col_Profit_Center a owl:DatatypeProperty ; rdfs:label "Profit Center" ; bq:column "Profit_Center" ; bq:type "STRING" .
+copa:col_Sales_Organization a owl:DatatypeProperty ; rdfs:label "Sales Organization" ; bq:column "Sales_Organization" ; bq:type "STRING" .
+
+# --- Measure Columns ---
+copa:col_Gross_Sales a owl:DatatypeProperty ; rdfs:label "Gross Sales" ; bq:column "Gross_Sales" ; bq:type "FLOAT" ; rdfs:comment "Total gross sales before deductions." .
+copa:col_Gross_Revenue a owl:DatatypeProperty ; rdfs:label "Gross Revenue" ; bq:column "Gross_Revenue" ; bq:type "FLOAT" ; rdfs:comment "Gross revenue." .
+copa:col_Net_Sales a owl:DatatypeProperty ; rdfs:label "Net Sales" ; bq:column "Net_Sales" ; bq:type "FLOAT" ; rdfs:comment "Net sales after deductions." .
+copa:col_Cogs a owl:DatatypeProperty ; rdfs:label "COGS" ; bq:column "Cogs" ; bq:type "FLOAT" ; rdfs:comment "Cost of goods sold." .
+copa:col_Total_COGS a owl:DatatypeProperty ; rdfs:label "Total COGS" ; bq:column "Total_COGS" ; bq:type "FLOAT" ; rdfs:comment "Total cost including all components." .
+copa:col_Ingredients a owl:DatatypeProperty ; rdfs:label "Ingredients" ; bq:column "Ingredients" ; bq:type "FLOAT" ; rdfs:comment "Raw material/ingredients cost." .
+copa:col_Packaging a owl:DatatypeProperty ; rdfs:label "Packaging" ; bq:column "Packaging" ; bq:type "FLOAT" ; rdfs:comment "Packaging material cost." .
+copa:col_Incoming_Freight a owl:DatatypeProperty ; rdfs:label "Incoming Freight" ; bq:column "Incoming_Freight" ; bq:type "FLOAT" ; rdfs:comment "Inbound freight cost." .
+copa:col_Sales_Margin a owl:DatatypeProperty ; rdfs:label "Sales Margin" ; bq:column "Sales_Margin_of_Net_Sales" ; bq:type "FLOAT" ; rdfs:comment "Profit margin on net sales." .
+copa:col_Inv_Quantity a owl:DatatypeProperty ; rdfs:label "Invoice Quantity" ; bq:column "Inv_Quantity" ; bq:type "FLOAT" ; rdfs:comment "Quantity invoiced." .
+
+# --- Example Questions & SQL ---
+copa:q1 mantrix:exampleQuestion "Total revenue by region" ;
+    mantrix:exampleSQL "SELECT Region, SUM(Gross_Revenue) as revenue, SUM(Net_Sales) as net FROM dataset_25m_table GROUP BY Region ORDER BY revenue DESC" .
+copa:q2 mantrix:exampleQuestion "Top 10 customers by gross sales" ;
+    mantrix:exampleSQL "SELECT Sold_to_Name, SUM(Gross_Sales) as total_sales, SUM(Net_Sales) as net_sales, SUM(Cogs) as total_cogs FROM dataset_25m_table GROUP BY Sold_to_Name ORDER BY total_sales DESC LIMIT 10" .
+copa:q3 mantrix:exampleQuestion "Gross margin by brand" ;
+    mantrix:exampleSQL "SELECT Brand, SUM(Gross_Revenue) as revenue, SUM(Cogs) as cogs, SUM(Gross_Revenue) - SUM(Cogs) as gross_margin, (SUM(Gross_Revenue) - SUM(Cogs)) / NULLIF(SUM(Gross_Revenue), 0) * 100 as gm_pct FROM dataset_25m_table GROUP BY Brand ORDER BY gross_margin DESC" .
+copa:q4 mantrix:exampleQuestion "Revenue trend by month" ;
+    mantrix:exampleSQL "SELECT DATE_TRUNC(Posting_Date, MONTH) as month, SUM(Gross_Revenue) as revenue, SUM(Net_Sales) as net_sales FROM dataset_25m_table GROUP BY month ORDER BY month" .
+copa:q5 mantrix:exampleQuestion "Profitability by product" ;
+    mantrix:exampleSQL "SELECT Material_Name, SUM(Net_Sales) as net_sales, SUM(Total_COGS) as total_cogs, SUM(Sales_Margin_of_Net_Sales) as margin, SUM(Inv_Quantity) as units FROM dataset_25m_table GROUP BY Material_Name ORDER BY margin DESC LIMIT 20" .
+copa:q6 mantrix:exampleQuestion "Customer profitability analysis" ;
+    mantrix:exampleSQL """SELECT Sold_to_Name, Payer_Name,
+  SUM(Net_Sales) as net_sales, SUM(Cogs) as cogs,
+  SUM(Net_Sales) - SUM(Cogs) as gross_profit,
+  (SUM(Net_Sales) - SUM(Cogs)) / NULLIF(SUM(Net_Sales), 0) * 100 as margin_pct,
+  SUM(Inv_Quantity) as units
+FROM dataset_25m_table
+GROUP BY Sold_to_Name, Payer_Name
+ORDER BY gross_profit DESC LIMIT 20""" .
+
+# --- Edge Cases ---
+copa:edge1 mantrix:edgeCases "This is a FLAT denormalized table. No joins required. All dimension and measure columns in one table." .
+copa:edge2 mantrix:edgeCases "Gross_Revenue and Net_Sales differ by deductions (discounts, returns). Use Net_Sales for margin calculations." .
+copa:edge3 mantrix:edgeCases "Total_COGS includes Ingredients + Packaging + Incoming_Freight + other cost components. Cogs may be a subset." .
+copa:edge4 mantrix:edgeCases "Inv_Quantity can be negative for returns/credit memos. Filter for positive quantities for volume analysis." .

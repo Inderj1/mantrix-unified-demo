@@ -1,0 +1,32 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# AP Metric: Discount Capture Rate
+# ============================================================================
+
+ap:metric_discount_capture_rate a mantrix:Metric ;
+    rdfs:label "Discount Capture Rate" ;
+    rdfs:comment "Percentage of available early payment discounts that were captured. Missed discounts = direct bottom-line leakage. High-value quick win for AP optimization." ;
+    skos:altLabel "discount utilization" , "early pay discount rate" , "cash discount rate" ;
+    mantrix:category "working_capital" ;
+    mantrix:unit "percent" ;
+    mantrix:direction "higher_is_better" ;
+    mantrix:benchmark "80-90% (best-in-class), 50-60% (average)" ;
+    mantrix:sqlFormula "COUNTIF(DISCOUNT_CAPTURED = true) * 100.0 / COUNTIF(DISC_AMOUNT > 0)" ;
+    mantrix:sourceTables "ACDOCA_UniversalJournal, RBKP_InvoiceHeaders, REGUP_PaymentItems, T052_PaymentTerms" ;
+    mantrix:dimensions "vendor, company_code, payment_terms" ;
+    mantrix:exampleQuestion "What is our discount capture rate?" ;
+    mantrix:exampleSQL """SELECT
+  COUNTIF(DISCOUNT_CAPTURED = true) * 100.0 / NULLIF(COUNTIF(DISCOUNT_AMOUNT > 0), 0) as capture_rate,
+  SUM(CASE WHEN DISCOUNT_CAPTURED = true THEN DISCOUNT_AMOUNT ELSE 0 END) as captured_amount,
+  SUM(CASE WHEN DISCOUNT_CAPTURED = false AND DISCOUNT_AMOUNT > 0 THEN DISCOUNT_AMOUNT ELSE 0 END) as missed_amount
+FROM ACDOCA_UniversalJournal
+WHERE KOART = 'K' AND RLDNR = '0L' AND AUGBL IS NOT NULL""" ;
+    mantrix:edgeCases "Only invoices with discount terms (T052.ZPRZ1 > 0) are eligible. DISCOUNT_CAPTURED and DISCOUNT_AMOUNT are Axis AI enriched fields." .

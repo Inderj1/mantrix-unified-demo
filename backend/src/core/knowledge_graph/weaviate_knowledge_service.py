@@ -21,10 +21,11 @@ Usage:
 """
 
 from typing import Dict, List, Any, Optional, Tuple
+import json
 import structlog
 import weaviate
 import weaviate.classes as wvc
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import re
 
 from src.config import settings
@@ -66,6 +67,17 @@ class ColumnTypeMatch:
     display_type: str
     format_template: str
     confidence: float
+
+
+@dataclass
+class OntologyMatch:
+    """Result of ontology knowledge search."""
+    name: str
+    description: str
+    module: str
+    knowledge_type: str
+    content: Dict[str, Any] = field(default_factory=dict)
+    confidence: float = 0.0
 
 
 class WeaviateKnowledgeService:
@@ -423,6 +435,87 @@ class WeaviateKnowledgeService:
         except Exception as e:
             logger.error(f"Error getting SQL examples: {e}")
             return self._fallback_sql_examples(query)
+
+    def find_ontology_knowledge(
+        self, query: str, module: str = None,
+        knowledge_type: str = None, limit: int = 5
+    ) -> List[OntologyMatch]:
+        """Find relevant ontology knowledge for a natural language query.
+
+        Searches the OntologyKnowledge collection which contains parsed TTL
+        ontology data — table schemas, metrics, business terms, join paths,
+        query patterns, and business rules.
+
+        Args:
+            query: Natural language query, e.g. "open AP balance"
+            module: Optional filter — "ap" or "copa"
+            knowledge_type: Optional filter — "table", "metric", "term",
+                           "join_path", "query_pattern", "business_rule",
+                           "dimension", "measure", "relationship"
+            limit: Max results to return
+
+        Returns:
+            List of OntologyMatch sorted by confidence (highest first)
+        """
+        if not self.client:
+            logger.warning("Weaviate client not available for ontology search")
+            return []
+
+        try:
+            if not self.client.collections.exists("OntologyKnowledge"):
+                logger.warning("OntologyKnowledge collection not found. Run load_ontology_to_weaviate.py first.")
+                return []
+
+            embedding = self.embedding_service.generate_embedding(query)
+            collection = self.client.collections.get("OntologyKnowledge")
+
+            # Build optional filters
+            filters = None
+            if module and knowledge_type:
+                filters = (
+                    wvc.query.Filter.by_property("module").equal(module) &
+                    wvc.query.Filter.by_property("knowledge_type").equal(knowledge_type)
+                )
+            elif module:
+                filters = wvc.query.Filter.by_property("module").equal(module)
+            elif knowledge_type:
+                filters = wvc.query.Filter.by_property("knowledge_type").equal(knowledge_type)
+
+            response = collection.query.near_vector(
+                near_vector=embedding,
+                limit=limit,
+                filters=filters,
+                return_metadata=wvc.query.MetadataQuery(distance=True),
+            )
+
+            results = []
+            for item in response.objects:
+                props = item.properties
+                distance = item.metadata.distance if item.metadata else 0.5
+
+                if distance < 0.7:  # Reasonable confidence threshold
+                    content = {}
+                    try:
+                        content = json.loads(props.get("content_json", "{}"))
+                    except (json.JSONDecodeError, TypeError):
+                        pass
+
+                    results.append(OntologyMatch(
+                        name=props.get("name", ""),
+                        description=props.get("description", ""),
+                        module=props.get("module", ""),
+                        knowledge_type=props.get("knowledge_type", ""),
+                        content=content,
+                        confidence=round(1 - distance, 4),
+                    ))
+
+            logger.info(f"Ontology search for '{query[:50]}': {len(results)} results",
+                        module=module, knowledge_type=knowledge_type)
+            return results
+
+        except Exception as e:
+            logger.error(f"Error searching ontology knowledge: {e}")
+            return []
 
     def _fallback_sql_examples(self, query: str) -> List[Dict[str, Any]]:
         """Fallback SQL examples when Weaviate is not available."""

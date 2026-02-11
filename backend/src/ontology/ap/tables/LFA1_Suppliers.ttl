@@ -1,0 +1,71 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# BigQuery Table: LFA1_Suppliers — Vendor Master Data
+# ============================================================================
+# Business context: Central master record for all suppliers/vendors.
+# Contains identification, payment terms, blocking status, and risk scoring.
+# S/4HANA uses BUT000 (Business Partner); ECC uses LFA1.
+# This is the primary dimension table for vendor analysis.
+# ============================================================================
+
+ap:LFA1_Suppliers a owl:Class ;
+    rdfs:label "LFA1_Suppliers" ;
+    rdfs:comment "Vendor master data table. Central record for supplier identification, payment defaults, blocking status, and Axis AI risk scoring. One row per vendor." ;
+    bq:table "LFA1_Suppliers" ;
+    bq:primaryKey "LIFNR" ;
+    skos:altLabel "vendor" , "payee" , "creditor" , "business partner" , "supplier master" , "BP" ;
+    mantrix:sapTable "LFA1" , "BUT000" ;
+    mantrix:relatedConcepts "EKKO_POHeaders, RBKP_InvoiceHeaders, ACDOCA_UniversalJournal, REGUH_PaymentHeaders, LFBK_VendorBanks" .
+
+# --- Column Definitions ---
+ap:LFA1_LIFNR a owl:DatatypeProperty ; rdfs:label "Vendor Number" ; bq:column "LIFNR" ; bq:type "INTEGER" ; rdfs:comment "SAP vendor number (LIFNR). Primary key. Join to all transactional tables via LIFNR." ; mantrix:sapField "LIFNR" .
+ap:LFA1_NAME1 a owl:DatatypeProperty ; rdfs:label "Vendor Name" ; bq:column "NAME1" ; bq:type "STRING" ; rdfs:comment "Supplier company name. Searchable — users often query by partial name." ; mantrix:sapField "NAME1" .
+ap:LFA1_LAND1 a owl:DatatypeProperty ; rdfs:label "Country" ; bq:column "LAND1" ; bq:type "STRING" ; rdfs:comment "Country key (ISO 2-letter). E.g., US, DE, CN, IN." ; mantrix:sapField "LAND1" .
+ap:LFA1_KTOKK a owl:DatatypeProperty ; rdfs:label "Account Group" ; bq:column "KTOKK" ; bq:type "STRING" ; rdfs:comment "Vendor account group controlling which fields are visible/required. E.g., KRED=domestic, KRAU=foreign." ; mantrix:sapField "KTOKK" .
+ap:LFA1_STCD1 a owl:DatatypeProperty ; rdfs:label "Tax ID" ; bq:column "STCD1" ; bq:type "STRING" ; rdfs:comment "Tax identification number 1 (EIN/TIN in US). Used for 1099 reporting." ; mantrix:sapField "STCD1" .
+ap:LFA1_BUKRS a owl:DatatypeProperty ; rdfs:label "Company Code" ; bq:column "BUKRS" ; bq:type "STRING" ; rdfs:comment "Company code where vendor is maintained." ; mantrix:sapField "BUKRS" .
+ap:LFA1_AKONT a owl:DatatypeProperty ; rdfs:label "Reconciliation Account" ; bq:column "AKONT" ; bq:type "STRING" ; rdfs:comment "GL reconciliation account linking AP subledger to general ledger. Critical for subledger-vs-GL reconciliation." ; mantrix:sapField "AKONT" .
+ap:LFA1_ZTERM a owl:DatatypeProperty ; rdfs:label "Default Payment Terms" ; bq:column "ZTERM" ; bq:type "STRING" ; rdfs:comment "Default payment terms from vendor master. Join to T052_PaymentTerms.ZTERM for net days and discount details." ; mantrix:sapField "ZTERM" .
+ap:LFA1_ZWELS a owl:DatatypeProperty ; rdfs:label "Payment Method" ; bq:column "ZWELS" ; bq:type "STRING" ; rdfs:comment "Permitted payment methods. C=check, T=wire, E=ACH. Multiple values concatenated." ; mantrix:sapField "ZWELS" .
+ap:LFA1_WAERS a owl:DatatypeProperty ; rdfs:label "Currency" ; bq:column "WAERS" ; bq:type "STRING" ; rdfs:comment "Default currency for vendor transactions." ; mantrix:sapField "WAERS" .
+ap:LFA1_SPERR a owl:DatatypeProperty ; rdfs:label "Posting Block" ; bq:column "SPERR" ; bq:type "BOOLEAN" ; rdfs:comment "Company-code-level POSTING block. True = no new invoices can be posted against this vendor." ; mantrix:sapField "SPERR" .
+ap:LFA1_ZAHLS a owl:DatatypeProperty ; rdfs:label "Payment Block" ; bq:column "ZAHLS" ; bq:type "BOOLEAN" ; rdfs:comment "Company-code-level PAYMENT block. True = vendor excluded from F110 payment runs." ; mantrix:sapField "ZAHLS" .
+ap:LFA1_SPERM a owl:DatatypeProperty ; rdfs:label "Purchasing Block" ; bq:column "SPERM" ; bq:type "BOOLEAN" ; rdfs:comment "Purchasing-org-level block. True = no new POs can be created for this vendor." ; mantrix:sapField "SPERM" .
+ap:LFA1_INDUSTRY a owl:DatatypeProperty ; rdfs:label "Industry" ; bq:column "INDUSTRY" ; bq:type "STRING" ; rdfs:comment "Industry classification for vendor segmentation." .
+ap:LFA1_RISK_SCORE a owl:DatatypeProperty ; rdfs:label "Risk Score" ; bq:column "RISK_SCORE" ; bq:type "FLOAT" ; rdfs:comment "Axis AI computed vendor risk score 0-100. Derived from payment history, block frequency, dispute rate, invoice accuracy. NOT a SAP field." .
+
+# --- Join Paths ---
+ap:LFA1_join_EKKO a mantrix:joinPath ; rdfs:label "Supplier → POs" ; rdfs:comment "LFA1_Suppliers.LIFNR = EKKO_POHeaders.LIFNR — Find all POs for a vendor" .
+ap:LFA1_join_RBKP a mantrix:joinPath ; rdfs:label "Supplier → Invoices" ; rdfs:comment "LFA1_Suppliers.LIFNR = RBKP_InvoiceHeaders.LIFNR — Find all invoices from a vendor" .
+ap:LFA1_join_ACDOCA a mantrix:joinPath ; rdfs:label "Supplier → Open Items" ; rdfs:comment "LFA1_Suppliers.LIFNR = ACDOCA_UniversalJournal.LIFNR WHERE KOART='K' — Open/cleared AP items" .
+ap:LFA1_join_REGUH a mantrix:joinPath ; rdfs:label "Supplier → Payments" ; rdfs:comment "LFA1_Suppliers.LIFNR = REGUH_PaymentHeaders.LIFNR — Payment history" .
+ap:LFA1_join_LFBK a mantrix:joinPath ; rdfs:label "Supplier → Bank Details" ; rdfs:comment "LFA1_Suppliers.LIFNR = LFBK_VendorBanks.LIFNR — Bank account info (RESTRICTED)" .
+ap:LFA1_join_T052 a mantrix:joinPath ; rdfs:label "Supplier → Payment Terms" ; rdfs:comment "LFA1_Suppliers.ZTERM = T052_PaymentTerms.ZTERM — Payment terms details" .
+
+# --- Example Questions & SQL ---
+ap:LFA1_q1 mantrix:exampleQuestion "Show all vendors in US" ;
+    mantrix:exampleSQL "SELECT LIFNR, NAME1, LAND1, INDUSTRY FROM LFA1_Suppliers WHERE LAND1 = 'US' ORDER BY NAME1" .
+ap:LFA1_q2 mantrix:exampleQuestion "Which vendors are blocked?" ;
+    mantrix:exampleSQL "SELECT LIFNR, NAME1, SPERR as posting_blocked, ZAHLS as payment_blocked, SPERM as purchasing_blocked FROM LFA1_Suppliers WHERE SPERR = true OR ZAHLS = true OR SPERM = true" .
+ap:LFA1_q3 mantrix:exampleQuestion "What payment terms does vendor X have?" ;
+    mantrix:exampleSQL "SELECT s.LIFNR, s.NAME1, s.ZTERM, t.TEXT1, t.ZTAG1, t.ZPRZ1, t.ZTAG3 FROM LFA1_Suppliers s JOIN T052_PaymentTerms t ON s.ZTERM = t.ZTERM WHERE s.NAME1 LIKE '%vendor_name%'" .
+ap:LFA1_q4 mantrix:exampleQuestion "Top 10 vendors by risk score" ;
+    mantrix:exampleSQL "SELECT LIFNR, NAME1, RISK_SCORE, INDUSTRY, LAND1 FROM LFA1_Suppliers ORDER BY RISK_SCORE DESC LIMIT 10" .
+ap:LFA1_q5 mantrix:exampleQuestion "How much do we owe vendor X?" ;
+    mantrix:exampleSQL "SELECT s.LIFNR, s.NAME1, SUM(a.HSL) as open_balance FROM LFA1_Suppliers s JOIN ACDOCA_UniversalJournal a ON s.LIFNR = a.LIFNR WHERE a.KOART = 'K' AND a.AUGBL IS NULL AND a.RLDNR = '0L' GROUP BY s.LIFNR, s.NAME1" .
+ap:LFA1_q6 mantrix:exampleQuestion "Vendors with payment method = check" ;
+    mantrix:exampleSQL "SELECT LIFNR, NAME1, ZWELS FROM LFA1_Suppliers WHERE ZWELS LIKE '%C%'" .
+
+# --- Edge Cases ---
+ap:LFA1_edge1 mantrix:edgeCases "THREE different block types: SPERR (posting), ZAHLS (payment), SPERM (purchasing). User saying 'blocked vendor' could mean any of the three — clarify." .
+ap:LFA1_edge2 mantrix:edgeCases "RISK_SCORE is Axis AI derived (0-100), NOT a SAP field. Computed from payment history, block frequency, dispute rate." .
+ap:LFA1_edge3 mantrix:edgeCases "ZTERM from vendor master is the DEFAULT. Individual POs and invoices can override with their own ZTERM." .
+ap:LFA1_edge4 mantrix:edgeCases "In S/4HANA, vendor data may be split across BUT000 (BP general) + LFB1 (company code) + LFM1 (purchasing org). BQ replica uses denormalized LFA1." .

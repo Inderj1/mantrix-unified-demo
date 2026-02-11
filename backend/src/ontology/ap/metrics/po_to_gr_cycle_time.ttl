@@ -1,0 +1,40 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ap: <http://mantrix.ai/ontology/ap#> .
+@prefix bq: <http://mantrix.ai/ontology/bigquery#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+# ============================================================================
+# AP Metric: PO-to-GR Cycle Time
+# ============================================================================
+
+ap:metric_po_to_gr_cycle_time a mantrix:Metric ;
+    rdfs:label "PO-to-GR Cycle Time" ;
+    rdfs:comment "Average days from PO creation to first goods receipt. Measures supplier delivery performance and lead time." ;
+    skos:altLabel "delivery lead time" , "order to receipt" , "PO to goods receipt" ;
+    mantrix:category "cycle_time" ;
+    mantrix:unit "days" ;
+    mantrix:direction "lower_is_better" ;
+    mantrix:benchmark "5-10 days (domestic), 15-30 days (international)" ;
+    mantrix:sqlFormula "AVG(DATE_DIFF(g.BUDAT, k.AEDAT, DAY))" ;
+    mantrix:sourceTables "EKKO_POHeaders, MATDOC_GoodsReceipts" ;
+    mantrix:dimensions "vendor, plant, material_group, purchasing_org" ;
+    mantrix:exampleQuestion "Average PO to GR cycle time" ;
+    mantrix:exampleSQL """SELECT
+  AVG(DATE_DIFF(g.BUDAT, k.AEDAT, DAY)) as avg_days,
+  APPROX_QUANTILES(DATE_DIFF(g.BUDAT, k.AEDAT, DAY), 100)[OFFSET(50)] as median_days
+FROM EKKO_POHeaders k
+JOIN MATDOC_GoodsReceipts g ON k.EBELN = g.EBELN
+WHERE g.BWART = '101'""" ;
+    mantrix:exampleQuestion "PO to GR time by vendor" ;
+    mantrix:exampleSQL """SELECT k.LIFNR, s.NAME1,
+  AVG(DATE_DIFF(g.BUDAT, k.AEDAT, DAY)) as avg_days, COUNT(*) as deliveries
+FROM EKKO_POHeaders k
+JOIN MATDOC_GoodsReceipts g ON k.EBELN = g.EBELN
+JOIN LFA1_Suppliers s ON k.LIFNR = s.LIFNR
+WHERE g.BWART = '101'
+GROUP BY k.LIFNR, s.NAME1 ORDER BY avg_days DESC""" ;
+    mantrix:edgeCases "Only use BWART='101' (standard GR). Exclude reversals (102). Use first GR per PO item for lead time calc." .

@@ -1,0 +1,31 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix copa: <http://mantrix.ai/ontology/copa#> .
+@prefix mantrix: <http://mantrix.ai/ontology#> .
+
+copa:term_ytd a mantrix:SemanticTerm ;
+    rdfs:label "Year to Date" ;
+    skos:altLabel "YTD" , "this year" ;
+    mantrix:canonicalFilter "Posting_Date >= DATE_TRUNC(CURRENT_DATE(), YEAR)" .
+
+copa:term_qtd a mantrix:SemanticTerm ;
+    rdfs:label "Quarter to Date" ;
+    skos:altLabel "QTD" , "this quarter" ;
+    mantrix:canonicalFilter "Posting_Date >= DATE_TRUNC(CURRENT_DATE(), QUARTER)" .
+
+copa:term_mtd a mantrix:SemanticTerm ;
+    rdfs:label "Month to Date" ;
+    skos:altLabel "MTD" , "this month" ;
+    mantrix:canonicalFilter "Posting_Date >= DATE_TRUNC(CURRENT_DATE(), MONTH)" .
+
+copa:term_yoy a mantrix:SemanticTerm ;
+    rdfs:label "Year over Year" ;
+    skos:altLabel "YoY" , "vs last year" , "annual comparison" ;
+    mantrix:disambiguation "YoY comparison: compute metric for current period and same period last year. Use EXTRACT(YEAR FROM Posting_Date) or LAG() window function." .
+
+copa:term_mom a mantrix:SemanticTerm ;
+    rdfs:label "Month over Month" ;
+    skos:altLabel "MoM" , "vs last month" , "monthly comparison" ;
+    mantrix:disambiguation "MoM: compare current month to prior month. Use LAG(metric, 1) OVER (ORDER BY month)." .
