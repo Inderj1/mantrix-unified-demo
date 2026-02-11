@@ -1969,8 +1969,9 @@ const SimpleChatInterface = ({ darkMode = false }) => {
                                 return <span style={{ color: darkMode ? '#6b7280' : '#9ca3af', fontStyle: 'italic' }}>—</span>;
                               }
 
-                              // Convert to number if it's a numeric string
-                              const numValue = typeof params.value === 'number' ? params.value : parseFloat(params.value);
+                              // Convert to number if it's a numeric string (strip commas first)
+                              const cleanedValue = typeof params.value === 'string' ? params.value.replace(/,/g, '') : params.value;
+                              const numValue = typeof cleanedValue === 'number' ? cleanedValue : parseFloat(cleanedValue);
                               const isValidNumber = !isNaN(numValue) && isFinite(numValue);
 
                               // Style year columns — centered, no commas
