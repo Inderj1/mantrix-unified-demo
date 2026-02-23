@@ -17,4 +17,4 @@ copa:dim_time_period a mantrix:Dimension ;
   'last year' → EXTRACT(YEAR FROM Posting_Date) = EXTRACT(YEAR FROM CURRENT_DATE()) - 1
   'Q1' → EXTRACT(QUARTER FROM Posting_Date) = 1
   YoY comparison → use LAG() or self-join on same month/quarter prior year""" ;
-    mantrix:exampleSQL "SELECT DATE_TRUNC(Posting_Date, MONTH) as month, SUM(Gross_Revenue) as revenue FROM dataset_25m_table GROUP BY month ORDER BY month" .
+    mantrix:exampleSQL "SELECT DATE_TRUNC(Posting_Date, MONTH) as month, SUM(Gross_Sales) as revenue FROM dataset_25m_table GROUP BY month ORDER BY month" .

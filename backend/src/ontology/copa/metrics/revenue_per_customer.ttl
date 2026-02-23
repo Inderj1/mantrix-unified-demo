@@ -9,5 +9,5 @@ copa:metric_revenue_per_customer a mantrix:Metric ;
     rdfs:label "Revenue per Customer" ;
     rdfs:comment "Average revenue per unique customer. Measures customer value." ;
     skos:altLabel "ARPC" , "average revenue per customer" , "customer value" ;
-    mantrix:sqlFormula "SUM(Gross_Revenue) / COUNT(DISTINCT Sold_to_Name)" ;
-    mantrix:exampleSQL "SELECT SUM(Gross_Revenue) / COUNT(DISTINCT Sold_to_Name) as arpc FROM dataset_25m_table" .
+    mantrix:sqlFormula "SUM(Gross_Sales) / COUNT(DISTINCT Sold_to_Name)" ;
+    mantrix:exampleSQL "SELECT SUM(Gross_Sales) / COUNT(DISTINCT Sold_to_Name) as arpc FROM dataset_25m_table" .

@@ -471,14 +471,14 @@ The LOWER() function is ONLY for filtering in WHERE clause. NEVER apply it to SE
 THIS IS THE MOST IMPORTANT RULE - FOLLOW EXACTLY:
 
 For ANY query about revenue, sales, or income:
-1. ALWAYS use the Gross_Revenue column: SUM(COALESCE(Gross_Revenue, 0))
+1. ALWAYS use the Gross_Sales column: SUM(COALESCE(Gross_Sales, 0)). NEVER use Gross_Revenue.
 2. NEVER use GL_Amount_in_CC for revenue calculations
 3. NEVER use "CASE WHEN GL_Amount_in_CC > 0" pattern for revenue
 4. NEVER use "SUM(CASE WHEN GL_Amount_in_CC > 0 THEN GL_Amount_in_CC ELSE 0 END)"
 
 CORRECT revenue query pattern:
   SELECT EXTRACT(YEAR FROM Posting_Date) as year,
-         ROUND(SUM(COALESCE(Gross_Revenue, 0)), 2) as total_revenue
+         ROUND(SUM(COALESCE(Gross_Sales, 0)), 2) as total_revenue
   FROM table_name
   WHERE Posting_Date >= CURRENT_DATE - INTERVAL '2 years'
   GROUP BY year
@@ -489,7 +489,7 @@ INCORRECT patterns (NEVER USE THESE):
   ❌ GL_Amount_in_CC > 0 for revenue
 
 Revenue column mapping:
-- "revenue", "total revenue", "sales revenue" → SUM(COALESCE(Gross_Revenue, 0))
+- "revenue", "total revenue", "sales revenue" → SUM(COALESCE(Gross_Sales, 0))
 - "net sales" → SUM(COALESCE(Net_Sales, 0))  
 - "gross sales" → SUM(COALESCE(Gross_Sales, 0))
 
@@ -581,25 +581,26 @@ Rules:
       * Numeric sorting: 8240 < 80333 (correct!)
       * Always sort on NUMBERS, format AFTER sorting
 14. COPA Schema Revenue and Margin Rules:
-    - Gross Revenue: Use Gross_Revenue column for total gross revenue queries
+    - Gross Revenue: Use Gross_Sales column (NEVER Gross_Revenue — it produces wrong negative values)
     - Net Sales: Use Net_Sales column for net sales after deductions
     - Gross Sales: Use Gross_Sales column for gross sales amounts
     - General Revenue: Check for Revenue column or use appropriate revenue column based on context
     - COGS: Use the pre-calculated Total_COGS field, NOT GL account ranges
     - Margin %: Use Sales_Margin_of_Gross_Sales for pre-calculated percentages
-    - Gross Profit: Calculate as (Gross_Revenue - Total_COGS)
-    - Net Profit: Calculate as (Net_Sales - Total_COS)
+    - Gross Profit: Calculate as SUM(Gross_Sales) + SUM(Total_COGS) — costs are stored as NEGATIVE, so ADD not subtract
+    - Net Profit: Calculate as SUM(Net_Sales) + SUM(Total_COGS) — costs are NEGATIVE
     - Fiscal Year: Data is typically for previous year (2024), not current year
     - GL Accounts: 6-digit range (400000-700000), not 4-digit ranges like 4000-4999
-    - PROFIT MARGIN %: ALWAYS calculate as (SUM(Gross_Revenue) - SUM(Total_COGS)) / NULLIF(SUM(Gross_Revenue), 0) * 100. Never invent alternative formulas.
-    - CUSTOMER PROFIT MARGIN: Group by Sold_to_Name (or Customer), use SUM(COALESCE(Gross_Revenue, 0)) and SUM(COALESCE(Total_COGS, 0)). Add HAVING SUM(Gross_Revenue) > 0 to avoid division by zero.
+    - PROFIT MARGIN %: ALWAYS calculate as (SUM(Gross_Sales) + SUM(Total_COGS)) / NULLIF(SUM(Gross_Sales), 0) * 100. Costs are NEGATIVE so use addition.
+    - CUSTOMER PROFIT MARGIN: Group by Sold_to_Name, use SUM(Gross_Sales) and SUM(Total_COGS). Add HAVING SUM(Gross_Sales) > 0 to avoid division by zero.
     - COLUMN WHITELIST for P&L queries:
-      * Revenue columns: Gross_Revenue, Net_Sales, Gross_Sales, Revenue
-      * Cost columns: Total_COGS, Cogs, Total_COS
+      * Revenue columns: Gross_Sales, Net_Sales (NEVER use Gross_Revenue — it produces wrong negative values)
+      * Cost columns: Total_COGS, Cogs, Total_COS (ALL stored as NEGATIVE values)
       * Pre-calculated margins: Sales_Margin_of_Net_Sales, Sales_Margin_of_Gross_Sales
     - NEVER HALLUCINATE COLUMNS: Only use columns from the provided schema. Specifically, these columns DO NOT EXIST and must NEVER be used: Pallet_Revenue_Net, Promotional_Allowances, Freight_Allowance, Net_Revenue, Revenue_Adjustments. If unsure whether a column exists, use only the whitelisted columns above.
 15. CRITICAL: When generating queries for revenue, margin, profitability, cost analysis:
-    - ALWAYS use the appropriate revenue columns (Gross_Revenue, Net_Sales, Gross_Sales) NOT GL_Amount_in_CC
+    - ALWAYS use Gross_Sales (NOT Gross_Revenue) for revenue. NEVER use Gross_Revenue — it produces wrong negative values.
+    - All cost columns (Total_COGS, Cogs, Ingredients, Packaging, etc.) are stored as NEGATIVE values. Use ADDITION for profit: SUM(Gross_Sales) + SUM(Total_COGS)
     - Use Total_COGS for cost of goods sold, not manual calculations
     - Use COALESCE to handle NULL values in revenue and cost columns
     - Follow the column mapping: revenue queries should use revenue columns, not GL account amounts
@@ -637,7 +638,7 @@ Rules:
     '$' || to_char(ROUND(column_value, 2), 'FM999,999,999.00')
 
     Apply to these column types:
-    - Revenue, Sales, Gross_Revenue, Net_Sales, Total_Sales
+    - Revenue, Sales, Gross_Sales, Net_Sales, Total_Sales
     - Cost, COGS, Total_COGS, Expenses, OpEx, Std_Cost
     - Price, Amount, Value, Total, Sum
     - Profit, Margin (when not %), Income, EBITDA
@@ -694,24 +695,25 @@ Rules:
     - Format EVERY applicable column in SELECT clause
     - Apply to BOTH raw columns AND calculated fields
     - The formatting pattern is complex but ensures thousand separators appear correctly
-    - Use COALESCE before formatting: SUM(COALESCE(Gross_Revenue, 0))
+    - Use COALESCE before formatting: SUM(COALESCE(Gross_Sales, 0))
 
     **Good Example** - Copy this formatting pattern exactly:
 
     WITH CustomerMetrics AS (
       SELECT
-        Customer,
-        SUM(COALESCE(Gross_Revenue, 0)) as total_revenue,
+        Sold_to_Name,
+        SUM(COALESCE(Gross_Sales, 0)) as total_revenue,
         SUM(COALESCE(Total_COGS, 0)) as total_cogs,
         COUNT(DISTINCT Sales_Order_KDAUF) as order_count
       FROM dataset_25m_table
-      GROUP BY Customer
+      WHERE Sold_to_Name IS NOT NULL
+      GROUP BY Sold_to_Name
     )
     SELECT
-      Customer,
-      CONCAT('$', FORMAT('%\\'d', CAST(FLOOR(total_revenue) AS INT64)), FORMAT('.%02d', CAST(ROUND((total_revenue - FLOOR(total_revenue)) * 100) AS INT64))) as revenue,
-      CONCAT('$', FORMAT('%\\'d', CAST(FLOOR(total_cogs) AS INT64)), FORMAT('.%02d', CAST(ROUND((total_cogs - FLOOR(total_cogs)) * 100) AS INT64))) as cogs,
-      FORMAT('%\\'d', CAST(order_count AS INT64)) as order_count
+      Sold_to_Name,
+      '$' || to_char(ROUND(total_revenue, 2), 'FM999,999,999.00') as revenue,
+      '$' || to_char(ROUND(total_cogs, 2), 'FM999,999,999.00') as cogs,
+      order_count
     FROM CustomerMetrics
 
     NOTE: First character in CONCAT must be '$' (dollar sign, ASCII 36)
@@ -919,8 +921,8 @@ Financial Query Rules:
             prompt_parts.append("\n\nEXAMPLE MULTI-TABLE QUERY PATTERN:")
             prompt_parts.append("sql")
             prompt_parts.append("SELECT")
-            prompt_parts.append("    copa.Gross_Revenue,")
-            prompt_parts.append("    copa.Customer,")
+            prompt_parts.append("    copa.Gross_Sales,")
+            prompt_parts.append("    copa.Sold_to_Name,")
             prompt_parts.append("    cockpit.DocumentDate_AUDAT,")
             prompt_parts.append("    cockpit.Delivery_VBELN")
             prompt_parts.append("FROM project.dataset.dataset_25m_table copa")
@@ -1258,7 +1260,7 @@ Return a JSON object with:
 
         # PRIORITY 1: Check for revenue queries FIRST - this is most critical
         if any(term in query_lower for term in ['revenue', 'sales', 'income', 'turnover']):
-            # ALWAYS add revenue examples from GROSS_MARGIN_EXAMPLES that use Gross_Revenue correctly
+            # ALWAYS add revenue examples from GROSS_MARGIN_EXAMPLES that use Gross_Sales correctly
             relevant_examples.extend([ex for ex in GROSS_MARGIN_EXAMPLES if 'revenue' in ex['question'].lower()][:2])
             # Ensure we have at least one revenue example
             if not relevant_examples:

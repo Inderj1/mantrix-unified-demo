@@ -4,7 +4,7 @@ BigQuery SQL Generator - NLP to SQL for AXIS.AI with configurable datasets
 Integrates with WeaviateKnowledgeService for:
 - Dynamic few-shot SQL examples
 - Financial metric definitions and formulas
-- Synonym resolution (e.g., "revenue" -> "Gross_Revenue")
+- Synonym resolution (e.g., "revenue" -> "Gross_Sales")
 - Column type detection for formatting
 """
 from typing import List, Dict, Any, Optional
@@ -13,6 +13,7 @@ from src.core.llm_client import LLMClient
 from src.core.cache_manager import CacheManager
 from src.db.bigquery import BigQueryClient
 from src.config import settings
+from src.core.ap_examples import AP_BUSINESS_RULES, select_relevant_ap_examples
 
 # Import knowledge service for semantic search
 try:
@@ -1246,7 +1247,7 @@ class BigQuerySQLGenerator:
             - "Last 6 months": ORDER BY month DESC LIMIT 6 (NOT: WHERE date >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH))
             - "Recent data": ORDER BY Posting_Date DESC LIMIT 1000 (NOT: WHERE Posting_Date >= CURRENT_DATE() - 30)
             - "This year" or "YTD" or "year to date": WHERE EXTRACT(YEAR FROM Posting_Date) = 2025
-            - "YTD revenue": SUM(Gross_Revenue) WHERE EXTRACT(YEAR FROM Posting_Date) = 2025
+            - "YTD revenue": SUM(Gross_Sales) WHERE EXTRACT(YEAR FROM Posting_Date) = 2025
 
             CRITICAL - YEAR TO DATE (YTD) QUERIES:
             - For ANY "YTD", "year to date", "this year" query, use year = 2025 (the most recent complete year in data)
@@ -1294,7 +1295,7 @@ class BigQuerySQLGenerator:
                - `Gross_Sales` - Total gross sales (use for revenue queries, always positive)
                - `Net_Sales` - Net sales after discounts
                - `Net_Sales_Invoice` - Net invoice sales
-               - `Pallet_Revenue_Net` - Net pallet revenue
+               - `Packaging` - Packaging costs (stored as NEGATIVE)
                - `Total_COGS` - Total cost of goods sold
                - `Total_COS` - Total cost of sales
                - `Total_COGM` - Total cost of goods manufactured
@@ -1324,22 +1325,26 @@ class BigQuerySQLGenerator:
 
             IMPORTANT RULES FOR REVENUE QUERIES:
             - For simple revenue: SUM(Gross_Sales) or SUM(Net_Sales) -- NO GL filter needed
-            - For gross profit: SUM(Gross_Sales) - SUM(Total_COGS) or use SUM(Sales_Margin_of_Gross_Sales)
+            - For gross profit: SUM(Gross_Sales) + SUM(Total_COGS) (Total_COGS is stored as negative, so ADD it) or use SUM(Sales_Margin_of_Gross_Sales)
             - For net margin: SUM(Sales_Margin_of_Net_Sales)
             - For P&L statement: Use GL_Account_Description with SUM(GL_Amount_in_CC), filter GL_Account_Type = 'P'
             - NEVER use Gross_Revenue column at all - use Gross_Sales instead (Gross_Revenue produces WRONG negative values)
             - For "top-down P&L": Show Revenue (SUM(Gross_Sales)), COGS (SUM(Total_COGS)), Gross Profit, then detail cost categories using GL_Account_Description
 
-            PROFIT MARGIN QUERIES:
+            PROFIT MARGIN QUERIES (MANDATORY - follow this exactly):
+            - ALWAYS use Gross_Sales and Total_COGS for margin calculations. NEVER use Pallet_Revenue_Net, Promotional_Allowances, Freight_Allowance, or Management_Fee for margin — those allowance columns contain negative values and produce wildly wrong percentages (e.g. 1700%).
+            - CRITICAL: Total_COGS is stored as NEGATIVE values in the data (e.g. -6595.21). Therefore:
+              * Gross Profit = Gross_Sales + Total_COGS  (ADD, not subtract, because COGS is already negative)
+              * Margin % = (Gross_Sales + Total_COGS) / Gross_Sales * 100
+              * If you subtract a negative COGS you will get margins over 100% which is WRONG.
             - Customer profit margin: GROUP BY Sold_to_Number, Sold_to_Name, use SUM(Gross_Sales) and SUM(Total_COGS)
-            - Profit Margin % = SAFE_DIVIDE(SUM(Gross_Sales) - SUM(Total_COGS), SUM(Gross_Sales)) * 100
             - Always add HAVING SUM(Gross_Sales) > 0 to avoid division by zero rows
-            - Example:
+            - Example for "show me customers by margin":
               SELECT Sold_to_Number, Sold_to_Name,
                 ROUND(SUM(Gross_Sales), 2) AS total_revenue,
-                ROUND(SUM(Total_COGS), 2) AS total_cogs,
-                ROUND(SUM(Gross_Sales) - SUM(Total_COGS), 2) AS gross_profit,
-                ROUND(SAFE_DIVIDE(SUM(Gross_Sales) - SUM(Total_COGS), SUM(Gross_Sales)) * 100, 2) AS profit_margin_pct
+                ROUND(ABS(SUM(Total_COGS)), 2) AS total_cogs,
+                ROUND(SUM(Gross_Sales) + SUM(Total_COGS), 2) AS gross_profit,
+                ROUND(SAFE_DIVIDE(SUM(Gross_Sales) + SUM(Total_COGS), SUM(Gross_Sales)) * 100, 2) AS margin_pct
               FROM `{self.project_id}.{self.dataset_id}.dataset_25m_table`
               WHERE Sold_to_Name IS NOT NULL
               GROUP BY 1, 2
@@ -1427,14 +1432,14 @@ class BigQuerySQLGenerator:
             DERIVED METRICS - ALWAYS TRY TO CALCULATE:
             Before saying data is "not available", check if you can DERIVE the metric from available columns:
 
-            1. Operating Income / EBIT = Net_Sales - Total_COGS (or Gross_Sales - Total_COS)
-            2. Gross Profit = Gross_Sales - Cogs (or Net_Sales - Total_COGS)
-            3. Gross Margin % = (Gross_Sales - Cogs) / NULLIF(Gross_Sales, 0) * 100
+            1. Operating Income / EBIT = Net_Sales + Total_COGS (COGS/cost columns are stored as NEGATIVE values, so ADD them)
+            2. Gross Profit = Gross_Sales + Total_COGS (Total_COGS is negative, so ADD to get profit)
+            3. Gross Margin % = (Gross_Sales + Total_COGS) / NULLIF(Gross_Sales, 0) * 100
             4. Net Margin % = Sales_Margin_of_Net_Sales / Net_Sales * 100
             5. EBITDA = Operating Income + Depreciation (if available, else just use Operating Income proxy)
             6. Contribution Margin = Net_Sales - Variable Costs (Ingredients + Packaging + Incoming_Freight)
             7. Profit per Unit = Sales_Margin_of_Net_Sales / Inv_Quantity
-            8. Revenue per Customer = SUM(Gross_Revenue) / COUNT(DISTINCT Customer)
+            8. Revenue per Customer = SUM(Gross_Sales) / COUNT(DISTINCT Sold_to_Number)
             9. Average Order Value = SUM(Net_Sales) / COUNT(DISTINCT Order_ID)
 
             ONLY say "not available" for metrics that require data NOT derivable from transactional data:
@@ -1452,6 +1457,86 @@ class BigQuerySQLGenerator:
             6. Always use fully qualified table names with backticks: `{self.project_id}.{self.dataset_id}.table_name`
             7. ALWAYS attempt to derive/calculate metrics before saying they're not available
             """
+
+            # --- AP domain detection and prompt/example injection ---
+            query_lower = query.lower()
+            ap_keywords = [
+                "invoice", "vendor", "supplier", "payment", "purchase order", "po ",
+                "purchasing", "accounts payable", "a/p", "ap ", "overdue", "aging",
+                "gr/ir", "grir", "goods receipt", "blocked", "discount", "cash outflow",
+                "duplicate", "workflow", "approval", "bank", "tax", "accrual",
+                "liability", "company code", "cost center", "profit center",
+                "payment term", "dpo", "days payable",
+            ]
+            is_ap_query = any(kw in query_lower for kw in ap_keywords)
+
+            if is_ap_query:
+                # Append AP-specific rules to the prompt
+                enhanced_query += """
+
+            AP TABLE JOIN RULES (CRITICAL — follow these exactly):
+            - Vendor master: LFA1_Suppliers (key: LIFNR)
+            - Vendor banks: LFBK_VendorBanks (JOIN ON LFA1.LIFNR = LFBK.LIFNR)
+            - Invoice headers: RBKP_InvoiceHeaders (vendor: LIFNR, PO: EBELN)
+            - Invoice items: RSEG_InvoiceItems (JOIN ON RBKP.BELNR = RSEG.BELNR AND RBKP.GJAHR = RSEG.GJAHR)
+            - PO headers: EKKO_POHeaders (key: EBELN)
+            - PO items: EKPO_POItems (JOIN ON EBELN + EBELP)
+            - Account assignment: EKKN_AcctAssignment (JOIN ON EBELN + EBELP)
+            - Payment headers: REGUH_PaymentHeaders (key: LAUFD + LAUFI + LIFNR)
+            - Payment items: REGUP_PaymentItems (key: BELNR, vendor: LIFNR)
+            - GR/IR: GRIR_Reconciliation (STATUS values: 'GR>IR', 'IR>GR' — NEVER use 'Open' or 'matched')
+
+            AP COLUMN SEMANTICS (CRITICAL):
+            - EBELN = Purchase Order number — exists in RSEG, EKKO, EKPO, EKKN (NOT in RBKP!)
+            - BELNR = SAP document number
+            - XBLNR = External reference / vendor invoice number (in RBKP)
+            - LIFNR = Vendor number
+            - ZLSPR = Payment block code in RBKP (NULL = not blocked)
+            - ZTERM = Payment terms key (Z001=Net30, Z002=2/10Net30, etc.) — in both RBKP and LFA1
+            - ANLN1 in EKKN = Asset number (NOT NULL = capital expenditure)
+            - NAME1 = Vendor name in LFA1_Suppliers
+            - RMWWR = Gross invoice amount in RBKP (NOT WRBTR — RBKP does not have WRBTR!)
+            - WRBTR = Amount in RSEG and REGUP (line item amount)
+            - DISC_DUE_DATE = Discount due date in RBKP
+            - DISC_AMOUNT = Discount amount in RBKP
+            - DUE_DATE = Payment due date in RBKP
+            - MENGE = Quantity in RSEG
+            - NETPR = Net price per unit in EKPO
+            - PEINH = Price unit in EKPO (divide NETPR by PEINH for unit price)
+
+            AP QUERY PATTERNS (MUST FOLLOW):
+            - RBKP amount column is RMWWR (NOT WRBTR). RSEG/REGUP use WRBTR for amounts.
+            - EBELN (PO number) is in RSEG, NOT in RBKP. To check if invoice has PO, LEFT JOIN RSEG.
+            - For "invoices without PO": LEFT JOIN RSEG to RBKP, check WHERE i.EBELN IS NULL
+            - For "duplicate invoices" or "same amount and reference": Group by XBLNR (external ref) + LIFNR + RMWWR, HAVING COUNT(*) > 1. Use XBLNR, NOT BELNR.
+            - For "payment term exceptions": Compare RBKP.ZTERM != LFA1.ZTERM (vendor-level vs invoice-level)
+            - For "vendor bank details": JOIN LFA1 to LFBK on LIFNR = LIFNR. NEVER use NAME1 as a join key.
+            - For "capital expenditure invoices": JOIN RSEG to EKKN_AcctAssignment on EBELN + EBELP, filter ANLN1 IS NOT NULL. Do NOT use LIKE '%capital%' on text columns.
+            - For "GR/IR accruals" or "goods received not invoiced": Use GRIR_Reconciliation WHERE STATUS = 'GR>IR'. Do NOT use STATUS = 'Open'.
+            - For "payment performance by vendor": JOIN LFA1 to REGUP_PaymentItems on LIFNR. NEVER CAST NAME1 to INTEGER.
+            - For "price variance" or "invoicing above PO": Compare RSEG.WRBTR/MENGE vs EKPO.NETPR/PEINH. Use HAVING COUNT(*) >= 2 for "consistently".
+            - For "cash discount eligible": Filter WHERE DISC_DUE_DATE IS NOT NULL AND DISC_AMOUNT > 0 in RBKP.
+            - For "blocked invoices": WHERE ZLSPR IS NOT NULL AND ZLSPR != ''
+            """
+                logger.info("Injected AP-specific rules into prompt")
+
+                # Select only the most relevant AP examples for this query
+                relevant_ap_examples = select_relevant_ap_examples(query, max_examples=4)
+                if relevant_ap_examples:
+                    dynamic_examples = [
+                        {
+                            "question": ex["question"],
+                            "sql": ex["sql"].format(
+                                project=self.project_id,
+                                dataset=self.dataset_id
+                            ),
+                            "explanation": ex["explanation"]
+                        }
+                        for ex in relevant_ap_examples
+                    ]
+                    logger.info(f"Injected {len(dynamic_examples)} relevant AP SQL examples")
+                else:
+                    logger.info("No keyword-matched AP examples found, using Weaviate examples")
 
             # Generate SQL using LLM with dynamic examples if available
             result = self.llm_client.generate_sql(

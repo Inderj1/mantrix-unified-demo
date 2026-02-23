@@ -7,15 +7,16 @@
 
 copa:metric_gross_margin a mantrix:Metric ;
     rdfs:label "Gross Margin" ;
-    rdfs:comment "Revenue minus COGS. Measures production profitability." ;
+    rdfs:comment "Gross sales plus COGS (COGS is negative). Measures production profitability." ;
     skos:altLabel "gross profit" , "GM" , "gross income" ;
-    mantrix:sqlFormula "SUM(Gross_Revenue) - SUM(Cogs)" ;
-    mantrix:exampleSQL "SELECT SUM(Gross_Revenue) - SUM(Cogs) as gross_margin FROM dataset_25m_table" .
+    mantrix:sqlFormula "SUM(Gross_Sales) + SUM(Total_COGS)" ;
+    mantrix:exampleSQL "SELECT SUM(Gross_Sales) + SUM(Total_COGS) as gross_margin FROM dataset_25m_table" ;
+    mantrix:edgeCases "Cost columns are stored as NEGATIVE values. Use SUM(Gross_Sales) + SUM(Total_COGS) — addition, not subtraction. NEVER use Gross_Revenue — use Gross_Sales." .
 
 copa:metric_gross_margin_pct a mantrix:Metric ;
     rdfs:label "Gross Margin %" ;
-    rdfs:comment "Gross margin as percentage of revenue." ;
+    rdfs:comment "Gross margin as percentage of gross sales." ;
     skos:altLabel "GM%" , "gross profit margin" , "GPM" ;
-    mantrix:sqlFormula "(SUM(Gross_Revenue) - SUM(Cogs)) / NULLIF(SUM(Gross_Revenue), 0) * 100" ;
+    mantrix:sqlFormula "(SUM(Gross_Sales) + SUM(Total_COGS)) / NULLIF(SUM(Gross_Sales), 0) * 100" ;
     mantrix:exampleQuestion "Gross margin % by brand" ;
-    mantrix:exampleSQL "SELECT Brand, (SUM(Gross_Revenue) - SUM(Cogs)) / NULLIF(SUM(Gross_Revenue), 0) * 100 as gm_pct FROM dataset_25m_table GROUP BY Brand ORDER BY gm_pct DESC" .
+    mantrix:exampleSQL "SELECT Brand, (SUM(Gross_Sales) + SUM(Total_COGS)) / NULLIF(SUM(Gross_Sales), 0) * 100 as gm_pct FROM dataset_25m_table GROUP BY Brand ORDER BY gm_pct DESC" .

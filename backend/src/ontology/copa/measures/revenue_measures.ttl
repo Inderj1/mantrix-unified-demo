@@ -11,17 +11,18 @@
 
 copa:measure_gross_sales a mantrix:Measure ;
     rdfs:label "Gross Sales" ;
-    rdfs:comment "Total gross sales before any deductions. The top-line number." ;
+    rdfs:comment "Total gross sales before any deductions. The top-line number. Use this column for revenue in all queries." ;
     skos:altLabel "gross revenue" , "total sales" , "top line" ;
     mantrix:bqColumn "Gross_Sales" ;
     mantrix:aggregation "SUM" .
 
 copa:measure_gross_revenue a mantrix:Measure ;
     rdfs:label "Gross Revenue" ;
-    rdfs:comment "Gross revenue amount. May differ from Gross_Sales by specific adjustments." ;
+    rdfs:comment "DO NOT use Gross_Revenue for queries — it produces wrong negative values. Always use Gross_Sales instead." ;
     skos:altLabel "revenue" , "turnover" ;
     mantrix:bqColumn "Gross_Revenue" ;
-    mantrix:aggregation "SUM" .
+    mantrix:aggregation "SUM" ;
+    mantrix:edgeCases "NEVER use Gross_Revenue in SQL queries. It produces incorrect negative values. Always use Gross_Sales instead." .
 
 copa:measure_net_sales a mantrix:Measure ;
     rdfs:label "Net Sales" ;

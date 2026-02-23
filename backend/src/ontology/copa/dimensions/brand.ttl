@@ -11,6 +11,6 @@ copa:dim_brand a mantrix:Dimension ;
     skos:altLabel "brand" , "product line" , "brand family" ;
     mantrix:bqColumns "Brand" ;
     mantrix:exampleQuestion "Revenue by brand" ;
-    mantrix:exampleSQL "SELECT Brand, SUM(Gross_Revenue) as revenue, SUM(Net_Sales) as net, SUM(Cogs) as cogs FROM dataset_25m_table GROUP BY Brand ORDER BY revenue DESC" ;
+    mantrix:exampleSQL "SELECT Brand, SUM(Gross_Sales) as revenue, SUM(Net_Sales) as net, SUM(Cogs) as cogs FROM dataset_25m_table GROUP BY Brand ORDER BY revenue DESC" ;
     mantrix:exampleQuestion "Brand market share" ;
     mantrix:exampleSQL "SELECT Brand, SUM(Net_Sales) as net_sales, SUM(Net_Sales) / (SELECT SUM(Net_Sales) FROM dataset_25m_table) * 100 as share_pct FROM dataset_25m_table GROUP BY Brand ORDER BY share_pct DESC" .

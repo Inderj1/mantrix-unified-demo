@@ -8,12 +8,13 @@
 copa:term_margin a mantrix:SemanticTerm ;
     rdfs:label "margin" ;
     skos:altLabel "profit" , "profit margin" , "profitability" ;
-    mantrix:disambiguation """'margin' in COPA:
-  'gross margin' → SUM(Gross_Revenue) - SUM(Cogs)
-  'gross margin %' → (revenue - cogs) / revenue * 100
-  'net margin' → SUM(Sales_Margin_of_Net_Sales) / SUM(Net_Sales) * 100
-  'contribution margin' → Net_Sales - Ingredients - Packaging - Freight
-  'margin per unit' → margin / SUM(Inv_Quantity)
+    mantrix:disambiguation """'margin' in COPA (IMPORTANT: all cost columns are stored as NEGATIVE values, use ADDITION not subtraction):
+  'gross margin' → SUM(Gross_Sales) + SUM(Total_COGS)
+  'gross margin %' → (SUM(Gross_Sales) + SUM(Total_COGS)) / NULLIF(SUM(Gross_Sales), 0) * 100
+  'net margin' → SUM(Sales_Margin_of_Net_Sales) / NULLIF(SUM(Net_Sales), 0) * 100
+  'contribution margin' → SUM(Net_Sales) + SUM(Ingredients) + SUM(Packaging) + SUM(Incoming_Freight)
+  'margin per unit' → SUM(Sales_Margin_of_Net_Sales) / NULLIF(SUM(Inv_Quantity), 0)
+  NEVER use Gross_Revenue — always use Gross_Sales.
   If unqualified, 'margin' typically means gross margin.""" .
 
 copa:term_profitability a mantrix:SemanticTerm ;

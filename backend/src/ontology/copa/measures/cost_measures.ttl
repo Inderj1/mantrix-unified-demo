@@ -7,37 +7,41 @@
 
 # ============================================================================
 # COPA Measures: Cost (COGS, Ingredients, Packaging, Freight)
+# ALL cost columns are stored as NEGATIVE values in BigQuery.
+# Use + (addition) for profit = revenue + cost, NOT revenue - cost.
 # ============================================================================
 
 copa:measure_cogs a mantrix:Measure ;
     rdfs:label "Cost of Goods Sold" ;
-    rdfs:comment "Direct cost of goods sold." ;
+    rdfs:comment "Direct cost of goods sold. Stored as NEGATIVE values in BigQuery." ;
     skos:altLabel "COGS" , "cost of sales" , "direct costs" , "COS" ;
     mantrix:bqColumn "Cogs" ;
-    mantrix:aggregation "SUM" .
+    mantrix:aggregation "SUM" ;
+    mantrix:edgeCases "Cogs is stored as NEGATIVE. For profit calculations use SUM(Gross_Sales) + SUM(Total_COGS), not subtraction." .
 
 copa:measure_total_cogs a mantrix:Measure ;
     rdfs:label "Total COGS" ;
-    rdfs:comment "Total cost of goods sold including all cost components (ingredients + packaging + freight + other)." ;
+    rdfs:comment "Total cost of goods sold including all cost components (ingredients + packaging + freight + other). Stored as NEGATIVE values." ;
     mantrix:bqColumn "Total_COGS" ;
-    mantrix:aggregation "SUM" .
+    mantrix:aggregation "SUM" ;
+    mantrix:edgeCases "Total_COGS is stored as NEGATIVE. For gross margin use SUM(Gross_Sales) + SUM(Total_COGS), not subtraction." .
 
 copa:measure_ingredients a mantrix:Measure ;
     rdfs:label "Ingredients Cost" ;
-    rdfs:comment "Raw material / ingredients cost component." ;
+    rdfs:comment "Raw material / ingredients cost component. Stored as NEGATIVE values." ;
     skos:altLabel "raw materials" , "ingredients" ;
     mantrix:bqColumn "Ingredients" ;
     mantrix:aggregation "SUM" .
 
 copa:measure_packaging a mantrix:Measure ;
     rdfs:label "Packaging Cost" ;
-    rdfs:comment "Packaging material cost component." ;
+    rdfs:comment "Packaging material cost component. Stored as NEGATIVE values." ;
     mantrix:bqColumn "Packaging" ;
     mantrix:aggregation "SUM" .
 
 copa:measure_incoming_freight a mantrix:Measure ;
     rdfs:label "Incoming Freight" ;
-    rdfs:comment "Inbound freight and logistics cost." ;
+    rdfs:comment "Inbound freight and logistics cost. Stored as NEGATIVE values." ;
     skos:altLabel "freight" , "logistics cost" , "shipping cost" ;
     mantrix:bqColumn "Incoming_Freight" ;
     mantrix:aggregation "SUM" .

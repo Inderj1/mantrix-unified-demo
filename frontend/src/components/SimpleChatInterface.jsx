@@ -216,10 +216,11 @@ const SimpleChatInterface = ({ darkMode = false }) => {
   const userId = user?.id || user?.primaryEmailAddress?.emailAddress || 'default';
 
   // Pre-populate with welcome message
+  const welcomeContent = 'Hello! I\'m AXIS.AI — your intelligent business analytics agent.\n\nI connect to your live data sources to answer questions in real time:\n\n1. SAP COPA — Revenue, margins, profitability & P&L analysis\n2. Sales Orders — Order status, delivery & fulfillment\n3. Knowledge Graph — Business rules, metrics & domain context\n\nAsk me anything — from "Show me revenue by customer" to "What\'s our gross margin trend?" I\'ll write the query, run it, and explain the results.';
   const [messages, setMessages] = useState([{
     id: Date.now(),
     type: 'assistant',
-    content: 'Hello! I\'m AXIS.AI, your BigQuery analytics assistant. I can query your BigQuery datasets to answer business questions. Try asking something like "Show me revenue by product" or "What are the top 10 customers by sales?". I\'ll maintain context throughout our conversation for follow-up questions.',
+    content: welcomeContent,
     timestamp: new Date(),
   }]);
   const [inputMessage, setInputMessage] = useState('');
@@ -380,7 +381,7 @@ const SimpleChatInterface = ({ darkMode = false }) => {
       const welcomeMessage = {
         id: Date.now().toString(),
         type: 'assistant',
-        content: 'Hello! I\'m AXIS.AI, your BigQuery analytics assistant. I can query your BigQuery datasets to answer business questions. Try asking something like "Show me revenue by product" or "What are the top 10 customers by sales?". I\'ll maintain context throughout our conversation for follow-up questions.',
+        content: welcomeContent,
         timestamp: new Date(),
       };
       
@@ -431,7 +432,7 @@ const SimpleChatInterface = ({ darkMode = false }) => {
         formattedMessages.push({
           id: Date.now(),
           type: 'assistant',
-          content: 'Hello! I\'m AXIS.AI, your BigQuery analytics assistant. I can query your BigQuery datasets to answer business questions. Try asking something like "Show me revenue by product" or "What are the top 10 customers by sales?". I\'ll maintain context throughout our conversation for follow-up questions.',
+          content: welcomeContent,
           timestamp: new Date(),
         });
       }
@@ -742,7 +743,7 @@ const SimpleChatInterface = ({ darkMode = false }) => {
     setMessages([{
       id: Date.now(),
       type: 'assistant',
-      content: 'Hello! I\'m AXIS.AI, your BigQuery analytics assistant. I can query your BigQuery datasets to answer business questions. Try asking something like "Show me revenue by product" or "What are the top 10 customers by sales?". I\'ll maintain context throughout our conversation for follow-up questions.',
+      content: welcomeContent,
       timestamp: new Date(),
     }]);
     await createNewConversation();
@@ -791,7 +792,7 @@ const SimpleChatInterface = ({ darkMode = false }) => {
       setMessages([{
         id: Date.now(),
         type: 'assistant',
-        content: 'Hello! I\'m AXIS.AI, your BigQuery analytics assistant. I can query your BigQuery datasets to answer business questions. Try asking something like "Show me revenue by product" or "What are the top 10 customers by sales?". I\'ll maintain context throughout our conversation for follow-up questions.',
+        content: welcomeContent,
         timestamp: new Date(),
       }]);
 

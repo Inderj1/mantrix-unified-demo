@@ -11,10 +11,10 @@ copa:dim_customer a mantrix:Dimension ;
     skos:altLabel "client" , "buyer" , "account" , "sold-to party" , "customer" ;
     mantrix:bqColumns "Sold_to_Number, Sold_to_Name, Payer_Name" ;
     mantrix:exampleQuestion "Revenue by customer" ;
-    mantrix:exampleSQL "SELECT Sold_to_Name, SUM(Gross_Revenue) as revenue FROM dataset_25m_table GROUP BY Sold_to_Name ORDER BY revenue DESC" ;
+    mantrix:exampleSQL "SELECT Sold_to_Name, SUM(Gross_Sales) as revenue FROM dataset_25m_table GROUP BY Sold_to_Name ORDER BY revenue DESC" ;
     mantrix:exampleQuestion "Customer concentration (top 10 share)" ;
     mantrix:exampleSQL """SELECT
   SUM(CASE WHEN rn <= 10 THEN revenue ELSE 0 END) / SUM(revenue) * 100 as top10_pct
-FROM (SELECT Sold_to_Name, SUM(Gross_Revenue) as revenue,
-  ROW_NUMBER() OVER (ORDER BY SUM(Gross_Revenue) DESC) as rn
+FROM (SELECT Sold_to_Name, SUM(Gross_Sales) as revenue,
+  ROW_NUMBER() OVER (ORDER BY SUM(Gross_Sales) DESC) as rn
 FROM dataset_25m_table GROUP BY Sold_to_Name)""" .

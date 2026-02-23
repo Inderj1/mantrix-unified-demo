@@ -364,10 +364,15 @@ def extract_subject_properties(g, subj, rdf_type, column_subjects,
     }
 
 
-def collect_ttl_files() -> list:
-    """Collect all TTL files from ontology subdirectories (ap/, copa/, shared/)."""
+def collect_ttl_files(modules=None) -> list:
+    """Collect TTL files from ontology subdirectories.
+
+    Args:
+        modules: List of module names to load (e.g. ["copa"]). None = all.
+    """
+    subdirs = modules if modules else ["ap", "copa"]
     ttl_files = []
-    for subdir in ["ap", "copa"]:
+    for subdir in subdirs:
         dir_path = ONTOLOGY_DIR / subdir
         if dir_path.exists():
             for ttl_file in sorted(dir_path.rglob("*.ttl")):
@@ -440,13 +445,20 @@ def index_entries(client: weaviate.WeaviateClient, entries: list,
 
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="Load ontology TTL files into Weaviate")
+    parser.add_argument("--modules", nargs="+", default=None,
+                        help="Modules to load (e.g. --modules copa). Default: all")
+    args = parser.parse_args()
+
     print("=" * 70)
     print("  Load Ontology TTL Files → Weaviate OntologyKnowledge")
     print("=" * 70)
 
     # 1. Collect TTL files
-    print("\n[1/4] Collecting TTL files...")
-    ttl_files = collect_ttl_files()
+    modules = args.modules
+    print(f"\n[1/4] Collecting TTL files{' for ' + ', '.join(modules) if modules else ''}...")
+    ttl_files = collect_ttl_files(modules=modules)
     print(f"  Found {len(ttl_files)} TTL files")
 
     # 2. Parse all TTL files

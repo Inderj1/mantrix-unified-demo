@@ -7,11 +7,12 @@
 
 copa:metric_contribution_margin a mantrix:Metric ;
     rdfs:label "Contribution Margin" ;
-    rdfs:comment "Net sales minus variable costs (Ingredients + Packaging + Incoming_Freight)." ;
+    rdfs:comment "Net sales plus variable costs (Ingredients + Packaging + Incoming_Freight are stored as negative values)." ;
     skos:altLabel "CM" , "variable margin" , "contribution profit" ;
-    mantrix:sqlFormula "SUM(Net_Sales) - SUM(Ingredients) - SUM(Packaging) - SUM(Incoming_Freight)" ;
+    mantrix:sqlFormula "SUM(Net_Sales) + SUM(Ingredients) + SUM(Packaging) + SUM(Incoming_Freight)" ;
     mantrix:exampleQuestion "Contribution margin by product" ;
     mantrix:exampleSQL """SELECT Material_Name,
-  SUM(Net_Sales) - SUM(Ingredients) - SUM(Packaging) - SUM(Incoming_Freight) as contribution_margin,
-  (SUM(Net_Sales) - SUM(Ingredients) - SUM(Packaging) - SUM(Incoming_Freight)) / NULLIF(SUM(Net_Sales), 0) * 100 as cm_pct
-FROM dataset_25m_table GROUP BY Material_Name ORDER BY contribution_margin DESC LIMIT 20""" .
+  SUM(Net_Sales) + SUM(Ingredients) + SUM(Packaging) + SUM(Incoming_Freight) as contribution_margin,
+  (SUM(Net_Sales) + SUM(Ingredients) + SUM(Packaging) + SUM(Incoming_Freight)) / NULLIF(SUM(Net_Sales), 0) * 100 as cm_pct
+FROM dataset_25m_table GROUP BY Material_Name ORDER BY contribution_margin DESC LIMIT 20""" ;
+    mantrix:edgeCases "Ingredients, Packaging, Incoming_Freight are stored as NEGATIVE values. Use + (addition) not - (subtraction)." .

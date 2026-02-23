@@ -7,7 +7,8 @@
 
 copa:metric_operating_income a mantrix:Metric ;
     rdfs:label "Operating Income" ;
-    rdfs:comment "Net sales minus total COGS. Proxy for EBIT in COPA." ;
+    rdfs:comment "Net sales plus total COGS (Total_COGS is negative). Proxy for EBIT in COPA." ;
     skos:altLabel "operating profit" , "EBIT" , "operating earnings" ;
-    mantrix:sqlFormula "SUM(Net_Sales) - SUM(Total_COGS)" ;
-    mantrix:exampleSQL "SELECT SUM(Net_Sales) - SUM(Total_COGS) as operating_income FROM dataset_25m_table" .
+    mantrix:sqlFormula "SUM(Net_Sales) + SUM(Total_COGS)" ;
+    mantrix:exampleSQL "SELECT SUM(Net_Sales) + SUM(Total_COGS) as operating_income FROM dataset_25m_table" ;
+    mantrix:edgeCases "Total_COGS is stored as NEGATIVE. Use + (addition) not - (subtraction)." .

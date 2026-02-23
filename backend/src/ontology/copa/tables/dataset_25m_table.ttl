@@ -43,10 +43,10 @@ copa:col_Sales_Organization a owl:DatatypeProperty ; rdfs:label "Sales Organizat
 
 # --- Measure Columns ---
 copa:col_Gross_Sales a owl:DatatypeProperty ; rdfs:label "Gross Sales" ; bq:column "Gross_Sales" ; bq:type "FLOAT" ; rdfs:comment "Total gross sales before deductions." .
-copa:col_Gross_Revenue a owl:DatatypeProperty ; rdfs:label "Gross Revenue" ; bq:column "Gross_Revenue" ; bq:type "FLOAT" ; rdfs:comment "Gross revenue." .
+copa:col_Gross_Revenue a owl:DatatypeProperty ; rdfs:label "Gross Revenue" ; bq:column "Gross_Revenue" ; bq:type "FLOAT" ; rdfs:comment "DO NOT use this column — produces wrong negative values. Use Gross_Sales instead." .
 copa:col_Net_Sales a owl:DatatypeProperty ; rdfs:label "Net Sales" ; bq:column "Net_Sales" ; bq:type "FLOAT" ; rdfs:comment "Net sales after deductions." .
-copa:col_Cogs a owl:DatatypeProperty ; rdfs:label "COGS" ; bq:column "Cogs" ; bq:type "FLOAT" ; rdfs:comment "Cost of goods sold." .
-copa:col_Total_COGS a owl:DatatypeProperty ; rdfs:label "Total COGS" ; bq:column "Total_COGS" ; bq:type "FLOAT" ; rdfs:comment "Total cost including all components." .
+copa:col_Cogs a owl:DatatypeProperty ; rdfs:label "COGS" ; bq:column "Cogs" ; bq:type "FLOAT" ; rdfs:comment "Cost of goods sold. Stored as NEGATIVE values." .
+copa:col_Total_COGS a owl:DatatypeProperty ; rdfs:label "Total COGS" ; bq:column "Total_COGS" ; bq:type "FLOAT" ; rdfs:comment "Total cost including all components. Stored as NEGATIVE values." .
 copa:col_Ingredients a owl:DatatypeProperty ; rdfs:label "Ingredients" ; bq:column "Ingredients" ; bq:type "FLOAT" ; rdfs:comment "Raw material/ingredients cost." .
 copa:col_Packaging a owl:DatatypeProperty ; rdfs:label "Packaging" ; bq:column "Packaging" ; bq:type "FLOAT" ; rdfs:comment "Packaging material cost." .
 copa:col_Incoming_Freight a owl:DatatypeProperty ; rdfs:label "Incoming Freight" ; bq:column "Incoming_Freight" ; bq:type "FLOAT" ; rdfs:comment "Inbound freight cost." .
@@ -55,20 +55,20 @@ copa:col_Inv_Quantity a owl:DatatypeProperty ; rdfs:label "Invoice Quantity" ; b
 
 # --- Example Questions & SQL ---
 copa:q1 mantrix:exampleQuestion "Total revenue by region" ;
-    mantrix:exampleSQL "SELECT Region, SUM(Gross_Revenue) as revenue, SUM(Net_Sales) as net FROM dataset_25m_table GROUP BY Region ORDER BY revenue DESC" .
+    mantrix:exampleSQL "SELECT Region, SUM(Gross_Sales) as revenue, SUM(Net_Sales) as net FROM dataset_25m_table GROUP BY Region ORDER BY revenue DESC" .
 copa:q2 mantrix:exampleQuestion "Top 10 customers by gross sales" ;
-    mantrix:exampleSQL "SELECT Sold_to_Name, SUM(Gross_Sales) as total_sales, SUM(Net_Sales) as net_sales, SUM(Cogs) as total_cogs FROM dataset_25m_table GROUP BY Sold_to_Name ORDER BY total_sales DESC LIMIT 10" .
+    mantrix:exampleSQL "SELECT Sold_to_Name, SUM(Gross_Sales) as total_sales, SUM(Net_Sales) as net_sales, SUM(Total_COGS) as total_cogs FROM dataset_25m_table GROUP BY Sold_to_Name ORDER BY total_sales DESC LIMIT 10" .
 copa:q3 mantrix:exampleQuestion "Gross margin by brand" ;
-    mantrix:exampleSQL "SELECT Brand, SUM(Gross_Revenue) as revenue, SUM(Cogs) as cogs, SUM(Gross_Revenue) - SUM(Cogs) as gross_margin, (SUM(Gross_Revenue) - SUM(Cogs)) / NULLIF(SUM(Gross_Revenue), 0) * 100 as gm_pct FROM dataset_25m_table GROUP BY Brand ORDER BY gross_margin DESC" .
+    mantrix:exampleSQL "SELECT Brand, SUM(Gross_Sales) as revenue, SUM(Total_COGS) as cogs, SUM(Gross_Sales) + SUM(Total_COGS) as gross_margin, (SUM(Gross_Sales) + SUM(Total_COGS)) / NULLIF(SUM(Gross_Sales), 0) * 100 as gm_pct FROM dataset_25m_table GROUP BY Brand ORDER BY gross_margin DESC" .
 copa:q4 mantrix:exampleQuestion "Revenue trend by month" ;
-    mantrix:exampleSQL "SELECT DATE_TRUNC(Posting_Date, MONTH) as month, SUM(Gross_Revenue) as revenue, SUM(Net_Sales) as net_sales FROM dataset_25m_table GROUP BY month ORDER BY month" .
+    mantrix:exampleSQL "SELECT DATE_TRUNC(Posting_Date, MONTH) as month, SUM(Gross_Sales) as revenue, SUM(Net_Sales) as net_sales FROM dataset_25m_table GROUP BY month ORDER BY month" .
 copa:q5 mantrix:exampleQuestion "Profitability by product" ;
     mantrix:exampleSQL "SELECT Material_Name, SUM(Net_Sales) as net_sales, SUM(Total_COGS) as total_cogs, SUM(Sales_Margin_of_Net_Sales) as margin, SUM(Inv_Quantity) as units FROM dataset_25m_table GROUP BY Material_Name ORDER BY margin DESC LIMIT 20" .
 copa:q6 mantrix:exampleQuestion "Customer profitability analysis" ;
     mantrix:exampleSQL """SELECT Sold_to_Name, Payer_Name,
-  SUM(Net_Sales) as net_sales, SUM(Cogs) as cogs,
-  SUM(Net_Sales) - SUM(Cogs) as gross_profit,
-  (SUM(Net_Sales) - SUM(Cogs)) / NULLIF(SUM(Net_Sales), 0) * 100 as margin_pct,
+  SUM(Gross_Sales) as gross_sales, SUM(Total_COGS) as cogs,
+  SUM(Gross_Sales) + SUM(Total_COGS) as gross_profit,
+  (SUM(Gross_Sales) + SUM(Total_COGS)) / NULLIF(SUM(Gross_Sales), 0) * 100 as margin_pct,
   SUM(Inv_Quantity) as units
 FROM dataset_25m_table
 GROUP BY Sold_to_Name, Payer_Name
@@ -76,6 +76,7 @@ ORDER BY gross_profit DESC LIMIT 20""" .
 
 # --- Edge Cases ---
 copa:edge1 mantrix:edgeCases "This is a FLAT denormalized table. No joins required. All dimension and measure columns in one table." .
-copa:edge2 mantrix:edgeCases "Gross_Revenue and Net_Sales differ by deductions (discounts, returns). Use Net_Sales for margin calculations." .
+copa:edge2 mantrix:edgeCases "NEVER use Gross_Revenue for queries — it produces wrong negative values. Always use Gross_Sales for revenue." .
 copa:edge3 mantrix:edgeCases "Total_COGS includes Ingredients + Packaging + Incoming_Freight + other cost components. Cogs may be a subset." .
 copa:edge4 mantrix:edgeCases "Inv_Quantity can be negative for returns/credit memos. Filter for positive quantities for volume analysis." .
+copa:edge5 mantrix:edgeCases "Total_COGS, Cogs, Ingredients, Packaging, Incoming_Freight and ALL cost columns are stored as NEGATIVE values in BigQuery. Use + (addition) not - (subtraction) for profit/margin calculations. Example: gross_margin = SUM(Gross_Sales) + SUM(Total_COGS)." .

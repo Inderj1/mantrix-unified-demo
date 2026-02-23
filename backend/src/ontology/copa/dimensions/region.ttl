@@ -11,8 +11,8 @@ copa:dim_region a mantrix:Dimension ;
     skos:altLabel "territory" , "area" , "geography" , "market" , "sales region" ;
     mantrix:bqColumns "Region" ;
     mantrix:exampleQuestion "Revenue by region" ;
-    mantrix:exampleSQL "SELECT Region, SUM(Gross_Revenue) as revenue, SUM(Inv_Quantity) as units FROM dataset_25m_table GROUP BY Region ORDER BY revenue DESC" ;
+    mantrix:exampleSQL "SELECT Region, SUM(Gross_Sales) as revenue, SUM(Inv_Quantity) as units FROM dataset_25m_table GROUP BY Region ORDER BY revenue DESC" ;
     mantrix:exampleQuestion "Region profitability comparison" ;
     mantrix:exampleSQL """SELECT Region, SUM(Net_Sales) as net, SUM(Cogs) as cogs,
-  (SUM(Net_Sales) - SUM(Cogs)) / NULLIF(SUM(Net_Sales), 0) * 100 as margin_pct
+  (SUM(Net_Sales) + SUM(Cogs)) / NULLIF(SUM(Net_Sales), 0) * 100 as margin_pct
 FROM dataset_25m_table GROUP BY Region ORDER BY margin_pct DESC""" .
