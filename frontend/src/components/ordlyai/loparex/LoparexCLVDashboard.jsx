@@ -283,12 +283,12 @@ const LoparexCLVDashboard = ({ onBack, darkMode = false }) => {
         </Grid>
 
         {/* ─── CLV Segments ─── */}
-        <Box sx={{ ...scrollCardSx, mb: 1.75 }}>
+        <Box sx={{ bgcolor: cardBg, borderRadius: '10px', border: `1px solid ${borderColor}`, boxShadow: darkMode ? 'none' : '0 2px 8px rgba(12,31,63,0.09)', p: 2.5, mb: 1.75 }}>
           <Typography sx={{ fontSize: 14, fontWeight: 700, color: textPrimary, mb: 0.375 }}>Customer CLV Segments</Typography>
           <Typography sx={{ fontSize: 11, color: textMuted, mb: 2, lineHeight: 1.5 }}>
             Fader segmentation — forward-looking CLV, not backward-looking revenue. Computed from purchase history patterns in VBAK + margin in ACDOCA.
           </Typography>
-          <Grid container spacing={1.25}>
+          <Grid container spacing={1.25} alignItems="flex-start">
             {CLV_DATA.segments.map((s) => (
               <Grid item xs={3} key={s.label}>
                 <Box sx={{
