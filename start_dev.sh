@@ -14,7 +14,7 @@
 # Services:
 #   - Docker: Redis, MongoDB, Weaviate, Neo4j, PostgreSQL, Fuseki
 #   - Backend: FastAPI (uvicorn) on port 8000
-#   - Frontend: Vite dev server on port 5173
+#   - Frontend: Vite dev server on port 3000
 #
 
 set -e
@@ -96,7 +96,7 @@ echo "============================================================="
 echo "         MANTRIX UNIFIED DEVELOPMENT ENVIRONMENT             "
 echo "============================================================="
 echo "  Backend:  http://localhost:8000                            "
-echo "  Frontend: http://localhost:5173                            "
+echo "  Frontend: http://localhost:3000                            "
 echo "  API Docs: http://localhost:8000/docs                       "
 echo "============================================================="
 echo -e "${NC}"
@@ -231,8 +231,8 @@ if [ "$START_FRONTEND" = true ]; then
     echo -e "\n${BLUE}[3/3] Starting Frontend (Vite)...${NC}"
 
     # Check if frontend is already running
-    if check_port 5173; then
-        echo -e "  ${YELLOW}Frontend already running on port 5173${NC}"
+    if check_port 3000; then
+        echo -e "  ${YELLOW}Frontend already running on port 3000${NC}"
     else
         cd "${FRONTEND_DIR}"
 
@@ -253,7 +253,7 @@ if [ "$START_FRONTEND" = true ]; then
         echo -e "  Log file: ${FRONTEND_LOG}"
 
         # Wait for frontend to be ready
-        wait_for_service "Frontend" "http://localhost:5173" 30 || true
+        wait_for_service "Frontend" "http://localhost:3000" 30 || true
     fi
 else
     echo -e "\n${YELLOW}[3/3] Skipping Frontend${NC}"
@@ -271,7 +271,7 @@ if [ "$START_BACKEND" = true ]; then
     echo "  API Docs:     http://localhost:8000/docs                   "
 fi
 if [ "$START_FRONTEND" = true ]; then
-    echo "  Frontend:     http://localhost:5173                        "
+    echo "  Frontend:     http://localhost:3000                        "
 fi
 if [ "$START_DOCKER" = true ]; then
     echo "-------------------------------------------------------------"

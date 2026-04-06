@@ -179,6 +179,10 @@ import DemandSignal from './components/ordlyai/DemandSignal';
 import NetworkOptimizer from './components/ordlyai/NetworkOptimizer';
 import Arbitration from './components/ordlyai/Arbitration';
 import SapCommit from './components/ordlyai/SapCommit';
+import LoparexWorkbench from './components/ordlyai/loparex/LoparexWorkbench';
+import LoparexOpsDashboard from './components/ordlyai/loparex/LoparexOpsDashboard';
+import LoparexCLVDashboard from './components/ordlyai/loparex/LoparexCLVDashboard';
+import LoparexMarginDashboard from './components/ordlyai/loparex/LoparexMarginDashboard';
 import O2CAILanding from './components/O2CAILanding';
 import FleetManagement from './components/routeai/FleetManagement';
 import RouteOptimization from './components/routeai/RouteOptimization';
@@ -1175,9 +1179,11 @@ function App() {
               </Fade>
               <Fade in={coreAIView === 'ordly'} timeout={300}>
                 <Box sx={{ display: coreAIView === 'ordly' ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
-                  {ordlyView === 'landing' && (
+                  {(ordlyView === 'landing' || ordlyView === 'loparex-landing') && (
                     <OrdlyAILanding
+                      key={ordlyView}
                       darkMode={darkMode}
+                      defaultView={ordlyView === 'loparex-landing' ? 'loparex' : undefined}
                       onBack={() => setCoreAIView('landing')}
                       onTileClick={(moduleId) => {
                         console.log('OrdlyAI tile clicked:', moduleId);
@@ -1254,6 +1260,18 @@ function App() {
                   )}
                   {ordlyView === 'sap-commit' && (
                     <SapCommit darkMode={darkMode} onBack={() => setOrdlyView('landing')} />
+                  )}
+                  {ordlyView === 'loparex-workbench' && (
+                    <LoparexWorkbench darkMode={darkMode} onBack={() => setOrdlyView('loparex-landing')} />
+                  )}
+                  {ordlyView === 'loparex-d1' && (
+                    <LoparexOpsDashboard darkMode={darkMode} onBack={() => setOrdlyView('loparex-landing')} />
+                  )}
+                  {ordlyView === 'loparex-d2' && (
+                    <LoparexCLVDashboard darkMode={darkMode} onBack={() => setOrdlyView('loparex-landing')} />
+                  )}
+                  {ordlyView === 'loparex-d3' && (
+                    <LoparexMarginDashboard darkMode={darkMode} onBack={() => setOrdlyView('loparex-landing')} />
                   )}
                 </Box>
               </Fade>
@@ -2105,7 +2123,7 @@ function AuthenticatedApp() {
           }}>
             {/* Logo */}
             <Box sx={{ textAlign: 'center', mb: 4 }}>
-              <img src="/MANTRIX_AI.svg" alt="MANTRIX AI" style={{ height: 56 }} />
+              <img src="/stratax.png" alt="StrataxAI" style={{ height: 36 }} />
             </Box>
 
             <Typography sx={{

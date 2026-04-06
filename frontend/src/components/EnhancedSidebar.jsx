@@ -164,11 +164,11 @@ const EnhancedSidebar = ({
           /* Full Logo when expanded */
           <Box
             component="img"
-            src="/MANTRIX_AI.svg"
-            alt="MANTRIX AI"
+            src="/stratax.png"
+            alt="StrataxAI"
             sx={{
-              height: 44,
-              width: 'auto',
+              height: 28,
+              maxWidth: '80%',
               objectFit: 'contain',
               filter: darkMode
                 ? 'invert(1) hue-rotate(180deg)'
@@ -177,18 +177,30 @@ const EnhancedSidebar = ({
             }}
           />
         ) : (
-          /* Icon Logo when collapsed */
+          /* Icon Logo when collapsed - $ cropped from stratax.png */
           <Box
-            component="img"
-            src="/3.png"
-            alt="MANTRIX"
             sx={{
-              height: 42,
-              width: 42,
-              objectFit: 'contain',
+              height: 28,
+              width: 24,
+              overflow: 'hidden',
               transition: 'all 0.2s ease',
+              filter: darkMode
+                ? 'invert(1) hue-rotate(180deg)'
+                : 'none',
             }}
-          />
+          >
+            <Box
+              component="img"
+              src="/stratax.png"
+              alt="$"
+              sx={{
+                height: 28,
+                width: 'auto',
+                objectFit: 'cover',
+                objectPosition: 'left center',
+              }}
+            />
+          </Box>
         )}
       </Box>
 
