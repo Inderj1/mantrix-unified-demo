@@ -2123,7 +2123,7 @@ function AuthenticatedApp() {
           }}>
             {/* Logo */}
             <Box sx={{ textAlign: 'center', mb: 4 }}>
-              <img src="/stratax.png" alt="StrataxAI" style={{ height: 36 }} />
+              <img src="/MANTRIX_AI.svg" alt="MANTRIX AI" style={{ height: 48 }} />
             </Box>
 
             <Typography sx={{

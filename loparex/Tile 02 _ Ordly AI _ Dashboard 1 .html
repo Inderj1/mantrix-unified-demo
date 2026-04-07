@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ordly AI — Performance & Value Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #F1F4F8;
+  --surface: #FFFFFF;
+  --surface-2: #F8F9FB;
+  --border: #E2E7EF;
+  --navy: #0C1F3F;
+  --blue: #0050C8;
+  --blue-light: #EBF2FF;
+  --text-primary: #0C1F3F;
+  --text-secondary: #3D5066;
+  --text-muted: #7A90A8;
+  --green: #0C7A52;
+  --green-light: #E3F7EE;
+  --amber: #A85C00;
+  --amber-light: #FEF5E4;
+  --red: #C0352A;
+  --red-light: #FEE8E6;
+  --purple: #6436C8;
+  --purple-light: #F0EBFF;
+  --r: 10px;
+  --r-sm: 6px;
+  --sh-sm: 0 1px 4px rgba(12,31,63,.07);
+  --sh: 0 2px 10px rgba(12,31,63,.10);
+}
+body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; font-size: 13px; }
+
+/* NAV */
+.nav { height: 54px; background: var(--navy); display: flex; align-items: center; padding: 0 24px; gap: 14px; position: sticky; top: 0; z-index: 200; }
+.nav-logo { display: flex; align-items: center; gap: 9px; color: white; font-weight: 800; font-size: 16px; letter-spacing: -.4px; text-decoration: none; }
+.nav-logo-icon { width: 30px; height: 30px; background: var(--blue); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+.nav-div { width: 1px; height: 22px; background: rgba(255,255,255,.15); }
+.nav-module { color: rgba(255,255,255,.55); font-size: 12px; font-weight: 500; }
+.nav-spacer { flex: 1; }
+.nav-period { display: flex; align-items: center; gap: 6px; color: rgba(255,255,255,.7); font-size: 11px; font-weight: 500; }
+.period-btn { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.15); color: rgba(255,255,255,.7); font-family:'Outfit',sans-serif; font-size:11px; font-weight:500; padding: 5px 12px; border-radius: 5px; cursor: pointer; transition: all .15s; }
+.period-btn:hover, .period-btn.active { background: rgba(255,255,255,.22); color: white; }
+.nav-link { color: rgba(255,255,255,.65); text-decoration: none; font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 6px; transition: all .18s; border: 1px solid rgba(255,255,255,.12); }
+.nav-link:hover { background: rgba(255,255,255,.1); color: white; }
+.nav-avatar { width: 30px; height: 30px; background: var(--blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; font-weight: 700; }
+
+/* PAGE */
+.page { max-width: 1400px; margin: 0 auto; padding: 24px 24px; }
+
+/* PAGE HEADER */
+.page-header { margin-bottom: 22px; display: flex; align-items: flex-end; justify-content: space-between; }
+.page-title { font-size: 22px; font-weight: 800; color: var(--navy); letter-spacing: -.5px; }
+.page-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+.last-updated { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
+.live-dot { width: 7px; height: 7px; border-radius: 50%; background: #00D264; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* SECTION HEADER */
+.sec-hdr { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .9px; color: var(--text-muted); margin-bottom: 12px; }
+
+/* KPI CARDS */
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+.kpi-card { background: var(--surface); border-radius: var(--r); padding: 18px 20px; border: 1px solid var(--border); box-shadow: var(--sh-sm); position: relative; overflow: hidden; }
+.kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent, var(--blue)); }
+.kpi-eyebrow { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--text-muted); margin-bottom: 10px; }
+.kpi-value { font-family: 'IBM Plex Mono', monospace; font-size: 32px; font-weight: 700; color: var(--navy); line-height: 1; margin-bottom: 6px; letter-spacing: -1px; }
+.kpi-sub { font-size: 11px; color: var(--text-secondary); margin-bottom: 10px; }
+.kpi-trend { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; }
+.trend-up { color: var(--green); }
+.trend-down { color: var(--red); }
+.kpi-icon { position: absolute; right: 16px; top: 16px; font-size: 22px; opacity: .15; }
+
+/* GRID LAYOUTS */
+.grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-bottom: 22px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 22px; }
+.grid-1-1 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 22px; }
+
+/* CARD */
+.card { background: var(--surface); border-radius: var(--r); padding: 18px 20px; border: 1px solid var(--border); box-shadow: var(--sh-sm); }
+.card-title { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+.card-sub { font-size: 11px; color: var(--text-muted); margin-bottom: 16px; }
+
+/* SVG CHART CONTAINER */
+.chart-wrap { width: 100%; overflow: hidden; }
+svg.chart { width: 100%; }
+
+/* AUTOMATION DONUT */
+.donut-wrap { display: flex; align-items: center; gap: 24px; }
+.donut-svg { flex-shrink: 0; }
+.donut-legend { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.legend-item { display: flex; align-items: center; gap: 10px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.legend-lbl { font-size: 11px; color: var(--text-secondary); flex: 1; }
+.legend-val { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700; }
+.legend-pct { font-size: 10px; color: var(--text-muted); }
+
+/* LEAD TIME BARS */
+.lt-row { display: flex; flex-direction: column; gap: 14px; }
+.lt-item { }
+.lt-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.lt-lbl { font-size: 11px; font-weight: 500; color: var(--text-secondary); }
+.lt-delta { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 700; color: var(--green); }
+.lt-bars { display: flex; flex-direction: column; gap: 3px; }
+.lt-bar-wrap { display: flex; align-items: center; gap: 8px; }
+.lt-bar-lbl { font-size: 9px; color: var(--text-muted); width: 42px; text-align: right; flex-shrink: 0; }
+.lt-bar-track { flex: 1; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+.lt-bar-fill { height: 100%; border-radius: 4px; }
+.lt-bar-val { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--text-muted); width: 28px; flex-shrink: 0; }
+
+/* MARGIN TABLE */
+.margin-items { display: flex; flex-direction: column; gap: 8px; }
+.margin-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--surface-2); border-radius: var(--r-sm); border: 1px solid var(--border); }
+.margin-icon { font-size: 16px; flex-shrink: 0; }
+.margin-body { flex: 1; }
+.margin-lbl { font-size: 11px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+.margin-desc { font-size: 10px; color: var(--text-muted); }
+.margin-val { font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; color: var(--green); }
+.margin-total-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: var(--green-light); border: 1px solid #86EFAC; border-radius: var(--r-sm); margin-top: 10px; }
+.margin-total-lbl { font-size: 12px; font-weight: 700; color: var(--green); }
+.margin-total-val { font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 700; color: var(--green); }
+
+/* CUSTOMER TABLE */
+.tbl { width: 100%; border-collapse: collapse; }
+.tbl th { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; color: var(--text-muted); text-align: left; padding: 8px 12px; border-bottom: 2px solid var(--border); }
+.tbl td { padding: 10px 12px; font-size: 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.tbl tr:last-child td { border-bottom: none; }
+.tbl tr:hover td { background: var(--surface-2); }
+.tier-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+.tier-1 { background: var(--purple-light); color: var(--purple); }
+.tier-2 { background: var(--blue-light); color: var(--blue); }
+.tier-3 { background: var(--amber-light); color: var(--amber); }
+.tier-4 { background: var(--surface-2); color: var(--text-muted); }
+.fill-bar { height: 6px; border-radius: 3px; overflow: hidden; background: var(--bg); width: 80px; }
+.fill-bar-in { height: 100%; border-radius: 3px; }
+.mono { font-family: 'IBM Plex Mono', monospace; font-weight: 500; }
+
+/* EXCEPTION FUNNEL */
+.funnel-row { display: flex; flex-direction: column; gap: 8px; }
+.funnel-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-sm); }
+.funnel-num { font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 700; width: 54px; flex-shrink: 0; }
+.funnel-lbl { font-size: 11px; font-weight: 600; color: var(--text-primary); }
+.funnel-sub { font-size: 10px; color: var(--text-muted); }
+.funnel-bar-wrap { flex: 1; }
+.funnel-bar { height: 6px; border-radius: 3px; overflow: hidden; background: var(--bg); }
+.funnel-bar-in { height: 100%; border-radius: 3px; }
+.funnel-pct { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 700; width: 42px; text-align: right; flex-shrink: 0; }
+
+/* MINI STAT */
+.mini-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mini-stat { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 10px 12px; }
+.mini-stat-lbl { font-size: 10px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 5px; }
+.mini-stat-val { font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 700; color: var(--navy); }
+.mini-stat-sub { font-size: 10px; margin-top: 2px; }
+
+/* PRODUCTIVITY */
+.prod-items { display: flex; flex-direction: column; gap: 6px; }
+.prod-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-radius: var(--r-sm); background: var(--surface-2); border: 1px solid var(--border); }
+.prod-lbl { font-size: 11px; color: var(--text-secondary); }
+.prod-val { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.prod-badge { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="ordly-workbench.html" class="nav-logo">
+    <div class="nav-logo-icon">⚡</div>
+    Ordly AI
+  </a>
+  <div class="nav-div"></div>
+  <span class="nav-module">Performance &amp; Value Dashboard</span>
+  <div class="nav-spacer"></div>
+  <div class="nav-period">
+    <button class="period-btn" onclick="setPeriod('1d',this)">1D</button>
+    <button class="period-btn active" onclick="setPeriod('7d',this)">7D</button>
+    <button class="period-btn" onclick="setPeriod('30d',this)">30D</button>
+    <button class="period-btn" onclick="setPeriod('qtd',this)">QTD</button>
+  </div>
+  <a href="ordly-workbench.html" class="nav-link">⚡ Workbench</a>
+  <a href="ordly-dashboard.html" class="nav-link" style="color:white;border-color:rgba(255,255,255,.4);">📊 D1: Ops</a>
+  <a href="ordly-dashboard-2.html" class="nav-link">🎯 D2: CLV</a>
+  <a href="ordly-dashboard-3.html" class="nav-link">💰 D3: Margin</a>
+  <div class="nav-avatar">KS</div>
+</nav>
+
+<div class="page">
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Order Performance &amp; Value Intelligence</div>
+      <div class="page-sub">Order-to-Cash · SAP S/4HANA · IBP-connected · Last 7 days</div>
+    </div>
+    <div class="last-updated"><div class="live-dot"></div> Updated 4 minutes ago</div>
+  </div>
+
+  <!-- KPI CARDS -->
+  <div class="kpi-row" id="kpiRow"></div>
+
+  <!-- ROW 2: VOLUME CHART + AUTOMATION BREAKDOWN -->
+  <div class="grid-2-1">
+    <div class="card">
+      <div class="card-title">Order Volume — 7-Day Trend</div>
+      <div class="card-sub">Received vs. Auto-Created vs. Exceptions by day</div>
+      <div class="chart-wrap" id="volumeChart"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Automation Breakdown</div>
+      <div class="card-sub">Order processing disposition this week</div>
+      <div class="donut-wrap" id="donutWrap" style="margin-top:8px;"></div>
+    </div>
+  </div>
+
+  <!-- ROW 3: LEAD TIME + MARGIN + CUSTOMER -->
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title">Lead Time Impact</div>
+      <div class="card-sub">Before Ordly vs. After Ordly (days)</div>
+      <div class="lt-row" id="ltRows"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Margin Intelligence</div>
+      <div class="card-sub">Weekly uplift by decision source</div>
+      <div class="margin-items" id="marginItems"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Processing Funnel</div>
+      <div class="card-sub">Where every order goes</div>
+      <div class="funnel-row" id="funnelRows"></div>
+      <div class="mini-stats" id="miniStats" style="margin-top:14px;"></div>
+    </div>
+  </div>
+
+  <!-- ROW 4: CUSTOMER TIER TABLE + PRODUCTIVITY -->
+  <div class="grid-2-1">
+    <div class="card">
+      <div class="card-title">Customer Centricity Performance</div>
+      <div class="card-sub">Fill rate, DSO, and service score by customer tier — powered by KNVV segmentation + ACDOCA</div>
+      <table class="tbl" id="tierTable"></table>
+    </div>
+    <div class="card">
+      <div class="card-title">Team Productivity</div>
+      <div class="card-sub">CSR efficiency gains this week</div>
+      <div class="prod-items" id="prodItems"></div>
+      <div style="margin-top:16px;padding:14px;background:linear-gradient(135deg,var(--navy),#1A3560);border-radius:var(--r-sm);color:white;">
+        <div style="font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;">🧠 Ordly vs. Traditional Order Entry</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.85);line-height:1.7;">
+          Traditional tools <strong style="color:white;">digitize the front door.</strong><br>
+          Ordly AI <strong style="color:#00D264;">optimizes the decision at the front door.</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 5: EXCEPTION ANALYSIS + AR/COMMERCIAL -->
+  <div class="grid-1-1">
+    <div class="card">
+      <div class="card-title">Exception Root Cause Analysis</div>
+      <div class="card-sub">Why orders required human review this week</div>
+      <div id="excChart"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">AR &amp; Commercial Quality</div>
+      <div class="card-sub">Orders screened against credit and payment risk</div>
+      <div id="arStats"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// SHARED DATA SOURCE (ordly-data.js)
+// ══════════════════════════════════════════
+const DASH_DATA = {
+  kpis: [
+    { lbl:'Orders Received', val:'126', sub:'This week, all channels', trend:'+14% vs prior week', up:true, icon:'📥', accent:'#0050C8' },
+    { lbl:'Auto-Created', val:'104', sub:'Touchless SAP SO creation', trend:'82.5% automation rate', up:true, icon:'⚡', accent:'#0C7A52' },
+    { lbl:'Avg. Lead Time Saved', val:'−3.4d', sub:'vs. pre-Ordly baseline', trend:'+0.6d improvement this week', up:true, icon:'⏱', accent:'#6436C8' },
+    { lbl:'Margin Uplift', val:'$27.4K', sub:'Optimal fulfillment decisions', trend:'+$4.1K vs prior week', up:true, icon:'💰', accent:'#A85C00' },
+  ],
+  volume: {
+    days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+    received: [18, 22, 15, 27, 31, 8, 5],
+    auto:     [14, 18, 12, 23, 26, 7,  4],
+    exceptions:[2,  1,  3,  2,  3,  1,  1],
+  },
+  automation: [
+    { lbl:'Auto-Created (Touchless)', val:104, pct:82.5, color:'#0050C8' },
+    { lbl:'Human Review Required',    val:13,  pct:10.3, color:'#A85C00' },
+    { lbl:'Manual Override (CSR)',     val:9,   pct:7.1,  color:'#7A90A8' },
+  ],
+  leadTime: [
+    { lbl:'Standard Orders', before:6.8, after:3.6 },
+    { lbl:'Strategic Accounts', before:5.2, after:0.4 },
+    { lbl:'Expedited Orders', before:4.1, after:2.0 },
+    { lbl:'EDI / Portal', before:2.8, after:1.3 },
+  ],
+  margin: [
+    { icon:'🏭', lbl:'Optimal Plant Selection', desc:'PL01 vs PL02/PL03 routing decisions', val:12400 },
+    { icon:'🔄', lbl:'Substitution Intelligence', desc:'Margin-preserving material substitutions', val:8200 },
+    { icon:'🚫', lbl:'Avoided Low-Margin Routing', desc:'Rejected suboptimal fulfillment paths', val:6800 },
+  ],
+  funnel: [
+    { lbl:'Received', sub:'All channels combined', val:126, pct:100, color:'#0050C8' },
+    { lbl:'Validated', sub:'Passed SAP checks', val:119, pct:94.4, color:'#0C7A52' },
+    { lbl:'Auto-Created', sub:'Touchless SO creation', val:104, pct:82.5, color:'#00D264' },
+    { lbl:'Human Review', sub:'Exception or approval needed', val:22, pct:17.5, color:'#A85C00' },
+    { lbl:'Failed / Cancelled', sub:'Material or credit block', val:3, pct:2.4, color:'#C0352A' },
+  ],
+  miniStats: [
+    { lbl:'Touchless Rate', val:'82.5%', sub:'↑ from 71% pre-Ordly', col:'var(--green)' },
+    { lbl:'First-Pass Rate', val:'94.4%', sub:'SAP validation success', col:'var(--blue)' },
+    { lbl:'Avg. Cycle Time', val:'4.2m', sub:'PO received → SO created', col:'var(--purple)' },
+    { lbl:'Exception Rate', val:'10.3%', sub:'↓ from 18% pre-Ordly', col:'var(--amber)' },
+  ],
+  tiers: [
+    { tier:'Tier 1', name:'Strategic (Bosch, GE, Honeywell)', cnt:14, fill:98.2, dso:18, score:97, change:'+1.8%' },
+    { tier:'Tier 2', name:'Premium Partners',                  cnt:31, fill:94.5, dso:28, score:91, change:'+3.2%' },
+    { tier:'Tier 3', name:'Standard Accounts',                 cnt:58, fill:89.1, dso:35, score:84, change:'+5.4%' },
+    { tier:'Tier 4', name:'New / Transactional',               cnt:23, fill:82.3, dso:42, score:76, change:'+8.1%' },
+  ],
+  productivity: [
+    { lbl:'CSR Hours Saved', val:'38.4 hrs', badge:'This week', badgeColor:'var(--green-light)', badgeText:'var(--green)' },
+    { lbl:'Orders per CSR', val:'31.5', badge:'↑ from 19', badgeColor:'var(--blue-light)', badgeText:'var(--blue)' },
+    { lbl:'Manual Keystrokes Avoided', val:'14,200', badge:'Automated', badgeColor:'var(--purple-light)', badgeText:'var(--purple)' },
+    { lbl:'Avg. Exception Close Time', val:'12.3 min', badge:'↓ 34%', badgeColor:'var(--green-light)', badgeText:'var(--green)' },
+  ],
+  exceptions: [
+    { lbl:'Low OCR Confidence', val:7, color:'#A85C00' },
+    { lbl:'Material Mapping Ambiguous', val:4, color:'#C0352A' },
+    { lbl:'Pricing / Contract Mismatch', val:4, color:'#6436C8' },
+    { lbl:'Credit Near-Limit', val:3, color:'#0050C8' },
+    { lbl:'Stock Shortfall', val:3, color:'#7A90A8' },
+    { lbl:'Customer-Specific Rule', val:1, color:'#0C7A52' },
+  ],
+  ar: [
+    { lbl:'Orders Screened for Credit Risk', val:'126', sub:'All orders evaluated via FSCM/UKM' },
+    { lbl:'Near Credit-Limit Flagged', val:'6', sub:'Routed for review before SO creation' },
+    { lbl:'High-Risk Accounts Blocked', val:'2', sub:'Prevented bad debt exposure' },
+    { lbl:'Strategic Account Override', val:'1', sub:'Senior approval applied (GE Aviation)' },
+    { lbl:'Avg. DSO (Ordly-screened)', val:'28.1d', sub:'vs 34.5d pre-Ordly baseline' },
+    { lbl:'Est. Bad Debt Avoidance', val:'$18,400', sub:'Via proactive AR risk screening' },
+  ]
+};
+
+// ══════════════════════════════════════════
+// KPI CARDS
+// ══════════════════════════════════════════
+function renderKPIs() {
+  document.getElementById('kpiRow').innerHTML = DASH_DATA.kpis.map(k => `
+    <div class="kpi-card" style="--accent:${k.accent}">
+      <div class="kpi-eyebrow">${k.lbl}</div>
+      <div class="kpi-value">${k.val}</div>
+      <div class="kpi-sub">${k.sub}</div>
+      <div class="kpi-trend ${k.up?'trend-up':'trend-down'}">${k.up?'↑':'↓'} ${k.trend}</div>
+      <div class="kpi-icon">${k.icon}</div>
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════════
+// VOLUME BAR CHART (SVG)
+// ══════════════════════════════════════════
+function renderVolumeChart() {
+  const d = DASH_DATA.volume;
+  const W = 600, H = 200, padL = 30, padR = 10, padT = 14, padB = 28;
+  const cW = W - padL - padR;
+  const cH = H - padT - padB;
+  const maxV = Math.max(...d.received) + 4;
+  const n = d.days.length;
+  const grpW = cW / n;
+  const barW = Math.min(16, grpW * 0.28);
+  const gap = 3;
+
+  const sy = v => padT + cH - (v / maxV) * cH;
+
+  const gridLines = [0, 10, 20, 30, 40].filter(v => v <= maxV + 2);
+
+  let bars = '';
+  d.days.forEach((day, i) => {
+    const cx = padL + i * grpW + grpW / 2;
+    const x0 = cx - barW - gap;
+    const x1 = cx;
+    const x2 = cx + barW + gap;
+
+    const hR = (d.received[i]/maxV)*cH;
+    const hA = (d.auto[i]/maxV)*cH;
+    const hE = (d.exceptions[i]/maxV)*cH;
+
+    bars += `
+      <rect x="${x0 - barW/2}" y="${sy(d.received[i])}" width="${barW}" height="${hR}" rx="2" fill="#0050C8" opacity=".85"/>
+      <rect x="${x1 - barW/2}" y="${sy(d.auto[i])}" width="${barW}" height="${hA}" rx="2" fill="#0C7A52"/>
+      <rect x="${x2 - barW/2}" y="${sy(d.exceptions[i])}" width="${barW}" height="${hE}" rx="2" fill="#A85C00"/>
+      <text x="${cx}" y="${H - 6}" text-anchor="middle" font-size="11" fill="#7A90A8" font-family="Outfit,sans-serif">${day}</text>
+    `;
+  });
+
+  const grids = gridLines.map(v => {
+    const y = sy(v);
+    return `
+      <line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#E2E7EF" stroke-width="1"/>
+      <text x="${padL - 4}" y="${y + 4}" text-anchor="end" font-size="9" fill="#7A90A8" font-family="IBM Plex Mono,monospace">${v}</text>`;
+  }).join('');
+
+  const legend = `
+    <rect x="0" y="0" width="10" height="10" rx="2" fill="#0050C8"/><text x="14" y="9" font-size="10" fill="#3D5066" font-family="Outfit,sans-serif">Received</text>
+    <rect x="78" y="0" width="10" height="10" rx="2" fill="#0C7A52"/><text x="92" y="9" font-size="10" fill="#3D5066" font-family="Outfit,sans-serif">Auto-Created</text>
+    <rect x="178" y="0" width="10" height="10" rx="2" fill="#A85C00"/><text x="192" y="9" font-size="10" fill="#3D5066" font-family="Outfit,sans-serif">Exceptions</text>
+  `;
+
+  document.getElementById('volumeChart').innerHTML = `
+    <svg class="chart" viewBox="0 0 ${W} ${H + 20}" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(0,18)">${legend}</g>
+      <g>${grids}</g>
+      ${bars}
+    </svg>
+  `;
+}
+
+// ══════════════════════════════════════════
+// DONUT CHART
+// ══════════════════════════════════════════
+function renderDonut() {
+  const data = DASH_DATA.automation;
+  const total = data.reduce((a, d) => a + d.val, 0);
+  const r = 52, cx = 70, cy = 70, sw = 14;
+  const circ = 2 * Math.PI * r;
+
+  let offset = 0;
+  const arcs = data.map(d => {
+    const len = (d.val / total) * circ;
+    const arc = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${d.color}" stroke-width="${sw}"
+      stroke-dasharray="${len - 2} ${circ - len + 2}" stroke-dashoffset="${-offset}" stroke-linecap="butt" transform="rotate(-90 ${cx} ${cy})"/>`;
+    offset += len;
+    return arc;
+  }).join('');
+
+  const svg = `
+    <svg width="140" height="140" viewBox="0 0 140 140" class="donut-svg">
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#E2E7EF" stroke-width="${sw}"/>
+      ${arcs}
+      <text x="${cx}" y="${cy - 7}" text-anchor="middle" font-size="22" font-weight="700" fill="#0C1F3F" font-family="IBM Plex Mono,monospace">82.5</text>
+      <text x="${cx}" y="${cy + 11}" text-anchor="middle" font-size="11" fill="#7A90A8" font-family="Outfit,sans-serif">% touchless</text>
+    </svg>
+  `;
+
+  const legend = data.map(d => `
+    <div class="legend-item">
+      <div class="legend-dot" style="background:${d.color}"></div>
+      <div class="legend-lbl">${d.lbl}</div>
+      <div>
+        <span class="legend-val">${d.val}</span>
+        <span class="legend-pct"> · ${d.pct}%</span>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('donutWrap').innerHTML = `${svg}<div class="donut-legend">${legend}</div>`;
+}
+
+// ══════════════════════════════════════════
+// LEAD TIME BARS
+// ══════════════════════════════════════════
+function renderLeadTime() {
+  const data = DASH_DATA.leadTime;
+  const maxV = Math.max(...data.map(d => d.before));
+
+  document.getElementById('ltRows').innerHTML = data.map(d => {
+    const delta = (d.before - d.after).toFixed(1);
+    const pctBefore = (d.before / maxV) * 100;
+    const pctAfter = (d.after / maxV) * 100;
+    return `
+      <div class="lt-item">
+        <div class="lt-item-header">
+          <span class="lt-lbl">${d.lbl}</span>
+          <span class="lt-delta">−${delta} days</span>
+        </div>
+        <div class="lt-bars">
+          <div class="lt-bar-wrap">
+            <div class="lt-bar-lbl">Before</div>
+            <div class="lt-bar-track"><div class="lt-bar-fill" style="width:${pctBefore}%;background:#C8D4E0;"></div></div>
+            <div class="lt-bar-val">${d.before}d</div>
+          </div>
+          <div class="lt-bar-wrap">
+            <div class="lt-bar-lbl">After</div>
+            <div class="lt-bar-track"><div class="lt-bar-fill" style="width:${pctAfter}%;background:var(--green);"></div></div>
+            <div class="lt-bar-val" style="color:var(--green);font-weight:700;">${d.after}d</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ══════════════════════════════════════════
+// MARGIN ITEMS
+// ══════════════════════════════════════════
+function renderMargin() {
+  const data = DASH_DATA.margin;
+  const total = data.reduce((a, d) => a + d.val, 0);
+  document.getElementById('marginItems').innerHTML = data.map(d => `
+    <div class="margin-item">
+      <div class="margin-icon">${d.icon}</div>
+      <div class="margin-body">
+        <div class="margin-lbl">${d.lbl}</div>
+        <div class="margin-desc">${d.desc}</div>
+      </div>
+      <div class="margin-val">+$${d.val.toLocaleString()}</div>
+    </div>
+  `).join('') + `
+    <div class="margin-total-row">
+      <div class="margin-total-lbl">Total Weekly Margin Uplift</div>
+      <div class="margin-total-val">+$${total.toLocaleString()}</div>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════
+// FUNNEL
+// ══════════════════════════════════════════
+function renderFunnel() {
+  document.getElementById('funnelRows').innerHTML = DASH_DATA.funnel.map(f => `
+    <div class="funnel-item">
+      <div class="funnel-num" style="color:${f.color}">${f.val}</div>
+      <div style="flex:1;">
+        <div class="funnel-lbl">${f.lbl}</div>
+        <div class="funnel-sub">${f.sub}</div>
+        <div class="funnel-bar" style="margin-top:5px;">
+          <div class="funnel-bar-in" style="width:${f.pct}%;background:${f.color};opacity:.7;"></div>
+        </div>
+      </div>
+      <div class="funnel-pct" style="color:${f.color}">${f.pct}%</div>
+    </div>
+  `).join('');
+
+  document.getElementById('miniStats').innerHTML = DASH_DATA.miniStats.map(s => `
+    <div class="mini-stat">
+      <div class="mini-stat-lbl">${s.lbl}</div>
+      <div class="mini-stat-val" style="color:${s.col}">${s.val}</div>
+      <div class="mini-stat-sub" style="color:var(--text-muted)">${s.sub}</div>
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════════
+// CUSTOMER TIER TABLE
+// ══════════════════════════════════════════
+function renderTierTable() {
+  const tierClass = ['tier-1','tier-2','tier-3','tier-4'];
+  document.getElementById('tierTable').innerHTML = `
+    <thead>
+      <tr>
+        <th>Tier</th>
+        <th>Account Segment</th>
+        <th>Orders</th>
+        <th>Fill Rate</th>
+        <th>DSO (days)</th>
+        <th>Service Score</th>
+        <th>vs. Pre-Ordly</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${DASH_DATA.tiers.map((t, i) => `
+        <tr>
+          <td><span class="tier-badge ${tierClass[i]}">${t.tier}</span></td>
+          <td style="font-size:11px;color:var(--text-secondary);">${t.name}</td>
+          <td class="mono">${t.cnt}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="fill-bar"><div class="fill-bar-in" style="width:${t.fill}%;background:${t.fill>=95?'var(--green)':t.fill>=88?'var(--blue)':'var(--amber)'};"></div></div>
+              <span class="mono" style="font-size:11px;">${t.fill}%</span>
+            </div>
+          </td>
+          <td class="mono">${t.dso}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div style="width:36px;height:36px;border-radius:50%;border:3px solid ${t.score>=95?'var(--green)':t.score>=88?'var(--blue)':'var(--amber)'};display:flex;align-items:center;justify-content:center;font-family:IBM Plex Mono,monospace;font-size:11px;font-weight:700;">
+                ${t.score}
+              </div>
+            </div>
+          </td>
+          <td style="color:var(--green);font-weight:700;font-size:12px;">${t.change}</td>
+        </tr>
+      `).join('')}
+    </tbody>
+  `;
+}
+
+// ══════════════════════════════════════════
+// PRODUCTIVITY
+// ══════════════════════════════════════════
+function renderProductivity() {
+  document.getElementById('prodItems').innerHTML = DASH_DATA.productivity.map(p => `
+    <div class="prod-row">
+      <span class="prod-lbl">${p.lbl}</span>
+      <div style="display:flex;align-items:center;gap:7px;">
+        <span class="prod-val">${p.val}</span>
+        <span class="prod-badge" style="background:${p.badgeColor};color:${p.badgeText}">${p.badge}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════════
+// EXCEPTION CHART (horizontal bars)
+// ══════════════════════════════════════════
+function renderExceptions() {
+  const data = DASH_DATA.exceptions;
+  const maxV = Math.max(...data.map(d => d.val));
+
+  document.getElementById('excChart').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+      ${data.map(d => `
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:160px;font-size:11px;color:var(--text-secondary);text-align:right;flex-shrink:0;">${d.lbl}</div>
+          <div style="flex:1;height:10px;background:var(--bg);border-radius:5px;overflow:hidden;">
+            <div style="width:${(d.val/maxV)*100}%;height:100%;background:${d.color};border-radius:5px;"></div>
+          </div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:${d.color};width:20px;">${d.val}</div>
+        </div>
+      `).join('')}
+      <div style="margin-top:8px;padding:10px 12px;background:var(--amber-light);border:1px solid #F6AD55;border-radius:var(--r-sm);font-size:11px;color:var(--amber);">
+        <strong>Top fix:</strong> Improve PDF template parsing for low-confidence customers. Can reduce exceptions by ~35%.
+      </div>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════
+// AR STATS
+// ══════════════════════════════════════════
+function renderAR() {
+  document.getElementById('arStats').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;">
+      ${DASH_DATA.ar.map(s => `
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);margin-bottom:6px;">${s.lbl}</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:700;color:var(--navy);margin-bottom:3px;">${s.val}</div>
+          <div style="font-size:10px;color:var(--text-muted);">${s.sub}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div style="margin-top:12px;padding:12px 14px;background:linear-gradient(135deg,#E3F7EE,#EBF2FF);border:1px solid #86EFAC;border-radius:var(--r-sm);">
+      <div style="font-size:10px;font-weight:700;color:var(--green);margin-bottom:4px;text-transform:uppercase;letter-spacing:.6px;">🔒 Ordly AR Shield</div>
+      <div style="font-size:11px;color:var(--text-secondary);line-height:1.6;">Every order is scored against FSCM credit exposure, BSID payment history, and ACDOCA profitability before the sales order is created. This week, Ordly prevented <strong>$18,400 in at-risk receivables</strong> from entering the pipeline.</div>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════
+// PERIOD SELECTOR
+// ══════════════════════════════════════════
+function setPeriod(p, btn) {
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+renderKPIs();
+renderVolumeChart();
+renderDonut();
+renderLeadTime();
+renderMargin();
+renderFunnel();
+renderTierTable();
+renderProductivity();
+renderExceptions();
+renderAR();
+</script>
+</body>
+</html>

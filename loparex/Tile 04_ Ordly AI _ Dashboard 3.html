@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ordly AI — Margin & Working Capital Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#F1F4F8;--surface:#FFF;--surface-2:#F8F9FB;--border:#E2E7EF;
+  --navy:#0C1F3F;--blue:#0050C8;--blue-light:#EBF2FF;
+  --text-primary:#0C1F3F;--text-secondary:#3D5066;--text-muted:#7A90A8;
+  --green:#0C7A52;--green-light:#E3F7EE;
+  --amber:#A85C00;--amber-light:#FEF5E4;
+  --red:#C0352A;--red-light:#FEE8E6;
+  --teal:#0E7490;--teal-light:#ECFEFF;
+  --r:10px;--r-sm:6px;--sh:0 2px 8px rgba(12,31,63,.09);
+}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text-primary);font-size:13px;}
+.nav{height:54px;background:var(--navy);display:flex;align-items:center;padding:0 24px;gap:12px;position:sticky;top:0;z-index:100;}
+.nav-logo{display:flex;align-items:center;gap:9px;color:white;font-weight:800;font-size:16px;letter-spacing:-.4px;text-decoration:none;}
+.nav-logo-icon{width:30px;height:30px;background:var(--blue);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.nav-div{width:1px;height:22px;background:rgba(255,255,255,.15);}
+.nav-module{color:rgba(255,255,255,.55);font-size:12px;font-weight:500;}
+.nav-spacer{flex:1;}
+.nav-link{color:rgba(255,255,255,.65);text-decoration:none;font-size:12px;font-weight:500;display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:6px;transition:all .15s;border:1px solid rgba(255,255,255,.12);}
+.nav-link:hover{background:rgba(255,255,255,.1);color:white;}
+.nav-avatar{width:30px;height:30px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:700;}
+.page{max-width:1440px;margin:0 auto;padding:24px;}
+
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.kpi-card{background:var(--surface);border-radius:var(--r);padding:18px 20px;border:1px solid var(--border);box-shadow:var(--sh);position:relative;overflow:hidden;}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent,var(--green));}
+.kpi-eyebrow{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:10px;}
+.kpi-value{font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:700;color:var(--navy);line-height:1;margin-bottom:5px;letter-spacing:-1px;}
+.kpi-sub{font-size:11px;color:var(--text-secondary);margin-bottom:6px;}
+.kpi-trend{font-size:11px;font-weight:600;}
+.kpi-icon{position:absolute;right:16px;top:14px;font-size:24px;opacity:.12;}
+.sap-src{display:inline-flex;align-items:center;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text-muted);background:var(--surface-2);border:1px solid var(--border);padding:2px 7px;border-radius:4px;margin-top:4px;}
+
+.grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:22px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:22px;}
+.grid-1-1{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px;}
+
+.card{background:var(--surface);border-radius:var(--r);padding:20px;border:1px solid var(--border);box-shadow:var(--sh);}
+.card-title{font-size:14px;font-weight:700;margin-bottom:3px;}
+.card-sub{font-size:11px;color:var(--text-muted);margin-bottom:16px;line-height:1.5;}
+
+/* WATERFALL */
+.wf-bar{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.wf-label{font-size:11px;color:var(--text-secondary);width:160px;flex-shrink:0;text-align:right;}
+.wf-track{flex:1;height:28px;position:relative;border-radius:4px;overflow:hidden;}
+.wf-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px;}
+.wf-value{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:white;}
+.wf-pct{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;width:60px;flex-shrink:0;}
+
+/* WORKING CAPITAL */
+.wc-cycle{display:flex;align-items:center;justify-content:center;gap:0;margin:16px 0;}
+.wc-box{text-align:center;padding:14px 16px;border-radius:var(--r-sm);border:1px solid var(--border);}
+.wc-box-val{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:700;line-height:1;margin-bottom:4px;}
+.wc-box-lbl{font-size:10px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.wc-arrow{font-size:18px;color:var(--text-muted);padding:0 6px;}
+.wc-formula{font-family:'IBM Plex Mono',monospace;font-size:11px;text-align:center;color:var(--text-secondary);padding:8px;background:var(--surface-2);border-radius:var(--r-sm);border:1px solid var(--border);}
+
+/* PLANT PROFITABILITY */
+.plant-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.plant-row:last-child{border-bottom:none;}
+.plant-code{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;width:36px;}
+.plant-name{font-size:11px;color:var(--text-secondary);flex:1;}
+.plant-bar-wrap{width:120px;}
+.plant-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
+.plant-bar-in{height:100%;border-radius:4px;}
+.plant-pct{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;width:48px;text-align:right;}
+.plant-rev{font-size:10px;color:var(--text-muted);width:60px;text-align:right;}
+
+/* O2C TIMELINE */
+.o2c-steps{display:flex;align-items:flex-start;gap:0;margin-top:8px;overflow-x:auto;}
+.o2c-step{flex:1;min-width:90px;text-align:center;position:relative;}
+.o2c-step::after{content:'';position:absolute;top:18px;left:calc(50% + 18px);right:calc(-50% + 18px);height:2px;background:var(--border);}
+.o2c-step:last-child::after{display:none;}
+.o2c-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;margin:0 auto 6px;border:2px solid var(--border);}
+.o2c-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted);margin-bottom:4px;}
+.o2c-days{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;}
+
+/* FREIGHT TABLE */
+.freight-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.freight-row:last-child{border-bottom:none;}
+.lane-tag{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:var(--blue);background:var(--blue-light);padding:2px 7px;border-radius:4px;white-space:nowrap;}
+
+/* COPA ACCOUNT BASED */
+.copa-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);}
+.copa-row:last-child{border-bottom:none;}
+.copa-lbl{font-size:11px;color:var(--text-secondary);}
+.copa-amt{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;}
+.copa-sap{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text-muted);}
+
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="ordly-workbench.html" class="nav-logo">
+    <div class="nav-logo-icon">⚡</div>Ordly AI
+  </a>
+  <div class="nav-div"></div>
+  <span class="nav-module">D3 · Margin &amp; Working Capital Intelligence</span>
+  <div class="nav-spacer"></div>
+  <a href="ordly-workbench.html" class="nav-link">⚡ Workbench</a>
+  <a href="ordly-dashboard.html" class="nav-link">📊 D1: Ops</a>
+  <a href="ordly-dashboard-2.html" class="nav-link">🎯 D2: CLV</a>
+  <a href="ordly-dashboard-3.html" class="nav-link" style="color:white;border-color:rgba(255,255,255,.4);">💰 D3: Margin</a>
+  <div class="nav-avatar">KS</div>
+</nav>
+
+<div class="page">
+
+  <!-- PAGE HEADER -->
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;">
+    <div>
+      <div style="font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.5px;">Margin &amp; Working Capital Intelligence</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Account-Based CO-PA · ACDOCA GL entries · No value fields · This week · SAP S/4HANA data only</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted);">
+      <div style="width:7px;height:7px;border-radius:50%;background:#00D264;animation:pulse 2s infinite;"></div>
+      Updated 6 min ago
+    </div>
+  </div>
+  <style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}</style>
+
+  <!-- KPI ROW -->
+  <div class="kpi-row" id="kpiRow"></div>
+
+  <!-- MARGIN WATERFALL + O2C TIMELINE -->
+  <div class="grid-2-1">
+    <div class="card">
+      <div class="card-title">Margin Waterfall — Account-Based CO-PA</div>
+      <div class="card-sub">Revenue → Cost → Gross Margin → Freight Deduction → Net Margin. Source: ACDOCA GL accounts only. No value fields (VV-xxx). Margin Analysis account-based.</div>
+      <div id="waterfallChart"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Order-to-Cash Cycle</div>
+      <div class="card-sub">Average days per O2C stage. Source: VBAK → LIKP → VF01 → BSID → BSAD.</div>
+      <div id="o2cChart"></div>
+      <div style="margin-top:14px;padding:10px 12px;background:var(--green-light);border-radius:var(--r-sm);border-left:3px solid var(--green);">
+        <div style="font-size:10px;font-weight:700;color:var(--green);margin-bottom:3px;">Ordly Impact on O2C</div>
+        <div style="font-size:10px;color:var(--text-secondary);line-height:1.5;">Order entry time: <strong>4.2 min</strong> (vs 38 min manual). Removes the largest single bottleneck in the cycle. VBEP confirmed at intake — no re-scheduling loops.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLANT PROFITABILITY + WORKING CAPITAL -->
+  <div class="grid-1-1">
+    <div class="card">
+      <div class="card-title">Plant-Level Contribution Margin</div>
+      <div class="card-sub">Gross margin % by fulfillment plant after freight. Source: ACDOCA → WERKS (plant) + freight cost from LIKP/DELVRY. Account-based CO-PA — no VV- value fields.</div>
+      <div id="plantProfit"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Working Capital Metrics</div>
+      <div class="card-sub">DSO, DIO, DPO and Cash Conversion Cycle. All from S/4HANA: BSID (AR), MARD (inventory), BSIK (AP).</div>
+      <div id="wcChart"></div>
+    </div>
+  </div>
+
+  <!-- FREIGHT IMPACT + CO-PA DETAIL -->
+  <div class="grid-1-1">
+    <div class="card">
+      <div class="card-title">Freight Cost Analysis by Lane</div>
+      <div class="card-sub">Freight as % of order revenue by fulfillment lane. Source: LIKP-VSTEL (shipping point) + VTTK/VTTS (route). Ordly selects lowest freight lane for each line automatically.</div>
+      <div id="freightTable"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Account-Based CO-PA — Contribution Margin</div>
+      <div class="card-sub">Profitability per GL account posting. ACDOCA account-based only — no VV-xxx value fields. Ledger: 0L. All P&L flows through GL accounts to ACDOCA.</div>
+      <div id="copaDetail"></div>
+    </div>
+  </div>
+
+  <!-- DSO TREND + MARGIN BY CUSTOMER TIER -->
+  <div class="grid-1-1">
+    <div class="card">
+      <div class="card-title">DSO Trend — 6 Months</div>
+      <div class="card-sub">Days Sales Outstanding by customer tier. Source: BSID (open AR) + BSAD (cleared). Ordly's AR Shield prevents high-risk orders from entering the pipeline.</div>
+      <div id="dsoChart"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Net Margin by Customer Tier (after freight)</div>
+      <div class="card-sub">Gross margin minus allocated freight cost. Shows true profitability of each tier. Strategic accounts have lower gross but higher net due to freight efficiency.</div>
+      <div id="tierMargin"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// SHARED DATA SOURCE (ordly-data.js)
+// ACDOCA + BSID + BSAD + MARD + LIKP sources
+// ══════════════════════════════════════════
+const MARGIN_DATA = {
+  kpis:[
+    {lbl:'Gross Margin %',val:'31.8%',sub:'Weighted avg this week · ACDOCA',trend:'↑ +1.2pp — Ordly plant optimization',up:true,icon:'📈',accent:'#0C7A52',sap:'ACDOCA-KSTAR/BETRW'},
+    {lbl:'Net Margin (after freight)',val:'29.4%',sub:'Post-freight · ACDOCA + LIKP',trend:'↑ +0.9pp — freight lane savings',up:true,icon:'💰',accent:'#0050C8',sap:'ACDOCA + DELVRY cost'},
+    {lbl:'Days Sales Outstanding',val:'28.1d',sub:'Weighted avg DSO · BSID/BSAD',trend:'↓ −6.4d vs pre-Ordly baseline',up:true,icon:'📅',accent:'#5B21B6',sap:'BSID-ZFBDT / BSAD-AUGDT'},
+    {lbl:'Cash Conversion Cycle',val:'34.6d',sub:'DIO + DSO − DPO · S/4HANA',trend:'↓ −8.2d improvement this quarter',up:true,icon:'🔄',accent:'#A85C00',sap:'MARD + BSID + BSIK'},
+  ],
+  waterfall:[
+    {lbl:'Gross Revenue',          amt:4820000, pct:100.0, col:'#0050C8', type:'start'},
+    {lbl:'↓ Cost of Goods Sold',   amt:-3287600, pct:-68.2, col:'#C0352A', type:'sub'},
+    {lbl:'= Gross Margin',         amt:1532400, pct:31.8, col:'#0C7A52', type:'result'},
+    {lbl:'↓ Freight Costs',        amt:-116800, pct:-2.4, col:'#A85C00', type:'sub'},
+    {lbl:'↓ Expedite Surcharges',  amt:-22100, pct:-0.5, col:'#C0352A', type:'sub'},
+    {lbl:'= Net Margin (O2C)',     amt:1393500, pct:28.9, col:'#0C7A52', type:'result', bold:true},
+  ],
+  o2c:[
+    {step:'PO Received',icon:'📥',days:0,  col:'#7A90A8',sap:'VBAK-ERDAT'},
+    {step:'SO Created', icon:'⚡',days:0.07,col:'#0050C8',sap:'VBAK-AUDAT (Ordly)'},
+    {step:'Delivery',   icon:'🚛',days:3.2, col:'#0C7A52',sap:'LIKP-LFDAT'},
+    {step:'Goods Issue',icon:'📦',days:1.0, col:'#A85C00',sap:'LIKP-WADAT'},
+    {step:'Invoice',    icon:'🧾',days:0.5, col:'#5B21B6',sap:'VBRK-FKDAT'},
+    {step:'Payment',    icon:'💳',days:28.1,col:'#0C7A52',sap:'BSAD-AUGDT'},
+  ],
+  plants:[
+    {plant:'PL03',name:'Detroit, MI',    gm:33.8, netGm:33.4, rev:'$4.2M', col:'#0C7A52'},
+    {plant:'PL01',name:'Chicago, IL',    gm:31.4, netGm:28.9, rev:'$5.8M', col:'#0050C8'},
+    {plant:'PL02',name:'Atlanta, GA',    gm:29.6, netGm:27.5, rev:'$3.1M', col:'#5B21B6'},
+  ],
+  wc:{dso:28.1, dio:22.4, dpo:31.8, ccc:18.7,
+    sapDSO:'BSID-ZFBDT → BSAD-AUGDT', sapDIO:'MARD-LABST × MARC-PLIFZ / COGS/365',
+    sapDPO:'BSIK-ZFBDT → BSAK-AUGDT', sapCCC:'DSO + DIO − DPO'},
+  freight:[
+    {lane:'PL03 → Auburn Hills MI', dist:'22 mi',  pct:0.41,  orders:12, col:'#0C7A52', badge:'Optimal'},
+    {lane:'PL01 → Charlotte NC',    dist:'788 mi', pct:1.75,  orders:8,  col:'#0050C8', badge:'Good'},
+    {lane:'PL02 → Orlando FL',      dist:'441 mi', pct:1.08,  orders:6,  col:'#0050C8', badge:'Good'},
+    {lane:'PL01 → Cincinnati OH',   dist:'302 mi', pct:0.82,  orders:4,  col:'#A85C00', badge:'Watch'},
+    {lane:'PL01 → Chicago IL',      dist:'0 mi',   pct:0.20,  orders:3,  col:'#0C7A52', badge:'Local'},
+    {lane:'PL02 → Atlanta GA',      dist:'0 mi',   pct:0.18,  orders:2,  col:'#0C7A52', badge:'Local'},
+  ],
+  copa:[
+    {lbl:'Revenue (VKUML)',        amt:4820000,  sap:'ACDOCA-KSTAR 800000',  col:'var(--blue)',  sign:'+'},
+    {lbl:'COGS — Material',        amt:-2841200, sap:'ACDOCA-KSTAR 893000',  col:'var(--red)',   sign:'−'},
+    {lbl:'COGS — Labour/OH',       amt:-446400,  sap:'ACDOCA-KSTAR 894000',  col:'var(--red)',   sign:'−'},
+    {lbl:'= Gross Margin I',       amt:1532400,  sap:'Derived: Rev − COGS', col:'var(--green)', sign:'=', bold:true},
+    {lbl:'Freight Cost (outbound)',amt:-116800,  sap:'ACDOCA-KSTAR 476000',  col:'var(--amber)', sign:'−'},
+    {lbl:'Expedite Surcharges',    amt:-22100,   sap:'ACDOCA-KSTAR 478000',  col:'var(--red)',   sign:'−'},
+    {lbl:'= Net Contribution',     amt:1393500,  sap:'Account-based CO-PA',  col:'var(--green)', sign:'=', bold:true},
+  ],
+  dso:[
+    {period:'Nov 23',tier1:20,tier2:30,tier3:38},
+    {period:'Dec 23',tier1:21,tier2:31,tier3:37},
+    {period:'Jan 24',tier1:19,tier2:29,tier3:36},
+    {period:'Feb 24',tier1:18,tier2:28,tier3:35},
+    {period:'Mar 24',tier1:18,tier2:28,tier3:34},
+    {period:'Apr 24',tier1:17,tier2:27,tier3:33},
+  ],
+  tierMargin:[
+    {tier:'Tier 1 Strategic', gm:'34.2%', freight:'0.41%', net:'33.8%', col:'#5B21B6'},
+    {tier:'Tier 2 Premium',   gm:'30.8%', freight:'1.42%', net:'29.4%', col:'#0050C8'},
+    {tier:'Tier 3 Standard',  gm:'28.1%', freight:'2.10%', net:'26.0%', col:'#A85C00'},
+    {tier:'Tier 4 New',       gm:'25.4%', freight:'3.20%', net:'22.2%', col:'#7A90A8'},
+  ],
+};
+
+// Render KPIs
+function renderKPIs() {
+  document.getElementById('kpiRow').innerHTML = MARGIN_DATA.kpis.map(k=>`
+    <div class="kpi-card" style="--accent:${k.accent}">
+      <div class="kpi-eyebrow">${k.lbl}</div>
+      <div class="kpi-value">${k.val}</div>
+      <div class="kpi-sub">${k.sub}</div>
+      <div class="kpi-trend" style="color:${k.up?'var(--green)':'var(--red)'};">${k.trend}</div>
+      <div class="sap-src">📊 ${k.sap}</div>
+      <div class="kpi-icon">${k.icon}</div>
+    </div>`).join('');
+}
+
+// Margin Waterfall
+function renderWaterfall() {
+  const maxAmt = 4820000;
+  document.getElementById('waterfallChart').innerHTML = MARGIN_DATA.waterfall.map(w=>{
+    const width = Math.abs(w.amt)/maxAmt*100;
+    const isNeg = w.amt < 0;
+    return `
+      <div class="wf-bar">
+        <div class="wf-label">${w.lbl}</div>
+        <div class="wf-track" style="background:${w.col}18;">
+          <div class="wf-fill" style="width:${width}%;background:${w.col};${w.bold?'border:2px solid '+w.col+'88;':''}">
+            <span class="wf-value" style="color:white;">${isNeg?'−':''}$${Math.abs(w.amt/1000).toFixed(0)}K</span>
+          </div>
+        </div>
+        <div class="wf-pct" style="color:${w.col};font-weight:700;">${w.pct > 0 ? w.pct : w.pct}%</div>
+      </div>`;
+  }).join('');
+}
+
+// O2C Timeline
+function renderO2C() {
+  const total = MARGIN_DATA.o2c.reduce((a,s)=>a+s.days,0);
+  document.getElementById('o2cChart').innerHTML = `
+    <div style="margin-bottom:14px;padding:10px 12px;background:var(--surface-2);border-radius:var(--r-sm);border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:11px;font-weight:600;color:var(--text-secondary);">Total Avg O2C Cycle</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:700;color:var(--navy);">${total.toFixed(1)} days</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:7px;">
+      ${MARGIN_DATA.o2c.map(s=>`
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:26px;height:26px;border-radius:50%;background:${s.col}18;border:2px solid ${s.col};display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">${s.icon}</div>
+          <div style="flex:1;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+              <span style="font-size:11px;font-weight:600;color:var(--text-primary);">${s.step}</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:${s.col};">${s.days===0?'< 5 min':s.days+'d'}</span>
+            </div>
+            <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;">
+              <div style="width:${Math.max((s.days/total)*100,s.days===0?2:0)}%;height:100%;background:${s.col};border-radius:3px;"></div>
+            </div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text-muted);margin-top:2px;">${s.sap}</div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// Plant Profitability
+function renderPlantProfit() {
+  document.getElementById('plantProfit').innerHTML = `
+    <div style="display:flex;justify-content:flex-end;gap:14px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text-muted);"><div style="width:12px;height:4px;background:var(--green);border-radius:2px;"></div>Net margin (after freight)</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text-muted);"><div style="width:12px;height:4px;background:var(--border);border-radius:2px;"></div>Gross margin</div>
+    </div>
+    ${MARGIN_DATA.plants.map(p=>`
+      <div class="plant-row">
+        <div class="plant-code" style="color:${p.col};">${p.plant}</div>
+        <div style="flex:1;">
+          <div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:5px;">${p.name}</div>
+          <div style="position:relative;height:10px;background:var(--border);border-radius:5px;overflow:hidden;margin-bottom:3px;">
+            <div style="position:absolute;left:0;top:0;height:100%;width:${p.gm}%;background:${p.col}30;border-radius:5px;"></div>
+            <div style="position:absolute;left:0;top:0;height:100%;width:${p.netGm}%;background:${p.col};border-radius:5px;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;">
+            <span style="font-size:9px;color:var(--text-muted);">Gross: ${p.gm}%</span>
+            <span style="font-size:9px;font-weight:700;color:${p.col};">Net: ${p.netGm}%</span>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:var(--text-primary);">${p.netGm}%</div>
+          <div style="font-size:9px;color:var(--text-muted);">${p.rev}M revenue</div>
+        </div>
+      </div>`).join('')}
+    <div style="margin-top:10px;padding:9px 12px;background:var(--teal-light);border-radius:var(--r-sm);border-left:3px solid var(--teal);">
+      <div style="font-size:10px;font-weight:700;color:var(--teal);margin-bottom:3px;">CO-PA Note</div>
+      <div style="font-size:10px;color:var(--text-secondary);">Account-based CO-PA only. All profitability flows via GL accounts in ACDOCA (Ledger 0L). No VV-xxx value fields — consistent with Margin Analysis configuration at this client.</div>
+    </div>`;
+}
+
+// Working Capital
+function renderWC() {
+  const wc = MARGIN_DATA.wc;
+  document.getElementById('wcChart').innerHTML = `
+    <div class="wc-formula" style="margin-bottom:16px;">
+      CCC = DSO + DIO − DPO &nbsp;|&nbsp; 
+      <span style="color:var(--navy);font-weight:600;">${wc.dso} + ${wc.dio} − ${wc.dpo} = ${wc.ccc} days</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+      ${[
+        {lbl:'DSO',val:wc.dso+'d',desc:'Days Sales Outstanding',col:'var(--blue)',sap:wc.sapDSO,trend:'↓ from 34.5d'},
+        {lbl:'DIO',val:wc.dio+'d',desc:'Days Inventory Outstanding',col:'var(--amber)',sap:wc.sapDIO,trend:'↓ from 28.1d'},
+        {lbl:'DPO',val:wc.dpo+'d',desc:'Days Payable Outstanding',col:'var(--green)',sap:wc.sapDPO,trend:'stable'},
+        {lbl:'CCC',val:wc.ccc+'d',desc:'Cash Conversion Cycle',col:'var(--purple)',sap:wc.sapCCC,trend:'↓ from 26.9d',bold:true},
+      ].map(m=>`
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;${m.bold?'border-color:var(--purple);background:var(--purple-light);':''}">
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);margin-bottom:4px;">${m.lbl}</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:700;color:${m.col};margin-bottom:3px;">${m.val}</div>
+          <div style="font-size:10px;color:var(--text-secondary);margin-bottom:4px;">${m.desc}</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--text-muted);">${m.sap}</div>
+          <div style="font-size:10px;font-weight:600;color:var(--green);margin-top:3px;">${m.trend}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// Freight Table
+function renderFreight() {
+  document.getElementById('freightTable').innerHTML = `
+    <div style="display:flex;justify-content:space-between;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);padding:0 0 8px;border-bottom:2px solid var(--border);margin-bottom:4px;">
+      <span>Lane (Plant → Ship-To)</span><span>Dist</span><span>Freight %</span><span>Orders</span>
+    </div>
+    ${MARGIN_DATA.freight.map(f=>`
+      <div class="freight-row">
+        <div style="flex:1;">
+          <div style="font-size:11px;font-weight:600;color:var(--text-primary);">${f.lane}</div>
+          <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:4px;width:80%;">
+            <div style="width:${Math.min(f.pct/3.5*100,100)}%;height:100%;background:${f.col};border-radius:3px;"></div>
+          </div>
+        </div>
+        <div style="font-size:10px;color:var(--text-muted);width:52px;text-align:right;">${f.dist}</div>
+        <div style="width:54px;text-align:right;">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:${f.col};">${f.pct}%</span>
+        </div>
+        <div style="width:28px;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text-muted);">${f.orders}</div>
+      </div>`).join('')}
+    <div style="margin-top:10px;padding:8px 12px;background:var(--green-light);border-radius:var(--r-sm);font-size:10px;color:var(--green);font-weight:600;">
+      ✓ Ordly auto-selects lowest-freight eligible lane per line. PL03→Auburn Hills at 0.41% is the system benchmark.
+    </div>`;
+}
+
+// CO-PA Detail
+function renderCOPA() {
+  document.getElementById('copaDetail').innerHTML = MARGIN_DATA.copa.map(c=>`
+    <div class="copa-row" style="${c.bold?'background:var(--green-light);margin:4px -8px;padding:9px 8px;border-radius:var(--r-sm);border-bottom:none;':''}">
+      <div>
+        <div class="copa-lbl" style="${c.bold?'font-weight:700;':''}"><span style="color:${c.col};font-weight:700;">${c.sign}</span> ${c.lbl}</div>
+        <div class="copa-sap">${c.sap}</div>
+      </div>
+      <div class="copa-amt" style="color:${c.col};">
+        ${c.sign === '−' ? '−' : c.sign==='+'?'':'' }$${Math.abs(c.amt/1000).toFixed(0)}K
+      </div>
+    </div>`).join('');
+}
+
+// DSO Trend Chart
+function renderDSO() {
+  const d = MARGIN_DATA.dso;
+  const W=460, H=160, padL=30, padR=10, padT=10, padB=24;
+  const cW=W-padL-padR, cH=H-padT-padB;
+  const maxV=45, n=d.length;
+  const xPos = i => padL + (i/(n-1))*cW;
+  const yPos = v => padT + cH - ((v/maxV)*cH);
+
+  function polyLine(vals, col) {
+    const pts = vals.map((v,i) => `${xPos(i)},${yPos(v)}`).join(' ');
+    return `<polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+  }
+
+  const grids = [20,30,40].map(v=>`
+    <line x1="${padL}" y1="${yPos(v)}" x2="${W-padR}" y2="${yPos(v)}" stroke="#E2E7EF" stroke-width="1"/>
+    <text x="${padL-3}" y="${yPos(v)+4}" text-anchor="end" font-size="9" fill="#7A90A8">${v}d</text>`).join('');
+
+  const xLabels = d.map((row,i)=>`
+    <text x="${xPos(i)}" y="${H-4}" text-anchor="middle" font-size="9" fill="#7A90A8">${row.period}</text>`).join('');
+
+  document.getElementById('dsoChart').innerHTML = `
+    <svg width="100%" viewBox="0 0 ${W} ${H}">
+      ${grids}
+      ${polyLine(d.map(r=>r.tier1),'#5B21B6')}
+      ${polyLine(d.map(r=>r.tier2),'#0050C8')}
+      ${polyLine(d.map(r=>r.tier3),'#A85C00')}
+      ${xLabels}
+    </svg>
+    <div style="display:flex;gap:14px;margin-top:8px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;"><div style="width:20px;height:2px;background:#5B21B6;border-radius:1px;"></div><span style="color:var(--text-muted);">Tier 1 Strategic</span></div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;"><div style="width:20px;height:2px;background:#0050C8;border-radius:1px;"></div><span style="color:var(--text-muted);">Tier 2 Premium</span></div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;"><div style="width:20px;height:2px;background:#A85C00;border-radius:1px;"></div><span style="color:var(--text-muted);">Tier 3 Standard</span></div>
+    </div>`;
+}
+
+// Tier Margin
+function renderTierMargin() {
+  document.getElementById('tierMargin').innerHTML = `
+    <div style="display:flex;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:0 0 8px;border-bottom:2px solid var(--border);gap:8px;margin-bottom:6px;">
+      <span style="flex:1;">Tier</span><span style="width:58px;text-align:right;">Gross GM</span><span style="width:58px;text-align:right;">Freight %</span><span style="width:58px;text-align:right;">Net GM</span>
+    </div>
+    ${MARGIN_DATA.tierMargin.map(t=>`
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);">
+        <div style="flex:1;">
+          <div style="font-size:11px;font-weight:600;color:${t.col};">${t.tier}</div>
+          <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-top:5px;position:relative;">
+            <div style="position:absolute;left:0;top:0;height:100%;width:${parseFloat(t.gm)}%;background:${t.col}30;border-radius:4px;"></div>
+            <div style="position:absolute;left:0;top:0;height:100%;width:${parseFloat(t.net)}%;background:${t.col};border-radius:4px;"></div>
+          </div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text-muted);width:52px;text-align:right;">${t.gm}</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--amber);width:52px;text-align:right;">−${t.freight}</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:${t.col};width:52px;text-align:right;">${t.net}</div>
+      </div>`).join('')}
+    <div style="margin-top:10px;padding:9px 12px;background:var(--blue-light);border-radius:var(--r-sm);font-size:10px;color:var(--blue);">
+      <strong>Key insight:</strong> Tier 1 Strategic has lower gross margin than Tier 3 Standard (34.2% vs 28.1% gross), but Tier 1 net margin is 33.8% vs 26.0% for Tier 3 — because Ordly routes Tier 1 orders through optimal freight lanes (PL03 local, 0.41% freight-to-revenue).
+    </div>`;
+}
+
+// INIT
+renderKPIs();
+renderWaterfall();
+renderO2C();
+renderPlantProfit();
+renderWC();
+renderFreight();
+renderCOPA();
+renderDSO();
+renderTierMargin();
+</script>
+</body>
+</html>

@@ -147,8 +147,9 @@ const EnhancedSidebar = ({
       {/* Header */}
       <Box
         sx={{
-          p: drawerOpen ? 2 : 1,
-          minHeight: 70,
+          px: drawerOpen ? 2.5 : 1,
+          py: drawerOpen ? 2 : 1.5,
+          minHeight: 64,
           background: darkMode
             ? 'linear-gradient(135deg, #161b22 0%, #0d1117 100%)'
             : 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
@@ -157,18 +158,19 @@ const EnhancedSidebar = ({
           position: 'relative',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: drawerOpen ? 'flex-start' : 'center',
+          justifyContent: 'center',
         }}
       >
         {drawerOpen ? (
           /* Full Logo when expanded */
           <Box
             component="img"
-            src="/stratax.png"
-            alt="StrataxAI"
+            src="/MANTRIX_AI.svg"
+            alt="MANTRIX AI"
             sx={{
-              height: 28,
-              maxWidth: '80%',
+              height: 44,
+              width: '100%',
+              maxWidth: 190,
               objectFit: 'contain',
               filter: darkMode
                 ? 'invert(1) hue-rotate(180deg)'
@@ -177,30 +179,21 @@ const EnhancedSidebar = ({
             }}
           />
         ) : (
-          /* Icon Logo when collapsed - $ cropped from stratax.png */
+          /* Icon Logo when collapsed - M mark */
           <Box
+            component="img"
+            src="/MANTRIX_M.svg?v=2"
+            alt="M"
             sx={{
-              height: 28,
-              width: 24,
-              overflow: 'hidden',
+              height: 32,
+              width: 32,
+              objectFit: 'contain',
               transition: 'all 0.2s ease',
               filter: darkMode
                 ? 'invert(1) hue-rotate(180deg)'
                 : 'none',
             }}
-          >
-            <Box
-              component="img"
-              src="/stratax.png"
-              alt="$"
-              sx={{
-                height: 28,
-                width: 'auto',
-                objectFit: 'cover',
-                objectPosition: 'left center',
-              }}
-            />
-          </Box>
+          />
         )}
       </Box>
 

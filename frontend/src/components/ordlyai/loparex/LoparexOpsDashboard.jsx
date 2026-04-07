@@ -218,22 +218,27 @@ const DonutChart = ({ darkMode }) => {
   });
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mt: 1 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, mt: 1 }}>
+      {/* Donut chart centered */}
       <svg width="140" height="140" viewBox="0 0 140 140" style={{ flexShrink: 0 }}>
         <circle cx={cx} cy={cy} r={r} fill="none" stroke={darkMode ? 'rgba(255,255,255,0.1)' : '#E2E7EF'} strokeWidth={sw} />
         {arcs}
         <text x={cx} y={cy - 7} textAnchor="middle" fontSize="22" fontWeight="700" fill={textColor}>82.5</text>
         <text x={cx} y={cy + 11} textAnchor="middle" fontSize="11" fill={MUTED}>% touchless</text>
       </svg>
-      <Stack spacing={1.25} sx={{ flex: 1 }}>
+      {/* Legend rows */}
+      <Stack spacing={0.75} sx={{ width: '100%' }}>
         {data.map((d, i) => (
-          <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+          <Box key={i} sx={{
+            display: 'flex', alignItems: 'center', gap: 1.25,
+            p: '8px 12px', borderRadius: 1.5,
+            bgcolor: darkMode ? 'rgba(255,255,255,0.04)' : alpha(d.color, 0.04),
+            border: `1px solid ${darkMode ? 'rgba(255,255,255,0.06)' : alpha(d.color, 0.1)}`,
+          }}>
             <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: d.color, flexShrink: 0 }} />
             <Typography sx={{ fontSize: 11, color: darkMode ? '#8b949e' : '#3D5066', flex: 1 }}>{d.lbl}</Typography>
-            <Box>
-              <Typography component="span" sx={{ fontSize: 13, fontWeight: 700, color: textColor }}>{d.val}</Typography>
-              <Typography component="span" sx={{ fontSize: 10, color: MUTED, ml: 0.5 }}>{d.pct}%</Typography>
-            </Box>
+            <Typography sx={{ fontSize: 14, fontWeight: 700, color: textColor }}>{d.val}</Typography>
+            <Typography sx={{ fontSize: 10, color: MUTED, minWidth: 32, textAlign: 'right' }}>{d.pct}%</Typography>
           </Box>
         ))}
       </Stack>

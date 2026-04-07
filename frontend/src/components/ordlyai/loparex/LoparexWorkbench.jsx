@@ -14,6 +14,8 @@ import {
   FiberManualRecord as DotIcon,
   PictureAsPdf as PdfIcon, OpenInNew as OpenInNewIcon,
   DocumentScanner as DocumentScannerIcon,
+  ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon,
+  ViewSidebar as ViewSidebarIcon, UploadFile as UploadFileIcon,
 } from '@mui/icons-material';
 import { MODULE_COLOR, BRAND, SEMANTIC } from '../../../config/brandColors';
 
@@ -142,94 +144,94 @@ const ORDERS = [
     ],
   },
   {
-    id: 'ORD-003', poNumber: '57503', customer: 'Sun Process Converting, Inc.', soldTo: 'CUST-30112',
-    amount: 30487.88, channel: 'PDF', channelIcon: '📄', status: 'validating', priority: 'medium', received: '07:58 AM', lines: 1,
-    pdfFile: '/po-docs/PO-57503.pdf',
+    id: 'ORD-003', poNumber: '3588457', customer: 'Shurtape Technologies, LLC', soldTo: 'CUST-SHUR01',
+    amount: 27511.60, channel: 'PDF', channelIcon: '📄', status: 'validating', priority: 'medium', received: '07:58 AM', lines: 1,
+    pdfFile: '/po-docs/SHURTAPE-3588457.pdf',
     hdr: [
-      { lbl: 'Sold-To Customer', val: 'Sun Process Converting, Inc.', conf: 96, sap: 'VBAK-KUNNR' },
-      { lbl: 'Customer PO Number', val: '57503', conf: 99, sap: 'VBKD-BSTKD' },
-      { lbl: 'PO Date', val: 'May 30, 2025', conf: 98, sap: 'VBKD-BSTDK' },
-      { lbl: 'Ship-To Address', val: 'Loparex, 2000 Industrial Park, Iowa City IA 52240', conf: 94, sap: 'VBPA-WE' },
-      { lbl: 'Terms', val: '1% 10 / NET 30, FOB: Iowa City', conf: 92, sap: 'VBKD-INCO1' },
-      { lbl: 'Delivery Instructions', val: 'Buyer: 05 — Jessica Alvarez. Del Date: 08/13/2025.', conf: 88, sap: 'VBKD-BSTK2' },
+      { lbl: 'Sold-To Customer', val: 'Shurtape Technologies, LLC', conf: 97, sap: 'VBAK-KUNNR' },
+      { lbl: 'Customer PO Number', val: '3588457', conf: 99, sap: 'VBKD-BSTKD' },
+      { lbl: 'PO Date', val: 'September 23, 2025', conf: 99, sap: 'VBKD-BSTDK' },
+      { lbl: 'Ship-To Address', val: 'Springfield Sulco Warehouse, Shurtape Technologies LLC, 311 Industry Avenue, Springfield MA 01104', conf: 96, sap: 'VBPA-WE' },
+      { lbl: 'Terms', val: '2J 1% 10 Days NET 30', conf: 95, sap: 'VBKD-INCO1' },
+      { lbl: 'Delivery Instructions', val: 'Delivery date: 03/05/2026. Incoterms: COL. Contact: Amy Robinson 828-315-7724. Attn: Brian Granata.', conf: 91, sap: 'VBKD-BSTK2' },
     ],
     items: [
-      { line: 10, custSku: 'RM821143', sapMat: '2002507', qty: '128,262', uom: 'LF', price: '0.23770', cur: 'USD', reqDate: 'August 13, 2025', confMat: 91, confQty: 96, confPrice: 94, confDate: 90, lineGM: '22.5%', confirmDate: 'August 8, 2025',
+      { line: 10, custSku: '330797', sapMat: '2002596', qty: '450,000', uom: '1K sq ft', price: '57.84', cur: 'USD', reqDate: 'March 5, 2026', confMat: 94, confQty: 97, confPrice: 96, confDate: 98, lineGM: '28.3%', confirmDate: 'March 1, 2026',
         plantOptions: [
-          { code: 'PL01', name: 'Iowa City, IA', dist: '0 mi (on-site)', atp: 150000, freightCost: 0, freightPerUnit: 0, arrivalDate: 'Aug 8', onTime: true, lateDays: 0, score: 99, selected: true },
-          { code: 'PL02', name: 'Willowbrook, IL', dist: '220 mi', atp: 130000, freightCost: 640, freightPerUnit: 0.005, arrivalDate: 'Aug 6', onTime: true, lateDays: 0, score: 72 },
+          { code: 'PL01', name: 'Iowa City, IA', dist: '1,150 mi', atp: 500000, freightCost: 3200, freightPerUnit: 7.11, arrivalDate: 'Mar 1', onTime: true, lateDays: 0, score: 85, selected: true },
+          { code: 'PL03', name: 'Eden, NC', dist: '680 mi', atp: 420000, freightCost: 2100, freightPerUnit: 4.67, arrivalDate: 'Mar 2', onTime: true, lateDays: 0, score: 79 },
         ],
-        insight: 'PL01 selected: ship-to IS Iowa City plant — zero freight. 92# BL KFT L/L Polycoated Grade 51304 matched to SAP 2002507. Full ATP.',
+        insight: 'PL01 selected: full ATP 500K. Loparex 51827 3.2 BL SCK 6000/6010 56in matched to SAP 2002596. Vendor# 112368, Plant# 89. Certs required with each shipment.',
       },
     ],
     validations: [
-      { lbl: 'Customer Master', st: 'ok', msg: 'CUST-30112 active. Sun Process Converting regular account.', src: 'KNA1/KNVV' },
-      { lbl: 'Material Mapping', st: 'ok', msg: '2002507 — 92# BL KFT L/L Polycoated Grade 51304 Liner 61" validated.', src: 'MARA/MVKE' },
-      { lbl: 'Pricing Record', st: 'warn', msg: 'PO price $0.23770/LF. Contract shows $0.2395/LF. Delta $0.0018/LF ($230.87 total). Within 1% tolerance.', src: 'PRCD_ELEMENTS' },
-      { lbl: 'Credit / FSCM', st: 'ok', msg: 'Limit $400K. Exposure $52K. Clear.', src: 'UKM_* / FSCM' },
-      { lbl: 'Inventory / ATP', st: 'ok', msg: '2002507: 150,000 LF unrestricted at PL01. Full coverage.', src: 'MARD/MATDOC' },
+      { lbl: 'Customer Master', st: 'ok', msg: 'CUST-SHUR01 active. Shurtape Technologies key account. Vendor# 112368.', src: 'KNA1/KNVV' },
+      { lbl: 'Material Mapping', st: 'ok', msg: '2002596 — Loparex 51827 3.2 BL SCK 6000/6010 56in validated.', src: 'MARA/MVKE' },
+      { lbl: 'Pricing Record', st: 'warn', msg: 'Gross price $57.84/MSF. Contract shows $56.90/MSF. Delta $0.94/MSF ($423 total). Within 2% tolerance.', src: 'PRCD_ELEMENTS' },
+      { lbl: 'Credit / FSCM', st: 'ok', msg: 'Limit $800K. Exposure $120K. Clear.', src: 'UKM_* / FSCM' },
+      { lbl: 'Inventory / ATP', st: 'ok', msg: '2002596: 500,000 1K sq ft unrestricted at PL01. Full coverage.', src: 'MARD/MATDOC' },
       { lbl: 'Contracts / Agreements', st: 'ok', msg: 'Framework active. Price within tolerance.', src: 'VBAK/VBKD' },
-      { lbl: 'Open AR / Payment Risk', st: 'ok', msg: 'No overdue. DSO: 30 days. Clean.', src: 'BSID/ACDOCA' },
+      { lbl: 'Open AR / Payment Risk', st: 'ok', msg: 'No overdue. DSO: 28 days. Clean.', src: 'BSID/ACDOCA' },
       { lbl: 'Order Blocking Reasons', st: 'ok', msg: 'No blocks active.', src: 'VBUK' },
     ],
     decision: {
-      score: 82, rec: 'Auto-Create — Minor Price Delta Within Tolerance', autoOk: true,
-      plant: 'PL01 — Iowa City, IA', plantReason: 'Ship-to is Iowa City plant. Zero freight cost.',
-      confirmedQty: '128,262 LF (1 line)', confirmedDate: 'Aug 8, 2025',
-      mode: 'Full Stock Available', gm: '22.5%', marginVsAlt: '+$640 vs PL02 (freight savings)',
-      ibpSignal: 'PL01 fully stocked. On-site delivery. IBP confirms zero supply risk.',
-      ibpLead: 'IBP Lead Time: 5 days from PL01 (on-site)',
-      scores: { 'Service Level': 96, 'Margin Impact': 72, 'Customer Value': 75, 'Lead Time': 98, 'Inventory Health': 90, 'AR / Credit Risk': 93 },
+      score: 84, rec: 'Auto-Create — Minor Price Delta Within Tolerance', autoOk: true,
+      plant: 'PL01 — Iowa City, IA', plantReason: 'Full ATP. Loparex primary plant for Shurtape account.',
+      confirmedQty: '450,000 1K sq ft (1 line)', confirmedDate: 'Mar 1, 2026',
+      mode: 'Full Stock Available', gm: '28.3%', marginVsAlt: '+$1,100 vs Eden routing',
+      ibpSignal: 'PL01 fully stocked. Long lead delivery (Mar 2026). IBP confirms zero supply risk.',
+      ibpLead: 'IBP Lead Time: 14 days from PL01',
+      scores: { 'Service Level': 92, 'Margin Impact': 78, 'Customer Value': 80, 'Lead Time': 94, 'Inventory Health': 90, 'AR / Credit Risk': 95 },
     },
     soHeader: [
       { lbl: 'Order Type', val: 'ZOR', sap: 'VBAK-AUART' }, { lbl: 'Sales Org', val: '1000', sap: 'VBAK-VKORG' },
       { lbl: 'Dist. Channel', val: '10', sap: 'VBAK-VTWEG' }, { lbl: 'Division', val: '00', sap: 'VBAK-SPART' },
-      { lbl: 'Sold-To', val: '30112', sap: 'KNVP AG' }, { lbl: 'Ship-To', val: '30112-01', sap: 'KNVP WE' },
-      { lbl: 'Customer PO', val: '57503', sap: 'VBKD-BSTKD' }, { lbl: 'Req. Date', val: '2025-08-13', sap: 'VBKD-BSTDK' },
+      { lbl: 'Sold-To', val: 'SHUR01', sap: 'KNVP AG' }, { lbl: 'Ship-To', val: 'SHUR01-01', sap: 'KNVP WE' },
+      { lbl: 'Customer PO', val: '3588457', sap: 'VBKD-BSTKD' }, { lbl: 'Req. Date', val: '2026-03-05', sap: 'VBKD-BSTDK' },
     ],
     soItems: [
-      { line: 10, mat: '2002507', qty: 128262, plant: 'PL01', date: '2025-08-08', price: 0.2377 },
+      { line: 10, mat: '2002596', qty: 450, plant: 'PL01', date: '2026-03-01', price: 57.84 },
     ],
   },
   {
-    id: 'ORD-004', poNumber: '57669', customer: 'Sun Process Converting, Inc.', soldTo: 'CUST-30112',
-    amount: 31255.00, channel: 'PDF', channelIcon: '📄', status: 'exception', priority: 'medium', received: '11:20 AM', lines: 1,
-    pdfFile: '/po-docs/PO-57669.pdf',
+    id: 'ORD-004', poNumber: '2025-0981', customer: 'Bizerba Tekno Label Inc.', soldTo: 'CUST-BIZ01',
+    amount: 16284.00, channel: 'PDF', channelIcon: '📄', status: 'exception', priority: 'medium', received: '11:20 AM', lines: 1,
+    pdfFile: '/po-docs/BIZERBA-2025-0981.pdf',
     hdr: [
-      { lbl: 'Sold-To Customer', val: 'Sun Process Converting, Inc.', conf: 96, sap: 'VBAK-KUNNR' },
-      { lbl: 'Customer PO Number', val: '57669', conf: 99, sap: 'VBKD-BSTKD' },
-      { lbl: 'PO Date', val: 'August 21, 2025', conf: 97, sap: 'VBKD-BSTDK' },
-      { lbl: 'Ship-To Address', val: 'Loparex, 816 Fieldcrest Road, Eden NC 27288', conf: 93, sap: 'VBPA-WE' },
-      { lbl: 'Terms', val: '1% 10 / NET 30, FOB: Eden, NC', conf: 91, sap: 'VBKD-INCO1' },
-      { lbl: 'Delivery Instructions', val: 'Buyer: 05 — Jessica Alvarez. Platinum Release, Target 37.5, Silicone wound in, 6" Cores 32" Max Dia.', conf: 78, sap: 'VBKD-BSTK2' },
+      { lbl: 'Sold-To Customer', val: 'Bizerba Tekno Label Inc.', conf: 96, sap: 'VBAK-KUNNR' },
+      { lbl: 'Customer PO Number', val: '2025-0981', conf: 99, sap: 'VBKD-BSTKD' },
+      { lbl: 'PO Date', val: 'July 28, 2025', conf: 99, sap: 'VBKD-BSTDK' },
+      { lbl: 'Ship-To Address', val: 'Bizerba Tekno Label, 1450 rue Nobel porte 13, Boucherville QC J4B 5H3, Canada', conf: 93, sap: 'VBPA-WE' },
+      { lbl: 'Terms', val: 'Net 30 days', conf: 98, sap: 'VBKD-INCO1' },
+      { lbl: 'Delivery Instructions', val: 'Requested: September 22, 2025. Project# 1100-5020. Attn: Ruby Melendez. Send docs to customs@agotrans.com & ca.btlshipping@bizerba.com.', conf: 82, sap: 'VBKD-BSTK2' },
     ],
     items: [
-      { line: 10, custSku: 'RM821149', sapMat: 'Ambiguous — 2 candidates for Grade 32519', qty: '175,000', uom: 'LF', price: '0.17860', cur: 'USD', reqDate: 'October 23, 2025', confMat: 68, confQty: 95, confPrice: 88, confDate: 92, lineGM: 'Unknown — material unresolved', confirmDate: 'Cannot confirm',
+      { line: 10, custSku: '2100882-13"', sapMat: 'Ambiguous — Loparex 2100882 width variant', qty: '20', uom: 'Roll', price: '814.20', cur: 'USD', reqDate: 'September 22, 2025', confMat: 72, confQty: 95, confPrice: 88, confDate: 96, lineGM: 'Unknown — material width variant unresolved', confirmDate: 'Cannot confirm',
         plantOptions: [
-          { code: 'PL03', name: 'Eden, NC', dist: '0 mi (on-site)', atp: 160000, freightCost: 0, freightPerUnit: 0, arrivalDate: 'Oct 18', onTime: true, lateDays: 0, score: 78 },
-          { code: 'PL01', name: 'Iowa City, IA', dist: '940 mi', atp: 200000, freightCost: 2800, freightPerUnit: 0.016, arrivalDate: 'Oct 15', onTime: true, lateDays: 0, score: 52 },
+          { code: 'PL01', name: 'Iowa City, IA', dist: '980 mi', atp: 50, freightCost: 1200, freightPerUnit: 60.00, arrivalDate: 'Sep 18', onTime: true, lateDays: 0, score: 68 },
+          { code: 'PL03', name: 'Eden, NC', dist: '820 mi', atp: 35, freightCost: 900, freightPerUnit: 45.00, arrivalDate: 'Sep 19', onTime: true, lateDays: 0, score: 62 },
         ],
-        insight: 'Material ambiguity: 57# BL SCK CIS 6020/000R Grade 32519 maps to 2 SAP materials. Platinum release spec (Target 37.5) needs CSR confirmation. PL03 (Eden) is ship-to plant but ATP short 15K LF.',
+        insight: 'Material ambiguity: Loparex 2100882-13" — 3.2 BL SCK 6000/000R, 13" wide, 20,000 ft/roll (6667 LY/rl). Unit $0.04071/ft. International ship-to (Canada) — customs broker required.',
       },
     ],
     validations: [
-      { lbl: 'Customer Master', st: 'ok', msg: 'CUST-30112 active. Sun Process Converting.', src: 'KNA1/KNVV' },
-      { lbl: 'Material Mapping', st: 'err', msg: 'Grade 32519 Liner 62" — 2 candidates in MARA. Platinum release spec requires manual resolution.', src: 'MARA/MVKE' },
-      { lbl: 'Pricing Record', st: 'warn', msg: 'PO price $0.17860/LF. Cannot validate until material resolved.', src: 'PRCD_ELEMENTS' },
-      { lbl: 'Credit / FSCM', st: 'ok', msg: 'Limit $400K. Exposure $83K. Clear.', src: 'UKM_* / FSCM' },
-      { lbl: 'Inventory / ATP', st: 'warn', msg: 'PL03 (Eden): 160,000 LF — short 15,000 LF vs 175K requirement. PL01 has 200K but high freight.', src: 'MARD/MATDOC' },
-      { lbl: 'Contracts / Agreements', st: 'warn', msg: 'No active contract for Grade 32519 Platinum release variant.', src: 'VBAK/VBKD' },
-      { lbl: 'Open AR / Payment Risk', st: 'ok', msg: 'No overdue. DSO: 30 days. Clean.', src: 'BSID/ACDOCA' },
-      { lbl: 'Order Blocking Reasons', st: 'err', msg: 'Material unresolved — SO creation blocked until CSR confirms SAP material.', src: 'VBUK' },
+      { lbl: 'Customer Master', st: 'ok', msg: 'CUST-BIZ01 active. Bizerba Tekno Label, Boucherville QC.', src: 'KNA1/KNVV' },
+      { lbl: 'Material Mapping', st: 'err', msg: 'Loparex 2100882 — width variant 13" not uniquely matched. Multiple SAP materials for different widths.', src: 'MARA/MVKE' },
+      { lbl: 'Pricing Record', st: 'warn', msg: 'PO price $814.20/Roll. Cannot fully validate until material width variant resolved.', src: 'PRCD_ELEMENTS' },
+      { lbl: 'Credit / FSCM', st: 'ok', msg: 'Limit $200K. Exposure $32K. Clear.', src: 'UKM_* / FSCM' },
+      { lbl: 'Inventory / ATP', st: 'warn', msg: 'Cannot confirm ATP — material variant unresolved. PL01 has ~50 rolls of base material.', src: 'MARD/MATDOC' },
+      { lbl: 'Contracts / Agreements', st: 'warn', msg: 'No active contract for Bizerba. Spot pricing assumed.', src: 'VBAK/VBKD' },
+      { lbl: 'Open AR / Payment Risk', st: 'ok', msg: 'Clean. DSO: 34 days. No overdue.', src: 'BSID/ACDOCA' },
+      { lbl: 'Order Blocking Reasons', st: 'err', msg: 'Material unresolved + international ship-to requires export compliance check.', src: 'VBUK' },
     ],
     decision: {
-      score: 38, rec: 'Exception — Material Ambiguity + ATP Shortfall', autoOk: false,
-      plant: 'PL03 — Eden, NC (pending)', plantReason: 'Ship-to is Eden plant, but ATP short 15K LF. Material must be resolved first.',
+      score: 35, rec: 'Exception — Material Ambiguity + International Compliance', autoOk: false,
+      plant: 'Undetermined', plantReason: 'Cannot determine until material width variant resolved. Export compliance pending.',
       confirmedQty: 'Pending', confirmedDate: 'Pending — material unresolved',
       mode: 'Unknown', gm: 'Unknown — material unresolved', marginVsAlt: 'N/A',
-      ibpSignal: 'IBP check blocked — material ambiguity. PL03 short 15K LF. Replenishment available from PL01 in 12 days.',
+      ibpSignal: 'IBP check blocked — material ambiguity. Canada ship-to requires customs documentation. Contact customs@agotrans.com.',
       ibpLead: 'IBP Lead: Cannot calculate until material resolved',
-      scores: { 'Service Level': 35, 'Margin Impact': 28, 'Customer Value': 75, 'Lead Time': 42, 'Inventory Health': 38, 'AR / Credit Risk': 93 },
+      scores: { 'Service Level': 32, 'Margin Impact': 25, 'Customer Value': 60, 'Lead Time': 40, 'Inventory Health': 35, 'AR / Credit Risk': 90 },
     },
     soHeader: [], soItems: [],
   },
@@ -246,11 +248,11 @@ const ORDERS = [
       { lbl: 'Delivery Instructions', val: 'Freight: PREPAID (ALLOW). Branch Plant: 94. Buyer: DEROSIER, ADAM. Easy Release.', conf: 93, sap: 'VBKD-BSTK2' },
     ],
     items: [
-      { line: 10, custSku: '0903W55', sapMat: '2004583', qty: '90,000', uom: 'FT', price: '0.1515', cur: 'USD', reqDate: 'November 20, 2025', confMat: 94, confQty: 99, confPrice: 96, confDate: 95, lineGM: '21.3%', confirmDate: 'November 16, 2025',
+      { line: 10, custSku: '0903W55', sapMat: '2004583', qty: '90,000', uom: 'FT', price: '0.1515', cur: 'USD', reqDate: 'November 3, 2025', confMat: 94, confQty: 99, confPrice: 96, confDate: 95, lineGM: '21.3%', confirmDate: 'October 30, 2025',
         plantOptions: [
-          { code: 'PL01', name: 'Iowa City, IA', dist: '264 mi', atp: 95000, freightCost: 520, freightPerUnit: 0.0058, arrivalDate: 'Nov 16', onTime: true, lateDays: 0, score: 90, selected: true },
-          { code: 'PL02', name: 'Willowbrook, IL', dist: '410 mi', atp: 60000, freightCost: 880, freightPerUnit: 0.0098, arrivalDate: 'Nov 14', onTime: true, lateDays: 0, score: 68 },
-          { code: 'PL03', name: 'Eden, NC', dist: '1,120 mi', atp: 100000, freightCost: 2400, freightPerUnit: 0.0267, arrivalDate: 'Nov 22', onTime: false, lateDays: 2, score: 32 },
+          { code: 'PL01', name: 'Iowa City, IA', dist: '264 mi', atp: 95000, freightCost: 520, freightPerUnit: 0.0058, arrivalDate: 'Oct 30', onTime: true, lateDays: 0, score: 90, selected: true },
+          { code: 'PL02', name: 'Willowbrook, IL', dist: '410 mi', atp: 60000, freightCost: 880, freightPerUnit: 0.0098, arrivalDate: 'Oct 28', onTime: true, lateDays: 0, score: 68 },
+          { code: 'PL03', name: 'Eden, NC', dist: '1,120 mi', atp: 100000, freightCost: 2400, freightPerUnit: 0.0267, arrivalDate: 'Nov 6', onTime: false, lateDays: 3, score: 32 },
         ],
         insight: 'PL01 selected: full ATP 95K FT. 55" GLAS 55# BLEACH 6000M Easy Release matched to SAP 2004583. Strategic account — Mactac second EDI order today.',
       },
@@ -268,7 +270,7 @@ const ORDERS = [
     decision: {
       score: 76, rec: 'Review & Approve — Price Below Contract', autoOk: false,
       plant: 'PL01 — Iowa City, IA', plantReason: 'Nearest plant to Minneapolis ship-to. Full ATP for Easy Release grade.',
-      confirmedQty: '90,000 FT (1 line)', confirmedDate: 'Nov 16, 2025',
+      confirmedQty: '90,000 FT (1 line)', confirmedDate: 'Oct 30, 2025',
       mode: 'Full Stock Available', gm: '21.3%', marginVsAlt: '+$360 vs PL02 routing',
       ibpSignal: 'PL01 stocked. Combined with OP-22271 shipment possible for freight consolidation. IBP confirms supply through Dec.',
       ibpLead: 'IBP Lead Time: 10 days from PL01',
@@ -278,10 +280,10 @@ const ORDERS = [
       { lbl: 'Order Type', val: 'ZOR', sap: 'VBAK-AUART' }, { lbl: 'Sales Org', val: '1000', sap: 'VBAK-VKORG' },
       { lbl: 'Dist. Channel', val: '10', sap: 'VBAK-VTWEG' }, { lbl: 'Division', val: '00', sap: 'VBAK-SPART' },
       { lbl: 'Sold-To', val: '20031', sap: 'KNVP AG' }, { lbl: 'Ship-To', val: '20031-01', sap: 'KNVP WE' },
-      { lbl: 'Customer PO', val: 'OP-22274', sap: 'VBKD-BSTKD' }, { lbl: 'Req. Date', val: '2025-11-20', sap: 'VBKD-BSTDK' },
+      { lbl: 'Customer PO', val: 'OP-22274', sap: 'VBKD-BSTKD' }, { lbl: 'Req. Date', val: '2025-11-03', sap: 'VBKD-BSTDK' },
     ],
     soItems: [
-      { line: 10, mat: '2004583', qty: 90000, plant: 'PL01', date: '2025-11-16', price: 0.1515 },
+      { line: 10, mat: '2004583', qty: 90000, plant: 'PL01', date: '2025-10-30', price: 0.1515 },
     ],
   },
   {
@@ -465,12 +467,24 @@ const LoparexWorkbench = ({ onBack, darkMode = false }) => {
   const [selectedOrder, setSelectedOrder] = useState(ORDERS[0]);
   const [activeTab, setActiveTab] = useState(0);
   const [filterMode, setFilterMode] = useState('all');
+  const [channelFilter, setChannelFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [expandedItems, setExpandedItems] = useState({});
+  const [expandedItems, setExpandedItems] = useState(() => {
+    const init = {};
+    ORDERS[0].items.forEach((_, idx) => { init[`${ORDERS[0].id}-${idx}`] = true; });
+    return init;
+  });
   const [overrideCount, setOverrideCount] = useState(0);
   const [toast, setToast] = useState({ open: false, msg: '', severity: 'info' });
   const [soCreating, setSoCreating] = useState(false);
   const [soCreated, setSoCreated] = useState(false);
+  const [leftCollapsed, setLeftCollapsed] = useState(false);
+  const [rightCollapsed, setRightCollapsed] = useState(false);
+  // Track user plant selections per line: { 'ORD-001-0': 'PL02', ... }
+  const [plantSelections, setPlantSelections] = useState({});
+  // Track SO preview edits: { 'hdr-0': 'newVal', 'item-0-qty': '500', ... }
+  const [soEdits, setSoEdits] = useState({});
+  const [editingField, setEditingField] = useState(null);
   const [activePdfIdx, setActivePdfIdx] = useState(0);
 
   const showToast = useCallback((msg, severity = 'info') => {
@@ -483,7 +497,9 @@ const LoparexWorkbench = ({ onBack, darkMode = false }) => {
       if (filterMode === 'new' && o.status !== 'new') return false;
       if (filterMode === 'ready' && o.status !== 'ready') return false;
       if (filterMode === 'exception' && o.status !== 'exception') return false;
+      if (filterMode === 'reviewing' && o.status !== 'reviewing' && o.status !== 'validating') return false;
     }
+    if (channelFilter !== 'all' && o.channel !== channelFilter) return false;
     if (searchTerm) {
       const s = searchTerm.toLowerCase();
       return o.customer.toLowerCase().includes(s) || o.poNumber.toLowerCase().includes(s);
@@ -494,10 +510,16 @@ const LoparexWorkbench = ({ onBack, darkMode = false }) => {
   const selectOrder = (order) => {
     setSelectedOrder(order);
     setActiveTab(0);
-    setExpandedItems({});
+    // Auto-expand all line items by default
+    const expanded = {};
+    order.items.forEach((_, idx) => { expanded[`${order.id}-${idx}`] = true; });
+    setExpandedItems(expanded);
     setOverrideCount(0);
     setSoCreating(false);
     setSoCreated(false);
+    setPlantSelections({});
+    setSoEdits({});
+    setEditingField(null);
     setActivePdfIdx(0);
   };
 
@@ -518,6 +540,35 @@ const LoparexWorkbench = ({ onBack, darkMode = false }) => {
   const o = selectedOrder;
   const valCounts = o ? { ok: o.validations.filter(v => v.st === 'ok').length, warn: o.validations.filter(v => v.st === 'warn').length, err: o.validations.filter(v => v.st === 'err').length } : {};
 
+  // ─── Pipeline summary stats ───
+  const totalOrders = ORDERS.length;
+  const readyCount = ORDERS.filter(o => o.status === 'ready').length;
+  const reviewCount = ORDERS.filter(o => o.status === 'reviewing' || o.status === 'validating').length;
+  const exceptionCount = ORDERS.filter(o => o.status === 'exception').length;
+  const newCount = ORDERS.filter(o => o.status === 'new').length;
+  const totalValue = ORDERS.reduce((s, o) => s + o.amount, 0);
+
+  const statusSummary = [
+    { label: 'TOTAL TODAY', count: totalOrders, color: NAVY },
+    { label: 'READY', count: readyCount, color: GREEN },
+    { label: 'REVIEW', count: reviewCount, color: AMBER },
+    { label: 'EXCEPTION', count: exceptionCount, color: RED },
+    { label: 'NEW', count: newCount, color: NAVY_LIGHT },
+  ];
+
+  // Channel breakdown
+  const channels = ['Email', 'EDI', 'PDF', 'Portal'];
+  const channelData = channels.map(ch => {
+    const orders = ORDERS.filter(o => o.channel === ch);
+    const count = orders.length;
+    const value = orders.reduce((s, o) => s + o.amount, 0);
+    const ready = orders.filter(o => o.status === 'ready').length;
+    const review = orders.filter(o => o.status === 'reviewing' || o.status === 'validating').length;
+    const exc = orders.filter(o => o.status === 'exception').length;
+    return { label: ch === 'Email' ? 'EMAIL / OCR' : ch === 'EDI' ? 'EDI / IDOC' : ch === 'PDF' ? 'SCANNED PDF' : 'SUPPLIER PORTAL', channel: ch, count, value, ready, review, exc, pct: totalOrders > 0 ? Math.round(count / totalOrders * 100) : 0 };
+  });
+  const allChannelData = { label: 'ALL CHANNELS', count: totalOrders, value: totalValue, ready: readyCount, review: reviewCount, exc: exceptionCount, pct: 100 };
+
   // ─── Shared styles ───
   const sectionTitle = { fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: MUTED, mb: 1.5, pb: 1, borderBottom: `1px solid ${BORDER}` };
   const fieldCard = (conf) => ({
@@ -535,16 +586,120 @@ const LoparexWorkbench = ({ onBack, darkMode = false }) => {
           <Link component="button" onClick={onBack} sx={{ fontSize: '0.75rem', textDecoration: 'none', color: 'text.secondary' }}>ORDER SYNC</Link>
           <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: NAVY }}>Workbench</Typography>
         </Breadcrumbs>
-        <Button startIcon={<ArrowBackIcon />} onClick={onBack} size="small" variant="outlined" sx={{ textTransform: 'none', fontSize: '0.7rem' }}>Back</Button>
+        <Stack direction="row" spacing={1} alignItems="center">
+          <input type="file" accept=".pdf" id="po-upload-input" hidden
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                showToast(`"${file.name}" uploaded — AI extraction in progress...`, 'success');
+                e.target.value = '';
+              }
+            }}
+          />
+          <Button startIcon={<UploadFileIcon />} size="small" variant="contained"
+            onClick={() => document.getElementById('po-upload-input')?.click()}
+            sx={{ textTransform: 'none', fontSize: '0.7rem', fontWeight: 600, bgcolor: NAVY, '&:hover': { bgcolor: NAVY_DARK } }}>
+            Upload PO
+          </Button>
+          <Button startIcon={<ArrowBackIcon />} onClick={onBack} size="small" variant="outlined" sx={{ textTransform: 'none', fontSize: '0.7rem' }}>Back</Button>
+        </Stack>
+      </Box>
+
+      {/* ─── Status Summary Row (compact) ─── */}
+      <Box sx={{ px: 1.5, py: 0.5, borderBottom: `1px solid ${BORDER}`, bgcolor: 'white' }}>
+        {/* Row 1: Status counts */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: `repeat(${statusSummary.length}, 1fr)`, gap: 0.75, mb: 0.5 }}>
+          {statusSummary.map((s, i) => {
+            const filterKey = s.label === 'TOTAL TODAY' ? 'all' : s.label === 'READY' ? 'ready' : s.label === 'NEW' ? 'new' : s.label === 'EXCEPTION' ? 'exception' : s.label === 'REVIEW' ? 'reviewing' : 'all';
+            const isActive = filterMode === filterKey;
+            return (
+              <Box key={i} onClick={() => { setFilterMode(filterKey); setChannelFilter('all'); }}
+                sx={{ textAlign: 'center', py: 0.4, borderRadius: 1, cursor: 'pointer', transition: 'all 0.15s',
+                  border: isActive ? `2px solid ${s.color}` : `1px solid ${BORDER}`,
+                  bgcolor: isActive ? alpha(s.color, 0.06) : 'transparent',
+                  '&:hover': { borderColor: alpha(s.color, 0.4), bgcolor: alpha(s.color, 0.03) } }}>
+                <Typography sx={{ fontSize: '0.9rem', fontWeight: 700, color: s.color, lineHeight: 1.2 }}>{s.count}</Typography>
+                <Typography sx={{ fontSize: '0.5rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: isActive ? s.color : MUTED }}>{s.label}</Typography>
+              </Box>
+            );
+          })}
+        </Box>
+        {/* Row 2: Channel cards */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: `repeat(${channelData.length + 1}, 1fr)`, gap: 0.75 }}>
+          {[allChannelData, ...channelData].map((ch, i) => {
+            const isAll = i === 0;
+            const chKey = isAll ? 'all' : ch.channel;
+            const isActive = channelFilter === chKey;
+            return (
+              <Box key={i} onClick={() => { setChannelFilter(chKey); setFilterMode('all'); }}
+                sx={{ px: 0.75, py: 0.5, borderRadius: 1, cursor: 'pointer', transition: 'all 0.15s',
+                  border: isActive ? `2px solid ${NAVY}` : `1.5px solid ${isAll ? alpha(NAVY, 0.3) : alpha(NAVY, 0.15)}`,
+                  bgcolor: isActive ? alpha(NAVY, 0.05) : isAll ? alpha(NAVY, 0.02) : 'white',
+                  '&:hover': { borderColor: alpha(NAVY, 0.5), bgcolor: alpha(NAVY, 0.03) } }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.25 }}>
+                  <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: NAVY }}>
+                    {isAll ? '📊' : ch.channel === 'Email' ? '✉' : ch.channel === 'EDI' ? '⚡' : ch.channel === 'PDF' ? '📄' : '🌐'}{' '}{ch.count}
+                  </Typography>
+                  <Chip label={ch.label} size="small" sx={{ fontSize: '0.45rem', fontWeight: 700, height: 16, bgcolor: alpha(NAVY, 0.08), color: NAVY }} />
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.25 }}>
+                  <Typography sx={{ fontSize: '0.6rem', fontWeight: 600, color: 'text.secondary' }}>
+                    ${ch.value >= 1000000 ? `${(ch.value / 1000000).toFixed(1)}M` : ch.value >= 1000 ? `${(ch.value / 1000).toFixed(0)}K` : ch.value.toFixed(0)}
+                  </Typography>
+                  {!isAll && <Typography sx={{ fontSize: '0.5rem', color: MUTED }}>({ch.pct}%)</Typography>}
+                </Box>
+                {/* Progress bar */}
+                <Box sx={{ height: 3, borderRadius: 2, bgcolor: alpha(NAVY, 0.06), overflow: 'hidden', mb: 0.25 }}>
+                  <Box sx={{ display: 'flex', height: '100%' }}>
+                    <Box sx={{ width: `${ch.count > 0 ? (ch.ready / ch.count * 100) : 0}%`, bgcolor: GREEN }} />
+                    <Box sx={{ width: `${ch.count > 0 ? (ch.review / ch.count * 100) : 0}%`, bgcolor: AMBER }} />
+                    <Box sx={{ width: `${ch.count > 0 ? (ch.exc / ch.count * 100) : 0}%`, bgcolor: RED }} />
+                  </Box>
+                </Box>
+                {/* Status dots */}
+                <Box sx={{ display: 'flex', gap: 0.75 }}>
+                  <Typography sx={{ fontSize: '0.45rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 0.2, color: GREEN }}>
+                    <Box component="span" sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: GREEN, display: 'inline-block' }} />{ch.ready}READY
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.45rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 0.2, color: AMBER }}>
+                    <Box component="span" sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: AMBER, display: 'inline-block' }} />{ch.review}REVIEW
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.45rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 0.2, color: RED }}>
+                    <Box component="span" sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: RED, display: 'inline-block' }} />{ch.exc}EXC
+                  </Typography>
+                </Box>
+              </Box>
+            );
+          })}
+        </Box>
       </Box>
 
       {/* ─── 3-Panel Layout ─── */}
-      <Box sx={{ flex: 1, display: 'grid', gridTemplateColumns: '272px 1fr 312px', overflow: 'hidden' }}>
+      <Box sx={{ flex: 1, display: 'grid', gridTemplateColumns: `${leftCollapsed ? '40px' : '272px'} 1fr ${rightCollapsed ? '40px' : '312px'}`, overflow: 'hidden', transition: 'grid-template-columns 0.25s ease' }}>
 
         {/* ════════ LEFT: Order Queue ════════ */}
         <Box sx={{ borderRight: `1px solid ${BORDER}`, bgcolor: 'white', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          {leftCollapsed ? (
+            /* Collapsed: just a thin vertical bar with expand button */
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 1 }}>
+              <MuiTooltip title="Expand order queue" placement="right">
+                <IconButton size="small" onClick={() => setLeftCollapsed(false)} sx={{ color: NAVY, '&:hover': { bgcolor: alpha(NAVY, 0.08) } }}>
+                  <ChevronRightIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </MuiTooltip>
+              <Typography sx={{ fontSize: '0.5rem', fontWeight: 700, color: MUTED, writingMode: 'vertical-rl', mt: 1, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Orders</Typography>
+            </Box>
+          ) : (
+          <>
           <Box sx={{ p: 1.5, borderBottom: `1px solid ${BORDER}` }}>
-            <Typography sx={{ fontSize: '0.6rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: MUTED, mb: 1 }}>Incoming Orders</Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Typography sx={{ fontSize: '0.6rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: MUTED }}>Incoming Orders</Typography>
+              <MuiTooltip title="Collapse queue">
+                <IconButton size="small" onClick={() => setLeftCollapsed(true)} sx={{ color: MUTED, p: 0.25, '&:hover': { color: NAVY } }}>
+                  <ChevronLeftIcon sx={{ fontSize: 16 }} />
+                </IconButton>
+              </MuiTooltip>
+            </Box>
             <TextField size="small" fullWidth placeholder="Search orders..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
               InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 16, color: MUTED }} /></InputAdornment> }}
               sx={{ '& .MuiOutlinedInput-root': { fontSize: '0.75rem', height: 32, bgcolor: '#f8fafc' } }}
@@ -590,24 +745,22 @@ const LoparexWorkbench = ({ onBack, darkMode = false }) => {
           <Box sx={{ p: 1.2, borderTop: `1px solid ${BORDER}`, display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', color: MUTED }}>
             <span>{filteredOrders.length} orders</span><span>2 min ago</span>
           </Box>
+          </>
+          )}
         </Box>
 
         {/* ════════ CENTER: Tabs Content ════════ */}
         <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: '#f8fafc' }}>
-          {/* Order bar */}
+          {/* Order bar — compact single line */}
           {o && (
-            <Box sx={{ bgcolor: 'white', borderBottom: `1px solid ${BORDER}`, px: 2, py: 1.2, display: 'flex', alignItems: 'center', gap: 1.5, flexShrink: 0 }}>
-              <Box sx={{ flex: 1 }}>
-                <Typography sx={{ fontSize: '1rem', fontWeight: 700 }}>{o.customer}</Typography>
-                <Typography sx={{ fontSize: '0.7rem', color: MUTED }}>{o.soldTo} · {o.lines} lines · {o.received}</Typography>
+            <Box sx={{ bgcolor: 'white', borderBottom: `1px solid ${BORDER}`, px: 2, py: 0.5, display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+              <Typography sx={{ fontSize: '0.8rem', fontWeight: 700 }}>{o.customer}</Typography>
+              <Typography sx={{ fontSize: '0.6rem', color: MUTED }}>{o.soldTo} · {o.lines} lines</Typography>
+              <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Chip label={o.poNumber} size="small" sx={{ fontSize: '0.55rem', fontWeight: 600, height: 18, bgcolor: '#f1f5f9', border: `1px solid ${BORDER}` }} />
+                <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: NAVY }}>{fmt(o.amount)}</Typography>
+                <Chip label={o.status} size="small" sx={{ fontSize: '0.5rem', fontWeight: 700, height: 18, textTransform: 'uppercase', bgcolor: statusBg[o.status], color: statusColor[o.status] }} />
               </Box>
-              <Chip label={o.poNumber} size="small" sx={{ fontSize: '0.65rem', fontWeight: 600, bgcolor: '#f1f5f9', border: `1px solid ${BORDER}` }} />
-              <Typography sx={{ fontSize: '0.95rem', fontWeight: 700, color: NAVY }}>{fmt(o.amount)}</Typography>
-              <Chip label={o.status} size="small" sx={{ fontSize: '0.6rem', fontWeight: 700, textTransform: 'uppercase', bgcolor: statusBg[o.status], color: statusColor[o.status] }} />
-              {overrideCount > 0 && (
-                <Chip icon={<EditIcon sx={{ fontSize: 12 }} />} label={`${overrideCount} overrides`} size="small"
-                  sx={{ fontSize: '0.6rem', fontWeight: 700, bgcolor: alpha(AMBER, 0.12), color: AMBER, border: `1px solid ${alpha(AMBER, 0.3)}` }} />
-              )}
             </Box>
           )}
 
@@ -635,257 +788,124 @@ const LoparexWorkbench = ({ onBack, darkMode = false }) => {
                 <Typography sx={{ fontSize: '0.75rem' }}>Choose an incoming purchase order from the queue</Typography>
               </Box>
             ) : activeTab === 0 ? (
-              /* ═══ TAB 0: PO Extraction (AP-style) ═══ */
-              <Box>
-                {/* ── PO Document Viewer (collapsible) ── */}
-                {(() => {
-                  const pdfs = o.pdfFiles || [{ label: o.poNumber, path: o.pdfFile }];
-                  const currentPdf = pdfs[activePdfIdx] || pdfs[0];
-                  return (
-                    <Paper elevation={0} sx={{ mb: 2, borderRadius: 2.5, border: `1px solid ${BORDER}`, overflow: 'hidden' }}>
-                      {/* PDF Header bar — click to toggle */}
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 1.5, py: 0.75, bgcolor: '#e2e8f0', cursor: 'pointer', '&:hover': { bgcolor: '#dbe2ea' } }}
-                        onClick={() => toggleItem('pdf-viewer')}>
-                        <Stack direction="row" alignItems="center" spacing={1}>
-                          <PdfIcon sx={{ fontSize: 16, color: '#dc2626' }} />
-                          <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: '#334155' }}>
-                            {o.poNumber} — {o.customer}
-                          </Typography>
-                          <Chip label={`${pdfs.length} doc${pdfs.length > 1 ? 's' : ''}`} size="small" sx={{ fontSize: '0.55rem', fontWeight: 600, height: 18, bgcolor: alpha(NAVY, 0.1), color: NAVY }} />
-                        </Stack>
-                        <Stack direction="row" alignItems="center" spacing={0.5}>
+              /* ═══ TAB 0: PO Extraction — Side-by-Side (PDF | Extracted Fields) ═══ */
+              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0, height: '100%' }}>
+                {/* ── LEFT: PDF Preview ── */}
+                <Box sx={{ borderRight: `1px solid ${BORDER}`, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                  {(() => {
+                    const pdfs = o.pdfFiles || [{ label: o.poNumber, path: o.pdfFile }];
+                    const currentPdf = pdfs[activePdfIdx] || pdfs[0];
+                    return (
+                      <>
+                        {/* PDF header */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 1.5, py: 0.75, bgcolor: '#e2e8f0', borderBottom: `1px solid ${BORDER}`, flexShrink: 0 }}>
+                          <Stack direction="row" alignItems="center" spacing={1}>
+                            <PdfIcon sx={{ fontSize: 16, color: '#dc2626' }} />
+                            <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: '#334155' }}>{o.poNumber} — {o.customer}</Typography>
+                            <Chip label={`${pdfs.length} doc`} size="small" sx={{ fontSize: '0.5rem', fontWeight: 600, height: 18, bgcolor: alpha(NAVY, 0.1), color: NAVY }} />
+                          </Stack>
                           <MuiTooltip title="Open in new tab">
-                            <IconButton size="small" onClick={(e) => { e.stopPropagation(); window.open(currentPdf.path, '_blank'); }}
-                              sx={{ color: '#64748b', '&:hover': { color: NAVY } }}>
+                            <IconButton size="small" onClick={() => window.open(currentPdf.path, '_blank')} sx={{ color: '#64748b' }}>
                               <OpenInNewIcon sx={{ fontSize: 15 }} />
                             </IconButton>
                           </MuiTooltip>
-                          {expandedItems['pdf-viewer'] ? <ExpandLessIcon sx={{ fontSize: 16, color: MUTED }} /> : <ExpandMoreIcon sx={{ fontSize: 16, color: MUTED }} />}
-                        </Stack>
-                      </Box>
-                      <Collapse in={!!expandedItems['pdf-viewer']}>
-                        {/* PDF tab selector (when multiple docs) */}
+                        </Box>
+                        {/* PDF tab selector */}
                         {pdfs.length > 1 && (
-                          <Box sx={{ display: 'flex', gap: 0.5, px: 1.5, py: 0.75, bgcolor: '#f1f5f9', borderBottom: `1px solid ${BORDER}`, overflowX: 'auto' }}>
+                          <Box sx={{ display: 'flex', gap: 0.5, px: 1.5, py: 0.5, bgcolor: '#f1f5f9', borderBottom: `1px solid ${BORDER}`, flexShrink: 0 }}>
                             {pdfs.map((pdf, idx) => (
-                              <Chip key={idx} label={pdf.label} size="small"
-                                onClick={() => setActivePdfIdx(idx)}
-                                sx={{
-                                  fontSize: '0.58rem', fontWeight: activePdfIdx === idx ? 700 : 500, height: 22, cursor: 'pointer', flexShrink: 0,
-                                  bgcolor: activePdfIdx === idx ? alpha(NAVY, 0.15) : 'transparent',
-                                  color: activePdfIdx === idx ? NAVY : MUTED,
-                                  border: activePdfIdx === idx ? `1px solid ${alpha(NAVY, 0.3)}` : '1px solid transparent',
-                                  '&:hover': { bgcolor: alpha(NAVY, 0.08) },
+                              <Chip key={idx} label={pdf.label} size="small" onClick={() => setActivePdfIdx(idx)}
+                                sx={{ fontSize: '0.55rem', fontWeight: activePdfIdx === idx ? 700 : 500, height: 20, cursor: 'pointer',
+                                  bgcolor: activePdfIdx === idx ? alpha(NAVY, 0.15) : 'transparent', color: activePdfIdx === idx ? NAVY : MUTED,
+                                  border: activePdfIdx === idx ? `1px solid ${alpha(NAVY, 0.3)}` : '1px solid transparent', '&:hover': { bgcolor: alpha(NAVY, 0.08) },
                                 }} />
                             ))}
                           </Box>
                         )}
-                        {/* PDF Preview */}
-                        <Box sx={{ position: 'relative', height: 280, cursor: 'pointer' }} onClick={() => window.open(currentPdf.path, '_blank')}>
-                          <iframe
-                            src={`${currentPdf.path}#toolbar=0&navpanes=0&scrollbar=0`}
-                            title={`${currentPdf.label} preview`}
-                            style={{ width: '100%', height: '100%', border: 'none', pointerEvents: 'none' }}
-                          />
-                          <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 1.5, py: 0.75, bgcolor: 'rgba(255,255,255,0.92)', borderTop: `1px solid ${BORDER}` }}>
-                            <Typography sx={{ fontSize: '0.6rem', color: MUTED }}>
-                              {currentPdf.label}.pdf · {o.channel} channel · Click to open
-                            </Typography>
-                            <Chip label="AI Extracted" size="small" sx={{ height: 18, fontSize: '0.55rem', bgcolor: alpha(GREEN, 0.1), color: GREEN, fontWeight: 600 }} />
-                          </Box>
+                        {/* PDF iframe — fills remaining height */}
+                        <Box sx={{ flex: 1, position: 'relative', minHeight: 0 }}>
+                          <iframe src={`${currentPdf.path}#toolbar=0&navpanes=0&scrollbar=0`} title={`${currentPdf.label} preview`}
+                            style={{ width: '100%', height: '100%', border: 'none' }} />
                         </Box>
-                      </Collapse>
-                    </Paper>
-                  );
-                })()}
-
-                {/* ── Overall Confidence Summary ── */}
-                {(() => {
-                  const allConfs = [...o.hdr.map(h => h.conf), ...o.items.flatMap(it => [it.confMat, it.confQty, it.confPrice, it.confDate])];
-                  const validConfs = allConfs.filter(c => c > 0);
-                  const overallConf = validConfs.length ? (validConfs.reduce((a, b) => a + b, 0) / validConfs.length).toFixed(1) : 0;
-                  const highCount = validConfs.filter(c => c >= 90).length;
-                  const medCount = validConfs.filter(c => c >= 70 && c < 90).length;
-                  const lowCount = validConfs.filter(c => c < 70).length;
-                  const zeroCount = allConfs.filter(c => c === 0).length;
-                  const oColor = confColor(parseFloat(overallConf));
-                  // Source counts
-                  const srcCounts = { 'OCR': 0, 'SAP Master Data': 0, 'Contract Lookup': 0, 'Not Detected': 0 };
-                  o.hdr.forEach(h => { if (h.conf === 0) srcCounts['Not Detected']++; else if (h.conf >= 95) srcCounts['SAP Master Data']++; else srcCounts['OCR']++; });
-                  o.items.forEach(it => { [it.confMat, it.confQty, it.confPrice, it.confDate].forEach(c => { if (c === 0) srcCounts['Not Detected']++; else if (c >= 95) srcCounts['SAP Master Data']++; else if (c >= 85) srcCounts['Contract Lookup']++; else srcCounts['OCR']++; }); });
-                  const srcColors = { 'OCR': GREEN, 'SAP Master Data': NAVY, 'Contract Lookup': PURPLE, 'Not Detected': '#94a3b8' };
-                  return (
-                    <Paper elevation={0} sx={{ p: 2, borderRadius: 2.5, mb: 2, border: `1px solid ${BORDER}`, bgcolor: 'white' }}>
-                      <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1.5fr', gap: 3, alignItems: 'center' }}>
-                        {/* Big score */}
-                        <Box sx={{ textAlign: 'center' }}>
-                          <Typography sx={{ fontSize: '1.6rem', fontWeight: 800, color: oColor, lineHeight: 1, mb: 0.5 }}>{overallConf}%</Typography>
-                          <Typography sx={{ fontSize: '0.6rem', fontWeight: 600, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Overall Confidence</Typography>
-                          <Typography sx={{ fontSize: '0.55rem', color: MUTED, mt: 0.5 }}>{validConfs.length} fields extracted</Typography>
-                        </Box>
-                        {/* Confidence breakdown */}
-                        <Box>
-                          <Typography sx={{ fontSize: '0.6rem', fontWeight: 600, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.5px', mb: 1.5 }}>Confidence Breakdown</Typography>
-                          <Stack spacing={0.75}>
-                            {[
-                              { label: 'HIGH', count: highCount, color: GREEN, threshold: '≥90%' },
-                              { label: 'MED', count: medCount, color: AMBER, threshold: '70–89%' },
-                              { label: 'LOW', count: lowCount, color: RED, threshold: '<70%' },
-                            ].map(band => (
-                              <Box key={band.label} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                <Chip label={band.label} size="small" sx={{ fontSize: '0.55rem', fontWeight: 700, height: 20, minWidth: 46, bgcolor: alpha(band.color, 0.1), color: band.color, textTransform: 'uppercase', letterSpacing: '0.5px' }} />
-                                <Box sx={{ flex: 1 }}>
-                                  <LinearProgress variant="determinate" value={validConfs.length ? (band.count / validConfs.length) * 100 : 0}
-                                    sx={{ height: 5, borderRadius: 3, bgcolor: alpha(band.color, 0.08), '& .MuiLinearProgress-bar': { bgcolor: band.color, borderRadius: 3 } }} />
-                                </Box>
-                                <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: band.color, minWidth: 20, textAlign: 'right' }}>{band.count}</Typography>
-                              </Box>
-                            ))}
-                            {zeroCount > 0 && (
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                <Chip label="N/A" size="small" sx={{ fontSize: '0.55rem', fontWeight: 700, height: 20, minWidth: 46, bgcolor: alpha('#94a3b8', 0.1), color: '#94a3b8' }} />
-                                <Box sx={{ flex: 1 }}><LinearProgress variant="determinate" value={(zeroCount / allConfs.length) * 100} sx={{ height: 5, borderRadius: 3, bgcolor: alpha('#94a3b8', 0.08), '& .MuiLinearProgress-bar': { bgcolor: '#94a3b8', borderRadius: 3 } }} /></Box>
-                                <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: '#94a3b8', minWidth: 20, textAlign: 'right' }}>{zeroCount}</Typography>
-                              </Box>
-                            )}
-                          </Stack>
-                        </Box>
-                        {/* Extraction sources */}
-                        <Box>
-                          <Typography sx={{ fontSize: '0.6rem', fontWeight: 600, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.5px', mb: 1.5 }}>Extraction Sources</Typography>
-                          <Stack spacing={0.5}>
-                            {Object.entries(srcCounts).filter(([, c]) => c > 0).map(([src, count]) => (
-                              <Box key={src} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: srcColors[src], flexShrink: 0 }} />
-                                <Typography sx={{ fontSize: '0.68rem', color: 'text.secondary', flex: 1 }}>{src}</Typography>
-                                <Typography sx={{ fontSize: '0.68rem', fontWeight: 700 }}>{count}</Typography>
-                              </Box>
-                            ))}
-                          </Stack>
-                        </Box>
-                      </Box>
-                    </Paper>
-                  );
-                })()}
-
-                {/* ── Per-Field Extraction Table (AP-style) ── */}
-                <Paper elevation={0} sx={{ borderRadius: 2.5, border: `1px solid ${BORDER}`, overflow: 'hidden', mb: 2 }}>
-                  {/* Terminal-style header */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1.2, bgcolor: '#f1f5f9', borderBottom: `1px solid ${BORDER}` }}>
-                    <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: '#f87171' }} />
-                    <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: '#fbbf24' }} />
-                    <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: '#34d399' }} />
-                    <Typography sx={{ fontSize: '0.6rem', color: MUTED, ml: 1 }}>AI Extraction — Per-Field Confidence · {o.channel} Channel</Typography>
-                  </Box>
-                  {/* Column headers */}
-                  <Box sx={{ display: 'grid', gridTemplateColumns: '150px 1fr 160px 70px 100px', px: 2, py: 1, bgcolor: '#f0f4f8', borderBottom: `2px solid ${NAVY}` }}>
-                    {['Field', 'Extracted Value', 'Confidence', 'Level', 'SAP Ref'].map(h => (
-                      <Typography key={h} sx={{ fontSize: '0.65rem', fontWeight: 700, color: NAVY, textTransform: 'uppercase', letterSpacing: '0.3px' }}>{h}</Typography>
-                    ))}
-                  </Box>
-                  {/* Header field rows */}
-                  {o.hdr.map((f, i) => {
-                    const cl = confLevel(f.conf);
-                    const cc = confColor(f.conf);
-                    return (
-                      <Box key={i} sx={{ display: 'grid', gridTemplateColumns: '150px 1fr 160px 70px 100px', px: 2, py: 1.1, alignItems: 'center', borderBottom: `1px solid ${BORDER}`, bgcolor: i % 2 === 0 ? 'transparent' : alpha(NAVY, 0.015), '&:hover': { bgcolor: alpha(NAVY, 0.04) } }}>
-                        <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: 'text.secondary' }}>{f.lbl}</Typography>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: f.conf === 0 ? MUTED : 'text.primary' }}>{f.val}</Typography>
-                          {f.conf < 70 && f.conf > 0 && (
-                            <Chip label="Accept" size="small" onClick={() => showToast(`Field accepted: ${f.lbl}`, 'success')}
-                              sx={{ fontSize: '0.5rem', fontWeight: 700, height: 16, cursor: 'pointer', bgcolor: alpha(GREEN, 0.08), color: GREEN, '&:hover': { bgcolor: GREEN, color: 'white' } }} />
-                          )}
-                        </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Box sx={{ flex: 1, height: 4, borderRadius: 2, bgcolor: alpha(cc, 0.12), overflow: 'hidden' }}>
-                            <Box sx={{ width: `${f.conf}%`, height: '100%', borderRadius: 2, bgcolor: cc }} />
-                          </Box>
-                          <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: cc, minWidth: 30 }}>{f.conf > 0 ? `${f.conf}%` : '—'}</Typography>
-                        </Box>
-                        <Chip label={f.conf === 0 ? 'N/A' : cl.toUpperCase()} size="small"
-                          sx={{ fontSize: '0.5rem', fontWeight: 700, height: 18, bgcolor: confBg(f.conf), color: cc, textTransform: 'uppercase', letterSpacing: '0.3px' }} />
-                        <Typography sx={{ fontSize: '0.55rem', color: MUTED, bgcolor: '#f8fafc', border: `1px solid ${BORDER}`, px: 0.5, py: 0.15, borderRadius: 0.5, textAlign: 'center' }}>{f.sap}</Typography>
-                      </Box>
+                      </>
                     );
-                  })}
-                </Paper>
+                  })()}
+                </Box>
 
-                {/* ── Line Items (keep existing expandable pattern) ── */}
-                <Typography sx={sectionTitle}>Line Items</Typography>
-                {o.items.map((item, idx) => {
-                  const key = `${o.id}-${idx}`;
-                  const expanded = expandedItems[key];
-                  const avgConf = Math.round([item.confMat, item.confQty, item.confPrice, item.confDate].filter(v => v > 0).reduce((a, b) => a + b, 0) / [item.confMat, item.confQty, item.confPrice, item.confDate].filter(v => v > 0).length || 1);
-                  const hasLow = [item.confMat, item.confQty, item.confPrice, item.confDate].some(c => c < 70);
-                  return (
-                    <Paper key={key} variant="outlined" sx={{ mb: 1, borderRadius: 1, overflow: 'hidden', border: `1px solid ${hasLow ? alpha(AMBER, 0.3) : BORDER}` }}>
-                      <Box onClick={() => toggleItem(key)} sx={{ px: 1.5, py: 1, cursor: 'pointer', '&:hover': { bgcolor: alpha(NAVY, 0.02) } }}>
-                        {/* Row 1: Line chip + material + confidence */}
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                          <Chip label={`Line ${item.line}`} size="small" sx={{ fontSize: '0.6rem', fontWeight: 700, height: 20, bgcolor: alpha(NAVY, 0.1), color: NAVY }} />
-                          <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: 'text.primary' }}>{item.custSku}</Typography>
-                          <Typography sx={{ fontSize: '0.65rem', color: MUTED }}>→ {item.sapMat}</Typography>
-                          <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                            <ConfRing value={avgConf} />
-                            {hasLow && <WarningIcon sx={{ fontSize: 14, color: AMBER }} />}
-                            {expanded ? <ExpandLessIcon sx={{ fontSize: 16, color: MUTED }} /> : <ExpandMoreIcon sx={{ fontSize: 16, color: MUTED }} />}
-                          </Box>
-                        </Box>
-                        {/* Row 2: Material, Qty, Unit, Price details */}
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, pl: 0.5 }}>
-                          {[
-                            { lbl: 'Material', val: item.sapMat },
-                            { lbl: 'Quantity', val: item.qty },
-                            { lbl: 'Unit', val: item.uom },
-                            { lbl: 'Price', val: `$${item.price}/${item.uom}` },
-                          ].map(d => (
-                            <Box key={d.lbl} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                              <Typography sx={{ fontSize: '0.55rem', fontWeight: 600, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.3px' }}>{d.lbl}:</Typography>
-                              <Typography sx={{ fontSize: '0.65rem', fontWeight: 600, color: 'text.primary' }}>{d.val}</Typography>
-                            </Box>
-                          ))}
-                        </Box>
+                {/* ── RIGHT: Extracted Fields ── */}
+                <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                  {/* Scrollable extraction table */}
+                  <Box sx={{ flex: 1, overflowY: 'auto' }}>
+                    {/* Combined sticky header: terminal dots + column headers */}
+                    <Box sx={{ position: 'sticky', top: 0, zIndex: 3 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 1.5, py: 0.5, bgcolor: '#f1f5f9', borderBottom: `1px solid ${BORDER}` }}>
+                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#f87171' }} />
+                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#fbbf24' }} />
+                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#34d399' }} />
+                        <Typography sx={{ fontSize: '0.55rem', color: MUTED, ml: 0.5 }}>AI Extraction · {o.channel} Channel</Typography>
                       </Box>
-                      <Collapse in={expanded}>
-                        <Box sx={{ bgcolor: '#fafbfc', borderTop: `1px solid ${BORDER}` }}>
-                          {/* AP-style field rows for line item */}
-                          {[
-                            { lbl: 'SAP Material', val: item.sapMat, conf: item.confMat, sap: 'VBAP-MATNR' },
-                            { lbl: 'Qty / UOM', val: `${item.qty} ${item.uom}`, conf: item.confQty, sap: 'VBAP-KWMENG' },
-                            { lbl: 'Unit Price', val: `$${item.price}`, conf: item.confPrice, sap: 'PRCD_ELEMENTS' },
-                            { lbl: 'Req. Delivery Date', val: item.reqDate, conf: item.confDate, sap: 'VBEP-EDATU' },
-                          ].map((f, fi) => {
-                            const cc = confColor(f.conf);
-                            return (
-                              <Box key={fi} sx={{ display: 'grid', gridTemplateColumns: '120px 1fr 120px 55px 90px', px: 1.5, py: 0.8, alignItems: 'center', borderBottom: `1px solid ${BORDER}`, '&:hover': { bgcolor: alpha(NAVY, 0.03) } }}>
-                                <Typography sx={{ fontSize: '0.62rem', fontWeight: 600, color: 'text.secondary' }}>{f.lbl}</Typography>
-                                <Typography sx={{ fontSize: '0.68rem', fontWeight: 600, color: f.conf === 0 ? MUTED : 'text.primary' }}>{f.val}</Typography>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                                  <Box sx={{ flex: 1, height: 3, borderRadius: 2, bgcolor: alpha(cc, 0.12), overflow: 'hidden' }}>
-                                    <Box sx={{ width: `${f.conf}%`, height: '100%', borderRadius: 2, bgcolor: cc }} />
-                                  </Box>
-                                  <Typography sx={{ fontSize: '0.6rem', fontWeight: 700, color: cc }}>{f.conf > 0 ? `${f.conf}%` : '—'}</Typography>
-                                </Box>
-                                <Chip label={f.conf === 0 ? 'N/A' : confLevel(f.conf).toUpperCase()} size="small"
-                                  sx={{ fontSize: '0.45rem', fontWeight: 700, height: 16, bgcolor: confBg(f.conf), color: cc }} />
-                                <Typography sx={{ fontSize: '0.5rem', color: MUTED, bgcolor: '#f0f4f8', border: `1px solid ${BORDER}`, px: 0.5, py: 0.1, borderRadius: 0.5, textAlign: 'center' }}>{f.sap}</Typography>
+                      <Box sx={{ display: 'grid', gridTemplateColumns: '140px 1fr', px: 1.5, py: 0.5, bgcolor: '#f0f4f8', borderBottom: `2px solid ${NAVY}` }}>
+                        {['Field', 'Extracted Value'].map(h => (
+                          <Typography key={h} sx={{ fontSize: '0.6rem', fontWeight: 700, color: NAVY, textTransform: 'uppercase', letterSpacing: '0.3px' }}>{h}</Typography>
+                        ))}
+                      </Box>
+                    </Box>
+
+                    {/* Header field rows */}
+                    {o.hdr.map((f, i) => (
+                      <Box key={i} sx={{ display: 'grid', gridTemplateColumns: '140px 1fr', px: 1.5, py: 0.9, alignItems: 'center', borderBottom: `1px solid ${BORDER}`, bgcolor: i % 2 === 0 ? 'transparent' : alpha(NAVY, 0.015), '&:hover': { bgcolor: alpha(NAVY, 0.04) } }}>
+                        <Typography sx={{ fontSize: '0.65rem', fontWeight: 600, color: 'text.secondary' }}>{f.lbl}</Typography>
+                        <Typography sx={{ fontSize: '0.68rem', fontWeight: 600, color: f.conf === 0 ? MUTED : 'text.primary' }}>{f.val}</Typography>
+                      </Box>
+                    ))}
+
+                    {/* Line Items section */}
+                    <Box sx={{ px: 1.5, py: 1, bgcolor: alpha(NAVY, 0.03), borderBottom: `1px solid ${BORDER}` }}>
+                      <Typography sx={{ fontSize: '0.6rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: NAVY }}>Line Items</Typography>
+                    </Box>
+                    {o.items.map((item, idx) => {
+                      const key = `${o.id}-${idx}`;
+                      const expanded = expandedItems[key];
+                      const avgConf = Math.round([item.confMat, item.confQty, item.confPrice, item.confDate].filter(v => v > 0).reduce((a, b) => a + b, 0) / [item.confMat, item.confQty, item.confPrice, item.confDate].filter(v => v > 0).length || 1);
+                      const hasLow = [item.confMat, item.confQty, item.confPrice, item.confDate].some(c => c < 70);
+                      return (
+                        <Box key={key}>
+                          <Box onClick={() => toggleItem(key)} sx={{ px: 1.5, py: 0.8, cursor: 'pointer', bgcolor: alpha(NAVY, 0.02), borderBottom: `1px solid ${BORDER}`, '&:hover': { bgcolor: alpha(NAVY, 0.05) } }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Chip label={`Line ${item.line}`} size="small" sx={{ fontSize: '0.55rem', fontWeight: 700, height: 18, bgcolor: alpha(NAVY, 0.1), color: NAVY }} />
+                              <Typography sx={{ fontSize: '0.65rem', fontWeight: 600 }}>{item.custSku}</Typography>
+                              <Typography sx={{ fontSize: '0.6rem', color: MUTED }}>→ {item.sapMat}</Typography>
+                              <Typography sx={{ fontSize: '0.6rem', color: MUTED, ml: 'auto' }}>{item.qty} {item.uom} · ${item.price}</Typography>
+                              {hasLow && <WarningIcon sx={{ fontSize: 12, color: AMBER }} />}
+                              {expanded ? <ExpandLessIcon sx={{ fontSize: 14, color: MUTED }} /> : <ExpandMoreIcon sx={{ fontSize: 14, color: MUTED }} />}
+                            </Box>
+                          </Box>
+                          <Collapse in={expanded}>
+                            {[
+                              { lbl: 'SAP Material', val: item.sapMat },
+                              { lbl: 'Qty / UOM', val: `${item.qty} ${item.uom}` },
+                              { lbl: 'Unit Price', val: `$${item.price}` },
+                              { lbl: 'Req. Delivery', val: item.reqDate },
+                            ].map((f, fi) => (
+                              <Box key={fi} sx={{ display: 'grid', gridTemplateColumns: '140px 1fr', px: 1.5, py: 0.7, alignItems: 'center', borderBottom: `1px solid ${BORDER}`, bgcolor: '#fafbfc', '&:hover': { bgcolor: alpha(NAVY, 0.03) } }}>
+                                <Typography sx={{ fontSize: '0.6rem', fontWeight: 600, color: 'text.secondary' }}>{f.lbl}</Typography>
+                                <Typography sx={{ fontSize: '0.65rem', fontWeight: 600, color: 'text.primary' }}>{f.val}</Typography>
                               </Box>
-                            );
-                          })}
-                          <Box sx={{ p: 1.5 }}>
+                            ))}
                             {item.insight && (
-                              <Box sx={{ p: 1, borderRadius: 1, bgcolor: alpha(NAVY, 0.04), border: `1px solid ${alpha(NAVY, 0.1)}` }}>
-                                <Typography sx={{ fontSize: '0.6rem', fontWeight: 700, color: NAVY, mb: 0.3 }}>Ordly AI Insight</Typography>
-                                <Typography sx={{ fontSize: '0.65rem', color: 'text.secondary', lineHeight: 1.5 }}>{item.insight}</Typography>
+                              <Box sx={{ px: 1.5, py: 1 }}>
+                                <Box sx={{ p: 1, borderRadius: 1, bgcolor: alpha(NAVY, 0.04), border: `1px solid ${alpha(NAVY, 0.1)}` }}>
+                                  <Typography sx={{ fontSize: '0.55rem', fontWeight: 700, color: NAVY, mb: 0.2 }}>Ordly AI Insight</Typography>
+                                  <Typography sx={{ fontSize: '0.6rem', color: 'text.secondary', lineHeight: 1.5 }}>{item.insight}</Typography>
+                                </Box>
                               </Box>
                             )}
-                          </Box>
+                          </Collapse>
                         </Box>
-                      </Collapse>
-                    </Paper>
-                  );
-                })}
+                      );
+                    })}
+                  </Box>
+                </Box>
               </Box>
             ) : activeTab === 1 ? (
               /* ═══ TAB 1: SAP Validation ═══ */
@@ -917,91 +937,227 @@ const LoparexWorkbench = ({ onBack, darkMode = false }) => {
               </Box>
             ) : (
               /* ═══ TAB 2: AI Decision ═══ */
-              <Box>
-                {/* Hero card */}
-                <Paper sx={{ p: 2, mb: 2, borderRadius: 2, background: `linear-gradient(135deg, ${NAVY_DARK} 0%, ${NAVY} 50%, ${NAVY_LIGHT} 100%)`, color: 'white' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <ScoreRing value={o.decision.score} />
-                    <Box sx={{ flex: 1 }}>
-                      <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.6, mb: 0.5 }}>Recommendation</Typography>
-                      <Typography sx={{ fontSize: '1rem', fontWeight: 700, mb: 0.5 }}>{o.decision.rec}</Typography>
-                      <Typography sx={{ fontSize: '0.7rem', opacity: 0.7, mb: 1 }}>{o.decision.plant} · {o.decision.mode}</Typography>
-                      <Stack direction="row" spacing={1} flexWrap="wrap">
-                        {[
-                          { lbl: 'Confirmed Qty', val: o.decision.confirmedQty },
-                          { lbl: 'Confirm Date', val: o.decision.confirmedDate },
-                          { lbl: 'Gross Margin', val: o.decision.gm },
-                        ].map(b => (
-                          <Chip key={b.lbl} label={`${b.lbl}: ${b.val}`} size="small"
-                            sx={{ fontSize: '0.6rem', fontWeight: 600, height: 22, bgcolor: 'rgba(255,255,255,0.12)', color: 'white', border: '1px solid rgba(255,255,255,0.2)' }} />
-                        ))}
-                      </Stack>
-                    </Box>
-                  </Box>
-                </Paper>
+              (() => {
+                // Compute effective decision based on user plant selections
+                // Check if user actually selected a DIFFERENT plant from AI's recommendation
+                const hasOverrides = o.items.some((item, idx) => {
+                  const key = `${o.id}-${idx}`;
+                  const userPick = plantSelections[key];
+                  if (!userPick) return false;
+                  const aiRec = item.plantOptions?.find(p => p.selected);
+                  return aiRec && userPick !== aiRec.code;
+                });
+                const getSelectedPlant = (item, idx) => {
+                  const key = `${o.id}-${idx}`;
+                  const overrideCode = plantSelections[key];
+                  if (overrideCode && item.plantOptions) {
+                    return item.plantOptions.find(p => p.code === overrideCode) || item.plantOptions.find(p => p.selected);
+                  }
+                  return item.plantOptions ? item.plantOptions.find(p => p.selected) : null;
+                };
 
-                {/* IBP Intelligence */}
-                <Paper variant="outlined" sx={{ p: 1.5, mb: 2, borderRadius: 1, bgcolor: alpha(PURPLE, 0.04), borderColor: alpha(PURPLE, 0.15) }}>
-                  <Typography sx={{ fontSize: '0.6rem', fontWeight: 700, textTransform: 'uppercase', color: PURPLE, mb: 0.5 }}>IBP Intelligence</Typography>
-                  <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary', lineHeight: 1.5 }}>{o.decision.ibpSignal}</Typography>
-                  <Typography sx={{ fontSize: '0.65rem', fontWeight: 600, color: PURPLE, mt: 0.5 }}>{o.decision.ibpLead}</Typography>
-                </Paper>
+                // Recalculate scores from selected plants
+                let effScores = { ...o.decision.scores };
+                let effScore = o.decision.score;
+                let effPlant = o.decision.plant;
+                let effRec = o.decision.rec;
+                let effMode = o.decision.mode;
+                let effQty = o.decision.confirmedQty;
+                let effDate = o.decision.confirmedDate;
+                let effGM = o.decision.gm;
 
-                {/* Score Components */}
-                <Typography sx={sectionTitle}>Score Components</Typography>
-                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, mb: 2 }}>
-                  {Object.entries(o.decision.scores).map(([label, val]) => (
-                    <Box key={label} sx={{ p: 1, borderRadius: 1, border: `1px solid ${BORDER}`, bgcolor: 'white' }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                        <Typography sx={{ fontSize: '0.65rem', fontWeight: 600, color: 'text.secondary' }}>{label}</Typography>
-                        <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: confColor(val) }}>{val}</Typography>
+                if (hasOverrides) {
+                  const selectedPlants = o.items.map((item, idx) => getSelectedPlant(item, idx)).filter(Boolean);
+                  if (selectedPlants.length > 0) {
+                    const avgPlantScore = Math.round(selectedPlants.reduce((s, p) => s + (p.score || 0), 0) / selectedPlants.length);
+                    const allOnTime = selectedPlants.every(p => p.onTime);
+                    const hasDisq = selectedPlants.some(p => p.disq);
+                    const totalFreight = selectedPlants.reduce((s, p) => s + (p.freightCost || 0), 0);
+                    const plantCodes = [...new Set(selectedPlants.map(p => p.code))];
+                    const plantNames = [...new Set(selectedPlants.map(p => `${p.code} — ${p.name}`))];
+
+                    effPlant = plantNames.join(' + ');
+                    effScore = hasDisq ? Math.min(avgPlantScore, 25) : avgPlantScore;
+                    effMode = plantCodes.length > 1 ? 'Multi-Plant Split' : 'Single Plant';
+                    effDate = selectedPlants.map(p => p.arrivalDate).join(' / ');
+                    effRec = hasDisq ? 'Exception — Disqualified Plant Selected' : effScore >= 80 ? 'Auto-Create Sales Order' : effScore >= 60 ? 'Human Review Required' : 'Exception — Manual Review';
+
+                    // Adjust component scores based on selection
+                    effScores = {
+                      'Service Level': Math.min(100, Math.round(allOnTime ? avgPlantScore + 5 : avgPlantScore - 15)),
+                      'Margin Impact': Math.min(100, Math.round(avgPlantScore - (totalFreight > 5000 ? 15 : totalFreight > 2000 ? 8 : 0))),
+                      'Customer Value': o.decision.scores['Customer Value'],
+                      'Lead Time': Math.min(100, Math.round(allOnTime ? avgPlantScore + 3 : avgPlantScore - 20)),
+                      'Inventory Health': Math.min(100, Math.round(selectedPlants.every(p => p.atp > 0) ? avgPlantScore + 5 : avgPlantScore - 25)),
+                      'AR / Credit Risk': o.decision.scores['AR / Credit Risk'],
+                    };
+                  }
+                }
+
+                const isUserOverride = hasOverrides;
+
+                return (
+                <Box>
+                  {/* ── AI Recommendation Hero ── */}
+                  <Paper sx={{ p: 2, mb: 2, borderRadius: 2, background: `linear-gradient(135deg, ${NAVY_DARK} 0%, ${NAVY} 50%, ${NAVY_LIGHT} 100%)`, color: 'white' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <ScoreRing value={effScore} />
+                      <Box sx={{ flex: 1 }}>
+                        <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mb: 0.5 }}>
+                          <Typography sx={{ fontSize: '0.6rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.6 }}>
+                            {isUserOverride ? 'Updated Recommendation' : 'AI Recommendation'}
+                          </Typography>
+                          {isUserOverride && (
+                            <Chip label="USER OVERRIDE" size="small"
+                              sx={{ fontSize: '0.45rem', fontWeight: 700, height: 16, bgcolor: alpha(AMBER, 0.25), color: '#fbbf24', border: '1px solid rgba(251,191,36,0.4)' }} />
+                          )}
+                          {!isUserOverride && (
+                            <Chip label="ORDLY AI" size="small"
+                              sx={{ fontSize: '0.45rem', fontWeight: 700, height: 16, bgcolor: 'rgba(255,255,255,0.15)', color: 'white', border: '1px solid rgba(255,255,255,0.25)' }} />
+                          )}
+                        </Stack>
+                        <Typography sx={{ fontSize: '1rem', fontWeight: 700, mb: 0.5 }}>{effRec}</Typography>
+                        <Typography sx={{ fontSize: '0.7rem', opacity: 0.7, mb: 1 }}>{effPlant} · {effMode}</Typography>
+                        <Stack direction="row" spacing={1} flexWrap="wrap">
+                          {[
+                            { lbl: 'Confirmed Qty', val: effQty },
+                            { lbl: 'Confirm Date', val: effDate },
+                            { lbl: 'Gross Margin', val: effGM },
+                          ].map(b => (
+                            <Chip key={b.lbl} label={`${b.lbl}: ${b.val}`} size="small"
+                              sx={{ fontSize: '0.6rem', fontWeight: 600, height: 22, bgcolor: 'rgba(255,255,255,0.12)', color: 'white', border: '1px solid rgba(255,255,255,0.2)' }} />
+                          ))}
+                        </Stack>
                       </Box>
-                      <LinearProgress variant="determinate" value={val} sx={{ height: 4, borderRadius: 2,
-                        bgcolor: alpha(confColor(val), 0.1), '& .MuiLinearProgress-bar': { bgcolor: confColor(val), borderRadius: 2 } }} />
                     </Box>
-                  ))}
-                </Box>
-
-                {/* Plant Analysis per line */}
-                <Typography sx={sectionTitle}>Fulfillment — Plant Analysis</Typography>
-                {o.items.map((item, idx) => (
-                  <Box key={idx} sx={{ mb: 2 }}>
-                    <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: NAVY, mb: 1 }}>Line {item.line}: {item.custSku}</Typography>
-                    {item.plantOptions ? item.plantOptions.map((p, pi) => (
-                      <Box key={pi} sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1, mb: 0.5, borderRadius: 1,
-                        border: `1.5px solid ${p.selected ? alpha(GREEN, 0.4) : p.disq ? alpha(RED, 0.2) : BORDER}`,
-                        bgcolor: p.selected ? alpha(GREEN, 0.03) : p.disq ? alpha(RED, 0.02) : 'white',
-                        borderStyle: p.disq ? 'dashed' : 'solid',
-                      }}>
-                        <Box sx={{ flex: 1 }}>
-                          <Typography sx={{ fontSize: '0.7rem', fontWeight: 700 }}>{p.code} — {p.name}</Typography>
-                          <Typography sx={{ fontSize: '0.6rem', color: MUTED }}>{p.dist} · ATP: {p.atp} · Freight: ${p.freightPerUnit}/EA · {p.arrivalDate}</Typography>
-                          {p.disq && <Typography sx={{ fontSize: '0.6rem', color: RED, fontWeight: 600, mt: 0.3 }}>{p.disq}</Typography>}
-                        </Box>
-                        {p.onTime !== undefined && !p.disq && (
-                          <Chip label={p.onTime ? 'On Time' : `Late ${p.lateDays}d`} size="small"
-                            sx={{ fontSize: '0.55rem', fontWeight: 600, height: 18, bgcolor: p.onTime ? alpha(GREEN, 0.1) : alpha(RED, 0.1), color: p.onTime ? GREEN : RED }} />
-                        )}
-                        <Chip label={p.disq ? 'DISQ' : p.score} size="small"
-                          sx={{ fontSize: '0.6rem', fontWeight: 700, height: 20, minWidth: 32,
-                            bgcolor: p.disq ? alpha(RED, 0.1) : alpha(confColor(p.score), 0.12), color: p.disq ? RED : confColor(p.score) }} />
-                        {p.selected && <CheckCircleIcon sx={{ fontSize: 16, color: GREEN }} />}
+                    {/* Show original AI rec when user has overridden */}
+                    {isUserOverride && (
+                      <Box sx={{ mt: 1.5, pt: 1.5, borderTop: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <Typography sx={{ fontSize: '0.55rem', opacity: 0.5, textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em' }}>AI Original:</Typography>
+                        <Typography sx={{ fontSize: '0.6rem', opacity: 0.6 }}>Score {o.decision.score} · {o.decision.rec} · {o.decision.plant}</Typography>
+                        <Button size="small" onClick={() => setPlantSelections({})}
+                          sx={{ fontSize: '0.5rem', fontWeight: 700, color: '#fbbf24', textTransform: 'none', minWidth: 0, ml: 'auto', '&:hover': { bgcolor: 'rgba(255,255,255,0.08)' } }}>
+                          Reset to AI
+                        </Button>
                       </Box>
-                    )) : (
-                      <Typography sx={{ fontSize: '0.65rem', color: MUTED, fontStyle: 'italic' }}>No plant options — material unresolved</Typography>
                     )}
+                  </Paper>
+
+                  {/* IBP Intelligence */}
+                  <Paper variant="outlined" sx={{ p: 1.5, mb: 2, borderRadius: 1, bgcolor: alpha(PURPLE, 0.04), borderColor: alpha(PURPLE, 0.15) }}>
+                    <Typography sx={{ fontSize: '0.6rem', fontWeight: 700, textTransform: 'uppercase', color: PURPLE, mb: 0.5 }}>IBP Intelligence</Typography>
+                    <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary', lineHeight: 1.5 }}>{o.decision.ibpSignal}</Typography>
+                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 600, color: PURPLE, mt: 0.5 }}>{o.decision.ibpLead}</Typography>
+                  </Paper>
+
+                  {/* ── Plant Selection ── */}
+                  <Box sx={{ p: 1.2, mb: 1.5, borderRadius: 1, bgcolor: alpha(NAVY, 0.03), border: `1px solid ${alpha(NAVY, 0.1)}` }}>
+                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: NAVY, mb: 0.3 }}>Fulfillment — Plant Selection</Typography>
+                    <Typography sx={{ fontSize: '0.6rem', color: MUTED, lineHeight: 1.4 }}>
+                      Ordly AI recommends the optimal plant per line (marked <span style={{ color: NAVY, fontWeight: 700 }}>AI REC</span>). You can override by clicking an alternate plant — scores and recommendation will update automatically.
+                    </Typography>
                   </Box>
-                ))}
-              </Box>
+                  {o.items.map((item, idx) => {
+                    const key = `${o.id}-${idx}`;
+                    const currentSelection = plantSelections[key];
+                    return (
+                      <Box key={idx} sx={{ mb: 2 }}>
+                        <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: NAVY, mb: 1 }}>Line {item.line}: {item.custSku}</Typography>
+                        {item.plantOptions ? item.plantOptions.map((p, pi) => {
+                          const isAiRec = p.selected; // original AI recommendation
+                          const isSelected = currentSelection ? currentSelection === p.code : p.selected;
+                          const isUserPick = currentSelection && currentSelection === p.code && !p.selected; // user chose differently from AI
+                          const isClickable = !p.disq;
+                          return (
+                            <Box key={pi}
+                              onClick={() => {
+                                if (!isClickable) return;
+                                setPlantSelections(prev => ({ ...prev, [key]: p.code }));
+                              }}
+                              sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1, mb: 0.5, borderRadius: 1,
+                                cursor: isClickable ? 'pointer' : 'not-allowed',
+                                border: `1.5px solid ${isSelected ? alpha(GREEN, 0.5) : p.disq ? alpha(RED, 0.2) : BORDER}`,
+                                bgcolor: isSelected ? alpha(GREEN, 0.04) : p.disq ? alpha(RED, 0.02) : 'white',
+                                borderStyle: p.disq ? 'dashed' : 'solid',
+                                transition: 'all 0.2s',
+                                '&:hover': isClickable ? { borderColor: alpha(GREEN, 0.6), bgcolor: alpha(GREEN, 0.06), transform: 'translateX(2px)' } : {},
+                              }}>
+                              <Box sx={{ flex: 1 }}>
+                                <Stack direction="row" spacing={0.5} alignItems="center">
+                                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 700 }}>{p.code} — {p.name}</Typography>
+                                  {isAiRec && (
+                                    <Chip label="AI REC" size="small"
+                                      sx={{ fontSize: '0.4rem', fontWeight: 800, height: 14, bgcolor: alpha(NAVY, 0.12), color: NAVY, letterSpacing: '0.05em' }} />
+                                  )}
+                                  {isUserPick && (
+                                    <Chip label="YOUR PICK" size="small"
+                                      sx={{ fontSize: '0.4rem', fontWeight: 800, height: 14, bgcolor: alpha(AMBER, 0.15), color: AMBER, letterSpacing: '0.05em' }} />
+                                  )}
+                                </Stack>
+                                <Typography sx={{ fontSize: '0.6rem', color: MUTED }}>{p.dist} · ATP: {p.atp} · Freight: ${p.freightPerUnit}/EA · {p.arrivalDate}</Typography>
+                                {p.disq && <Typography sx={{ fontSize: '0.6rem', color: RED, fontWeight: 600, mt: 0.3 }}>{p.disq}</Typography>}
+                              </Box>
+                              {p.onTime !== undefined && !p.disq && (
+                                <Chip label={p.onTime ? 'On Time' : `Late ${p.lateDays}d`} size="small"
+                                  sx={{ fontSize: '0.55rem', fontWeight: 600, height: 18, bgcolor: p.onTime ? alpha(GREEN, 0.1) : alpha(RED, 0.1), color: p.onTime ? GREEN : RED }} />
+                              )}
+                              <Chip label={p.disq ? 'DISQ' : p.score} size="small"
+                                sx={{ fontSize: '0.6rem', fontWeight: 700, height: 20, minWidth: 32,
+                                  bgcolor: p.disq ? alpha(RED, 0.1) : alpha(confColor(p.score), 0.12), color: p.disq ? RED : confColor(p.score) }} />
+                              {isSelected && <CheckCircleIcon sx={{ fontSize: 16, color: GREEN }} />}
+                            </Box>
+                          );
+                        }) : (
+                          <Typography sx={{ fontSize: '0.65rem', color: MUTED, fontStyle: 'italic' }}>No plant options — material unresolved</Typography>
+                        )}
+                      </Box>
+                    );
+                  })}
+
+                  {/* Score Components */}
+                  <Typography sx={sectionTitle}>Score Components {isUserOverride ? '(recalculated)' : ''}</Typography>
+                  <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, mb: 2 }}>
+                    {Object.entries(effScores).map(([label, val]) => (
+                      <Box key={label} sx={{ p: 1, borderRadius: 1, border: `1px solid ${BORDER}`, bgcolor: 'white' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                          <Typography sx={{ fontSize: '0.65rem', fontWeight: 600, color: 'text.secondary' }}>{label}</Typography>
+                          <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: confColor(val) }}>{val}</Typography>
+                        </Box>
+                        <LinearProgress variant="determinate" value={val} sx={{ height: 4, borderRadius: 2,
+                          bgcolor: alpha(confColor(val), 0.1), '& .MuiLinearProgress-bar': { bgcolor: confColor(val), borderRadius: 2, transition: 'transform 0.5s ease' } }} />
+                      </Box>
+                    ))}
+                  </Box>
+                </Box>
+                );
+              })()
             )}
           </Box>
         </Box>
 
         {/* ════════ RIGHT: Sales Order Preview ════════ */}
         <Box sx={{ borderLeft: `1px solid ${BORDER}`, bgcolor: 'white', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <Box sx={{ p: 1.5, borderBottom: `1px solid ${BORDER}` }}>
-            <Typography sx={{ fontSize: '0.85rem', fontWeight: 700 }}>Sales Order Preview</Typography>
-            <Typography sx={{ fontSize: '0.6rem', color: MUTED }}>BAPI_SALESORDER_CREATEFROMDAT2</Typography>
+          {rightCollapsed ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 1 }}>
+              <MuiTooltip title="Expand SO preview" placement="left">
+                <IconButton size="small" onClick={() => setRightCollapsed(false)} sx={{ color: NAVY, '&:hover': { bgcolor: alpha(NAVY, 0.08) } }}>
+                  <ChevronLeftIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </MuiTooltip>
+              <Typography sx={{ fontSize: '0.5rem', fontWeight: 700, color: MUTED, writingMode: 'vertical-rl', mt: 1, letterSpacing: '0.1em', textTransform: 'uppercase' }}>SO Preview</Typography>
+            </Box>
+          ) : (
+          <>
+          <Box sx={{ p: 1.5, borderBottom: `1px solid ${BORDER}`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <Box>
+              <Typography sx={{ fontSize: '0.85rem', fontWeight: 700 }}>Sales Order Preview</Typography>
+              <Typography sx={{ fontSize: '0.6rem', color: MUTED }}>BAPI_SALESORDER_CREATEFROMDAT2</Typography>
+            </Box>
+            <MuiTooltip title="Collapse preview">
+              <IconButton size="small" onClick={() => setRightCollapsed(true)} sx={{ color: MUTED, p: 0.25, '&:hover': { color: NAVY } }}>
+                <ChevronRightIcon sx={{ fontSize: 16 }} />
+              </IconButton>
+            </MuiTooltip>
           </Box>
 
           <Box sx={{ flex: 1, overflowY: 'auto', p: 1.5 }}>
@@ -1022,32 +1178,131 @@ const LoparexWorkbench = ({ onBack, darkMode = false }) => {
               </Box>
             ) : (
               <Box>
+                {Object.keys(soEdits).length > 0 && (
+                  <Chip label={`${Object.keys(soEdits).length} field(s) edited`} size="small" icon={<EditIcon sx={{ fontSize: 12 }} />}
+                    sx={{ mb: 1, fontSize: '0.55rem', fontWeight: 600, height: 20, bgcolor: alpha(AMBER, 0.1), color: AMBER, border: `1px solid ${alpha(AMBER, 0.3)}` }} />
+                )}
                 <Typography sx={sectionTitle}>VBAK — Order Header</Typography>
+                {(() => {
+                  // Build friendly sub-labels from order data
+                  const shipToAddr = o.hdr.find(h => h.lbl === 'Ship-To Address')?.val || '';
+                  const friendlyMap = {
+                    'Order Type': 'Standard Order',
+                    'Sales Org': 'Loparex LLC',
+                    'Dist. Channel': 'Direct Sales',
+                    'Division': 'Cross-Division',
+                    'Sold-To': o.customer,
+                    'Ship-To': shipToAddr.length > 40 ? shipToAddr.substring(0, 40) + '...' : shipToAddr,
+                    'Customer PO': o.hdr.find(h => h.lbl === 'PO Date')?.val || '',
+                    'Req. Date': o.hdr.find(h => h.lbl === 'Delivery Instructions')?.val?.substring(0, 45) || '',
+                  };
+                  return (
                 <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0.5, mb: 2 }}>
-                  {o.soHeader.map((f, i) => (
-                    <Box key={i} sx={{ py: 0.5 }}>
-                      <Typography sx={{ fontSize: '0.5rem', color: MUTED, textTransform: 'uppercase' }}>{f.lbl}</Typography>
-                      <Typography sx={{ fontSize: '0.7rem', fontWeight: 600 }}>{f.val}</Typography>
-                      <Typography sx={{ fontSize: '0.45rem', color: MUTED }}>{f.sap}</Typography>
-                    </Box>
-                  ))}
+                  {o.soHeader.map((f, i) => {
+                    const editKey = `hdr-${i}`;
+                    const isEditing = editingField === editKey;
+                    const editedVal = soEdits[editKey];
+                    const displayVal = editedVal !== undefined ? editedVal : f.val;
+                    const wasEdited = editedVal !== undefined;
+                    const friendlyLabel = friendlyMap[f.lbl] || '';
+                    return (
+                      <Box key={i} sx={{ py: 0.5, px: 0.5, borderRadius: 0.5, cursor: 'pointer', transition: 'all 0.15s',
+                        bgcolor: wasEdited ? alpha(AMBER, 0.04) : 'transparent',
+                        '&:hover': { bgcolor: alpha(NAVY, 0.04) },
+                      }}
+                        onClick={() => { if (!isEditing) setEditingField(editKey); }}>
+                        <Typography sx={{ fontSize: '0.5rem', color: MUTED, textTransform: 'uppercase' }}>{f.lbl}</Typography>
+                        {isEditing ? (
+                          <TextField size="small" autoFocus fullWidth defaultValue={displayVal}
+                            onBlur={(e) => {
+                              const newVal = e.target.value.trim();
+                              if (newVal && newVal !== f.val) {
+                                setSoEdits(prev => ({ ...prev, [editKey]: newVal }));
+                                showToast(`${f.lbl} updated to "${newVal}"`, 'info');
+                              } else if (newVal === f.val) {
+                                setSoEdits(prev => { const n = { ...prev }; delete n[editKey]; return n; });
+                              }
+                              setEditingField(null);
+                            }}
+                            onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); if (e.key === 'Escape') setEditingField(null); }}
+                            sx={{ '& .MuiOutlinedInput-root': { fontSize: '0.7rem', fontWeight: 600, height: 24 } }}
+                          />
+                        ) : (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: wasEdited ? AMBER : 'text.primary' }}>{displayVal}</Typography>
+                            {wasEdited && <EditIcon sx={{ fontSize: 10, color: AMBER }} />}
+                          </Box>
+                        )}
+                        {friendlyLabel && <Typography sx={{ fontSize: '0.45rem', color: 'text.secondary', lineHeight: 1.3, mt: 0.2 }}>{friendlyLabel}</Typography>}
+                      </Box>
+                    );
+                  })}
                 </Box>
+                  );
+                })()}
 
                 <Typography sx={sectionTitle}>VBAP / VBEP — Line Items</Typography>
-                {o.soItems.map((item, i) => (
-                  <Box key={i} sx={{ pl: 1.5, py: 1, mb: 0.5, bgcolor: alpha(NAVY, 0.02), borderRadius: 1 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: NAVY }}>Line {item.line}: {item.mat}</Typography>
-                      <Typography sx={{ fontSize: '0.65rem', fontWeight: 600 }}>{fmt(item.qty * item.price)}</Typography>
+                {o.soItems.map((item, i) => {
+                  const qtyKey = `item-${i}-qty`;
+                  const priceKey = `item-${i}-price`;
+                  const dateKey = `item-${i}-date`;
+                  const plantKey = `item-${i}-plant`;
+                  const effQty = soEdits[qtyKey] !== undefined ? parseFloat(soEdits[qtyKey]) : item.qty;
+                  const effPrice = soEdits[priceKey] !== undefined ? parseFloat(soEdits[priceKey]) : item.price;
+                  const effDate = soEdits[dateKey] !== undefined ? soEdits[dateKey] : item.date;
+                  const effPlant = soEdits[plantKey] !== undefined ? soEdits[plantKey] : item.plant;
+
+                  const renderEditableField = (key, label, value, width = 60) => {
+                    const isEditing = editingField === key;
+                    const wasEdited = soEdits[key] !== undefined;
+                    return isEditing ? (
+                      <TextField size="small" autoFocus defaultValue={value}
+                        onBlur={(e) => {
+                          const v = e.target.value.trim();
+                          if (v && v !== String(value)) { setSoEdits(prev => ({ ...prev, [key]: v })); showToast(`${label} updated`, 'info'); }
+                          setEditingField(null);
+                        }}
+                        onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); if (e.key === 'Escape') setEditingField(null); }}
+                        sx={{ width, '& .MuiOutlinedInput-root': { fontSize: '0.6rem', fontWeight: 600, height: 20 } }}
+                      />
+                    ) : (
+                      <Typography component="span" onClick={(e) => { e.stopPropagation(); setEditingField(key); }}
+                        sx={{ fontSize: '0.6rem', color: wasEdited ? AMBER : MUTED, cursor: 'pointer', borderBottom: `1px dashed ${wasEdited ? AMBER : 'transparent'}`,
+                          '&:hover': { borderBottomColor: NAVY, color: NAVY } }}>
+                        {value}{wasEdited && <EditIcon sx={{ fontSize: 8, ml: 0.3, verticalAlign: 'middle', color: AMBER }} />}
+                      </Typography>
+                    );
+                  };
+
+                  return (
+                    <Box key={i} sx={{ pl: 1.5, py: 1, mb: 0.5, bgcolor: alpha(NAVY, 0.02), borderRadius: 1, borderLeft: `3px solid ${alpha(NAVY, 0.3)}` }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: NAVY }}>Line {item.line}: {item.mat}</Typography>
+                        <Typography sx={{ fontSize: '0.65rem', fontWeight: 600 }}>{fmt(effQty * effPrice)}</Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap', mt: 0.3 }}>
+                        {renderEditableField(plantKey, 'Plant', effPlant, 50)}
+                        <Typography sx={{ fontSize: '0.6rem', color: MUTED }}>·</Typography>
+                        {renderEditableField(dateKey, 'Date', effDate, 80)}
+                        <Typography sx={{ fontSize: '0.6rem', color: MUTED }}>·</Typography>
+                        {renderEditableField(qtyKey, 'Qty', effQty, 60)}
+                        <Typography sx={{ fontSize: '0.6rem', color: MUTED }}>EA ·</Typography>
+                        <Typography sx={{ fontSize: '0.6rem', color: MUTED }}>$</Typography>
+                        {renderEditableField(priceKey, 'Price', effPrice, 60)}
+                        <Typography sx={{ fontSize: '0.6rem', color: MUTED }}>/EA</Typography>
+                      </Box>
                     </Box>
-                    <Typography sx={{ fontSize: '0.6rem', color: MUTED }}>{item.plant} · {item.date} · {item.qty} EA · ${item.price}/EA</Typography>
-                  </Box>
-                ))}
+                  );
+                })}
 
                 <Box sx={{ mt: 2, p: 1.2, bgcolor: alpha(NAVY, 0.04), borderRadius: 1, border: `1px solid ${alpha(NAVY, 0.1)}` }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                     <Typography sx={{ fontSize: '0.7rem', fontWeight: 700 }}>Order Total</Typography>
-                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: NAVY }}>{fmt(o.soItems.reduce((s, i) => s + i.qty * i.price, 0))}</Typography>
+                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: NAVY }}>{fmt(o.soItems.reduce((s, item, i) => {
+                      const q = soEdits[`item-${i}-qty`] !== undefined ? parseFloat(soEdits[`item-${i}-qty`]) : item.qty;
+                      const p = soEdits[`item-${i}-price`] !== undefined ? parseFloat(soEdits[`item-${i}-price`]) : item.price;
+                      return s + q * p;
+                    }, 0))}</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                     <Typography sx={{ fontSize: '0.65rem', color: MUTED }}>Gross Margin</Typography>
@@ -1081,7 +1336,7 @@ const LoparexWorkbench = ({ onBack, darkMode = false }) => {
                   sx={{ textTransform: 'none', fontSize: '0.7rem', borderColor: BORDER, color: 'text.secondary' }}>Save Draft</Button>
                 <Button fullWidth size="small" startIcon={<ReportProblemIcon sx={{ fontSize: 14 }} />}
                   onClick={() => showToast('Routed to Exception Queue. CSR team notified.', 'warning')}
-                  sx={{ textTransform: 'none', fontSize: '0.7rem', color: RED }}>Route to Exception</Button>
+                  sx={{ textTransform: 'none', fontSize: '0.7rem', color: RED, border: `1px solid ${alpha(RED, 0.3)}` }}>Route to Exception</Button>
               </Stack>
             </Box>
           )}
@@ -1091,6 +1346,8 @@ const LoparexWorkbench = ({ onBack, darkMode = false }) => {
                 onClick={() => showToast('Routed to Exception Queue. CSR team notified.', 'warning')}
                 sx={{ textTransform: 'none', fontSize: '0.75rem', borderColor: alpha(RED, 0.3), color: RED }}>Route to Exception Queue</Button>
             </Box>
+          )}
+          </>
           )}
         </Box>
       </Box>

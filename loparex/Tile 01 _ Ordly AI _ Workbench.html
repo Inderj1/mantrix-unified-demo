@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ordly AI — Order Intake Workbench v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F1F4F8;--surface:#FFFFFF;--surface-2:#F8F9FB;--surface-3:#EEF2F7;
+  --border:#E2E7EF;--border-strong:#C8D4E0;
+  --navy:#0C1F3F;--navy-2:#1A3560;
+  --blue:#0050C8;--blue-hover:#003EA0;--blue-light:#EBF2FF;--blue-mid:#C5DAFF;
+  --text-primary:#0C1F3F;--text-secondary:#3D5066;--text-muted:#7A90A8;
+  --green:#0C7A52;--green-light:#E3F7EE;--green-mid:#A7F0CC;
+  --amber:#A85C00;--amber-light:#FEF5E4;
+  --red:#C0352A;--red-light:#FEE8E6;
+  --purple:#6436C8;--purple-light:#F0EBFF;
+  --r:8px;--r-sm:5px;--r-lg:12px;
+  --sh-sm:0 1px 3px rgba(12,31,63,.07);
+  --sh:0 2px 8px rgba(12,31,63,.10);
+  --sh-md:0 4px 16px rgba(12,31,63,.12);
+  --sh-lg:0 8px 32px rgba(12,31,63,.18);
+}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text-primary);min-height:100vh;font-size:13px;line-height:1.4}
+
+/* NAV */
+.nav{height:54px;background:var(--navy);display:flex;align-items:center;padding:0 18px;gap:14px;position:sticky;top:0;z-index:200;border-bottom:1px solid rgba(255,255,255,.07)}
+.nav-logo{display:flex;align-items:center;gap:9px;color:white;font-weight:800;font-size:16px;letter-spacing:-.4px;text-decoration:none}
+.nav-logo-icon{width:30px;height:30px;background:var(--blue);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.nav-div{width:1px;height:22px;background:rgba(255,255,255,.15)}
+.nav-module{color:rgba(255,255,255,.55);font-size:12px;font-weight:500;letter-spacing:.3px}
+.nav-spacer{flex:1}
+.nav-live{display:flex;align-items:center;gap:6px;background:rgba(0,210,100,.12);border:1px solid rgba(0,210,100,.3);color:#00D264;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.6px}
+.nav-live::before{content:'';width:6px;height:6px;background:#00D264;border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.nav-link{color:rgba(255,255,255,.65);text-decoration:none;font-size:12px;font-weight:500;display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:6px;transition:all .18s;border:1px solid rgba(255,255,255,.12)}
+.nav-link:hover{background:rgba(255,255,255,.1);color:white}
+.nav-avatar{width:30px;height:30px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:700}
+
+/* TOAST */
+.toast-container{position:fixed;top:66px;right:16px;z-index:999;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.toast{background:var(--navy);color:white;padding:9px 14px;border-radius:var(--r);font-size:12px;font-weight:500;box-shadow:var(--sh-lg);display:flex;align-items:center;gap:8px;transform:translateX(120%);transition:transform .3s cubic-bezier(.34,1.56,.64,1);pointer-events:auto;max-width:280px}
+.toast.show{transform:translateX(0)}
+.toast-icon{font-size:14px;flex-shrink:0}
+.toast-green{border-left:3px solid var(--green)}
+.toast-amber{border-left:3px solid #F6AD55}
+.toast-blue{border-left:3px solid var(--blue)}
+.toast-red{border-left:3px solid var(--red)}
+
+/* LAYOUT */
+.main{display:grid;grid-template-columns:272px 1fr 312px;height:calc(100vh - 54px);overflow:hidden}
+
+/* QUEUE */
+.queue{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.queue-header{padding:14px;border-bottom:1px solid var(--border)}
+.section-eyebrow{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;color:var(--text-muted);margin-bottom:10px}
+.queue-search{position:relative}
+.queue-search input{width:100%;height:33px;border:1px solid var(--border);border-radius:var(--r-sm);padding:0 10px 0 28px;font-family:'Outfit',sans-serif;font-size:12px;background:var(--surface-2);color:var(--text-primary);outline:none;transition:border-color .18s}
+.queue-search input:focus{border-color:var(--blue);background:white}
+.queue-search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:14px;pointer-events:none}
+.queue-filters{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+.filter-btn{font-family:'Outfit',sans-serif;font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);cursor:pointer;text-transform:uppercase;letter-spacing:.4px;transition:all .15s}
+.filter-btn.active{background:var(--navy);border-color:var(--navy);color:white}
+.queue-list{flex:1;overflow-y:auto;padding:8px}
+.order-item{padding:11px 12px 11px 18px;border-radius:var(--r);margin-bottom:3px;cursor:pointer;transition:all .15s;border:1.5px solid transparent;position:relative}
+.order-item:hover{background:var(--surface-2)}
+.order-item.active{background:var(--blue-light);border-color:var(--blue)}
+.order-item-row1{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;gap:6px}
+.order-customer{font-size:12px;font-weight:600;color:var(--text-primary);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.order-item.active .order-customer{color:var(--blue)}
+.badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+.badge-new{background:var(--blue-light);color:var(--blue)}
+.badge-validating{background:var(--amber-light);color:var(--amber)}
+.badge-ready{background:var(--green-light);color:var(--green)}
+.badge-exception{background:var(--red-light);color:var(--red)}
+.badge-reviewing{background:var(--purple-light);color:var(--purple)}
+.order-po{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);margin-bottom:5px}
+.order-item-row2{display:flex;align-items:center;justify-content:space-between}
+.order-amount{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;color:var(--text-secondary)}
+.order-channel{font-size:10px;color:var(--text-muted);display:flex;align-items:center;gap:3px}
+.prio-dot{width:6px;height:6px;border-radius:50%;position:absolute;left:7px;top:50%;transform:translateY(-50%)}
+.prio-high{background:#E53E3E}
+.prio-medium{background:#ED8936}
+.prio-strategic{background:var(--purple)}
+.prio-low{background:var(--border-strong)}
+.queue-footer{padding:9px 14px;border-top:1px solid var(--border);font-size:10px;color:var(--text-muted);display:flex;justify-content:space-between}
+
+/* CENTER */
+.center{display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.order-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:14px;flex-shrink:0}
+.order-bar-name{font-size:16px;font-weight:700}
+.order-bar-po{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-muted);background:var(--surface-2);border:1px solid var(--border);padding:3px 8px;border-radius:4px}
+.order-bar-amt{font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;color:var(--navy)}
+.order-bar-meta{display:flex;align-items:center;gap:10px;margin-left:auto;font-size:11px;color:var(--text-muted);flex-wrap:wrap}
+.override-counter{display:flex;align-items:center;gap:5px;background:var(--amber-light);border:1px solid #F6AD55;color:var(--amber);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;cursor:default}
+.override-counter.hidden{display:none}
+
+/* TABS */
+.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;flex-shrink:0}
+.tab-btn{font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;padding:12px 15px;border:none;background:none;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .18s;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.tab-btn:hover{color:var(--text-primary)}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:700}
+.tab-ind{font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ti-ok{background:var(--green-light);color:var(--green)}
+.ti-warn{background:var(--amber-light);color:var(--amber)}
+.ti-blue{background:var(--blue-light);color:var(--blue)}
+.ti-red{background:var(--red-light);color:var(--red)}
+.tab-content{flex:1;overflow-y:auto;padding:16px 20px}
+
+/* SECTION HEADERS */
+.sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+
+/* ═══════════════════════════════════
+   OCR FIELD CARDS (Header fields)
+══════════════════════════════════════ */
+.ext-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px}
+.ext-field{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:10px 12px;transition:all .2s;cursor:pointer;position:relative}
+.ext-field:hover{border-color:var(--blue-mid);box-shadow:var(--sh-sm)}
+.ext-field.low-conf{border-color:var(--red);background:#fff8f8}
+.ext-field.overridden{border-color:#6436C8;background:var(--purple-light)}
+.ext-field.accepted{border-color:var(--green);background:var(--green-light)}
+.ext-field-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.ext-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);line-height:1}
+.ocr-pill{font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;padding:2px 6px;border-radius:10px;white-space:nowrap;display:flex;align-items:center;gap:3px}
+.ocr-high{background:var(--green-light);color:var(--green)}
+.ocr-mid{background:var(--amber-light);color:var(--amber)}
+.ocr-low{background:var(--red-light);color:var(--red)}
+.ocr-zero{background:#F0F0F0;color:var(--text-muted)}
+.ext-val{font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:7px;line-height:1.3;min-height:18px;cursor:text;border-radius:3px;padding:1px 2px;transition:background .15s}
+.ext-val:hover{background:rgba(0,80,200,.06)}
+.ext-field.low-conf .ext-val{color:var(--red)}
+.ext-field.overridden .ext-val{color:var(--purple)}
+.ext-field.accepted .ext-val{color:var(--green)}
+.ext-field-input{width:100%;border:1px solid var(--blue);border-radius:4px;padding:3px 6px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:var(--text-primary);background:white;outline:none;box-shadow:0 0 0 3px rgba(0,80,200,.15);margin-bottom:7px}
+.conf-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:4px}
+.conf-fill{height:100%;border-radius:2px;transition:width .6s ease;width:0}
+.cf-high{background:linear-gradient(90deg,#0C7A52,#22C77A)}
+.cf-mid{background:linear-gradient(90deg,#A85C00,#F6AD55)}
+.cf-low{background:linear-gradient(90deg,#C0352A,#FC8181)}
+.cf-zero{background:var(--border-strong)}
+.ext-footer{display:flex;align-items:center;justify-content:space-between}
+.sap-tag{font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--text-muted);background:var(--surface-2);border:1px solid var(--border);padding:1px 5px;border-radius:3px}
+.field-action-row{display:flex;gap:5px;margin-top:6px}
+.field-btn-accept{font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;border:1px solid var(--green);color:var(--green);background:var(--green-light);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .12s}
+.field-btn-accept:hover{background:var(--green);color:white}
+.field-btn-edit{font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;border:1px solid var(--border);color:var(--text-muted);background:var(--surface);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .12s}
+.field-btn-edit:hover{border-color:var(--blue);color:var(--blue)}
+.override-tag{font-size:8px;font-weight:700;color:var(--purple);background:rgba(100,54,200,.1);border:1px solid rgba(100,54,200,.2);padding:1px 5px;border-radius:3px;white-space:nowrap}
+.accepted-tag{font-size:8px;font-weight:700;color:var(--green);background:var(--green-light);border:1px solid var(--green-mid);padding:1px 5px;border-radius:3px;white-space:nowrap}
+
+/* ═══════════════════════════════════
+   LINE ITEM ACCORDION CARDS
+══════════════════════════════════════ */
+.items-section{margin-bottom:14px}
+.item-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-lg);margin-bottom:8px;overflow:hidden;transition:box-shadow .2s}
+.item-card:hover{box-shadow:var(--sh)}
+.item-card.expanded{box-shadow:var(--sh-md)}
+.item-card-head{padding:11px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .15s;user-select:none}
+.item-card-head:hover{background:var(--surface-2)}
+.item-line-badge{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;background:var(--surface-3);border:1px solid var(--border);color:var(--text-muted);padding:2px 7px;border-radius:4px;flex-shrink:0;white-space:nowrap}
+.item-sku-wrap{flex:1;min-width:0}
+.item-cust-sku{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--blue);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-sap-mat{font-size:10px;color:var(--text-muted);margin-top:1px}
+.item-head-stats{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.item-head-qty{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--text-primary)}
+.item-head-price{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-secondary)}
+.item-head-total{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--navy)}
+.item-avg-conf{display:flex;align-items:center;gap:5px}
+.item-avg-ring{width:26px;height:26px;position:relative;flex-shrink:0}
+.item-avg-ring svg{transform:rotate(-90deg)}
+.item-avg-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:700}
+.item-chevron{color:var(--text-muted);font-size:12px;transition:transform .25s;flex-shrink:0}
+.item-card.expanded .item-chevron{transform:rotate(180deg)}
+.item-card-body{display:none;padding:0 14px 14px;border-top:1px solid var(--border);background:var(--surface-2)}
+.item-card.expanded .item-card-body{display:block}
+.item-fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:12px;margin-bottom:10px}
+.item-field{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:9px 11px;transition:all .2s;cursor:pointer}
+.item-field:hover{border-color:var(--blue-mid)}
+.item-field.low-conf{border-color:var(--red);background:#fff8f8}
+.item-field.overridden{border-color:var(--purple);background:var(--purple-light)}
+.item-field.accepted{border-color:var(--green);background:var(--green-light)}
+.item-field-lbl-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.item-field-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted)}
+.item-field-val{font-size:12px;font-weight:600;color:var(--text-primary);min-height:16px;margin-bottom:6px;border-radius:3px;padding:1px 2px;transition:background .15s}
+.item-field-val:hover{background:rgba(0,80,200,.06)}
+.item-field-input{width:100%;border:1px solid var(--blue);border-radius:4px;padding:2px 5px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:var(--text-primary);background:white;outline:none;box-shadow:0 0 0 3px rgba(0,80,200,.15);margin-bottom:6px}
+.item-field.low-conf .item-field-val{color:var(--red)}
+.item-insight{font-size:11px;color:var(--text-secondary);background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:var(--r-sm);padding:8px 10px;line-height:1.5;margin-top:4px}
+.item-insight strong{color:var(--blue);font-weight:700}
+
+/* VALIDATION */
+.val-list{display:flex;flex-direction:column;gap:5px}
+.val-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px;display:flex;align-items:center;gap:11px;transition:box-shadow .15s}
+.val-row:hover{box-shadow:var(--sh-sm)}
+.val-ic{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.vi-ok{background:var(--green-light);color:var(--green)}
+.vi-warn{background:var(--amber-light);color:var(--amber)}
+.vi-err{background:var(--red-light);color:var(--red)}
+.val-body{flex:1}
+.val-lbl{font-size:11px;font-weight:600;margin-bottom:2px}
+.val-msg{font-size:10px;color:var(--text-secondary)}
+.val-src{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text-muted);background:var(--surface-2);padding:2px 6px;border-radius:3px;white-space:nowrap}
+
+/* DECISION */
+.dec-hero{background:linear-gradient(135deg,var(--navy) 0%,#162E5C 100%);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.dec-top{display:flex;align-items:center;gap:18px;margin-bottom:12px}
+.dec-ring{width:72px;height:72px;position:relative;flex-shrink:0}
+.dec-ring svg{transform:rotate(-90deg)}
+.dec-ring-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white}
+.dec-ring-score{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:700;line-height:1}
+.dec-ring-lbl{font-size:8px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.4px}
+.dec-text h3{font-size:14px;font-weight:700;color:white;margin-bottom:4px}
+.dec-text p{font-size:11px;color:rgba(255,255,255,.65);line-height:1.4}
+.dec-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.dec-mini{background:rgba(255,255,255,.1);border-radius:6px;padding:6px 10px}
+.dec-mini-lbl{font-size:8px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.dec-mini-val{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:white}
+.ibp-card{background:linear-gradient(135deg,#F5F0FF,#EDF5FF);border:1px solid #C4B5FD;border-radius:var(--r);padding:11px 13px;margin-bottom:12px;display:flex;gap:10px}
+.ibp-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.ibp-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--purple);margin-bottom:3px}
+.ibp-text{font-size:11px;color:#3D2E6E;line-height:1.5}
+.ibp-lead{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--purple);font-weight:600;margin-top:4px}
+.score-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
+.score-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px}
+.score-item-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.score-item-lbl{font-size:10px;color:var(--text-secondary);font-weight:500}
+.score-item-val{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700}
+.score-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.score-fill{height:100%;border-radius:3px;transition:width .6s ease;width:0}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px}
+.detail-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:11px 13px}
+.detail-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);margin-bottom:5px}
+.detail-val{font-size:12px;font-weight:700;color:var(--text-primary);line-height:1.3}
+.detail-sub{font-size:10px;font-weight:600;margin-top:3px}
+
+/* ALERT */
+.alert{border-radius:var(--r);padding:10px 13px;font-size:11px;display:flex;align-items:flex-start;gap:8px;margin-bottom:12px}
+.alert-warn{background:var(--amber-light);border:1px solid #F6AD55;color:var(--amber)}
+.alert-red{background:var(--red-light);border:1px solid #FC8181;color:var(--red)}
+.alert-blue{background:var(--blue-light);border:1px solid var(--blue-mid);color:var(--blue)}
+
+/* RIGHT PANEL */
+.right{background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.right-head{padding:13px 15px;border-bottom:1px solid var(--border)}
+.right-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:2px}
+.right-sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-secondary)}
+.right-body{flex:1;overflow-y:auto;padding:12px}
+.so-sec{margin-bottom:14px}
+.so-sec-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text-muted);margin-bottom:7px;display:flex;align-items:center;gap:5px}
+.so-field{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--border);gap:8px}
+.so-field:last-child{border-bottom:none}
+.so-f-lbl{font-size:10px;color:var(--text-muted);flex-shrink:0}
+.so-f-val{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;color:var(--text-primary);text-align:right}
+
+/* SO Item cards - enhanced */
+.so-item{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px 10px;margin-bottom:5px;position:relative;overflow:hidden}
+.so-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--blue)}
+.so-item-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.so-item-line{font-size:9px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.so-item-total{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--navy)}
+.so-mat{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--blue)}
+.so-item-row2{display:flex;justify-content:space-between;align-items:center;margin-top:3px}
+.so-item-details{font-size:10px;color:var(--text-muted)}
+.so-item-price{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-secondary)}
+
+.so-summary{padding-top:10px;border-top:2px solid var(--border);margin-bottom:8px}
+.so-sum-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.so-sum-lbl{font-size:11px;font-weight:500;color:var(--text-secondary)}
+.so-sum-val{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700}
+.margin-tag{background:var(--green-light);color:var(--green);font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.bapi-note{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 10px}
+.bapi-txt{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text-muted);line-height:1.7}
+.right-actions{padding:11px 12px;border-top:1px solid var(--border);background:var(--surface-2);display:flex;flex-direction:column;gap:5px}
+.btn-p{width:100%;height:38px;background:var(--blue);color:white;border:none;border-radius:var(--r);font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .18s;letter-spacing:.2px}
+.btn-p:hover:not(:disabled){background:var(--blue-hover);transform:translateY(-1px);box-shadow:var(--sh)}
+.btn-p:disabled{opacity:.7;cursor:not-allowed;transform:none}
+.btn-s{width:100%;height:31px;background:var(--surface);color:var(--text-secondary);border:1px solid var(--border);border-radius:var(--r);font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s}
+.btn-s:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-light)}
+.btn-d{width:100%;height:31px;background:var(--surface);color:var(--red);border:1px solid var(--border);border-radius:var(--r);font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s}
+.btn-d:hover{border-color:var(--red);background:var(--red-light)}
+
+/* EMPTY STATE */
+.empty-state{display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:12px;color:var(--text-muted)}
+.empty-icon{font-size:42px}
+.empty-ttl{font-size:14px;font-weight:600;color:var(--text-secondary)}
+.empty-sub{font-size:12px}
+
+/* PLANT ANALYSIS */
+.plant-cards{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.plant-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:11px 13px;transition:all .2s}
+.plant-card.selected-plant{border-color:var(--green);background:var(--green-light)}
+.plant-card.disqualified{opacity:.6;border-style:dashed}
+.plant-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.plant-id{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600}
+.plant-score-pill{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.plant-card.selected-plant .plant-score-pill{background:var(--green);color:white}
+.plant-score-pill-na{background:var(--red-light);color:var(--red)}
+.plant-attr-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:10px}
+.plant-attr{display:flex;flex-direction:column;gap:2px}
+.plant-attr-lbl{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px}
+.plant-attr-val{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:var(--text-primary)}
+.plant-disq-tag{font-size:9px;color:var(--red);font-weight:600;margin-top:5px;display:flex;align-items:center;gap:4px}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:2px}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scanLine{0%{top:-2px;opacity:.8}100%{top:102%;opacity:0}}
+.scan-anim{position:relative;overflow:hidden}
+.scan-anim::after{content:'';position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(0,80,200,.5),transparent);animation:scanLine 1.5s ease-out forwards;top:-2px}
+</style>
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<nav class="nav">
+  <a href="#" class="nav-logo"><div class="nav-logo-icon">⚡</div>Ordly AI</a>
+  <div class="nav-div"></div>
+  <span class="nav-module">Order Intake Workbench</span>
+  <div class="nav-spacer"></div>
+  <div class="nav-live">LIVE</div>
+  <a href="#" class="nav-link">📊 Performance Dashboard →</a>
+  <div class="nav-avatar">KS</div>
+</nav>
+
+<div class="main">
+  <aside class="queue">
+    <div class="queue-header">
+      <div class="section-eyebrow">Incoming Orders</div>
+      <div class="queue-search">
+        <span class="queue-search-icon">⌕</span>
+        <input type="text" placeholder="Search orders, customers..." id="searchInput" oninput="onSearch(this.value)">
+      </div>
+      <div class="queue-filters">
+        <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+        <button class="filter-btn" onclick="setFilter('new',this)">New</button>
+        <button class="filter-btn" onclick="setFilter('ready',this)">Ready</button>
+        <button class="filter-btn" onclick="setFilter('exception',this)">Exceptions</button>
+      </div>
+    </div>
+    <div class="queue-list" id="queueList"></div>
+    <div class="queue-footer">
+      <span id="queueCount">5 orders</span>
+      <span>↻ 2 min ago</span>
+    </div>
+  </aside>
+
+  <section class="center" id="center">
+    <div class="order-bar" id="orderBar">
+      <div>
+        <div class="order-bar-name" id="barName" style="color:var(--text-muted);font-weight:500;font-size:14px;">Select an order to begin</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:1px;" id="barSub"></div>
+      </div>
+      <span class="order-bar-po" id="barPO" style="display:none"></span>
+      <span class="order-bar-amt" id="barAmt"></span>
+      <div class="order-bar-meta" id="barMeta"></div>
+      <div class="override-counter hidden" id="overrideCtr">✏ <span id="overrideCount">0</span> overrides</div>
+    </div>
+    <div class="tabs" id="tabsRow" style="display:none">
+      <button class="tab-btn active" onclick="goTab(0)">📄 PO Extraction <span class="tab-ind ti-ok" id="ti0">✓</span></button>
+      <button class="tab-btn" onclick="goTab(1)">✓ SAP Validation <span class="tab-ind ti-warn" id="ti1">?</span></button>
+      <button class="tab-btn" onclick="goTab(2)">🧠 AI Decision <span class="tab-ind ti-blue" id="ti2">→</span></button>
+    </div>
+    <div class="tab-content" id="tabContent">
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <div class="empty-ttl">No order selected</div>
+        <div class="empty-sub">Choose an incoming purchase order from the queue</div>
+      </div>
+    </div>
+  </section>
+
+  <aside class="right">
+    <div class="right-head">
+      <div class="right-title">Sales Order Preview</div>
+      <div class="right-sub" id="rightSub">BAPI_SALESORDER_CREATEFROMDAT2</div>
+    </div>
+    <div class="right-body" id="rightBody">
+      <div class="empty-state">
+        <div class="empty-icon">📦</div>
+        <div class="empty-sub" style="text-align:center">VA01 preview appears<br>after order selection</div>
+      </div>
+    </div>
+    <div class="right-actions" id="rightActions" style="display:none">
+      <button class="btn-p" id="btnCreate" onclick="createSO()">⚡ Create Sales Order in SAP</button>
+      <button class="btn-s" onclick="saveDraft(event)">💾 Save Draft</button>
+      <button class="btn-d" onclick="routeExc()">⚠ Route to Exception Queue</button>
+    </div>
+  </aside>
+</div>
+
+<script>
+// ═══════════════════════════════════
+// STATE
+// ═══════════════════════════════════
+let currentOrder = null;
+let currentTab = 0;
+let overrideCount = 0;
+let filterMode = 'all';
+let searchTerm = '';
+let expandedItems = {};
+let acceptedFields = {};
+let overriddenFields = {};
+
+// ═══════════════════════════════════
+// DATA
+// ═══════════════════════════════════
+const ORDERS = [
+  {
+    id:'ORD-001', poNumber:'PO-2024-8821', customer:'Honeywell Industrial', soldTo:'CUST-10045',
+    amount:142800, channel:'Email', channelIcon:'✉', status:'new', priority:'high',
+    received:'09:15 AM', lines:3,
+    hdr:[
+      {lbl:'Sold-To Customer',val:'Honeywell Industrial LLC',conf:98,sap:'VBAK-KUNNR'},
+      {lbl:'Customer PO Number',val:'PO-2024-8821',conf:99,sap:'VBKD-BSTKD'},
+      {lbl:'PO Date',val:'March 8, 2024',conf:99,sap:'VBKD-BSTDK'},
+      {lbl:'Ship-To Address',val:'300 S Tryon St, Charlotte NC',conf:91,sap:'VBPA-WE'},
+      {lbl:'Incoterms',val:'CIP Charlotte, NC',conf:85,sap:'VBKD-INCO1'},
+      {lbl:'Delivery Instructions',val:'No substitutes. Standard packaging.',conf:96,sap:'VBKD-BSTK2'},
+    ],
+    items:[
+      {line:10,custSku:'HON-MECH-4455',sapMat:'MECH-4455',qty:'300',uom:'EA',price:'285.00',cur:'USD',reqDate:'April 15, 2024',
+       confMat:94,confQty:99,confPrice:88,confDate:97,
+       plantOptions:[
+         {plant:'PL01',city:'Chicago, IL',dist:'788 mi',atp:340,freightCost:840,freightPerUnit:1.68,arrivalDate:'Apr 12',onTime:true,lateDays:0,score:89,selected:true,disq:null},
+         {plant:'PL02',city:'Atlanta, GA',dist:'415 mi',atp:500,freightCost:2400,freightPerUnit:4.80,arrivalDate:'Apr 8',onTime:true,lateDays:0,score:71,selected:false,disq:null},
+         {plant:'PL03',city:'Detroit, MI',dist:'640 mi',atp:0,freightCost:1900,freightPerUnit:3.80,arrivalDate:'Apr 27',onTime:false,lateDays:12,score:18,selected:false,disq:null},
+       ],
+       lineGM:'31.4%',confirmDate:'April 12, 2024',
+       insight:'PL01 selected: replenishment closes the 160-unit gap by Apr 8, delivering 3 days early. Freight $1,560 cheaper than PL02 despite longer distance — contracted LTL rate advantage.'},
+      {line:20,custSku:'HON-SEAL-8821',sapMat:'SEAL-8821',qty:'200',uom:'EA',price:'149.50',cur:'USD',reqDate:'April 15, 2024',
+       confMat:91,confQty:95,confPrice:92,confDate:97,
+       plantOptions:[
+         {plant:'PL01',city:'Chicago, IL',dist:'788 mi',atp:250,freightCost:520,freightPerUnit:2.60,arrivalDate:'Apr 11',onTime:true,lateDays:0,score:84,selected:true,disq:null},
+         {plant:'PL02',city:'Atlanta, GA',dist:'415 mi',atp:200,freightCost:1800,freightPerUnit:9.00,arrivalDate:'Apr 8',onTime:true,lateDays:0,score:62,selected:false,disq:null},
+       ],
+       lineGM:'28.7%',confirmDate:'April 11, 2024',
+       insight:'PL01 covers full 200-unit requirement. Freight $1,280 cheaper than PL02. Consolidated shipment with Line 10 — single truck drop to Charlotte.'},
+      {line:30,custSku:'HON-CTRL-2244',sapMat:'CTRL-2244',qty:'50',uom:'EA',price:'548.00',cur:'USD',reqDate:'April 20, 2024',
+       confMat:87,confQty:99,confPrice:0,confDate:85,
+       plantOptions:[
+         {plant:'PL01',city:'Chicago, IL',dist:'788 mi',atp:80,freightCost:310,freightPerUnit:6.20,arrivalDate:'Apr 17',onTime:true,lateDays:0,score:76,selected:true,disq:null},
+       ],
+       lineGM:'Unknown — price not confirmed',confirmDate:'April 17, 2024',
+       insight:'⚠ Price not stated in PO — contract price $548.00 applied from ZK100245. CSR should confirm with customer before creation.'},
+    ],
+    validation:[
+      {lbl:'Customer Master',st:'ok',msg:'CUST-10045 active in KNA1. Credit class: A.',src:'KNA1/KNVV'},
+      {lbl:'Material Mapping',st:'ok',msg:'MECH-4455 / SEAL-8821 validated. CTRL-2244 pending price confirm.',src:'MARA/MVKE'},
+      {lbl:'Pricing Record',st:'warn',msg:'CTRL-2244 price not in PO — contract ZK100245 $548.00/EA applied. Δ confirm needed.',src:'PRCD_ELEMENTS'},
+      {lbl:'Credit / FSCM',st:'ok',msg:'Limit $2M. Exposure $380K. Clear.',src:'UKM_* / FSCM'},
+      {lbl:'Inventory / ATP',st:'warn',msg:'MECH-4455: 340 EA + 160 replenish by Apr 8. SEAL-8821: 250 EA available.',src:'MARD/MATDOC'},
+      {lbl:'Contracts / Agreements',st:'ok',msg:'Framework ZK100245 active through Dec 2024.',src:'VBAK/VBKD'},
+      {lbl:'Open AR / Payment Risk',st:'ok',msg:'No overdue. DSO: 28 days. Clean.',src:'BSID/ACDOCA'},
+      {lbl:'Order Blocking Reasons',st:'ok',msg:'No blocks active.',src:'VBUK'},
+    ],
+    decision:{
+      score:84, rec:'Auto-Create Sales Order', autoOk:true,
+      plant:'PL01 — Chicago, IL', plantReason:'Highest margin + nearest to ship-to for all 3 lines',
+      confirmedQty:'300 + 200 + 50 EA (3 lines)', confirmedDate:'Apr 12 / Apr 11 / Apr 17',
+      dateNote:'All 3 lines ahead of requested dates', mode:'Partial Stock + Replenishment',
+      gm:'31.4% blended', marginVsAlt:'+$4,200 vs alternate routing',
+      ibpSignal:'MECH-4455 replenishment PO confirmed. IBP receipt signal: Apr 8. SEAL-8821 and CTRL-2244 fully in stock.',
+      ibpLead:'IBP Lead Time: 18 days from PL01',
+      scores:[
+        {lbl:'Service Level',v:88},{lbl:'Margin Impact',v:82},
+        {lbl:'Customer Value',v:91},{lbl:'Lead Time Score',v:85},
+        {lbl:'Inventory Health',v:74},{lbl:'AR / Credit Risk',v:95},
+      ]
+    },
+    soHeader:[
+      {lbl:'Order Type',val:'ZOR',sap:'VBAK-AUART'},{lbl:'Sales Org',val:'1000',sap:'VBAK-VKORG'},
+      {lbl:'Dist. Channel',val:'10',sap:'VBAK-VTWEG'},{lbl:'Division',val:'00',sap:'VBAK-SPART'},
+      {lbl:'Sold-To',val:'10045',sap:'KNVP AG'},{lbl:'Ship-To',val:'10045-01',sap:'KNVP WE'},
+      {lbl:'Customer PO',val:'PO-2024-8821',sap:'VBKD-BSTKD'},{lbl:'Req. Date',val:'Multi-line',sap:'VBKD-BSTDK'},
+    ],
+    soItems:[
+      {line:10,mat:'MECH-4455',qty:300,plant:'PL01',date:'2024-04-12',price:284.50},
+      {line:20,mat:'SEAL-8821',qty:200,plant:'PL01',date:'2024-04-11',price:149.50},
+      {line:30,mat:'CTRL-2244',qty:50,plant:'PL01',date:'2024-04-17',price:548.00},
+    ]
+  },
+  {
+    id:'ORD-002', poNumber:'PO-2024-8822', customer:'Siemens Energy AG', soldTo:'CUST-20031',
+    amount:88700, channel:'EDI', channelIcon:'⇌', status:'validating', priority:'medium',
+    received:'08:42 AM', lines:2,
+    hdr:[
+      {lbl:'Sold-To Customer',val:'Siemens Energy AG',conf:99,sap:'VBAK-KUNNR'},
+      {lbl:'Customer PO Number',val:'PO-2024-8822',conf:99,sap:'VBKD-BSTKD'},
+      {lbl:'PO Date',val:'March 9, 2024',conf:99,sap:'VBKD-BSTDK'},
+      {lbl:'Ship-To Address',val:'4400 Alafaya Trail, Orlando FL 32826',conf:99,sap:'VBPA-WE'},
+      {lbl:'Incoterms',val:'DDP Orlando',conf:98,sap:'VBKD-INCO1'},
+      {lbl:'Delivery Instructions',val:'EDI 850. Auto-accept if price matched.',conf:99,sap:'VBKD-BSTK2'},
+    ],
+    items:[
+      {line:10,custSku:'SIE-ELEC-7890',sapMat:'ELEC-7890',qty:'100',uom:'EA',price:'446.00',cur:'USD',reqDate:'April 20, 2024',
+       confMat:97,confQty:99,confPrice:99,confDate:99,
+       plantOptions:[
+         {plant:'PL02',city:'Atlanta, GA',dist:'441 mi',atp:320,freightCost:960,freightPerUnit:4.80,arrivalDate:'Apr 9',onTime:true,lateDays:0,score:88,selected:true,disq:null},
+         {plant:'PL01',city:'Chicago, IL',dist:'1,144 mi',atp:280,freightCost:2050,freightPerUnit:10.25,arrivalDate:'Apr 10',onTime:true,lateDays:0,score:62,selected:false,disq:null},
+       ],
+       lineGM:'28.1%',confirmDate:'April 9, 2024',
+       insight:'PL02 selected: full ATP, nearest plant, cheapest freight. PL01 on-time but $1,090 more expensive freight and 703 miles further.'},
+      {line:20,custSku:'SIE-CTRL-4421',sapMat:'CTRL-4421',qty:'50',uom:'EA',price:'882.00',cur:'USD',reqDate:'April 20, 2024',
+       confMat:93,confQty:99,confPrice:76,confDate:99,
+       plantOptions:[
+         {plant:'PL02',city:'Atlanta, GA',dist:'441 mi',atp:75,freightCost:620,freightPerUnit:12.40,arrivalDate:'Apr 11',onTime:true,lateDays:0,score:82,selected:true,disq:null},
+       ],
+       lineGM:'24.3%',confirmDate:'April 11, 2024',
+       insight:'⚠ Price confidence 76% — OCR read $882 but contract shows $874/EA. Δ $8/EA ($400 total). CSR approval required before release.'},
+    ],
+    validation:[
+      {lbl:'Customer Master',st:'ok',msg:'CUST-20031 active. Credit class: B.',src:'KNA1/KNVV'},
+      {lbl:'Material Mapping',st:'ok',msg:'ELEC-7890 and CTRL-4421 validated and active.',src:'MARA/MVKE'},
+      {lbl:'Pricing Record',st:'warn',msg:'Contract expired Mar 31. Spot price applied on ELEC-7890. CTRL-4421 price mismatch Δ $8/EA.',src:'PRCD_ELEMENTS'},
+      {lbl:'Credit / FSCM',st:'ok',msg:'Limit $1.5M. Exposure $240K. Clear.',src:'UKM_* / FSCM'},
+      {lbl:'Inventory / ATP',st:'ok',msg:'ELEC-7890: 320 EA available. CTRL-4421: 75 EA available.',src:'MARD/MATDOC'},
+      {lbl:'Contracts / Agreements',st:'warn',msg:'Framework expired. Renewal in progress — no signed doc.',src:'VBAK/VBKD'},
+      {lbl:'Open AR / Payment Risk',st:'ok',msg:'Clean. DSO 32 days.',src:'BSID/ACDOCA'},
+      {lbl:'Order Blocking Reasons',st:'ok',msg:'No blocks.',src:'VBUK'},
+    ],
+    decision:{
+      score:72, rec:'Human Review — Pricing Mismatch', autoOk:false,
+      plant:'PL02 — Atlanta, GA', plantReason:'Full stock. Nearest plant for both lines.',
+      confirmedQty:'100 + 50 EA (2 lines)', confirmedDate:'Apr 9 / Apr 11',
+      dateNote:'Both lines ahead of requested date', mode:'Full Stock Available',
+      gm:'27.2% blended', marginVsAlt:'−$2,800 if spot price accepted without approval',
+      ibpSignal:'No replenishment needed. PL02 fully stocked for both SKUs. IBP confirms zero supply risk through May.',
+      ibpLead:'IBP Lead Time: 12 days from PL02',
+      scores:[
+        {lbl:'Service Level',v:92},{lbl:'Margin Impact',v:58},
+        {lbl:'Customer Value',v:78},{lbl:'Lead Time Score',v:90},
+        {lbl:'Inventory Health',v:88},{lbl:'AR / Credit Risk',v:91},
+      ]
+    },
+    soHeader:[
+      {lbl:'Order Type',val:'ZOR',sap:'VBAK-AUART'},{lbl:'Sales Org',val:'1000',sap:'VBAK-VKORG'},
+      {lbl:'Dist. Channel',val:'10',sap:'VBAK-VTWEG'},{lbl:'Division',val:'00',sap:'VBAK-SPART'},
+      {lbl:'Sold-To',val:'20031',sap:'KNVP AG'},{lbl:'Ship-To',val:'20031-01',sap:'KNVP WE'},
+      {lbl:'Customer PO',val:'PO-2024-8822',sap:'VBKD-BSTKD'},{lbl:'Req. Date',val:'2024-04-20',sap:'VBKD-BSTDK'},
+    ],
+    soItems:[
+      {line:10,mat:'ELEC-7890',qty:100,plant:'PL02',date:'2024-04-09',price:446.00},
+      {line:20,mat:'CTRL-4421',qty:50,plant:'PL02',date:'2024-04-11',price:882.00},
+    ]
+  },
+  {
+    id:'ORD-003', poNumber:'PO-2024-8823', customer:'Bosch Manufacturing', soldTo:'CUST-30112',
+    amount:203400, channel:'Portal', channelIcon:'🌐', status:'ready', priority:'strategic',
+    received:'07:58 AM', lines:3,
+    hdr:[
+      {lbl:'Sold-To Customer',val:'Robert Bosch GmbH',conf:99,sap:'VBAK-KUNNR'},
+      {lbl:'Customer PO Number',val:'PO-2024-8823',conf:99,sap:'VBKD-BSTKD'},
+      {lbl:'PO Date',val:'March 9, 2024',conf:99,sap:'VBKD-BSTDK'},
+      {lbl:'Ship-To Address',val:'Auburn Hills, MI 48326',conf:99,sap:'VBPA-WE'},
+      {lbl:'Incoterms',val:'FCA Detroit',conf:97,sap:'VBKD-INCO1'},
+      {lbl:'Delivery Instructions',val:'JIT delivery. Split 3 lots of 400 EA.',conf:92,sap:'VBKD-BSTK2'},
+    ],
+    items:[
+      {line:10,custSku:'BOS-COMP-3312',sapMat:'COMP-3312',qty:'400',uom:'EA',price:'169.50',cur:'USD',reqDate:'April 10, 2024',
+       confMat:96,confQty:99,confPrice:99,confDate:99,
+       plantOptions:[
+         {plant:'PL03',city:'Detroit, MI',dist:'22 mi',atp:1400,freightCost:280,freightPerUnit:0.70,arrivalDate:'Apr 7',onTime:true,lateDays:0,score:98,selected:true,disq:null},
+         {plant:'PL01',city:'Chicago, IL',dist:'282 mi',atp:0,freightCost:960,freightPerUnit:2.40,arrivalDate:'Apr 16',onTime:false,lateDays:6,score:9,selected:false,disq:null},
+       ],
+       lineGM:'34.2%',confirmDate:'April 7, 2024',
+       insight:'PL03 at 22 miles: $0.70/unit freight, arrives Apr 7 — 3 days early. PL01 has zero stock and arrives 6 days late. No contest.'},
+      {line:20,custSku:'BOS-COMP-3312',sapMat:'COMP-3312',qty:'400',uom:'EA',price:'169.50',cur:'USD',reqDate:'April 20, 2024',
+       confMat:96,confQty:99,confPrice:99,confDate:99,
+       plantOptions:[
+         {plant:'PL03',city:'Detroit, MI',dist:'22 mi',atp:1400,freightCost:280,freightPerUnit:0.70,arrivalDate:'Apr 17',onTime:true,lateDays:0,score:98,selected:true,disq:null},
+       ],
+       lineGM:'34.2%',confirmDate:'April 17, 2024',
+       insight:'All plants on-time for Line 20, but PL03 wins by 23+ points on freight. JIT rule: all schedule lines locked to same plant.'},
+      {line:30,custSku:'BOS-COMP-3312',sapMat:'COMP-3312',qty:'400',uom:'EA',price:'169.50',cur:'USD',reqDate:'April 30, 2024',
+       confMat:96,confQty:99,confPrice:99,confDate:99,
+       plantOptions:[
+         {plant:'PL03',city:'Detroit, MI',dist:'22 mi',atp:1400,freightCost:280,freightPerUnit:0.70,arrivalDate:'Apr 27',onTime:true,lateDays:0,score:98,selected:true,disq:null},
+       ],
+       lineGM:'34.2%',confirmDate:'April 27, 2024',
+       insight:'Final JIT lot. $840 total freight on $203,400 order = 0.41% freight-to-revenue. PL03 allocation confirmed through Q2.'},
+    ],
+    validation:[
+      {lbl:'Customer Master',st:'ok',msg:'CUST-30112 — Strategic Account (Tier 1). MSA active.',src:'KNA1/KNVV'},
+      {lbl:'Material Mapping',st:'ok',msg:'COMP-3312 active. JIT-enabled.',src:'MARA/MVKE'},
+      {lbl:'Pricing Record',st:'ok',msg:'Contract ZK200100 — $168.80/EA (Δ $0.70, within tolerance).',src:'PRCD_ELEMENTS'},
+      {lbl:'Credit / FSCM',st:'ok',msg:'$5M limit. $620K exposure. Clear.',src:'UKM_* / FSCM'},
+      {lbl:'Inventory / ATP',st:'ok',msg:'1,400 unrestricted. Full coverage all 3 lots.',src:'MARD/MATDOC'},
+      {lbl:'Contracts / Agreements',st:'ok',msg:'MSA active. Auto-accept flag configured.',src:'VBAK/VBKD'},
+      {lbl:'Open AR / Payment Risk',st:'ok',msg:'Excellent. DSO: 18 days. No overdue.',src:'BSID/ACDOCA'},
+      {lbl:'Order Blocking Reasons',st:'ok',msg:'No blocks.',src:'VBUK'},
+    ],
+    decision:{
+      score:96, rec:'Auto-Create Sales Order', autoOk:true,
+      plant:'PL03 — Detroit, MI', plantReason:'JIT proximity + Tier 1 allocation priority',
+      confirmedQty:'1,200 EA (3 schedule lines × 400)', confirmedDate:'Apr 7 / Apr 17 / Apr 27',
+      dateNote:'On schedule. JIT cadence locked.', mode:'JIT Split Shipment',
+      gm:'34.2%', marginVsAlt:'+$8,640 vs non-strategic routing',
+      ibpSignal:'PL03 capacity committed for Bosch JIT cadence. IBP locks Q2 allocation. Zero supply risk.',
+      ibpLead:'IBP Lead Time: 8 days from PL03',
+      scores:[
+        {lbl:'Service Level',v:98},{lbl:'Margin Impact',v:94},
+        {lbl:'Customer Value',v:99},{lbl:'Lead Time Score',v:96},
+        {lbl:'Inventory Health',v:97},{lbl:'AR / Credit Risk',v:99},
+      ]
+    },
+    soHeader:[
+      {lbl:'Order Type',val:'ZOR',sap:'VBAK-AUART'},{lbl:'Sales Org',val:'1000',sap:'VBAK-VKORG'},
+      {lbl:'Dist. Channel',val:'10',sap:'VBAK-VTWEG'},{lbl:'Division',val:'00',sap:'VBAK-SPART'},
+      {lbl:'Sold-To',val:'30112',sap:'KNVP AG'},{lbl:'Ship-To',val:'30112-01',sap:'KNVP WE'},
+      {lbl:'Customer PO',val:'PO-2024-8823',sap:'VBKD-BSTKD'},{lbl:'Req. Date',val:'JIT — 3 Lines',sap:'VBKD-BSTDK'},
+    ],
+    soItems:[
+      {line:10,mat:'COMP-3312',qty:400,plant:'PL03',date:'2024-04-07',price:168.80},
+      {line:20,mat:'COMP-3312',qty:400,plant:'PL03',date:'2024-04-17',price:168.80},
+      {line:30,mat:'COMP-3312',qty:400,plant:'PL03',date:'2024-04-27',price:168.80},
+    ]
+  },
+  {
+    id:'ORD-004', poNumber:'PO-2024-8824', customer:'Parker Hannifin Corp.', soldTo:'CUST-40088',
+    amount:67800, channel:'PDF', channelIcon:'📄', status:'exception', priority:'medium',
+    received:'11:20 AM', lines:3,
+    hdr:[
+      {lbl:'Sold-To Customer',val:'Parker Hannifin Corp.',conf:97,sap:'VBAK-KUNNR'},
+      {lbl:'Customer PO Number',val:'PO-2024-8824',conf:94,sap:'VBKD-BSTKD'},
+      {lbl:'PO Date',val:'March 7, 2024',conf:88,sap:'VBKD-BSTDK'},
+      {lbl:'Ship-To Address',val:'Cleveland OH — street not detected',conf:58,sap:'VBPA-WE'},
+      {lbl:'Incoterms',val:'Not detected',conf:0,sap:'VBKD-INCO1'},
+      {lbl:'Delivery Instructions',val:'Urgent. Expedite required.',conf:87,sap:'VBKD-BSTK2'},
+    ],
+    items:[
+      {line:10,custSku:'PHC-HOSE-??-2201',sapMat:'Ambiguous — 3 candidates in MARA',qty:'350',uom:'EA',price:'Not stated',cur:'USD',reqDate:'March 28, 2024',
+       confMat:44,confQty:91,confPrice:0,confDate:82,
+       plantOptions:null,
+       lineGM:'Unknown',confirmDate:'Cannot confirm',
+       insight:'Material must be resolved in MARA before IBP ATP check. 3 candidates: HOSE-2201A, HOSE-2201B, HOSE-2201C.'},
+      {line:20,custSku:'PHC-VALVE-??-3390',sapMat:'Ambiguous — 2 candidates in MARA',qty:'120',uom:'EA',price:'Not stated',cur:'USD',reqDate:'March 28, 2024',
+       confMat:38,confQty:88,confPrice:0,confDate:76,
+       plantOptions:null,
+       lineGM:'Unknown',confirmDate:'Cannot confirm',
+       insight:'VALVE family not resolvable from customer SKU alone. Candidates: VALVE-3390A, VALVE-3390B. Customer confirmation required.'},
+      {line:30,custSku:'PHC-FITT-1102',sapMat:'FITT-1102 (72% confidence)',qty:'80',uom:'EA',price:'42.50',cur:'USD',reqDate:'March 28, 2024',
+       confMat:72,confQty:91,confPrice:0,confDate:85,
+       plantOptions:null,
+       lineGM:'Unknown',confirmDate:'Cannot confirm',
+       insight:'Best match is FITT-1102 but confidence below threshold. Price not confirmed in PO. Requested date Mar 28 already passed.'},
+    ],
+    validation:[
+      {lbl:'Customer Master',st:'ok',msg:'CUST-40088 active.',src:'KNA1/KNVV'},
+      {lbl:'Material Mapping',st:'err',msg:'Lines 10 & 20: ambiguous SKUs — multiple MARA candidates. Line 30: low-confidence match.',src:'MARA/MVKE'},
+      {lbl:'Pricing Record',st:'err',msg:'No pricing — all 3 materials unresolved.',src:'PRCD_ELEMENTS'},
+      {lbl:'Credit / FSCM',st:'warn',msg:'$500K limit. $490K exposure. Near credit limit.',src:'UKM_* / FSCM'},
+      {lbl:'Inventory / ATP',st:'warn',msg:'Cannot run ATP — materials unresolved.',src:'MARD/MATDOC'},
+      {lbl:'Contracts / Agreements',st:'warn',msg:'No active contract for HOSE or VALVE family.',src:'VBAK/VBKD'},
+      {lbl:'Open AR / Payment Risk',st:'warn',msg:'$14K overdue >60 days. Monitor closely.',src:'BSID/ACDOCA'},
+      {lbl:'Order Blocking Reasons',st:'err',msg:'Credit near-limit block will trigger on SO creation.',src:'VBUK'},
+    ],
+    decision:{
+      score:29, rec:'Exception — Human Review Required', autoOk:false,
+      plant:'Undetermined', plantReason:'Cannot determine until materials resolved',
+      confirmedQty:'Pending', confirmedDate:'Pending (requested date already past)',
+      dateNote:'Requested date March 28 already passed.', mode:'Unknown',
+      gm:'Unknown', marginVsAlt:'N/A',
+      ibpSignal:'IBP check blocked — 3 materials unresolved. Expedite cost will be significant if date re-confirmed.',
+      ibpLead:'IBP Lead: Cannot calculate',
+      scores:[
+        {lbl:'Service Level',v:20},{lbl:'Margin Impact',v:12},
+        {lbl:'Customer Value',v:55},{lbl:'Lead Time Score',v:15},
+        {lbl:'Inventory Health',v:28},{lbl:'AR / Credit Risk',v:38},
+      ]
+    },
+    soHeader:[], soItems:[]
+  },
+  {
+    id:'ORD-005', poNumber:'PO-2024-8825', customer:'GE Aviation Systems', soldTo:'CUST-50201',
+    amount:415025, channel:'Email', channelIcon:'✉', status:'reviewing', priority:'strategic',
+    received:'06:30 AM', lines:3,
+    hdr:[
+      {lbl:'Sold-To Customer',val:'GE Aviation Systems LLC',conf:99,sap:'VBAK-KUNNR'},
+      {lbl:'Customer PO Number',val:'PO-2024-8825',conf:99,sap:'VBKD-BSTKD'},
+      {lbl:'PO Date',val:'March 9, 2024',conf:99,sap:'VBKD-BSTDK'},
+      {lbl:'Ship-To Address',val:'1 Neumann Way, Cincinnati OH 45215',conf:99,sap:'VBPA-WE'},
+      {lbl:'Incoterms',val:'DAP Cincinnati',conf:96,sap:'VBKD-INCO1'},
+      {lbl:'Delivery Instructions',val:'AS9100 certs required. No split shipment.',conf:94,sap:'VBKD-BSTK2'},
+    ],
+    items:[
+      {line:10,custSku:'GEA-SEAL-5567',sapMat:'SEAL-5567',qty:'500',uom:'EA',price:'518.75',cur:'USD',reqDate:'April 25, 2024',
+       confMat:95,confQty:99,confPrice:99,confDate:99,
+       plantOptions:[
+         {plant:'PL01',city:'Chicago, IL',dist:'302 mi',atp:620,freightCost:3200,freightPerUnit:6.40,arrivalDate:'Apr 22',onTime:true,lateDays:0,score:92,selected:true,disq:null},
+         {plant:'PL02',city:'Atlanta, GA',dist:'460 mi',atp:800,freightCost:2800,freightPerUnit:5.60,arrivalDate:'Apr 9',onTime:true,lateDays:0,score:0,selected:false,disq:'Not AS9100 Rev D certified for SEAL-5567'},
+       ],
+       lineGM:'29.6%',confirmDate:'April 22, 2024',
+       insight:'Quality constraint decisive: PL02 disqualified — not AS9100 Rev D certified. PL01 is only eligible plant. IBP expedite confirms 180 units by Apr 19 for full quantity.'},
+      {line:20,custSku:'GEA-BEAR-3310',sapMat:'BEAR-3310',qty:'200',uom:'EA',price:'287.50',cur:'USD',reqDate:'April 25, 2024',
+       confMat:93,confQty:99,confPrice:97,confDate:99,
+       plantOptions:[
+         {plant:'PL01',city:'Chicago, IL',dist:'302 mi',atp:280,freightCost:1200,freightPerUnit:6.00,arrivalDate:'Apr 20',onTime:true,lateDays:0,score:88,selected:true,disq:null},
+         {plant:'PL02',city:'Atlanta, GA',dist:'460 mi',atp:300,freightCost:900,freightPerUnit:4.50,arrivalDate:'Apr 12',onTime:true,lateDays:0,score:0,selected:false,disq:'Not AS9100 Rev D certified for BEAR-3310'},
+       ],
+       lineGM:'27.3%',confirmDate:'April 20, 2024',
+       insight:'PL02 has lower freight and full ATP but AS9100 certification disqualifies it. PL01: 280 EA in stock — full coverage without expedite.'},
+      {line:30,custSku:'GEA-GASK-771',sapMat:'GASK-771',qty:'1200',uom:'EA',price:'38.50',cur:'USD',reqDate:'April 30, 2024',
+       confMat:89,confQty:96,confPrice:91,confDate:99,
+       plantOptions:[
+         {plant:'PL01',city:'Chicago, IL',dist:'302 mi',atp:1500,freightCost:800,freightPerUnit:0.67,arrivalDate:'Apr 26',onTime:true,lateDays:0,score:94,selected:true,disq:null},
+       ],
+       lineGM:'31.8%',confirmDate:'April 26, 2024',
+       insight:'GASK-771: 1,500 EA available at PL01. Full coverage with 300 units spare. Consolidated freight with Lines 10 & 20 — same truck, same delivery point.'},
+    ],
+    validation:[
+      {lbl:'Customer Master',st:'ok',msg:'CUST-50201 — Strategic. AS9100 flag active in KNA1.',src:'KNA1/KNVV'},
+      {lbl:'Material Mapping',st:'ok',msg:'SEAL-5567, BEAR-3310, GASK-771 all validated. AS9100 certified.',src:'MARA/MVKE'},
+      {lbl:'Pricing Record',st:'ok',msg:'Aerospace LTA ZK300200 active. All 3 lines within tolerance.',src:'PRCD_ELEMENTS'},
+      {lbl:'Credit / FSCM',st:'ok',msg:'$5M limit. $1.1M exposure. Clear.',src:'UKM_* / FSCM'},
+      {lbl:'Inventory / ATP',st:'warn',msg:'SEAL-5567: short 180 units — IBP expedite active. BEAR-3310 and GASK-771 fully covered.',src:'MARD/MATDOC'},
+      {lbl:'Contracts / Agreements',st:'ok',msg:'LTA active through Dec 2025.',src:'VBAK/VBKD'},
+      {lbl:'Open AR / Payment Risk',st:'ok',msg:'Excellent. Net 45. No overdue. DSO 22 days.',src:'BSID/ACDOCA'},
+      {lbl:'Order Blocking Reasons',st:'ok',msg:'No blocks. AS9100 cert auto-attached.',src:'VBUK'},
+    ],
+    decision:{
+      score:79, rec:'Review & Approve — Short 180 Units on SEAL-5567', autoOk:false,
+      plant:'PL01 — Chicago, IL', plantReason:'Only AS9100-certified plant for all 3 lines.',
+      confirmedQty:'500 + 200 + 1,200 EA (3 lines)', confirmedDate:'Apr 22 / Apr 20 / Apr 26',
+      dateNote:'All 3 lines 3-9 days ahead of requested dates.', mode:'Partial + Expedited on Line 10',
+      gm:'29.7% blended', marginVsAlt:'No alternate — AS9100 certification locked to PL01',
+      ibpSignal:'IBP expedite: SEAL-5567 short 180 units. Supplier confirms by Apr 19. Expedite surcharge ~$8,500. Net margin impact acceptable for strategic account.',
+      ibpLead:'IBP Expedited Lead: 14 days (normal: 22 days)',
+      scores:[
+        {lbl:'Service Level',v:82},{lbl:'Margin Impact',v:71},
+        {lbl:'Customer Value',v:96},{lbl:'Lead Time Score',v:88},
+        {lbl:'Inventory Health',v:74},{lbl:'AR / Credit Risk',v:99},
+      ]
+    },
+    soHeader:[
+      {lbl:'Order Type',val:'ZOR',sap:'VBAK-AUART'},{lbl:'Sales Org',val:'1000',sap:'VBAK-VKORG'},
+      {lbl:'Dist. Channel',val:'10',sap:'VBAK-VTWEG'},{lbl:'Division',val:'00',sap:'VBAK-SPART'},
+      {lbl:'Sold-To',val:'50201',sap:'KNVP AG'},{lbl:'Ship-To',val:'50201-01',sap:'KNVP WE'},
+      {lbl:'Customer PO',val:'PO-2024-8825',sap:'VBKD-BSTKD'},{lbl:'Req. Date',val:'Multi-line',sap:'VBKD-BSTDK'},
+    ],
+    soItems:[
+      {line:10,mat:'SEAL-5567',qty:500,plant:'PL01',date:'2024-04-22',price:518.75},
+      {line:20,mat:'BEAR-3310',qty:200,plant:'PL01',date:'2024-04-20',price:287.50},
+      {line:30,mat:'GASK-771',qty:1200,plant:'PL01',date:'2024-04-26',price:38.50},
+    ]
+  },
+];
+
+// ═══════════════════════════════════
+// TOAST SYSTEM
+// ═══════════════════════════════════
+function showToast(msg, type='blue', icon='ℹ') {
+  const container = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.innerHTML = `<span class="toast-icon">${icon}</span>${msg}`;
+  container.appendChild(t);
+  requestAnimationFrame(() => t.classList.add('show'));
+  setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => t.remove(), 350);
+  }, 3000);
+}
+
+// ═══════════════════════════════════
+// QUEUE
+// ═══════════════════════════════════
+function renderQueue() {
+  const list = document.getElementById('queueList');
+  const filtered = ORDERS.filter(o => {
+    if (filterMode !== 'all' && o.status !== filterMode) return false;
+    if (searchTerm && !o.customer.toLowerCase().includes(searchTerm) && !o.poNumber.toLowerCase().includes(searchTerm)) return false;
+    return true;
+  });
+  document.getElementById('queueCount').textContent = `${filtered.length} order${filtered.length!==1?'s':''}`;
+  list.innerHTML = filtered.map(o => `
+    <div class="order-item${currentOrder?.id===o.id?' active':''}" onclick="selectOrder('${o.id}')">
+      <div class="prio-dot prio-${o.priority}"></div>
+      <div class="order-item-row1">
+        <span class="order-customer">${o.customer}</span>
+        <span class="badge badge-${o.status}">${o.status}</span>
+      </div>
+      <div class="order-po">${o.poNumber} · ${o.lines} line${o.lines!==1?'s':''}</div>
+      <div class="order-item-row2">
+        <span class="order-amount">$${o.amount.toLocaleString()}</span>
+        <span class="order-channel">${o.channelIcon} ${o.channel}</span>
+      </div>
+    </div>`).join('');
+}
+function setFilter(f, btn) {
+  filterMode = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderQueue();
+}
+function onSearch(v) { searchTerm = v.toLowerCase(); renderQueue(); }
+
+// ═══════════════════════════════════
+// SELECT ORDER
+// ═══════════════════════════════════
+function selectOrder(id) {
+  currentOrder = ORDERS.find(o => o.id === id);
+  currentTab = 0;
+  overrideCount = 0;
+  expandedItems = {};
+  acceptedFields = {};
+  overriddenFields = {};
+  updateOverrideCounter();
+  renderQueue();
+  renderOrderBar();
+  renderRight(currentOrder);
+  goTab(0);
+  document.getElementById('tabsRow').style.display = 'flex';
+  document.getElementById('rightActions').style.display = currentOrder.status !== 'exception' ? 'flex' : 'none';
+}
+
+function renderOrderBar() {
+  const o = currentOrder;
+  document.getElementById('barName').textContent = o.customer;
+  document.getElementById('barName').style.color = '';
+  document.getElementById('barName').style.fontWeight = '';
+  document.getElementById('barName').style.fontSize = '';
+  document.getElementById('barSub').textContent = `${o.soldTo} · ${o.lines} line${o.lines!==1?'s':''} · Received ${o.received}`;
+  const po = document.getElementById('barPO');
+  po.textContent = o.poNumber;
+  po.style.display = 'block';
+  document.getElementById('barAmt').textContent = `$${o.amount.toLocaleString()}`;
+  const meta = document.getElementById('barMeta');
+  meta.innerHTML = `
+    <span class="badge badge-${o.status}">${o.status.toUpperCase()}</span>
+    <span style="display:flex;align-items:center;gap:4px">${o.channelIcon} ${o.channel}</span>
+    <span style="display:flex;align-items:center;gap:4px">🏭 ${o.lines} line${o.lines!==1?'s':''}</span>
+  `;
+}
+
+function updateOverrideCounter() {
+  const ctr = document.getElementById('overrideCtr');
+  const countEl = document.getElementById('overrideCount');
+  countEl.textContent = overrideCount;
+  ctr.classList.toggle('hidden', overrideCount === 0);
+}
+
+// ═══════════════════════════════════
+// TABS
+// ═══════════════════════════════════
+function goTab(n) {
+  currentTab = n;
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', i===n));
+  const content = document.getElementById('tabContent');
+  if(n===0) renderExtraction(currentOrder);
+  else if(n===1) renderValidation(currentOrder);
+  else renderDecision(currentOrder);
+  // Animate bars after render
+  setTimeout(() => {
+    content.querySelectorAll('.conf-fill,.score-fill').forEach(el => {
+      const w = el.dataset.w;
+      if(w) el.style.width = w + '%';
+    });
+  }, 60);
+  content.classList.add('scan-anim');
+  setTimeout(() => content.classList.remove('scan-anim'), 1600);
+}
+
+// ═══════════════════════════════════
+// OCR HELPERS
+// ═══════════════════════════════════
+function confClass(c) { return c >= 90 ? 'high' : c >= 70 ? 'mid' : c > 0 ? 'low' : 'zero'; }
+function cfClass(c) { return c >= 90 ? 'cf-high' : c >= 70 ? 'cf-mid' : c > 0 ? 'cf-low' : 'cf-zero'; }
+function ocrLabel(c) { return c > 0 ? `OCR ${c}%` : 'Not detected'; }
+
+function avgConf(item) {
+  const vals = [item.confMat, item.confQty, item.confPrice, item.confDate].filter(v => v > 0);
+  if (!vals.length) return 0;
+  return Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+}
+
+function ringColorForConf(c) {
+  if(c >= 90) return '#0C7A52';
+  if(c >= 70) return '#ED8936';
+  return '#C0352A';
+}
+
+function miniRingSVG(conf, size=26) {
+  const r = (size-4)/2, cx=size/2, cy=size/2;
+  const circ = 2*Math.PI*r;
+  const dash = (conf/100)*circ;
+  const col = ringColorForConf(conf);
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#E2E7EF" stroke-width="2.5"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${col}" stroke-width="2.5"
+      stroke-dasharray="${dash} ${circ}" stroke-linecap="round"/>
+  </svg>`;
+}
+
+// ═══════════════════════════════════
+// FIELD EDITING
+// ═══════════════════════════════════
+function startEdit(valEl, fieldKey, originalVal) {
+  if (valEl.querySelector('input,textarea')) return;
+  const inp = document.createElement('input');
+  inp.className = valEl.closest('.item-field') ? 'item-field-input' : 'ext-field-input';
+  inp.value = valEl.textContent;
+  valEl.innerHTML = '';
+  valEl.appendChild(inp);
+  inp.focus(); inp.select();
+
+  function commit() {
+    const newVal = inp.value.trim() || originalVal;
+    valEl.textContent = newVal;
+    const card = valEl.closest('.ext-field,.item-field');
+    if (!card) return;
+    if (newVal !== originalVal) {
+      card.classList.remove('low-conf','accepted');
+      card.classList.add('overridden');
+      if (!overriddenFields[fieldKey]) {
+        overriddenFields[fieldKey] = true;
+        overrideCount++;
+        updateOverrideCounter();
+        showToast(`Override logged: <strong>${fieldKey}</strong> updated`, 'amber', '✏');
+      }
+      // Update override tag
+      let tag = card.querySelector('.override-tag');
+      if (!tag) { tag = document.createElement('span'); tag.className='override-tag'; card.appendChild(tag); }
+      tag.textContent = 'CSR Override';
+    } else {
+      inp.blur();
+    }
+  }
+
+  inp.addEventListener('keydown', e => {
+    if(e.key === 'Enter') commit();
+    if(e.key === 'Escape') { valEl.textContent = originalVal; }
+  });
+  inp.addEventListener('blur', commit);
+}
+
+function acceptField(fieldKey, cardEl) {
+  if (overriddenFields[fieldKey]) return;
+  cardEl.classList.remove('low-conf');
+  cardEl.classList.add('accepted');
+  if (!acceptedFields[fieldKey]) {
+    acceptedFields[fieldKey] = true;
+    showToast(`Field accepted: <strong>${fieldKey}</strong>`, 'green', '✓');
+  }
+  let tag = cardEl.querySelector('.accepted-tag,.override-tag');
+  if (!tag) { tag = document.createElement('span'); cardEl.appendChild(tag); }
+  tag.className = 'accepted-tag';
+  tag.textContent = '✓ Accepted';
+}
+
+// ═══════════════════════════════════
+// PO EXTRACTION TAB
+// ═══════════════════════════════════
+function renderExtraction(o) {
+  const el = document.getElementById('tabContent');
+  const lowHdrFields = o.hdr.filter(f => f.conf < 70);
+  const allItemConfs = o.items.flatMap(item => [item.confMat, item.confQty, item.confPrice, item.confDate]);
+  const lowItemConfs = allItemConfs.filter(c => c < 70 && c > 0).length;
+
+  let html = '';
+  if (lowHdrFields.length > 0 || lowItemConfs > 0) {
+    html += `<div class="alert alert-warn" style="margin-bottom:14px;">
+      <span>⚠</span>
+      <div><strong>${lowHdrFields.length + lowItemConfs} field${lowHdrFields.length+lowItemConfs!==1?'s':''} need review</strong> — Low OCR confidence. Click any field to edit or accept.</div>
+    </div>`;
+  }
+
+  // HEADER FIELDS
+  html += `<div class="sec-title"><span>📄 PO Header — Extracted Fields</span><span style="font-size:9px;color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0">Click field to edit · Tab accepts</span></div>`;
+  html += `<div class="ext-grid">`;
+  o.hdr.forEach((f, fi) => {
+    const cc = confClass(f.conf);
+    const isLow = f.conf < 70;
+    const fkey = `hdr-${fi}`;
+    html += `<div class="ext-field${isLow?' low-conf':''}" id="extf-${fkey}">
+      <div class="ext-field-top">
+        <span class="ext-lbl">${f.lbl}</span>
+        <span class="ocr-pill ocr-${cc}">◉ ${ocrLabel(f.conf)}</span>
+      </div>
+      <div class="ext-val" onclick="startEdit(this,'${f.lbl}','${f.val.replace(/'/g,"\\'")}')" title="Click to edit">${f.val}</div>
+      <div class="conf-bar"><div class="conf-fill ${cfClass(f.conf)}" data-w="${f.conf}" style="width:0"></div></div>
+      <div class="ext-footer">
+        <span class="sap-tag">${f.sap}</span>
+        ${isLow ? `<button class="field-btn-accept" onclick="acceptField('${f.lbl}',this.closest('.ext-field'))">Accept</button>` : `<span style="font-size:9px;color:var(--text-muted)">✓ Auto-validated</span>`}
+      </div>
+    </div>`;
+  });
+  html += `</div>`;
+
+  // LINE ITEMS ACCORDION
+  html += `<div class="sec-title" style="margin-top:4px"><span>📦 Line Items — ${o.items.length} lines extracted</span><span style="font-size:9px;color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0">Expand each line to see field-level OCR</span></div>`;
+  html += `<div class="items-section">`;
+  o.items.forEach((item, idx) => {
+    const iid = `item-${o.id}-${idx}`;
+    const avg = avgConf(item);
+    const hasLow = [item.confMat, item.confQty, item.confPrice, item.confDate].some(c => c < 70 && c > 0);
+    const totalVal = item.price !== 'Not stated' ? `$${(parseFloat(item.qty) * parseFloat(item.price)).toLocaleString('en-US',{minimumFractionDigits:2})}` : 'Pending';
+    const isExpanded = expandedItems[iid];
+
+    const fieldCards = [
+      {lbl:'Customer SKU',val:item.custSku,conf:null,sap:'VBAP-KDMAT'},
+      {lbl:'SAP Material',val:item.sapMat,conf:item.confMat,sap:'VBAP-MATNR'},
+      {lbl:'Quantity / UOM',val:`${item.qty} ${item.uom}`,conf:item.confQty,sap:'VBAP-KWMENG'},
+      {lbl:'Unit Price',val:item.price !== 'Not stated' ? `$${item.price}` : item.price,conf:item.confPrice,sap:'PRCD_ELEMENTS'},
+      {lbl:'Requested Delivery',val:item.reqDate,conf:item.confDate,sap:'VBEP-EDATU'},
+      {lbl:'Ship-To',val:item.shipTo || 'See PO header',conf:null,sap:'VBPA-WE'},
+    ].filter(f => f.conf !== null || f.lbl === 'Customer SKU' || f.lbl === 'Ship-To');
+
+    html += `<div class="item-card${isExpanded?' expanded':''}" id="${iid}">
+      <div class="item-card-head" onclick="toggleItem('${iid}')">
+        <span class="item-line-badge">Line ${String(item.line).padStart(2,'0')}</span>
+        <div class="item-sku-wrap">
+          <div class="item-cust-sku">${item.custSku}</div>
+          <div class="item-sap-mat">→ ${item.sapMat}</div>
+        </div>
+        <div class="item-head-stats">
+          <span class="item-head-qty">${item.qty} ${item.uom}</span>
+          <span style="color:var(--border-strong)">|</span>
+          <span class="item-head-price">${item.price !== 'Not stated' ? '$'+item.price+'/EA' : '—'}</span>
+          <span style="color:var(--border-strong)">|</span>
+          <span class="item-head-total">${totalVal}</span>
+        </div>
+        <div class="item-avg-conf" title="Average OCR confidence">
+          <div class="item-avg-ring">
+            ${miniRingSVG(avg)}
+            <div class="item-avg-num" style="color:${ringColorForConf(avg)}">${avg}%</div>
+          </div>
+          ${hasLow ? '<span style="font-size:9px;color:var(--red);font-weight:700">!</span>' : ''}
+        </div>
+        <span class="item-chevron">▼</span>
+      </div>
+      <div class="item-card-body">
+        <div class="item-fields-grid">
+          ${[
+            {lbl:'SAP Material',val:item.sapMat,conf:item.confMat,sap:'VBAP-MATNR'},
+            {lbl:'Qty / UOM',val:`${item.qty} ${item.uom}`,conf:item.confQty,sap:'VBAP-KWMENG'},
+            {lbl:'Unit Price',val:item.price !== 'Not stated' ? `$${item.price}` : 'Not stated',conf:item.confPrice,sap:'PRCD_ELEMENTS'},
+            {lbl:'Req. Delivery Date',val:item.reqDate,conf:item.confDate,sap:'VBEP-EDATU'},
+          ].map((f,fi) => {
+            const cc = confClass(f.conf);
+            const isLow = f.conf < 70;
+            const fkey = `${iid}-f${fi}`;
+            return `<div class="item-field${isLow?' low-conf':''}" id="itemf-${fkey}">
+              <div class="item-field-lbl-row">
+                <span class="item-field-lbl">${f.lbl}</span>
+                <span class="ocr-pill ocr-${cc}" style="font-size:8px;padding:1px 5px">${ocrLabel(f.conf)}</span>
+              </div>
+              <div class="item-field-val" onclick="startEdit(this,'${f.lbl}','${f.val.replace(/'/g,"\\'")}')" title="Click to edit">${f.val}</div>
+              <div class="conf-bar"><div class="conf-fill ${cfClass(f.conf)}" data-w="${f.conf}" style="width:0"></div></div>
+              <div style="display:flex;justify-content:space-between;margin-top:4px">
+                <span class="sap-tag">${f.sap}</span>
+                ${isLow ? `<button class="field-btn-accept" style="font-size:8px;padding:1px 6px" onclick="acceptField('${f.lbl}-${iid}',this.closest('.item-field'))">Accept</button>` : ''}
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+        <div class="item-insight">
+          <strong>⚡ Ordly AI:</strong> ${item.insight}
+        </div>
+      </div>
+    </div>`;
+  });
+  html += `</div>`;
+  el.innerHTML = html;
+
+  // Animate bars
+  setTimeout(() => {
+    el.querySelectorAll('.conf-fill').forEach(el => {
+      const w = el.dataset.w;
+      if(w) el.style.width = w + '%';
+    });
+  }, 80);
+
+  // Re-expand previously expanded items
+  Object.keys(expandedItems).forEach(iid => {
+    if(expandedItems[iid]) {
+      const card = document.getElementById(iid);
+      if(card) card.classList.add('expanded');
+    }
+  });
+}
+
+function toggleItem(iid) {
+  const card = document.getElementById(iid);
+  if(!card) return;
+  const wasExpanded = card.classList.contains('expanded');
+  card.classList.toggle('expanded');
+  expandedItems[iid] = !wasExpanded;
+  // Animate bars in expanded card
+  if(!wasExpanded) {
+    setTimeout(() => {
+      card.querySelectorAll('.conf-fill').forEach(el => {
+        const w = el.dataset.w;
+        if(w) el.style.width = w + '%';
+      });
+    }, 50);
+  }
+}
+
+// ═══════════════════════════════════
+// VALIDATION TAB
+// ═══════════════════════════════════
+function renderValidation(o) {
+  const el = document.getElementById('tabContent');
+  const okCount = o.validation.filter(v=>v.st==='ok').length;
+  const warnCount = o.validation.filter(v=>v.st==='warn').length;
+  const errCount = o.validation.filter(v=>v.st==='err').length;
+  el.innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <div style="flex:1;background:var(--green-light);border:1px solid var(--green-mid);border-radius:var(--r);padding:10px;text-align:center">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:700;color:var(--green)">${okCount}</div>
+        <div style="font-size:10px;color:var(--green);font-weight:600">Passed</div>
+      </div>
+      <div style="flex:1;background:var(--amber-light);border:1px solid #F6AD55;border-radius:var(--r);padding:10px;text-align:center">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:700;color:var(--amber)">${warnCount}</div>
+        <div style="font-size:10px;color:var(--amber);font-weight:600">Warnings</div>
+      </div>
+      <div style="flex:1;background:var(--red-light);border:1px solid #FC8181;border-radius:var(--r);padding:10px;text-align:center">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:700;color:var(--red)">${errCount}</div>
+        <div style="font-size:10px;color:var(--red);font-weight:600">Errors</div>
+      </div>
+    </div>
+    <div class="sec-title">SAP Validation Results</div>
+    <div class="val-list">
+      ${o.validation.map(v => `
+        <div class="val-row">
+          <div class="val-ic vi-${v.st}">${v.st==='ok'?'✓':v.st==='warn'?'!':'✗'}</div>
+          <div class="val-body">
+            <div class="val-lbl">${v.lbl}</div>
+            <div class="val-msg">${v.msg}</div>
+          </div>
+          <span class="val-src">${v.src}</span>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ═══════════════════════════════════
+// DECISION TAB
+// ═══════════════════════════════════
+function renderDecision(o) {
+  const d = o.decision;
+  const el = document.getElementById('tabContent');
+  const scoreColor = d.score >= 80 ? '#22C77A' : d.score >= 60 ? '#F6AD55' : '#FC8181';
+  const r=30, circ=2*Math.PI*r;
+  const dash=(d.score/100)*circ;
+
+  el.innerHTML = `
+    <div class="dec-hero">
+      <div class="dec-top">
+        <div class="dec-ring">
+          <svg width="72" height="72" viewBox="0 0 72 72">
+            <circle cx="36" cy="36" r="${r}" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="5"/>
+            <circle cx="36" cy="36" r="${r}" fill="none" stroke="${scoreColor}" stroke-width="5"
+              stroke-dasharray="${dash} ${circ}" stroke-linecap="round" class="score-ring-fill"/>
+          </svg>
+          <div class="dec-ring-num">
+            <span class="dec-ring-score" style="color:${scoreColor}">${d.score}</span>
+            <span class="dec-ring-lbl">Score</span>
+          </div>
+        </div>
+        <div class="dec-text">
+          <h3>${d.rec}</h3>
+          <p>${d.plant} · ${d.mode}</p>
+          <div class="dec-badges">
+            <div class="dec-mini"><div class="dec-mini-lbl">Confirmed Qty</div><div class="dec-mini-val">${d.confirmedQty}</div></div>
+            <div class="dec-mini"><div class="dec-mini-lbl">Confirm Date</div><div class="dec-mini-val">${d.confirmedDate}</div></div>
+            <div class="dec-mini"><div class="dec-mini-lbl">Gross Margin</div><div class="dec-mini-val">${d.gm}</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ibp-card">
+      <div class="ibp-icon">🧠</div>
+      <div>
+        <div class="ibp-label">IBP · Supply Intelligence Signal</div>
+        <div class="ibp-text">${d.ibpSignal}</div>
+        <div class="ibp-lead">${d.ibpLead}</div>
+      </div>
+    </div>
+    <div class="sec-title">Decision Score Components</div>
+    <div class="score-grid">
+      ${d.scores.map(s => {
+        const sc = s.v >= 80 ? 'var(--green)' : s.v >= 60 ? '#ED8936' : 'var(--red)';
+        return `<div class="score-item">
+          <div class="score-item-top">
+            <span class="score-item-lbl">${s.lbl}</span>
+            <span class="score-item-val" style="color:${sc}">${s.v}</span>
+          </div>
+          <div class="score-track"><div class="score-fill" data-w="${s.v}" style="width:0;background:${sc}"></div></div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="sec-title">Fulfillment Decision</div>
+    <div class="detail-grid">
+      <div class="detail-card">
+        <div class="detail-lbl">Fulfillment Plant</div>
+        <div class="detail-val">${d.plant}</div>
+        <div class="detail-sub" style="color:var(--text-muted);font-weight:400">${d.plantReason}</div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-lbl">Confirmed Qty</div>
+        <div class="detail-val">${d.confirmedQty}</div>
+        <div class="detail-sub" style="color:var(--green)">${d.mode}</div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-lbl">Confirmed Date</div>
+        <div class="detail-val" style="font-size:11px">${d.confirmedDate}</div>
+        <div class="detail-sub" style="color:var(--green)">${d.dateNote}</div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-lbl">Gross Margin</div>
+        <div class="detail-val">${d.gm}</div>
+        <div class="detail-sub" style="color:${d.marginVsAlt.startsWith('+')?'var(--green)':'var(--red)'}">${d.marginVsAlt}</div>
+      </div>
+    </div>
+    ${o.items.some(item => item.plantOptions && item.plantOptions.length > 0) ? `
+    <div class="sec-title">Plant Analysis (per line)</div>
+    ${o.items.map(item => item.plantOptions ? `
+      <div style="margin-bottom:10px">
+        <div style="font-size:10px;font-weight:700;color:var(--text-secondary);margin-bottom:5px">Line ${item.line} — ${item.custSku}</div>
+        <div class="plant-cards">
+          ${item.plantOptions.map(p => `
+            <div class="plant-card${p.selected?' selected-plant':''}${p.disq?' disqualified':''}">
+              <div class="plant-card-top">
+                <span class="plant-id">${p.plant} — ${p.city}</span>
+                <span class="plant-score-pill${p.score>0?'':' plant-score-pill-na'}">${p.score>0?'Score '+p.score:'DISQ'}</span>
+              </div>
+              <div class="plant-attr-row">
+                <div class="plant-attr"><div class="plant-attr-lbl">Distance</div><div class="plant-attr-val">${p.dist}</div></div>
+                <div class="plant-attr"><div class="plant-attr-lbl">Arrival</div><div class="plant-attr-val">${p.arrivalDate}${p.onTime?' ✓':' ✗ +'+p.lateDays+'d'}</div></div>
+                <div class="plant-attr"><div class="plant-attr-lbl">Freight/EA</div><div class="plant-attr-val">$${p.freightPerUnit.toFixed(2)}</div></div>
+              </div>
+              ${p.disq ? `<div class="plant-disq-tag">✗ ${p.disq}</div>` : ''}
+            </div>`).join('')}
+        </div>
+      </div>`:'').join('')}` : ''}
+  `;
+  setTimeout(() => {
+    el.querySelectorAll('.score-fill').forEach(el => {
+      const w = el.dataset.w;
+      if(w) el.style.width = w + '%';
+    });
+  }, 80);
+}
+
+// ═══════════════════════════════════
+// RIGHT PANEL
+// ═══════════════════════════════════
+function renderRight(o) {
+  const rb = document.getElementById('rightBody');
+  document.getElementById('rightSub').textContent = `VA01 · ${o.soItems.length} line${o.soItems.length!==1?'s':''}`;
+
+  if (o.status === 'exception') {
+    rb.innerHTML = `
+      <div class="alert alert-red" style="margin-bottom:14px">
+        <span>✗</span>
+        <div><strong>Cannot Create SO</strong><br>Multiple critical errors require human resolution.</div>
+      </div>
+      <div class="sec-title">Issues Requiring Resolution</div>
+      ${o.validation.filter(v=>v.st!=='ok').map(v=>`
+        <div style="padding:8px 10px;background:var(--${v.st==='err'?'red':'amber'}-light);border-left:3px solid var(--${v.st==='err'?'red':'amber'});border-radius:4px;margin-bottom:5px;font-size:11px">
+          <strong>${v.lbl}:</strong> ${v.msg}
+        </div>`).join('')}`;
+    return;
+  }
+
+  const total = o.soItems.reduce((a,i)=>a+(i.qty*i.price),0);
+  rb.innerHTML = `
+    <div class="so-sec">
+      <div class="so-sec-lbl">📋 VBAK — Order Header</div>
+      ${o.soHeader.map(f=>`
+        <div class="so-field">
+          <div class="so-f-lbl">${f.lbl}</div>
+          <div class="so-f-val">${f.val}</div>
+        </div>`).join('')}
+    </div>
+    <div class="so-sec">
+      <div class="so-sec-lbl">📦 VBAP / VBEP — Items & Schedule Lines</div>
+      ${o.soItems.map((item,i)=>`
+        <div class="so-item">
+          <div class="so-item-head">
+            <span class="so-item-line">Line ${String(item.line||((i+1)*10)).padStart(2,'0')}</span>
+            <span class="so-item-total">$${(item.qty*item.price).toLocaleString('en-US',{minimumFractionDigits:2})}</span>
+          </div>
+          <div class="so-mat">${item.mat}</div>
+          <div class="so-item-row2">
+            <span class="so-item-details">Plant: ${item.plant} · ${item.date} · ${item.qty.toLocaleString()} EA</span>
+            <span class="so-item-price">$${item.price.toFixed(2)}/EA</span>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div class="so-summary">
+      <div class="so-sum-row">
+        <span class="so-sum-lbl">Order Total</span>
+        <span class="so-sum-val" style="color:var(--navy)">$${total.toLocaleString('en-US',{minimumFractionDigits:2})}</span>
+      </div>
+      <div class="so-sum-row">
+        <span class="so-sum-lbl">Gross Margin</span>
+        <span class="margin-tag">▲ ${o.decision.gm}</span>
+      </div>
+      <div class="so-sum-row">
+        <span class="so-sum-lbl">Decision Score</span>
+        <span class="so-sum-val" style="color:${o.decision.score>=80?'var(--green)':o.decision.score>=60?'var(--amber)':'var(--red)'}">${o.decision.score}<span style="font-size:11px;font-weight:400;color:var(--text-muted)">/100</span></span>
+      </div>
+    </div>
+    <div class="bapi-note">
+      <div class="bapi-txt">
+        BAPI: BAPI_SALESORDER_CREATEFROMDAT2<br>
+        Doc Type: ZOR · Plant: ${o.decision.plant.split(' — ')[0]}<br>
+        ${o.soItems.length} Schedule Line${o.soItems.length!==1?'s':''} → VBEP
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════
+function createSO() {
+  const btn = document.getElementById('btnCreate');
+  btn.textContent = '⏳ Creating in SAP S/4HANA...';
+  btn.style.background = 'var(--amber)';
+  btn.disabled = true;
+  setTimeout(() => {
+    const soNum = '450' + Math.floor(Math.random()*9000000+1000000);
+    btn.textContent = `✓ Created — SO ${soNum}`;
+    btn.style.background = 'var(--green)';
+    showToast(`Sales Order ${soNum} created in SAP S/4HANA`, 'green', '✓');
+    setTimeout(() => {
+      btn.textContent = '⚡ Create Sales Order in SAP';
+      btn.style.background = 'var(--blue)';
+      btn.disabled = false;
+    }, 3500);
+  }, 2200);
+}
+function saveDraft(e) {
+  const btn = e.target;
+  btn.textContent = '✓ Draft Saved';
+  showToast('Draft saved to queue', 'blue', '💾');
+  setTimeout(() => btn.textContent = '💾 Save Draft', 2000);
+}
+function routeExc() {
+  showToast('Routed to Exception Queue. CSR team notified.', 'amber', '⚠');
+}
+
+// ═══════════════════════════════════
+// INIT
+// ═══════════════════════════════════
+renderQueue();
+setTimeout(() => selectOrder('ORD-001'), 80);
+</script>
+</body>
+</html>
